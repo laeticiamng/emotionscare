@@ -223,7 +223,7 @@ export const JournalTemplates = memo<JournalTemplatesProps>(({ onUseTemplate, cl
     setIsCreateOpen(false);
   };
   
-  const handleDeleteTemplate = (templateId: string) => {
+  const _handleDeleteTemplate = (templateId: string) => {
     setTemplates(prev => {
       const updated = prev.filter(t => t.id !== templateId);
       const customOnly = updated.filter(t => t.category === 'custom');

@@ -1,4 +1,4 @@
-import { subWeeks, format, startOfWeek, endOfWeek } from 'date-fns';
+import { subWeeks, format, startOfWeek } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';

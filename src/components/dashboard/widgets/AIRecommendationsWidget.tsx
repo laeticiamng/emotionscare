@@ -132,7 +132,7 @@ const AIRecommendationsWidget: React.FC<AIRecommendationsWidgetProps> = ({
         const hour = new Date().getHours();
         const currentMood = moodResult.data?.mood?.toLowerCase() || '';
         const energyLevel = moodResult.data?.energy_level || 5;
-        const recentCategories = (activityResult.data || []).map((a: any) => a.activity?.category).filter(Boolean);
+        const _recentCategories = (activityResult.data || []).map((a: any) => a.activity?.category).filter(Boolean);
         const streak = streakResult.data?.current_streak || 0;
 
         // Build context-aware recommendations

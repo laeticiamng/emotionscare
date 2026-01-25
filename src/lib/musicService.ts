@@ -1,4 +1,3 @@
-import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
 // Re-export everything from the service modules
@@ -42,7 +41,7 @@ export const getAudioSessions = async () => {
 };
 
 // Pour les recommandations basées sur les émotions
-export const getRecommendedTracks = async (emotion: string) => {
+export const getRecommendedTracks = async (_emotion: string) => {
   try {
     // This would typically come from an API
     // For now we'll just return mock data

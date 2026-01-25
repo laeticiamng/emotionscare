@@ -527,7 +527,7 @@ interface MetricChartProps {
   };
 }
 
-const MetricChart: React.FC<MetricChartProps> = ({ metric, currentValue, trend }) => {
+const MetricChart: React.FC<MetricChartProps> = ({ metric: _metric, currentValue, trend }) => {
   const [historicalData, setHistoricalData] = useState<number[]>([]);
 
   useEffect(() => {

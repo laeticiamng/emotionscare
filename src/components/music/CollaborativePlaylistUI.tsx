@@ -89,12 +89,12 @@ export const CollaborativePlaylistUI: React.FC<CollaborativePlaylistUIProps> = (
       .on('presence', { event: 'sync' }, () => {
         setIsRealtimeConnected(true);
       })
-      .on('presence', { event: 'join' }, ({ key, newPresences }) => {
+      .on('presence', { event: 'join' }, ({ key: _key, newPresences }) => {
         const activity = `${newPresences[0]?.user_name || 'Quelqu\'un'} a rejoint`;
         setRealtimeActivity(prev => [...prev.slice(-4), activity]);
         toast({ title: '👤 Nouveau collaborateur', description: activity, duration: 2000 });
       })
-      .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+      .on('presence', { event: 'leave' }, ({ key: _key, leftPresences }) => {
         const activity = `${leftPresences[0]?.user_name || 'Quelqu\'un'} est parti`;
         setRealtimeActivity(prev => [...prev.slice(-4), activity]);
       })

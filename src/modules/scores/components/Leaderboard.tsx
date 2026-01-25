@@ -1,11 +1,11 @@
 /**
  * Leaderboard - Classement communautaire
  */
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Medal, Crown, User, Flame, Star, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -75,7 +75,7 @@ export default function Leaderboard() {
   });
 
   const currentUserRank = leaderboard.findIndex(e => e.user_id === user?.id) + 1;
-  const currentUserEntry = leaderboard.find(e => e.user_id === user?.id);
+  const _currentUserEntry = leaderboard.find(e => e.user_id === user?.id);
 
   const getRankIcon = (rank: number) => {
     if (rank === 1) return <Crown className="h-5 w-5 text-amber-500" />;

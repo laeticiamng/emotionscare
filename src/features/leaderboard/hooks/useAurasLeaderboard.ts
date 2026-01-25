@@ -103,7 +103,7 @@ export const useAurasLeaderboard = (): UseAurasLeaderboardResult => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   
   // Connexion au système d'interconnexion pour les insights cross-modules
-  const { insights } = useModuleInterconnect({ autoFetch: true });
+  const {  } = useModuleInterconnect({ autoFetch: true });
 
   const fetchAuras = useCallback(async () => {
     try {

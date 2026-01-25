@@ -90,7 +90,7 @@ export const GalaxyExplorationMap: React.FC<GalaxyExplorationMapProps> = ({
                 <svg className="absolute inset-0 w-full h-full pointer-events-none">
                   {constellation.unlocked && constellation.stars.length > 1 && (
                     <motion.path
-                      d={`M ${constellation.stars.map((s, i) => 
+                      d={`M ${constellation.stars.map((s, _i) => 
                         `${s.x}% ${s.y}%`
                       ).join(' L ')}`}
                       stroke={constellation.color}

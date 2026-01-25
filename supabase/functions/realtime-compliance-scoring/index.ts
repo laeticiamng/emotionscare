@@ -141,7 +141,7 @@ Analyse l'impact de cet événement sur la conformité RGPD et détermine:
     const analysis = JSON.parse(toolCall.function.arguments);
 
     // Sauvegarder le nouveau score
-    const { data: newScoreRecord } = await supabase
+    await supabase
       .from('compliance_scores')
       .insert({
         user_id: user.id,

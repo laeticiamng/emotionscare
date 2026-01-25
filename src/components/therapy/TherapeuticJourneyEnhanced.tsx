@@ -182,7 +182,7 @@ export const TherapeuticJourneyEnhanced: React.FC = () => {
     if (!currentSession) return;
 
     try {
-      const { data, error } = await supabase.functions.invoke('therapeutic-journey', {
+      const { error } = await supabase.functions.invoke('therapeutic-journey', {
         body: {
           action: 'complete',
           sessionId: currentSession.id,

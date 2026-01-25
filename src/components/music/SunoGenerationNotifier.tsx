@@ -6,8 +6,7 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useSunoCallback } from '@/hooks/useSunoCallback';
-import { Music, Loader2, CheckCircle, XCircle, Clock } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Music, Loader2, CheckCircle, XCircle } from 'lucide-react';
 
 interface SunoGenerationNotifierProps {
   taskId: string | null;
@@ -25,7 +24,7 @@ const SunoGenerationNotifier: React.FC<SunoGenerationNotifierProps> = ({
   const [toastId, setToastId] = useState<string | number | null>(null);
   const [status, setStatus] = useState<'idle' | 'generating' | 'complete' | 'error'>('idle');
 
-  const { latestCallback, isWaiting, elapsedTime, signedUrl } = useSunoCallback({
+  const { isWaiting, elapsedTime, signedUrl } = useSunoCallback({
     taskId,
     onComplete: (callback) => {
       setStatus('complete');

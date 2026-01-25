@@ -108,7 +108,7 @@ async function uploadToSupabase(filepath: string, filename: string, metadata: an
     const storagePath = `public/${filename}`;
     
     // Upload le fichier - node-fetch buffer est compatible
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('music-tracks')
       .upload(storagePath, fileBuffer as any, {
         contentType: 'audio/mpeg',

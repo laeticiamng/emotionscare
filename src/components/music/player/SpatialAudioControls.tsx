@@ -35,8 +35,8 @@ const SpatialAudioControls: React.FC<SpatialAudioControlsProps> = ({ className, 
   const convolverRef = useRef<ConvolverNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
   const bassFilterRef = useRef<BiquadFilterNode | null>(null);
-  const stereoSplitterRef = useRef<ChannelSplitterNode | null>(null);
-  const stereoMergerRef = useRef<ChannelMergerNode | null>(null);
+  const _stereoSplitterRef = useRef<ChannelSplitterNode | null>(null);
+  const _stereoMergerRef = useRef<ChannelMergerNode | null>(null);
 
   const headphoneModes = [
     { id: 'studio', name: 'Studio', description: 'Son neutre et précis', reverbMix: 0.1 },

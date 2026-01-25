@@ -73,7 +73,7 @@ const TEST_ACCOUNTS: TestAccount[] = [
 ];
 
 const TestAccountsPage: React.FC = () => {
-  const { signUp } = useAuth();
+  const {  } = useAuth();
   const [createdAccounts, setCreatedAccounts] = useState<Set<string>>(new Set());
   const [creatingAccount, setCreatingAccount] = useState<string | null>(null);
   const [copiedPassword, setCopiedPassword] = useState<string | null>(null);

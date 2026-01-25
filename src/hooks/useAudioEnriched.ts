@@ -182,10 +182,10 @@ const EQUALIZER_PRESETS: EqualizerPreset[] = [
 
 const useAudioEnriched = (src?: string, title?: string) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const gainNodeRef = useRef<GainNode | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const equalizerNodesRef = useRef<BiquadFilterNode[]>([]);
+  const _audioContextRef = useRef<AudioContext | null>(null);
+  const _gainNodeRef = useRef<GainNode | null>(null);
+  const _analyserRef = useRef<AnalyserNode | null>(null);
+  const _equalizerNodesRef = useRef<BiquadFilterNode[]>([]);
   const sessionStartRef = useRef<number>(0);
 
   const [state, setState] = useState<AudioState>({

@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Mail, Shield, BookOpen, Users, Accessibility, Twitter, Linkedin, Instagram, Youtube, ExternalLink } from 'lucide-react';
+import { Heart, Mail, Shield, BookOpen, Accessibility, Twitter, Linkedin, Instagram, Youtube } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const Footer: React.FC = () => {

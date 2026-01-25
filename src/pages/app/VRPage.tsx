@@ -3,7 +3,7 @@
  * Unifie l'accès à VR Galaxy, VR Breath, historique et paramètres
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { 

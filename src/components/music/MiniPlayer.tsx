@@ -6,7 +6,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence, PanInfo, useDragControls } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import {
   Play,

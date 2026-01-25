@@ -25,7 +25,7 @@ import {
   Smartphone, Database, CheckCircle2, Info, HardDrive, Zap, TestTube2,
   Lock, Sparkles, User, BellRing
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { useToast } from "@/hooks/use-toast";
 import { useAccessibility } from "@/hooks/useAccessibility";

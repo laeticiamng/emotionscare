@@ -24,7 +24,7 @@ export function useBreathingVRMachine() {
   const phaseStartTimeRef = useRef<number>(0);
   const sessionStartTimeRef = useRef<number>(0);
 
-  const getCurrentPhaseDuration = useCallback((): number => {
+  const _getCurrentPhaseDuration = useCallback((): number => {
     if (!state.config) return 0;
     const phase = state.currentPhase;
     return (state.config[phase] || 0) * 1000;

@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, StopCircle, Moon, Zap, Brain, Heart, Wind, Target, Sparkles } from 'lucide-react';
+import { ArrowRight, StopCircle, Moon, Zap, Heart, Wind, Target, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 

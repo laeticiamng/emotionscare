@@ -260,7 +260,7 @@ export async function compareFriendStats(
 /**
  * Récupérer les playlists partagées
  */
-export async function getSharedPlaylists(userId: string): Promise<SharedPlaylist[]> {
+export async function getSharedPlaylists(_userId: string): Promise<SharedPlaylist[]> {
   try {
     const { data, error } = await supabase
       .from('shared_playlists')

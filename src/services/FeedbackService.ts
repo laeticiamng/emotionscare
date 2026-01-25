@@ -133,7 +133,7 @@ export class FeedbackService {
       return acc;
     }, {} as Record<string, { count: number; feedbacks: FeedbackEntry[] }>);
 
-    Object.entries(requestsByFeature).forEach(([feature, data]) => {
+    Object.entries(requestsByFeature).forEach(([_feature, data]) => {
       if (data.count >= 2) {
         suggestions.push({
           id: uuidv4(),

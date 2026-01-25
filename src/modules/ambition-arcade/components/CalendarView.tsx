@@ -221,7 +221,7 @@ export const CalendarView: React.FC = () => {
           ))}
 
           {/* Days */}
-          {calendarDays.map((day, index) => {
+          {calendarDays.map((day, _index) => {
             const key = format(day, 'yyyy-MM-dd');
             const activity = activityMap.get(key);
             const isCurrentMonth = isSameMonth(day, currentMonth);

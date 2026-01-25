@@ -73,7 +73,7 @@ const formatTime = (seconds: number): string => {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
-const formatTimeVerbose = (seconds: number): string => {
+const _formatTimeVerbose = (seconds: number): string => {
   if (isNaN(seconds) || !isFinite(seconds)) return '0 min';
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);

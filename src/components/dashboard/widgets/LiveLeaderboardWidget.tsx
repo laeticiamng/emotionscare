@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Trophy, Medal, Crown, TrendingUp, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { useGlobalLeaderboard, type LeaderboardEntry } from '@/hooks/useGlobalLeaderboard';
+import { useGlobalLeaderboard } from '@/hooks/useGlobalLeaderboard';
 import { cn } from '@/lib/utils';
 
 interface LiveLeaderboardWidgetProps {

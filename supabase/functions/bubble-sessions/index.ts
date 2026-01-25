@@ -2,7 +2,6 @@ import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { z } from '../_shared/zod.ts';
 import { supabase } from '../_shared/supa_client.ts';
 import { json } from '../_shared/http.ts';
-import { authorizeRole } from '../_shared/auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

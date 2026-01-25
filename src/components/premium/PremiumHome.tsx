@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Shield, Lock } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 const PremiumHome: React.FC = () => {
   const { isAuthenticated, user } = useAuth();

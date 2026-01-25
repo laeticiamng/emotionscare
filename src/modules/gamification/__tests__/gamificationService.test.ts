@@ -10,7 +10,7 @@ import { gamificationService } from '../gamificationService';
 // MOCKS
 // ============================================================================
 
-const mockSupabaseResponse = <T>(data: T, error: Error | null = null) => ({
+const _mockSupabaseResponse = <T>(data: T, error: Error | null = null) => ({
   data,
   error,
 });

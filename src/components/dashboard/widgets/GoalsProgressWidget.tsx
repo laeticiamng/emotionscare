@@ -1,7 +1,7 @@
 /**
  * Widget de progression des objectifs personnels avec création inline
  */
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

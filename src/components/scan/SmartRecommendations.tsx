@@ -234,7 +234,7 @@ export const SmartRecommendations: React.FC = () => {
   const [isActivating, setIsActivating] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { activateMusicForEmotion, isGenerating } = useMusicEmotionIntegration();
+  const { activateMusicForEmotion } = useMusicEmotionIntegration();
 
   // Action handler pour les recommandations
   const handleRecommendationAction = useCallback(async (rec: Recommendation) => {

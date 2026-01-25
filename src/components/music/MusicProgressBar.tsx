@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useRef, useMemo } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +14,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { Repeat, Bookmark, Star, Settings2, Trash2 } from 'lucide-react';
+import { Repeat, Bookmark, Star, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMusicSettings } from '@/hooks/music/useMusicSettings';
 
@@ -191,7 +191,7 @@ export const MusicProgressBar: React.FC<ProgressBarProps> = ({
     }
   };
 
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const _progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const bufferedProgress = duration > 0 ? (buffered / duration) * 100 : 0;
   const loopStartPercent = loop && duration > 0 ? (loop.start / duration) * 100 : 0;
   const loopEndPercent = loop && duration > 0 ? (loop.end / duration) * 100 : 0;

@@ -2,7 +2,7 @@
  * Statistiques utilisateur pour le module AR Filters
  */
 
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, Clock, Award, TrendingUp, Image, Star, Lightbulb } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

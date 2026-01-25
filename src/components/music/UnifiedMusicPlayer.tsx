@@ -46,7 +46,7 @@ import {
 } from '@/utils/music-a11y';
 
 // Lazy load additional components
-const TrackLyrics = lazy(() => import('@/components/music/TrackLyrics'));
+const _TrackLyrics = lazy(() => import('@/components/music/TrackLyrics'));
 const RealTimeLyricsPanel = lazy(() => import('@/components/music/RealTimeLyricsPanel'));
 const TrackExtendButton = lazy(() => import('@/components/music/TrackExtendButton'));
 const TrackFeedback = lazy(() => import('@/components/music/TrackFeedback'));

@@ -61,7 +61,7 @@ export default function EmotionScanEnhanced() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const { stream, startMedia, stopMedia, isActive, error: cameraError } = useUserMedia();
+  const { stream, startMedia, stopMedia, isActive } = useUserMedia();
   const { toast } = useToast();
   
   // Aliases for compatibility
@@ -218,7 +218,7 @@ export default function EmotionScanEnhanced() {
     return '😐';
   };
 
-  const getEmotionColor = (emotion: string, value: number) => {
+  const getEmotionColor = (_emotion: string, value: number) => {
     const intensity = Math.round(value * 100);
     if (intensity > 70) return 'bg-green-500/20 text-green-700 border-green-500/30';
     if (intensity > 40) return 'bg-yellow-500/20 text-yellow-700 border-yellow-500/30';

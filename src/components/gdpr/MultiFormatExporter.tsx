@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Download, FileText, Table, Image, FileJson, FileSpreadsheet, Shield, MessageSquare, Activity, TrendingUp, GraduationCap } from 'lucide-react';
+import { Download, FileText, FileJson, FileSpreadsheet } from 'lucide-react';
 import { useMultiFormatExport } from '@/hooks/useMultiFormatExport';
 import { useState } from 'react';
 import { ReportSignature } from './ReportSignature';

@@ -3,7 +3,7 @@
  * Connecté à Supabase avec persistence réelle
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -31,7 +31,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useMusic } from '@/hooks/useMusic';
-import type { MusicTrack } from '@/types/music';
+import type {} from '@/types/music';
 
 interface Collaborator {
   id: string;
@@ -93,7 +93,7 @@ export const CollaborativePlaylistSection: React.FC = () => {
 
       try {
         // Charger depuis Supabase user_settings
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('user_settings')
           .select('value')
           .eq('user_id', user.id)

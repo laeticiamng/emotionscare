@@ -186,7 +186,7 @@ export function useVRNebulaMachine() {
         if (timerRef.current) clearInterval(timerRef.current);
         if (breathTimerRef.current) clearTimeout(breathTimerRef.current);
 
-        const cycleDuration = calculateCycleDuration(
+        const _cycleDuration = calculateCycleDuration(
           getBreathTiming(state.session.breathing_pattern),
         );
         const respRate = state.breathCount > 0 

@@ -128,7 +128,7 @@ export async function recordAndTranscribe(
 
     mediaRecorder.start(1000);
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
       const stopAndTranscribe = async () => {
         return new Promise<string>((resolveStop) => {
           mediaRecorder.addEventListener('stop', async () => {

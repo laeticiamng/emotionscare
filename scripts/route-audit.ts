@@ -105,7 +105,7 @@ function detectDuplicatePaths(): string[] {
       pathCounts.set(alias.from, (pathCounts.get(alias.from) || 0) + 1);
     }
   } else if (ROUTE_ALIASES && typeof ROUTE_ALIASES === 'object') {
-    Object.entries(ROUTE_ALIASES).forEach(([from, to]) => {
+    Object.entries(ROUTE_ALIASES).forEach(([from, _to]) => {
       pathCounts.set(from, (pathCounts.get(from) || 0) + 1);
     });
   }

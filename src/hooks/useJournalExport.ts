@@ -111,7 +111,7 @@ function generateHtmlContent(notes: SanitizedNote[], includeMetadata = true): st
   <hr>
 `;
 
-  notes.forEach((note, index) => {
+  notes.forEach((note, _index) => {
     const date = new Date(note.created_at).toLocaleDateString('fr-FR', {
       day: 'numeric',
       month: 'long',

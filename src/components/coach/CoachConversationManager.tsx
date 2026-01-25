@@ -111,7 +111,7 @@ export const CoachConversationManager = () => {
     setDeleteId(null);
   };
 
-  const handleRename = (id: string, newTitle: string) => {
+  const _handleRename = (id: string, newTitle: string) => {
     setConversations(
       conversations.map((conv) =>
         conv.id === id ? { ...conv, title: newTitle } : conv

@@ -2,7 +2,6 @@
  * Prediction Risks and Opportunities Component
  */
 
-import React from 'react';
 import {
   AlertTriangle,
   TrendingUp,

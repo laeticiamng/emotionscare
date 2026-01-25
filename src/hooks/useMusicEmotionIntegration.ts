@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
 export const useMusicEmotionIntegration = () => {
-  const { state, generateMusicForEmotion, setPlaylist, play, getEmotionMusicDescription } = useMusic();
+  const { state, generateMusicForEmotion, setPlaylist, play: _play, getEmotionMusicDescription: _getEmotionMusicDescription } = useMusic();
   const { updateSoundscapeForEmotion } = useSoundscape();
 
   // Activation de la musique basée sur l'émotion

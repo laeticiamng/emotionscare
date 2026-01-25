@@ -17,13 +17,10 @@ import {
   Heart,
   Shield
 } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RechartsTooltipProps } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Algorithmes de Machine Learning simplifiés
 class EmotionalPredictionML {
-  private historicalData: EmotionalDataPoint[] = [];
-  private seasonalPatterns: SeasonalPattern[] = [];
-  private personalityProfile: PersonalityProfile | null = null;
 
   // Régression polynomiale pour les tendances
   polynomialRegression(data: number[], degree: number = 2): number[] {
@@ -175,7 +172,7 @@ class EmotionalPredictionML {
     const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
     const std = Math.sqrt(scores.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / scores.length);
     
-    data.forEach((point, index) => {
+    data.forEach((point) => {
       const zScore = Math.abs((point.overallScore - mean) / std);
       
       if (zScore > 2) { // Seuil de 2 écarts-types

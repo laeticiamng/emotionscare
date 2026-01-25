@@ -49,7 +49,7 @@ const disableDevTools = (): void => {
   }
 };
 
-const applySecurityHeaders = (): void => {
+const _applySecurityHeaders = (): void => {
   if (typeof document === 'undefined') {
     return;
   }

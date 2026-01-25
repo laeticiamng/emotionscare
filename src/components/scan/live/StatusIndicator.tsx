@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertCircle, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 
 export interface StatusIndicatorProps {
   isListening: boolean;

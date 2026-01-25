@@ -65,7 +65,7 @@ serve(async (req: Request) => {
     }
 
     // Test 3: Vérifier les secrets exposés dans le code
-    const { data: functions } = await supabase.storage.from('functions').list();
+    await supabase.storage.from('functions').list();
     let exposedSecrets = false;
     // Simulation - dans la vraie vie, on scannerait les fichiers
     if (Math.random() > 0.7) {

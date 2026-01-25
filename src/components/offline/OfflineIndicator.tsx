@@ -2,7 +2,7 @@
  * Offline Indicator - Affiche le statut de connexion
  */
 
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { AlertCircle, Wifi, WifiOff, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { useOffline } from '@/contexts/OfflineContext';
 import { cn } from '@/lib/utils';
@@ -17,7 +17,7 @@ export function OfflineIndicator() {
   }
 
   const isPending = queueStats.pending > 0;
-  const isFailed = queueStats.failed > 0;
+  const _isFailed = queueStats.failed > 0;
 
   return (
     <div className="fixed bottom-4 left-4 z-50">

@@ -3,8 +3,7 @@
  */
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Gem, Crown, Star, Sparkles } from 'lucide-react';
 import { useAmbitionArtifacts } from '../hooks/useAmbitionExtras';

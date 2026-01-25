@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { Target, Calendar, TrendingUp, Award, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Target, TrendingUp, Award, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';

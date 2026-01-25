@@ -7,8 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { X, Play, Pause, CheckCircle, RotateCcw } from 'lucide-react';
-import type { SeuilActionType } from '../types';
+import { X, Play, Pause, CheckCircle } from 'lucide-react';
+import type {} from '../types';
 
 interface SeuilMiniSessionProps {
   actionType: '3min' | '5min_guided';

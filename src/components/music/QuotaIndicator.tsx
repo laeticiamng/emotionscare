@@ -13,7 +13,7 @@
  * @module components/music/QuotaIndicator
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 import { useQuotaUI } from '@/hooks/music/useUserQuota';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -542,7 +542,7 @@ export function QuotaBadge({ className = '' }: { className?: string }) {
  * Composant d'avertissement quand quota insuffisant
  */
 export function QuotaWarning({ className = '' }: { className?: string }) {
-  const { remaining, canGenerate, formattedResetDate, tier } = useQuotaUI();
+  const { canGenerate, formattedResetDate, tier } = useQuotaUI();
 
   if (canGenerate) {
     return null;

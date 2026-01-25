@@ -21,7 +21,7 @@ interface AdminSidebarProps {
   currentPath: string;
 }
 
-const AdminSidebar: React.FC<AdminSidebarProps> = ({ currentPath }) => {
+const AdminSidebar: React.FC<AdminSidebarProps> = ({ currentPath: _currentPath }) => {
   const location = useLocation();
 
   const navigationItems = [

@@ -77,7 +77,7 @@ const TestPage: React.FC = () => {
     }
   ];
 
-  const getStatusColor = (status: string) => {
+  const _getStatusColor = (status: string) => {
     switch (status) {
       case 'success': return 'text-green-500';
       case 'warning': return 'text-yellow-500';

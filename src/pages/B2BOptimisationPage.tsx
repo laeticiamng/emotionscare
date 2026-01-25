@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, {} from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TrendingUp, Target, Zap, Brain, AlertTriangle, CheckCircle, BarChart3, Settings, Users } from 'lucide-react';
+import { Target, Zap, Brain, AlertTriangle, CheckCircle, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const B2BOptimisationPage: React.FC = () => {
@@ -88,7 +88,7 @@ const B2BOptimisationPage: React.FC = () => {
     }
   ];
 
-  const implementRecommendation = (id: number) => {
+  const implementRecommendation = (_id: number) => {
     toast({
       title: "Optimisation planifiée",
       description: "L'équipe RH va mettre en place cette recommandation.",

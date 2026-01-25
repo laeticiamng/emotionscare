@@ -6,8 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import type { SeuilEvent, SeuilZone } from '../types';
+import type { SeuilZone } from '../types';
 
 const ZONE_LABELS: Record<SeuilZone, string> = {
   low: 'Basse',

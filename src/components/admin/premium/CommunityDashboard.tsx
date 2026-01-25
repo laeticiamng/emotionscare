@@ -33,7 +33,7 @@ export const CommunityDashboard: React.FC<CommunityDashboardProps> = ({
   visualStyle,
   zenMode
 }) => {
-  const { admin } = useOpenAI();
+  const {  } = useOpenAI();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { analyzeCommunityTrends } = useCommunityRecommendations();

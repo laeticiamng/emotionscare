@@ -61,7 +61,7 @@ const initialState: ARState = {
 
 const useARStoreBase = create<ARStore>()(
   persist(
-    (set, get) => ({
+    (set, _get) => ({
       ...initialState,
       
       setActive: (active: boolean) => {

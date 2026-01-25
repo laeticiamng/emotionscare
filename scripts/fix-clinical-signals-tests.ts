@@ -28,7 +28,7 @@ const fixes: Array<{from: RegExp, to: string}> = [
 const lines = content.split('\n');
 const newLines: string[] = [];
 let inMockSignal = false;
-let signalIndent = '';
+let _signalIndent = '';
 
 for (let i = 0; i < lines.length; i++) {
   const line = lines[i];

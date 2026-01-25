@@ -2,7 +2,6 @@
  * Chatbot Message Bubble - Affichage d'un message
  */
 
-import React from 'react';
 import { SupportMessage } from '@/services/supportChatbotService';
 import { cn } from '@/lib/utils';
 

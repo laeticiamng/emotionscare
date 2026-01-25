@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
-import { Building2, Users, TrendingUp, FileText, Loader2, Download } from 'lucide-react';
+import { Building2, Users, TrendingUp, FileText, Loader2 } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
@@ -63,7 +63,7 @@ const B2BDashboard: React.FC<B2BDashboardProps> = ({ orgId }) => {
   const generateReport = async () => {
     try {
       setGenerating(true);
-      const { data, error } = await supabase.functions.invoke('b2b-management', {
+      const { error } = await supabase.functions.invoke('b2b-management', {
         body: { action: 'generateReport', orgId, period },
       });
 

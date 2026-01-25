@@ -8,7 +8,7 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useUserStatsQuery } from '@/hooks/useUserStatsQuery';
 import { useUserPreference } from '@/hooks/useSupabaseStorage';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Filter, Search, X, TrendingUp, Target, Award, ChevronDown, Star, Calendar, Sparkles, Trophy, Zap, BarChart3, Map, Clock, Heart, Share2, Download, Settings } from 'lucide-react';
+import { Filter, Search, X, TrendingUp, Target, Award, ChevronDown, Star, Calendar, Sparkles, Trophy, Zap, BarChart3, Map, Clock, Heart, Settings } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ParkAttraction } from '@/components/park/ParkAttraction';
 import type { Attraction } from '@/types/park';
@@ -119,10 +119,10 @@ export default function EmotionalPark() {
   const { syncAttractionVisit } = useParkModuleSymbiosis();
   
   // New hooks integration
-  const { notifications, unreadCount, notifyBadgeUnlock } = useParkRealtime();
+  const { notifyBadgeUnlock } = useParkRealtime();
   const { isFavorite, toggleFavorite, recordVisit } = useParkFavorites();
-  const { exportToJSON, isExporting } = useParkExport();
-  const { shareSummary, isSharing } = useParkSharing();
+  const { exportToJSON } = useParkExport();
+  const { shareSummary } = useParkSharing();
   const { achievements: parkAchievements, stats: achievementStats } = useParkAchievements();
 
   // Calculer le type de météo basé sur l'humeur

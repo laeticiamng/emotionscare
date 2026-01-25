@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -87,7 +87,7 @@ export default function CommunityHubEnhanced() {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('community-hub', {
+      const { error } = await supabase.functions.invoke('community-hub', {
         body: {
           action: 'create_post',
           content: newPost,

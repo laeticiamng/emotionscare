@@ -7,9 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
-import { User, Settings, Activity, Download, Loader2, Camera, Globe, Bell, Lock, Sparkles } from 'lucide-react';
+import { User, Settings, Activity, Download, Loader2, Lock, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { logger } from '@/lib/logger';
 
 const EnhancedProfileDashboard: React.FC = () => {
@@ -87,7 +87,7 @@ const EnhancedProfileDashboard: React.FC = () => {
   const handleUpdateProfile = async () => {
     try {
       setSaving(true);
-      const { data, error } = await supabase.functions.invoke('user-profile', {
+      const { error } = await supabase.functions.invoke('user-profile', {
         body: {
           action: 'updateProfile',
           profileData: formData,
@@ -117,7 +117,7 @@ const EnhancedProfileDashboard: React.FC = () => {
   const handleUpdatePreferences = async () => {
     try {
       setSaving(true);
-      const { data, error } = await supabase.functions.invoke('user-profile', {
+      const { error } = await supabase.functions.invoke('user-profile', {
         body: {
           action: 'updatePreferences',
           preferences,

@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fullApiService } from '@/services/api/fullApiService';
 import { logger } from '@/lib/logger';
 
 export interface ActivityLogFilters {
@@ -143,7 +142,7 @@ export const useUserActivityLogState = () => {
   const handleExport = useCallback(async () => {
     try {
       // Simple CSV export from current data
-      const data = activeTab === 'daily' ? filteredActivities : stats;
+      const _data = activeTab === 'daily' ? filteredActivities : stats;
       const csv = activeTab === 'daily'
         ? [
             'ID,Type,Catégorie,Compte,Date',

@@ -39,7 +39,7 @@ const EmotionAnalyticsDashboard: React.FC<EmotionAnalyticsDashboardProps> = ({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {trends.slice(0, 7).map((trend, index) => (
+          {trends.slice(0, 7).map((trend, _index) => (
             <div key={trend.date} className="flex items-center justify-between py-2">
               <span className="text-sm">{new Date(trend.date).toLocaleDateString()}</span>
               <div className="flex items-center gap-2">

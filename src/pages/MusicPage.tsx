@@ -2,7 +2,7 @@
  * Page principale du module Musicothérapie
  * Optimisée pour tous les appareils (mobile, tablette, desktop)
  */
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MusicProvider } from '@/contexts/MusicContext';
 import MusicPlayer from '@/components/music/MusicPlayer';
 import TrackList from '@/components/music/TrackList';

@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState, lazy, Suspense } from 'react';
-import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
 import { supabase } from '@/integrations/supabase/client';
 import { Link, useLocation } from 'react-router-dom';
@@ -116,7 +115,7 @@ const B2CScanPage: React.FC = () => {
     },
   ];
   
-  const currentMode = scanModes.find(m => m.path === location.pathname) || scanModes[0];
+  const _currentMode = scanModes.find(m => m.path === location.pathname) || scanModes[0];
 
   useEffect(() => {
     logger.info('scan:open', undefined, 'SCAN');

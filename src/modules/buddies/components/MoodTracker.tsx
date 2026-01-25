@@ -9,7 +9,7 @@ import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { motion } from 'framer-motion';
-import { Smile, Frown, Meh, Heart, Zap, Brain } from 'lucide-react';
+import { Smile, Heart, Zap, Brain } from 'lucide-react';
 
 interface MoodTrackerProps {
   type: 'before' | 'after';

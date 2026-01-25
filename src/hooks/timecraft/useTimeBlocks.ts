@@ -101,7 +101,7 @@ export function useTimeBlocks(versionId?: string) {
         description: 'Votre bloc temporel a été ajouté',
       });
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast({
         title: 'Erreur',
         description: 'Impossible de créer le bloc',

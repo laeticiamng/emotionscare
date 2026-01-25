@@ -5,7 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { motion } from 'framer-motion';
-import { Timer, Pause, Play, Square, ArrowLeft } from 'lucide-react';
+import { Pause, Play, Square, ArrowLeft } from 'lucide-react';
 
 interface GritChallenge {
   id: string;

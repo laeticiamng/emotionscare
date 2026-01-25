@@ -111,7 +111,7 @@ export class VoiceUtils {
   /**
    * Web Speech Synthesis fallback
    */
-  private static useWebSpeechSynthesis(text: string, voiceName?: string): void {
+  private static useWebSpeechSynthesis(text: string, _voiceName?: string): void {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'fr-FR';
     utterance.rate = 0.9;

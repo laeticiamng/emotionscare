@@ -125,7 +125,7 @@ serve(async (req) => {
 
     // Action: transition - Transition émotionnelle
     if (action === 'transition') {
-      const { current_emotion, target_emotion, intensity } = body;
+      const { current_emotion, target_emotion } = body;
       
       // Trouver des tracks pour la transition
       const currentTracks = MUSIC_LIBRARY.filter(t => 
@@ -154,7 +154,7 @@ serve(async (req) => {
 
     // Action: adapt-session - Adapter une session de musicothérapie
     if (action === 'adapt-session') {
-      const { sessionId, userId, emotionalJourney, analysis } = body;
+      const { analysis } = body;
       
       // Analyser le parcours émotionnel
       const dominantEmotion = analysis?.currentEmotion || 'calm';
@@ -179,7 +179,7 @@ serve(async (req) => {
 
     // Action: generate-report - Générer un rapport de session
     if (action === 'generate-report') {
-      const { sessionId, feedback } = body;
+      const { sessionId } = body;
       
       return new Response(JSON.stringify({
         success: true,

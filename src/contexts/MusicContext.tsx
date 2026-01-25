@@ -221,7 +221,7 @@ export { MusicContext };
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(musicReducer, initialState);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const timeUpdateIntervalRef = useRef<number>();
+  const _timeUpdateIntervalRef = useRef<number>();
   const crossfadeFrameRef = useRef<number>();
   const isPlayingRef = useRef(initialState.isPlaying);
 

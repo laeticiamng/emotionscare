@@ -3,7 +3,7 @@
  * @module discovery
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Compass, 
@@ -16,8 +16,6 @@ import {
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
 
 import { useDiscovery } from '../hooks/useDiscovery';
 import { DiscoveryCard } from '../components/DiscoveryCard';
@@ -55,7 +53,7 @@ export function DiscoveryPage() {
     // Filtrer les items du parcours sélectionné
     const path = paths.find(p => p.id === pathId);
     if (path) {
-      const pathItemIds = path.items.map(i => i.id);
+      const _pathItemIds = path.items.map(i => i.id);
       // On pourrait appliquer un filtre spécifique ici
       setActiveTab('explore');
     }

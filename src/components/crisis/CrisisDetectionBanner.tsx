@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { AlertTriangle, Phone, X, Heart, ExternalLink, MessageCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { AlertTriangle, Phone, X, Heart, ExternalLink } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';

@@ -4,7 +4,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, Brain, Music, Camera, MessageCircle, Star } from 'lucide-react';
+import { Heart, Brain, Music, MessageCircle, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 // Constant array to avoid re-creating on each render

@@ -218,7 +218,7 @@ const B2CProfileSettingsPage: React.FC = () => {
   }
 
   const completionPercentage = getProfileCompletionPercentage(profile);
-  const memberSinceMonths = profile.created_at 
+  const _memberSinceMonths = profile.created_at 
     ? differenceInMonths(new Date(), new Date(profile.created_at))
     : 0;
   const memberSinceText = profile.created_at

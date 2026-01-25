@@ -2,7 +2,7 @@
  * Contrôles de session AR avec démarrage/arrêt et feedback
  */
 
-import React, { memo, useState } from 'react';
+import { memo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Square, ThumbsUp, ThumbsDown, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';

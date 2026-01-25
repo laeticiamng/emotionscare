@@ -4,8 +4,8 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Star, RotateCcw, BarChart2, MessageCircle, Share2, Copy, Check } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Trophy, Star, RotateCcw, BarChart2, MessageCircle, Share2, Check } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';

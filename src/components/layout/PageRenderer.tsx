@@ -14,7 +14,7 @@ interface PageRendererProps {
 const PageRenderer: React.FC<PageRendererProps> = ({ children }) => {
   const location = useLocation();
   const { isAuthenticated, user } = useAuth();
-  const { userMode } = useUserMode();
+  const {  } = useUserMode();
 
   // Composant de fallback pour les erreurs de rendu
   const ErrorFallback = ({ error }: { error?: Error }) => (

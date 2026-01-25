@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, X, Filter, SlidersHorizontal } from 'lucide-react';
+import { Search, X, Filter } from 'lucide-react';
 import type { GroupSessionFilters, GroupSessionCategory } from '../types';
 import { cn } from '@/lib/utils';
 

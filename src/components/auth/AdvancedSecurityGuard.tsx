@@ -290,7 +290,7 @@ const AdvancedSecurityGuard: React.FC<AdvancedSecurityGuardProps> = ({
     }
 
     // Vérifier les permissions requises
-    const checkPermission = (permission: string): boolean => {
+    const checkPermission = (_permission: string): boolean => {
       // Implémentation simple - à adapter selon votre système de permissions
       return true; // Pour l'instant, on considère que toutes les permissions sont accordées
     };

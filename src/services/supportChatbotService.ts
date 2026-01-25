@@ -572,7 +572,7 @@ Be empathetic when discussing emotions or well-being.`;
     try {
       const ticketNumber = `TICK-${Date.now().toString(36).toUpperCase()}`;
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('support_tickets')
         .insert({
           conversation_id: conversationId,

@@ -2,7 +2,6 @@
  * VR Settings Modal - Paramètres utilisateur VR
  */
 
-import React from 'react';
 import {
   Dialog,
   DialogContent,

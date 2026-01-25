@@ -58,7 +58,7 @@ export const createGroup = async (groupData: Partial<Group>): Promise<Group> => 
 };
 
 // Get recommended tags based on content
-export const getRecommendedTags = async (content?: string): Promise<string[]> => {
+export const getRecommendedTags = async (_content?: string): Promise<string[]> => {
   // In a real app, this would analyze the content and return relevant tags
   const commonTags = [
     'motivation', 'wellness', 'meditation', 'mindfulness', 'selfcare',
@@ -76,7 +76,7 @@ export const getPosts = async (): Promise<Post[]> => {
   return [];
 };
 
-export const fetchUserById = async (id: string): Promise<User | null> => {
+export const fetchUserById = async (_id: string): Promise<User | null> => {
   return null;
 };
 

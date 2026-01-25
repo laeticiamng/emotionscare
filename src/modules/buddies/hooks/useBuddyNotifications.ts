@@ -109,7 +109,7 @@ export function useBuddyNotifications() {
           table: 'buddy_requests',
           filter: `to_user_id=eq.${user.id}`
         },
-        (payload) => {
+        (_payload) => {
           toast.info('Nouvelle demande de buddy ! 💝');
           loadNotifications();
         }
@@ -122,7 +122,7 @@ export function useBuddyNotifications() {
           table: 'buddy_messages',
           filter: `receiver_id=eq.${user.id}`
         },
-        (payload) => {
+        (_payload) => {
           toast.info('Nouveau message de votre buddy ! 💬');
           loadNotifications();
         }

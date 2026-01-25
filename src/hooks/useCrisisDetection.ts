@@ -3,7 +3,7 @@
  * Analyse multi-source: journal, mood, comportement, conversations
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
@@ -73,7 +73,7 @@ export function useCrisisDetection() {
     const indicators: CrisisIndicator[] = [];
     const lower = text.toLowerCase();
 
-    for (const [level, config] of Object.entries(CRISIS_KEYWORDS)) {
+    for (const [_level, config] of Object.entries(CRISIS_KEYWORDS)) {
       for (const word of config.words) {
         if (lower.includes(word)) {
           indicators.push({

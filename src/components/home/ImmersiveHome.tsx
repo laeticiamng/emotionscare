@@ -7,7 +7,6 @@ import { Heart, Building2, Sparkles, Users, Target, Lightbulb } from 'lucide-rea
 import WelcomeMessage from './WelcomeMessage';
 import ActionButtons from './ActionButtons';
 import AnimatedBackground from './AnimatedBackground';
-import { routes } from '@/routerV2';
 import '@/components/home/immersive-home.css';
 
 export const ImmersiveHome: React.FC = () => {

@@ -22,7 +22,7 @@ import {
   Filler
 } from 'chart.js';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
-import { TrendingUp, TrendingDown, Activity, Users, Calendar, Sparkles } from 'lucide-react';
+import { TrendingUp, TrendingDown, Users, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -189,7 +189,7 @@ export const AdvancedAnalyticsDashboard: React.FC = () => {
     datasets: [
       {
         label: 'Vos points',
-        data: [...analyticsData.userPoints, ...analyticsData.predictions.map((_, i) => i === 0 ? analyticsData.userPoints[analyticsData.userPoints.length - 1] : null)].filter((v, i) => i < analyticsData.userPoints.length || analyticsData.predictions[i - analyticsData.userPoints.length] !== undefined),
+        data: [...analyticsData.userPoints, ...analyticsData.predictions.map((_, i) => i === 0 ? analyticsData.userPoints[analyticsData.userPoints.length - 1] : null)].filter((_, i) => i < analyticsData.userPoints.length || analyticsData.predictions[i - analyticsData.userPoints.length] !== undefined),
         borderColor: 'rgb(59, 130, 246)',
         backgroundColor: 'rgba(59, 130, 246, 0.1)',
         fill: true,

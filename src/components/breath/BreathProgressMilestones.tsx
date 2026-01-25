@@ -1,9 +1,9 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Flame, Target, Star, Share2, Download, TrendingUp, Award, Lock } from 'lucide-react';
+import { Trophy, Flame, Target, Star, Share2, Download, Award, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
@@ -27,7 +27,7 @@ interface BreathProgressMilestonesProps {
   weeklyMinutes: number;
 }
 
-const STORAGE_KEY = 'breath_milestones_data';
+const _STORAGE_KEY = 'breath_milestones_data';
 
 const rarityConfig = {
   common: { label: 'Commun', color: 'bg-slate-500', textColor: 'text-slate-300' },

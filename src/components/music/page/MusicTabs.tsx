@@ -1,6 +1,6 @@
 import React from 'react';
 import { TabsContent } from '@/components/ui/tabs';
-import { MusicPlaylist, MusicCategory } from '@/types/music';
+import { MusicPlaylist } from '@/types/music';
 import { ensureArray } from '@/utils/musicCompatibility';
 
 interface MusicTabsProps {

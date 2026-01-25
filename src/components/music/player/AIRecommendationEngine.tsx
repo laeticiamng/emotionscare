@@ -31,7 +31,7 @@ const AIRecommendationEngine: React.FC<AIRecommendationEngineProps> = ({ classNa
     timeContext: 'evening'
   });
   
-  const { state, play, setPlaylist } = useMusic();
+  const { state, play } = useMusic();
   const { toast } = useToast();
   const currentTrack = state.currentTrack;
 

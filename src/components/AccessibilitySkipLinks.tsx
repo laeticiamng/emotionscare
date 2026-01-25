@@ -36,7 +36,7 @@ const STORAGE_KEY = 'accessibility-skiplinks-settings';
 const STATS_KEY = 'accessibility-skiplinks-stats';
 
 const AccessibilitySkipLinks: React.FC = () => {
-  const { toast } = useToast();
+  const {  } = useToast();
   const [activeLinks, setActiveLinks] = useState<SkipLink[]>(defaultSkipLinks);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [showSettings, setShowSettings] = useState(false);

@@ -33,7 +33,7 @@ test.describe('Méditation - Flux de session complet', () => {
   });
 
   test('permet de sélectionner une durée', async ({ page }) => {
-    const durations = ['5', '10', '15', '20', '30'];
+    const _durations = ['5', '10', '15', '20', '30'];
     
     const durationSelector = page.locator('[data-testid*="duration"], button').filter({ hasText: /min|minutes/i });
     const count = await durationSelector.count();
@@ -183,8 +183,8 @@ test.describe('Méditation - Streaks & Statistiques', () => {
     const hasStats = await statsSection.isVisible({ timeout: 3000 }).catch(() => false);
     
     // Vérifier les métriques individuelles
-    const totalSessions = page.getByText(/sessions|séances/i);
-    const streak = page.getByText(/série|streak|jours/i);
+    const _totalSessions = page.getByText(/sessions|séances/i);
+    const _streak = page.getByText(/série|streak|jours/i);
     
     console.log(`[STATS] Stats section visible: ${hasStats}`);
   });

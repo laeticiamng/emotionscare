@@ -1,9 +1,9 @@
 /**
  * GoalsPanel - Objectifs personnalisés avec progression
  */
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Target, Plus, Check, Clock, Trash2, Trophy, Zap } from 'lucide-react';
+import { Target, Plus, Check, Clock, Trash2, Trophy } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';

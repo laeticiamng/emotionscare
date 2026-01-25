@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { InteractiveTutorial } from '@/components/monitoring/InteractiveTutorial';
@@ -34,7 +34,7 @@ const EscalationMonitoringDashboard: React.FC = () => {
   const chartsContainerRef = React.useRef<HTMLDivElement>(null);
 
   // Fetch active escalations
-  const { data: activeEscalations, refetch: refetchEscalations } = useQuery({
+  const { data: activeEscalations } = useQuery({
     queryKey: ['active-escalations'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -406,7 +406,7 @@ const EscalationMonitoringDashboard: React.FC = () => {
                   ))}
                   
                   {/* Data rows */}
-                  {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((day, dayIndex) => (
+                  {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((day, _dayIndex) => (
                     <React.Fragment key={day}>
                       <div className="text-xs pr-2 flex items-center text-muted-foreground">
                         {day}

@@ -100,7 +100,7 @@ export const JournalHeatmap = memo<JournalHeatmapProps>(({
     return result;
   }, [heatmapData]);
 
-  const months = useMemo(() => {
+  const _months = useMemo(() => {
     const result: string[] = [];
     let lastMonth = -1;
 

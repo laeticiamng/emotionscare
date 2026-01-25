@@ -172,7 +172,7 @@ export const musicDiscoveryService = {
 
       // Récupérer les moods écoutés
       const favoriteGenres = profile.favoriteGenres.slice(0, 3);
-      const favoriteMoods = profile.favoriteMoods.slice(0, 3);
+      const _favoriteMoods = profile.favoriteMoods.slice(0, 3);
 
       // Récupérer les tracks candidats
       let query = supabase.from('music_tracks').select('*');

@@ -36,7 +36,7 @@ const AudioPreview: React.FC<AudioPreviewProps> = ({
   const [duration] = useState(180); // 3 minutes
   const [isRepeat, setIsRepeat] = useState(false);
   const [isShuffle, setIsShuffle] = useState(false);
-  const progressRef = useRef<number>(0);
+  const _progressRef = useRef<number>(0);
 
   // Simulate progress
   useEffect(() => {

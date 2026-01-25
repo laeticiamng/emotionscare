@@ -54,7 +54,7 @@ export const usePush = () => {
   }, [setStorePermission]);
 
   // Register service worker
-  const registerServiceWorker = useCallback(async () => {
+  const _registerServiceWorker = useCallback(async () => {
     if (!('serviceWorker' in navigator)) return null;
 
     try {

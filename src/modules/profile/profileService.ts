@@ -211,7 +211,7 @@ class ProfileService {
 
       // Calculate XP and level
       const totalXp = (totalScans * 10) + (totalJournalEntries * 15) + (totalBreathingSessions * 20) + (totalBadges * 50);
-      const { level, currentXp, xpToNext } = calculateLevel(totalXp);
+      const { level, xpToNext } = calculateLevel(totalXp);
 
       const memberSinceDays = profileResult.data?.created_at 
         ? differenceInDays(new Date(), new Date(profileResult.data.created_at))

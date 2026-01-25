@@ -13,7 +13,6 @@ import { CalendarIcon, Download, FileText, Sheet, Database, Palette, Filter, Set
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { cn } from '@/lib/utils';
 import * as XLSX from 'xlsx';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -79,8 +78,6 @@ const AdvancedReportExporter: React.FC = () => {
     },
   });
 
-  const availableEmotions = ['Joie', 'Calme', 'Énergie', 'Stress', 'Anxiété', 'Concentration', 'Fatigue'];
-  const availableCategories = ['Travail', 'Personnel', 'Social', 'Santé', 'Loisirs'];
 
   const { user } = useAuth();
 
@@ -186,7 +183,7 @@ const AdvancedReportExporter: React.FC = () => {
     }
   });
 
-  const exportToPDF = async (data: any) => {
+  const exportToPDF = async (_data: any) => {
     // Simulation d'export PDF avec jsPDF
     const doc = {
       title: config.title,

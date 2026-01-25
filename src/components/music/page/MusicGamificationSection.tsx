@@ -17,7 +17,7 @@ const LoadingFallback = () => (
   </div>
 );
 
-const ErrorFallback = ({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) => (
+const ErrorFallback = ({ error: _error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) => (
   <div className="flex flex-col items-center justify-center p-8 text-center">
     <AlertTriangle className="h-8 w-8 text-destructive mb-2" />
     <p className="text-sm text-muted-foreground mb-3">Erreur de chargement</p>

@@ -87,7 +87,7 @@ const OptimizedFeaturesSection: React.FC = () => {
   }), [shouldReduceMotion]);
 
   // Optimized hover handler
-  const handleCardHover = useCallback((isHovering: boolean) => {
+  const handleCardHover = useCallback((_isHovering: boolean) => {
     if (shouldReduceMotion) return;
     // Minimal hover effects for performance
   }, [shouldReduceMotion]);

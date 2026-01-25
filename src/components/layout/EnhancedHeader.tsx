@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 import { Link, useLocation, NavLink, useNavigate } from 'react-router-dom';
 import { routes } from '@/routerV2';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   Home, Music, MessageCircle, Users, LayoutDashboard, Settings,
   Bell, Search, Command, User, Sun, Moon, Menu, X,
@@ -35,7 +35,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
   const { theme, setTheme } = useTheme();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const location = useLocation();
+  const _location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user, signOut } = useAuth();
 

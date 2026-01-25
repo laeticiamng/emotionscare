@@ -157,7 +157,7 @@ class HumeAIServiceEnriched {
           this.handleDisconnect();
         };
 
-        this.ws.onerror = (event) => {
+        this.ws.onerror = (_event) => {
           logger.error('Hume AI WebSocket error', new Error('WebSocket error'), 'HUME');
           this.onError?.(new Error('WebSocket connection error'));
           resolve(false);

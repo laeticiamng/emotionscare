@@ -226,7 +226,7 @@ class EmailServiceEnriched {
     }
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('scheduled_emails' as any)
         .insert({
           options: options,

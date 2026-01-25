@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
@@ -8,7 +8,7 @@ import {
   downloadMetricsCSV,
   calculateGlobalStats 
 } from '@/services/musicQueueMetricsService';
-import { Download, TrendingUp, CheckCircle, XCircle, Clock, Crown } from 'lucide-react';
+import { Download, TrendingUp, CheckCircle, Clock, Crown } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Chart as ChartJS,

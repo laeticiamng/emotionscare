@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { 
   ArrowLeft, Download, FileText, Database, Image, 
   Calendar, CheckCircle, Clock, AlertCircle, Settings

@@ -92,7 +92,7 @@ export const MusicAnalyticsTab: React.FC<MusicAnalyticsTabProps> = ({
     const days: (ListeningSession | null)[] = Array(firstDay).fill(null);
 
     for (let i = 1; i <= daysInMonth; i++) {
-      const date = new Date(year, month, i);
+      const _date = new Date(year, month, i);
       const session = listeningHistory.find(
         (s) =>
           s.date.getDate() === i &&

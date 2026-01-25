@@ -3,7 +3,7 @@
  * Toggle between AR and fallback modes
  */
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Headset, Monitor } from 'lucide-react';
 import { useARSupport } from '@/hooks/useARPermissions';
 import { useAR } from '@/contexts/ARContext';

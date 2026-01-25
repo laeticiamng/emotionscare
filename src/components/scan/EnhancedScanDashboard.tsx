@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,8 +7,6 @@ import {
   ChevronRight, Filter, Download, Share2, Settings, Scan
 } from 'lucide-react';
 import { useScanHistory } from '@/hooks/useScanHistory';
-import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
 
 interface EmotionStat {
   label: string;

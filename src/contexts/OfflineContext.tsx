@@ -3,7 +3,7 @@
  * Partage l'état offline à travers l'application
  */
 
-import React, { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode } from 'react';
 import { useOfflineMode, OfflineModeState } from '@/hooks/useOfflineMode';
 
 interface OfflineContextValue extends ReturnType<typeof useOfflineMode> {}

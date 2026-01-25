@@ -3,7 +3,6 @@
  */
 
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
 import type { GroupSessionCategory } from '../types';
 import { cn } from '@/lib/utils';
 

@@ -1,5 +1,4 @@
-import React, { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import React, { useCallback } from 'react';
 import { Settings, Volume2, VolumeX, Monitor, Eye, Sparkles, Gauge, Timer, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';

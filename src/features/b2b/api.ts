@@ -248,7 +248,7 @@ export async function deleteEvent(eventId: string): Promise<B2BApiResponse<void>
 
 // ===== INVITATIONS =====
 
-export async function sendInvitation(orgId: string, input: InviteMemberInput): Promise<B2BApiResponse<B2BInvitation>> {
+export async function sendInvitation(_orgId: string, input: InviteMemberInput): Promise<B2BApiResponse<B2BInvitation>> {
   try {
     const { data, error } = await supabase.functions.invoke('b2b-teams-invite', {
       body: {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { 
   MessageSquare, Calendar, Clock, ChevronRight, Trash2, Search, Filter,
   Download, Share2, Star, Archive, MoreVertical, FileText, TrendingUp,

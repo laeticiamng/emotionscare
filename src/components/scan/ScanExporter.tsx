@@ -12,7 +12,6 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
 
@@ -108,7 +107,7 @@ export const ScanExporter: React.FC<ScanExporterProps> = ({ scans, onExport }) =
     try {
       // Appel à l'edge function pour envoyer le partage sécurisé
       const { supabase } = await import('@/integrations/supabase/client');
-      const { data, error } = await supabase.functions.invoke('send-email', {
+      const { error } = await supabase.functions.invoke('send-email', {
         body: {
           to: shareEmail,
           subject: 'Partage sécurisé - Scans EmotionsCare',

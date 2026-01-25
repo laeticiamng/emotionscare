@@ -4,7 +4,7 @@ import type { GlowBreathState } from '@/types/glow';
 const CACHE_DURATION = 600_000; // 10 minutes
 
 // Mock function for API call - replace with actual API integration
-const fetchWithAuth = async (url: string) => {
+const fetchWithAuth = async (_url: string) => {
   // Mock data for development
   return {
     json: async () => [

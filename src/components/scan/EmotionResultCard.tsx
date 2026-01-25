@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { EmotionResult } from '@/types/emotion';
 import { formatDistanceToNow, format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Check, Download, Music, Play, Share2, User, TrendingUp, TrendingDown, Minus, BarChart3, Heart, Brain, Zap, FileText, Bookmark, BookmarkCheck } from 'lucide-react';
+import { Check, Music, Play, Share2, User, TrendingUp, TrendingDown, Minus, BarChart3, Heart, Brain, Zap, FileText, Bookmark, BookmarkCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';

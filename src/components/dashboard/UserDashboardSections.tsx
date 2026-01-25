@@ -22,7 +22,7 @@ interface VRSession {
   thumbnailUrl?: string;
 }
 
-async function fetchRecommendedSessions(userId: string): Promise<VRSession[]> {
+async function fetchRecommendedSessions(_userId: string): Promise<VRSession[]> {
   // Récupérer les sessions VR depuis la base de données
   const { data, error } = await supabase
     .from('vr_session_templates')

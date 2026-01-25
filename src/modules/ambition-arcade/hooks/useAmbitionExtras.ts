@@ -2,7 +2,7 @@
  * Hooks pour les fonctionnalités étendues Ambition Arcade
  * Favoris, Ratings, Export, Recommendations
  */
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';

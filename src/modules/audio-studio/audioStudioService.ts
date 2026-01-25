@@ -2,7 +2,7 @@
  * Service pour l'enregistrement et gestion audio
  */
 
-import type { RecordingConfig, AudioTrack, AudioMetadata } from './types';
+import type { RecordingConfig, AudioMetadata } from './types';
 
 export class AudioStudioService {
   private mediaRecorder: MediaRecorder | null = null;

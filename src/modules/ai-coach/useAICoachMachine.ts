@@ -112,7 +112,7 @@ export function useAICoachMachine(): AICoachMachineState & AICoachMachineActions
       setState((prev) => ({ ...prev, phase: 'sending', isLoading: true }));
 
       try {
-        const response = await aiCoachService.sendMessage({
+        const _response = await aiCoachService.sendMessage({
           session_id: state.currentSession.id,
           message,
         });

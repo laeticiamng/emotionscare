@@ -1,8 +1,6 @@
 
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Heart, Brain, Music, BookOpen } from 'lucide-react';
-import PremiumCard from '@/components/ui/PremiumCard';
 
 const AccessSection = () => {
   const features = [

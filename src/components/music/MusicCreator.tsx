@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { logger } from '@/lib/logger';
 import { useMusic } from '@/hooks/useMusic';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, MusicIcon, Wand2 } from 'lucide-react';
-import type { MusicTrack } from '@/types/music';
+import type {} from '@/types/music';
 
 const MusicCreator = () => {
   const [prompt, setPrompt] = useState('');

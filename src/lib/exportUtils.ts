@@ -1,5 +1,4 @@
 import * as XLSX from 'xlsx';
-import html2canvas from 'html2canvas';
 
 interface ExportOptions {
   title: string;

@@ -3,13 +3,11 @@
  * Layout principal avec sidebar Shadcn intégré
  */
 
-import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/AppSidebar';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { Home, ArrowLeft, User } from 'lucide-react';
+import { Home, User } from 'lucide-react';
 
 export function AppLayout() {
   const location = useLocation();

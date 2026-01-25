@@ -5,11 +5,10 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { EmotionResult } from '@/types/emotion';
-import { computeBalanceFromScores } from './emotionScan.service';
 import { logger } from '@/lib/logger';
 
 const FAVORITES_KEY = 'emotion-favorites';
-const HISTORY_KEY = 'emotion-local-history';
+const _HISTORY_KEY = 'emotion-local-history';
 
 interface EmotionFavorite {
   id: string;

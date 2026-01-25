@@ -336,8 +336,8 @@ describe('Journal - Tests d\'intégration', () => {
     });
 
     it('limite le nombre de tags à 8', async () => {
-      const user = userEvent.setup();
-      const { rerender } = render(
+      const _user = userEvent.setup();
+      const {  } = render(
         <QueryClientProvider client={queryClient}>
           <TestJournalComposer />
         </QueryClientProvider>

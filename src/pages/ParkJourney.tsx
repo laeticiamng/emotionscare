@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -411,7 +411,7 @@ export default function ParkJourney() {
 
       {/* Journey Sections */}
       <section className="container mx-auto px-4 py-12">
-        {attractions.map((attraction, index) => (
+        {attractions.map((attraction, _index) => (
           <AttractionStop
             key={attraction.number}
             {...attraction}

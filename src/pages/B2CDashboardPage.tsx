@@ -178,14 +178,14 @@ export default function B2CDashboardPage() {
   const shouldReduceMotion = useReducedMotion();
   const { hints: clinicalHintsList, isLoading: hintsLoading, error: hintsError, refresh: refreshHints } = useClinicalHints('dashboard');
   const clinicalTone = summaryTone;
-  const location = useLocation();
+  const _location = useLocation();
   
   // Stats réelles depuis Supabase
-  const { stats: userStats, loading: statsLoading, refetch: refetchStats, error: statsError } = useUserStatsQuery();
+  const { stats: userStats, loading: statsLoading, refetch: refetchStats } = useUserStatsQuery();
   useUserStatsRealtime();
   
   // Recommandations dynamiques
-  const { recommendations, loading: recsLoading, refetch: refetchRecs } = useDynamicRecommendations();
+  const { refetch: refetchRecs } = useDynamicRecommendations();
   
   // Score de bien-être calculé depuis les données réelles
   const { score: wellbeingScore, trend: wellbeingTrend, loading: wellbeingLoading } = useWellbeingScore();

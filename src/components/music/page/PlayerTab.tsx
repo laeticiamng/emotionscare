@@ -38,7 +38,7 @@ const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
     setContextVolume(values[0] / 100);
   };
   
-  const handleToggleMute = () => {
+  const _handleToggleMute = () => {
     setLocalMute(!localMute);
     if (localMute) {
       setContextVolume(localVolume / 100);

@@ -114,7 +114,7 @@ export const usePersistentState = <T>(
     ttl?: number;
   } = {}
 ) => {
-  const { cache, localStorage: useLocalStorage = true, ttl = 30 * 60 * 1000 } = options;
+  const { localStorage: useLocalStorage = true, ttl = 30 * 60 * 1000 } = options;
   const cacheContext = useCache();
   const [state, setState] = React.useState<T>(() => {
     // Essayer de récupérer depuis le cache d'abord

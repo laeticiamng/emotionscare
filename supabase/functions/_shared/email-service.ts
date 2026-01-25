@@ -136,7 +136,7 @@ async function sendWithSendGrid(options: EmailOptions): Promise<EmailResponse> {
  * Send email using AWS SES
  * Requires: AWS_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
  */
-async function sendWithSES(options: EmailOptions): Promise<EmailResponse> {
+async function sendWithSES(_options: EmailOptions): Promise<EmailResponse> {
   const region = Deno.env.get('AWS_REGION');
   const accessKeyId = Deno.env.get('AWS_ACCESS_KEY_ID');
   const secretAccessKey = Deno.env.get('AWS_SECRET_ACCESS_KEY');

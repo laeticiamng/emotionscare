@@ -127,7 +127,7 @@ class WebPushManager {
       if (!user.user) return false;
 
       // Appel à l'edge function pour envoyer le push
-      const { data, error } = await supabase.functions.invoke('send-push-notification', {
+      const { error } = await supabase.functions.invoke('send-push-notification', {
         body: {
           userId: user.user.id,
           notification: {

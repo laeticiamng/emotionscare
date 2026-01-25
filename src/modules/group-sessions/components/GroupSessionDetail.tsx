@@ -13,7 +13,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
@@ -34,11 +33,10 @@ import {
   Share2,
   ExternalLink
 } from 'lucide-react';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import type { GroupSession, GroupSessionParticipant, GroupSessionResource } from '../types';
 import { GroupSessionChat } from './GroupSessionChat';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface GroupSessionDetailProps {
@@ -95,7 +93,7 @@ export const GroupSessionDetail: React.FC<GroupSessionDetailProps> = ({
 
   const isLive = session.status === 'live';
   const isPast = session.status === 'completed';
-  const isHost = session.host_id === currentUserId;
+  const _isHost = session.host_id === currentUserId;
   const participantCount = participants.length;
 
   const handleJoin = () => {

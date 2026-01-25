@@ -274,7 +274,7 @@ export class ApiClient {
    */
   static async healthCheck() {
     return this.request(async () => {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('profiles')
         .select('count')
         .limit(1);

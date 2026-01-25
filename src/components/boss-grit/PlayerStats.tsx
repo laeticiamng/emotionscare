@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Star, Target, Flame, Award, TrendingUp } from 'lucide-react';
+import { Trophy, Star, Target, Flame, TrendingUp } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 

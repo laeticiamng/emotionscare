@@ -8,7 +8,7 @@ import * as glob from 'glob';
 function checkImports(filePath: string): void {
   try {
     const content = fs.readFileSync(filePath, 'utf8');
-    const lines = content.split('\n');
+    const _lines = content.split('\n');
     
     // Array to store outdated imports
     const outdatedImports: string[] = [];

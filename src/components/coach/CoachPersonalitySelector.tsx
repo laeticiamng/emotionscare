@@ -10,7 +10,7 @@ import {
   Heart, Brain, Zap, Compass, Check, MessageSquare, Star, 
   ChevronRight, Sparkles, Users, Target, Clock, ThumbsUp
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Dialog,
   DialogContent,

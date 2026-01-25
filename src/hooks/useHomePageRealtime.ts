@@ -103,7 +103,7 @@ export function useHomePageRealtime(): UseHomePageRealtimeReturn {
           schema: 'public',
           table: 'activity_sessions',
         },
-        (payload) => {
+        (_payload) => {
           const newNotification: RealtimeNotification = {
             id: crypto.randomUUID(),
             type: 'session_complete',

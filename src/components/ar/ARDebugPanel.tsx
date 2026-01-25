@@ -3,7 +3,7 @@
  * Development debug panel for AR experiences
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { X, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAR } from '@/contexts/ARContext';
 import { cn } from '@/lib/utils';

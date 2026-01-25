@@ -2,7 +2,7 @@
  * Composant caméra AR avec accès webcam réel et effets de filtre
  */
 
-import React, { useRef, useEffect, memo } from 'react';
+import React, { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, CameraOff, Circle, Sparkles, FlipHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';

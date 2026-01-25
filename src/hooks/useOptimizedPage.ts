@@ -17,7 +17,7 @@ interface PagePerformanceMetrics {
 }
 
 // Cache des métriques par route
-const metricsCache = new Map<string, PagePerformanceMetrics>();
+const _metricsCache = new Map<string, PagePerformanceMetrics>();
 
 export function useOptimizedPage(pageName: string) {
   const location = useLocation();

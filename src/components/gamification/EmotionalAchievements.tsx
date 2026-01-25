@@ -8,13 +8,13 @@
  * @created 2025-11-14
  */
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Trophy,
   Star,
@@ -259,7 +259,7 @@ export const EmotionalAchievements: React.FC<EmotionalAchievementsProps> = ({
   onAchievementUnlocked,
   className,
 }) => {
-  const { toast } = useToast();
+  const {  } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<Achievement['category'] | 'all'>('all');
   const [showUnlocked, setShowUnlocked] = useState(true);
 
@@ -384,7 +384,7 @@ export const EmotionalAchievements: React.FC<EmotionalAchievementsProps> = ({
     diamond: 'text-purple-600 bg-purple-100',
   };
 
-  const categoryIcons = {
+  const _categoryIcons = {
     scan: Heart,
     streak: Flame,
     journey: TrendingUp,

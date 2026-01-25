@@ -3,7 +3,7 @@
  * Charge les données depuis Supabase et calcule les statistiques
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMusicHistory, useTrackPlayCounts } from './useMusicSettings';

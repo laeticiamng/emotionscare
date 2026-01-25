@@ -33,7 +33,7 @@ export interface SyncStats {
 
 const EVENTS_KEY = 'scores-events-queue';
 const STATS_KEY = 'scores-sync-stats';
-const MAX_RETRY = 3;
+const _MAX_RETRY = 3;
 const BATCH_SIZE = 20;
 
 // Récupérer les événements en queue
@@ -125,7 +125,7 @@ export async function trySyncScores(): Promise<SyncResult> {
 
       try {
         // Préparer les données pour Supabase
-        const records = batch.map(event => ({
+        const _records = batch.map(event => ({
           user_id: userId,
           event_type: event.type,
           score: event.score,

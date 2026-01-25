@@ -18,7 +18,7 @@ import { useMusicControls } from '@/hooks/useMusicControls';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import type { MusicTrack } from '@/types/music';
+import type {} from '@/types/music';
 import { useMusicSettings } from '@/hooks/music/useMusicSettings';
 
 interface GenerationHistory {

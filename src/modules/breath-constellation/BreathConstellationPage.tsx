@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
 import { useReducedMotion } from "framer-motion";
 import PageHeader from "@/components/ui/PageHeader";

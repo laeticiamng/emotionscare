@@ -13,7 +13,7 @@ import { logger } from '@/lib/logger';
 
 const PERSONAL_GOALS_KEY = 'gamification-personal-goals';
 const POINT_HISTORY_KEY = 'gamification-point-history';
-const ACHIEVEMENTS_CACHE_KEY = 'gamification-achievements-cache';
+const _ACHIEVEMENTS_CACHE_KEY = 'gamification-achievements-cache';
 const WEEKLY_TARGETS_KEY = 'gamification-weekly-targets';
 
 // ─────────────────────────────────────────────────────────────

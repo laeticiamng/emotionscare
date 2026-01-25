@@ -64,7 +64,7 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
     return 'text-orange-400';
   };
 
-  const getMoodDeltaLabel = (delta: number) => {
+  const _getMoodDeltaLabel = (delta: number) => {
     if (delta > 15) return 'Excellent';
     if (delta > 5) return 'Très bien';
     if (delta > 0) return 'Positif';

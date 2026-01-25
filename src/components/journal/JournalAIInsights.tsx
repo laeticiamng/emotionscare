@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, TrendingUp, TrendingDown, Activity, Calendar, Hash } from 'lucide-react';
 import type { SanitizedNote } from '@/modules/journal/types';
-import { format, parseISO, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
+import { parseISO, startOfWeek, endOfWeek } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 interface JournalAIInsightsProps {

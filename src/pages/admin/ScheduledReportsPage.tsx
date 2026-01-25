@@ -42,7 +42,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Mail, Plus, Trash2, Edit, PlayCircle } from 'lucide-react';
+import { Mail, Plus, Trash2, Edit, PlayCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';

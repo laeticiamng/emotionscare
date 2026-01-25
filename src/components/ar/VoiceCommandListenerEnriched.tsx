@@ -4,10 +4,9 @@
  */
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { Mic, MicOff, Volume2, History, Settings, BarChart2, Sparkles, ChevronDown } from 'lucide-react';
+import { Mic, MicOff, Volume2, History, Settings, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
@@ -169,8 +168,8 @@ const VoiceCommandListenerEnriched: React.FC<VoiceCommandListenerEnrichedProps> 
   const [lastReceivedCommand, setLastReceivedCommand] = useState<string | null>(null);
   const [lastTranscript, setLastTranscript] = useState('');
   
-  const { isListening, isConnected, isSpeaking, startListening, stopListening } = useVoiceCommands({
-    onCommand: (cmd, params) => {
+  const { isListening, startListening, stopListening } = useVoiceCommands({
+    onCommand: (cmd, _params) => {
       setLastReceivedCommand(cmd);
       onCommand(cmd);
     },

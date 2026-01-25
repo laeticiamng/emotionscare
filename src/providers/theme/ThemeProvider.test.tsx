@@ -4,10 +4,10 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, waitFor, act } from '@testing-library/react';
 import { renderHook } from '@testing-library/react';
 import { ThemeProvider, useTheme, useThemeToggle } from './ThemeProvider';
-import type { Theme } from './ThemeProvider';
+import type {} from './ThemeProvider';
 
 // Mock localStorage
 const localStorageMock = (() => {

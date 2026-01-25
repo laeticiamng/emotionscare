@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -146,7 +146,7 @@ export default function EnhancedCommunityFeed() {
     if (!newPost.trim()) return;
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('posts')
         .insert({
           content: newPost,

@@ -199,7 +199,7 @@ const MusicPlayerCard: React.FC<MusicPlayerCardProps> = ({
           onEnded={handleEnd}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
-          onVolumeChange={(e) => {
+          onVolumeChange={(_e) => {
             if (audioRef.current) {
               setVolume(audioRef.current.volume);
               setMuted(audioRef.current.muted);

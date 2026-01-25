@@ -33,7 +33,7 @@ const factorIcons = {
   scheduleMatch: Clock,
 };
 
-const factorLabels = {
+const _factorLabels = {
   emotionalSync: 'Sync émotionnelle',
   activityOverlap: 'Activités similaires',
   skillComplement: 'Compétences',

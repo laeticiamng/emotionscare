@@ -6,7 +6,7 @@
  * Exécuté en CI pour garantir qu'aucun bouton n'est jamais "mort"
  */
 
-import { NAV_SCHEMA, findNavNode, getAllRoutes } from '../src/lib/nav-schema';
+import { NAV_SCHEMA, getAllRoutes } from '../src/lib/nav-schema';
 import { NavNode } from '../src/types/nav';
 
 interface ValidationError {

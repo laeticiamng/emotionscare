@@ -297,7 +297,7 @@ export class MusicTherapyService {
 
     const recentPoints = journey.slice(-5);
     const moodTrend = this.calculateTrend(recentPoints.map(p => p.mood));
-    const energyTrend = this.calculateTrend(recentPoints.map(p => p.energy));
+    const _energyTrend = this.calculateTrend(recentPoints.map(p => p.energy));
 
     // Stagnation émotionnelle
     if (Math.abs(moodTrend) < 0.1 && journey.length > 10) {

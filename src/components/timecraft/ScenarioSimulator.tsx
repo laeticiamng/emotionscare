@@ -1,8 +1,7 @@
 /**
  * ScenarioSimulator - Simulateur de scénarios organisationnels B2B
  */
-import React, { memo, useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { memo, useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

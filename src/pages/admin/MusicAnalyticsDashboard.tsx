@@ -18,7 +18,7 @@ import {
   XCircle,
   BarChart3
 } from 'lucide-react';
-import { Line, Bar, Pie, Doughnut } from 'react-chartjs-2';
+import { Line, Bar, Pie } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,

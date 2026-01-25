@@ -7,7 +7,6 @@ import {
   MousePointer, Keyboard, Settings, X, Check,
   Zap, Moon, Sun, Palette, Move, RotateCcw
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useTheme } from '@/providers/theme';
 import {
   safeClassAdd,

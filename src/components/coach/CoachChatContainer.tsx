@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import CoachChatInterface from './CoachChatInterface';
-import { useChatMessages } from '@/hooks/chat/useChatMessages';
 import { useCoachChat } from '@/hooks/chat/useCoachChat';
 import { useConversations } from '@/hooks/chat/useConversations';
 import { ChatConversation, ChatMessage } from '@/types/chat';

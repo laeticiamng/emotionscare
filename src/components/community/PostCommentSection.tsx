@@ -3,7 +3,7 @@
  * Intègre useCommunityComments avec affichage et formulaire
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Heart, Trash2, Loader, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -77,7 +77,7 @@ export function PostCommentSection({
     await deleteComment(commentId, postId);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const _handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && e.ctrlKey) {
       handleSubmit();
     }

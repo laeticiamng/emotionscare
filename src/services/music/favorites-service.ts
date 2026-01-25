@@ -144,7 +144,7 @@ export async function getFavoritesCount(): Promise<number> {
     if (!user) return 0;
 
     // Compter directement au lieu d'utiliser une RPC inexistante
-    const { data, error, count } = await supabase
+    const { error, count } = await supabase
       .from('music_favorites')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', user.id);

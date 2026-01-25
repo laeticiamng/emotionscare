@@ -157,7 +157,7 @@ export class FlashLiteService {
     const totalCards = sessions.reduce((sum, s) => sum + s.cards_total, 0);
     const totalCorrect = sessions.reduce((sum, s) => sum + s.cards_correct, 0);
     const totalTime = sessions.reduce((sum, s) => sum + (s.duration_seconds || 0), 0);
-    const totalResponseTime = sessions.reduce((sum, s) => sum + (s.average_response_time || 0), 0);
+    const _totalResponseTime = sessions.reduce((sum, s) => sum + (s.average_response_time || 0), 0);
 
     return {
       totalSessions,

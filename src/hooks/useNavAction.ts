@@ -19,7 +19,7 @@ import { logger } from '@/lib/logger';
 export function useNavAction() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
-  const { toast } = useToast();
+  const {  } = useToast();
 
   const getContext = useCallback((): NavContext => ({
     isAuthenticated,
@@ -28,7 +28,7 @@ export function useNavAction() {
   }), [isAuthenticated, user]);
 
   const executeAction = useCallback(async (action: NavAction): Promise<ActionResult> => {
-    const context = getContext();
+    const _context = getContext();
     
     try {
       switch (action.type) {

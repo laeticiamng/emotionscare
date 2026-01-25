@@ -104,7 +104,7 @@ const EmotionMarket: React.FC = () => {
   const { data: portfolio } = useEmotionPortfolio();
   const { data: transactionHistory } = useEmotionTransactionHistory();
   const buyAsset = useBuyEmotionAsset();
-  const useAsset = useUseEmotionAsset();
+  const _useAsset = useUseEmotionAsset();
   
   const [selectedAsset, setSelectedAsset] = useState<EmotionAsset | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -162,7 +162,7 @@ const EmotionMarket: React.FC = () => {
   };
 
   // Set price alert
-  const setPriceAlert = (assetId: string, price: number) => {
+  const _setPriceAlert = (assetId: string, price: number) => {
     setPriceAlerts(prev => {
       const newAlerts = { ...prev, [assetId]: price };
       localStorage.setItem('emotionMarketAlerts', JSON.stringify(newAlerts));

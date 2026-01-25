@@ -143,7 +143,7 @@ const EmotionTextInput: React.FC<EmotionTextInputProps> = ({
     setShowHistory(false);
   };
 
-  const saveToHistory = () => {
+  const _saveToHistory = () => {
     if (!value.trim()) return;
     
     const entry = {

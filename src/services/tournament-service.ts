@@ -426,7 +426,7 @@ class TournamentService {
       if (participants.length < 2) return false;
 
       const shuffled = participants.sort(() => Math.random() - 0.5);
-      const numRounds = Math.ceil(Math.log2(shuffled.length));
+      const _numRounds = Math.ceil(Math.log2(shuffled.length));
       const matches: Partial<TournamentMatch>[] = [];
 
       for (let i = 0; i < shuffled.length; i += 2) {

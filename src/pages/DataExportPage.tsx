@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Download, FileJson, FileSpreadsheet, FileText, Check, Loader2, Shield, Eye, Clock, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Download, FileJson, FileSpreadsheet, FileText, Check, Loader2, Shield, Eye, Clock } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';

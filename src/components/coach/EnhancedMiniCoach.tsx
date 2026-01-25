@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Send, MessageSquareText, User, Smile, Award } from 'lucide-react';
+import { Send, MessageSquareText, User, Award } from 'lucide-react';
 import { useCoach } from '@/contexts/coach';
 import { cn } from '@/lib/utils';
 import TypewriterEffect from '@/components/chat/TypewriterEffect';

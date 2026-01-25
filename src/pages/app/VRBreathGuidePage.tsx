@@ -3,7 +3,7 @@
  * Session immersive de cohérence cardiaque
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -23,9 +23,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Slider } from '@/components/ui/slider';
 import {
   Select,
   SelectContent,
@@ -64,7 +62,7 @@ const PHASE_COLORS: Record<BreathPhase, string> = {
 
 export default function VRBreathGuidePage() {
   const navigate = useNavigate();
-  const { settings, saveSettings } = useVRSettings();
+  const { settings } = useVRSettings();
   const { toast } = useToast();
   
   // Session state

@@ -764,7 +764,7 @@ const SuspenseWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) 
 );
 
 // Import AppLayout for sidebar - uses Outlet instead of children
-const AppLayoutComponent = lazy(() => import('@/components/layout/AppLayout'));
+const _AppLayoutComponent = lazy(() => import('@/components/layout/AppLayout'));
 
 const LayoutWrapper: React.FC<{ 
   children: React.ReactNode; 

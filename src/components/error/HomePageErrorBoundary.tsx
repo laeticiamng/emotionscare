@@ -3,7 +3,7 @@
  * Fournit un fallback gracieux en cas d'erreur
  */
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';

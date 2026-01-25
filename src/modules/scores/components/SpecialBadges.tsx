@@ -1,9 +1,8 @@
 /**
  * SpecialBadges - Badges spéciaux et gamification avancée
  */
-import React from 'react';
 import { motion } from 'framer-motion';
-import { Award, Share2, Lock, Sparkles, Trophy } from 'lucide-react';
+import { Share2, Lock, Sparkles, Trophy } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

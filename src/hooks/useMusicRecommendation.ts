@@ -27,7 +27,7 @@ export interface MusicHookOptions {
 
 export function useMusicRecommendation(options: MusicHookOptions = {}) {
   const { autoActivate = false, defaultEmotion } = options;
-  const { play, state } = useMusic();
+  const { play } = useMusic();
   const { toast } = useToast();
 
   const [recommendedTracks, setRecommendedTracks] = useState<MusicTrack[]>([]);

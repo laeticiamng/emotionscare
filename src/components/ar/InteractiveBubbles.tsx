@@ -3,7 +3,7 @@
  * Interactive floating bubbles with gratitude affirmations
  */
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import { X, Sparkles } from 'lucide-react';
 import { useAR } from '@/contexts/ARContext';
 import { useARBubbles } from '@/hooks/useARCore';
@@ -50,7 +50,7 @@ export function InteractiveBubbles({
   className
 }: InteractivebubblesProps) {
   const { setBubblesScore, bubblesScore } = useAR();
-  const { popBubble, score, popCount, resetScore } = useARBubbles(userId);
+  const { popBubble, score, popCount } = useARBubbles(userId);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const bubblesRef = useRef<Bubble[]>([]);
   const animationRef = useRef<number>();

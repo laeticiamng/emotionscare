@@ -3,7 +3,7 @@
  * Aide les utilisateurs à répondre avec bienveillance
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, ChevronDown, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';

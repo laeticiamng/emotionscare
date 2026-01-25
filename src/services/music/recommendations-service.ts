@@ -4,7 +4,6 @@
  */
 
 import { MusicTrack } from '@/types/music';
-import { analyzeMusicBehavior } from './preferences-learning-service';
 import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 

@@ -5,10 +5,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, AreaChart, Area } from 'recharts';
-import { ArrowUpRight, ArrowDownRight, TrendingUp, Calendar, Filter, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, TrendingUp, Calendar, Filter, RefreshCw } from 'lucide-react';
 import { useScanHistory } from '@/hooks/useScanHistory';
 import { motion } from 'framer-motion';
-import { format, subDays, subWeeks, startOfWeek, endOfWeek } from 'date-fns';
+import { format, subDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 type PeriodType = '7d' | '14d' | '30d' | '90d';

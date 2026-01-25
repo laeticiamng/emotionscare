@@ -2,7 +2,7 @@
  * ScanFacialPage - Page de scan émotionnel par reconnaissance faciale
  */
 
-import React, { useState, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Camera, ArrowLeft, RefreshCw, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

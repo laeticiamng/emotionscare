@@ -398,7 +398,7 @@ class LongTermPredictionsService {
       frequency: 'Annuellement',
       emotionImpact: (best.average - 50) * 0.1,
       confidence: 0.7,
-      occurrences: Math.max(...seasonAverages.map((s) => 1)),
+      occurrences: Math.max(...seasonAverages.map((_s) => 1)),
     };
   }
 
@@ -471,7 +471,7 @@ class LongTermPredictionsService {
 
     // Calculer la moyenne de base
     const baselineBalance =
-      data.reduce((sum, d) => d.emotionBalance, 0) / data.length;
+      data.reduce((_sum, d) => d.emotionBalance, 0) / data.length;
 
     // Calculer le trend
     const trendPattern = patterns.find((p) => p.type === 'trend');
@@ -555,7 +555,7 @@ class LongTermPredictionsService {
   /**
    * Prédire les opportunités
    */
-  private predictOpportunity(patterns: IdentifiedPattern[], monthOffset: number): string | null {
+  private predictOpportunity(patterns: IdentifiedPattern[], _monthOffset: number): string | null {
     const positivePatterns = patterns.filter((p) => p.emotionImpact > 0);
     if (positivePatterns.length === 0) return null;
 

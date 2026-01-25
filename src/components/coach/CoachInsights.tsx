@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -50,7 +50,7 @@ interface HistoryEntry {
 }
 
 const STORAGE_KEY = 'coach-insights-history';
-const GOALS_KEY = 'coach-insights-goals';
+const _GOALS_KEY = 'coach-insights-goals';
 
 const CoachInsights: React.FC = () => {
   const { toast } = useToast();

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Line, Bar, Area, ComposedChart } from 'recharts';
+import { Line, Bar, Area } from 'recharts';
 import { LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, BarChart } from 'recharts';
 import { EmotionResult } from '@/types/emotion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -413,7 +413,7 @@ const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({
             </div>
             <Badge variant="outline">{stats.totalEntries} entrées</Badge>
             <div className="flex gap-1">
-              {stats.topEmotions.map(([emotion, count]) => (
+              {stats.topEmotions.map(([emotion, _count]) => (
                 <Badge 
                   key={emotion} 
                   style={{ backgroundColor: emotionColors[emotion] + '30', color: emotionColors[emotion] }}

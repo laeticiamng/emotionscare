@@ -80,7 +80,7 @@ const getFallbackImage = (prompt: string): string => {
 /**
  * Génère des variations d'une image
  */
-const generateVariations = async (imageUrl: string, options: DALLEOptions = {}): Promise<string[]> => {
+const generateVariations = async (imageUrl: string, _options: DALLEOptions = {}): Promise<string[]> => {
   try {
     // Pour les variations, retourner l'image originale avec des fallbacks
     return [imageUrl, getFallbackImage('variation')];
@@ -95,7 +95,7 @@ const generateVariations = async (imageUrl: string, options: DALLEOptions = {}):
  */
 const checkApiConnection = async (): Promise<{ status: boolean; message: string }> => {
   try {
-    const { data, error } = await supabase.functions.invoke('health-check', {
+    const { error } = await supabase.functions.invoke('health-check', {
       body: { service: 'image-generation' },
     });
     

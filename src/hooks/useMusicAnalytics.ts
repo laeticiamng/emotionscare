@@ -3,11 +3,10 @@
  * Statistiques et analytics musicales utilisateur
  */
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-import { logger } from '@/lib/logger';
 
 export interface MusicStats {
   totalListeningTime: number; // en minutes

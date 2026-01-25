@@ -55,7 +55,7 @@ export interface MeditationStats {
 }
 
 const STORAGE_KEY = 'meditation_stats';
-const SESSIONS_KEY = 'meditation_sessions';
+const _SESSIONS_KEY = 'meditation_sessions';
 
 // Sons ambiants (URLs de fichiers audio)
 const AMBIENT_SOUNDS: Record<AmbientSound, string | null> = {

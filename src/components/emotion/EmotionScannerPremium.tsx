@@ -2,7 +2,6 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
   Camera, Mic, MicOff, Video, VideoOff, 
@@ -69,7 +68,7 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
 
       if (scanMode === 'mood_cards' && selectedMood) {
         // Mood cards analysis
-        const moodData = moodCards.find(m => m.id === selectedMood);
+        const _moodData = moodCards.find(m => m.id === selectedMood);
         scanResult = {
           mood: {
             valence: Math.random() * 0.6 + 0.3,

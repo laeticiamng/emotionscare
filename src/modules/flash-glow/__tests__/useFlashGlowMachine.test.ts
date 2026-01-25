@@ -1,10 +1,9 @@
 import { renderHook, act } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useFlashGlowMachine } from '@/modules/flash-glow/useFlashGlowMachine';
 import { flashGlowService } from '@/modules/flash-glow/flash-glowService';
 import { createFlashGlowJournalEntry } from '@/modules/flash-glow/journal';
 import { toast } from '@/hooks/use-toast';
-import { logAndJournal } from '@/services/sessions/sessionsApi';
 
 vi.mock('@/modules/flash-glow/flash-glowService', () => ({
   flashGlowService: {

@@ -3,7 +3,7 @@
  * Quota, Immersive, Voice, Raccourcis clavier, Stats
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

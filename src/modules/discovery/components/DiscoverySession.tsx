@@ -3,8 +3,8 @@
  * @module discovery
  */
 
-import React, { memo, useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { memo, useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { 
   X, 
   Play, 

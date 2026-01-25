@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { VRSessionTemplate } from '@/types/vr';
-import { Play, Clock, BarChart3, Star, TrendingUp, Heart } from 'lucide-react';
+import { Play, Clock, BarChart3, TrendingUp, Heart } from 'lucide-react';
 import VRTemplateGrid from './VRTemplateGrid';
 import { useVRStats, useVRHistory } from '@/hooks/useVRStats';
 import { useVRSettings } from '@/hooks/useVRSettings';

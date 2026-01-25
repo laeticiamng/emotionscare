@@ -3,7 +3,6 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { useAsyncMachine } from '@/hooks/useAsyncMachine';
 import { meditationService } from './meditationService';
 import type { 
   MeditationConfig, 

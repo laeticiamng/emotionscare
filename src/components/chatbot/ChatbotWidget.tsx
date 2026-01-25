@@ -2,7 +2,7 @@
  * Chatbot Widget - Widget flottant du chatbot support
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MessageCircle, X, Send, Loader } from 'lucide-react';
 import { useSupportChatbot } from '@/hooks/useSupportChatbot';
 import { ChatbotMessageBubble } from './ChatbotMessageBubble';

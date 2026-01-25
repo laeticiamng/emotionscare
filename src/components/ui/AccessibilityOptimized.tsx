@@ -132,7 +132,7 @@ export const AccessibilityOptimized: React.FC<AccessibilityOptimizedProps> = ({
   const prefersReducedMotion = useReducedMotion();
   const [announcements, setAnnouncements] = React.useState<string[]>([]);
 
-  const announce = React.useCallback((message: string, priority: 'polite' | 'assertive' = 'polite') => {
+  const announce = React.useCallback((message: string, _priority: 'polite' | 'assertive' = 'polite') => {
     if (announceChanges) {
       setAnnouncements(prev => [...prev, message]);
       // Clear announcements after they've been read
@@ -143,7 +143,7 @@ export const AccessibilityOptimized: React.FC<AccessibilityOptimizedProps> = ({
   }, [announceChanges]);
 
   // Provide announce function to children via context if needed
-  const contextValue = React.useMemo(() => ({ announce }), [announce]);
+  const _contextValue = React.useMemo(() => ({ announce }), [announce]);
 
   return (
     <div 

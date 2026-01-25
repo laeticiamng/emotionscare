@@ -43,7 +43,7 @@ export function useSeuilEvents() {
 
 export function useCreateSeuilEvent() {
   const { user } = useAuth();
-  const { toast } = useToast();
+  const {  } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({

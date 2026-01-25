@@ -3,7 +3,7 @@
  * Module complet pour l'enregistrement, la transcription et la gestion des notes vocales
  */
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Mic, MicOff, FileText, History, BarChart3, Search, 
@@ -24,7 +24,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { journalService, type JournalEntry } from '@/modules/journal/journalService';
-import { formatDistanceToNow, format } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 // ============= Types =============
@@ -347,7 +347,7 @@ const StatsCard: React.FC<{ stats: VoiceJournalStats; isLoading: boolean }> = ({
 
 // ============= Main Component =============
 const B2CVoiceJournalPage: React.FC = () => {
-  const { user } = useAuth();
+  const {  } = useAuth();
   const { toast } = useToast();
   
   // Recording state

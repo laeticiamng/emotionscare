@@ -6,7 +6,7 @@ import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import * as vrNebulaService from './vrNebulaService';
-import type { VRNebulaSession, VRNebulaStats, NebulaScene, BreathingPattern } from './types';
+import type { VRNebulaSession, NebulaScene, BreathingPattern } from './types';
 
 export function useVRNebula() {
   const { user } = useAuth();

@@ -31,11 +31,11 @@ const EnhancedShell: React.FC<EnhancedShellProps> = memo(({
   const { theme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const location = useLocation();
+  const _location = useLocation();
   const [commandMenuOpen, setCommandMenuOpen] = useState(false);
   
   // Memoize theme check - only recalc on theme change
-  const isDarkMode = useMemo(() => 
+  const _isDarkMode = useMemo(() => 
     theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches),
     [theme]
   );

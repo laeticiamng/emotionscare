@@ -132,7 +132,7 @@ export const BreathGauge: React.FC<BreathGaugeProps> = ({
 
       // Calculate streak
       let currentStreak = 0;
-      const today = new Date().toDateString();
+      const _today = new Date().toDateString();
       const sortedDates = [...new Set(parsed.map(h => new Date(h.date).toDateString()))].sort((a, b) => 
         new Date(b).getTime() - new Date(a).getTime()
       );

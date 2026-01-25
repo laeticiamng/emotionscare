@@ -15,7 +15,7 @@ import AudioEqualizer from '@/components/music/AudioEqualizer';
 import MusicMoodVisualization from './MusicMoodVisualization';
 import { useToast } from '@/hooks/use-toast';
 import { useMusic } from '@/hooks/useMusic';
-import type { MusicTrack } from '@/types/music';
+import type {} from '@/types/music';
 
 interface MixPreset {
   id: string;

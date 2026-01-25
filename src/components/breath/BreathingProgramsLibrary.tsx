@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BREATHING_PROGRAMS, BreathingProgram } from '@/features/breath/programs/breathingProgramsDB';
-import { ChevronDown, Calendar, Clock, Target, Zap } from 'lucide-react';
+import { ChevronDown, Calendar, Clock, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const getCategoryLabel = (category: string) => {

@@ -25,7 +25,7 @@ const EnhancedLoginForm: React.FC = () => {
   const navigate = useNavigate();
   const { signIn } = useAuth();
   const { toast } = useToast();
-  const { theme } = useTheme();
+  const {  } = useTheme();
   
   // Use the preferred access hook for redirection
   usePreferredAccess();

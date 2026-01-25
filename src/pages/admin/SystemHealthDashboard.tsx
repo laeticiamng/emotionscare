@@ -7,9 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Activity, AlertTriangle, CheckCircle2, Clock, TrendingUp, Settings, Zap } from 'lucide-react';
+import { Activity, AlertTriangle, CheckCircle2, Clock, Settings, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { SystemHealthHistoryCharts } from '@/components/monitoring/SystemHealthHistoryCharts';
@@ -20,7 +20,7 @@ const SystemHealthDashboard: React.FC = () => {
   const [editingThreshold, setEditingThreshold] = useState<any>(null);
 
   // Fetch real-time metrics
-  const { data: metrics, isLoading: metricsLoading } = useQuery({
+  const { data: metrics } = useQuery({
     queryKey: ['system-health-metrics'],
     queryFn: async () => {
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
@@ -130,7 +130,7 @@ const SystemHealthDashboard: React.FC = () => {
     },
   });
 
-  const getStatusColor = (status: string) => {
+  const _getStatusColor = (status: string) => {
     switch (status) {
       case 'healthy': return 'text-green-500';
       case 'warning': return 'text-amber-500';
@@ -191,7 +191,7 @@ const SystemHealthDashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {displayMetrics.map((metric) => {
           const kpi = kpis[metric.name];
-          const Icon = metric.icon;
+          const _Icon = metric.icon;
           
           return (
             <Card key={metric.name}>

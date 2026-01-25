@@ -355,7 +355,7 @@ export class EmotionOrchestrator {
   /**
    * Obtient les bénéfices attendus d'un module
    */
-  private getExpectedBenefits(module: ModuleType, emotionalState: EmotionalState): string[] {
+  private getExpectedBenefits(module: ModuleType, _emotionalState: EmotionalState): string[] {
     const benefits: string[] = [];
 
     // Bénéfices par catégorie

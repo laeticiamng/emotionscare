@@ -2,7 +2,7 @@
  * Galerie des photos capturées avec les filtres AR
  */
 
-import React, { memo, useState } from 'react';
+import { memo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, Trash2, Image, Maximize2, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

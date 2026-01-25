@@ -466,7 +466,7 @@ export const performanceOptimizer = new PerformanceOptimizer();
 
 // ============= Hook React =============
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export const usePerformanceOptimization = () => {
   const [stats, setStats] = useState(performanceOptimizer.getStats());

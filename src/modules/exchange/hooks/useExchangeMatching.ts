@@ -276,7 +276,7 @@ export const useCreateMatch = () => {
   const { user } = useAuth();
 
   return useMutation({
-    mutationFn: async ({ targetUserId, marketType }: { targetUserId: string; marketType: string }) => {
+    mutationFn: async ({ targetUserId, marketType: _marketType }: { targetUserId: string; marketType: string }) => {
       const { error } = await supabase
         .from('buddies')
         .insert({

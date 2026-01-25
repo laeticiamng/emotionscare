@@ -11,7 +11,7 @@ import { performance } from 'node:perf_hooks';
 
 export const healthRoutes: FastifyPluginAsync = async app => {
   // Basic health check
-  app.get('/', async (req, reply) => {
+  app.get('/', async (_req, _reply) => {
     return {
       ok: true,
       timestamp: new Date().toISOString(),
@@ -20,7 +20,7 @@ export const healthRoutes: FastifyPluginAsync = async app => {
   });
 
   // Detailed health check
-  app.get('/healthz', async (req, reply) => {
+  app.get('/healthz', async (_req, reply) => {
     const checks = {
       database: { ok: true, latency: 0, error: undefined as string | undefined },
       supabase: { ok: true, latency: 0, error: undefined as string | undefined },

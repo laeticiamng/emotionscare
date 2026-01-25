@@ -1,4 +1,4 @@
-import React, { useState, useMemo, type CSSProperties } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -160,7 +160,7 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({ index, style, data }) =
         {/* Badges */}
         {entry.badges && entry.badges.length > 0 && (
           <div className="flex items-center gap-1">
-            {entry.badges.slice(0, 3).map((badge, idx) => (
+            {entry.badges.slice(0, 3).map((badge, _idx) => (
               <Tooltip key={badge}>
                 <TooltipTrigger>
                   <div

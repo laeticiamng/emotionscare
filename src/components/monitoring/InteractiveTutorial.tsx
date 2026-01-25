@@ -3,7 +3,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChevronRight, ChevronLeft, X, CheckCircle2, Lightbulb } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 
 interface TutorialStep {
   id: string;

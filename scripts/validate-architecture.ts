@@ -32,7 +32,7 @@ function scanFile(filePath: string): void {
   try {
     const content = readFileSync(filePath, 'utf-8');
     const lines = content.split('\n');
-    const fileName = basename(filePath);
+    const _fileName = basename(filePath);
 
     lines.forEach((line, index) => {
       const lineNum = index + 1;

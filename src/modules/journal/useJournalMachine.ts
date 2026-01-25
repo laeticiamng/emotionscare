@@ -4,7 +4,7 @@
 
 import { useCallback, useState, useEffect } from 'react';
 import { useAsyncMachine } from '@/hooks/useAsyncMachine';
-import { journalService, JournalEntry, JournalVoiceEntry, JournalTextEntry } from './journalService';
+import { journalService, JournalEntry } from './journalService';
 import { logger } from '@/lib/logger';
 
 export type JournalState = 'idle' | 'loading' | 'recording' | 'processing' | 'success' | 'error';
@@ -116,7 +116,7 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
     isLoading: machineIsLoading
   } = useAsyncMachine<JournalData>({
     run: processVoiceEntry,
-    onSuccess: (data) => {
+    onSuccess: (_data) => {
       setIsRecording(false);
       setRecordingDuration(0);
       if (recordingTimer) {

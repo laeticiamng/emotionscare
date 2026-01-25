@@ -3,7 +3,7 @@
  * @module discovery
  */
 
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Lock, 
@@ -166,7 +166,7 @@ export const DiscoveryPathsPanel = memo(function DiscoveryPathsPanel({
                   {path.isUnlocked && (
                     <div className="mt-4 pt-4 border-t border-border/50">
                       <div className="flex items-center gap-2 overflow-x-auto pb-2">
-                        {path.items.slice(0, 5).map((item, idx) => {
+                        {path.items.slice(0, 5).map((item, _idx) => {
                           const isItemComplete = item.status === 'completed' || item.status === 'mastered';
                           const isItemLocked = item.status === 'locked';
                           

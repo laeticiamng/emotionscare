@@ -2,7 +2,7 @@
  * useAccessibilityValidationEnriched - Validation WCAG réelle avec axe-core et audit DOM
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { logger } from '@/lib/logger';
 
 export interface AccessibilityIssue {
@@ -106,8 +106,8 @@ const BUILT_IN_RULES = [
     check: (el: Element) => {
       // Simplified check - in production, use actual contrast calculation
       const style = window.getComputedStyle(el);
-      const color = style.color;
-      const bgColor = style.backgroundColor;
+      const _color = style.color;
+      const _bgColor = style.backgroundColor;
       // Return true for now - real implementation would calculate contrast ratio
       return true;
     },
@@ -196,7 +196,7 @@ export const useAccessibilityValidationEnriched = () => {
         const elements = root.querySelectorAll(rule.selector);
         let ruleHasIssues = false;
 
-        elements.forEach((el, index) => {
+        elements.forEach((el, _index) => {
           const passed = rule.check(el, validationContextRef.current);
 
           if (!passed) {

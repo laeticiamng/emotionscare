@@ -191,7 +191,7 @@ export function useSupportChatbot(userId: string | undefined) {
    * Fermer la conversation et évaluer
    */
   const closeConversation = useCallback(
-    async (satisfaction?: number, feedback?: string) => {
+    async (satisfaction?: number, _feedback?: string) => {
       if (!state.conversation || !userId) return;
 
       try {

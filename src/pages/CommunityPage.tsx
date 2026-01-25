@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   Users, MessageCircle, Heart, Send, ArrowLeft, Smile, Search, Plus,
   TrendingUp, Bookmark, Flag, Settings, BarChart3, UserPlus
@@ -23,7 +23,7 @@ import { Navigate } from 'react-router-dom';
 import { useCommunityGroups, useCommunityPosts, useTrendingTags } from '@/hooks/community';
 import { CommunityReportService, REPORT_REASONS, ReportReason } from '@/modules/community/services';
 import { CommunitySavedPostsService } from '@/modules/community/services';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { MentionTextarea } from '@/components/community/MentionTextarea';
 import { CommunitySearch } from '@/components/community/CommunitySearch';
 import { NotificationBell } from '@/components/community/NotificationBell';
@@ -56,8 +56,8 @@ export default function CommunityPage() {
   const { toast } = useToast();
   
   // Hooks pour les données
-  const { groups, myGroups, loading: groupsLoading, joinGroup, leaveGroup, createGroup, refresh: refreshGroups } = useCommunityGroups();
-  const { posts, loading: postsLoading, createPost, toggleReaction, refresh: refreshPosts } = useCommunityPosts();
+  const { groups, myGroups, loading: groupsLoading, joinGroup, leaveGroup, createGroup } = useCommunityGroups();
+  const { posts, loading: postsLoading, createPost, toggleReaction } = useCommunityPosts();
   const { tags: trendingTags, loading: trendingLoading, refresh: refreshTrending } = useTrendingTags(10);
   
   // États locaux

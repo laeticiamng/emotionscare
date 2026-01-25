@@ -1,7 +1,6 @@
 /**
  * Widget affichant les recommandations dynamiques personnalisées
  */
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

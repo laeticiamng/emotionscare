@@ -12,7 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Play, Pause, RotateCcw, Glasses, Wind, Activity, Timer, Trophy } from 'lucide-react';
 import { useVRNebula } from '../useVRNebula';
-import type { NebulaScene, BreathingPattern, VRNebulaStats, VRNebulaSession } from '../types';
+import type { NebulaScene, BreathingPattern, VRNebulaStats } from '../types';
 
 const SCENE_OPTIONS: { value: NebulaScene; label: string; description: string }[] = [
   { value: 'cosmos', label: 'Cosmos', description: 'Couleurs cosmiques apaisantes' },

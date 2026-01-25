@@ -3,15 +3,14 @@
  * Utilise les données réelles de l'utilisateur pour les recommandations
  */
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Slider } from '@/components/ui/slider';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Brain,
   Sparkles,
@@ -151,7 +150,7 @@ export const MLRecommendationsPanel: React.FC<MLRecommendationsPanelProps> = ({
   onApplySunoParams,
 }) => {
   const { toast } = useToast();
-  const { play, state } = useMusic();
+  const { play } = useMusic();
   const { value: historyIds } = useMusicHistory();
   
   const [selectedCategory, setSelectedCategory] = useState<string>('all');

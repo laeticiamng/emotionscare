@@ -85,7 +85,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const formatDetailedTime = (seconds: number) => {
+  const _formatDetailedTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     const ms = Math.floor((seconds % 1) * 100);
@@ -129,7 +129,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   };
 
   // Calculate progress percentage
-  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const _progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   // Calculate hovered time based on mouse position
   const handleMouseMove = useCallback((e: React.MouseEvent) => {

@@ -3,7 +3,7 @@
  * @module discovery
  */
 
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, 

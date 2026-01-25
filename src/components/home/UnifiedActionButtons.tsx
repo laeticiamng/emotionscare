@@ -27,7 +27,7 @@ interface ActionButtonData {
 }
 
 const UnifiedActionButtons: React.FC = () => {
-  const { user } = useAuth();
+  const {  } = useAuth();
   const { userMode } = useUserMode();
 
   const getActionButtons = (): ActionButtonData[] => {

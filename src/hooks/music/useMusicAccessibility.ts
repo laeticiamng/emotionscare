@@ -16,7 +16,6 @@
 
 import { useEffect, useCallback, useState, useRef } from 'react';
 import { logger } from '@/lib/logger';
-import { useMusicAccessibilitySettings } from '@/hooks/music/useMusicSettings';
 
 // ============================================
 // TYPES

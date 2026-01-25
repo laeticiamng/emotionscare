@@ -1,14 +1,14 @@
 /**
  * Widget de notifications et rappels du dashboard
  */
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Bell, Clock, Sparkles, Heart, Brain, X, Check } from 'lucide-react';
+import { Bell, Clock, Sparkles, Heart, Brain, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
@@ -158,13 +158,13 @@ function saveSet(key: string, set: Set<string>) {
 
 export default function NotificationsWidget() {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
   
   // Initialiser depuis localStorage
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(() => getStoredSet(DISMISSED_KEY));
   const [readIds, setReadIds] = useState<Set<string>>(() => getStoredSet(READ_KEY));
 
-  const { data: notifications, isLoading, refetch } = useQuery({
+  const { data: notifications, isLoading } = useQuery({
     queryKey: ['dashboard-notifications', user?.id],
     queryFn: () => fetchNotifications(user!.id),
     enabled: !!user?.id,

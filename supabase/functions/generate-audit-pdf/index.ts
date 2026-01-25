@@ -271,7 +271,7 @@ function generateHTMLReport(data: any, options: any): string {
   return html;
 }
 
-function generateAuditSection(data: any, includeGraphs: boolean, includeRecommendations: boolean, includeCategoryDetails: boolean): string {
+function generateAuditSection(data: any, _includeGraphs: boolean, includeRecommendations: boolean, includeCategoryDetails: boolean): string {
   const { audit, scores, recommendations } = data;
 
   let html = `
@@ -352,7 +352,7 @@ function generateAuditSection(data: any, includeGraphs: boolean, includeRecommen
 }
 
 function generateViolationsSection(data: any): string {
-  const { violations, alerts, stats } = data;
+  const { violations, stats } = data;
 
   let html = `
     <div class="section">

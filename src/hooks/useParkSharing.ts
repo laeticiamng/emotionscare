@@ -17,7 +17,7 @@ export interface ShareableAchievement {
 }
 
 export function useParkSharing() {
-  const { user } = useAuth();
+  const {  } = useAuth();
   const { toast } = useToast();
   const { generateSummary } = useParkExport();
   const [isSharing, setIsSharing] = useState(false);

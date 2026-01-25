@@ -5,7 +5,6 @@ import { Download, FileText, Brain } from 'lucide-react';
 import { format as formatDate } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Incident, ExportFormat, SeverityVariant, StatusVariant } from './types';
-import { toast } from 'sonner';
 
 interface IncidentCardProps {
   incident: Incident;

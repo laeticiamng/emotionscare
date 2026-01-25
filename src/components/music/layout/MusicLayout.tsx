@@ -9,7 +9,7 @@ interface MusicLayoutProps {
 }
 
 const MusicLayout: React.FC<MusicLayoutProps> = ({ children }) => {
-  const music = useMusic();
+  const _music = useMusic();
   // MusicContext is always initialized if we get here (provider exists)
   const isInitialized = true;
 

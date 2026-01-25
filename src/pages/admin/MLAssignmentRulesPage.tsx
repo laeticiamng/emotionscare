@@ -97,7 +97,7 @@ const MLAssignmentRulesPage: React.FC = () => {
     }
   });
 
-  const { data: teamMembers } = useQuery({
+  useQuery({
     queryKey: ['team-member-skills'],
     queryFn: async () => {
       const { data, error } = await supabase

@@ -16,8 +16,8 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
   emotion = "calm",
   className = ""
 }) => {
-  const music = useMusic();
-  const { activateMusicForEmotion, getEmotionMusicDescription } = useMusicEmotionIntegration();
+  const _music = useMusic();
+  const { activateMusicForEmotion } = useMusicEmotionIntegration();
   
   const [recommendedEmotion, setRecommendedEmotion] = useState(emotion);
   

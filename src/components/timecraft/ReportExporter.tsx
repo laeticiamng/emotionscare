@@ -1,11 +1,10 @@
 /**
  * ReportExporter - Export de rapports stratégiques B2B
  */
-import React, { memo, useState } from 'react';
+import { memo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import {

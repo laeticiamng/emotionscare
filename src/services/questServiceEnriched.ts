@@ -342,7 +342,7 @@ class QuestServiceEnriched {
     };
   }
 
-  private updateLocalStats(data: { questId: string; points: number }): void {
+  private updateLocalStats(_data: { questId: string; points: number }): void {
     const stats = getLocalStats();
     const today = new Date().toISOString().split('T')[0];
 

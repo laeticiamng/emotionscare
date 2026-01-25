@@ -1,7 +1,7 @@
 /**
  * VersionSelector - Sélecteur et gestionnaire de versions de trajectoires
  */
-import React, { memo, useState } from 'react';
+import { memo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

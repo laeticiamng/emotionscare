@@ -5,7 +5,7 @@
  * @module music-unified/useMusicUnified
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { musicUnifiedService } from './musicUnifiedService';
 import type {
   MusicSession,

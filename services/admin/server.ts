@@ -39,7 +39,7 @@ export function createApp() {
       });
 
       // GET /admin/organization - Get organization details
-      app.get('/admin/organization', async (req, reply) => {
+      app.get('/admin/organization', async (_req, reply) => {
         reply.send({ 
           ok: true, 
           data: orgData

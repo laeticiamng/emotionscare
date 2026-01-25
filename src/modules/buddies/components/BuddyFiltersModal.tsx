@@ -8,9 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Filter, X, Check, RotateCcw } from 'lucide-react';
+import { Filter, Check, RotateCcw } from 'lucide-react';
 import type { BuddyFilters } from '../types';
 import { BUDDY_INTERESTS, BUDDY_GOALS } from '../types';
 

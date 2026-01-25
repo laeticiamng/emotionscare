@@ -48,7 +48,7 @@ const CollaborativeSession: React.FC<CollaborativeSessionProps> = ({ className }
   const [isConnecting, setIsConnecting] = useState(false);
   
   const { state, play, pause, seek } = useMusic();
-  const { currentTrack, isPlaying, currentTime } = state;
+  const { currentTrack, isPlaying } = state;
   const { user } = useAuth();
 
   // Subscribe to realtime channel

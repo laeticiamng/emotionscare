@@ -11,7 +11,6 @@ import type {
   NyveeSession,
   CocoonType,
 } from './types';
-import { DEFAULT_CYCLE_CONFIG } from './types';
 import { useToast } from '@/hooks/use-toast';
 
 export interface NyveeMachineConfig {

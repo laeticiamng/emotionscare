@@ -7,7 +7,7 @@ import { useJournalEnriched } from '@/modules/journal/useJournalEnriched';
 import { JournalUserPreferences } from '@/components/journal/JournalUserPreferences';
 import { JournalTagManager } from '@/components/journal/JournalTagManager';
 import { JournalTemplates } from '@/components/journal/JournalTemplates';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { logger } from '@/lib/logger';
 import { Settings, Tag, FileText, Shield, Flame, BarChart3 } from 'lucide-react';

@@ -72,7 +72,7 @@ export function withMonitoring<T = any>(
 ) {
   return async (req: Request): Promise<Response> => {
     // Initialiser Sentry si pas déjà fait
-    const sentry = initSentry();
+    const _sentry = initSentry();
     
     // Handle CORS preflight
     if (req.method === 'OPTIONS') {

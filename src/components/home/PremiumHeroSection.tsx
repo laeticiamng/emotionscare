@@ -3,7 +3,7 @@ import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Sparkles, ArrowRight, Play, Users, Clock } from 'lucide-react';
+import { Heart, Sparkles, ArrowRight, Users, Clock } from 'lucide-react';
 
 const PremiumHeroSection: React.FC = () => {
   const navigate = useNavigate();

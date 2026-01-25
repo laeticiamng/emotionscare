@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import { Send, Mic, Paperclip, Smile } from 'lucide-react';
+import { Send, Mic } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface EnhancedCoachChatInputProps {

@@ -28,7 +28,7 @@ const PremiumShell: React.FC<PremiumShellProps> = ({
 }) => {
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { resolvedTheme } = useTheme();
+  const {  } = useTheme();
   const location = useLocation();
   
   // Check for reduced motion preference

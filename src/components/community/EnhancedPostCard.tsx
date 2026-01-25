@@ -17,8 +17,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { BookmarkButton } from './BookmarkButton';
-import { SharePostButton } from './SharePostButton';
 import { UserProfileCard } from './UserProfileCard';
 import { useToast } from '@/hooks/use-toast';
 

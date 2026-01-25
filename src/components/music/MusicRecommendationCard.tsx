@@ -26,7 +26,7 @@ export const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = (
     setIsLoading(true);
     try {
       const params: EmotionMusicParams = { emotion, intensity };
-      const result = await activateMusicForEmotion(params);
+      const _result = await activateMusicForEmotion(params);
       // Success is already handled in the hook with notifications
     } finally {
       setIsLoading(false);

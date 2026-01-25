@@ -44,7 +44,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const currentInput = controlledInput ?? input;
   const updateInput = setControlledInput ?? setInput;
   const onChangeInput = controlledChange ?? handleInputChange;
-  const submitHandler = controlledSubmit ?? handleSubmit;
+  const _submitHandler = controlledSubmit ?? handleSubmit;
   
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   

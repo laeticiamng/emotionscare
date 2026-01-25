@@ -265,7 +265,7 @@ class HealthCheckServiceEnriched {
   private async checkEdgeFunctions(): Promise<{ healthy: boolean; latency: number; message?: string }> {
     const start = Date.now();
     try {
-      const { data, error } = await supabase.functions.invoke('health-check', {
+      const { error } = await supabase.functions.invoke('health-check', {
         body: { ping: true },
       });
       return {

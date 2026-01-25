@@ -6,8 +6,7 @@ import LoadingAnimation from '@/components/ui/loading-animation';
 import { routes } from '@/lib/routes';
 import type { Role, Segment } from './schema';
 import { stripUtmParams } from '@/lib/utm';
-import { logger } from '@/lib/logger';
-import { normalizeRole as normalizeRoleUtil, roleToMode, ROLE_TO_MODE } from '@/lib/role-mappings';
+import { normalizeRole as normalizeRoleUtil } from '@/lib/role-mappings';
 import type { UserMode as UserModeType } from '@/lib/role-mappings';
 
 type GuardChildren = { children: React.ReactNode };

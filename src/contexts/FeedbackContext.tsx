@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { logger } from '@/lib/logger';
@@ -51,7 +51,7 @@ const FeedbackContext = createContext<FeedbackContextType | undefined>(undefined
 
 export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
-  const { userMode } = useUserMode();
+  const {  } = useUserMode();
   const [feedbacks, setFeedbacks] = useState<FeedbackEntry[]>([]);
   const [suggestions, setSuggestions] = useState<ImprovementSuggestion[]>([]);
   const [metrics, setMetrics] = useState<FeedbackMetrics>({

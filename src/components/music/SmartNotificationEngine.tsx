@@ -8,7 +8,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import {
   Bell,
@@ -124,7 +123,7 @@ export const SmartNotificationEngine: React.FC<SmartNotificationEngineProps> = (
   }, [user?.id]);
 
   // Sauvegarder préférences
-  const savePreferences = useCallback(async (newPrefs: NotificationPreference[]) => {
+  const _savePreferences = useCallback(async (newPrefs: NotificationPreference[]) => {
     if (!user?.id) return;
     
     await supabase

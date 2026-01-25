@@ -2,7 +2,7 @@
  * Modal questionnaire préférences musicales avec animations
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { LazyMotionWrapper, m, AnimatePresence } from '@/utils/lazy-motion';
 import {
   Dialog,
@@ -18,9 +18,8 @@ import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Sparkles, Music2, Heart, MapPin, Volume2, Check } from '@/components/music/icons';
-import { saveUserPreferences, MUSIC_PREFERENCES_OPTIONS, type PreferencesFormData } from '@/services/music/preferences-service';
+import { saveUserPreferences, MUSIC_PREFERENCES_OPTIONS } from '@/services/music/preferences-service';
 import { toast } from 'sonner';
-import { logger } from '@/lib/logger';
 import ConfettiCelebration from '@/components/effects/ConfettiCelebration';
 
 interface MusicPreferencesModalProps {

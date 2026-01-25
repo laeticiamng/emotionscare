@@ -4,7 +4,6 @@
  * Uses Edge Functions - no API keys needed on client side
  */
 
-import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SunoMusicGenerator } from '@/components/music/SunoMusicGenerator';

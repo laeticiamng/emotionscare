@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Watch, Activity, Heart, Moon, Footprints, RefreshCw, Check, X, TrendingUp, TrendingDown, Minus, History, Settings } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { Watch, Activity, Heart, Moon, Footprints, RefreshCw, Check, X, TrendingUp, TrendingDown, Minus, History } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';

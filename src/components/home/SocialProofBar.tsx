@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
-import { Heart, User, Zap, Moon, CheckCircle2 } from 'lucide-react';
+import { Heart, User, Zap, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SocialProofItem {

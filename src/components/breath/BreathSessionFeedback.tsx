@@ -23,7 +23,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Sentry } from '@/lib/errors/sentry-compat';
 import { logger } from '@/lib/logger';
 import { useToast } from '@/hooks/use-toast';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 export interface SessionFeedback {
   session_id: string;

@@ -34,7 +34,7 @@ export const GDPRAlertHistory: React.FC = () => {
   const [severity, setSeverity] = useState('');
   const [alertType, setAlertType] = useState('');
 
-  const { alerts, statistics, isLoading, refetch } = useGDPRAlertHistory({
+  const { alerts, statistics, isLoading } = useGDPRAlertHistory({
     startDate: startDate || undefined,
     endDate: endDate || undefined,
     severity: severity || undefined,

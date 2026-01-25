@@ -281,7 +281,7 @@ class EmotionInsightsGenerator {
   // Générer des recommandations
   private generateRecommendations(context: InsightContext): EmotionInsight[] {
     const insights: EmotionInsight[] = [];
-    const { weeklyStats, recentScans } = context;
+    const { weeklyStats } = context;
 
     // Recommandation basée sur l'arousal
     if (weeklyStats.avgArousal < 35) {
@@ -381,7 +381,7 @@ class EmotionInsightsGenerator {
   // Détecter les alertes
   private detectWarnings(context: InsightContext): EmotionInsight[] {
     const insights: EmotionInsight[] = [];
-    const { recentScans, weeklyStats } = context;
+    const { recentScans } = context;
 
     // Warning: valence très basse persistante
     const lowValenceScans = recentScans.filter(s => s.valence < 30);

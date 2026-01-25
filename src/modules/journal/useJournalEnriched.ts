@@ -14,7 +14,7 @@ import {
   getJournalStats,
   insertText,
 } from '@/services/journal/journalApi'
-import type { SanitizedNote, FeedQuery } from './types'
+import type { SanitizedNote } from './types'
 
 const FEED_QUERY_KEY = ['journal', 'feed'] as const
 const FAVORITES_QUERY_KEY = ['journal', 'favorites'] as const

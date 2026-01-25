@@ -77,7 +77,7 @@ export interface AuditStats {
   issuesByCategory: { category: string; count: number }[];
 }
 
-const STORAGE_KEY = 'scheduled-audits-local';
+const _STORAGE_KEY = 'scheduled-audits-local';
 
 export const useScheduledAuditsEnriched = () => {
   const queryClient = useQueryClient();
@@ -302,7 +302,7 @@ export const useScheduledAuditsEnriched = () => {
 
   // Acquitter une alerte
   const acknowledgeAlertMutation = useMutation({
-    mutationFn: async ({ id, notes }: { id: string; notes?: string }) => {
+    mutationFn: async ({ id, notes: _notes }: { id: string; notes?: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
 
       const { error } = await supabase

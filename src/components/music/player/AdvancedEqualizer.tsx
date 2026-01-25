@@ -3,7 +3,7 @@
  * Modifications audio en temps réel
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
@@ -37,7 +37,7 @@ const presets: EqualizerPreset[] = [
 ];
 
 const frequencies = ['60Hz', '150Hz', '400Hz', '1kHz', '2.4kHz', '6kHz', '15kHz', '20kHz'];
-const frequencyValues = [60, 150, 400, 1000, 2400, 6000, 15000, 20000];
+const _frequencyValues = [60, 150, 400, 1000, 2400, 6000, 15000, 20000];
 
 interface AdvancedEqualizerProps {
   className?: string;
@@ -50,7 +50,7 @@ const AdvancedEqualizer: React.FC<AdvancedEqualizerProps> = ({ className }) => {
   const [currentPreset, setCurrentPreset] = useState<string>('Flat');
   const [isEnabled, setIsEnabled] = useState(true);
   
-  const { setEqualizerBand, getEqualizerValues, isConnected } = useWebAudioContext();
+  const { setEqualizerBand, isConnected } = useWebAudioContext();
 
   // Sync with Web Audio on band change
   const handleBandChange = useCallback((index: number, value: number[]) => {

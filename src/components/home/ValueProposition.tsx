@@ -4,7 +4,7 @@ import { routes } from '@/routerV2';
 import { withLandingUtm } from '@/lib/utm';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Shield, Activity, Brain, BarChart3, PieChart } from 'lucide-react';
+import { Shield, Activity, Brain, BarChart3 } from 'lucide-react';
 
 const ValueProposition: React.FC = () => {
   return (

@@ -12,7 +12,7 @@ const EmotionBasedMusicSelector: React.FC = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [detectedEmotion, setDetectedEmotion] = useState<string | null>(null);
   
-  const { analyzeEmotion } = useHumeAnalysis();
+  const {  } = useHumeAnalysis();
   const { generateMusic, isGenerating } = useMusicGeneration();
   const { playTrack, isLoading: isPlayerLoading } = useMusicControls();
 

@@ -33,7 +33,7 @@ export const useSunoServiceStatus = () => {
         body: { action: 'health-check' }
       });
 
-      const responseTime = Date.now() - startTime;
+      const _responseTime = Date.now() - startTime;
 
       if (error) {
         const apiStatus = await getSunoApiStatus();

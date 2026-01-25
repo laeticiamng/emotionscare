@@ -59,7 +59,7 @@ const TournamentsPage: React.FC = () => {
     return statusConfig[status];
   };
 
-  const getTypeBadge = (type: Tournament['tournament_type']) => {
+  const _getTypeBadge = (type: Tournament['tournament_type']) => {
     const typeConfig = {
       weekly_xp: { label: 'XP Hebdo', icon: TrendingUp },
       monthly_challenge: { label: 'Défi Mensuel', icon: Target },

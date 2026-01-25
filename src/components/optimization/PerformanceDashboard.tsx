@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -23,7 +23,6 @@ import {
 } from 'lucide-react';
 import { usePerformanceMonitor } from '@/hooks/usePerformanceMonitor';
 import { useServiceWorker, useCacheManager } from '@/hooks/optimization/useServiceWorker';
-import { performanceMonitor } from '@/lib/performance/performanceMonitor';
 import { logger } from '@/lib/logger';
 
 interface PerformanceMetric {
@@ -54,7 +53,7 @@ const PerformanceDashboard: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const performanceData = usePerformanceMonitor();
+  const _performanceData = usePerformanceMonitor();
   const serviceWorker = useServiceWorker();
   const cacheManager = useCacheManager();
 
@@ -244,7 +243,7 @@ const PerformanceDashboard: React.FC = () => {
     return 'text-red-600';
   };
 
-  const getScoreStatus = (score: number) => {
+  const _getScoreStatus = (score: number) => {
     if (score >= 90) return 'good';
     if (score >= 70) return 'warning';
     return 'critical';

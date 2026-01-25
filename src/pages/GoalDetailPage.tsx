@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, Target, Calendar, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Target, TrendingUp } from 'lucide-react';
 
 interface Milestone {
   date: string;

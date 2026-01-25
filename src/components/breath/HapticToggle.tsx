@@ -4,7 +4,6 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import {
   Collapsible,
   CollapsibleContent,
@@ -242,7 +241,7 @@ export const HapticToggle: React.FC = () => {
   };
 
   // Delete preset
-  const deletePreset = (index: number) => {
+  const _deletePreset = (index: number) => {
     const updated = presets.filter((_, i) => i !== index);
     setPresets(updated);
     localStorage.setItem(PRESETS_KEY, JSON.stringify(updated));

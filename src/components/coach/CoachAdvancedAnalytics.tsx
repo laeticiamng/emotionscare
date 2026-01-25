@@ -2,7 +2,7 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, L
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Download, Filter, TrendingUp, AlertCircle } from 'lucide-react';
+import { Download, TrendingUp, AlertCircle } from 'lucide-react';
 
 interface AnalyticsData {
   date: string;

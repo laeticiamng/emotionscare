@@ -2,7 +2,7 @@
  * Sélecteur de filtres AR avec aperçu visuel
  */
 
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';

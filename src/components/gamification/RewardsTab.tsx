@@ -2,9 +2,9 @@
  * Composant Onglet Récompenses - EmotionsCare
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Gift, Coins, Check, Lock, Sparkles, AlertCircle } from 'lucide-react';
+import { Gift, Coins, Check, Lock, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';

@@ -110,7 +110,7 @@ export function useMusicTherapyPremium() {
         : 0;
 
       // Calculate streak
-      const today = new Date().toISOString().split('T')[0];
+      const _today = new Date().toISOString().split('T')[0];
       let streak = 0;
       let checkDate = new Date();
       

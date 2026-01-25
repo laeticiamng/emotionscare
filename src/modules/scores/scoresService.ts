@@ -258,7 +258,7 @@ export class ScoresService {
       const emotional_score = this.calculateEmotionalScore(emotionalData);
       const wellbeing_score = this.calculateWellbeingScore(emotionalData, activityData);
       const engagement_score = this.calculateEngagementScore(sessionData, activityData);
-      const overall_score = Math.round(
+      const _overall_score = Math.round(
         emotional_score * 0.4 + wellbeing_score * 0.3 + engagement_score * 0.3
       );
 
@@ -274,7 +274,7 @@ export class ScoresService {
       }
 
       // Vibe de la semaine
-      const vibeData = await this.getCurrentVibe(userId);
+      const _vibeData = await this.getCurrentVibe(userId);
 
       // Calculer les minutes totales
       const totalMinutes = sessionData.reduce((sum, s) => sum + ((s as any).duration_minutes || 0), 0);

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Shield } from 'lucide-react';
 import PrivacySettingsTab from '@/components/settings/PrivacySettingsTab';
 import { Helmet } from 'react-helmet-async';

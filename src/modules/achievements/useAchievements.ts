@@ -137,7 +137,7 @@ export function useAchievements(): UseAchievementsReturn {
         }
       }
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Erreur lors de l\'enregistrement de la progression');
     },
   });

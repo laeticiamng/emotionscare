@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
 
 const DAYS_OF_WEEK = [
   { value: 0, label: 'Dim' },

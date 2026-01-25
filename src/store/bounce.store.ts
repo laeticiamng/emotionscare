@@ -175,7 +175,7 @@ const useBounceStoreBase = create<BounceStore>()(
       },
       
       pauseBattle: () => {
-        const state = get();
+        const _state = get();
         set({
           phase: 'paused'
         });
@@ -187,7 +187,7 @@ const useBounceStoreBase = create<BounceStore>()(
       },
       
       resumeBattle: () => {
-        const state = get();
+        const _state = get();
         set({
           phase: 'battle'
         });

@@ -13,7 +13,7 @@ interface UseShareRoomResult {
   shareViaEmail: (recipientEmail: string) => void;
 }
 
-export const useShareRoom = ({ roomId, inviteCode }: UseShareRoomOptions): UseShareRoomResult => {
+export const useShareRoom = ({ roomId: _roomId, inviteCode }: UseShareRoomOptions): UseShareRoomResult => {
   const { toast } = useToast();
   const [isCopied, setIsCopied] = useState(false);
 

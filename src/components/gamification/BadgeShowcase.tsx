@@ -10,7 +10,7 @@ import { Award, Star, Trophy, Target, Heart, Zap, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-const getBadgeIcon = (category: string) => {
+const _getBadgeIcon = (category: string) => {
   switch (category) {
     case 'emotion_mastery':
     case 'scan':

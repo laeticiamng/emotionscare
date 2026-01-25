@@ -17,7 +17,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({
   showProgress = false, 
   scrollProgress = 0 
 }) => {
-  const { theme } = useTheme();
+  const {  } = useTheme();
   
   return (
     <motion.header 

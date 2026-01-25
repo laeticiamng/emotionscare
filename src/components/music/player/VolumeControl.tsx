@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import {
@@ -58,7 +58,7 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
   
   const [showSettings, setShowSettings] = useState(false);
   const [presets, setPresets] = useState<VolumePreset[]>(savedPresets.length ? savedPresets : DEFAULT_PRESETS);
-  const [previousVolume, setPreviousVolume] = useState(volumeSettings.previousVolume || volume);
+  const [_previousVolume, setPreviousVolume] = useState(volumeSettings.previousVolume || volume);
   const [customPresetName, setCustomPresetName] = useState('');
   const [showKeyboardHints, setShowKeyboardHints] = useState(false);
   const [volumeHistory, setVolumeHistory] = useState<number[]>([]);
@@ -165,7 +165,7 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
     });
   };
 
-  const deletePreset = (index: number) => {
+  const _deletePreset = (index: number) => {
     const updated = presets.filter((_, i) => i !== index);
     setPresets(updated);
     setSavedPresets(updated);

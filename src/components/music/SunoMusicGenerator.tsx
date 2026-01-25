@@ -96,7 +96,7 @@ export const SunoMusicGenerator: React.FC = () => {
 
   // 🔥 Realtime updates via Supabase instead of polling
   const handleRealtimeComplete = useCallback((callback: { metadata?: { audioUrl?: string; imageUrl?: string; duration?: number; title?: string } }) => {
-    const moodData = MOOD_OPTIONS.find((m) => m.id === selectedMood);
+    const _moodData = MOOD_OPTIONS.find((m) => m.id === selectedMood);
     
     setCurrentTrack(prev => {
       if (!prev) return prev;
@@ -157,7 +157,7 @@ export const SunoMusicGenerator: React.FC = () => {
   }, [audioElement]);
 
   // La clé API est gérée côté serveur, pas besoin de vérifier côté client
-  const isApiConfigured = true; // L'API Suno est configurée via secrets serveur
+  const _isApiConfigured = true; // L'API Suno est configurée via secrets serveur
 
   const handleGenerateMusic = async () => {
     if (!user) {

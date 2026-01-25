@@ -2,7 +2,7 @@
  * Comprehensive System Audit Dashboard
  * Full audit of platform security, performance, compliance and data integrity
  */
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -250,12 +250,12 @@ export default function ComprehensiveSystemAudit() {
    * Simule/exécute une vérification d'audit
    */
   const runCheck = async (check: AuditCheck): Promise<AuditCheck> => {
-    const startTime = Date.now();
+    const _startTime = Date.now();
 
     try {
       switch (check.id) {
         case 'sec-auth': {
-          const { data, error } = await supabase.auth.getSession();
+          const { error } = await supabase.auth.getSession();
           return {
             ...check,
             status: error ? 'fail' : 'pass',
@@ -288,7 +288,7 @@ export default function ComprehensiveSystemAudit() {
         }
 
         case 'comp-privacy-policy': {
-          const { data, error } = await supabase
+          const { data } = await supabase
             .from('privacy_policies')
             .select('*')
             .eq('is_active', true)

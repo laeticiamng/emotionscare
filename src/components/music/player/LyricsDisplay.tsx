@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -74,7 +74,7 @@ const generateTherapeuticLyrics = (track: { title: string; mood?: string; artist
 const LyricsDisplay: React.FC<LyricsDisplayProps> = ({ className }) => {
   const { state } = useMusic();
   const { isFavorite, toggleFavorite } = useMusicFavorites();
-  const { currentTrack, isPlaying, currentTime: playerTime } = state;
+  const { currentTrack, currentTime: playerTime } = state;
   const [showTranslation, setShowTranslation] = useState(false);
   const [fontSize, setFontSize] = useState('md');
 

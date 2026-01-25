@@ -321,7 +321,7 @@ export const SessionsService = {
   /**
    * Appel à l'edge function sessions-api pour les stats
    */
-  async getStatsFromEdge(userId: string): Promise<SessionStats | null> {
+  async getStatsFromEdge(_userId: string): Promise<SessionStats | null> {
     const { data, error } = await supabase.functions.invoke('sessions-api', {
       body: { action: 'stats' },
     });

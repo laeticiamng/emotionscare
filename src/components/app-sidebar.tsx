@@ -2,7 +2,7 @@
  * AppSidebar - Navigation immersive avec sidebar moderne
  */
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -70,7 +70,7 @@ interface NavigationGroup {
 }
 
 export function AppSidebar() {
-  const { state, open } = useSidebar();
+  const { state } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);

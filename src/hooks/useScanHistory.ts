@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 
 export interface ScanHistoryItem {
   id: string;
@@ -45,7 +45,7 @@ export function useScanHistory(limit = 3) {
             table: 'clinical_signals',
             filter: `user_id=eq.${user.id}`
           },
-          (payload) => {
+          (_payload) => {
             // Invalider le cache pour récupérer les nouvelles données
             queryClient.invalidateQueries({ queryKey: ['scan-history'] });
             queryClient.invalidateQueries({ queryKey: ['multi-source-history'] });

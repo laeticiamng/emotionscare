@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 
 interface ExperimentFeature {
@@ -142,7 +142,7 @@ export const InnovationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [experiments, setExperiments] = useState<ExperimentFeature[]>(mockExperiments);
   const [techTrends, setTechTrends] = useState<TechTrend[]>(mockTechTrends);
   const [enabledFeatures, setEnabledFeatures] = useState<string[]>([]);
-  const { user } = useAuth();
+  const {  } = useAuth();
 
   useEffect(() => {
     // Calculer les fonctionnalités activées basées sur les expériences

@@ -1,5 +1,4 @@
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
-import { supabase } from '../_shared/supa_client.ts';
 import { getUserHash, json } from '../_shared/http.ts';
 import { authorizeRole } from '../_shared/auth.ts';
 
@@ -20,7 +19,7 @@ serve(async (req) => {
     }
 
     const jwt = req.headers.get('authorization')?.replace('Bearer ', '') || '';
-    const userHash = getUserHash(jwt);
+    const _userHash = getUserHash(jwt);
     
     // Get current week start (Monday)
     const now = new Date();

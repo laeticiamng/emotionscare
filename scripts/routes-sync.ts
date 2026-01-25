@@ -1,5 +1,5 @@
 #!/usr/bin/env tsx
-import { mkdir, writeFile, readdir, stat } from 'fs/promises';
+import { mkdir, writeFile, stat } from 'fs/promises';
 import { join, dirname } from 'path';
 import { ROUTES_REGISTRY as ROUTES_MANIFEST } from '../src/routerV2/registry';
 interface RouteManifestEntry { path: string; component: string; module?: string; auth?: boolean | string; role?: string; }

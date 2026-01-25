@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Activity, AlertTriangle, ArrowDown, ArrowUp, Clock, Download, RefreshCw, TrendingUp, Zap } from 'lucide-react';
+import { Activity, AlertTriangle, ArrowDown, ArrowUp, Download, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -59,7 +59,6 @@ export function K6MetricsChart({
   isLoading = false
 }: K6MetricsChartProps) {
   const [timeRange, setTimeRange] = useState<'1h' | '6h' | '24h' | '7d'>('24h');
-  const [showAnnotations, setShowAnnotations] = useState(true);
 
   // Statistiques calculées
   const stats = useMemo(() => {
@@ -67,7 +66,6 @@ export function K6MetricsChart({
 
     if (type === 'latency') {
       const p95Values = metrics.map(m => m.http_req_duration_p95);
-      const p99Values = metrics.map(m => m.http_req_duration_p99);
       return {
         current: p95Values[p95Values.length - 1],
         average: p95Values.reduce((a, b) => a + b, 0) / p95Values.length,
