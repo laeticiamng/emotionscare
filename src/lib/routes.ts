@@ -126,6 +126,7 @@ export const b2cRoutes = {
   exchange: () => resolveRoutePath('exchange-hub'),
   groupSessions: () => resolveRoutePath('group-sessions'),
   buddies: () => resolveRoutePath('buddies'),
+  brainViewer: () => resolveRoutePath('brain-viewer'),
 } as const;
 
 export const consumerRoutes = {
@@ -167,6 +168,7 @@ export const consumerRoutes = {
   profile: () => resolveRoutePath('settings-profile'),
   exchange: () => resolveRoutePath('exchange-hub'),
   groupSessions: () => resolveRoutePath('group-sessions'),
+  brainViewer: () => resolveRoutePath('brain-viewer'),
 } as const;
 
 export const b2bRoutes = {
