@@ -177,6 +177,24 @@ verify_jwt = true
 [functions.seuil-api]
 verify_jwt = true
 
+[functions.context-lens-auth]
+verify_jwt = false
+
+[functions.context-lens-patients]
+verify_jwt = false
+
+[functions.context-lens-brain]
+verify_jwt = false
+
+[functions.context-lens-notes]
+verify_jwt = false
+
+[functions.context-lens-reports]
+verify_jwt = false
+
+[functions.context-lens-websocket]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321
