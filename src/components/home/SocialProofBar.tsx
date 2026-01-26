@@ -1,12 +1,11 @@
 /**
  * SocialProofBar - Barre de preuve sociale animée
- * Affiche des notifications de nouveaux utilisateurs et actions
+ * OPTIMISÉ: CSS animations au lieu de framer-motion pour performance
  */
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, memo } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Heart, User, Zap, Moon, CheckCircle2 } from 'lucide-react';
+import { Heart, User, Zap, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SocialProofItem {
@@ -111,45 +110,43 @@ const SocialProofBar: React.FC<SocialProofBarProps> = ({
   if (!currentProof) return null;
 
   return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          initial={{ opacity: 0, y: position === 'bottom' ? 20 : -20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: position === 'bottom' ? 20 : -20, scale: 0.95 }}
-          transition={{ duration: 0.3 }}
-          className={cn(
-            'fixed z-50 left-4',
-            position === 'bottom' ? 'bottom-4' : 'top-4',
-            !showOnMobile && 'hidden md:block',
-            className
-          )}
-        >
-          <div 
-            className="flex items-center gap-3 px-4 py-3 bg-card/95 backdrop-blur-sm rounded-lg border border-border shadow-lg max-w-sm"
-            role="status"
-            aria-live="polite"
-            aria-label={`${currentProof.name} ${currentProof.action} - ${currentProof.time}`}
-          >
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted" aria-hidden="true">
-              {currentProof.icon}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm text-foreground truncate">
-                <span className="font-medium">{currentProof.name}</span>
-                {' '}
-                <span className="text-muted-foreground">{currentProof.action}</span>
-              </p>
-              <p className="text-xs text-muted-foreground">{currentProof.time}</p>
-            </div>
-            <Badge variant="secondary" className="text-xs flex-shrink-0">
-              Vérifié
-            </Badge>
-          </div>
-        </motion.div>
+    <div
+      className={cn(
+        'fixed z-50 left-4 transition-all duration-300 ease-out',
+        position === 'bottom' ? 'bottom-4' : 'top-4',
+        !showOnMobile && 'hidden md:block',
+        isVisible 
+          ? 'opacity-100 translate-y-0 scale-100' 
+          : cn(
+              'opacity-0 scale-95',
+              position === 'bottom' ? 'translate-y-5' : '-translate-y-5'
+            ),
+        className
       )}
-    </AnimatePresence>
+    >
+      <div 
+        className="flex items-center gap-3 px-4 py-3 bg-card/95 backdrop-blur-sm rounded-lg border border-border shadow-lg max-w-sm"
+        role="status"
+        aria-live="polite"
+        aria-label={`${currentProof.name} ${currentProof.action} - ${currentProof.time}`}
+      >
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted" aria-hidden="true">
+          {currentProof.icon}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm text-foreground truncate">
+            <span className="font-medium">{currentProof.name}</span>
+            {' '}
+            <span className="text-muted-foreground">{currentProof.action}</span>
+          </p>
+          <p className="text-xs text-muted-foreground">{currentProof.time}</p>
+        </div>
+        <Badge variant="secondary" className="text-xs flex-shrink-0">
+          Vérifié
+        </Badge>
+      </div>
+    </div>
   );
 };
 
-export default SocialProofBar;
+export default memo(SocialProofBar);

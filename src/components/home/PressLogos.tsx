@@ -1,10 +1,9 @@
 /**
  * PressLogos - Logos de presse et partenaires
- * Social proof via mentions médiatiques
+ * OPTIMISÉ: CSS animations au lieu de framer-motion pour performance
  */
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { memo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Award, Newspaper } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -34,19 +33,6 @@ const PressLogos: React.FC<PressLogosProps> = ({
   className,
   variant = 'static',
 }) => {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0 },
-  };
-
   if (variant === 'minimal') {
     return (
       <div className={cn('text-center', className)}>
@@ -66,54 +52,51 @@ const PressLogos: React.FC<PressLogosProps> = ({
     return (
       <div className={cn('overflow-hidden py-6', className)}>
         <div className="flex items-center gap-2 mb-4 justify-center">
-          <Newspaper className="h-4 w-4 text-muted-foreground" />
+          <Newspaper className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
           <span className="text-sm text-muted-foreground">Ils parlent de nous</span>
         </div>
-        <motion.div
-          animate={{ x: [0, -1000] }}
-          transition={{
-            x: {
-              repeat: Infinity,
-              repeatType: 'loop',
-              duration: 20,
-              ease: 'linear',
-            },
-          }}
-          className="flex gap-12 whitespace-nowrap"
-        >
-          {[...pressLogos, ...pressLogos].map((logo, index) => (
-            <div
-              key={`${logo.id}-${index}`}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/30"
-            >
-              <span className="text-lg font-bold text-foreground/80">{logo.name}</span>
-              {logo.mention && (
-                <Badge variant="secondary" className="text-xs">
-                  {logo.mention}
-                </Badge>
-              )}
-            </div>
-          ))}
-        </motion.div>
+        {/* CSS-only infinite scroll animation */}
+        <div className="relative">
+          <div 
+            className="flex gap-12 whitespace-nowrap animate-scroll-left"
+            style={{
+              animation: 'scroll-left 20s linear infinite',
+            }}
+          >
+            {[...pressLogos, ...pressLogos, ...pressLogos].map((logo, index) => (
+              <div
+                key={`${logo.id}-${index}`}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/30 flex-shrink-0"
+              >
+                <span className="text-lg font-bold text-foreground/80">{logo.name}</span>
+                {logo.mention && (
+                  <Badge variant="secondary" className="text-xs">
+                    {logo.mention}
+                  </Badge>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+        <style>{`
+          @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-33.333%); }
+          }
+        `}</style>
       </div>
     );
   }
 
-  // Static variant (default)
+  // Static variant (default) - CSS animations instead of framer-motion
   return (
     <section className={cn('py-12 bg-muted/20', className)}>
       <div className="container">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="space-y-8"
-        >
+        <div className="space-y-8 animate-in fade-in duration-500">
           {/* Header */}
           <div className="text-center">
             <Badge variant="outline" className="gap-2 mb-4">
-              <Award className="h-3 w-3" />
+              <Award className="h-3 w-3" aria-hidden="true" />
               Reconnu et recommandé
             </Badge>
             <p className="text-sm text-muted-foreground">
@@ -121,29 +104,25 @@ const PressLogos: React.FC<PressLogosProps> = ({
             </p>
           </div>
 
-          {/* Logos Grid */}
-          <motion.div
-            variants={containerVariants}
-            className="flex flex-wrap justify-center items-center gap-8 md:gap-12"
-          >
-            {pressLogos.map((logo) => (
-              <motion.div
+          {/* Logos Grid - staggered animation via CSS */}
+          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
+            {pressLogos.map((logo, index) => (
+              <div
                 key={logo.id}
-                variants={itemVariants}
-                whileHover={{ scale: 1.05 }}
-                className="flex flex-col items-center gap-2 px-6 py-4 rounded-xl bg-card/50 border border-border/50 hover:shadow-lg transition-all cursor-default"
+                className="flex flex-col items-center gap-2 px-6 py-4 rounded-xl bg-card/50 border border-border/50 hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-default animate-in fade-in slide-in-from-bottom-4"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
                 <span className="text-xl font-bold text-foreground/80">{logo.name}</span>
                 {logo.mention && (
                   <span className="text-xs text-muted-foreground">"{logo.mention}"</span>
                 )}
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </section>
   );
 };
 
-export default PressLogos;
+export default memo(PressLogos);
