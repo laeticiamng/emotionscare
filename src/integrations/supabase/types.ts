@@ -3066,6 +3066,242 @@ export type Database = {
           },
         ]
       }
+      brain_annotations: {
+        Row: {
+          annotation_type: string
+          author_id: string | null
+          content: string
+          created_at: string
+          id: string
+          position: Json | null
+          region_id: string | null
+          scan_id: string
+          updated_at: string
+        }
+        Insert: {
+          annotation_type?: string
+          author_id?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          position?: Json | null
+          region_id?: string | null
+          scan_id: string
+          updated_at?: string
+        }
+        Update: {
+          annotation_type?: string
+          author_id?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          position?: Json | null
+          region_id?: string | null
+          scan_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brain_annotations_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brain_annotations_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brain_annotations_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "brain_regions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brain_annotations_scan_id_fkey"
+            columns: ["scan_id"]
+            isOneToOne: false
+            referencedRelation: "brain_scans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brain_regions: {
+        Row: {
+          created_at: string
+          default_color: string
+          hemisphere: string | null
+          id: string
+          mesh_data: Json | null
+          region_code: string
+          region_name: string
+          scan_id: string
+          volume_mm3: number | null
+        }
+        Insert: {
+          created_at?: string
+          default_color?: string
+          hemisphere?: string | null
+          id?: string
+          mesh_data?: Json | null
+          region_code: string
+          region_name: string
+          scan_id: string
+          volume_mm3?: number | null
+        }
+        Update: {
+          created_at?: string
+          default_color?: string
+          hemisphere?: string | null
+          id?: string
+          mesh_data?: Json | null
+          region_code?: string
+          region_name?: string
+          scan_id?: string
+          volume_mm3?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brain_regions_scan_id_fkey"
+            columns: ["scan_id"]
+            isOneToOne: false
+            referencedRelation: "brain_scans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brain_scans: {
+        Row: {
+          created_at: string
+          dimensions: number[] | null
+          id: string
+          is_anonymized: boolean | null
+          mesh_file_path: string | null
+          metadata: Json | null
+          modality: string
+          original_file_path: string | null
+          patient_id: string
+          series_description: string | null
+          status: string
+          study_date: string | null
+          thumbnail_url: string | null
+          updated_at: string
+          voxel_size: number[] | null
+        }
+        Insert: {
+          created_at?: string
+          dimensions?: number[] | null
+          id?: string
+          is_anonymized?: boolean | null
+          mesh_file_path?: string | null
+          metadata?: Json | null
+          modality: string
+          original_file_path?: string | null
+          patient_id: string
+          series_description?: string | null
+          status?: string
+          study_date?: string | null
+          thumbnail_url?: string | null
+          updated_at?: string
+          voxel_size?: number[] | null
+        }
+        Update: {
+          created_at?: string
+          dimensions?: number[] | null
+          id?: string
+          is_anonymized?: boolean | null
+          mesh_file_path?: string | null
+          metadata?: Json | null
+          modality?: string
+          original_file_path?: string | null
+          patient_id?: string
+          series_description?: string | null
+          status?: string
+          study_date?: string | null
+          thumbnail_url?: string | null
+          updated_at?: string
+          voxel_size?: number[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brain_scans_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brain_scans_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brain_view_sessions: {
+        Row: {
+          duration_seconds: number | null
+          emotions_overlaid: boolean | null
+          ended_at: string | null
+          export_formats: string[] | null
+          id: string
+          regions_viewed: string[] | null
+          scan_id: string
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          duration_seconds?: number | null
+          emotions_overlaid?: boolean | null
+          ended_at?: string | null
+          export_formats?: string[] | null
+          id?: string
+          regions_viewed?: string[] | null
+          scan_id: string
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          duration_seconds?: number | null
+          emotions_overlaid?: boolean | null
+          ended_at?: string | null
+          export_formats?: string[] | null
+          id?: string
+          regions_viewed?: string[] | null
+          scan_id?: string
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brain_view_sessions_scan_id_fkey"
+            columns: ["scan_id"]
+            isOneToOne: false
+            referencedRelation: "brain_scans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brain_view_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brain_view_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       breath_session_feedback: {
         Row: {
           created_at: string
@@ -7382,6 +7618,61 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      emotion_brain_mappings: {
+        Row: {
+          created_at: string
+          hume_session_id: string | null
+          id: string
+          mappings: Json
+          patient_id: string
+          scan_id: string | null
+          source: string | null
+          timestamp: string
+        }
+        Insert: {
+          created_at?: string
+          hume_session_id?: string | null
+          id?: string
+          mappings?: Json
+          patient_id: string
+          scan_id?: string | null
+          source?: string | null
+          timestamp?: string
+        }
+        Update: {
+          created_at?: string
+          hume_session_id?: string | null
+          id?: string
+          mappings?: Json
+          patient_id?: string
+          scan_id?: string | null
+          source?: string | null
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emotion_brain_mappings_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emotion_brain_mappings_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emotion_brain_mappings_scan_id_fkey"
+            columns: ["scan_id"]
+            isOneToOne: false
+            referencedRelation: "brain_scans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       emotion_cards: {
         Row: {
