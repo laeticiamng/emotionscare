@@ -195,6 +195,9 @@ verify_jwt = false
 [functions.context-lens-websocket]
 verify_jwt = false
 
+[functions.context-lens-anatomy]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321

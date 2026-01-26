@@ -1413,6 +1413,118 @@ export type Database = {
         }
         Relationships: []
       }
+      anatomical_landmarks: {
+        Row: {
+          confidence: number | null
+          created_at: string | null
+          detection_method: string | null
+          id: string
+          landmark_code: string
+          landmark_name: string
+          position: number[]
+          scan_id: string
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string | null
+          detection_method?: string | null
+          id?: string
+          landmark_code: string
+          landmark_name: string
+          position: number[]
+          scan_id: string
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string | null
+          detection_method?: string | null
+          id?: string
+          landmark_code?: string
+          landmark_name?: string
+          position?: number[]
+          scan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anatomical_landmarks_scan_id_fkey"
+            columns: ["scan_id"]
+            isOneToOne: false
+            referencedRelation: "wholebody_scans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      anatomical_structures: {
+        Row: {
+          body_zone: string
+          bounding_box: number[] | null
+          centroid: number[] | null
+          created_at: string | null
+          default_color: string
+          id: string
+          laterality: string | null
+          mask_file_path: string | null
+          mesh_file_path_high: string | null
+          mesh_file_path_low: string | null
+          mesh_file_path_medium: string | null
+          metadata: Json | null
+          priority: number | null
+          scan_id: string
+          structure_category: string
+          structure_code: string
+          structure_name: string
+          volume_ml: number | null
+        }
+        Insert: {
+          body_zone: string
+          bounding_box?: number[] | null
+          centroid?: number[] | null
+          created_at?: string | null
+          default_color?: string
+          id?: string
+          laterality?: string | null
+          mask_file_path?: string | null
+          mesh_file_path_high?: string | null
+          mesh_file_path_low?: string | null
+          mesh_file_path_medium?: string | null
+          metadata?: Json | null
+          priority?: number | null
+          scan_id: string
+          structure_category: string
+          structure_code: string
+          structure_name: string
+          volume_ml?: number | null
+        }
+        Update: {
+          body_zone?: string
+          bounding_box?: number[] | null
+          centroid?: number[] | null
+          created_at?: string | null
+          default_color?: string
+          id?: string
+          laterality?: string | null
+          mask_file_path?: string | null
+          mesh_file_path_high?: string | null
+          mesh_file_path_low?: string | null
+          mesh_file_path_medium?: string | null
+          metadata?: Json | null
+          priority?: number | null
+          scan_id?: string
+          structure_category?: string
+          structure_code?: string
+          structure_name?: string
+          volume_ml?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anatomical_structures_scan_id_fkey"
+            columns: ["scan_id"]
+            isOneToOne: false
+            referencedRelation: "wholebody_scans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       api_integrations: {
         Row: {
           base_url: string
@@ -1553,6 +1665,47 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      ar_registration_matrices: {
+        Row: {
+          calibration_accuracy: number | null
+          calibration_method: string | null
+          created_at: string | null
+          id: string
+          scale_factor: number | null
+          scan_id: string
+          session_id: string | null
+          transformation_matrix: number[] | null
+        }
+        Insert: {
+          calibration_accuracy?: number | null
+          calibration_method?: string | null
+          created_at?: string | null
+          id?: string
+          scale_factor?: number | null
+          scan_id: string
+          session_id?: string | null
+          transformation_matrix?: number[] | null
+        }
+        Update: {
+          calibration_accuracy?: number | null
+          calibration_method?: string | null
+          created_at?: string | null
+          id?: string
+          scale_factor?: number | null
+          scan_id?: string
+          session_id?: string | null
+          transformation_matrix?: number[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ar_registration_matrices_scan_id_fkey"
+            columns: ["scan_id"]
+            isOneToOne: false
+            referencedRelation: "wholebody_scans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       assessment_sessions: {
         Row: {
@@ -27912,6 +28065,65 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      wholebody_scans: {
+        Row: {
+          body_region: string | null
+          brain_scan_id: string | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          modality: string
+          nifti_file_path: string | null
+          original_file_path: string
+          patient_id: string
+          processing_error: string | null
+          scan_date: string | null
+          segmentation_model: string | null
+          segmentation_status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          body_region?: string | null
+          brain_scan_id?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          modality: string
+          nifti_file_path?: string | null
+          original_file_path: string
+          patient_id: string
+          processing_error?: string | null
+          scan_date?: string | null
+          segmentation_model?: string | null
+          segmentation_status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          body_region?: string | null
+          brain_scan_id?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          modality?: string
+          nifti_file_path?: string | null
+          original_file_path?: string
+          patient_id?: string
+          processing_error?: string | null
+          scan_date?: string | null
+          segmentation_model?: string | null
+          segmentation_status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholebody_scans_brain_scan_id_fkey"
+            columns: ["brain_scan_id"]
+            isOneToOne: false
+            referencedRelation: "brain_scans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
