@@ -293,6 +293,9 @@ export const EmotionAtlasService = {
       ? data.nodes.reduce((sum, n) => sum + n.intensity, 0) / data.nodes.length
       : 0;
 
+    // Calculate streak days from mood entries
+    const streakDays = await this.calculateStreakDays(userId);
+
     return {
       totalEmotions: data.totalEntries,
       uniqueEmotions: data.nodes.length,
@@ -300,8 +303,55 @@ export const EmotionAtlasService = {
       emotionDiversity: Math.min(100, data.nodes.length * 10),
       positiveRatio: totalFreq > 0 ? Math.round((posFreq / totalFreq) * 100) : 50,
       averageIntensity: Math.round(avgIntensity),
-      streakDays: 0, // TODO: calculer depuis les dates
+      streakDays,
     };
+  },
+
+  /**
+   * Calcule les jours de streak consécutifs
+   */
+  async calculateStreakDays(userId: string): Promise<number> {
+    try {
+      const { data, error } = await supabase
+        .from('mood_entries')
+        .select('created_at')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(90);
+
+      if (error || !data || data.length === 0) return 0;
+
+      const dates = data.map(e => new Date(e.created_at).toDateString());
+      const uniqueDates = [...new Set(dates)].sort((a, b) => 
+        new Date(b).getTime() - new Date(a).getTime()
+      );
+
+      if (uniqueDates.length === 0) return 0;
+
+      const today = new Date().toDateString();
+      const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+      // Check if streak is active
+      if (uniqueDates[0] !== today && uniqueDates[0] !== yesterday) return 0;
+
+      let streak = 1;
+      for (let i = 1; i < uniqueDates.length; i++) {
+        const prev = new Date(uniqueDates[i - 1]).getTime();
+        const curr = new Date(uniqueDates[i]).getTime();
+        const diffDays = Math.round((prev - curr) / 86400000);
+        
+        if (diffDays === 1) {
+          streak++;
+        } else {
+          break;
+        }
+      }
+
+      return streak;
+    } catch (err) {
+      logger.error('Error calculating streak', err as Error, 'EMOTION_ATLAS');
+      return 0;
+    }
   },
 
   /**
