@@ -17,8 +17,15 @@ export interface OptimizationSuggestion {
 
 export async function logEvent(event: OptimizationEvent): Promise<void> {
   try {
+    // Get the current authenticated user's ID from Supabase auth
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      logger.warn('logEvent skipped: no authenticated user', null, 'ANALYTICS');
+      return;
+    }
+    
     const { error } = await supabase.from('pwa_metrics').insert({
-      user_id: event.userId,
+      user_id: user.id, // Use auth.uid() instead of provided userId to satisfy RLS
       metric_type: event.module,
       metric_value: { action: event.action },
       recorded_at: event.timestamp || new Date().toISOString()
