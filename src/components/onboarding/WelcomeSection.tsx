@@ -8,14 +8,11 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
   Sparkles, Play, Clock, Users, Heart, Brain, Music, 
-  Shield, Star, CheckCircle2, ArrowRight, Zap, Award
+  Shield, Star, CheckCircle2, ArrowRight, Zap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Tooltip,
-  TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
 } from "@/components/ui/tooltip";
 
 interface WelcomeSectionProps {

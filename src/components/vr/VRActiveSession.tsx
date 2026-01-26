@@ -4,7 +4,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlayCircle, PauseCircle } from 'lucide-react';
-import { VRSessionTemplate, VRSession } from '@/types';
+import { VRSessionTemplate } from '@/types';
 
 interface VRActiveSessionProps {
   template: VRSessionTemplate;

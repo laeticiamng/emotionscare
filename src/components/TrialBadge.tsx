@@ -9,7 +9,7 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { 
   Clock, Sparkles, Crown, AlertTriangle, X, 
-  Star, CheckCircle, Users, TrendingUp, Gift,
+  Star, Users, TrendingUp, Gift,
   Zap, Shield, HeartHandshake
 } from 'lucide-react';
 import { cn } from '@/lib/utils';

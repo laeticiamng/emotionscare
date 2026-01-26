@@ -4,9 +4,8 @@
  * Boucle cœur : Démarrage → constellations qui se tissent si tu tiens la cadence → sortie en mots.
  */
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import * as Sentry from '@sentry/react';
-import { captureException } from '@/lib/ai-monitoring';
 import { logger } from '@/lib/logger';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Play, Pause, RotateCcw, Sparkles } from 'lucide-react';

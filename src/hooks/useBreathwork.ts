@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useEffect, useRef, useCallback } from 'react';
-import { useBreathStore, Pattern, Phase, BreathEvent, BreathMetrics } from '@/store/breath.store';
+import { useBreathStore, BreathMetrics } from '@/store/breath.store';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 

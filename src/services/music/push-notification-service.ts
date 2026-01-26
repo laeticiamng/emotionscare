@@ -11,7 +11,7 @@ export const getPushNotificationConfig = async (): Promise<PushNotificationConfi
 };
 
 export const updatePushNotificationConfig = async (
-  config: Partial<PushNotificationConfig>
+  _config: Partial<PushNotificationConfig>
 ): Promise<void> => {
   // Implementation to come
 };

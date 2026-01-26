@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { logger } from '@/lib/logger';
 
 declare const React: any;

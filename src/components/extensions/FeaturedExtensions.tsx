@@ -1,11 +1,11 @@
 // @ts-nocheck
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { Star, ArrowRight, Download, Check } from 'lucide-react';
+import { Star, Download, Check } from 'lucide-react';
 import { useExtensions } from '@/contexts/ExtensionsContext';
 import { useNavigate } from 'react-router-dom';
 

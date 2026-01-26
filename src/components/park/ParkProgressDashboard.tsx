@@ -6,7 +6,7 @@
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Flame, TrendingUp, Calendar, Star, Zap, Trophy, 
+  Flame, Star, Zap, 
   Target, Clock, Award, ChevronRight, Sparkles 
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

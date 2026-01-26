@@ -2,13 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import {
   Accessibility,
-  Eye,
   Type,
   MousePointer,
   Volume2,
   Contrast,
-  ZoomIn,
-  Settings,
   X
 } from 'lucide-react';
 import {

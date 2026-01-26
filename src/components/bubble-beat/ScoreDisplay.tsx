@@ -4,7 +4,7 @@
 
 import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Target, Clock, Zap, TrendingUp } from 'lucide-react';
+import { Heart, Target, Clock, Zap } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 

@@ -25,8 +25,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Building2,
-  UserPlus,
-  Activity,
   AlertTriangle,
   Zap,
   Menu,

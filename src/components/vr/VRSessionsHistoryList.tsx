@@ -119,7 +119,6 @@ export const VRSessionsHistoryList: React.FC<VRSessionsHistoryListProps> = ({
 const DomeSessionCard: React.FC<DomeSession> = ({
   sessionId,
   tsJoin,
-  tsLeave,
   hrMean,
   valence,
   synchronyIdx,

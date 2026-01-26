@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
 import { CoachView } from '@/modules/coach/CoachView';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';

@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { WellnessGamificationPanel } from '@/components/gamification/WellnessGamificationPanel';
 import { WellnessStreakDisplay } from '@/components/gamification/WellnessStreakDisplay';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Trophy, Star, Flame, Calendar, Target, TrendingUp } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Trophy, Star, Calendar, TrendingUp } from 'lucide-react';
 
 export default function BadgesPage() {
   // Stats globales depuis localStorage

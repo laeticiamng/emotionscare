@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Play, Pause, RotateCcw, CheckCircle, Clock } from 'lucide-react';
+import { Play, Pause, RotateCcw, CheckCircle } from 'lucide-react';
 import { useCompleteQuest } from '../hooks';
 
 interface QuestTimerProps {

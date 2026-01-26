@@ -1,9 +1,8 @@
 // @ts-nocheck
 import { useCallback } from 'react';
-import { captureException } from '@/lib/ai-monitoring';
 import { logger } from '@/lib/logger';
 
-import { MOOD_UPDATED, publishMoodUpdated, type MoodEventDetail } from './mood-bus';
+import { publishMoodUpdated, type MoodEventDetail } from './mood-bus';
 
 export function toLevel(value: number): 0 | 1 | 2 | 3 | 4 {
   if (value <= 20) return 0;

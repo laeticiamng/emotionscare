@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { chatHistoryService } from '@/lib/chat/services';
-import { ChatConversation, ChatMessage } from '@/types/chat';
+import { ChatConversation } from '@/types/chat';
 
 // Étendons temporairement le service pour ajouter la fonction manquante
 const extendedChatHistoryService = {

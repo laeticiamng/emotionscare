@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -32,7 +32,7 @@ const VRTherapyEnhanced: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeSession, setActiveSession] = useState<VRSession | null>(null);
   const [environments, setEnvironments] = useState<VREnvironment[]>([]);
-  const [sessions, setSessions] = useState<VRSession[]>([]);
+  const [_sessions, setSessions] = useState<VRSession[]>([]);
   const [stats, setStats] = useState({ total: 0, completed: 0, avgDuration: 0 });
 
   // Paramètres de génération

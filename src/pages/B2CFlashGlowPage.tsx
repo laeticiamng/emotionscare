@@ -3,7 +3,7 @@
  * Page de respiration gamifiée accessible WCAG 2.1 AA
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Trophy, Flame, Clock, Share2, Settings, Loader2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';

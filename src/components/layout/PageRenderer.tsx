@@ -1,8 +1,6 @@
 import React, { Suspense } from 'react';
 import { logger } from '@/lib/logger';
 import { useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import { Card, CardContent } from '@/components/ui/card';
 import { AlertTriangle } from 'lucide-react';
@@ -13,8 +11,6 @@ interface PageRendererProps {
 
 const PageRenderer: React.FC<PageRendererProps> = ({ children }) => {
   const location = useLocation();
-  const { isAuthenticated, user } = useAuth();
-  const { userMode } = useUserMode();
 
   // Composant de fallback pour les erreurs de rendu
   const ErrorFallback = ({ error }: { error?: Error }) => (

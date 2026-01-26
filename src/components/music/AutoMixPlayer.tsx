@@ -55,7 +55,6 @@ export const AutoMixPlayer: React.FC = () => {
     activePlaylist,
     isGenerating,
     generateAutoMix,
-    fetchContext,
     saveContextPreferences,
     submitFeedback
   } = useAutoMix();
@@ -109,7 +108,7 @@ export const AutoMixPlayer: React.FC = () => {
   // Crossfade implementation
   const performCrossfade = useCallback((fromAudio: HTMLAudioElement, toAudio: HTMLAudioElement) => {
     const steps = crossfadeDuration * 20; // 20 steps per second
-    const fadeStep = 1 / steps;
+
     let step = 0;
 
     if (crossfadeIntervalRef.current) {

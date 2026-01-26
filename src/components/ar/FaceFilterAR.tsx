@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Camera, CameraOff, RotateCcw, Settings } from 'lucide-react';
+import { Camera, CameraOff, RotateCcw } from 'lucide-react';
 import { useCamera } from '@/hooks/useCamera';
 import { useARStore } from '@/store/ar.store';
 

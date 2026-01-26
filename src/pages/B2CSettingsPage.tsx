@@ -21,11 +21,10 @@ import { Label } from "@/components/ui/label";
 import { 
   Settings, Bell, Palette, Heart, Shield, Loader2, AlertCircle,
   Globe, Clock, Monitor, Moon, Sun, Volume2, VolumeX, Upload,
-  Accessibility, Eye, Download, Trash2, RefreshCw, Save, History,
-  Smartphone, Database, CheckCircle2, Info, HardDrive, Zap, TestTube2,
-  Lock, Sparkles, User, BellRing
+  Accessibility, Eye, Download, RefreshCw, Save,
+  Smartphone, Database, CheckCircle2, Info, HardDrive, Zap, TestTube2, User, BellRing
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { useToast } from "@/hooks/use-toast";
 import { useAccessibility } from "@/hooks/useAccessibility";
@@ -94,7 +93,7 @@ const B2CSettingsPage = () => {
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
-  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
+  const [_showHistoryDialog, _setShowHistoryDialog] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [storageInfo, setStorageInfo] = useState({ used: 0, max: 100, breakdown: { scans: 0, journal: 0, sessions: 0, other: 0 } });
   const [loadingStorage, setLoadingStorage] = useState(false);

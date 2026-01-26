@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import MeditationPage from '../MeditationPage';
 import { useMeditationStats, useMeditationHistory, useMeditationWeeklyProgress } from '@/hooks/useMeditationStats';
 import { useMeditationSettings } from '@/hooks/useMeditationSettings';

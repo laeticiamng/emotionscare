@@ -6,7 +6,6 @@
  */
 
 import { MusicTrack, MusicPlaylist } from '@/types/music';
-import { v4 as uuidv4 } from 'uuid';
 
 export const mockTracks: MusicTrack[] = [
   {

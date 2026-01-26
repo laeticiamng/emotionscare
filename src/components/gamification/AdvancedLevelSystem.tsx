@@ -7,8 +7,7 @@ import { Button } from '@/components/ui/button';
 import { 
   Trophy, 
   Star, 
-  Crown, 
-  Zap,
+  Crown,
   Gift,
   Sparkles,
   TrendingUp,

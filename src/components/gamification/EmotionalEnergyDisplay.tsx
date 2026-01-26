@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useState } from 'react';
-import { Sparkles, Zap, Battery, BatteryLow, BatteryCharging, Coffee, Moon, Heart } from 'lucide-react';
+import { Sparkles, Battery, BatteryLow, BatteryCharging, Coffee, Moon, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEmotionalEnergy } from '@/hooks/useEmotionalEnergy';
 import { Progress } from '@/components/ui/progress';

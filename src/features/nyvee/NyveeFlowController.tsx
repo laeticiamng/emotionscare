@@ -59,8 +59,8 @@ const DEFAULT_ANCHOR_DURATION = 60_000;
  * Persiste une session Nyvee dans la base de données
  */
 const persistNyveeSession = async (
-  moduleName: string,
-  data: {
+  _moduleName: string,
+  _data: {
     profile: string;
     next: string;
     exit: string;

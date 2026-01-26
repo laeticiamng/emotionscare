@@ -12,14 +12,12 @@ import {
   useTriggerRankings 
 } from '@/hooks/useCronJobs';
 import { 
-  Clock, 
   CheckCircle, 
   XCircle, 
   AlertCircle, 
   RefreshCw, 
   Calendar,
   Play,
-  Filter,
   Activity,
   Zap,
   Trophy,

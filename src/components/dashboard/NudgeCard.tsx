@@ -4,8 +4,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
-  ArrowRight, X, Clock, ThumbsUp, ThumbsDown, Bell, BellOff, 
-  Share2, History, Star, Sparkles, ChevronDown, MoreVertical 
+  ArrowRight, X, Clock, ThumbsUp, ThumbsDown, 
+  Share2, History, Star, Sparkles, MoreVertical 
 } from 'lucide-react';
 import { useRouter } from '@/hooks/router';
 import { useDashboardStore } from '@/store/dashboard.store';
@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 
 const HISTORY_KEY = 'nudge_history';
 const FEEDBACK_KEY = 'nudge_feedback';

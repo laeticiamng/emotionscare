@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, Clock, TrendingUp, CheckCircle, Star } from 'lucide-react';
+import { Clock, TrendingUp, CheckCircle, Star } from 'lucide-react';
 import { GamificationStats } from '@/types/gamification';
 
 interface UserSidePanelProps {

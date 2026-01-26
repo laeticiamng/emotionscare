@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Trophy, Star, Flame, Gift, Zap, Crown, Sparkles, Target } from 'lucide-react';
+import { ArrowLeft, Trophy, Star, Flame, Gift, Zap, Crown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AurasGalaxy } from '@/features/leaderboard';
 import { RewardsTab } from '@/components/gamification/RewardsTab';
@@ -16,7 +16,7 @@ import { Progress } from '@/components/ui/progress';
 const B2CGamificationPage: React.FC = () => {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState<'achievements' | 'rewards' | 'leaderboard'>('achievements');
-  const { progress, achievements, isLoading } = useGamification();
+ const { progress, achievements } = useGamification();
 
   const level = progress?.level ?? 1;
   const experience = progress?.currentXp ?? 0;

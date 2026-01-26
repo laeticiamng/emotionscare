@@ -10,7 +10,6 @@ import {
   BarChart4,
   Users,
   Calendar,
-  Headset,
   Shield,
   Lock,
   Star,
@@ -27,7 +26,6 @@ import {
   Eye,
   Info
 } from "lucide-react";
-import FeatureCard from '@/components/onboarding/FeatureCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Tooltip,

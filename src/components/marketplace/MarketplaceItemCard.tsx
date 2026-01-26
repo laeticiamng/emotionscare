@@ -2,7 +2,6 @@
  * Marketplace Item Card - Affichage d'un item
  */
 
-import React from 'react';
 import { Star, Download, Lock, Badge } from 'lucide-react';
 import { MarketplaceItem } from '@/services/marketplaceService';
 import { cn } from '@/lib/utils';

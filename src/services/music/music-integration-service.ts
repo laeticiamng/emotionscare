@@ -285,7 +285,7 @@ class MusicIntegrationService {
     );
 
     // Implement conflict resolution based on strategy
-    for (const conflict of conflicts) {
+    for (const _conflict of conflicts) {
       switch (strategy) {
         case 'keep-remote':
           // Use remote version

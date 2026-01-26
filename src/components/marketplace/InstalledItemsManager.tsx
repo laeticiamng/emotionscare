@@ -2,10 +2,10 @@
  * Installed Items Manager - Gestion des thèmes/widgets installés
  */
 
-import React, { useState } from 'react';
-import { Trash2, Eye, EyeOff, Download } from 'lucide-react';
+import { useState } from 'react';
+import { Trash2, Eye, EyeOff } from 'lucide-react';
 import { useInstalledThemes } from '@/hooks/useMarketplace';
-import { InstalledTheme, MarketplaceItem } from '@/services/marketplaceService';
+import { MarketplaceItem } from '@/services/marketplaceService';
 import { cn } from '@/lib/utils';
 
 interface InstalledItemsManagerProps {

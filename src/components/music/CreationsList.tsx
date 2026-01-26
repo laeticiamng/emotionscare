@@ -90,7 +90,7 @@ const CreationsList: React.FC = () => {
     }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (_id: string) => {
     toast({
       title: "Suppression confirmée",
       description: "La composition a été supprimée de votre bibliothèque",
@@ -98,7 +98,7 @@ const CreationsList: React.FC = () => {
     });
   };
 
-  const handleDownload = (id: string) => {
+  const handleDownload = (_id: string) => {
     toast({
       title: "Téléchargement commencé",
       description: "Votre composition est en cours de téléchargement",

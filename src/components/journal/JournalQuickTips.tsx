@@ -8,9 +8,9 @@ import { Progress } from '@/components/ui/progress';
 import { 
   X, Lightbulb, ChevronLeft, ChevronRight, Star, StarOff, 
   CheckCircle2, Share2, BookOpen, Heart, Sparkles, Target,
-  Wind, Mic, Filter, ExternalLink
+  Wind, Mic, ExternalLink
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Dialog,
   DialogContent,

@@ -5,7 +5,7 @@
  */
 
 import { readFileSync, readdirSync, statSync, existsSync } from 'fs';
-import { join, basename } from 'path';
+import { join } from 'path';
 import { ROUTES_REGISTRY } from '../src/routerV2/registry';
 
 interface ValidationIssue {
@@ -32,7 +32,6 @@ function scanFile(filePath: string): void {
   try {
     const content = readFileSync(filePath, 'utf-8');
     const lines = content.split('\n');
-    const fileName = basename(filePath);
 
     lines.forEach((line, index) => {
       const lineNum = index + 1;

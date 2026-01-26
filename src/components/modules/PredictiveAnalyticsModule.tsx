@@ -8,8 +8,8 @@ import { Progress } from '@/components/ui/progress';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Brain, TrendingUp, Target, Lightbulb, Settings, 
-  BarChart3, Zap, Eye, Clock, AlertCircle
+  Brain, TrendingUp, Lightbulb, Settings, 
+  BarChart3, Eye, AlertCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';

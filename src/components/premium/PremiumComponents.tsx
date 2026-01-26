@@ -6,7 +6,7 @@
 
 import React, { forwardRef, useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { useUnifiedStore, useUnifiedContext } from '@/core/UnifiedStateManager';
+import { useUnifiedContext } from '@/core/UnifiedStateManager';
 import { Loader2, CheckCircle, AlertCircle, Info, X } from 'lucide-react';
 
 // ==================== BUTTON PREMIUM ====================

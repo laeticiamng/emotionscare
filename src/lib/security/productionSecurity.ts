@@ -1,4 +1,3 @@
-import { APP_BASE_CSP } from './headers';
 import { logger } from '@/lib/logger';
 
 /**
@@ -47,48 +46,6 @@ const disableDevTools = (): void => {
       };
     }
   }
-};
-
-const applySecurityHeaders = (): void => {
-  if (typeof document === 'undefined') {
-    return;
-  }
-
-  // Content Security Policy
-  const existingCsp = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
-  if (existingCsp) {
-    existingCsp.setAttribute('content', APP_BASE_CSP);
-  } else {
-    const cspMeta = document.createElement('meta');
-    cspMeta.httpEquiv = 'Content-Security-Policy';
-    cspMeta.content = APP_BASE_CSP;
-    document.head.appendChild(cspMeta);
-  }
-
-  // Autres en-têtes de sécurité
-  const securityHeaders = [
-    { httpEquiv: 'X-Content-Type-Options', content: 'nosniff' },
-    { httpEquiv: 'X-Frame-Options', content: 'DENY' },
-    { httpEquiv: 'X-XSS-Protection', content: '1; mode=block' },
-    { httpEquiv: 'Referrer-Policy', content: 'strict-origin-when-cross-origin' },
-    { httpEquiv: 'Permissions-Policy', content: 'camera=(), microphone=(), geolocation=()' },
-    { httpEquiv: 'Cross-Origin-Resource-Policy', content: 'same-site' },
-    { httpEquiv: 'X-Robots-Tag', content: 'noindex' }
-  ];
-
-  securityHeaders.forEach(({ httpEquiv, content }) => {
-    const selector = `meta[http-equiv="${httpEquiv}"]`;
-    const existing = document.querySelector(selector);
-    if (existing) {
-      existing.setAttribute('content', content);
-      return;
-    }
-
-    const meta = document.createElement('meta');
-    meta.httpEquiv = httpEquiv;
-    meta.content = content;
-    document.head.appendChild(meta);
-  });
 };
 
 const cleanSensitiveData = (): void => {

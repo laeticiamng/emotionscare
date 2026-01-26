@@ -222,15 +222,6 @@ export const JournalTemplates = memo<JournalTemplatesProps>(({ onUseTemplate, cl
     setNewTemplate({ name: '', description: '', content: '', tags: '' });
     setIsCreateOpen(false);
   };
-  
-  const handleDeleteTemplate = (templateId: string) => {
-    setTemplates(prev => {
-      const updated = prev.filter(t => t.id !== templateId);
-      const customOnly = updated.filter(t => t.category === 'custom');
-      localStorage.setItem('journal_custom_templates', JSON.stringify(customOnly));
-      return updated;
-    });
-  };
 
   const getCategoryLabel = (category: JournalTemplate['category']): string => {
     const labels = {

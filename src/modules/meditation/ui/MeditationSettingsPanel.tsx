@@ -7,11 +7,10 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { 
   Settings, Bell, Volume2, Vibrate, Moon,
-  RotateCcw, Save, Clock, Music, Brain
+  RotateCcw, Save, Clock, Brain
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { meditationDurations, type MeditationDuration } from '../types';

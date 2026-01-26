@@ -6,14 +6,10 @@ import type {
   GalaxyEnvironment,
   BiometricInsight,
   BiometricMetrics,
-  ExplorationPreferences,
-  SessionCurrentState,
   AdaptiveRecommendation,
   SessionCompletion,
-  SessionCompletionResult,
   SessionReport,
   DiscoveryResult,
-  CosmicProgressionStats,
 } from '../types';
 
 describe('VR Galaxy types', () => {

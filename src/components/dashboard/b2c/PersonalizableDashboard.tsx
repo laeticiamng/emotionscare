@@ -5,7 +5,7 @@ import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '
 import { SortableContext, arrayMove, rectSortingStrategy } from '@dnd-kit/sortable';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Settings, Plus, Eye, EyeOff } from 'lucide-react';
+import { Settings, Eye, EyeOff } from 'lucide-react';
 import { DraggableWidget } from './DraggableWidget';
 import { EmotionalStatsWidget } from './widgets/EmotionalStatsWidget';
 import { QuickActionsWidget } from './widgets/QuickActionsWidget';

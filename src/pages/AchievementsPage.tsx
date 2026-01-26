@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  Trophy, Star, Calendar, Share2, Download, TrendingUp,
+  Trophy, Calendar, Share2, Download, TrendingUp,
   Target, Award, Sparkles, ArrowLeft, Lock, CheckCircle2
 } from 'lucide-react';
 import { useAttractionProgress } from '@/hooks/useAttractionProgress';

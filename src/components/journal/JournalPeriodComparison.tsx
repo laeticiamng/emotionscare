@@ -1,6 +1,5 @@
 import { memo, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Minus, Calendar, FileText, Hash, Activity } from 'lucide-react';
 import type { SanitizedNote } from '@/modules/journal/types';
 import { format, parseISO, startOfMonth, endOfMonth, subMonths, isWithinInterval } from 'date-fns';

@@ -9,11 +9,9 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { 
-  Users, MessageCircle, Heart, Star, Calendar, 
-  MapPin, Send, Phone, Video, Gift, Trophy,
-  Coffee, Book, Music, Gamepad2, Camera,
-  Zap, Clock, CheckCircle, UserPlus, Search,
-  Filter, Settings, Activity, Target, Sparkles
+  Users, MessageCircle, Heart, Calendar, 
+  MapPin, Send, Phone, Video, Book, Gamepad2, Camera,
+  Zap, Clock, CheckCircle, UserPlus, Search, Activity, Target, Sparkles
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';

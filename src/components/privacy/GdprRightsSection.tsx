@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { 
   Eye, Edit, Trash2, Download, Shield, AlertCircle, 
-  CheckCircle, Clock, FileText, Users, Lock 
+  CheckCircle, Clock, FileText, Lock 
 } from 'lucide-react';
 import { useEthics } from '@/contexts/EthicsContext';
 import { toast } from 'sonner';

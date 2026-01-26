@@ -317,7 +317,7 @@ export function useWearablesSync() {
     // Prioriser les données selon les sources (Garmin > Apple > Fitbit > Google)
     const priority: WearableProvider[] = ['garmin', 'apple_health', 'fitbit', 'google_fit', 'withings'];
 
-    const getFirstAvailable = <T,>(key: string, path: string[]): T | null => {
+    const getFirstAvailable = <T,>(_key: string, path: string[]): T | null => {
       for (const provider of priority) {
         const data = rawData[provider];
         if (data) {

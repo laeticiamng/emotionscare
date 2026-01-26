@@ -3,11 +3,10 @@
  * Immersive breathing guidance with 3D sphere animations
  */
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Wind, X, Play, Pause } from 'lucide-react';
 import { useAR } from '@/contexts/ARContext';
 import { useARBreathing } from '@/hooks/useARCore';
-import { BreathingPattern } from '@/services/arService';
 import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 
@@ -30,8 +29,8 @@ export function BreathingARGuide({
   onComplete,
   className
 }: BreathingARGuideProps) {
-  const { arMode, breathingPattern, setBreathingPattern } = useAR();
-  const { startBreathingSession, updateProgress, getBreathingPattern, loading, sessionId } =
+ const { breathingPattern, setBreathingPattern } = useAR();
+ const { startBreathingSession, getBreathingPattern } =
     useARBreathing(userId);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();

@@ -23,7 +23,6 @@ interface VRNebulaSessionProps {
  */
 export const VRNebulaSession: React.FC<VRNebulaSessionProps> = ({
   tsStart,
-  tsEnd,
   hrvPre,
   hrvPost,
   rmssdDelta,

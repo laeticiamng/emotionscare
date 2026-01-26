@@ -7,11 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
   TrendingUp, 
-  TrendingDown, 
   DollarSign, 
-  Clock, 
-  Zap, 
-  Award,
+  Zap,
   AlertTriangle,
   Activity,
   CheckCircle2,

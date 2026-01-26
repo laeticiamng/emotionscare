@@ -4,11 +4,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { 
-  BarChart3, TrendingUp, Flame, Trophy, 
+import { TrendingUp, Flame, Trophy, 
   Clock, Zap, Target, Calendar 
 } from 'lucide-react';
 import { flashGlowService, FlashGlowStats } from '../flash-glowService';

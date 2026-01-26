@@ -4,8 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, XCircle, ExternalLink } from 'lucide-react';
-import { routes } from '@/routerV2';
+import { CheckCircle, ExternalLink } from 'lucide-react';
 import { logger } from '@/lib/logger';
 
 const NavigationValidator: React.FC = () => {

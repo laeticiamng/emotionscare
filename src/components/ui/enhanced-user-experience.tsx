@@ -1,14 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useInView, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence, useInView, useScroll } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { 
-  Star, Heart, Sparkles, Zap, ArrowUp, ArrowRight, Clock,
-  TrendingUp, Award, Target, Bookmark, Share2, Download,
-  PlayCircle, PauseCircle, SkipForward, Volume2, Settings,
-  ChevronLeft, ChevronRight, RefreshCw, AlertCircle, CheckCircle,
-  Info, XCircle, HelpCircle, MessageSquare, ThumbsUp, Eye
+  Star, Heart, Sparkles, Zap, ArrowUp, Bookmark, Share2, AlertCircle, CheckCircle,
+  Info, XCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';

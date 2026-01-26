@@ -9,7 +9,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { 
   Search, Calendar, TrendingUp, TrendingDown, Filter, 
-  Download, Share2, Trash2, Star, ChevronDown, ChevronUp,
+  Download, Trash2, Star, ChevronDown, ChevronUp,
   BarChart3, Clock, Heart, Minus
 } from 'lucide-react';
 import {

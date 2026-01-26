@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, X, ExternalLink, Clock, MoreHorizontal, Bell, BellOff, Pin, Archive, Reply, Share2, Bookmark, ChevronDown, ChevronUp } from 'lucide-react';
+import { Check, X, ExternalLink, Clock, MoreHorizontal, BellOff, Pin, Archive, Reply, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';

@@ -12,7 +12,6 @@ import type {
   InsightStats, 
   InsightFilters, 
   InsightGenerationContext,
-  InsightPaginationOptions,
   InsightFeedback,
   InsightType,
   InsightPriority,
@@ -25,7 +24,7 @@ const STORAGE_KEY = 'insights_filters';
 
 export function useInsights(initialFilters?: InsightFilters) {
   const { user } = useAuth();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, _setSearchParams] = useSearchParams();
   
   const [insights, setInsights] = useState<Insight[]>([]);
   const [stats, setStats] = useState<InsightStats | null>(null);

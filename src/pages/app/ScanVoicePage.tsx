@@ -2,7 +2,7 @@
  * ScanVoicePage - Page de scan émotionnel par analyse vocale
  */
 
-import React, { useState, useCallback, useRef, lazy, Suspense } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Mic, MicOff, ArrowLeft, RefreshCw, Loader2, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';

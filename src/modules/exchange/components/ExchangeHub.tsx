@@ -12,7 +12,6 @@ import {
   ArrowRight,
   ArrowLeft,
   Sparkles,
-  Users,
   Zap,
   Trophy,
   BarChart3

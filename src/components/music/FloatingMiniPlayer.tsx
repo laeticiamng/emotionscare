@@ -52,7 +52,6 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
   onNext,
   onPrevious,
   onExpand,
-  onClose,
   onImmersive,
   onSeek,
   onVolumeChange,

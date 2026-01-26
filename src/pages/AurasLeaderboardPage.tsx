@@ -23,7 +23,7 @@ import {
   type TimeRange,
 } from '@/features/leaderboard';
 import { supabase } from '@/integrations/supabase/client';
-import { startOfWeek, startOfMonth, subWeeks } from 'date-fns';
+import { startOfWeek, startOfMonth } from 'date-fns';
 
 interface AuraHistoryEntry {
   weekStart: string;
@@ -35,7 +35,7 @@ interface AuraHistoryEntry {
 
 const AurasLeaderboardPage = () => {
   const navigate = useNavigate();
-  const { auras, myAura, loading } = useAurasLeaderboard();
+ const { auras, myAura } = useAurasLeaderboard();
   const [timeRange, setTimeRange] = useState<TimeRange>('week');
   const [myHistory, setMyHistory] = useState<AuraHistoryEntry[]>([]);
   const galaxyRef = useRef<HTMLDivElement>(null);

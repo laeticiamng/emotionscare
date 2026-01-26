@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
-import { logger } from '@/lib/logger';
 
 import { AccessibilityProvider } from '@/components/common/AccessibilityProvider';
 import { NotificationProvider } from '@/components/ui/notification-system';

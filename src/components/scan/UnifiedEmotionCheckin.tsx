@@ -53,7 +53,7 @@ const UnifiedEmotionCheckin: React.FC = () => {
 
   const handleQuickCheckin = async (emotion: any) => {
     try {
-      const { data, error } = await supabase
+ const { error } = await supabase
         .from('emotions')
         .insert([{
           emojis: emotion.name,
@@ -74,7 +74,7 @@ const UnifiedEmotionCheckin: React.FC = () => {
     }
   };
 
-  const mockMoodData = recentEntries.map((entry, index) => ({
+  const mockMoodData = recentEntries.map((entry, _index) => ({
     date: new Date(entry.timestamp).toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' }),
     mood: entry.intensity,
     emotion: entry.emotion,

@@ -20,7 +20,7 @@ serve(async (req) => {
     }
 
     const jwt = req.headers.get('authorization')?.replace('Bearer ', '') || '';
-    const userHash = getUserHash(jwt);
+    getUserHash(jwt);
     
     // Get current week start (Monday)
     const now = new Date();

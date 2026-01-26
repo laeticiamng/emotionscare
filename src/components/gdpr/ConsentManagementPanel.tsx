@@ -1,7 +1,6 @@
 // @ts-nocheck
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { logger } from '@/lib/logger';
 import { 
   Mail, MessageSquare, Bell, Phone, MapPin,
-  Check, X, History, TrendingUp, Shield, Info
+  Check, X, History, TrendingUp, Shield
 } from 'lucide-react';
 import { useConsentManagement } from '@/hooks/useConsentManagement';
 import { format } from 'date-fns';

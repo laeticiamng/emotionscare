@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Monitor, Eye, Clock, Pause, Play, Settings, TrendingDown, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Monitor, Eye, Clock, Play, Settings, TrendingDown, AlertTriangle, CheckCircle } from 'lucide-react';
 
 interface BreakSession {
   id: string;

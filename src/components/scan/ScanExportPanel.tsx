@@ -67,7 +67,7 @@ export const ScanExportPanel: React.FC = () => {
   const [loadingFormat, setLoadingFormat] = useState<ExportFormat | null>(null);
   const [lastExport, setLastExport] = useState<ExportFormat | null>(null);
   const [activeTab, setActiveTab] = useState('export');
-  const [localExportHistory, setLocalExportHistory] = useState<ExportRecord[]>(exportHistory);
+  const [_localExportHistory, setLocalExportHistory] = useState<ExportRecord[]>(exportHistory);
 
   // Sync from hook
   useEffect(() => {

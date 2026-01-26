@@ -12,7 +12,6 @@ import {
   WifiOff,
   Volume2,
   Sparkles,
-  Settings2,
 } from 'lucide-react';
 import { OfflineModeManager } from './OfflineModeManager';
 import { Audio3DVisualizer } from './Audio3DVisualizer';
@@ -41,7 +40,6 @@ export const AdvancedMusicDashboard: React.FC<AdvancedMusicDashboardProps> = ({
   tracks,
   isPlaying = false,
   currentTrack,
-  onTrackSelect,
 }) => {
   const [activeTab, setActiveTab] = useState('visualizer');
   const [currentWeather, setCurrentWeather] = useState<'sunny' | 'cloudy' | 'rainy' | 'snowy'>('sunny');

@@ -2,7 +2,6 @@
 
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { MusicTrack } from '@/types/music';
-import { UseAudioPlayerStateReturn } from '@/types/audio-player';
 import { logger } from '@/lib/logger';
 
 export const useAudioPlayerCore = (

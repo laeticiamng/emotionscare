@@ -6,12 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { Users, Search, Filter, Edit3, Shield, Mail, Phone, Calendar, MapPin, Activity, AlertTriangle, CheckCircle, XCircle, Eye, Download, Upload } from 'lucide-react';
+import { Users, Search, Edit3, Shield, Mail, Phone, Calendar, MapPin, Activity, AlertTriangle, CheckCircle, XCircle, Eye, Download, Upload } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
@@ -51,15 +48,15 @@ interface UserFilters {
 }
 
 export const AdvancedUserManagement: React.FC = () => {
-  const { user } = useAuth();
+  useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [filters, setFilters] = useState<UserFilters>({});
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
+  const [_viewMode, _setViewMode] = useState<'grid' | 'table'>('table');
   const [sortBy, setSortBy] = useState<'name' | 'email' | 'created_at' | 'lastLogin'>('created_at');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortOrder, _setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   // Statistiques globales
   const [stats, setStats] = useState({

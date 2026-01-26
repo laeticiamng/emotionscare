@@ -202,7 +202,7 @@ describe('AI Coach Service', () => {
       const emotions = [{ emotion: 'happy', intensity: 0.9 }] as any;
       mockChain.single.mockResolvedValue(mockSupabaseResponse({ ...mockSession, emotions_detected: emotions }));
 
-      const result = await updateSession({
+      await updateSession({
         session_id: 'session-123',
         emotions_detected: emotions,
       } as any);

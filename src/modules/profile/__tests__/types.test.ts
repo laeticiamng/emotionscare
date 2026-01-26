@@ -12,16 +12,10 @@ import {
 } from '../types';
 import type {
   UserProfile,
-  ProfilePreferences,
-  ProfileStats,
   AchievementRarity,
-  AchievementCategory,
   Achievement,
-  UserBadge,
-  ActiveSession,
   SecurityInfo,
   ActivityHistoryItem,
-  UpdateProfileInput,
 } from '../types';
 
 describe('Profile Types', () => {

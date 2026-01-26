@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useState, useCallback } from 'react';
-import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
+import { EmotionResult } from '@/types/emotion';
 import { v4 as uuidv4 } from 'uuid';
 
 export function useHumeAI() {

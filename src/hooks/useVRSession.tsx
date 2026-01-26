@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import VRService from '@/lib/vrService';
-import { VRSession, VRSessionTemplate, VRSessionFeedback } from '@/types/vr';
+import { VRSession, VRSessionTemplate } from '@/types/vr';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
 

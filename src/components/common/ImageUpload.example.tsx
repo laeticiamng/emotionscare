@@ -102,7 +102,7 @@ export function ProductImagesExample() {
  * - Reasonable file size
  */
 export function JournalPhotoExample() {
-  const [photo, setPhoto] = useState<File[]>([]);
+  const [_photo, setPhoto] = useState<File[]>([]);
 
   return (
     <Card>

@@ -7,7 +7,6 @@ import React, { useMemo } from 'react';
 import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 

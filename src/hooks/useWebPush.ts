@@ -80,7 +80,7 @@ export const useWebPush = () => {
   }, [state.isSupported]);
 
   // S'abonner aux notifications push
-  const subscribe = useCallback(async (vapidPublicKey?: string): Promise<PushSubscription | null> => {
+  const subscribe = useCallback(async (_vapidPublicKey?: string): Promise<PushSubscription | null> => {
     if (!state.isSupported) {
       throw new Error('Push notifications non supportées');
     }
@@ -254,7 +254,7 @@ export const useWebPush = () => {
 // Hook pour rappels de bien-être
 export const useWellnessReminders = () => {
   const { user } = useAuth();
-  const { subscribe, sendTestNotification, isSubscribed, isSupported, permission } = useWebPush();
+ const { sendTestNotification, isSubscribed, isSupported, permission } = useWebPush();
   
   const setupReminders = useCallback(async (
     preferences: {

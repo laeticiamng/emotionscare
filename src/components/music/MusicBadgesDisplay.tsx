@@ -7,7 +7,7 @@ import { LazyMotionWrapper, m, AnimatePresence } from '@/utils/lazy-motion';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Award, Lock, TrendingUp } from '@/components/music/icons';
 import { checkAndUnlockBadges, getUserMusicBadges, MusicBadge } from '@/services/music/badges-service';
 import { useToast } from '@/hooks/use-toast';

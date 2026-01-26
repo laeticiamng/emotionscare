@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { EmotionTrend, EmotionPattern, EmotionResult, EmotionInsight } from '@/types/emotion';
+import { EmotionTrend, EmotionPattern, EmotionInsight } from '@/types/emotion';
 import { supabase } from '@/integrations/supabase/client';
 import { useLogger } from '@/lib/logger';
 

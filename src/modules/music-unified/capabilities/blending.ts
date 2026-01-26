@@ -11,7 +11,6 @@ import type {
   EmotionBlend,
   EmotionalSliders,
 } from '../types';
-import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Couleurs associées aux émotions

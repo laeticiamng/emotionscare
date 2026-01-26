@@ -2,7 +2,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCcw } from 'lucide-react';
-import { User } from '@/types/user';
 import { useAuth } from '@/contexts/AuthContext';
 
 export interface DashboardHeaderProps {

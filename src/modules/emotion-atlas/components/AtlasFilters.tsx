@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, SlidersHorizontal, Filter } from 'lucide-react';
+import { SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';

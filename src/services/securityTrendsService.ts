@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
-import { subDays, format, startOfDay, endOfDay } from 'date-fns';
+import { subDays, format } from 'date-fns';
 
 export interface TrendData {
   date: string;

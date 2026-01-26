@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -6,8 +6,6 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
-  BarChart, 
-  Bar, 
   LineChart, 
   Line, 
   PieChart, 
@@ -30,19 +28,13 @@ import {
   TrendingUp, 
   TrendingDown, 
   Brain, 
-  Target, 
-  Users, 
-  Calendar,
+  Users,
   Activity,
   Zap,
   Heart,
   Eye,
-  Download,
   RefreshCw,
-  Filter,
   BarChart3,
-  PieChart as PieIcon,
-  LineChartIcon,
   AlertCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -51,7 +43,7 @@ import { logger } from '@/lib/logger';
 // Services et hooks
 import { generateAnalyticsInsights } from '@/lib/ai/analytics-service';
 import { useReporting } from '@/contexts/ReportingContext';
-import { analyticsService, type AnalyticsMetrics, type EmotionStats, type UserSegment } from '@/services/analyticsService';
+import { analyticsService, type AnalyticsMetrics, type EmotionStats } from '@/services/analyticsService';
 
 interface DashboardMetric {
   id: string;
@@ -61,24 +53,6 @@ interface DashboardMetric {
   trend: 'up' | 'down' | 'stable';
   icon: React.ReactNode;
   description: string;
-}
-
-interface EmotionAnalytics {
-  emotion: string;
-  value: number;
-  change: number;
-  color: string;
-  sessions: number;
-}
-
-interface TimeSeriesData {
-  timestamp: string;
-  overall: number;
-  joy: number;
-  calm: number;
-  energy: number;
-  stress: number;
-  focus: number;
 }
 
 interface LocalUserSegment {
@@ -98,7 +72,7 @@ interface InsightCard {
 }
 
 const EnhancedAnalyticsDashboard: React.FC = () => {
-  const { stats, chartData, isLoading, loadData } = useReporting();
+ const { loadData } = useReporting();
   const [timeRange, setTimeRange] = useState<'1w' | '1m' | '3m' | '6m'>('1m');
   const [selectedView, setSelectedView] = useState<'overview' | 'emotions' | 'users' | 'predictions'>('overview');
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -231,7 +205,7 @@ const EnhancedAnalyticsDashboard: React.FC = () => {
     };
 
     try {
-      const aiInsights = await generateAnalyticsInsights(rawData, 'monthly');
+      await generateAnalyticsInsights(rawData, 'monthly');
 
       // Générer des insights dynamiques basés sur les données réelles
       const insightCards: InsightCard[] = [];
@@ -318,7 +292,7 @@ const EnhancedAnalyticsDashboard: React.FC = () => {
   // Utiliser les données réelles
   const displayMetrics = generateAdvancedMetrics();
 
-  const getMetricIcon = (trend: string, change: number) => {
+  const getMetricIcon = (trend: string, _change: number) => {
     if (trend === 'up') return <TrendingUp className="h-3 w-3 text-green-500" />;
     if (trend === 'down') return <TrendingDown className="h-3 w-3 text-red-500" />;
     return <Activity className="h-3 w-3 text-blue-500" />;

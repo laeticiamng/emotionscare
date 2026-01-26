@@ -66,7 +66,7 @@ export interface ARProviderProps {
 }
 
 export function ARProvider({ children }: ARProviderProps) {
-  const [isARSupported, setIsARSupported] = useState(false);
+  const [isARSupported, _setIsARSupported] = useState(false);
   const [sessionActive, setSessionActive] = useState(false);
   const [sessionConfig, setSessionConfig] = useState<ARSessionConfig | null>(null);
   const [currentExperience, setCurrentExperience] = useState<

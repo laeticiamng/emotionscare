@@ -29,6 +29,7 @@ serve(async (req: Request) => {
     console.log('Running security penetration tests');
 
     const vulnerabilities = [];
+    let exposedSecrets = false;
 
     // Test 1: Vérifier les tables sans RLS
     const { data: tables } = await supabase.rpc('get_tables_without_rls');
@@ -65,8 +66,8 @@ serve(async (req: Request) => {
     }
 
     // Test 3: Vérifier les secrets exposés dans le code
-    const { data: functions } = await supabase.storage.from('functions').list();
-    let exposedSecrets = false;
+    const { data: _functions } = await supabase.storage.from('functions').list();
+
     // Simulation - dans la vraie vie, on scannerait les fichiers
     if (Math.random() > 0.7) {
       exposedSecrets = true;

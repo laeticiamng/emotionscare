@@ -391,7 +391,7 @@ test.describe('B2B Admin - Audit Logs & Conformité', () => {
 
   test('vérifie l\'intégrité des logs (non modifiables)', async ({ page }) => {
     let updateAttempted = false;
-    
+
     await page.route('**/rest/v1/b2b_audit_logs**', async route => {
       const method = route.request().method();
       

@@ -12,18 +12,13 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   Users,
-  Share2,
   Copy,
   Check,
   Trash2,
   Lock,
   Unlock,
-  Music,
-  Plus,
-  X,
   UserPlus,
   Clock,
-  Edit,
   Wifi,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -64,7 +59,6 @@ const roleColors: Record<'owner' | 'editor' | 'viewer', string> = {
 
 export const CollaborativePlaylistUI: React.FC<CollaborativePlaylistUIProps> = ({
   playlistId,
-  playlistName,
   collaborators,
   currentUserId,
   isPublic,
@@ -80,7 +74,7 @@ export const CollaborativePlaylistUI: React.FC<CollaborativePlaylistUIProps> = (
   const [copiedLink, setCopiedLink] = useState(false);
   const [expandedCollaborator, setExpandedCollaborator] = useState<string | null>(null);
   const [isRealtimeConnected, setIsRealtimeConnected] = useState(false);
-  const [realtimeActivity, setRealtimeActivity] = useState<string[]>([]);
+  const [_realtimeActivity, setRealtimeActivity] = useState<string[]>([]);
 
   // Subscribe to realtime updates for this playlist
   useEffect(() => {
@@ -89,12 +83,12 @@ export const CollaborativePlaylistUI: React.FC<CollaborativePlaylistUIProps> = (
       .on('presence', { event: 'sync' }, () => {
         setIsRealtimeConnected(true);
       })
-      .on('presence', { event: 'join' }, ({ key, newPresences }) => {
+ .on('presence', { event: 'join' }, ({ newPresences }) => {
         const activity = `${newPresences[0]?.user_name || 'Quelqu\'un'} a rejoint`;
         setRealtimeActivity(prev => [...prev.slice(-4), activity]);
         toast({ title: '👤 Nouveau collaborateur', description: activity, duration: 2000 });
       })
-      .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+ .on('presence', { event: 'leave' }, ({ leftPresences }) => {
         const activity = `${leftPresences[0]?.user_name || 'Quelqu\'un'} est parti`;
         setRealtimeActivity(prev => [...prev.slice(-4), activity]);
       })

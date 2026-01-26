@@ -20,7 +20,6 @@ import type {
   VisualConfig,
   ImmersiveConfig,
   BiofeedbackData,
-  BreathCycle,
   SessionStatistics,
   ProtocolRecommendation,
 } from './types';
@@ -186,7 +185,7 @@ export class BreathUnifiedService {
   // ==========================================================================
 
   async getRecommendation(
-    userId: string,
+    _userId: string,
     currentStressLevel: number,
     targetStressLevel: number,
     context?: {

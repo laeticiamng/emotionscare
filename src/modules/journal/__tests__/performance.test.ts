@@ -172,7 +172,6 @@ describe('Journal Performance Tests', () => {
         { initialProps: { count: 100 } }
       );
 
-      const initialCount = calculationCount;
       
       rerender({ count: 100 });
       

@@ -7,13 +7,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { EmotionResult } from '@/types/emotion';
 import { logger } from '@/lib/logger';
 
-interface ScanOptions {
-  type: 'voice' | 'text' | 'facial';
-  duration?: number;
-  content?: string;
-  userId?: string;
-}
-
 /**
  * Convertit un Blob en base64
  */

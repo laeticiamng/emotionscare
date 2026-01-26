@@ -3,10 +3,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import {
-  Tooltip,
-  TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { 
   Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, 
@@ -73,14 +70,6 @@ const formatTime = (seconds: number): string => {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
-const formatTimeVerbose = (seconds: number): string => {
-  if (isNaN(seconds) || !isFinite(seconds)) return '0 min';
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  if (mins === 0) return `${secs}s`;
-  return `${mins}min ${secs}s`;
-};
-
 // ─────────────────────────────────────────────────────────────
 // COMPONENT
 // ─────────────────────────────────────────────────────────────
@@ -121,7 +110,7 @@ const MusicProgressBarEnriched: React.FC<MusicProgressBarEnrichedProps> = ({
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [hoverTime, setHoverTime] = useState<number | null>(null);
-  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const [_showVolumeSlider, _setShowVolumeSlider] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const progressRef = useRef<HTMLDivElement>(null);
 

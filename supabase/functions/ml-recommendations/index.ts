@@ -11,12 +11,11 @@ serve(async (req) => {
   }
 
   try {
-    const { 
-      action, 
-      userHistory, 
-      currentEmotion, 
+    const {
+      action,
+      userHistory,
+      currentEmotion,
       timeOfDay,
-      userId 
     } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");

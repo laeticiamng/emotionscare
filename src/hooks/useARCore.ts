@@ -259,12 +259,12 @@ export function useARBreathing(userId: string | undefined) {
 /**
  * Hook for interactive bubbles in AR
  */
-export function useARBubbles(userId: string | undefined) {
+export function useARBubbles(_userId: string | undefined) {
   const [bubblesActive, setBubblesActive] = useState(true);
   const [score, setScore] = useState(0);
   const [popCount, setPopCount] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, _setLoading] = useState(false);
+  const [error, _setError] = useState<string | null>(null);
 
   const popBubble = useCallback((bubbleId: string, value: number = 10) => {
     try {

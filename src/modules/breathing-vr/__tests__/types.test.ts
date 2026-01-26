@@ -5,8 +5,6 @@
 import { describe, it, expect } from 'vitest';
 import {
   BreathingPattern,
-  BreathingPhase,
-  BreathingConfig,
   BreathingVRState,
   BreathingSession,
   BREATHING_PATTERNS

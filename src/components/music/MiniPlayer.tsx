@@ -6,7 +6,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence, PanInfo, useDragControls } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import {
   Play,
@@ -59,7 +58,6 @@ export const MiniPlayer: React.FC<MiniPlayerProps> = ({
   onNext,
   onPrevious,
   onVolumeChange,
-  onSeek,
   onExpand,
   onClose,
   onToggleLike,
@@ -69,7 +67,7 @@ export const MiniPlayer: React.FC<MiniPlayerProps> = ({
   const [isLiked, setIsLiked] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const [_showVolumeSlider, _setShowVolumeSlider] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const dragControls = useDragControls();
 

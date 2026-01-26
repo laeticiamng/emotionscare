@@ -4,7 +4,6 @@
 
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { routes } from '@/routerV2';
 import { toast } from '@/hooks/use-toast';
 import { useAuth as useAuthContext } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';

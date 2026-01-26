@@ -12,14 +12,12 @@ import {
   Music, 
   Brain, 
   TrendingUp, 
-  Clock, 
-  Heart,
+  Clock,
   Activity,
   Play,
   Pause,
   SkipForward,
   Shuffle,
-  Settings,
   Zap
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -102,7 +100,7 @@ const AdaptivePlaylistEngine: React.FC = () => {
   const [userProfile, setUserProfile] = useState<UserEmotionalProfile | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
-  const [playbackTime, setPlaybackTime] = useState(0);
+  const [_playbackTime, _setPlaybackTime] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [adaptationSettings, setAdaptationSettings] = useState<AdaptationSettings>({
     auto_adapt: true,
@@ -270,7 +268,6 @@ const AdaptivePlaylistEngine: React.FC = () => {
       const playlistTracks: MusicTrack[] = [];
       const sessionDuration = adaptationSettings.session_length * 60; // Convert to seconds
       let currentDuration = 0;
-      let emotionalProgress = 0;
 
       while (currentDuration < sessionDuration && playlistTracks.length < 20) {
         const progressRatio = currentDuration / sessionDuration;
@@ -285,7 +282,7 @@ const AdaptivePlaylistEngine: React.FC = () => {
 
         playlistTracks.push(nextTrack);
         currentDuration += nextTrack.duration;
-        emotionalProgress = progressRatio;
+        let emotionalProgress = progressRatio;
       }
 
       const newPlaylist: AdaptivePlaylist = {
@@ -356,9 +353,6 @@ const AdaptivePlaylistEngine: React.FC = () => {
         // Potentially modify remaining playlist based on new emotional state
         const remainingTracks = currentPlaylist.tracks.slice(currentPlaylist.current_index + 1);
         if (remainingTracks.length > 2) {
-          // Re-evaluate and potentially replace some tracks
-          const sessionProgress = (currentPlaylist.current_index + 1) / currentPlaylist.tracks.length;
-          
           // This would implement real-time playlist adaptation logic
           logger.info('Adapting playlist based on current state', { currentEmotionalState }, 'MUSIC');
         }

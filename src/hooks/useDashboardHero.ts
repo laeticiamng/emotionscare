@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import { useState, useEffect, useCallback } from 'react';
-import { LucideIcon, Home, Clock, Calendar, User, TrendingUp, Activity, BarChart } from 'lucide-react';
+import { LucideIcon, Clock, Calendar, User, TrendingUp, Activity, BarChart } from 'lucide-react';
 import { logger } from '@/lib/logger';
 
 // Define the return type for clarity

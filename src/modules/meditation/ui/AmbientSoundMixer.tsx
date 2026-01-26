@@ -1,16 +1,14 @@
 /**
  * Mixeur de sons ambiants pour méditation
  */
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Volume2, VolumeX, Play, Pause, RotateCcw,
+  Volume2, VolumeX, RotateCcw,
   Waves, Wind, CloudRain, Bird, Flame, Trees
 } from 'lucide-react';
 
@@ -156,7 +154,7 @@ export const AmbientSoundMixer: React.FC<AmbientSoundMixerProps> = ({
 
   // Update all volumes when master changes
   useEffect(() => {
-    Object.entries(soundStates).forEach(([soundId, state]) => {
+    Object.entries(soundStates).forEach(([_soundId, state]) => {
       if (state.audio) {
         const effectiveVolume = isMasterMuted ? 0 : (state.volume / 100) * (masterVolume / 100);
         state.audio.volume = effectiveVolume;

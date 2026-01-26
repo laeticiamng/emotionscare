@@ -15,14 +15,8 @@ export interface TeamOverviewProps {
 }
 
 const TeamOverview: React.FC<TeamOverviewProps> = ({
-  teamId,
-  userId,
-  anonymized = true, // Toujours anonymisé pour respecter la confidentialité
   className = '',
-  dateRange,
   users = [],
-  showNames = false, // Jamais de noms pour les RH
-  compact = false
 }) => {
   // Vérification du minimum requis pour l'anonymisation
   const minParticipants = 5;

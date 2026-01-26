@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle, XCircle, AlertTriangle, RefreshCw } from 'lucide-react';
-import { routes } from '@/routerV2';
 import { validateRouteAccess } from '@/utils/routeValidation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';

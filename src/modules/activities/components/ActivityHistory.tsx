@@ -14,10 +14,9 @@ import {
   Heart,
   Zap,
   ChevronLeft,
-  ChevronRight,
-  TrendingUp
+  ChevronRight
 } from 'lucide-react';
-import { ActivitySessionService, ActivitySession } from '../services/activitySessionService';
+import { ActivitySessionService } from '../services/activitySessionService';
 import { useAuth } from '@/contexts/AuthContext';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths } from 'date-fns';
 import { fr } from 'date-fns/locale';

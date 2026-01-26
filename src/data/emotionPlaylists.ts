@@ -1,4 +1,4 @@
-import type { MusicTrack, MusicPlaylist } from '@/types/music';
+import type { MusicPlaylist } from '@/types/music';
 
 // Mock emotion music playlists
 export const emotionPlaylists: MusicPlaylist[] = [

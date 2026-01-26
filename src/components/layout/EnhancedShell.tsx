@@ -1,6 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense, memo, useMemo, useCallback } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
-import { useTheme } from '@/providers/theme';
+import { Outlet } from 'react-router-dom';
 import EnhancedHeader from './EnhancedHeader';
 import SkipLinks from './SkipLinks';
 import { cn } from '@/lib/utils';
@@ -17,7 +16,6 @@ interface EnhancedShellProps {
   children?: React.ReactNode;
   hideNav?: boolean;
   hideFooter?: boolean;
-  immersive?: boolean;
   className?: string;
 }
 
@@ -25,21 +23,12 @@ const EnhancedShell: React.FC<EnhancedShellProps> = memo(({
   children,
   hideNav = false,
   hideFooter = false,
-  immersive = false,
   className = '',
 }) => {
-  const { theme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const location = useLocation();
   const [commandMenuOpen, setCommandMenuOpen] = useState(false);
-  
-  // Memoize theme check - only recalc on theme change
-  const isDarkMode = useMemo(() => 
-    theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches),
-    [theme]
-  );
-  
+
   // Check once on mount
   const reduceMotion = useMemo(() => 
     typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,

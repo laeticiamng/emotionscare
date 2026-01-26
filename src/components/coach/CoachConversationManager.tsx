@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -94,7 +93,7 @@ const EMOTION_COLORS = {
 export const CoachConversationManager = () => {
   const [conversations, setConversations] = useState<Conversation[]>(SAMPLE_CONVERSATIONS);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const [_selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [shareConversationId, setShareConversationId] = useState<string | null>(null);
@@ -109,15 +108,6 @@ export const CoachConversationManager = () => {
   const handleDelete = (id: string) => {
     setConversations(conversations.filter((conv) => conv.id !== id));
     setDeleteId(null);
-  };
-
-  const handleRename = (id: string, newTitle: string) => {
-    setConversations(
-      conversations.map((conv) =>
-        conv.id === id ? { ...conv, title: newTitle } : conv
-      )
-    );
-    setSelectedConversation(null);
   };
 
   const handleExport = (conversation: Conversation) => {

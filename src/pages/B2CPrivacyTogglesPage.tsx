@@ -41,12 +41,10 @@ const B2CPrivacyTogglesPage = memo(() => {
   const [isDeleting, setIsDeleting] = useState(false);
   
   const {
-    preferences,
     stats,
     exports,
     consentHistory,
     isLoading,
-    error,
     updatePreference,
     requestExport,
     requestDeletion,

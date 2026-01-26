@@ -213,7 +213,7 @@ export const musicSearchService = {
   /**
    * Obtenir les facettes pour les filtres
    */
-  async getFacets(options: MusicSearchOptions): Promise<SearchFacet> {
+  async getFacets(_options: MusicSearchOptions): Promise<SearchFacet> {
     const facets: SearchFacet = {};
 
     try {

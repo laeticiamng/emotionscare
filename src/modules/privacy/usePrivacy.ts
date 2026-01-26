@@ -3,7 +3,7 @@
  * Avec real-time updates et persistance Supabase
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
@@ -14,7 +14,6 @@ import type {
   PrivacyStats,
   DataExportRequest,
   ConsentRecord,
-  DEFAULT_PRIVACY_PREFERENCES,
 } from './types';
 
 const LOG_CATEGORY = 'PRIVACY_HOOK';

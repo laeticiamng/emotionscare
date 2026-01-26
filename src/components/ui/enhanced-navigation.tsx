@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   Home, Brain, Music, BookOpen, MessageCircle, User, Menu, X,
-  Sparkles, Headphones, Trophy, Zap, Heart, Building2, Settings,
-  ChevronDown, Search, Bell, Moon, Sun, Palette
+  Sparkles, Headphones, Trophy, Zap, Settings, Search, Bell, Moon, Sun, Palette
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/providers/theme';

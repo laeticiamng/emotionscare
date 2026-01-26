@@ -10,8 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { 
   CalendarDays, Mail, Shield, AlertTriangle, CheckCircle, Clock,
-  MessageSquare, Ban, UserCheck, Tag, Plus, X, History, Activity,
-  TrendingUp, TrendingDown, MoreVertical, Edit, Trash2, Send
+  MessageSquare, Ban, UserCheck, Plus, X, History, Activity,
+  TrendingUp, MoreVertical, Trash2, Send
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {

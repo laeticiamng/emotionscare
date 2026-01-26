@@ -1,12 +1,12 @@
 /**
  * Hook useScores - Gestion des scores et vibes
  */
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { logger } from '@/lib/logger';
-import type { UserScore, VibeMetrics, WeeklyMetrics, ScoreHistory, ScoreInsights, ScoreStatistics, VibeType } from './types';
+import type { UserScore, VibeMetrics, WeeklyMetrics, ScoreInsights, ScoreStatistics, VibeType } from './types';
 
 // ============================================================================
 // TYPES

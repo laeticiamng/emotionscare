@@ -10,7 +10,6 @@ import type {
   Notification,
   CreateNotificationInput,
   NotificationFilters,
-  NotificationPreferences,
   NotificationStats,
 } from '../types';
 

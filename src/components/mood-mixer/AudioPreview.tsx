@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -36,7 +36,6 @@ const AudioPreview: React.FC<AudioPreviewProps> = ({
   const [duration] = useState(180); // 3 minutes
   const [isRepeat, setIsRepeat] = useState(false);
   const [isShuffle, setIsShuffle] = useState(false);
-  const progressRef = useRef<number>(0);
 
   // Simulate progress
   useEffect(() => {

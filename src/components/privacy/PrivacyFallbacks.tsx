@@ -8,7 +8,6 @@ import {
   Camera, 
   Mic, 
   Heart, 
-  Headphones, 
   Monitor, 
   Settings,
   AlertCircle 

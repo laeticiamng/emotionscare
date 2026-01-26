@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useCallback, useEffect, useRef } from 'react';
-import { useGlowStore, type GlowPattern, type SelfReport } from '@/store/glow.store';
+import { useGlowStore, type GlowPattern } from '@/store/glow.store';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';

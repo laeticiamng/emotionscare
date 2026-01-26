@@ -95,7 +95,6 @@ export const ScanInsightsPanel: React.FC = () => {
         // Calculer le streak
         const sortedDates = [...new Set(monthlyScans.map(s => new Date(s.timestamp).toDateString()))].sort();
         let streakDays = 0;
-        const today = new Date().toDateString();
         for (let i = sortedDates.length - 1; i >= 0; i--) {
           const expected = new Date(Date.now() - (sortedDates.length - 1 - i) * 24 * 60 * 60 * 1000).toDateString();
           if (sortedDates[i] === expected || i === sortedDates.length - 1) {

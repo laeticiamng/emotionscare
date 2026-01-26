@@ -23,7 +23,6 @@ import {
 } from 'lucide-react';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
-import { cn } from '@/lib/utils';
 
 const B2BSelectionPage: React.FC = () => {
   const navigate = useNavigate();

@@ -15,8 +15,7 @@ import {
   Twitter,
   Facebook,
   Instagram,
-  Linkedin,
-  Github
+  Linkedin
 } from 'lucide-react';
 
 const EnhancedFooter: React.FC = () => {

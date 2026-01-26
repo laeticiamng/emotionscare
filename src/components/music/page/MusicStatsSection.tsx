@@ -12,7 +12,6 @@ import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   BarChart3,
-  TrendingUp,
   Clock,
   Music,
   Heart,

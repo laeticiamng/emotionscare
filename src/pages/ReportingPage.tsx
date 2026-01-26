@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { logger } from '@/lib/logger';
 import {
   ArrowLeft, Download, Filter, Calendar, BarChart3, 
-  TrendingUp, Users, Activity, Heart, Brain, Target 
+  TrendingUp, Activity, Heart, Brain, Target 
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';

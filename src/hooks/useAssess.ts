@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useState, useCallback } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { startAssess, submitAssess, aggregateAssess } from '@/lib/assess/client';
 import type { 
   StartInput, 

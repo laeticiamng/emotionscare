@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import React, { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { X, CheckCircle, AlertTriangle, Info, XCircle } from 'lucide-react';

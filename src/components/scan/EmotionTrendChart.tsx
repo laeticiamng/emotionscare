@@ -1,11 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { Line, Bar, Area, ComposedChart } from 'recharts';
+import { Line, Bar, Area } from 'recharts';
 import { LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, BarChart } from 'recharts';
 import { EmotionResult } from '@/types/emotion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
   SelectContent,
@@ -15,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { 
   TrendingUp, TrendingDown, BarChart3, LineChart as LineChartIcon, 
-  Calendar, Download, Share2, Filter, Minus, Activity
+  Calendar, Download, Share2, Minus, Activity
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -40,7 +39,7 @@ const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({
   const [chartType, setChartType] = useState<ChartType>('area');
   const [timeRange, setTimeRange] = useState<TimeRange>('30d');
   const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]);
-  const [showComparison, setShowComparison] = useState(false);
+  const [showComparison, _setShowComparison] = useState(false);
 
   // Mapper les émotions à des couleurs
   const emotionColors: Record<string, string> = {
@@ -413,7 +412,7 @@ const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({
             </div>
             <Badge variant="outline">{stats.totalEntries} entrées</Badge>
             <div className="flex gap-1">
-              {stats.topEmotions.map(([emotion, count]) => (
+              {stats.topEmotions.map(([emotion, _count]) => (
                 <Badge 
                   key={emotion} 
                   style={{ backgroundColor: emotionColors[emotion] + '30', color: emotionColors[emotion] }}

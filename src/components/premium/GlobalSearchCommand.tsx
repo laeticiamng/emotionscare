@@ -8,17 +8,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Command, CommandDialog, CommandEmpty, CommandGroup, 
+import { CommandDialog, CommandEmpty, CommandGroup, 
   CommandInput, CommandItem, CommandList, CommandSeparator 
 } from '@/components/ui/command';
 import { 
   Search, Brain, Music, Sparkles, FileText, Users, Trophy, 
-  BarChart3, Settings, Zap, Wind, Camera, Star, Heart, Home,
-  Calendar, Shield, Monitor, Headphones, Target, Palette
+  BarChart3, Settings, Zap, Wind, Camera, Star, Heart, Home, Shield, Monitor, Target, Palette
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface SearchItem {
   title: string;

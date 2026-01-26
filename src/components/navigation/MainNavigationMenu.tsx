@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
-  Menu, 
   X, 
   Home, 
   Brain, 
@@ -42,11 +41,9 @@ import {
   Clock,
   Rocket,
   Globe,
-  Smile,
   TrendingUp,
   Gift,
   Lock,
-  Database,
   Smartphone,
   RefreshCw,
   LayoutDashboard,

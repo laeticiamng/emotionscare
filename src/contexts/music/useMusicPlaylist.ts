@@ -10,7 +10,7 @@ import { logger } from '@/lib/logger';
 export const useMusicPlaylist = (
   state: MusicState,
   dispatch: Dispatch<MusicAction>,
-  play: (track?: MusicTrack) => Promise<void>
+  _play: (track?: MusicTrack) => Promise<void>
 ) => {
   const setPlaylist = useCallback((tracks: MusicTrack[]) => {
     dispatch({ type: 'SET_PLAYLIST', payload: tracks });

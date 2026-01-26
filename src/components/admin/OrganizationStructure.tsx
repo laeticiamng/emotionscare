@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ const OrganizationStructure = () => {
   const [activeTab, setActiveTab] = useState('hierarchy');
   
   // Mock data for departments
-  const [departments, setDepartments] = useState<Department[]>([
+  const [departments, _setDepartments] = useState<Department[]>([
     { id: 'dept-1', name: 'Ressources Humaines', manager: 'Sophie Lemaire', employeeCount: 8 },
     { id: 'dept-2', name: 'Marketing', manager: 'Thomas Dubois', employeeCount: 12 },
     { id: 'dept-3', name: 'Développement', manager: 'Julie Martin', employeeCount: 15 },
@@ -36,7 +36,7 @@ const OrganizationStructure = () => {
   ]);
   
   // Mock data for teams
-  const [teams, setTeams] = useState<Team[]>([
+  const [teams, _setTeams] = useState<Team[]>([
     { 
       id: 'team-1', 
       name: 'Équipe RH Opérations', 

@@ -47,7 +47,7 @@ interface UseHomePageAnalyticsReturn {
 }
 
 export function useHomePageAnalytics(): UseHomePageAnalyticsReturn {
-  const { isAuthenticated } = useAuth();
+  useAuth();
   const [pageView, setPageView] = useState<PageView | null>(null);
   const [interactions, setInteractions] = useState<UserInteraction[]>([]);
   const [startTime] = useState(Date.now());

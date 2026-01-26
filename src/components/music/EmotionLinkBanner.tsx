@@ -49,7 +49,6 @@ const EMOTION_TO_MOOD: Record<string, { mood: string; description: string; color
 export const EmotionLinkBanner: React.FC<EmotionLinkBannerProps> = ({
   lastEmotion,
   lastScanTime,
-  suggestedMood,
   onGenerateForEmotion,
   className,
 }) => {

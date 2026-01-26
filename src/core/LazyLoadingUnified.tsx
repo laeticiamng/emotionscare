@@ -4,7 +4,7 @@
  * Centralizes all lazy loading with intelligent preloading and error handling
  */
 
-import React, { Suspense, ComponentType, lazy, useEffect, useState } from 'react';
+import React, { Suspense, ComponentType, lazy, useEffect } from 'react';
 import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { logProductionEvent } from '@/utils/consoleCleanup';

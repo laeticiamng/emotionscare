@@ -13,8 +13,7 @@ import {
   AlertTriangle, 
   Heart,
   Brain,
-  Activity,
-  Calendar
+  Activity
 } from 'lucide-react';
 
 interface EmotionTrend {

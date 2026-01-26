@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Play, Pause, RotateCcw, Trophy, Target, Zap, Star } from 'lucide-react';
+import { Heart, Play, Pause, RotateCcw, Trophy, Target, Zap } from 'lucide-react';
 import { useWebBluetooth } from '@/hooks/useWebBluetooth';
 import { supabase } from '@/integrations/supabase/client';
 import { triggerConfetti } from '@/lib/confetti';

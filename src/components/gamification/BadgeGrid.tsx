@@ -4,7 +4,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Lock } from 'lucide-react';
 
 // Use the badge normalization utility
-import { normalizeBadge, normalizeBadges } from '@/utils/badgeUtils';
 
 interface BadgeGridProps {
   badges: any[];

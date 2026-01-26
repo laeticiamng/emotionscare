@@ -10,7 +10,7 @@ import { format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { AnonymousActivity, ActivityStats } from '@/types/activity';
+import { AnonymousActivity } from '@/types/activity';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase-client';
 import Pagination from '@/components/ui/data-table/Pagination';

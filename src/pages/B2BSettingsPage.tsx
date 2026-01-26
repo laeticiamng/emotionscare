@@ -6,14 +6,13 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Settings, Bell, FileText, Target, Globe, Save, Loader2 } from 'lucide-react';
+import { Settings, Bell, Target, Globe, Save, Loader2 } from 'lucide-react';
 import { useB2BSettings } from '@/hooks/useB2BSettings';
 import { useB2BRole } from '@/hooks/useB2BRole';
 import { usePageSEO } from '@/hooks/usePageSEO';

@@ -2,7 +2,7 @@
  * QuestPanel - Panneau de quête active
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Target, Trophy, Clock, Pause, Play, X, CheckCircle2, Circle, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

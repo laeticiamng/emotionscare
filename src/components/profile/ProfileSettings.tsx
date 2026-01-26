@@ -12,16 +12,13 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Slider } from '@/components/ui/slider';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { User, Mail, Briefcase, Building, Heart, Settings, Save, Download, Share2, Trophy, Activity, Calendar, TrendingUp, Eye, EyeOff, Copy, FileText, Target, Star, Flame, Award, Zap, Crown, Medal, Sparkles, BarChart3, Clock, CheckCircle2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { User, Mail, Settings, Save, Download, Share2, Trophy, Activity, Calendar, FileText, Target, Flame, Award, Crown, Sparkles, Clock, CheckCircle2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { toast } from 'sonner';
-import { format, differenceInDays, startOfWeek, endOfWeek } from 'date-fns';
+import { format, startOfWeek, endOfWeek } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 // ─────────────────────────────────────────────────────────────

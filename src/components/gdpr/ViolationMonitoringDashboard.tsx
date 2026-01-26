@@ -31,7 +31,7 @@ import {
   RefreshCw,
   Zap,
 } from 'lucide-react';
-import { useViolationMonitoring, GDPRViolation, ViolationAlert } from '@/hooks/useViolationMonitoring';
+import { useViolationMonitoring, GDPRViolation } from '@/hooks/useViolationMonitoring';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import PDFExportButton from './PDFExportButton';

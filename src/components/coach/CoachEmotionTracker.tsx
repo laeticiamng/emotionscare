@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -13,11 +12,8 @@ import {
 } from '@/components/ui/select';
 import {
   TrendingUp,
-  Calendar,
   Heart,
   Brain,
-  Activity,
-  Zap,
   AlertCircle,
 } from 'lucide-react';
 
@@ -74,7 +70,7 @@ const EMOTION_COLORS = {
 };
 
 export const CoachEmotionTracker = () => {
-  const [period, setPeriod] = useState('week');
+  const [_period, _setPeriod] = useState('week');
   const [selectedEmotion, setSelectedEmotion] = useState<'all' | keyof Omit<EmotionalData, 'date'>>('all');
 
   const getDominantEmotion = () => {

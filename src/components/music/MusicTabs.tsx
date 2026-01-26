@@ -11,9 +11,6 @@ import {
   Music,
   TrendingUp,
   Settings,
-  Sparkles,
-  Radio,
-  Zap,
 } from 'lucide-react';
 
 interface MusicTabsProps {

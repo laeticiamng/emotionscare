@@ -26,7 +26,6 @@ export const PlaylistManager: React.FC<PlaylistManagerProps> = ({
   onCreatePlaylist,
   onDeletePlaylist,
   onUpdatePlaylist,
-  onAddTrackToPlaylist,
   onRemoveTrackFromPlaylist
 }) => {
   const [newPlaylistName, setNewPlaylistName] = useState('');

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { logger } from '@/lib/logger';
@@ -20,7 +20,7 @@ import {
   ResponsiveContainer,
   Legend
 } from 'recharts';
-import { format as formatDate, subMonths, startOfMonth, endOfMonth } from 'date-fns';
+import { format as formatDate, subMonths, startOfMonth } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { 
   TrendingUp, 

@@ -2,7 +2,6 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import { captureException } from '@/lib/ai-monitoring';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

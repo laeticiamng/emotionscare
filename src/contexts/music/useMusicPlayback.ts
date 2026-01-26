@@ -6,7 +6,7 @@ import { useCallback, useRef, MutableRefObject, Dispatch, useEffect } from 'reac
 import { MusicState, MusicAction, MusicTrack } from './types';
 import { logger } from '@/lib/logger';
 import { toast } from 'sonner';
-import { saveHistoryEntry, updateHistoryEntry, calculateCompletionRate } from '@/services/music/history-service';
+import { updateHistoryEntry, calculateCompletionRate } from '@/services/music/history-service';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useMusicPlayback = (

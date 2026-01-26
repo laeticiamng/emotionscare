@@ -33,7 +33,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Search, Crown, Shield, User, Trash2, Plus, History } from 'lucide-react';
-import { AppRole, getRoleLabel, getRoleColor } from '@/services/userRolesService';
+import { AppRole, getRoleLabel } from '@/services/userRolesService';
 import { logger } from '@/lib/logger';
 import { RoleAuditLogsViewer } from './RoleAuditLogsViewer';
 import { AuditStatsDashboard } from './AuditStatsDashboard';

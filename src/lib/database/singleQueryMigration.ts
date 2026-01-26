@@ -4,7 +4,7 @@
  * Corrige les 40+ occurrences trouvées dans l'audit
  */
 
-import { safeSingle, requireSingle } from './queryOptimizer';
+import { safeSingle } from './queryOptimizer';
 import { logger } from '@/lib/logger';
 
 // Service gamification corrigé

@@ -96,14 +96,14 @@ const generateDemoAuras = (): AuraEntry[] => {
 
 export const useAurasLeaderboard = (): UseAurasLeaderboardResult => {
   const [rawAuras, setRawAuras] = useState<AuraEntry[]>([]);
-  const [profiles, setProfiles] = useState<Map<string, { name: string; avatar: string | null }>>(new Map());
+  const [_profiles, setProfiles] = useState<Map<string, { name: string; avatar: string | null }>>(new Map());
   const [myAura, setMyAura] = useState<AuraEntry | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [_currentUserId, setCurrentUserId] = useState<string | null>(null);
   
   // Connexion au système d'interconnexion pour les insights cross-modules
-  const { insights } = useModuleInterconnect({ autoFetch: true });
+  useModuleInterconnect({ autoFetch: true });
 
   const fetchAuras = useCallback(async () => {
     try {

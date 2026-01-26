@@ -107,7 +107,7 @@ const AIRecommendationsWidget: React.FC<AIRecommendationsWidgetProps> = ({
 
       try {
         // Fetch user context data for personalized recommendations
-        const [moodResult, activityResult, streakResult] = await Promise.all([
+        const [moodResult, , streakResult] = await Promise.all([
           supabase
             .from('mood_entries')
             .select('mood, energy_level')
@@ -132,7 +132,6 @@ const AIRecommendationsWidget: React.FC<AIRecommendationsWidgetProps> = ({
         const hour = new Date().getHours();
         const currentMood = moodResult.data?.mood?.toLowerCase() || '';
         const energyLevel = moodResult.data?.energy_level || 5;
-        const recentCategories = (activityResult.data || []).map((a: any) => a.activity?.category).filter(Boolean);
         const streak = streakResult.data?.current_streak || 0;
 
         // Build context-aware recommendations

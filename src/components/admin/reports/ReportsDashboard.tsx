@@ -9,7 +9,7 @@ import { DateRange } from 'react-day-picker';
 
 const ReportsDashboard: React.FC = () => {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState('recent');
+  const [_activeTab, _setActiveTab] = useState('recent');
   const [dateRange, setDateRange] = useState<DateRange>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
     to: new Date()

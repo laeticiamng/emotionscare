@@ -93,7 +93,6 @@ export function useUnifiedEmotionAnalysis(
     showSuccessToast = false,
     onSuccess,
     onError,
-    autoSave = false,
   } = options;
 
   const { toast } = useToast();
@@ -105,9 +104,8 @@ export function useUnifiedEmotionAnalysis(
    * Wrapper générique pour les analyses
    */
   const performAnalysis = useCallback(
-    async <T extends any>(
-      analysisFn: () => Promise<EmotionAnalysisResult>,
-      analyticsEvent?: string
+    async (
+      analysisFn: () => Promise<EmotionAnalysisResult>
     ): Promise<EmotionAnalysisResult | null> => {
       setIsAnalyzing(true);
       setError(null);
@@ -166,8 +164,7 @@ export function useUnifiedEmotionAnalysis(
   const analyzeText = useCallback(
     async (input: TextAnalysisInput) => {
       return performAnalysis(
-        () => EmotionAnalysisService.analyzeText(input),
-        'emotion_text_analyzed'
+        () => EmotionAnalysisService.analyzeText(input)
       );
     },
     [performAnalysis]
@@ -179,8 +176,7 @@ export function useUnifiedEmotionAnalysis(
   const analyzeVoice = useCallback(
     async (input: VoiceAnalysisInput) => {
       return performAnalysis(
-        () => EmotionAnalysisService.analyzeVoice(input),
-        'emotion_voice_analyzed'
+        () => EmotionAnalysisService.analyzeVoice(input)
       );
     },
     [performAnalysis]
@@ -192,8 +188,7 @@ export function useUnifiedEmotionAnalysis(
   const analyzeCamera = useCallback(
     async (input: CameraAnalysisInput) => {
       return performAnalysis(
-        () => EmotionAnalysisService.analyzeCamera(input),
-        'emotion_camera_analyzed'
+        () => EmotionAnalysisService.analyzeCamera(input)
       );
     },
     [performAnalysis]
@@ -205,8 +200,7 @@ export function useUnifiedEmotionAnalysis(
   const analyzeEmoji = useCallback(
     async (input: EmojiAnalysisInput) => {
       return performAnalysis(
-        () => EmotionAnalysisService.analyzeEmoji(input),
-        'emotion_emoji_analyzed'
+        () => EmotionAnalysisService.analyzeEmoji(input)
       );
     },
     [performAnalysis]
@@ -218,8 +212,7 @@ export function useUnifiedEmotionAnalysis(
   const analyzeMultiModal = useCallback(
     async (input: { text?: string; audio?: Blob | string; emojis?: string[] }) => {
       return performAnalysis(
-        () => EmotionAnalysisService.analyzeMultiModal(input),
-        'emotion_multimodal_analyzed'
+        () => EmotionAnalysisService.analyzeMultiModal(input)
       );
     },
     [performAnalysis]

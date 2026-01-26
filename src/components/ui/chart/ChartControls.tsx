@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from "@/components/ui/button";
 import { ZoomIn, ZoomOut, Grab } from "lucide-react";
 import { cn } from "@/lib/utils";

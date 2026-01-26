@@ -5,7 +5,6 @@
 
 import { useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Trophy, Flame, Target, TrendingUp } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export interface UserStats {

@@ -258,9 +258,6 @@ export class ScoresService {
       const emotional_score = this.calculateEmotionalScore(emotionalData);
       const wellbeing_score = this.calculateWellbeingScore(emotionalData, activityData);
       const engagement_score = this.calculateEngagementScore(sessionData, activityData);
-      const overall_score = Math.round(
-        emotional_score * 0.4 + wellbeing_score * 0.3 + engagement_score * 0.3
-      );
 
       // Calculer les activités par jour
       const dailyActivity: Record<string, number> = {};
@@ -272,9 +269,6 @@ export class ScoresService {
           (a.created_at as string)?.startsWith(dayStr)
         ).length;
       }
-
-      // Vibe de la semaine
-      const vibeData = await this.getCurrentVibe(userId);
 
       // Calculer les minutes totales
       const totalMinutes = sessionData.reduce((sum, s) => sum + ((s as any).duration_minutes || 0), 0);
@@ -378,49 +372,6 @@ export class ScoresService {
   /**
    * Obtenir les modules les plus utilisés
    */
-  private static getTopModules(activityData: Record<string, unknown>[]): string[] {
-    const moduleCounts: Record<string, number> = {};
-    for (const activity of activityData) {
-      const module = activity.module_name as string;
-      if (module) {
-        moduleCounts[module] = (moduleCounts[module] || 0) + 1;
-      }
-    }
-    return Object.entries(moduleCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([name]) => name);
-  }
-
-  /**
-   * Générer les insights hebdomadaires
-   */
-  private static async generateWeeklyInsights(
-    userId: string,
-    emotional: number,
-    wellbeing: number,
-    engagement: number
-  ): Promise<string[]> {
-    const insights: string[] = [];
-
-    if (emotional >= 75) {
-      insights.push('🌟 Excellent équilibre émotionnel cette semaine !');
-    } else if (emotional < 50) {
-      insights.push('💡 Essayez plus de sessions de respiration pour améliorer votre score émotionnel.');
-    }
-
-    if (wellbeing >= 70) {
-      insights.push('✨ Votre bien-être est stable, continuez ainsi !');
-    }
-
-    if (engagement >= 80) {
-      insights.push('🎯 Engagement exceptionnel avec la plateforme !');
-    } else if (engagement < 40) {
-      insights.push('📱 Utilisez plus régulièrement les modules pour de meilleurs résultats.');
-    }
-
-    return insights;
-  }
 
   /**
    * Générer des insights basés sur les scores

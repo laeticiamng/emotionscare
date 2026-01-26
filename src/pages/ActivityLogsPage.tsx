@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,15 +7,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   FileText, 
-  Search, 
-  Filter, 
   Download, 
   AlertTriangle,
   CheckCircle,
   Info,
   Shield,
   Clock,
-  User,
   Monitor,
   Smartphone,
   Globe
@@ -129,8 +126,8 @@ const mockSecurityEvents: SecurityEvent[] = [
 ];
 
 export default function ActivityLogsPage() {
-  const [logs, setLogs] = useState<ActivityLog[]>(mockActivityLogs);
-  const [securityEvents, setSecurityEvents] = useState<SecurityEvent[]>(mockSecurityEvents);
+  const [logs, _setLogs] = useState<ActivityLog[]>(mockActivityLogs);
+  const [securityEvents, _setSecurityEvents] = useState<SecurityEvent[]>(mockSecurityEvents);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterAction, setFilterAction] = useState('all');
   const [filterSeverity, setFilterSeverity] = useState('all');

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useState } from 'react';
-import { Send, Mic, Zap, Target, Clock, TrendingUp, Sparkles } from 'lucide-react';
+import { Send, Zap, Sparkles } from 'lucide-react';
 import PageRoot from '@/components/common/PageRoot';
 import { logger } from '@/lib/logger';
 

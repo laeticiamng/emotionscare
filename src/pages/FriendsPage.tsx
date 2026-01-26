@@ -1,15 +1,15 @@
 // @ts-nocheck
 
 import { useState, useMemo, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { 
   UserPlus, Search, MessageCircle, UserMinus, MoreVertical, Check, X, Clock,
-  Star, StarOff, Trophy, TrendingUp, Filter, SortAsc, SortDesc, Users,
-  Download, Share2, Eye, Flame, Calendar, Award, Heart, Activity
+  Star, StarOff, Trophy, Filter, SortAsc, SortDesc, Users,
+  Download, Share2, Eye, Flame, Award
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -22,7 +22,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";

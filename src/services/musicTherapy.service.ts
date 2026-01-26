@@ -2,7 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import sunoService from './suno.service';
 import emotionAnalysisService from './emotionAnalysis.service';
-import type { ApiResponse, EmotionData, MusicRecommendation, TherapeuticSession } from './types';
+import type { ApiResponse, EmotionData, MusicRecommendation } from './types';
 import { logger } from '@/lib/logger';
 
 interface TherapySession {

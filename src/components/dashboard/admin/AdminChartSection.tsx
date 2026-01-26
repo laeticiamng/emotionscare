@@ -1,7 +1,6 @@
 // @ts-nocheck
 import React from 'react';
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Activity, LineChart, Users } from 'lucide-react';
+import { Activity, Users } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import ChartCard from '@/components/dashboard/charts/ChartCard';
 import { Skeleton } from '@/components/ui/skeleton';

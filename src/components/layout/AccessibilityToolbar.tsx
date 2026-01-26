@@ -17,7 +17,6 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from '@/components/ui/premium-card';
 import { useAccessibility } from '@/components/common/AccessibilityProvider';
-import { cn } from '@/lib/utils';
 
 const AccessibilityToolbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);

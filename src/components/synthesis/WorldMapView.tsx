@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useOrchestration } from '@/contexts/OrchestrationContext';
-import { Globe, ZoomIn, ZoomOut, Map } from 'lucide-react';
+import { Globe, ZoomIn, ZoomOut } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTheme } from '@/providers/theme';
 import { Skeleton } from '@/components/ui/skeleton';

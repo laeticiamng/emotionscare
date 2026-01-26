@@ -24,7 +24,6 @@ import {
   Shield, 
   Zap,
   Chrome,
-  Apple,
   Github
 } from 'lucide-react';
 import { cn } from '@/lib/utils';

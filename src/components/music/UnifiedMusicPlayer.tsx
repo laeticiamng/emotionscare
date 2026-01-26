@@ -26,7 +26,6 @@ import {
   SlidersHorizontal,
   Coins,
   FileText,
-  Maximize2,
   ThumbsUp,
 } from 'lucide-react';
 import { useAudioEqualizer, EQUALIZER_PRESETS } from '@/hooks/useAudioEqualizer';
@@ -46,7 +45,6 @@ import {
 } from '@/utils/music-a11y';
 
 // Lazy load additional components
-const TrackLyrics = lazy(() => import('@/components/music/TrackLyrics'));
 const RealTimeLyricsPanel = lazy(() => import('@/components/music/RealTimeLyricsPanel'));
 const TrackExtendButton = lazy(() => import('@/components/music/TrackExtendButton'));
 const TrackFeedback = lazy(() => import('@/components/music/TrackFeedback'));

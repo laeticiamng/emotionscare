@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FileText, Wand2, Loader2, RefreshCw, Mic2 } from 'lucide-react';
-import { MusicLyricsSynchronized, type LRCData } from '@/components/music/MusicLyricsSynchronized';
+import { MusicLyricsSynchronized } from '@/components/music/MusicLyricsSynchronized';
 import { useSyncedLyrics } from '@/hooks/music/useSyncedLyrics';
 import { cn } from '@/lib/utils';
 

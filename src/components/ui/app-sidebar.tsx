@@ -98,8 +98,6 @@ export function AppSidebar() {
   const currentPath = location.pathname;
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
-  const isActive = (path: string) => currentPath === path;
-  
   const toggleItem = (title: string) => {
     setExpandedItems(prev => 
       prev.includes(title) ? prev.filter(t => t !== title) : [...prev, title]

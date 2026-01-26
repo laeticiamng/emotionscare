@@ -2,21 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Settings, Bell, Shield, Palette, Globe, User, 
-  Monitor, Smartphone, Headphones, Eye, Brain,
-  Zap, Heart, Star, Crown, Sparkles, Volume2,
-  Camera, Mic, Wifi, Bluetooth, Battery,
-  Moon, Sun, Contrast, Accessibility
+  Settings, Bell, Shield, Palette, 
+  Monitor, Smartphone, Headphones, Brain, Crown, Accessibility
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 
 interface SettingsSection {

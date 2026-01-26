@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 import { motion, useMotionValue, useTransform, animate, useReducedMotion } from "framer-motion";
 import { useRaf } from "@/ui/hooks/useRaf";
 

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useCallback, useEffect, useRef } from 'react';
-import { useHRStore, type HRReading } from '@/store/hr.store';
+import { useHRStore } from '@/store/hr.store';
 import { logger } from '@/lib/logger';
 
 // Realistic BPM ranges for demo

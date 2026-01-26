@@ -20,7 +20,6 @@ import {
   Filter,
   Grid3X3,
   Star,
-  Zap,
   Target,
   ChevronRight
 } from 'lucide-react';

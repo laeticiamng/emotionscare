@@ -3,15 +3,14 @@
  * Design du temps collectif & charge humaine
  */
 
-import React, { useState, useCallback } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useCallback } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
-  Clock,
   Building2,
   Users,
   BarChart3,
@@ -28,7 +27,6 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { usePageSEO } from '@/hooks/usePageSEO';
-import { cn } from '@/lib/utils';
 
 // Hooks TIMECRAFT
 import { useOrgTimeAggregates } from '@/hooks/timecraft';

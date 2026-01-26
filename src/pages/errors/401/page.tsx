@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ErrorView from '@/components/error/ErrorView';
 import { Button } from '@/components/ui/button';

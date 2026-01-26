@@ -3,7 +3,7 @@
  * Visualisation du temps comme architecture, pas comme to-do list
  */
 
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -23,7 +23,6 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { usePageSEO } from '@/hooks/usePageSEO';
-import { cn } from '@/lib/utils';
 
 // Hooks TIMECRAFT
 import {
@@ -72,7 +71,7 @@ export default function TimeCraftPage() {
     isCreating: versionCreating,
   } = useTimeVersions();
 
-  const { insights, balanceIndicators } = useTimeInsights();
+ const { insights } = useTimeInsights();
 
   const {
     correlations,

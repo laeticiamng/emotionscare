@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { Cloud, CloudDrizzle, CloudRain, CloudSun, Sun } from 'lucide-react';
+import { CloudDrizzle, CloudRain, CloudSun, Sun } from 'lucide-react';
 
 type EmotionalWeather = 'sunny' | 'cloudy' | 'rainy' | 'stormy' | 'mixed';
 

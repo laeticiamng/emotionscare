@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
-  FileText, Calendar, Users, BarChart, Download, 
+  FileText, Calendar, BarChart, Download, 
   Settings, Play, Clock, CheckCircle 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';

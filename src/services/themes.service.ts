@@ -7,7 +7,6 @@ import { supabase } from '@/lib/supabase';
 import type {
   CustomTheme,
   UserThemePreferences,
-  ThemePreset,
   ThemeExport,
 } from '@/types/themes';
 

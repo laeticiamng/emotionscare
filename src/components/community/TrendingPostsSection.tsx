@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { TrendingUp, ArrowRight, RefreshCw, Share2, Filter, Star, StarOff, Clock, Eye, Heart, MessageSquare } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
+import { TrendingUp, ArrowRight, RefreshCw, Share2, Filter, Star, StarOff, Eye, Heart, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 
@@ -23,7 +23,6 @@ interface TrendingPost {
 interface TrendingPostsSectionProps {
   posts: TrendingPost[];
   onPostClick?: (postId: string) => void;
-  isLoading?: boolean;
   onRefresh?: () => void;
 }
 
@@ -35,7 +34,6 @@ type FilterOption = 'all' | 'up' | 'stable' | 'down';
 export const TrendingPostsSection: React.FC<TrendingPostsSectionProps> = ({
   posts,
   onPostClick,
-  isLoading = false,
   onRefresh,
 }) => {
   const { toast } = useToast();

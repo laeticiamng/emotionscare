@@ -2,7 +2,7 @@
 /**
  * JournalArchivePage - Archive & Export enrichi avec notes archivées
  */
-import { memo, useMemo, useState } from 'react';
+import { memo, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { listArchivedNotes, unarchiveNote } from '@/services/journal/journalApi';
 import { useJournalEnriched } from '@/modules/journal/useJournalEnriched';
@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Archive, FileText, Download, Database, Shield, Calendar, RotateCcw } from 'lucide-react';
+import { Archive, FileText, Database, Shield, Calendar, RotateCcw } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';

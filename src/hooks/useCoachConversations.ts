@@ -53,7 +53,7 @@ export const useCoachConversations = (): UseCoachConversationsReturn => {
       try {
         if (user) {
           // Charger depuis Supabase via user_settings
-          const { data, error: fetchError } = await supabase
+          const { data, error: _fetchError } = await supabase
             .from('user_settings')
             .select('value')
             .eq('user_id', user.id)

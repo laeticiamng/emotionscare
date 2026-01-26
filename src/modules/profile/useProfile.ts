@@ -11,7 +11,6 @@ import { profileService } from './profileService';
 import {
   UserProfile,
   ProfileStats,
-  ProfilePreferences,
   Achievement,
   UserBadge,
   ActivityHistoryItem,

@@ -3,7 +3,7 @@
  * Compatible avec shadcn/ui et personnalisable
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 
 export interface ToastProps {
   id?: string;

@@ -4,13 +4,12 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -18,18 +17,14 @@ import {
   Award, 
   Clock, 
   Flame, 
-  Heart, 
-  Brain,
+  Heart,
   Activity as ActivityIcon,
   Sparkles,
   Calendar,
   Grid3X3,
-  ChevronRight,
   Star,
   Play,
-  Zap,
-  Filter,
-  RefreshCw
+  Filter
 } from 'lucide-react';
 import PageRoot from '@/components/common/PageRoot';
 import { useAuth } from '@/contexts/AuthContext';

@@ -10,8 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Sparkles, Zap, Heart, Brain, Eye, Music, Wind, 
-  Sun, Moon, Waves, Leaf, Star, Clock, Circle
+  Sparkles, Zap, Heart, Eye, Wind, Waves, Star, Circle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';

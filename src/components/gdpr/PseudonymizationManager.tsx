@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Shield, Plus, Key, TestTube, Trash2, Edit, RefreshCw, Lock, Unlock, Activity } from 'lucide-react';
+import { Shield, Plus, TestTube, Trash2, RefreshCw, Lock, Unlock, Activity } from 'lucide-react';
 
 export const PseudonymizationManager = () => {
   const {

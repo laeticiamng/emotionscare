@@ -110,7 +110,7 @@ function generateInsights(stats: TimeBlockStats, moodData: { valence: number; ar
 }
 
 export function useTimeInsights(versionId?: string) {
-  const { stats, blocks, isLoading: blocksLoading } = useTimeBlocks(versionId);
+ const { stats, isLoading: blocksLoading } = useTimeBlocks(versionId);
   const moodStore = useMood();
 
   // Fetch saved insights from DB

@@ -64,7 +64,7 @@ const initialState = {
 
 const useNotifyStoreBase = create<NotifyState>()(
   persist(
-    (set, get) => ({
+    (set, _get) => ({
       ...initialState,
       
       setPrefs: (newPrefs) => {

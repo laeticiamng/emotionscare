@@ -16,13 +16,10 @@ import {
   Play,
   Wallet,
   Star,
-  Bell,
-  BellOff,
   History,
   Filter,
   Search,
   Share2,
-  Eye,
   BarChart3
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -55,7 +52,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
-import { useEmotionAssets, useEmotionPortfolio, useBuyEmotionAsset, useEmotionTransactionHistory, useUseEmotionAsset } from '../hooks/useExchangeData';
+import { useEmotionAssets, useEmotionPortfolio, useBuyEmotionAsset, useEmotionTransactionHistory } from '../hooks/useExchangeData';
 import type { EmotionType, EmotionAsset } from '../types';
 import { toast } from 'sonner';
 import { useToast } from '@/hooks/use-toast';
@@ -87,15 +84,6 @@ const emotionLabels: Record<EmotionType, string> = {
   confidence: 'Confiance',
 };
 
-interface Transaction {
-  id: string;
-  assetName: string;
-  type: 'buy' | 'sell';
-  quantity: number;
-  price: number;
-  date: string;
-}
-
 type SortOption = 'price-asc' | 'price-desc' | 'demand' | 'name';
 
 const EmotionMarket: React.FC = () => {
@@ -104,7 +92,6 @@ const EmotionMarket: React.FC = () => {
   const { data: portfolio } = useEmotionPortfolio();
   const { data: transactionHistory } = useEmotionTransactionHistory();
   const buyAsset = useBuyEmotionAsset();
-  const useAsset = useUseEmotionAsset();
   
   const [selectedAsset, setSelectedAsset] = useState<EmotionAsset | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -119,8 +106,8 @@ const EmotionMarket: React.FC = () => {
     return saved ? new Set(JSON.parse(saved)) : new Set();
   });
   
-  // Price Alerts
-  const [priceAlerts, setPriceAlerts] = useState<Record<string, number>>(() => {
+  // Price Alerts - stored in localStorage for future use
+  useState<Record<string, number>>(() => {
     const saved = localStorage.getItem('emotionMarketAlerts');
     return saved ? JSON.parse(saved) : {};
   });
@@ -161,15 +148,6 @@ const EmotionMarket: React.FC = () => {
     });
   };
 
-  // Set price alert
-  const setPriceAlert = (assetId: string, price: number) => {
-    setPriceAlerts(prev => {
-      const newAlerts = { ...prev, [assetId]: price };
-      localStorage.setItem('emotionMarketAlerts', JSON.stringify(newAlerts));
-      return newAlerts;
-    });
-    toastHook({ title: 'Alerte configurée', description: `Vous serez notifié quand le prix atteint ${price} EC` });
-  };
 
   // Filter and sort assets
   const filteredAssets = useMemo(() => {

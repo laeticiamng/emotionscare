@@ -6,7 +6,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { EmotionResult, EmotionAnalysisConfig, ScanMode } from '@/types';
+import { EmotionResult, EmotionAnalysisConfig } from '@/types';
 import { emotionsCareApi } from '@/services/emotions-care-api';
 import { logger } from '@/lib/logger';
 

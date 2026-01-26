@@ -13,9 +13,7 @@ import {
   Zap,
   AlertCircle,
   CheckCircle,
-  BarChart3,
-  PieChart,
-  LineChart
+  BarChart3
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
@@ -77,7 +75,7 @@ export const RealTimeAnalytics: React.FC = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [alerts, setAlerts] = useState<RealtimeEvent[]>([]);
   const [selectedMetric, setSelectedMetric] = useState<string>('activeUsers');
-  const [alertRules, setAlertRules] = useState<AlertRule[]>([
+  const [alertRules, _setAlertRules] = useState<AlertRule[]>([
     {
       id: '1',
       metric: 'errorRate',
@@ -527,7 +525,7 @@ interface MetricChartProps {
   };
 }
 
-const MetricChart: React.FC<MetricChartProps> = ({ metric, currentValue, trend }) => {
+const MetricChart: React.FC<MetricChartProps> = ({ currentValue, trend }) => {
   const [historicalData, setHistoricalData] = useState<number[]>([]);
 
   useEffect(() => {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Trophy, Calendar, Users, Medal, Swords, Clock, TrendingUp, Target, Sparkles } from 'lucide-react';
+import { Trophy, Calendar, Users, Medal, Swords, Clock } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -57,15 +57,6 @@ const TournamentsPage: React.FC = () => {
       cancelled: { label: 'Annulé', variant: 'destructive' as const },
     };
     return statusConfig[status];
-  };
-
-  const getTypeBadge = (type: Tournament['tournament_type']) => {
-    const typeConfig = {
-      weekly_xp: { label: 'XP Hebdo', icon: TrendingUp },
-      monthly_challenge: { label: 'Défi Mensuel', icon: Target },
-      special_event: { label: 'Événement Spécial', icon: Sparkles },
-    };
-    return typeConfig[type] || { label: type, icon: Trophy };
   };
 
   return (

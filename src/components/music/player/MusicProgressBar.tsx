@@ -17,7 +17,6 @@ const MusicProgressBar: React.FC<ProgressBarProps> = ({
   value,
   max = 100,
   onChange,
-  position,
   currentTime = 0,
   duration = 0,
   className = "",

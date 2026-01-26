@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { 
   Play, 
@@ -19,8 +18,7 @@ import {
   Volume2, 
   Vibrate,
   Save,
-  Trash2,
-  Plus
+  Trash2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';

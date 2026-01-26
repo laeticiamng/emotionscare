@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
-  Trophy, Star, Flame, Zap, Crown, Heart, 
+  Trophy, Star, Flame, Crown, Heart, 
   Target, Award, Shield, Sparkles, Gift,
   TrendingUp, Calendar, Activity
 } from 'lucide-react';

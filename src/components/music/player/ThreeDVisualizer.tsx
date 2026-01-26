@@ -215,10 +215,9 @@ interface ThreeDVisualizerProps {
   audioData?: number[];
 }
 
-const ThreeDVisualizer: React.FC<ThreeDVisualizerProps> = ({ 
-  isPlaying, 
-  track, 
-  fullscreen = false,
+const ThreeDVisualizer: React.FC<ThreeDVisualizerProps> = ({
+  isPlaying,
+  track,
   audioData = []
 }) => {
   const [hasError, setHasError] = useState(false);

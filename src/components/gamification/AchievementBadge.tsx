@@ -5,8 +5,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Trophy, Lock, Share2, Sparkles, Users, Star, Eye, EyeOff, Crown, BarChart3 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Trophy, Lock, Share2, Sparkles, Users, Star, Eye, EyeOff, BarChart3 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import {
   Tooltip,
   TooltipContent,

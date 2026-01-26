@@ -8,7 +8,6 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Settings2, ArrowRight, Eye, EyeOff, TrendingUp } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 
 interface SkipLink {
   href: string;
@@ -36,7 +35,6 @@ const STORAGE_KEY = 'accessibility-skiplinks-settings';
 const STATS_KEY = 'accessibility-skiplinks-stats';
 
 const AccessibilitySkipLinks: React.FC = () => {
-  const { toast } = useToast();
   const [activeLinks, setActiveLinks] = useState<SkipLink[]>(defaultSkipLinks);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [showSettings, setShowSettings] = useState(false);

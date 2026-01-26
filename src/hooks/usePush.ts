@@ -10,14 +10,6 @@ import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
-interface PushSubscriptionData {
-  endpoint: string;
-  keys: {
-    p256dh: string;
-    auth: string;
-  };
-}
-
 const PUSH_STORAGE_KEY = 'push_subscription_data';
 
 export const usePush = () => {
@@ -52,20 +44,6 @@ export const usePush = () => {
 
     checkSupport();
   }, [setStorePermission]);
-
-  // Register service worker
-  const registerServiceWorker = useCallback(async () => {
-    if (!('serviceWorker' in navigator)) return null;
-
-    try {
-      const registration = await navigator.serviceWorker.register('/sw.js');
-      await navigator.serviceWorker.ready;
-      return registration;
-    } catch (error) {
-      logger.error('SW registration failed', error as Error, 'PUSH');
-      return null;
-    }
-  }, []);
 
   // Subscribe to push notifications
   const subscribe = useCallback(async () => {

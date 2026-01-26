@@ -5,7 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { calculateBlendAtTime } from '../capabilities/blending';
-import type { EmotionComponent, MixingStrategy, EmotionBlend } from '../types';
+import type { EmotionComponent, MixingStrategy } from '../types';
 
 describe('Music Unified - Blending Algorithms', () => {
   // Helper pour créer des émotions de test
@@ -135,7 +135,7 @@ describe('Music Unified - Blending Algorithms', () => {
       expect(blend0.dominant_emotion).toBe('anxious');
 
       // At 50%
-      const blend50 = calculateBlendAtTime(emotions, strategy, 300);
+      calculateBlendAtTime(emotions, strategy, 300);
       // La transition doit être en cours
 
       // At 100%
@@ -232,7 +232,7 @@ describe('Music Unified - Blending Algorithms', () => {
         therapeutic_focus: ['building-positivity'],
       };
 
-      const blend0 = calculateBlendAtTime(emotions, strategy, 0);
+      calculateBlendAtTime(emotions, strategy, 0);
       const blend300 = calculateBlendAtTime(emotions, strategy, 300);
       const blend900 = calculateBlendAtTime(emotions, strategy, 900);
 

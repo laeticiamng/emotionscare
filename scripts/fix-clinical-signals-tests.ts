@@ -12,23 +12,10 @@ let content = readFileSync(filePath, 'utf-8');
 // Pattern pour trouver les objets ClinicalSignal incomplets
 // On cherche les objets qui ont source_instrument mais pas module_context
 
-const fixes: Array<{from: RegExp, to: string}> = [
-  // Ajouter module_context et expires_at après source_instrument
-  {
-    from: /(source_instrument: '[^']+',\s+domain: '[^']+',\s+level: \d+,)/g,
-    to: '$1\n          module_context: \'music\',',
-  },
-  {
-    from: /(level: \d+,\s+module_context: 'music',\s+metadata:)/g,
-    to: 'level: $1,\n          module_context: \'music\',\n          expires_at: new Date(Date.now() + 3600000).toISOString(),\n          metadata:',
-  }
-];
-
 // Méthode plus simple : remplacer les patterns spécifiques
 const lines = content.split('\n');
 const newLines: string[] = [];
 let inMockSignal = false;
-let signalIndent = '';
 
 for (let i = 0; i < lines.length; i++) {
   const line = lines[i];

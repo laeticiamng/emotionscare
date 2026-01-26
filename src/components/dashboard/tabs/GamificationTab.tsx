@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 
-  Trophy, Star, Medal, TrendingUp, Download, Share2, 
+  Trophy, Star, Download, Share2, 
   Target, Flame, Award, Crown 
 } from 'lucide-react';
 import { useGamificationRealData } from '@/hooks/useGamificationRealData';

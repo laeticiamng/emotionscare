@@ -263,8 +263,6 @@ test.describe('Scan Émotionnel - Intégration Hume AI', () => {
     await page.goto('/app/scan');
     
     // L'UI devrait avoir un timeout côté client aussi
-    const loadingIndicator = page.locator('[data-testid*="loading"], .animate-spin, .loading');
-    
     // Si le loading persiste trop longtemps, c'est un problème
     await page.waitForTimeout(5000);
     console.log('[HUME] Timeout test - UI should handle long waits gracefully');
@@ -381,7 +379,6 @@ test.describe('Scan Émotionnel - Robustesse & Edge Cases', () => {
     await page.waitForLoadState('networkidle');
 
     // Devrait afficher un message approprié
-    const noFaceMessage = page.getByText(/aucun visage|no face|visage non détecté|repositionnez/i);
     // Ce message peut apparaître après une tentative d'analyse
     console.log('[DETECTION] Testing no-face-detected handling');
   });

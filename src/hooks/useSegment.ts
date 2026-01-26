@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useMarketingStore, Segment, UTMParams } from '@/store/marketing.store';
 import { LANDING_UTM_CAMPAIGN, LANDING_UTM_SOURCE, sanitizeLandingUtm } from '@/lib/utm';

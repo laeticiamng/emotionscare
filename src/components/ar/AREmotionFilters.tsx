@@ -17,11 +17,9 @@ import {
   Sun,
   Moon,
   Palette,
-  Filter,
-  RotateCcw
+  Filter
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FaceLandmarker, FilesetResolver, DrawingUtils } from '@mediapipe/tasks-vision';
+import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 
 interface EmotionFilter {
   id: string;

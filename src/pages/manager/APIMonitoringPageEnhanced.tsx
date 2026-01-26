@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,20 +11,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { 
   Activity, 
   TrendingUp, 
-  TrendingDown, 
   AlertTriangle, 
   CheckCircle, 
   Clock, 
   Zap,
-  Server,
   Database,
-  Globe,
-  Shield,
   RefreshCw,
   BarChart3,
-  Monitor,
-  Wifi,
-  AlertCircle
+  Monitor
 } from 'lucide-react';
 
 interface APIEndpoint {

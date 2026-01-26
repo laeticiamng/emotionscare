@@ -7,7 +7,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Shield, 
   Heart, 
-  Clock, 
   Zap, 
   Target, 
   ChevronRight, 

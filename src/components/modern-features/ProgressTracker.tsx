@@ -12,8 +12,7 @@ import { Button } from '@/components/ui/button';
 import { 
   TrendingUp, 
   Target, 
-  Award, 
-  Calendar,
+  Award,
   Zap,
   Clock,
   BarChart3,

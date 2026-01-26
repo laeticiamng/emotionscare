@@ -11,18 +11,12 @@ import {
   Shield, 
   Key, 
   Lock, 
-  Eye, 
-  EyeOff, 
-  Smartphone, 
   AlertTriangle,
   CheckCircle,
   Clock,
   Globe,
   Download,
-  Users,
-  Building,
   Database,
-  Server,
   Settings,
   FileText
 } from 'lucide-react';

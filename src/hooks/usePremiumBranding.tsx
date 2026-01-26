@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import { useContext } from 'react';
-import { BrandingContext, BrandingContextType } from '@/contexts/BrandingContext';
+import { BrandingContext } from '@/contexts/BrandingContext';
 
 export const usePremiumBranding = () => {
   const context = useContext(BrandingContext);

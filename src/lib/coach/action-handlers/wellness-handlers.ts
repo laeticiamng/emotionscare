@@ -2,7 +2,6 @@
 
 import { logger } from '@/lib/logger';
 import { NotificationService } from '@/lib/notifications';
-import { CoachNotification } from '../types';
 
 /**
  * Add a wellness notification to the user

@@ -15,10 +15,7 @@ import type {
   ScoreComponents,
   CurrentVibe,
   WeeklyMetrics,
-  ScoreCalculationInput,
-  ScoreCalculationResult,
   ScoreInsight,
-  ScoreInsights,
   LeaderboardEntry,
   ScoreStatistics,
 } from '../types';

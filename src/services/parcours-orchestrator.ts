@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import { supabase } from '@/integrations/supabase/client';
-import type { ParcoursPreset, ParcoursRun, ParcoursSegment } from '@/types/music/parcours';
+import type { ParcoursRun } from '@/types/music/parcours';
 import { logger } from '@/lib/logger';
 
 export const AVAILABLE_PRESETS: Array<{ key: string; title: string; emotion: string; description: string }> = [

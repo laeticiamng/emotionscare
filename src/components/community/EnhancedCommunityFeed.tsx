@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,9 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { 
-  Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, Send, 
-  Image, Video, Mic, MapPin, Smile, TrendingUp, Users, 
-  Flame, Award, Eye, ThumbsUp, Zap, Camera, Paperclip
+  Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, Send, Video, Mic, MapPin, Smile, TrendingUp, Users, 
+  Flame, Award, Eye, ThumbsUp, Camera
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -72,10 +71,10 @@ export default function EnhancedCommunityFeed() {
   const [newPost, setNewPost] = useState('');
   const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
   const [showComments, setShowComments] = useState<{ [key: string]: boolean }>({});
-  const [comments, setComments] = useState<{ [key: string]: Comment[] }>({});
+  const [comments, _setComments] = useState<{ [key: string]: Comment[] }>({});
   const [newComment, setNewComment] = useState<{ [key: string]: string }>({});
   const [filter, setFilter] = useState<'all' | 'trending' | 'following' | 'featured'>('all');
-  const [isRecording, setIsRecording] = useState(false);
+  const [_isRecording, _setIsRecording] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -146,7 +145,7 @@ export default function EnhancedCommunityFeed() {
     if (!newPost.trim()) return;
 
     try {
-      const { data, error } = await supabase
+ const { error } = await supabase
         .from('posts')
         .insert({
           content: newPost,

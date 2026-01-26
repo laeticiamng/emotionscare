@@ -10,8 +10,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
   Calendar, 
   Clock, 
-  Users, 
-  Play, 
   UserPlus,
   UserMinus,
   Sparkles,

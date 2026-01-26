@@ -1,19 +1,17 @@
 // @ts-nocheck
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, LineChart, Line, Area, AreaChart
+  PieChart, Pie, Cell, Area, AreaChart
 } from 'recharts';
-import {
-  Search, Filter, TrendingUp, Users, MessageSquare, Star,
+import { TrendingUp, Users, MessageSquare, Star,
   Bug, Lightbulb, Heart, Plus, CheckCircle, Clock, AlertTriangle
 } from 'lucide-react';
 import { FeedbackEntry, QualityMetrics } from '@/types/feedback';

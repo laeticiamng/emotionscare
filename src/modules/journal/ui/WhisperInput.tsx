@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Mic, MicOff, Square, Play, 
+  Mic, MicOff, Square, 
   Volume2, Loader2 
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -32,7 +32,7 @@ export const WhisperInput: React.FC<WhisperInputProps> = ({
   onStopRecording,
   className
 }) => {
-  const [audioLevel, setAudioLevel] = useState(0);
+  const [_audioLevel, _setAudioLevel] = useState(0);
 
   const formatDuration = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);

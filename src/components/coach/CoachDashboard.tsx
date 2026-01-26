@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Heart, TrendingUp, MessageCircle, Zap, Calendar, Target } from 'lucide-react';
 
@@ -26,7 +25,7 @@ const EMOTION_COLORS = {
 };
 
 export const CoachDashboard = () => {
-  const [stats, setStats] = useState<DashboardStats>({
+  const [stats, _setStats] = useState<DashboardStats>({
     totalConversations: 24,
     thisWeekConversations: 5,
     averageMoodScore: 6.8,
@@ -232,7 +231,7 @@ export const CoachDashboard = () => {
                   fill="#8884d8"
                   dataKey="value"
                 >
-                  {stats.emotionDistribution.map((entry, index) => (
+                  {stats.emotionDistribution.map((_entry, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={Object.values(EMOTION_COLORS)[index % 6]}

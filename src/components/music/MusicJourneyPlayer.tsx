@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Slider } from '@/components/ui/slider';
 import {
   Play,
   Pause,
@@ -20,7 +19,7 @@ import {
   TrendingUp,
   Sparkles
 } from '@/components/music/icons';
-import { useMusicJourney, type MusicJourney } from '@/hooks/useMusicJourney';
+import { useMusicJourney } from '@/hooks/useMusicJourney';
 import { useMusic } from '@/hooks/useMusic';
 
 interface Props {

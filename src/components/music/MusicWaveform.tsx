@@ -29,7 +29,6 @@ const MusicWaveform: React.FC<MusicWaveformProps> = ({
   interactive = true,
   waveformType = 'bars'
 }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const waveformRef = useRef<HTMLDivElement>(null);
   const { state, seek } = useMusic();
   const { currentTrack, isPlaying, currentTime, duration } = state;

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 import { logger } from '@/lib/logger';
 
 interface SegmentContextType {

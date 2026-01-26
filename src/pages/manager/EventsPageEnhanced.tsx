@@ -19,11 +19,8 @@ import {
   Star,
   Edit,
   Trash,
-  Share,
-  Download,
-  Bell
+  Share
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
 const EventsPageEnhanced = () => {

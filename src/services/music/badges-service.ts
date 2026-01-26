@@ -158,7 +158,7 @@ export const MUSIC_BADGES: MusicBadge[] = [
  * Vérifie et débloque les badges basés sur l'historique d'écoute
  */
 export async function checkAndUnlockBadges(
-  userId: string,
+  _userId: string,
   listeningHistory: any[]
 ): Promise<MusicBadge[]> {
   try {

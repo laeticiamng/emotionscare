@@ -4,7 +4,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Users, Send, Copy, Check, MessageCircle } from 'lucide-react';
+import { Users, Send, Copy, Check } from 'lucide-react';
 import {
   Dialog,
   DialogContent,

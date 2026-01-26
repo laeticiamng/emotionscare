@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { 
-  MessageSquare, Calendar, Clock, ChevronRight, Trash2, Search, Filter,
-  Download, Share2, Star, Archive, MoreVertical, FileText, TrendingUp,
-  Bookmark, Tag, Eye
+  MessageSquare, Calendar, Clock, Trash2, Search,
+  Download, Share2, Star, MoreVertical, Tag, Eye
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -69,7 +68,7 @@ export default function CoachConversationHistory({ onSelectConversation }: Props
   const [searchQuery, setSearchQuery] = useState('');
   const [filterTopic, setFilterTopic] = useState<string>('all');
   const [periodFilter, setPeriodFilter] = useState<PeriodFilter>('all');
-  const [sortOption, setSortOption] = useState<SortOption>('recent');
+  const [sortOption, _setSortOption] = useState<SortOption>('recent');
   const [favorites, setFavorites] = useState<Set<string>>(() => {
     const saved = localStorage.getItem('coachConversationFavorites');
     return saved ? new Set(JSON.parse(saved)) : new Set();

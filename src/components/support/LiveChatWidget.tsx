@@ -4,11 +4,10 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, Send, Minimize2, Maximize2, Paperclip, Bot, User as UserIcon, Clock } from 'lucide-react';
+import { MessageSquare, X, Send, Minimize2, Maximize2, Paperclip, Bot, User as UserIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -49,7 +48,7 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [agentStatus, setAgentStatus] = useState<'online' | 'offline' | 'away'>('online');
-  const [isConnected, setIsConnected] = useState(false);
+  const [_isConnected, setIsConnected] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 

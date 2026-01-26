@@ -30,7 +30,6 @@ import {
 import {
   mapStateToPreset,
   type PomsTrendSummary,
-  type AdaptivePresetId,
 } from "@/services/music/presetMapper";
 import {
   INTENSITY_TEXT,

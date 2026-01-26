@@ -1,8 +1,7 @@
 // @ts-nocheck
 
-import { MusicPlaylist, MusicTrack } from '@/types/music';
+import { MusicPlaylist } from '@/types/music';
 import { getPlaylist } from '@/services/music/playlist-service';
-import { useToast } from '@/hooks/use-toast';
 import { playlistToMusicPlaylist } from '@/services/music/converters';
 import { logger } from '@/lib/logger';
 

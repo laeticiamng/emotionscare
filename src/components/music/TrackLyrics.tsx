@@ -34,7 +34,7 @@ export const TrackLyrics: React.FC<TrackLyricsProps> = ({
   const [lyrics, setLyrics] = useState<string | null>(null);
   const [generatedTitle, setGeneratedTitle] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [taskId, setTaskId] = useState<string | null>(null);
+  const [_taskId, setTaskId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const cancelledRef = useRef(false);
 

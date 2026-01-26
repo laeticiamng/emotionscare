@@ -15,8 +15,6 @@ import {
   Search,
   Share2,
   UserPlus,
-  Eye,
-  Filter,
   Download
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,7 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Select,
   SelectContent,
@@ -120,7 +118,7 @@ const ExchangeLeaderboard: React.FC = () => {
     const saved = localStorage.getItem('exchangeFollowing');
     return saved ? new Set(JSON.parse(saved)) : new Set();
   });
-  const { data: leaderboardData, isLoading } = useLeaderboard(selectedMarket, period);
+ const { data: leaderboardData } = useLeaderboard(selectedMarket, period);
 
   // Transform API data or use mock as fallback
   const mockLeaderboard: LeaderboardEntry[] = useMemo(() => {

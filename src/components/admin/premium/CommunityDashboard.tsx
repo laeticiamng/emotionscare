@@ -30,10 +30,9 @@ interface CommunityDashboardProps {
 export const CommunityDashboard: React.FC<CommunityDashboardProps> = ({
   isActive,
   onClick,
-  visualStyle,
   zenMode
 }) => {
-  const { admin } = useOpenAI();
+  useOpenAI();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { analyzeCommunityTrends } = useCommunityRecommendations();

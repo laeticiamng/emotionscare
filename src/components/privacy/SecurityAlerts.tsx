@@ -8,8 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Shield, AlertTriangle, CheckCircle, Bell, 
-  Lock, Eye, Globe, Smartphone, Mail, Settings 
+  Shield, AlertTriangle, CheckCircle, Bell, Eye, Smartphone, Mail, Settings 
 } from 'lucide-react';
 import { toast } from 'sonner';
 

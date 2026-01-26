@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, Lightbulb, Waves, Scan, Beaker, Sword, Sliders, Users, Trophy, Theater, Sprout, Filter, Zap, Home, Brain, Calendar, Heart, Monitor, Camera, Shield, MessageSquare, BarChart3, Grid3X3, Settings, Bell, Search, X, TrendingUp, Target, Award, ChevronDown } from 'lucide-react';
+import { Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, Lightbulb, Waves, Scan, Beaker, Sword, Sliders, Users, Trophy, Theater, Sprout, Filter, Zap, Home, Calendar, Heart, Monitor, Camera, Shield, MessageSquare, BarChart3, Grid3X3, Settings, Bell, Search, X, TrendingUp, Target, Award, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ParkAttraction } from '@/components/park/ParkAttraction';
 import { Button } from '@/components/ui/button';
@@ -14,8 +14,7 @@ import { GuidedTourModal } from '@/components/park/GuidedTourModal';
 import { TourStepOverlay } from '@/components/park/TourStepOverlay';
 import { useParkRecommendations } from '@/hooks/useParkRecommendations';
 import { AttractionRecommendations } from '@/components/park/AttractionRecommendations';
-import { ParkStatistics, ProgressStage } from '@/components/park/ParkStatistics';
-import { Attraction, Zone, ZoneKey, ZoneProgressData, ParkStat, MoodOption } from '@/types/park';
+import { Attraction, Zone, ZoneKey } from '@/types/park';
 
 /**
  * Carte du Parc Émotionnel — Monde des Modules

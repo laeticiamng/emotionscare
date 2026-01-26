@@ -12,8 +12,6 @@ interface ChartLegendProps {
 
 export const ChartLegend: React.FC<ChartLegendProps> = ({
   align = 'center',
-  verticalAlign = 'bottom',
-  layout = 'horizontal',
   iconType = 'circle',
   iconSize = 10,
   className = '',

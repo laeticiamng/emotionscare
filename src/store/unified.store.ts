@@ -21,30 +21,6 @@ interface SessionData {
   [key: string]: unknown;
 }
 
-interface TrackData {
-  id: string;
-  title?: string;
-  [key: string]: unknown;
-}
-
-interface ConversationData {
-  id: string;
-  [key: string]: unknown;
-}
-
-interface NotificationData {
-  id?: string;
-  type?: string;
-  createdAt?: string;
-  read?: boolean;
-  [key: string]: unknown;
-}
-
-interface WidgetData {
-  id: string;
-  [key: string]: unknown;
-}
-
 // Auth State
 interface AuthState {
   user: UserData | null;

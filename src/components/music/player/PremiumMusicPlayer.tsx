@@ -28,7 +28,7 @@ const PremiumMusicPlayer: React.FC<PremiumMusicPlayerProps> = ({
   compact = false 
 }) => {
   const [activeTab, setActiveTab] = useState('player');
-  const [showFullscreen, setShowFullscreen] = useState(false);
+  const [_showFullscreen, setShowFullscreen] = useState(false);
   
   const {
     state,

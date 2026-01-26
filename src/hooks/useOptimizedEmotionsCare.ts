@@ -2,7 +2,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useEmotionAnalysisEngine } from './useEmotionAnalysisEngine';
 import { useMusicGeneration } from './useMusicGeneration';
-import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from './use-toast';
 import type { EmotionResult, MusicTrack } from '@/types';
 

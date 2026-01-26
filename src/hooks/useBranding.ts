@@ -1,7 +1,6 @@
 // @ts-nocheck
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase';
 import { logger } from '@/lib/logger';
 
 interface Branding {

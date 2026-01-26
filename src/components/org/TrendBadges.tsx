@@ -3,7 +3,6 @@ import React from 'react';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { TeamRow, Trend } from '@/hooks/useOrgWeekly';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
 
 interface TrendBadgesProps {
   teams: TeamRow[];

@@ -4,12 +4,7 @@ import { EmotionalTeamViewProps } from '@/types/emotion';
 import { Users, BarChart, Shield, AlertTriangle } from 'lucide-react';
 
 const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({
-  teamId,
-  period = 'week',
-  anonymized = true, // Toujours anonymisé pour les RH
-  dateRange,
   showGraph = true,
-  showMembers = false, // Jamais d'informations individuelles
   className = '',
   showDetails = false
 }) => {

@@ -1,7 +1,6 @@
 /**
  * Hook pour gérer les blocs temporels personnels (B2C)
  */
-import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -101,7 +100,7 @@ export function useTimeBlocks(versionId?: string) {
         description: 'Votre bloc temporel a été ajouté',
       });
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast({
         title: 'Erreur',
         description: 'Impossible de créer le bloc',

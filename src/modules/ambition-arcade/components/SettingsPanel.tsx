@@ -11,8 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { 
-  Settings, Bell, Volume2, Vibrate, Sparkles, 
-  Moon, Sun, Palette, RotateCcw, Save,
+  Settings, Bell, Volume2, Vibrate, Sparkles, RotateCcw, Save,
   BellRing, Trophy, Target
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';

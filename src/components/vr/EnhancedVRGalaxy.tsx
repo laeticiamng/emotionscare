@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import React, { useState, useEffect, useRef, Suspense } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Stars, Text, Float, Sphere, Box, Torus } from '@react-three/drei';
 import * as THREE from 'three';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Slider } from '@/components/ui/slider';
-import { ArrowLeft, Play, Pause, RotateCcw, Volume2, VolumeX, Sparkles, Globe, Zap, Heart, Brain, Stars as StarsIcon, Gamepad2, Target, Award } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Globe, Brain, Gamepad2, Target, Award } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { triggerConfetti } from '@/lib/confetti';

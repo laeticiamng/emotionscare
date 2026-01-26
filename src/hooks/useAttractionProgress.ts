@@ -23,9 +23,6 @@ export interface SearchHistory {
   resultCount: number;
 }
 
-const STORAGE_KEY = 'emotional-park-progress';
-const SEARCH_HISTORY_KEY = 'emotional-park-search-history';
-
 export const useAttractionProgress = () => {
   const { user } = useAuth();
   const [visitedAttractions, setVisitedAttractions] = useState<Record<string, AttractionVisit>>({});

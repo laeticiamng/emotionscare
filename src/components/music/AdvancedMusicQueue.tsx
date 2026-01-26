@@ -51,7 +51,6 @@ export const AdvancedMusicQueue: React.FC<AdvancedMusicQueueProps> = ({
   currentTrackId,
   onTrackSelect,
   onQueueChange,
-  onPlayPause,
   isPlaying = false,
 }) => {
   const { toast } = useToast();

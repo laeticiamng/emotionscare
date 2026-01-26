@@ -1,10 +1,9 @@
 // @ts-nocheck
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   Search, 
   ArrowRight,
-  Clock,
   Star,
   Zap,
   Heart,
@@ -21,7 +20,6 @@ import {
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
 interface SearchResult {

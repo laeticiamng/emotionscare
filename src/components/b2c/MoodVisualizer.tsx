@@ -44,7 +44,7 @@ export const MoodVisualizer: React.FC<MoodVisualizerProps> = ({
       { x: centerX, y: centerY, color: 'rgba(168, 85, 247, 0.1)' }, // Low arousal, positive valence (calm)
     ];
 
-    quadrants.forEach((q, i) => {
+    quadrants.forEach((q, _i) => {
       ctx.fillStyle = q.color;
       ctx.fillRect(q.x, q.y, centerX, centerY);
     });

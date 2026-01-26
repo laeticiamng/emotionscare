@@ -24,10 +24,6 @@ import {
   Edit,
   Save,
   Camera,
-  Mail,
-  Phone,
-  MapPin,
-  Briefcase,
   Star,
   TrendingUp
 } from 'lucide-react';

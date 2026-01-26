@@ -9,9 +9,8 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Music, Wand2, Download, Play, Pause, Volume2, Settings, Sparkles } from 'lucide-react';
+import { Music, Wand2, Download, Play, Pause, Settings, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { useSunoMusic } from '@/hooks/api/useSunoMusic';
 
 interface GenerationSettings {
@@ -97,7 +96,7 @@ const AdvancedMusicGenerator: React.FC = () => {
   }, []);
 
   const generateEnhancedPrompt = useCallback(() => {
-    const { emotion, mood, genre, style, bpm, key } = settings;
+ const { genre, style, bpm, key } = settings;
     const { valence, arousal, stress_level } = emotionalContext;
 
     let enhancedPrompt = settings.prompt;

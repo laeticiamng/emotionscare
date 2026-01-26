@@ -3,7 +3,6 @@
 
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
 
 import { supabase } from '@/integrations/supabase/client';

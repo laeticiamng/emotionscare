@@ -1,11 +1,10 @@
 /**
  * ReportExporter - Export de rapports stratégiques B2B
  */
-import React, { memo, useState } from 'react';
+import { memo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import {
@@ -25,7 +24,6 @@ import {
   TrendingUp,
   Calendar,
   Users,
-  CheckCircle,
   Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -85,7 +83,6 @@ const reportTypes: ReportType[] = [
 export const ReportExporter = memo(function ReportExporter({
   hasEnoughData,
   onGenerateReport,
-  isLoading = false,
 }: ReportExporterProps) {
   const [selectedReport, setSelectedReport] = useState<ReportType | null>(null);
   const [selectedSections, setSelectedSections] = useState<string[]>([]);

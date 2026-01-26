@@ -5,7 +5,6 @@ import {
   FileText, 
   Scan, 
   Music, 
-  MessageCircle, 
   Glasses, 
   Settings,
   Users,
@@ -14,9 +13,7 @@ import {
   Sparkles,
   Watch,
   Heart,
-  Target,
-  Shield,
-  User
+  Target
 } from 'lucide-react';
 
 export interface NavItem {

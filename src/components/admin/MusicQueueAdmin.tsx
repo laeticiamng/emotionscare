@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
-  getUserQueueItems, 
   triggerQueueWorker, 
   getSunoApiStatus,
   getQueueStatistics,
@@ -17,7 +16,6 @@ import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { PremiumBadge } from '@/components/music/PremiumBadge';
-import { getRolePriority } from '@/services/userRolesService';
 import { useNavigate } from 'react-router-dom';
 import { routes } from '@/lib/routes';
 

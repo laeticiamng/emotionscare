@@ -28,12 +28,10 @@ export const useSunoServiceStatus = () => {
   const fetchStatus = useCallback(async () => {
     try {
       const startTime = Date.now();
-      
+
       const { data, error } = await supabase.functions.invoke('suno-music', {
         body: { action: 'health-check' }
       });
-
-      const responseTime = Date.now() - startTime;
 
       if (error) {
         const apiStatus = await getSunoApiStatus();

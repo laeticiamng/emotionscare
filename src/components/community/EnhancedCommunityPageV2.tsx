@@ -1,20 +1,17 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
-  HeartHandshake,
   Shield,
   Sparkles,
   Users,
-  LayoutGrid,
   BarChart3,
 } from 'lucide-react';
 
 import ZeroNumberBoundary from '@/components/accessibility/ZeroNumberBoundary';
 import PageSEO from '@/components/seo/PageSEO';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -137,7 +134,7 @@ export const EnhancedCommunityPageV2: React.FC = () => {
   const [posts, setPosts] = useState<CommunityPost[]>(initialPosts);
   const [reportDraft, setReportDraft] = useState<ReportDraft>({ postId: null, reason: REPORT_REASONS[0].id, message: '' });
   const [showSocialConfirm, setShowSocialConfirm] = useState(false);
-  const { bookmarks, toggleBookmark, isBookmarked, addReaction } = useCommunityEnhancements();
+ const { bookmarks, addReaction } = useCommunityEnhancements();
 
   const trendingPosts = useMemo(() => generateTrendingPosts(posts), [posts]);
 
@@ -202,7 +199,7 @@ export const EnhancedCommunityPageV2: React.FC = () => {
     }
   }, [toast]);
 
-  const handleReply = useCallback((postId: string) => {
+  const handleReply = useCallback((_postId: string) => {
     toast({
       title: 'Mode réponse',
       description: 'Formule ta réponse avec bienveillance.',

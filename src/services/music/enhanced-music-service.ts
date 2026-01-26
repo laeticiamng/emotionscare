@@ -6,7 +6,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
-import { generateMusic, extendMusic, addVocals, type SunoGenerateRequest } from '../suno-client';
+import { generateMusic, type SunoGenerateRequest } from '../suno-client';
 import { validateInput, CreatePlaylistSchema, ShareMusicSchema, AddToPlaylistSchema } from '@/validators/music';
 import { quotaService } from './quota-service';
 

@@ -1,9 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mic, Square, Save, Trash } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
-import { AudioTrack } from '@/types/audio';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 

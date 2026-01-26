@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Slider } from '@/components/ui/slider';
 import {
   Accessibility,
   Keyboard,
@@ -18,10 +17,7 @@ import {
   Type,
   Contrast,
   MousePointer2,
-  Settings,
   Info,
-  Check,
-  X,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -83,7 +79,6 @@ interface MusicAccessibilityPanelProps {
 export const MusicAccessibilityPanel: React.FC<MusicAccessibilityPanelProps> = ({
   onSettingsChange,
   onPlay,
-  onPause,
   onNext,
   onPrevious,
   onSeek,

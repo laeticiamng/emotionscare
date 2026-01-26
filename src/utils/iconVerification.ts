@@ -3,7 +3,6 @@
  * Vérification automatique des imports manquants dans les composants
  */
 
-import React from 'react';
 import { logger } from '@/lib/logger';
 import { 
   // Icônes de base
@@ -31,38 +30,35 @@ import {
   // Icônes d'interface
   Loader, Loader2, MoreHorizontal, MoreVertical, ExternalLink, Inbox,
   HelpCircle, Lightbulb, Briefcase, Coffee, Gift, Umbrella, Thermometer,
-  Watch, Sunrise, Sunset, Wifi as WifiIcon, Type, Underline, Bold, Italic,
+  Watch, Sunrise, Sunset, Type, Underline, Bold, Italic,
   AlignLeft, AlignCenter, AlignRight, AlignJustify, Hash, AtSign, Paperclip,
   Scissors, PenTool, Tool, Sliders, ToggleLeft, ToggleRight, ZoomIn, ZoomOut,
   
   // Icônes sociales et communication
   Twitter, Instagram, LinkedIn, GitHub, Youtube, Twitch, Slack,
-  MessageSquare, PhoneCall, PhoneOff, MailOpen, PhoneIncoming, PhoneOutgoing,
+  MessageSquare, PhoneCall, PhoneOff, PhoneIncoming, PhoneOutgoing,
   
   // Icônes de fichiers et dossiers
   FolderOpen, FilePlus, FileMinus, FileCheck, FileX, Archive, Package2,
   
   // Icônes de médias
-  FastForward, Rewind, StepBack, StepForward, Square as StopIcon,
+  FastForward,
   
   // Icônes émotionnelles et bien-être
-  Frown, Meh, ThumbsUp, ThumbsDown, Rainbow, Sunrise as SunriseIcon,
+  Frown, Meh, ThumbsUp, ThumbsDown, Rainbow,
   
   // Icônes de système et technique
-  Cpu, HardDrive, Server, Terminal as TerminalIcon, Code2, GitBranch,
+  Cpu, HardDrive, Server, GitBranch,
   GitCommit, GitMerge, GitPullRequest, Bug, ShieldCheck, ShieldOff,
   
   // Icônes de commerce et finance
   ShoppingCart, ShoppingBag, CreditCard, DollarSign, TrendingDown,
   
   // Icônes de transport et navigation
-  Car, Truck, Navigation2, Compass as CompassIcon, Route,
-  
-  // Icônes de temps et calendrier
-  CalendarDays, CalendarCheck, CalendarX, CalendarPlus, CalendarMinus,
+  Car, Truck, Navigation2, Route,
   
   // Icônes d'état et notification
-  BellOff, BellRing, AlertOctagon, Info as InfoIcon, CheckCircle2,
+  BellOff, BellRing, AlertOctagon, CheckCircle2,
   XOctagon, MinusCircle, PlusSquare, MinusSquare
 } from 'lucide-react';
 

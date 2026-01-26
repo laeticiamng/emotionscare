@@ -11,12 +11,12 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Wind, Play, Pause, RotateCcw, TrendingUp, Share2, Download,
-  Volume2, VolumeX, Users, Trophy, Flame, Calendar, Star,
-  Clock, Heart, Award, Settings, History, Sparkles
+  Volume2, VolumeX, Users, Trophy, Flame, Calendar,
+  Clock, Award, Settings, History
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Dialog,
   DialogContent,

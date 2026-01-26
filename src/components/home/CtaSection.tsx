@@ -116,7 +116,7 @@ const CtaSection: React.FC = () => {
                   'Musicothérapie adaptative',
                   'Journal de bien-être intelligent',
                   'Communauté bienveillante'
-                ].map((feature, index) => (
+                ].map((feature, _index) => (
                   <div key={feature} className="flex items-center gap-2 sm:gap-3">
                     <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
                     <span className="text-foreground font-medium text-sm sm:text-base">{feature}</span>
@@ -165,7 +165,7 @@ const CtaSection: React.FC = () => {
                   'Gestion multi-équipes',
                   'API et intégrations',
                   'Support premium dédié'
-                ].map((feature, index) => (
+                ].map((feature, _index) => (
                   <div key={feature} className="flex items-center gap-2 sm:gap-3">
                     <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
                     <span className="text-foreground font-medium text-sm sm:text-base">{feature}</span>

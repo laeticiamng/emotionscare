@@ -120,7 +120,7 @@ export function announcePlaylistAdd(trackTitle: string, playlistName: string): v
 /**
  * Annonce le quota utilisateur
  */
-export function announceQuota(remaining: number, limit: number): void {
+export function announceQuota(remaining: number, _limit: number): void {
   if (remaining === 0) {
     announce('Quota de générations épuisé', 'assertive');
   } else if (remaining <= 3) {
@@ -419,7 +419,7 @@ export function ensureFocusVisible(): void {
 /**
  * Génère les attributs ARIA pour un player
  */
-export function getPlayerAriaAttributes(isPlaying: boolean, track?: MusicTrack) {
+export function getPlayerAriaAttributes(_isPlaying: boolean, track?: MusicTrack) {
   return {
     'role': 'region',
     'aria-label': 'Lecteur audio',

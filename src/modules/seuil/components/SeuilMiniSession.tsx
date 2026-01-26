@@ -7,8 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { X, Play, Pause, CheckCircle, RotateCcw } from 'lucide-react';
-import type { SeuilActionType } from '../types';
+import { X, Play, Pause, CheckCircle } from 'lucide-react';
 
 interface SeuilMiniSessionProps {
   actionType: '3min' | '5min_guided';
@@ -292,7 +291,7 @@ interface BreathGuideProps {
 
 const BreathGuide: React.FC<BreathGuideProps> = memo(({ pattern }) => {
   const [phase, setPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
-  const [progress, setProgress] = useState(0);
+  const [_progress, setProgress] = useState(0);
 
   useEffect(() => {
     const totalCycle = pattern.inhale + pattern.hold + pattern.exhale;

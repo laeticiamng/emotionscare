@@ -97,7 +97,7 @@ function getTimeOfDay(): 'morning' | 'afternoon' | 'evening' | 'night' {
  */
 function calculateRelevanceScore(
   module: ModuleType,
-  emotionalState: EmotionalState,
+  _emotionalState: EmotionalState,
   context: UserContext,
   reasons: RecommendationReason[]
 ): number {
@@ -355,7 +355,7 @@ export class EmotionOrchestrator {
   /**
    * Obtient les bénéfices attendus d'un module
    */
-  private getExpectedBenefits(module: ModuleType, emotionalState: EmotionalState): string[] {
+  private getExpectedBenefits(module: ModuleType, _emotionalState: EmotionalState): string[] {
     const benefits: string[] = [];
 
     // Bénéfices par catégorie

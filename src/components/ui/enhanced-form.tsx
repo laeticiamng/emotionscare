@@ -1,5 +1,5 @@
 import React from 'react';
-import { useForm, FieldValues, Path, FieldPath } from 'react-hook-form';
+import { useForm, FieldValues, Path } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -56,7 +56,6 @@ export function EnhancedForm<T extends FieldValues>({
     register,
     handleSubmit,
     formState: { errors, isValid, isDirty },
-    watch,
     reset
   } = useForm<T>({
     resolver: zodResolver(schema),

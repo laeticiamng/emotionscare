@@ -8,13 +8,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
 
-// Types
-interface StorageItem<T> {
-  key: string;
-  value: T;
-  updated_at: string;
-}
-
 interface UseSupabaseStorageOptions<T> {
   defaultValue: T;
   syncInterval?: number; // ms, 0 = no auto-sync

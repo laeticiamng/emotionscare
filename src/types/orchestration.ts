@@ -1,6 +1,5 @@
 // @ts-nocheck
 
-import { MoodData } from '@/types/audio';
 
 export interface MoodEvent {
   id: string;

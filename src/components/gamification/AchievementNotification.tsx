@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
-import { Trophy, Star, Award, X, Share2, Sparkles, Crown, Flame, Gem } from 'lucide-react';
+import { Star, Award, X, Share2, Sparkles, Crown, Flame, Gem } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import confetti from 'canvas-confetti';
 import { useToast } from '@/hooks/use-toast';

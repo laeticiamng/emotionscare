@@ -13,10 +13,8 @@ import {
   Play,
   Plus,
   Search,
-  Heart,
   Zap,
   CloudRain,
-  Sun,
   Moon,
   Focus
 } from 'lucide-react';

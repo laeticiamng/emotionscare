@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -45,12 +45,6 @@ const typeConfig = {
   music: { icon: Music, color: 'text-pink-500', bg: 'bg-pink-500/10' },
   activity: { icon: Heart, color: 'text-red-500', bg: 'bg-red-500/10' },
   story: { icon: BookOpen, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-};
-
-const priorityBadges = {
-  high: { variant: 'default' as const, label: 'Recommandé' },
-  medium: { variant: 'secondary' as const, label: 'Suggéré' },
-  low: { variant: 'outline' as const, label: 'Optionnel' },
 };
 
 const CoachRecommendations: React.FC = () => {

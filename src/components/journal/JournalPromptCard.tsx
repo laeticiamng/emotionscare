@@ -1,13 +1,11 @@
 import { useState, useEffect, useCallback, memo } from 'react';
 import { 
-  Lightbulb, RefreshCw, Heart, Clock, Star, ChevronDown, ChevronUp, 
+  Lightbulb, RefreshCw, Heart, Clock, Star, ChevronDown, 
   Bookmark, History, Share2, TrendingUp, Filter, Download, Volume2
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Collapsible,
   CollapsibleContent,

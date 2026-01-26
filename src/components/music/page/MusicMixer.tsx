@@ -3,7 +3,6 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { 
-  Music, 
   Save, 
   RefreshCw, 
   Headphones, 
@@ -15,7 +14,6 @@ import AudioEqualizer from '@/components/music/AudioEqualizer';
 import MusicMoodVisualization from './MusicMoodVisualization';
 import { useToast } from '@/hooks/use-toast';
 import { useMusic } from '@/hooks/useMusic';
-import type { MusicTrack } from '@/types/music';
 
 interface MixPreset {
   id: string;

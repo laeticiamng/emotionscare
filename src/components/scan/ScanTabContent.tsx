@@ -12,7 +12,7 @@ import {
   Calendar, BarChart3, Share2, Download, Filter, Star, 
   Sparkles, History, Target, Award, Loader2
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -21,7 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useScanSettings, type ScanStats, type ScanHistoryEntry } from '@/hooks/useScanSettings';
+import { useScanSettings, type ScanStats } from '@/hooks/useScanSettings';
 
 interface ScanTabContentProps {
   showScanForm: boolean;
@@ -53,8 +53,7 @@ const ScanTabContent: React.FC<ScanTabContentProps> = ({
     favoriteMethods,
     isLoading,
     updateStats,
-    addHistoryEntry,
-    toggleFavoriteMethod
+    addHistoryEntry
   } = useScanSettings();
 
   // Show loading state while fetching from Supabase
@@ -106,14 +105,6 @@ const ScanTabContent: React.FC<ScanTabContentProps> = ({
     onScanComplete(result);
     setShowScanForm(false);
     setSelectedMethod(null);
-  };
-
-  const handleToggleFavorite = (methodId: string) => {
-    toggleFavoriteMethod(methodId);
-    toast({
-      title: favoriteMethods.includes(methodId) ? 'Retiré des favoris' : 'Ajouté aux favoris',
-      duration: 2000
-    });
   };
 
   const exportHistory = () => {

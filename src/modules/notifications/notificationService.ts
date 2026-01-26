@@ -10,8 +10,7 @@ import type {
   CreateNotificationInput, 
   NotificationFilters,
   NotificationPreferences,
-  NotificationStats,
-  DEFAULT_NOTIFICATION_PREFERENCES 
+  NotificationStats 
 } from './types';
 
 const LOG_CONTEXT = 'NotificationService';

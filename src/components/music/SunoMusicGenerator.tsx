@@ -19,13 +19,11 @@ import {
   Wand2,
   Loader2,
   Heart,
-  Download,
   Play,
   Pause,
   AlertTriangle,
   Info,
   Sparkles,
-  Star,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -88,16 +86,14 @@ export const SunoMusicGenerator: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<GeneratedTrack | null>(null);
   const [generationQueue, setGenerationQueue] = useState<string[]>([]);
-  const [savedTracks, setSavedTracks] = useState<GeneratedTrack[]>([]);
+  const [_savedTracks, setSavedTracks] = useState<GeneratedTrack[]>([]);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioElement] = useState(() => new Audio());
-  const [showLyrics, setShowLyrics] = useState(false);
+  const [_showLyrics, _setShowLyrics] = useState(false);
 
   // 🔥 Realtime updates via Supabase instead of polling
   const handleRealtimeComplete = useCallback((callback: { metadata?: { audioUrl?: string; imageUrl?: string; duration?: number; title?: string } }) => {
-    const moodData = MOOD_OPTIONS.find((m) => m.id === selectedMood);
-    
     setCurrentTrack(prev => {
       if (!prev) return prev;
       return {
@@ -155,9 +151,6 @@ export const SunoMusicGenerator: React.FC = () => {
       audio.src = '';
     };
   }, [audioElement]);
-
-  // La clé API est gérée côté serveur, pas besoin de vérifier côté client
-  const isApiConfigured = true; // L'API Suno est configurée via secrets serveur
 
   const handleGenerateMusic = async () => {
     if (!user) {

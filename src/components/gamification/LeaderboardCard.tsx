@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
   SelectContent,
@@ -18,7 +17,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { 
-  Trophy, Medal, Award, Crown, TrendingUp, TrendingDown, 
+  Trophy, Medal, Award, Crown, TrendingUp, 
   Minus, Download, Share2, RefreshCw, Filter, ChevronUp, ChevronDown,
   Users, Calendar, Star
 } from 'lucide-react';

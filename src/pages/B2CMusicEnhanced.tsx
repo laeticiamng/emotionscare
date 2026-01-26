@@ -13,8 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Music, ArrowLeft, Loader2, Heart, Brain, Zap, Sparkles } from 'lucide-react';
+import { Music, ArrowLeft, Heart, Brain, Zap, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMusic } from '@/hooks/useMusic';
 import { useMusicFavorites } from '@/hooks/useMusicFavorites';
@@ -59,11 +58,9 @@ import { QuotaWarningBanner } from '@/components/music/QuotaWarningBanner';
 import { EmotionLinkBanner } from '@/components/music/EmotionLinkBanner';
 import { MusicPageHeaderEnhanced } from '@/components/music/MusicPageHeaderEnhanced';
 import { MusicStatsDrawer } from '@/components/music/MusicStatsDrawer';
-import { AudioSourceBadge } from '@/components/music/AudioSourceBadge';
 
 // Composants statiques chargés immédiatement
 import {
-  MusicPageHeader,
   VinylIntroduction,
   MusicFavoritesSection,
   MusicHistorySection,

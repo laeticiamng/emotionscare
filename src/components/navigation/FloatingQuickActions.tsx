@@ -12,7 +12,6 @@ import {
   Heart,
   Zap,
   Search,
-  Settings,
   HelpCircle,
   X
 } from 'lucide-react';

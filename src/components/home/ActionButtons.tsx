@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, Brain, Music, BookOpen, Users, Settings, Headphones, Trophy, Bell } from 'lucide-react';
 import MiniMusicPlayer from './MiniMusicPlayer';
-import PremiumButton from '@/components/ui/PremiumButton';
 
 const ActionButtons: React.FC = () => {
   const navigate = useNavigate();

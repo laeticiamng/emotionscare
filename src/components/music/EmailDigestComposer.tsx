@@ -67,7 +67,7 @@ export const EmailDigestComposer: React.FC = () => {
       }
 
       try {
-        const { data, error } = await supabase
+ const { data } = await supabase
           .from('user_settings')
           .select('value')
           .eq('user_id', user.id)

@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Shield, AlertTriangle, Eye, EyeOff, Flag, Ban, 
-  CheckCircle, XCircle, MessageSquare, Users, 
+  Shield, AlertTriangle, Eye, EyeOff, Flag, 
+  CheckCircle, XCircle, MessageSquare, 
   TrendingUp, Activity, Settings, Filter,
-  Clock, Zap, Heart, ThumbsDown, Lock
+  Clock, Zap, Lock
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';

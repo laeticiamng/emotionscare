@@ -11,10 +11,7 @@ import {
   Search, 
   Plus, 
   MoreHorizontal, 
-  Mail,
-  Phone,
-  MapPin,
-  Calendar
+  Mail
 } from 'lucide-react';
 
 const users = [

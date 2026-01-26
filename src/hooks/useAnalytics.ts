@@ -44,7 +44,7 @@ interface ImprovementInsight {
 
 export const useAnalytics = () => {
   const { user } = useAuth();
-  const { userMode } = useUserMode();
+  useUserMode();
   const [events, setEvents] = useState<AnalyticsEvent[]>([]);
   const [currentJourney, setCurrentJourney] = useState<UserJourney | null>(null);
   const [metrics, setMetrics] = useState<AnalyticsMetrics>({
@@ -196,7 +196,7 @@ export const useAnalytics = () => {
     };
   };
 
-  const generateTrendData = (feature: string) => {
+  const generateTrendData = (_feature: string) => {
     // Génération de données de tendance simulées
     const days = 30;
     const data = [];

@@ -2,9 +2,8 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
-import { Loader2, Wind, BookOpen, Zap, Trophy, Calendar, History, Sparkles } from 'lucide-react';
+import { Loader2, Wind, BookOpen, Zap, Trophy, History } from 'lucide-react';
 
 import PageHeader from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/button';

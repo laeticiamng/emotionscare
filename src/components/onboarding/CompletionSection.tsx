@@ -4,11 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Loader2, CheckCircle2, Music, Brain, LineChart, Share2,
-  Trophy, Flame, Target, Download, Star, Sparkles, ArrowRight,
+  Loader2, CheckCircle2, Music, LineChart, Share2,
+  Trophy, Flame, Target, Download, Sparkles, ArrowRight,
   Heart, Wind, BookOpen, Calendar, Gift, Zap, Award, Copy
 } from 'lucide-react';
 import MoodBasedRecommendations from '@/components/music/MoodBasedRecommendations';

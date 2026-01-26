@@ -28,7 +28,6 @@ import { useRgpdMetrics } from '@/hooks/useRgpdMetrics';
 import { useComplianceAudit } from '@/hooks/useComplianceAudit';
 
 import { Skeleton } from '@/components/ui/skeleton';
-import { toast } from 'sonner';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 

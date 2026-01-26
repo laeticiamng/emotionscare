@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Brain, TrendingUp, Lightbulb, Target, Users, Zap,
-  CheckCircle, Clock, AlertTriangle, ArrowRight, Sparkles
+  CheckCircle, AlertTriangle, ArrowRight, Sparkles
 } from 'lucide-react';
 import { ImprovementSuggestion, FeedbackEntry } from '@/types/feedback';
 

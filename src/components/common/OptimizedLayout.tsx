@@ -11,7 +11,6 @@ const PerformanceMonitor = lazy(() => import('@/components/monitoring/Performanc
 interface OptimizedLayoutProps {
   children: React.ReactNode;
   enableMonitoring?: boolean;
-  enableAccessibility?: boolean;
 }
 
 const ErrorFallback = ({ error, resetError }: { error?: Error; resetError: () => void }) => {
@@ -49,10 +48,9 @@ const LoadingFallback = () => (
  * OptimizedLayout - Production-ready layout with performance optimizations
  * Features: Error boundaries, lazy loading, accessibility, monitoring
  */
-const OptimizedLayout: React.FC<OptimizedLayoutProps> = memo(({ 
-  children, 
-  enableMonitoring = true,
-  enableAccessibility = true 
+const OptimizedLayout: React.FC<OptimizedLayoutProps> = memo(({
+  children,
+  enableMonitoring = true
 }) => {
   return (
     <EnhancedErrorBoundary fallback={ErrorFallback}>

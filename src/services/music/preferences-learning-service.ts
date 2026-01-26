@@ -3,7 +3,6 @@
  * Ajuste les préférences en fonction de l'historique d'écoute réel
  */
 
-import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 import { getUserHistory, type MusicHistoryEntry } from './history-service';
 import { getUserPreferences, saveUserPreferences, type UserMusicPreferences } from './preferences-service';
@@ -229,12 +228,6 @@ function suggestNewGenres(
   currentGenres: string[],
   preferences: UserMusicPreferences | null
 ): string[] {
-  const allGenres = [
-    'ambient', 'classical', 'electronic', 'jazz', 'pop', 'rock', 
-    'lofi', 'world', 'indie', 'soundtrack', 'folk', 'blues',
-    'reggae', 'soul', 'funk', 'metal', 'punk', 'country'
-  ];
-
   const existingGenres = new Set([
     ...currentGenres,
     ...(preferences?.favorite_genres || []),

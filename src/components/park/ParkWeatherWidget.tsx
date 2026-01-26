@@ -81,10 +81,8 @@ export const ParkWeatherWidget: React.FC<ParkWeatherWidgetProps> = ({
   weatherType = 'sunny',
   mood = 75,
   description = 'Le parc est en pleine forme !',
-  onRefresh
 }) => {
   const config = weatherConfig[weatherType];
-  const Icon = config.icon;
 
   // Determine weather based on mood if not explicitly provided
   const computedWeather = useMemo(() => {

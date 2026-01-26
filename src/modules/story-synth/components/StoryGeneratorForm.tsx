@@ -3,7 +3,7 @@
  * @module story-synth
  */
 
-import React, { memo, useState } from 'react';
+import { memo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Wand2, 
@@ -126,8 +126,6 @@ export const StoryGeneratorForm = memo(function StoryGeneratorForm({
       ambient,
     });
   };
-
-  const selectedTheme = themes.find(t => t.value === theme);
 
   return (
     <Card className="p-5">

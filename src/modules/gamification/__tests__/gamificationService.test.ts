@@ -10,11 +10,6 @@ import { gamificationService } from '../gamificationService';
 // MOCKS
 // ============================================================================
 
-const mockSupabaseResponse = <T>(data: T, error: Error | null = null) => ({
-  data,
-  error,
-});
-
 const mockChain = {
   select: vi.fn().mockReturnThis(),
   order: vi.fn().mockReturnThis(),

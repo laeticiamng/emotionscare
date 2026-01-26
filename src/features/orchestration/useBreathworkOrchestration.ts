@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
 
 import { useAssessment, type UseAssessmentResult } from '@/hooks/useAssessment';

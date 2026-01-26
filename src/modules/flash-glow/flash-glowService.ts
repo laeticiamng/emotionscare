@@ -357,7 +357,7 @@ class FlashGlowService {
     return defaults;
   }
 
-  private checkAchievements(session: FlashGlowSession): void {
+  private checkAchievements(_session: FlashGlowSession): void {
     const achievements = this.getAchievements();
     const localData = this.getLocalData();
     const streak = this.getStreak();

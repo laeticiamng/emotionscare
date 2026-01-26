@@ -3,8 +3,8 @@
  * Partage des prédictions long-terme à travers l'application
  */
 
-import React, { createContext, useContext, ReactNode } from 'react';
-import { useLongTermPredictions, TimeframeType } from '@/hooks/useLongTermPredictions';
+import { createContext, useContext, ReactNode } from 'react';
+import { useLongTermPredictions } from '@/hooks/useLongTermPredictions';
 import { EmotionalForecast } from '@/services/longTermPredictionsService';
 
 interface PredictionsContextValue extends ReturnType<typeof useLongTermPredictions> {}

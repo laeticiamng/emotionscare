@@ -154,7 +154,7 @@ export const useMusicGenerationEnriched = () => {
   // Génération avec retry et fallback
   const generateMusic = useCallback(async (
     emotion: string,
-    customPrompt?: string,
+    _customPrompt?: string,
     mood?: string,
     intensity: number = 0.5,
     userContext?: string

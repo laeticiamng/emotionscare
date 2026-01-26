@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Activity } from 'lucide-react';
 import type { SanitizedNote } from '@/modules/journal/types';
-import { format, parseISO, startOfYear, endOfYear, eachDayOfInterval, isSameDay } from 'date-fns';
+import { parseISO, startOfYear, endOfYear, eachDayOfInterval, isSameDay, format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 interface JournalHeatmapProps {
@@ -94,23 +94,6 @@ export const JournalHeatmap = memo<JournalHeatmapProps>(({
         }
         result.push(currentWeek);
         currentWeek = [];
-      }
-    });
-
-    return result;
-  }, [heatmapData]);
-
-  const months = useMemo(() => {
-    const result: string[] = [];
-    let lastMonth = -1;
-
-    heatmapData.forEach((day) => {
-      const month = day.date.getMonth();
-      if (month !== lastMonth) {
-        result.push(format(day.date, 'MMM', { locale: fr }));
-        lastMonth = month;
-      } else {
-        result.push('');
       }
     });
 

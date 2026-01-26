@@ -2,7 +2,6 @@
  * Offline Queue Status - Affiche le détail de la queue
  */
 
-import React from 'react';
 import { AlertTriangle, CheckCircle2, Clock, XCircle, Zap } from 'lucide-react';
 import { useOffline } from '@/contexts/OfflineContext';
 import { cn } from '@/lib/utils';
@@ -19,23 +18,6 @@ export function OfflineQueueStatus({ className }: OfflineQueueStatusProps) {
   if (totalItems === 0) {
     return null;
   }
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'synced':
-        return 'text-green-600 bg-green-50';
-      case 'pending':
-        return 'text-blue-600 bg-blue-50';
-      case 'syncing':
-        return 'text-amber-600 bg-amber-50';
-      case 'failed':
-        return 'text-red-600 bg-red-50';
-      case 'conflict':
-        return 'text-orange-600 bg-orange-50';
-      default:
-        return 'text-gray-600 bg-gray-50';
-    }
-  };
 
   return (
     <div className={cn('space-y-3', className)}>

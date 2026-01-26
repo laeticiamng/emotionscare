@@ -16,9 +16,7 @@ import {
   Trash2,
   Music,
   Clock,
-  Copy,
   Save,
-  Settings2,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -82,7 +80,6 @@ export const PlaylistBuilderTab: React.FC<PlaylistBuilderTabProps> = ({
   existingPlaylists = [],
   onCreatePlaylist,
   onDeletePlaylist,
-  availableTracks = [],
 }) => {
   const { toast } = useToast();
   const [newPlaylistName, setNewPlaylistName] = useState('');

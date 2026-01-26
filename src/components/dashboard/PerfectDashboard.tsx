@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePerfectDashboardData } from '@/hooks/usePerfectDashboardData';
@@ -25,7 +25,6 @@ import {
   Target,
   Clock,
   Award,
-  Users,
   ChevronRight,
   Smile,
   Calendar,

@@ -16,7 +16,6 @@ import {
   PopoverContent,
   PopoverTrigger 
 } from "@/components/ui/popover";
-import { Label } from "@/components/ui/label";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';

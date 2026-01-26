@@ -2,7 +2,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import PremiumButton from '@/components/ui/PremiumButton';
 import { 
@@ -14,7 +13,6 @@ import {
   HeartHandshake,
   Zap,
   Video,
-  Settings,
   BarChart3
 } from 'lucide-react';
 
@@ -27,7 +25,6 @@ interface ActionButtonData {
 }
 
 const UnifiedActionButtons: React.FC = () => {
-  const { user } = useAuth();
   const { userMode } = useUserMode();
 
   const getActionButtons = (): ActionButtonData[] => {

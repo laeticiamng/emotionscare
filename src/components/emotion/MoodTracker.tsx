@@ -1,15 +1,13 @@
 // @ts-nocheck
 
 import React, { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
-  Calendar, TrendingUp, TrendingDown, Download, Share2, Filter,
-  ChevronLeft, ChevronRight, BarChart3, Info, Pencil, X
+  Calendar, TrendingUp, TrendingDown, Download, Share2, BarChart3, Pencil
 } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, ReferenceLine, Area, AreaChart } from 'recharts';
+import { Line, XAxis, YAxis, ResponsiveContainer, Tooltip, ReferenceLine, Area, AreaChart } from 'recharts';
 import {
   Select,
   SelectContent,

@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
   Music, Brain, Heart, Users, BookOpen, Camera,
-  Zap, PlayCircle, Pause, SkipForward, Volume2,
+  Zap, PlayCircle, SkipForward, Volume2,
   Settings, Share2, Download, Star, Plus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';

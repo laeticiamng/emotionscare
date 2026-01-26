@@ -30,8 +30,7 @@ const AudioPlayerAdvanced: React.FC<AudioPlayerAdvancedProps> = ({
   tracks,
   currentTrack,
   className,
-  variant = 'full',
-  showPlaylist = true
+  variant = 'full'
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -43,7 +42,7 @@ const AudioPlayerAdvanced: React.FC<AudioPlayerAdvancedProps> = ({
   const [isLiked, setIsLiked] = useState(false);
   
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [activeTrack, setActiveTrack] = useState<Track | null>(currentTrack || tracks[0] || null);
+  const [activeTrack, _setActiveTrack] = useState<Track | null>(currentTrack || tracks[0] || null);
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);

@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { BossGritService, type BattleScoreResult } from '../bossGritService';
+import { BossGritService } from '../bossGritService';
 
 // ============================================================================
 // MOCKS

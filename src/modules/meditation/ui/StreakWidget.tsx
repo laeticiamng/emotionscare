@@ -5,11 +5,10 @@ import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Flame, Trophy, Star, Zap, Calendar } from 'lucide-react';
+import { Flame, Trophy, Zap } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { meditationService } from '../meditationService';
-import { startOfWeek, eachDayOfInterval, isSameDay, format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { startOfWeek, eachDayOfInterval, isSameDay } from 'date-fns';
 
 interface StreakWidgetProps {
   compact?: boolean;

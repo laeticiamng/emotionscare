@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
-  ArrowLeft, ShoppingCart, CreditCard, RotateCcw, 
+  ArrowLeft, ShoppingCart, RotateCcw, 
   FileText, AlertCircle, Euro, Calendar 
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';

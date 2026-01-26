@@ -6,12 +6,10 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Bell, BellOff, Clock, Zap, Moon, Volume2, VolumeX, Send, Settings2, CheckCircle2 } from 'lucide-react';
+import { Bell, BellOff, Zap, Moon, Volume2, VolumeX, Send, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
 
 interface NotificationSetting {
   label: string;

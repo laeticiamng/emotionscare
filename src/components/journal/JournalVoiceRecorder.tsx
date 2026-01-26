@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Mic, MicOff, Square, Play, Pause, Trash2, Check } from 'lucide-react';
+import { Mic, Square, Play, Pause, Trash2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';

@@ -10,11 +10,7 @@ import {
   TrendingUp,
   Clock,
   Heart,
-  Target,
-  Calendar,
   BarChart3,
-  PieChart,
-  Activity,
   Award,
   Lightbulb,
   Users

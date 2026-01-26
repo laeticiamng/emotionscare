@@ -8,7 +8,7 @@ let org = {
   updated_at: new Date().toISOString()
 };
 
-export async function getOrganization(req: IncomingMessage, res: ServerResponse) {
+export async function getOrganization(_req: IncomingMessage, res: ServerResponse) {
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify(org));

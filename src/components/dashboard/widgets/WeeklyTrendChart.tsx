@@ -1,7 +1,7 @@
 /**
  * Graphique de tendance hebdomadaire - Mini sparkline des 7 derniers jours
  */
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -183,7 +183,7 @@ export default function WeeklyTrendChart() {
               role="img" 
               aria-label={`Tendance hebdomadaire: ${activeDaysCount} jours actifs sur 7`}
             >
-              {weekData?.map((day, index) => (
+              {weekData?.map((day, _index) => (
                 <div 
                   key={day.date} 
                   className="flex-1 flex flex-col items-center gap-1"

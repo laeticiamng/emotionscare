@@ -3,11 +3,10 @@
  * Version enrichie avec profils, export, analytics, préférences persistées
  */
 
-import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
 const PREFERENCES_KEY = 'accessibility-preferences';
 const PROFILES_KEY = 'accessibility-profiles';
-const ANALYTICS_KEY = 'accessibility-analytics';
 
 interface AccessibilitySettings {
   reducedMotion: boolean;

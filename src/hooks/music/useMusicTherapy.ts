@@ -66,7 +66,6 @@ export const useMusicTherapy = (): MusicTherapyHook => {
   const [error, setError] = useState<string | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const progressUpdateRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialiser l'élément audio
   useEffect(() => {

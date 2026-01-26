@@ -22,11 +22,9 @@ import {
   Plus,
   Trash2,
   Bell,
-  MessageSquare,
   Activity,
   Clock,
   CheckCircle,
-  XCircle,
   User,
   Mail
 } from 'lucide-react';

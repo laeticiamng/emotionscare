@@ -11,7 +11,7 @@ const isComponent = <T>(value: unknown): value is T => {
   return isValidElementType(value);
 };
 
-export function lazyDefault<T extends ComponentType<any>>( // eslint-disable-line @typescript-eslint/no-explicit-any
+export function lazyDefault<T extends ComponentType<any>>(  
   importer: () => Promise<LazyModule<T>>,
   exportName?: keyof LazyModule<T> | string
 ): LazyExoticComponent<T> {

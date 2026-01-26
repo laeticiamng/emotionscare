@@ -175,19 +175,17 @@ const useBounceStoreBase = create<BounceStore>()(
       },
       
       pauseBattle: () => {
-        const state = get();
         set({
           phase: 'paused'
         });
-        
+
         get().addEvent({
           type: 'pause',
           timestamp: Date.now()
         });
       },
-      
+
       resumeBattle: () => {
-        const state = get();
         set({
           phase: 'battle'
         });

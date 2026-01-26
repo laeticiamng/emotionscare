@@ -321,8 +321,8 @@ export class MoodMixerService {
    */
   private static analyzeBlendingProgress(
     steps: BlendingStep[],
-    strategy: MixingStrategy,
-    initialEmotions: EmotionComponent[]
+    _strategy: MixingStrategy,
+    _initialEmotions: EmotionComponent[]
   ): { needsAdjustment: boolean; reason?: string; urgency?: number } {
     if (steps.length < 3) return { needsAdjustment: false };
 
@@ -567,7 +567,7 @@ export class MoodMixerService {
   }
 
   private static calculateTherapeuticOutcome(
-    initial: EmotionComponent[],
+    _initial: EmotionComponent[],
     final: EmotionComponent[]
   ): number {
     if (final.length === 0) return 0.5;

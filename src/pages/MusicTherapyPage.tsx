@@ -8,7 +8,6 @@ import { usePageSEO } from '@/hooks/usePageSEO';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
-import { Music } from 'lucide-react';
 
 // Lazy load B2CMusicEnhanced
 const B2CMusicEnhanced = lazy(() => import('@/pages/B2CMusicEnhanced'));

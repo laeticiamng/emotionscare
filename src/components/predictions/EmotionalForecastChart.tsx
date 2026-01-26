@@ -2,7 +2,6 @@
  * Emotional Forecast Chart - Graphique des prédictions
  */
 
-import React from 'react';
 import {
   LineChart,
   Line,

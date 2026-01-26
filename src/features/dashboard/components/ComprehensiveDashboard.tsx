@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { NavButton } from '@/components/navigation/NavButton';
-import { NAV_SCHEMA, findNavNode } from '@/lib/nav-schema';
+import { findNavNode } from '@/lib/nav-schema';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { Sparkline } from '@/ui/Sparkline';

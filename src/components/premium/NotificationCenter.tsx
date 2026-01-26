@@ -2,8 +2,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Bell, X, Heart, Brain, Music, Users, Trophy, 
-  AlertCircle, CheckCircle, Info, Star, Clock 
+  Bell, X, Users, Trophy, Info, Star, Clock 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

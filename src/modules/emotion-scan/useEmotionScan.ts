@@ -17,7 +17,7 @@ interface UseEmotionScanOptions {
 }
 
 export const useEmotionScan = (options: UseEmotionScanOptions) => {
-  const { userId, autoSave = true } = options;
+  const { userId } = options;
 
   const [isScanning, setIsScanning] = useState(false);
   const [lastResult, setLastResult] = useState<EmotionResult | null>(null);

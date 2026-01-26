@@ -21,7 +21,6 @@ import {
   Twitter,
   Facebook,
   MessageCircle,
-  Link2,
   QrCode,
   Music,
   Heart,

@@ -2,7 +2,6 @@ import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { getUserModeDisplayName } from '@/utils/userModeHelpers';
 import { UserModeType } from '@/types/userMode';
 import { User, Users, Shield } from 'lucide-react';
 

@@ -1,8 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   journalRemindersService, 
-  type CreateReminderParams,
-  type JournalReminder 
+  type CreateReminderParams 
 } from '@/services/journalReminders';
 import { toast } from 'sonner';
 

@@ -9,7 +9,6 @@ import {
   UserSettings,
   ConsentType,
   ConsentOptions,
-  ConsentRecord,
   PrivacySettings,
   NotificationCategory,
   NotificationPriority,
@@ -26,7 +25,6 @@ import type {
   DataExportResult,
   AccountDeletionRequest,
   AccountDeletionResult,
-  UserPreferencesBundle,
 } from '../types';
 
 describe('User Preferences Types', () => {

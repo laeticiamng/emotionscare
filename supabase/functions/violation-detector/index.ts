@@ -14,29 +14,6 @@ interface DetectionRequest {
   requestContext?: Record<string, any>;
 }
 
-interface ViolationData {
-  violation_type: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  title: string;
-  description: string;
-  affected_data_types: string[];
-  affected_users_count: number;
-  risk_score: number;
-  ml_confidence: number;
-  metadata: Record<string, any>;
-}
-
-interface AlertData {
-  alert_type: string;
-  severity: 'info' | 'warning' | 'critical';
-  title: string;
-  message: string;
-  risk_indicators: Record<string, any>;
-  recommendations: string[];
-  predicted_impact: string;
-  confidence_score: number;
-}
-
 const handler = withMonitoring('violation-detector', async (req, context) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;

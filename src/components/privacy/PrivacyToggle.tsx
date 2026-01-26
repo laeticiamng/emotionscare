@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -19,8 +18,7 @@ import {
   MapPin, 
   Users, 
   Coins,
-  HelpCircle,
-  Lock
+  HelpCircle
 } from 'lucide-react';
 import { usePrivacyPrefs } from '@/hooks/usePrivacyPrefs';
 import { PrivacyKey } from '@/store/privacy.store';

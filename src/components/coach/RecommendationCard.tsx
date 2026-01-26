@@ -10,10 +10,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Clock, Star, ArrowRight, Heart, Share2, Calendar, 
-  CheckCircle, ThumbsUp, ThumbsDown, Bookmark, Play,
+  Clock, Star, ArrowRight, Heart, Share2, 
+  CheckCircle, ThumbsUp, ThumbsDown, Play,
   History, TrendingUp, Bell, BellOff, MessageSquare,
-  BarChart3, Download, Filter, Sparkles, Trophy, Flame
+  BarChart3, Download, Flame
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';

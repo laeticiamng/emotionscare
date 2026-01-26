@@ -2,7 +2,7 @@
  * ScanTextPage - Page de scan émotionnel par analyse textuelle
  */
 
-import React, { useState, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { FileText, ArrowLeft, RefreshCw, Loader2, Send, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';

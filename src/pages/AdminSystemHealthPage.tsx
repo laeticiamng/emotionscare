@@ -57,7 +57,7 @@ const AdminSystemHealthPage: React.FC = () => {
     keywords: 'admin, system health, métriques, qualité code, tests, SEO'
   });
 
-  const [metrics, setMetrics] = useState<{
+  const [metrics, _setMetrics] = useState<{
     roleMappings: MetricData;
     seoPages: MetricData;
     testIds: MetricData;
@@ -73,7 +73,7 @@ const AdminSystemHealthPage: React.FC = () => {
     codeCoverage: { label: 'Code Coverage', value: 82, target: 85, status: 'warning' },
   });
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Simulate fetching metrics

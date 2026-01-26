@@ -27,7 +27,6 @@ interface TournamentRegistrationProps {
 export const TournamentRegistration = memo(({
   tournament,
   isRegistered,
-  isLoading,
   onRegister
 }: TournamentRegistrationProps) => {
   const [displayName, setDisplayName] = useState('');

@@ -1,11 +1,10 @@
 /**
  * EmotionCorrelationChart - Visualisation des corrélations temps ↔ émotions
  */
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import {
   Brain,
   TrendingUp,
@@ -63,7 +62,6 @@ export const EmotionCorrelationChart = memo(function EmotionCorrelationChart({
   dayPatterns,
   emotionDataCount,
   hasData,
-  isLoading = false,
 }: EmotionCorrelationChartProps) {
   if (!hasData) {
     return (

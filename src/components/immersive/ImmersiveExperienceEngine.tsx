@@ -7,9 +7,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Stars, Float, Text3D, OrbitControls } from '@react-three/drei';
-import { Sparkles, Heart, Zap, Wind, Music, Camera, Gamepad2 } from 'lucide-react';
+import { Sparkles, Heart, Zap, Wind, Music, Camera } from 'lucide-react';
 
 interface ExperienceContext {
   emotion: string;

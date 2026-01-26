@@ -3,7 +3,6 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Universe } from '@/types/universes';
 import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
-import { useRewardsStore } from '@/store/rewards.store';
 
 interface UniverseEngineProps {
   universe: Universe;

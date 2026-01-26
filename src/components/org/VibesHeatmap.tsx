@@ -1,6 +1,6 @@
 // @ts-nocheck
-import React, { useRef, useEffect, useState } from 'react';
-import { OrgWeekly, TeamRow, VibeBucket } from '@/hooks/useOrgWeekly';
+import React, { useState } from 'react';
+import { OrgWeekly, VibeBucket } from '@/hooks/useOrgWeekly';
 import { useOrgStore } from '@/store/org.store';
 import { AnonymityGuard } from './AnonymityGuard';
 import { useTranslation } from 'react-i18next';

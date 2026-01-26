@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
   Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Repeat1, 
-  Heart, ListMusic, MoreVertical, Share2, Download, Clock, Star
+  Heart, ListMusic, MoreVertical, Share2, Clock, Star
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';

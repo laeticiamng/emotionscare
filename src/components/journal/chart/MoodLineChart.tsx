@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
-import { ChartContainer } from '@/components/ui/chart';
 import type { MoodData } from '@/types';
 import MoodChartTooltip from './MoodChartTooltip';
 import { useMediaQuery } from '@/hooks/use-media-query';

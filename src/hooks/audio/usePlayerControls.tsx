@@ -1,7 +1,6 @@
 // @ts-nocheck
 
 import { useCallback, RefObject } from 'react';
-import { UseAudioPlayerStateReturn } from '@/types/audio-player';
 
 /**
  * Hook that provides playback control functions (seek, volume)

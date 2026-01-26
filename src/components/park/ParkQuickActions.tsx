@@ -2,7 +2,6 @@
  * ParkQuickActions - Actions rapides pour le parc
  */
 
-import React from 'react';
 import { motion } from 'framer-motion';
 import { 
   Heart, 

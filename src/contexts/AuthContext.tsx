@@ -6,7 +6,7 @@
  * l'authentification est bypassée et un utilisateur mock est utilisé.
  */
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
@@ -165,7 +165,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const signIn = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+ const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });

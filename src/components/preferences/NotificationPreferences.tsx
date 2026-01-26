@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { NotificationFrequency, NotificationPreference } from '@/types/notification';
+import { NotificationFrequency } from '@/types/notification';
 
 interface NotificationPreferencesProps {
   preferences: {

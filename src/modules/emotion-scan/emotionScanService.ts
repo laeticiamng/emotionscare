@@ -12,7 +12,6 @@ import type {
   EmotionScanStats,
   EmotionTrend,
   EmotionResult,
-  EmotionAnalysisResult,
   FacialAnalysisResult,
   ScanMode,
   EmotionType

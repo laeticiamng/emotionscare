@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ChatMessage } from '@/types/chat';
-import { chatHistoryService, conversationsService } from '@/lib/chat/services';
+import { chatHistoryService } from '@/lib/chat/services';
 
 export const useMessages = (conversationId: string | null) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);

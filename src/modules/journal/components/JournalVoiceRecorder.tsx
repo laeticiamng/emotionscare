@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Mic, Square, Loader2, AlertCircle, Pause, Play, RotateCcw, Volume2 } from 'lucide-react';
+import { Mic, Square, Loader2, AlertCircle, Pause, Play, Volume2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface JournalVoiceRecorderProps {

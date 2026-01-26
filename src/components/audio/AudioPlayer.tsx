@@ -38,7 +38,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   const [currentIndex, setCurrentIndex] = useState(currentTrackIndex);
   
   const audioRef = useRef<HTMLAudioElement>(null);
-  const progressRef = useRef<HTMLDivElement>(null);
 
   const currentTrack = tracks[currentIndex];
 

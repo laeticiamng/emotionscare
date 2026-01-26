@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { CoachChatProps } from '@/types/coach';
 import { useCoach } from '@/contexts/coach';
 import CoachMessage from './CoachMessage';
@@ -11,14 +11,10 @@ import { logger } from '@/lib/logger';
 const CoachChat: React.FC<CoachChatProps> = ({
   initialMessage,
   showCharacter = true,
-  characterSize = "md",
-  className,
-  showControls = true,
   showHeader = true,
   showInput = true,
-  embedded = false
 }) => {
-  const { messages, sendMessage, isProcessing, clearMessages } = useCoach();
+ const { messages, sendMessage, isProcessing } = useCoach();
   const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   

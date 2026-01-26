@@ -1,5 +1,4 @@
 import React from 'react';
-import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
@@ -35,7 +34,7 @@ function formatPeriodLabel(period: string): string {
   return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
-function buildCsvContent(period: string, summaries: AggregateSummary[] | undefined): string {
+function buildCsvContent(_period: string, summaries: AggregateSummary[] | undefined): string {
   const header = 'period,instrument,text_summary,action';
   const rows = (summaries ?? []).map(summary => {
     const values = [

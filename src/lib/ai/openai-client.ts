@@ -8,7 +8,7 @@
  */
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { AI_MODEL_CONFIG, AIModule, OpenAIModelParams } from "./openai-config";
+import { AI_MODEL_CONFIG, AIModule } from "./openai-config";
 import { logger } from "@/lib/logger";
 
 // Implémentation de cache pour les réponses API

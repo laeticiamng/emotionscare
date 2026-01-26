@@ -2,7 +2,7 @@
  * Meditation Page - Module complet de méditation guidée
  */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -18,20 +18,14 @@ import {
   TrendingUp,
   Target,
   Volume2,
-  VolumeX,
   Heart,
   CheckCircle,
   BarChart3,
   Wind,
-  Waves,
-  TreePine,
-  Flame,
-  Cloud,
-  Calendar,
-  Download
+  Calendar
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';

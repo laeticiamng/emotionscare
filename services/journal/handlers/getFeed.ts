@@ -2,9 +2,7 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { hash } from '../lib/hash';
 import { listFeed } from '../lib/db';
 
-export async function getFeed(req: IncomingMessage, res: ServerResponse, user: any) {
-  const url = new URL(req.url || '', 'http://localhost');
-  const range = url.searchParams.get('range') || '30d';
+export async function getFeed(_req: IncomingMessage, res: ServerResponse, user: any) {
   const userHash = hash(user.sub);
   const entries = listFeed(userHash); // ignoring range for simplicity
   res.setHeader('Content-Type', 'application/json');

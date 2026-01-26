@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Download, TrendingUp } from 'lucide-react';
+import { Download, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useScanHistory } from '@/hooks/useScanHistory';

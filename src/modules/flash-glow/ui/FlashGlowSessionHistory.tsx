@@ -4,12 +4,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
-  History, Clock, TrendingUp, TrendingDown, 
+  History, TrendingUp, TrendingDown, 
   Minus, ChevronRight, Calendar, Sparkles 
 } from 'lucide-react';
 import { flashGlowService } from '../flash-glowService';

@@ -2,7 +2,7 @@
 import React from 'react';
 import { HealthBadge } from '@/components/system/HealthBadge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Wifi, WifiOff } from 'lucide-react';
+import { WifiOff } from 'lucide-react';
 
 /**
  * Bandeau de statut compact en haut du dashboard

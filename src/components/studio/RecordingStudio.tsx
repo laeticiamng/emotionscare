@@ -14,7 +14,6 @@ import {
   Mic, 
   Square, 
   Play, 
-  Pause, 
   Download,
   Upload,
   Waveform,
@@ -25,7 +24,6 @@ import {
   FileAudio
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 
 interface AudioTrack {
   id: string;

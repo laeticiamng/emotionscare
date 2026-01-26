@@ -14,7 +14,6 @@ const CoachChatInput: React.FC<CoachChatInputProps> = ({
   onSendMessage,
   isProcessing = false,
   placeholder = "Écrivez votre message...",
-  className
 }) => {
   const [message, setMessage] = useState('');
   

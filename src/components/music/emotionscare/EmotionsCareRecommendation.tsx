@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
-import { Play, Pause, RotateCcw, Heart, Sparkles } from 'lucide-react';
+import { Play, Pause, RotateCcw, Sparkles } from 'lucide-react';
 import { useMusic } from '@/hooks/useMusic';
 import { useMusicGeneration } from '@/hooks/useMusicGeneration';
 import { useToast } from '@/hooks/use-toast';

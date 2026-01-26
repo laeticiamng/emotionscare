@@ -16,8 +16,8 @@ const ScanPageHeader: React.FC<ScanPageHeaderProps> = ({
   setShowScanForm
 }) => {
   const navigate = useNavigate();
-  const { userMode } = useUserMode();
-  
+  useUserMode();
+
   const getFormattedPath = (path: string) => {
     // Utiliser les routes canoniques
     return `/app/${path}`;

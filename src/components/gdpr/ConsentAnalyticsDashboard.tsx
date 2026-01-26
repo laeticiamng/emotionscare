@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useConsentAnalytics } from '@/hooks/useConsentAnalytics';
-import { TrendingUp, TrendingDown, Activity, BarChart3, PieChart } from 'lucide-react';
+import { TrendingUp, Activity, BarChart3, PieChart } from 'lucide-react';
 import { 
   LineChart, Line, BarChart, Bar, PieChart as RechartsPie, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 

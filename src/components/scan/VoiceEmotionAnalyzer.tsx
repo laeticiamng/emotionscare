@@ -11,7 +11,7 @@ import {
 } from '@/types/emotion';
 
 const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ onResult, onStartRecording }) => {
-  const [emotion, setEmotion] = useState("calm");
+  const [emotion, _setEmotion] = useState("calm");
   const [confidence, setConfidence] = useState(0.75);
   const [intensity, setIntensity] = useState(0.6);
   const [showResults, setShowResults] = useState(false);

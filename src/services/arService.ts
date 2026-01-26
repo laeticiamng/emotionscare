@@ -112,9 +112,6 @@ export class ARService {
     }
 
     try {
-      // Get planes from frame (implementation depends on XR frame)
-      const detectedPlanes: ARPlane[] = [];
-
       // This would be called from the render loop with actual frame data
       // For now, return cached planes
       return Array.from(this.planes.values());

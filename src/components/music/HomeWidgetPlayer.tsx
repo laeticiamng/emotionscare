@@ -59,7 +59,7 @@ export const HomeWidgetPlayer: React.FC<HomeWidgetPlayerProps> = ({
   onClose,
 }) => {
   const [displayProgress, setDisplayProgress] = useState(progress);
-  const [isDragging, setIsDragging] = useState(false);
+  const [isDragging, _setIsDragging] = useState(false);
 
   // Animate progress
   useEffect(() => {

@@ -1,12 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
   Play, Pause, Camera, Brain, Heart, Sparkles, Zap,
-  ChevronRight, ArrowRight, CheckCircle, Star,
-  Volume2, Users, Shield, Headphones,
+  ChevronRight, ArrowRight, CheckCircle, Star, Users, Shield, Headphones,
   LucideIcon
 } from 'lucide-react';
 import { Link } from 'react-router-dom';

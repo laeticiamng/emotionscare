@@ -25,7 +25,7 @@ interface ARFiltersMainProps {
  */
 export const ARFiltersMain: React.FC<ARFiltersMainProps> = ({ className = '' }) => {
   const { user } = useAuth();
-  const { createSession, incrementPhotosTaken, completeSession } = useARFilters(user?.id || '');
+ const { createSession, completeSession } = useARFilters(user?.id || '');
   const [currentFilter, setCurrentFilter] = useState<Filter>(FILTERS[0]);
   const [isActive, setIsActive] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);

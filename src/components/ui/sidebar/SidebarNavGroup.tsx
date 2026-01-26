@@ -15,8 +15,7 @@ export function SidebarNavGroup({
   title,
   icon,
   children,
-  defaultExpanded = false,
-  badge
+  defaultExpanded = false
 }: SidebarNavGroupProps) {
   const { collapsed } = useSidebar();
   const [expanded, setExpanded] = React.useState(defaultExpanded);

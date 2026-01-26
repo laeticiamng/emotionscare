@@ -5,8 +5,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Bell, X, CheckCircle, AlertCircle, Info, Heart,
-  Music, Brain, Users, Star, Zap, Gift, TrendingUp
+  Bell, X, CheckCircle, AlertCircle, Info,
+  Music, Users, Star
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';

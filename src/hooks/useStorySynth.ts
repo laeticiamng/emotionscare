@@ -27,14 +27,8 @@ export const useStorySynth = (userId: string) => {
   });
 
   const createStory = useMutation({
-    mutationFn: async ({ 
-      title, 
-      content, 
-      genre, 
-      style,
-      metadata 
-    }: { 
-      title: string; 
+    mutationFn: async (_params: {
+      title: string;
       content: string;
       genre: string;
       style: string;

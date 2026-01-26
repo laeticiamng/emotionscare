@@ -13,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { MessageCircle, Mail, FileQuestion, Home, HelpCircle, Shield, ArrowRight, Phone, Clock } from 'lucide-react';
+import { MessageCircle, Mail, FileQuestion, Home, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';

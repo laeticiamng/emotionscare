@@ -4,7 +4,7 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
-import { Shield, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import LoadingAnimation from '@/components/ui/loading-animation';
 
 interface SecureRouteGuardProps {

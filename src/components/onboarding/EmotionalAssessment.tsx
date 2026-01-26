@@ -10,7 +10,7 @@ import { Slider } from '@/components/ui/slider';
 import { Progress } from '@/components/ui/progress';
 import { 
   Loader2, Sparkles, Heart, Frown, Smile, Meh, 
-  Zap, Moon, Coffee, Brain, Wind, Sun, Cloud,
+  Zap, Moon, Brain, Wind, Cloud,
   AlertCircle, CheckCircle2, Lightbulb, TrendingUp
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';

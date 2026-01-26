@@ -10,8 +10,7 @@ import {
   Clock, 
   Briefcase,
   Zap,
-  UserPlus,
-  ChevronRight
+  UserPlus
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -31,13 +30,6 @@ const factorIcons = {
   activityOverlap: Zap,
   skillComplement: Briefcase,
   scheduleMatch: Clock,
-};
-
-const factorLabels = {
-  emotionalSync: 'Sync émotionnelle',
-  activityOverlap: 'Activités similaires',
-  skillComplement: 'Compétences',
-  scheduleMatch: 'Disponibilités',
 };
 
 const MatchCard: React.FC<{ candidate: MatchCandidate; onConnect: () => void; isConnecting: boolean }> = ({ 

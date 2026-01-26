@@ -83,8 +83,8 @@ export const useFocusFlow = () => {
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const pomodoroTimerRef = useRef<NodeJS.Timeout | null>(null);
-  
-  const { generateMusicForEmotion, pollGenerationStatus } = useEmotionalMusicAI();
+
+  useEmotionalMusicAI();
 
   useEffect(() => {
     if (user) loadActiveSession();

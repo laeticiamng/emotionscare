@@ -201,7 +201,7 @@ export function useCrisisDetectionEnriched() {
   ): CrisisIndicator[] => {
     const indicators: CrisisIndicator[] = [];
 
-    for (const [level, config] of Object.entries(CRISIS_PATTERNS)) {
+    for (const [_level, config] of Object.entries(CRISIS_PATTERNS)) {
       for (const pattern of config.patterns) {
         if (pattern.regex.test(text)) {
           indicators.push({

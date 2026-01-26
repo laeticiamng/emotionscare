@@ -2,11 +2,11 @@
  * CommunityGroupsList - Liste des groupes de soutien
  */
 
-import React, { useState, memo } from 'react';
+import { useState, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Plus, Lock, Globe, Search, MessageSquare, ChevronRight } from 'lucide-react';
+import { Users, Plus, Lock, Globe, Search, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';

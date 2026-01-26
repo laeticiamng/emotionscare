@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Upload, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 

@@ -12,12 +12,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { format, subDays, eachDayOfInterval, isSameDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
-interface DayData {
-  date: Date;
-  quests: number;
-  xp: number;
-}
-
 export const ProgressChart: React.FC = () => {
   const { user } = useAuth();
 

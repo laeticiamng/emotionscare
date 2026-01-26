@@ -13,11 +13,7 @@ import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { z } from 'zod';
 import { 
-  User, 
-  Mail, 
-  Phone, 
-  Calendar,
-  MapPin,
+  User,
   Camera,
   Shield,
   CreditCard,
@@ -25,10 +21,8 @@ import {
   Save,
   Edit3,
   Crown,
-  Star,
   BarChart3,
   Clock,
-  TrendingUp,
   Download,
   FileText,
   Activity,

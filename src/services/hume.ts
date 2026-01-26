@@ -142,7 +142,7 @@ export class HumeEmotionDetector {
   /**
    * Mapper les émotions Hume vers nos presets
    */
-  private mapHumeToPreset(humeEmotion: string, valence: number, arousal: number): string {
+  private mapHumeToPreset(humeEmotion: string, _valence: number, _arousal: number): string {
     const mapping: Record<string, string> = {
       'Anxiety': 'panique-anxiete',
       'Fear': 'peur-anticipatoire',

@@ -6,7 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { Heart, BarChart, Users } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface EmotionalQuizProps {

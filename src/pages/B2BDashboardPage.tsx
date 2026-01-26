@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Users,
   Calendar,
@@ -19,7 +18,6 @@ import {
   FileText,
   TrendingUp,
   TrendingDown,
-  Activity,
   AlertTriangle,
   CheckCircle,
   Clock,
@@ -29,7 +27,6 @@ import {
   UserPlus,
   Zap,
   Heart,
-  Target,
   Sparkles,
 } from 'lucide-react';
 import { useB2BTeams } from '@/hooks/useB2BTeams';

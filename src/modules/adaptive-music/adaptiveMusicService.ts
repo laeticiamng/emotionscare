@@ -2,7 +2,6 @@
  * Service pour le module Adaptive Music
  */
 
-import { supabase } from '@/integrations/supabase/client';
 import type {
   AdaptiveMusicSession,
   AdaptiveMusicStats,

@@ -6,7 +6,7 @@ import EnhancedFooter from './enhanced-footer';
 import CommandMenu from './command-menu';
 import NotificationToast from './notification-toast';
 import { FloatingActionButton } from './enhanced-user-experience';
-import { Sparkles, Download, Share2, Settings, HelpCircle } from 'lucide-react';
+import { Download, Share2, Settings, HelpCircle } from 'lucide-react';
 
 interface ToastNotification {
   id: string;

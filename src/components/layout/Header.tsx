@@ -16,14 +16,12 @@ import {
   LogOut,
   Bell,
   Search,
-  Globe,
   Sun,
   Moon,
   Monitor,
   ChevronDown,
   Zap,
   Crown,
-  Shield,
   Headphones,
   Brain,
   Music,
@@ -102,7 +100,7 @@ const Header: React.FC<HeaderProps> = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [notifications, setNotifications] = useState(3);
+  const [notifications, _setNotifications] = useState(3);
   const [xp, setXp] = useState<number>(0);
   const [isLoadingXp, setIsLoadingXp] = useState(false);
   const { user, signOut, isAuthenticated } = useAuth();

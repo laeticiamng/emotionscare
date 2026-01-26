@@ -14,7 +14,6 @@ import {
   Heart,
   MapPin,
   Clock,
-  Star,
   Sparkles,
   Check
 } from 'lucide-react';

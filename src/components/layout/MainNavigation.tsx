@@ -4,8 +4,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Brain, Music, MessageCircle, BookOpen, Headset, Wind, Users, BarChart3,
-  Settings, Home, Calendar, Target, Heart, Zap, Play, Globe, Shield,
-  TrendingUp, Award, Sparkles, Activity, Camera, Gamepad2, Palette
+  Settings, Home,
+  TrendingUp, Camera, Gamepad2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

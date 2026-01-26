@@ -138,8 +138,8 @@ function calculateSkillComplement(skills1: string[], skills2: string[]): number 
 function calculateScheduleMatch(
   hours1: string[],
   hours2: string[],
-  tz1?: string,
-  tz2?: string
+  _tz1?: string,
+  _tz2?: string
 ): number {
   if (hours1.length === 0 || hours2.length === 0) return 0.5;
   
@@ -276,7 +276,7 @@ export const useCreateMatch = () => {
   const { user } = useAuth();
 
   return useMutation({
-    mutationFn: async ({ targetUserId, marketType }: { targetUserId: string; marketType: string }) => {
+ mutationFn: async ({ targetUserId }: { targetUserId: string; marketType: string }) => {
       const { error } = await supabase
         .from('buddies')
         .insert({

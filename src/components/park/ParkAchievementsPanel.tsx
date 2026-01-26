@@ -4,12 +4,11 @@
  */
 
 import React, { useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Trophy, Star, Award, Lock, Check, Sparkles, Crown, Medal, Target, Zap } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface Achievement {
@@ -72,7 +71,7 @@ const AchievementCard: React.FC<{
   achievement: Achievement; 
   index: number;
   onClaim?: () => void;
-}> = ({ achievement, index, onClaim }) => {
+}> = ({ achievement, index }) => {
   const rarity = rarityConfig[achievement.rarity];
   const progress = (achievement.progress / achievement.maxProgress) * 100;
 
@@ -183,7 +182,6 @@ const AchievementCard: React.FC<{
 export const ParkAchievementsPanel: React.FC<ParkAchievementsPanelProps> = ({
   achievements,
   totalXP = 0,
-  totalCoins = 0,
   onClaimReward
 }) => {
   const stats = useMemo(() => {

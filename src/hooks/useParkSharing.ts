@@ -3,7 +3,6 @@
  */
 
 import { useState, useCallback } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useParkExport } from './useParkExport';
 
@@ -17,7 +16,6 @@ export interface ShareableAchievement {
 }
 
 export function useParkSharing() {
-  const { user } = useAuth();
   const { toast } = useToast();
   const { generateSummary } = useParkExport();
   const [isSharing, setIsSharing] = useState(false);

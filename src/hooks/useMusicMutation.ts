@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useState } from 'react';
 import { useMusic } from '@/hooks/useMusic';
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicTrack } from '@/types/music';
 import { useToast } from '@/hooks/use-toast';
 
 export const useMusicMutation = () => {

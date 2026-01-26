@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { useBreathSessions } from '@/hooks/useBreathSessions';
-import { Activity, Flame, Target, Clock, TrendingUp, TrendingDown, Minus, Share2, ChevronRight, Award, Calendar } from 'lucide-react';
+import { Activity, Flame, Target, Clock, TrendingUp, TrendingDown, Minus, Share2, ChevronRight, Award } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';

@@ -10,10 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   Clock,
-  Cloud,
-  Sun,
-  Moon,
-  CloudRain,
   Zap,
   Heart,
   Music,

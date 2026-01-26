@@ -4,20 +4,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
-import { BreathingVRService } from '@/modules/breathing-vr/breathingVRService';
-import { meditationService } from '@/modules/meditation/meditationService';
 import { ActivityService } from '@/modules/activities';
-import { MusicTherapyService } from '@/modules/music-therapy/musicTherapyServiceUnified';
-import { FlashLiteService } from '@/modules/flash-lite/flashLiteService';
-import { VRGalaxyService } from '@/modules/vr-galaxy/vrGalaxyServiceUnified';
-import { BossGritService } from '@/modules/boss-grit/bossGritService';
-import { CommunityService } from '@/modules/community/communityService';
-import { nyveeService } from '@/modules/nyvee/nyveeServiceUnified';
-import { storySynthService } from '@/modules/story-synth/storySynthServiceUnified';
-import { MoodMixerService } from '@/modules/mood-mixer/moodMixerServiceUnified';
-import * as bubbleBeatService from '@/modules/bubble-beat/bubbleBeatService';
-import { ARFiltersService } from '@/modules/ar-filters/arFiltersService';
-import * as screenSilkService from '@/modules/screen-silk/screenSilkServiceUnified';
 
 export interface DashboardStats {
   totalSessions: number;

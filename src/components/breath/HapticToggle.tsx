@@ -4,7 +4,6 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import {
   Collapsible,
   CollapsibleContent,
@@ -19,7 +18,6 @@ import {
 import { 
   Smartphone, 
   Vibrate, 
-  ChevronDown, 
   Settings2,
   Waves,
   Zap,
@@ -27,8 +25,7 @@ import {
   Save,
   RotateCcw,
   Star,
-  TrendingUp,
-  Clock
+  TrendingUp
 } from 'lucide-react';
 import { useBreathStore } from '@/store/breath.store';
 import { cn } from '@/lib/utils';
@@ -237,13 +234,6 @@ export const HapticToggle: React.FC = () => {
     const updated = presets.map((p, i) => 
       i === index ? { ...p, isFavorite: !p.isFavorite } : p
     );
-    setPresets(updated);
-    localStorage.setItem(PRESETS_KEY, JSON.stringify(updated));
-  };
-
-  // Delete preset
-  const deletePreset = (index: number) => {
-    const updated = presets.filter((_, i) => i !== index);
     setPresets(updated);
     localStorage.setItem(PRESETS_KEY, JSON.stringify(updated));
   };

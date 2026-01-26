@@ -9,9 +9,8 @@ interface CoachMessageProps {
   isLast?: boolean;
 }
 
-const CoachMessage: React.FC<CoachMessageProps> = ({ 
+const CoachMessage: React.FC<CoachMessageProps> = ({
   message,
-  isLast = false
 }) => {
   const isCoach = message.sender === 'assistant' || message.sender === 'system';
   const content = message.content || message.text || '';

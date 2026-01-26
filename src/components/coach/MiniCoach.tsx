@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { 
   Send, MessageSquareText, UserIcon, Sparkles, Mic, MicOff, 
   Maximize2, Minimize2, RefreshCw, ThumbsUp, ThumbsDown, Copy, 
-  Volume2, Download, Share2, Trash2, History, TrendingUp, Star
+  Volume2, Download, Share2, TrendingUp
 } from 'lucide-react';
 import { useCoach } from '@/contexts/coach';
 import { cn } from '@/lib/utils';

@@ -11,7 +11,6 @@ import {
   ChevronRight, 
   Check, 
   Sparkles, 
-  Target, 
   Heart, 
   Brain,
   Users,

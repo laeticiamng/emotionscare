@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getSupportResponse } from '@/services/chatService';
-import { Message, ChatResponse } from '@/types/support';
 import { v4 as uuidv4 } from 'uuid';
 
 interface SupportMessage {

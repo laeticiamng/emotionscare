@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 
   Trophy, Star, Target, Flame, CheckCircle, 
-  TrendingUp, Zap, Clock 
+  TrendingUp, Zap 
 } from 'lucide-react';
 import { useAmbitionStats } from '../hooks';
 

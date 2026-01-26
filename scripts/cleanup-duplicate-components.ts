@@ -6,7 +6,6 @@
  */
 
 import fs from 'fs/promises';
-import path from 'path';
 import { glob } from 'glob';
 
 interface ComponentMigration {
@@ -95,7 +94,7 @@ async function updateImportsInFile(filePath: string): Promise<boolean> {
         patterns.forEach(pattern => {
           if (pattern.test(content)) {
             // Remplacer par le nouvel import
-            updatedContent = updatedContent.replace(pattern, (match, componentName, alias) => {
+            updatedContent = updatedContent.replace(pattern, (_match, componentName, alias) => {
               hasChanges = true;
               const importName = alias || componentName;
               

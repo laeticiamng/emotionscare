@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import * as React from "react";
-import { ChartConfig, ChartContextProps } from "./types";
+import { ChartContextProps } from "./types";
 
 const ChartContext = React.createContext<ChartContextProps | null>(null);
 

@@ -1,14 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Brain, 
   Target, 
@@ -18,8 +14,6 @@ import {
   Zap,
   Settings,
   BarChart3,
-  Activity,
-  AlertCircle,
   CheckCircle,
   RefreshCw
 } from 'lucide-react';
@@ -48,29 +42,6 @@ interface RecommendationRule {
     triggers: number;
     successRate: number;
     avgRating: number;
-  };
-}
-
-interface PersonalizationVector {
-  userId: string;
-  userName: string;
-  preferences: {
-    exerciseTypes: string[];
-    musicGenres: string[];
-    vrExperiences: string[];
-    coachingStyle: string;
-    sessionDuration: number;
-  };
-  behaviorData: {
-    loginFrequency: number;
-    avgSessionDuration: number;
-    preferredTimes: string[];
-    completionRate: number;
-  };
-  emotionalProfile: {
-    dominantEmotions: string[];
-    stressPatterns: string[];
-    responsiveToTypes: string[];
   };
 }
 
@@ -123,7 +94,7 @@ const mockRules: RecommendationRule[] = [
 
 export default function RecommendationEngineAdminPage() {
   const [rules, setRules] = useState<RecommendationRule[]>(mockRules);
-  const [selectedRule, setSelectedRule] = useState<RecommendationRule | null>(null);
+  const [_selectedRule, setSelectedRule] = useState<RecommendationRule | null>(null);
   const [isTraining, setIsTraining] = useState(false);
   const [newRuleName, setNewRuleName] = useState('');
   const [testUserId, setTestUserId] = useState('');

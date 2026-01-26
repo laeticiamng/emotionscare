@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { quotaService, UserTier, type UserQuota, type QuotaStatus } from '../quota-service';
+import { quotaService, UserTier } from '../quota-service';
 import { supabase } from '@/integrations/supabase/client';
 
 // Mock Supabase

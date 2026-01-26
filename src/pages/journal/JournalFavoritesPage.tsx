@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Heart, Star, FileText, ArrowRight, Sparkles, Trash2 } from 'lucide-react';
+import { Heart, Star, FileText, ArrowRight, Sparkles } from 'lucide-react';
 
 const JournalFavoritesPage = memo(() => {
   const { favorites, isLoadingFavorites, handleToggleFavorite, isTogglingFavorite } = useJournalEnriched();

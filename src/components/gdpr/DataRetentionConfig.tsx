@@ -26,7 +26,6 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useDataRetention } from '@/hooks/useDataRetention';
 import { 
-  Clock, 
   Archive, 
   Trash2, 
   Bell, 
@@ -34,9 +33,7 @@ import {
   Settings, 
   CheckCircle2, 
   AlertTriangle,
-  Calendar,
   Database,
-  TrendingUp,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';

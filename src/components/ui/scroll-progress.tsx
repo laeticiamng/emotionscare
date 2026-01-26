@@ -9,7 +9,6 @@ interface ScrollProgressProps {
 }
 
 const ScrollProgress: React.FC<ScrollProgressProps> = ({
-  color = 'primary',
   height = 2,
   className = ''
 }) => {

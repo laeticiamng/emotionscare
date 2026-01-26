@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { Heart, Brain, Users, Sparkles, ArrowRight, Check, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';

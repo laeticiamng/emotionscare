@@ -3,7 +3,7 @@
  * TOP 20 #2 - Composant UI pour useGuildChat
  */
 
-import React, { memo, useState, useRef, useEffect } from 'react';
+import React, { memo, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Pin, Users, Crown, Shield, User, Hash } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

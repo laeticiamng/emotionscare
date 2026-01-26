@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 // Presets d'animations fluides
@@ -200,8 +200,7 @@ interface PageTransitionProps {
 }
 
 export const PageTransition: React.FC<PageTransitionProps> = ({
-  children,
-  exitBeforeEnter = true
+  children
 }) => {
   return (
     <AnimatePresence mode="sync">{/* Removed conditional wait mode to fix warnings */}

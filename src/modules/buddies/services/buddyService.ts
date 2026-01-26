@@ -9,7 +9,6 @@ import type {
   BuddyMessage,
   BuddyActivity,
   BuddyRequest,
-  BuddySession,
   BuddyStats,
   BuddyFilters
 } from '../types';
@@ -175,7 +174,7 @@ export const BuddyService = {
   /**
    * Répondre à une demande
    */
-  async respondToRequest(requestId: string, accept: boolean, userId: string): Promise<void> {
+  async respondToRequest(requestId: string, accept: boolean, _userId: string): Promise<void> {
     const { data: request, error: fetchError } = await supabase
       .from('buddy_requests')
       .select('*')

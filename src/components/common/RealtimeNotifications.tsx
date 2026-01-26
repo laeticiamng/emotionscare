@@ -83,8 +83,6 @@ const RealtimeNotifications: React.FC = () => {
   };
 
   const showToastNotification = (notification: Notification) => {
-    const icon = getNotificationIcon(notification.type, notification.priority);
-    
     toast(notification.title, {
       description: notification.message,
       action: notification.action_link ? {

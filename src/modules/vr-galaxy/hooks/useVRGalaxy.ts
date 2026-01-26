@@ -225,7 +225,7 @@ const DEFAULT_ACHIEVEMENTS: GalaxyAchievement[] = [
 export const useVRGalaxy = (): UseVRGalaxyReturn => {
   const [isImmersed, setIsImmersed] = useState(false);
   const [galaxyType, setGalaxyType] = useState('Nebula');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, _setIsLoading] = useState(false);
   const [settings, setSettings] = useState<GalaxySettings>(DEFAULT_SETTINGS);
   const [constellations, setConstellations] = useState<Constellation[]>(DEFAULT_CONSTELLATIONS);
   const [achievements, setAchievements] = useState<GalaxyAchievement[]>(DEFAULT_ACHIEVEMENTS);

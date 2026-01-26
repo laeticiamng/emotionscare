@@ -99,7 +99,7 @@ function replaceConsoleCalls(content: string, filePath: string): { content: stri
   const patterns = [
     {
       regex: /console\.log\((.*?)\);?$/gm,
-      replacement: (match: string, args: string) => {
+      replacement: (_match: string, args: string) => {
         stats.consoleLogsReplaced++;
         modified = true;
         return `logger.debug(${args}, '${context}');`;
@@ -107,7 +107,7 @@ function replaceConsoleCalls(content: string, filePath: string): { content: stri
     },
     {
       regex: /console\.error\((.*?)\);?$/gm,
-      replacement: (match: string, args: string) => {
+      replacement: (_match: string, args: string) => {
         stats.consoleErrorsReplaced++;
         modified = true;
         // Essayer de détecter si le premier argument est une erreur
@@ -120,7 +120,7 @@ function replaceConsoleCalls(content: string, filePath: string): { content: stri
     },
     {
       regex: /console\.warn\((.*?)\);?$/gm,
-      replacement: (match: string, args: string) => {
+      replacement: (_match: string, args: string) => {
         stats.consoleWarnsReplaced++;
         modified = true;
         return `logger.warn(${args}, '${context}');`;
@@ -128,7 +128,7 @@ function replaceConsoleCalls(content: string, filePath: string): { content: stri
     },
     {
       regex: /console\.info\((.*?)\);?$/gm,
-      replacement: (match: string, args: string) => {
+      replacement: (_match: string, args: string) => {
         stats.consoleInfosReplaced++;
         modified = true;
         return `logger.info(${args}, '${context}');`;

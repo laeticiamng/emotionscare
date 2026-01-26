@@ -4,7 +4,6 @@ import { LucideIconType } from '@/types/common';
 import { useLocation, Link } from 'react-router-dom';
 import {
   Breadcrumb,
-  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,

@@ -1,6 +1,6 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import type { MicroGesture } from '@/features/mood/useSamOrchestration';
-import { useAIMicroGestures, type AIMicroGesture } from '@/hooks/useAIMicroGestures';
+import { useAIMicroGestures } from '@/hooks/useAIMicroGestures';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Loader2 } from 'lucide-react';
 

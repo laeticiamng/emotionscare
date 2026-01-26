@@ -7,7 +7,6 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
-import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 export type ExportFormat = 'csv' | 'json' | 'xlsx';

@@ -65,7 +65,7 @@ export function useAudioEqualizer(): UseAudioEqualizerReturn {
     }))
   );
   const [isConnected, setIsConnected] = useState(false);
-  const [analyserData, setAnalyserData] = useState<Uint8Array | null>(null);
+  const [analyserData, _setAnalyserData] = useState<Uint8Array | null>(null);
 
   // Créer le contexte audio et les filtres
   const initializeAudioContext = useCallback(() => {

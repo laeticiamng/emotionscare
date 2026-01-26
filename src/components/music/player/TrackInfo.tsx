@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { MusicTrack } from '@/types/music';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +10,6 @@ import {
   useTrackPlayCounts 
 } from '@/hooks/music/useMusicSettings';
 import { 
-  Music, 
   Heart, 
   Share2, 
   MoreHorizontal, 

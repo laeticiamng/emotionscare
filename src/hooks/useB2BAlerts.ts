@@ -80,10 +80,8 @@ const DEMO_ALERTS: B2BAlert[] = [
   },
 ];
 
-async function fetchAlerts(orgId: string): Promise<B2BAlertsData> {
+async function fetchAlerts(_orgId: string): Promise<B2BAlertsData> {
   try {
-    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-
     // Tenter de récupérer les alertes réelles
     const { data: alertsData, error } = await supabase
       .from('unified_alerts')

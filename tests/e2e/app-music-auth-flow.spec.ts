@@ -6,9 +6,6 @@
 import { test, expect } from '@playwright/test';
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL!;
-const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY!;
-
 test.describe('/app/music - Authentication & Guards', () => {
   test('doit rediriger vers /login si non authentifié', async ({ page }) => {
     // Naviguer directement vers /app/music sans être connecté
@@ -196,7 +193,7 @@ test.describe('/app/music - Lecture avec historique', () => {
 });
 
 test.describe('/app/music - RLS Isolation Tests', () => {
-  test('RLS: les favoris d\'un user ne doivent pas être visibles par un autre', async ({ page, browser }) => {
+ test('RLS: les favoris d\'un user ne doivent pas être visibles par un autre', async ({ browser }) => {
     // Créer 2 contextes avec 2 users différents
     const context1 = await browser.newContext();
     const context2 = await browser.newContext();

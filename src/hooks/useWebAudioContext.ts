@@ -5,12 +5,6 @@
 
 import { useRef, useCallback, useEffect, useState } from 'react';
 
-interface EqualizerBand {
-  frequency: number;
-  gain: number;
-  filter: BiquadFilterNode | null;
-}
-
 const EQUALIZER_FREQUENCIES = [60, 250, 1000, 4000, 16000];
 
 export interface UseWebAudioContextReturn {

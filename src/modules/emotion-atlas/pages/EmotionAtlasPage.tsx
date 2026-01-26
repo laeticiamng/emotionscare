@@ -6,7 +6,6 @@ import { usePageSEO } from '@/hooks/usePageSEO';
 import PageRoot from '@/components/common/PageRoot';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AtlasMap } from '../components/AtlasMap';
 import { AtlasTimeline } from '../components/AtlasTimeline';
 import { AtlasFilters } from '../components/AtlasFilters';

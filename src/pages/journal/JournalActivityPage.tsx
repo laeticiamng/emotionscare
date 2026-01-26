@@ -4,8 +4,7 @@
  */
 import { memo } from 'react';
 import { useJournalEnriched } from '@/modules/journal/useJournalEnriched';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { JournalHeatmap } from '@/components/journal/JournalHeatmap';
 import { JournalStreak } from '@/components/journal/JournalStreak';

@@ -11,8 +11,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { motion } from 'framer-motion';
 import { 
   FileText, Search, Filter, Calendar as CalendarIcon, 
-  Eye, Edit, Trash2, Download, Shield, AlertTriangle,
-  CheckCircle, Clock, User, Database, Settings
+  Eye, Trash2, Download, Shield, AlertTriangle,
+  CheckCircle, User, Database, Settings
 } from 'lucide-react';
 import { useEthics } from '@/contexts/EthicsContext';
 import { format } from 'date-fns';

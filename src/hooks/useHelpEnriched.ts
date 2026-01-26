@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useState, useEffect, useCallback } from 'react';
-import { useHelpStore, type Section, type ArticleSummary, type Article, type Feedback } from '@/store/help.store';
+import { useHelpStore, type Feedback } from '@/store/help.store';
 import { toast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';

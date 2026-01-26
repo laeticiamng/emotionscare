@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 
   Bell, Settings, Clock, Mail, Smartphone, Volume2, 
-  Trash2, Check, Pin, Filter, RefreshCw, BellOff
+  Trash2, Check, Pin, RefreshCw, BellOff
 } from 'lucide-react';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import { useNotifications } from '@/modules/notifications';

@@ -3,7 +3,7 @@
  * Page de respiration avancée accessible WCAG 2.1 AA
  */
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Info, Settings, Share2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 
 export default function B2CBreathworkPage() {
   const { user } = useAuth();
-  const { stats, isLoading, saveSession } = useBreathworkStats();
+ const { stats, isLoading } = useBreathworkStats();
 
   useEffect(() => {
     document.title = "Breathwork Avancé | EmotionsCare";

@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { 
   Search, Grid3X3, Heart, Brain, Music, Gamepad2, Camera,
   Zap, Wind, Palette, Trophy, BarChart3, Settings, Users,
-  FileText, Calendar, Shield, Monitor, Headphones, Star,
+  FileText, Shield, Monitor, Headphones, Star,
   Sparkles, Target, Flame, Waves, Filter, ArrowRight,
   CheckCircle, Navigation
 } from 'lucide-react';

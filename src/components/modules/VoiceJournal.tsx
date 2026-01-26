@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Mic, Square, Play, Pause, FileText, Heart } from 'lucide-react';
+import { Mic, Square, Play, FileText, Heart } from 'lucide-react';
 import { useUserMedia } from '@/hooks/useUserMedia';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';

@@ -1,7 +1,6 @@
 // @ts-nocheck
 
 import { toast } from "@/hooks/use-toast";
-import { NODE_ENV } from "@/lib/env";
 import { logger } from '@/lib/logger';
 
 const OPENAI_API_KEY = ''; // Clé gérée côté serveur via Supabase Edge Functions

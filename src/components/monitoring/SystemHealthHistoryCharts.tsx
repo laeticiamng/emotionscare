@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { 
   LineChart, 
@@ -19,7 +19,7 @@ import {
   Legend,
   ReferenceLine 
 } from 'recharts';
-import { format, subDays, startOfDay, endOfDay } from 'date-fns';
+import { format, subDays, startOfDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { TrendingUp, TrendingDown, Activity, Zap } from 'lucide-react';
 
@@ -176,7 +176,7 @@ export const SystemHealthHistoryCharts: React.FC<SystemHealthHistoryChartsProps>
           { key: 'avg_response_time_ms', label: 'Latence', unit: 'ms', good: 'down' },
           { key: 'error_rate_percentage', label: 'Erreurs', unit: '%', good: 'down' },
           { key: 'alerts_per_hour', label: 'Alertes/h', unit: '', good: 'down' }
-        ].map(({ key, label, unit, good }) => {
+ ].map(({ key, label, good }) => {
           const comp = comparison[key];
           const isGood = comp ? (comp.trend === good || comp.trend === 'stable') : true;
           

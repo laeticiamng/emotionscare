@@ -5,7 +5,6 @@
 
 import type { MusicTrack, Playlist, AdaptiveMusicConfig } from '@/types/music';
 import { logger } from '@/lib/logger';
-import { supabase } from '@/integrations/supabase/client';
 
 const HISTORY_KEY = 'adaptive-music-history';
 const FAVORITES_KEY = 'adaptive-music-favorites';

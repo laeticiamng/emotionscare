@@ -20,7 +20,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
 }) => {
   const [text, setText] = useState('');
   const [isRecording, setIsRecording] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [_selectedImage, setSelectedImage] = useState<File | null>(null);
   const [activeTab, setActiveTab] = useState('text');
   
   const fileInputRef = useRef<HTMLInputElement>(null);

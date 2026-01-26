@@ -20,7 +20,7 @@ serve(async (req) => {
       throw new Error('No authorization header');
     }
 
-    const token = authHeader.replace('Bearer ', '');
+    authHeader.replace('Bearer ', '');
     
     // Verify JWT and get user
     const userResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {

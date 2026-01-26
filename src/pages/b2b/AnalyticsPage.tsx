@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, LineChart, TrendingUp, Users, Activity, Clock, RefreshCw, AlertCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';

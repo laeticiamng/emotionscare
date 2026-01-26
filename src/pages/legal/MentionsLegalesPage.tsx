@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Building, Mail, Phone, Shield } from 'lucide-react';
+import { ArrowLeft, Building, Mail, Shield } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { routes } from '@/lib/routes';
 

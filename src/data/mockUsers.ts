@@ -1,5 +1,5 @@
 // @ts-nocheck - Mock data file with flexible typing
-import { User, UserRole } from '@/types/user';
+import { User } from '@/types/user';
 import { PrivacyPreferences } from '@/types/preferences';
 
 export const mockUsers: User[] = [

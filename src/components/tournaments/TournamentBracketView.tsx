@@ -3,9 +3,9 @@
  * TOP 20 #1 - Composant UI pour useTournamentBrackets
  */
 
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Users, Clock, Swords } from 'lucide-react';
+import { Trophy, Users, Swords } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';

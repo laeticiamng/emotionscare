@@ -24,14 +24,14 @@ interface AIRecommendationEngineProps {
 const AIRecommendationEngine: React.FC<AIRecommendationEngineProps> = ({ className }) => {
   const [recommendations, setRecommendations] = useState<AIRecommendation[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [userPreferences, setUserPreferences] = useState({
+  const [userPreferences, _setUserPreferences] = useState({
     preferredGenres: ['ambient', 'electronic', 'classical'],
     energyLevel: 'medium',
     moodHistory: ['calm', 'focused', 'relaxed'],
     timeContext: 'evening'
   });
   
-  const { state, play, setPlaylist } = useMusic();
+ const { state, play } = useMusic();
   const { toast } = useToast();
   const currentTrack = state.currentTrack;
 

@@ -1,7 +1,7 @@
 // @ts-nocheck
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sun, Moon, Monitor, Palette, Check, Sparkles, Eye, Clock, Share2, Download, Upload, Accessibility } from 'lucide-react';
+import { Sun, Moon, Monitor, Palette, Check, Sparkles, Share2, Download, Upload, Accessibility } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThemeName } from '@/types/theme';
 import { cn } from '@/lib/utils';

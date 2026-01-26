@@ -16,7 +16,6 @@ import {
   Wifi,
   WifiOff,
   Loader2,
-  Play,
   Square,
   AlertTriangle,
   Activity,

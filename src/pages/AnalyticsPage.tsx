@@ -7,7 +7,6 @@ import { Progress } from '@/components/ui/progress';
 import {
   BarChart,
   TrendingUp,
-  Calendar,
   Target,
   Heart,
   Brain,
@@ -41,8 +40,8 @@ interface WeeklyMood {
 
 export default function AnalyticsPage() {
   const { user } = useAuth();
-  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('7d');
-  const [isLoading, setIsLoading] = useState(true);
+  const [timeRange, _setTimeRange] = useState<'7d' | '30d' | '90d'>('7d');
+  const [_isLoading, setIsLoading] = useState(true);
   const [moodData, setMoodData] = useState<MoodData>({
     average: 0,
     trend: '+0%',

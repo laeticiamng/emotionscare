@@ -6,32 +6,9 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useGamification } from '@/modules/gamification';
-import { Award, Star, Trophy, Target, Heart, Zap, Sparkles } from 'lucide-react';
+import { Award } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-
-const getBadgeIcon = (category: string) => {
-  switch (category) {
-    case 'emotion_mastery':
-    case 'scan':
-      return <Heart className="h-4 w-4" />;
-    case 'consistency':
-    case 'streak':
-      return <Target className="h-4 w-4" />;
-    case 'social':
-      return <Star className="h-4 w-4" />;
-    case 'exploration':
-      return <Zap className="h-4 w-4" />;
-    case 'meditation':
-    case 'wellness':
-      return <Sparkles className="h-4 w-4" />;
-    case 'achievement':
-    case 'level':
-      return <Trophy className="h-4 w-4" />;
-    default:
-      return <Award className="h-4 w-4" />;
-  }
-};
 
 const getRarityStyles = (rarity: string) => {
   switch (rarity) {

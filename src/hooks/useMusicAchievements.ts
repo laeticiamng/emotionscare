@@ -12,7 +12,7 @@ import {
   MUSIC_BADGES,
   type MusicBadge 
 } from '@/services/music/badges-service';
-import { getUserHistory, getWeeklyHistory, getTotalListeningTime } from '@/services/music/history-service';
+import { getUserHistory, getTotalListeningTime } from '@/services/music/history-service';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 

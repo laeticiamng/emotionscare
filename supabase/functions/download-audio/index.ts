@@ -27,9 +27,8 @@ serve(async (req) => {
     console.log('[download-audio] Fetching:', audioUrl);
 
     // Validate URL
-    let url: URL;
     try {
-      url = new URL(audioUrl);
+      new URL(audioUrl);
     } catch {
       return new Response(JSON.stringify({ error: 'Invalid URL' }), {
         status: 400,

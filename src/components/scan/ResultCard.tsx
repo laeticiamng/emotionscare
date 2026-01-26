@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -9,7 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Smile, Frown, Meh, Zap, Loader2, Share2, Heart, History,
   TrendingUp, TrendingDown, Minus, Music, BookOpen, Wind,
-  Sparkles, Download, Copy, ChevronRight, BarChart3, Clock
+  Sparkles, Download, ChevronRight, Clock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -32,17 +32,6 @@ interface ResultCardProps {
   result: ScanResult | null;
   onRecommendation?: (type: string) => void;
 }
-
-interface ScanHistoryEntry {
-  id: string;
-  bucket: ScanBucket;
-  label: string;
-  confidence: number;
-  timestamp: Date;
-  isFavorite: boolean;
-}
-
-const STORAGE_KEY = 'scan-result-history';
 
 const bucketConfig = {
   positif: {

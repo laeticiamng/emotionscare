@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/tooltip';
 import { 
   Flame, TrendingUp, Calendar, Share2, Trophy, Target, Sparkles, 
-  Download, BarChart3, Award, Zap, Crown, Gift, History, Bell, BellOff
+  Download, BarChart3, Award, Zap, Bell, BellOff
 } from 'lucide-react';
 import type { SanitizedNote } from '@/modules/journal/types';
 import { cn } from '@/lib/utils';

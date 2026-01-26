@@ -4,8 +4,8 @@
  * Couvre toutes les méthodes CRUD et legacy
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { journalService, JournalEntry } from '../journalService';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { journalService } from '../journalService';
 
 // Mock Supabase
 const mockSupabaseResponse = {

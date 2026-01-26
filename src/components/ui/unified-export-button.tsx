@@ -15,10 +15,7 @@ import {
   Package, 
   Loader2, 
   CheckCircle, 
-  AlertCircle,
-  Mail,
-  Copy,
-  ExternalLink
+  AlertCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';

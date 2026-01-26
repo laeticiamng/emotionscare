@@ -4,13 +4,12 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { logger } from '@/lib/logger';
 import {
@@ -19,9 +18,6 @@ import {
   WifiOff,
   Trash2,
   HardDrive,
-  Clock,
-  CheckCircle,
-  AlertCircle,
   Zap,
   ListMusic,
   Star,
@@ -80,12 +76,6 @@ const formatFileSize = (bytes: number): string => {
   return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
 };
 
-const formatDuration = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
-};
-
 export const OfflineModeManager: React.FC<OfflineModeManagerProps> = ({
   tracks,
   onDownload,
@@ -99,7 +89,7 @@ export const OfflineModeManager: React.FC<OfflineModeManagerProps> = ({
   const [totalCacheSize, setTotalCacheSize] = useState(0);
   const [maxCacheSize] = useState(500);
   const [autoSync, setAutoSync] = useState(true);
-  const [showDetails, setShowDetails] = useState(false);
+  const [_showDetails, _setShowDetails] = useState(false);
   const [activeTab, setActiveTab] = useState('downloads');
   
   // Nouvelles fonctionnalités

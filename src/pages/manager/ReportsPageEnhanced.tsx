@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +14,6 @@ import {
   Users, 
   Calendar,
   Download,
-  Filter,
   FileText,
   PieChart,
   Activity,
@@ -22,7 +21,6 @@ import {
   AlertTriangle,
   CheckCircle
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
 const ReportsPageEnhanced = () => {

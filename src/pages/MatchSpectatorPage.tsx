@@ -28,7 +28,7 @@ export default function MatchSpectatorPage() {
     loadMatchData();
     spectatorService.joinAsSpectator(matchId);
 
-    const channel = spectatorService.subscribeToMatch(
+    spectatorService.subscribeToMatch(
       matchId,
       (payload) => {
         setMatch(payload.new);

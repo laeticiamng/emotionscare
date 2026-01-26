@@ -277,7 +277,7 @@ class LongTermPredictionsServiceEnriched {
   }
 
   // Détecter les risques
-  private detectRiskIndicators(data: any[], forecasts: MonthlyForecast[], patterns: IdentifiedPattern[]): RiskIndicator[] {
+  private detectRiskIndicators(_data: any[], _forecasts: MonthlyForecast[], patterns: IdentifiedPattern[]): RiskIndicator[] {
     const risks: RiskIndicator[] = [];
 
     // Détecter une tendance négative
@@ -416,7 +416,7 @@ class LongTermPredictionsServiceEnriched {
   }
 
   // Générer des alertes
-  private generateAlerts(current: EmotionalForecast, previous: EmotionalForecast | null): void {
+  private generateAlerts(current: EmotionalForecast, _previous: EmotionalForecast | null): void {
     const alerts: PredictionAlert[] = [];
 
     // Alerte pour nouveaux risques

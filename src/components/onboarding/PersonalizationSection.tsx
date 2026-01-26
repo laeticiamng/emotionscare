@@ -10,7 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { 
-  Music, Bell, Palette, Target, Clock, Heart, 
+  Music, Bell, Palette, Target, Heart, 
   Sunrise, Moon, Sun, Volume2, Vibrate, Calendar,
   Brain, Wind, BookOpen, Sparkles, CheckCircle2
 } from 'lucide-react';

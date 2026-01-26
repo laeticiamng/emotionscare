@@ -3,9 +3,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { 
-  Sparkles, Mic, MicOff, Clock, Save, FileText, 
-  TrendingUp, Heart, Lightbulb, ChevronDown, Volume2
+import { Mic, MicOff, Clock, Save, FileText, 
+  TrendingUp, Heart, Lightbulb, ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -42,7 +41,7 @@ const EmotionTextInput: React.FC<EmotionTextInputProps> = ({
   placeholder = "Décrivez ce que vous ressentez...",
   className = "" 
 }) => {
-  const { textDrafts, textHistory, saveTextDraft, addTextHistory } = useScanSettings();
+  const { textDrafts, textHistory, saveTextDraft } = useScanSettings();
   
   const [isRecording, setIsRecording] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
@@ -141,19 +140,6 @@ const EmotionTextInput: React.FC<EmotionTextInputProps> = ({
   const loadDraft = (draft: typeof drafts[0]) => {
     onChange(draft.text);
     setShowHistory(false);
-  };
-
-  const saveToHistory = () => {
-    if (!value.trim()) return;
-    
-    const entry = {
-      text: value,
-      date: new Date().toISOString(),
-      sentiment: sentiment || 'neutral'
-    };
-    
-    addTextHistory(entry);
-    setHistory(prev => [entry, ...prev].slice(0, 50));
   };
 
   const toggleRecording = () => {

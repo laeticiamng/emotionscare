@@ -1,8 +1,7 @@
 // @ts-nocheck
 
 // Routeur et générateur de musique antalgique EmotionsCare
-import { HumeEmotionScore } from './humeClient';
-import { SunoApiClient, SunoGenerateRequest } from './sunoClient';
+import { SunoApiClient } from './sunoClient';
 import { PRESETS } from './presets';
 
 export interface EmotionInput {

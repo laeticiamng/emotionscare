@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { MusicContext } from '@/contexts/MusicContext';
 import { vi as vitestVi } from 'vitest';
 

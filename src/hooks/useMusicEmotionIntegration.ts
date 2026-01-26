@@ -7,13 +7,13 @@ import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
 export const useMusicEmotionIntegration = () => {
-  const { state, generateMusicForEmotion, setPlaylist, play, getEmotionMusicDescription } = useMusic();
+ const { state, generateMusicForEmotion, setPlaylist } = useMusic();
   const { updateSoundscapeForEmotion } = useSoundscape();
 
   // Activation de la musique basée sur l'émotion
   const activateMusicForEmotion = useCallback(async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
     try {
-      const { emotion, intensity = 0.5, duration = 120, instrumental = true, style } = params;
+      const { emotion, style } = params;
 
       // Rechercher d'abord dans la bibliothèque existante
       const existingTracks = await searchExistingTracks(emotion);

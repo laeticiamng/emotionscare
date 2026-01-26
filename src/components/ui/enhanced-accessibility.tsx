@@ -3,11 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Eye, EyeOff, Volume2, VolumeX, Type, Contrast,
-  MousePointer, Keyboard, Settings, X, Check,
+  Eye, Volume2, Type, Contrast,
+  MousePointer, Keyboard, X, Check,
   Zap, Moon, Sun, Palette, Move, RotateCcw
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useTheme } from '@/providers/theme';
 import {
   safeClassAdd,
@@ -42,7 +41,7 @@ const defaultSettings: AccessibilitySettings = {
 
 // Enhanced Skip Links
 export const EnhancedSkipLinks: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [_isVisible, setIsVisible] = useState(false);
 
   const skipLinks = [
     { href: '#main-content', label: 'Aller au contenu principal' },

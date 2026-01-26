@@ -54,7 +54,7 @@ export const useEmotionScan = () => {
   }, []);
 
   // Analyse vocale
-  const analyzeVoice = useCallback(async (audioBlob: Blob, options: ScanOptions = {}): Promise<EmotionResult> => {
+  const analyzeVoice = useCallback(async (audioBlob: Blob, _options: ScanOptions = {}): Promise<EmotionResult> => {
     // Convertir en base64
     const reader = new FileReader();
     const base64Promise = new Promise<string>((resolve, reject) => {
@@ -90,7 +90,7 @@ export const useEmotionScan = () => {
   }, []);
 
   // Analyse d'image (webcam ou upload)
-  const analyzeImage = useCallback(async (imageData: string, options: ScanOptions = {}): Promise<EmotionResult> => {
+  const analyzeImage = useCallback(async (imageData: string, _options: ScanOptions = {}): Promise<EmotionResult> => {
     // Extraire le base64 si c'est un data URL
     const base64 = imageData.includes(',') ? imageData.split(',')[1] : imageData;
 

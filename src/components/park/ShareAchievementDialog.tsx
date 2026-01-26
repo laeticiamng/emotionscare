@@ -2,7 +2,7 @@
  * ShareAchievementDialog - Dialog pour partager un accomplissement
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Share2, Copy, Check, Twitter, Facebook, MessageCircle } from 'lucide-react';
 import {

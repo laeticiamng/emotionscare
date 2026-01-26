@@ -18,9 +18,7 @@ import {
   Zap,
   Lightbulb,
   MessageSquare,
-  Clock,
   Filter,
-  Copy,
   Send,
   Eye,
   Star,
@@ -28,7 +26,6 @@ import {
   Search,
   Sparkles,
   TrendingUp,
-  Edit2,
   X,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -190,7 +187,7 @@ const EMOTION_COLORS: Record<string, string> = {
 };
 
 export const CoachQuickActions = () => {
-  const [selectedTemplate, setSelectedTemplate] = useState<MessageTemplate | null>(null);
+  const [_selectedTemplate, setSelectedTemplate] = useState<MessageTemplate | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState('all');
   const [favorites, setFavorites] = useState<string[]>([]);

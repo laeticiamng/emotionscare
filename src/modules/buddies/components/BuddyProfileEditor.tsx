@@ -20,7 +20,6 @@ import {
   Target, 
   Heart, 
   Check,
-  X,
   Camera,
   Loader2
 } from 'lucide-react';

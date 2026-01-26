@@ -2,11 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
-  Sparkles, ArrowRight, SkipForward, Users, Star, Shield, 
-  Clock, Heart, CheckCircle, Quote, ChevronLeft, ChevronRight,
+  Sparkles, ArrowRight, SkipForward, Star, Shield, 
+  Clock, CheckCircle, Quote, ChevronLeft, ChevronRight,
   Brain, Music, BookOpen, Activity
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';

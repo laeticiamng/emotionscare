@@ -23,13 +23,12 @@ interface AuthGuardProps {
 const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const location = useLocation();
   const [isInitialized, setIsInitialized] = useState(false);
-  const { 
-    isAuthenticated, 
-    isLoading, 
-    setSession, 
-    setLoading, 
-    initialize,
-    refreshSession 
+  const {
+    isAuthenticated,
+    isLoading,
+    setSession,
+    setLoading,
+    initialize
   } = useAuthStore();
 
   useEffect(() => {

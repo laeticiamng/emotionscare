@@ -9,7 +9,6 @@
 
 import { globby } from 'globby';
 import fs from 'fs/promises';
-import path from 'path';
 
 interface LinkReplacement {
   pattern: RegExp;

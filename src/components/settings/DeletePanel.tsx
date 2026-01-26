@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { DeleteAccountButton } from '@/components/account/DeleteAccountButton';
 import { 
-  Trash2, 
   AlertTriangle, 
   Download, 
   Clock,

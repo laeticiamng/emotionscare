@@ -31,9 +31,7 @@ interface WeeklyInsightsDashboardProps {
   listeningHistory?: any[];
 }
 
-export const WeeklyInsightsDashboard: React.FC<WeeklyInsightsDashboardProps> = ({
-  listeningHistory: propHistory
-}) => {
+export const WeeklyInsightsDashboard: React.FC<WeeklyInsightsDashboardProps> = () => {
   const [insights, setInsights] = useState<WeeklyInsight | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();

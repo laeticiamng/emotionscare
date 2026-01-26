@@ -7,7 +7,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { 
   Repeat, 
   Bookmark, 
-  Plus, 
   Trash2, 
   Clock, 
   FastForward,
@@ -60,9 +59,9 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   const [loop, setLoop] = useState<LoopRegion | null>(null);
   const [isLoopActive, setIsLoopActive] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
-  const [showWaveform, setShowWaveform] = useState(true);
+  const [showWaveform, _setShowWaveform] = useState(true);
   const [hoverTime, setHoverTime] = useState<number | null>(null);
-  const [seekHistory, setSeekHistory] = useState<number[]>([]);
+  const [_seekHistory, setSeekHistory] = useState<number[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
 
@@ -83,13 +82,6 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const formatDetailedTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    const ms = Math.floor((seconds % 1) * 100);
-    return `${mins}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
   };
 
   const addMarker = () => {
@@ -127,9 +119,6 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   const jumpToMarker = (marker: Marker) => {
     onSeek(marker.time);
   };
-
-  // Calculate progress percentage
-  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   // Calculate hovered time based on mouse position
   const handleMouseMove = useCallback((e: React.MouseEvent) => {

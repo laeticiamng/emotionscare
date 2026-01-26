@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Clock, Wind, TrendingUp, TrendingDown, Minus, 
-  ChevronDown, ChevronUp, Filter
+  ChevronDown, ChevronUp
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useBreathSessions, type BreathSession } from '@/hooks/useBreathSessions';

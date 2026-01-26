@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { 
-  Heart, Activity, TrendingUp, TrendingDown, Minus, 
+  Heart, TrendingUp, TrendingDown, Minus, 
   History, Share2, Download, Star, Zap, Wind
 } from 'lucide-react';
 import {
@@ -132,7 +132,6 @@ export const BreathGauge: React.FC<BreathGaugeProps> = ({
 
       // Calculate streak
       let currentStreak = 0;
-      const today = new Date().toDateString();
       const sortedDates = [...new Set(parsed.map(h => new Date(h.date).toDateString()))].sort((a, b) => 
         new Date(b).getTime() - new Date(a).getTime()
       );

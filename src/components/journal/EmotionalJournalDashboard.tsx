@@ -102,7 +102,7 @@ export const EmotionalJournalDashboard: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('emotional-journal', {
+ const { error } = await supabase.functions.invoke('emotional-journal', {
         body: {
           action: 'create',
           entryData: {

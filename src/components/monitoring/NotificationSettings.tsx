@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Bell, BellOff, Check, X, AlertCircle } from 'lucide-react';
+import { Bell, Check, X, AlertCircle } from 'lucide-react';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 

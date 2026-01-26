@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Send } from 'lucide-react';
 import ChatMessageItem from './ChatMessageItem';
 
@@ -30,7 +29,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   input: controlledInput,
   setInput: setControlledInput,
   handleInputChange: controlledChange,
-  handleSubmit: controlledSubmit
 }) => {
   const {
     messages,
@@ -38,13 +36,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     setInput,
     sendMessage,
     handleInputChange,
-    handleSubmit
   } = useChat({ initialMessages });
 
   const currentInput = controlledInput ?? input;
   const updateInput = setControlledInput ?? setInput;
   const onChangeInput = controlledChange ?? handleInputChange;
-  const submitHandler = controlledSubmit ?? handleSubmit;
+
   
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   

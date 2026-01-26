@@ -4,18 +4,11 @@
  */
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { Mic, MicOff, Volume2, History, Settings, BarChart2, Sparkles, ChevronDown } from 'lucide-react';
+import { Mic, MicOff, Volume2, History, Settings, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
+
 import {
   Sheet,
   SheetContent,
@@ -37,7 +30,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 const HISTORY_KEY = 'voice-commands-history';
 const STATS_KEY = 'voice-commands-stats';
 const PREFERENCES_KEY = 'voice-commands-preferences';
-const CUSTOM_COMMANDS_KEY = 'voice-commands-custom';
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -68,12 +60,6 @@ interface VoicePreferences {
   language: 'fr' | 'en';
   showConfidence: boolean;
   autoListen: boolean;
-}
-
-interface CustomCommand {
-  trigger: string;
-  action: string;
-  enabled: boolean;
 }
 
 interface VoiceCommandListenerEnrichedProps {
@@ -147,14 +133,6 @@ function savePreferences(prefs: VoicePreferences): void {
   localStorage.setItem(PREFERENCES_KEY, JSON.stringify(prefs));
 }
 
-function getCustomCommands(): CustomCommand[] {
-  try {
-    return JSON.parse(localStorage.getItem(CUSTOM_COMMANDS_KEY) || '[]');
-  } catch {
-    return [];
-  }
-}
-
 // ─────────────────────────────────────────────────────────────
 // COMPONENT
 // ─────────────────────────────────────────────────────────────
@@ -167,10 +145,10 @@ const VoiceCommandListenerEnriched: React.FC<VoiceCommandListenerEnrichedProps> 
   showStats = false,
 }) => {
   const [lastReceivedCommand, setLastReceivedCommand] = useState<string | null>(null);
-  const [lastTranscript, setLastTranscript] = useState('');
+  const [_lastTranscript, setLastTranscript] = useState('');
   
-  const { isListening, isConnected, isSpeaking, startListening, stopListening } = useVoiceCommands({
-    onCommand: (cmd, params) => {
+ const { isListening, startListening, stopListening } = useVoiceCommands({
+    onCommand: (cmd, _params) => {
       setLastReceivedCommand(cmd);
       onCommand(cmd);
     },

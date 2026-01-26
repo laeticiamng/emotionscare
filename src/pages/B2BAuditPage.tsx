@@ -12,11 +12,8 @@ import {
   Clock, 
   FileText,
   Download,
-  TrendingUp, 
-  Users,
-  Database,
+  TrendingUp,
   Server,
-  Eye,
   Zap,
   BarChart3,
   Building

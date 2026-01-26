@@ -17,7 +17,6 @@ import {
   Volume2,
 } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { captureException } from '@/lib/ai-monitoring';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -35,7 +34,6 @@ import { cn } from '@/lib/utils';
 import { useSocialRooms } from '@/features/social-cocon/hooks/useSocialRooms';
 import { useSocialBreakPlanner } from '@/features/social-cocon/hooks/useSocialBreakPlanner';
 import { useMspssSummary } from '@/features/social-cocon/hooks/useMspssSummary';
-import { usePastBreaks } from '@/features/social-cocon/hooks/usePastBreaks';
 import ShareRoomDialog from '@/features/social-cocon/components/ShareRoomDialog';
 import PastBreaksHistory from '@/features/social-cocon/components/PastBreaksHistory';
 import QuietHoursConfig from '@/features/social-cocon/components/QuietHoursConfig';

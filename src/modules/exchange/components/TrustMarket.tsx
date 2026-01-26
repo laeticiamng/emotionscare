@@ -11,14 +11,13 @@ import {
   Star,
   Heart,
   Plus,
-  CheckCircle,
-  ArrowRight
+  CheckCircle
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -37,7 +36,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useTrustProfile, useTrustProjects, useGiveTrust, useCreateTrustProject, useTrustLeaderboard } from '../hooks/useExchangeData';
-import TrustActivityFeed from './TrustActivityFeed';
 import type { TrustLevel } from '../types';
 import { toast } from 'sonner';
 
@@ -67,12 +65,12 @@ const projectCategories = [
 ];
 
 const TrustMarket: React.FC = () => {
-  const { data: profile, isLoading: profileLoading } = useTrustProfile();
+  const { data: profile, isLoading: _profileLoading } = useTrustProfile();
   const { data: projects, isLoading: projectsLoading } = useTrustProjects();
   const { data: leaderboard, isLoading: leaderboardLoading } = useTrustLeaderboard();
   const giveTrust = useGiveTrust();
   const createProject = useCreateTrustProject();
-  const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const [_selectedProject, setSelectedProject] = useState<string | null>(null);
   const [trustAmount, setTrustAmount] = useState(10);
   const [isProjectDialogOpen, setIsProjectDialogOpen] = useState(false);
   const [newProject, setNewProject] = useState({

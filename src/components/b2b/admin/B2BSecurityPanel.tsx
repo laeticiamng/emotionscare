@@ -14,8 +14,6 @@ import {
   Clock, Monitor, Globe, RefreshCw, Download,
   CheckCircle, XCircle, Eye
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 

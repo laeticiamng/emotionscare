@@ -3,7 +3,7 @@
  * Phase 3 - Excellence
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
@@ -16,7 +16,6 @@ import {
   Volume2,
   Keyboard,
   Contrast,
-  MousePointer2,
   Check,
   AlertTriangle,
 } from 'lucide-react';

@@ -2,7 +2,7 @@
  * AppSidebar - Navigation immersive avec sidebar moderne
  */
 
-import React, { useState } from "react";
+import { useState } from 'react';
 import { NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -14,7 +14,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -26,11 +25,9 @@ import {
   Heart, 
   Scan, 
   Music, 
-  MessageCircle, 
   Brain, 
   Gamepad2, 
   Users, 
-  BarChart3, 
   Settings, 
   Home,
   Camera,
@@ -48,7 +45,6 @@ import {
   Trophy,
   Target,
   FileText,
-  Smile,
   Waves,
   HeartPulse
 } from "lucide-react";
@@ -70,7 +66,7 @@ interface NavigationGroup {
 }
 
 export function AppSidebar() {
-  const { state, open } = useSidebar();
+ const { state } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);

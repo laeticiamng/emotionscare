@@ -16,8 +16,6 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { 
-  LineChart, 
-  Line, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -26,7 +24,7 @@ import {
   AreaChart,
   Area
 } from 'recharts';
-import { format, subDays, startOfWeek, endOfWeek } from 'date-fns';
+import { format, subDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 export interface EmotionalOverviewTabProps {

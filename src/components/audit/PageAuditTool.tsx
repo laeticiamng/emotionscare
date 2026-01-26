@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,18 +7,15 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { routes } from '@/routerV2';
 import { validateRouteAccess } from '@/utils/routeValidation';
 import { 
   CheckCircle, 
   XCircle, 
   AlertTriangle, 
   Clock, 
-  Users, 
   Shield, 
   Eye,
   BarChart3,
-  FileText,
   Zap
 } from 'lucide-react';
 import { toast } from 'sonner';

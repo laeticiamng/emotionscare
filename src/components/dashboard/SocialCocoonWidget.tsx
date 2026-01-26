@@ -15,7 +15,7 @@ export interface SocialCocoonWidgetProps {
   userId?: string;
 }
 
-const SocialCocoonWidget: React.FC<SocialCocoonWidgetProps> = memo(({ collapsed, onToggle, userId }) => {
+const SocialCocoonWidget: React.FC<SocialCocoonWidgetProps> = memo(({ collapsed, onToggle }) => {
   const navigate = useNavigate();
   const { rooms, isLoading: roomsLoading } = useSocialRooms({ enabled: !collapsed });
   const { upcomingBreaks, isLoading: breaksLoading } = useSocialBreakPlanner({ enabled: !collapsed });

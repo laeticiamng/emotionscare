@@ -3,7 +3,7 @@
  * Tests du système de validation des routes
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { RouteValidator, validator, routeValidationRules } from '../validation';
 import type { RouteMeta } from '../schema';
 import { ROUTES_REGISTRY } from '../registry';

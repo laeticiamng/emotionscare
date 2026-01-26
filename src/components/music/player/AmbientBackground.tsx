@@ -8,10 +8,9 @@ interface AmbientBackgroundProps {
   fullscreen?: boolean;
 }
 
-const AmbientBackground: React.FC<AmbientBackgroundProps> = ({ 
-  track, 
-  isPlaying, 
-  fullscreen = false 
+const AmbientBackground: React.FC<AmbientBackgroundProps> = ({
+  track,
+  isPlaying,
 }) => {
   const [currentTheme, setCurrentTheme] = useState<string>('default');
 

@@ -8,7 +8,7 @@ import { useEmotionalEnergy } from '@/hooks/useEmotionalEnergy';
 import { useWellnessStreak } from '@/hooks/useWellnessStreak';
 import { useHarmonyPoints } from '@/hooks/useHarmonyPoints';
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   TrendingUp, TrendingDown, Minus, Flame, Zap, Trophy, Target,
   Share2, Settings, ChevronRight, Sparkles, Award, BarChart3

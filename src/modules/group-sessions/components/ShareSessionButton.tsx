@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { 
   Share2, 
-  Copy, 
   Check,
   MessageCircle,
   Mail,

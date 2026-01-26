@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';

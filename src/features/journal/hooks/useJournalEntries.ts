@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import type { JournalEntry, ListJournalEntriesInput } from '@emotionscare/contracts';
+import type { ListJournalEntriesInput } from '@emotionscare/contracts';
 import { journalApi } from '../services/journalApi';
 
 /**

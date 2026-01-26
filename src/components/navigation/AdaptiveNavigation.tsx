@@ -4,16 +4,13 @@ import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { useLocation, Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Home, 
   Brain, 
   FileText, 
   Scan, 
   Music, 
-  MessageCircle, 
   Glasses, 
   Settings,
   Users,

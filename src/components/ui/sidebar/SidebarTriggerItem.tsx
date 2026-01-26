@@ -1,4 +1,3 @@
-import React from 'react';
 import { PanelLeft, PanelRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSidebar } from './SidebarContext';
@@ -10,7 +9,7 @@ interface SidebarTriggerItemProps {
 }
 
 export function SidebarTriggerItem({ className, title = "Toggle Sidebar" }: SidebarTriggerItemProps) {
-  const { toggle, collapsed, open } = useSidebar();
+ const { toggle, collapsed } = useSidebar();
 
   return (
     <Button

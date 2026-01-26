@@ -10,7 +10,7 @@ const ActivityLogsTab: React.FC = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<ActivityTabView>("daily");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, _setPageSize] = useState(10);
   
   const [filters, setFilters] = useState({
     searchTerm: '',

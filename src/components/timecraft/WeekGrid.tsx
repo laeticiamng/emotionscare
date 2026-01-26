@@ -1,13 +1,12 @@
 /**
  * WeekGrid - Grille de visualisation hebdomadaire des blocs temporels
  */
-import React, { memo, useState } from 'react';
+import { memo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { TimeBlockCard } from './TimeBlockCard';
 import type { TimeBlock, TimeBlockType } from '@/hooks/timecraft';
 
 interface WeekGridProps {
@@ -39,12 +38,9 @@ const blockTypeColors: Record<TimeBlockType, string> = {
 };
 
 export const WeekGrid = memo(function WeekGrid({
-  blocks,
   blocksByDay,
   onAddBlock,
   onEditBlock,
-  onDeleteBlock,
-  viewMode = 'week',
 }: WeekGridProps) {
   const [hoveredCell, setHoveredCell] = useState<{ day: number; hour: number } | null>(null);
 

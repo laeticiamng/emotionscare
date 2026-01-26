@@ -14,8 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { 
-  Building2, Bell, Shield, Palette, Globe, 
-  Mail, MessageSquare, Users, Clock, Save,
+  Building2, Bell, Shield, Palette, 
+  Mail, MessageSquare, Save,
   RefreshCw, Lock, Eye, EyeOff
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';

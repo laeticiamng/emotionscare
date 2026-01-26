@@ -44,7 +44,7 @@ export const runProductionCleanup = async (): Promise<CleanupStats> => {
     // 3. Nettoyage automatique des console.log (en mode production)
     if (import.meta.env.PROD) {
       // Rediriger tous les console.log vers le logger
-      const originalConsole = { ...console };
+
       
       console.log = (message: any, ...args: any[]) => {
         logger.info(String(message), args.length > 0 ? args : undefined, 'SYSTEM');

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { EmotionResult, EmotionVector } from '@/types/emotion';
-import { BASE_EMOTIONS, EMOTION_CATEGORIES } from './constants';
+import { EMOTION_CATEGORIES } from './constants';
 
 /**
  * Service d'agrégation et d'analyse de données de scan émotionnel

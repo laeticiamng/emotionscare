@@ -11,8 +11,6 @@ import {
   Heart,
   Play,
   Sparkles,
-  Zap,
-  TrendingUp,
   Radio,
   Loader2,
 } from 'lucide-react';

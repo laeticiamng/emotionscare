@@ -49,12 +49,10 @@ const getMoodColor = (mood: string): string => {
 
 export const MusicAnalyticsTab: React.FC<MusicAnalyticsTabProps> = ({
   listeningHistory = [],
-  totalListeningHours = 0,
   favoriteGenres = [],
-  weeklyStats = [],
   children,
 }) => {
-  const [timeRange, setTimeRange] = useState<'week' | 'month' | 'all'>('week');
+  const [timeRange, _setTimeRange] = useState<'week' | 'month' | 'all'>('week');
 
   // Calculate statistics
   const stats = useMemo(() => {
@@ -92,7 +90,6 @@ export const MusicAnalyticsTab: React.FC<MusicAnalyticsTabProps> = ({
     const days: (ListeningSession | null)[] = Array(firstDay).fill(null);
 
     for (let i = 1; i <= daysInMonth; i++) {
-      const date = new Date(year, month, i);
       const session = listeningHistory.find(
         (s) =>
           s.date.getDate() === i &&

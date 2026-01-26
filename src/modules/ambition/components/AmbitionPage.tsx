@@ -18,7 +18,6 @@ import {
   Zap,
   Plus,
   Check,
-  X,
   Loader2,
   TrendingUp,
   Star,

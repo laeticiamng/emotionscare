@@ -20,7 +20,6 @@ import {
   VolumeX,
   Lightbulb,
   Target,
-  Compass,
   Loader2
 } from 'lucide-react';
 import { emotionsCareApi } from '@/services/emotions-care-api';

@@ -12,12 +12,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
-  Shield, Database, Target, Eye, Download, Upload, History, 
-  Trash2, FileText, CheckCircle2, AlertTriangle, Lock, 
-  Clock, Calendar, Share2, AlertCircle, RefreshCw, Award,
-  ShieldCheck, ShieldAlert, ChevronDown, ChevronUp
+  Shield, Database, Target, Eye, Download, History, 
+  Trash2, FileText, AlertTriangle, Lock, 
+  Clock, AlertCircle, RefreshCw, Award,
+  ShieldCheck
 } from 'lucide-react';
 import { useEthics } from '@/contexts/EthicsContext';
 import { toast } from 'sonner';
@@ -29,12 +29,8 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+
+
 import {
   Tooltip,
   TooltipContent,

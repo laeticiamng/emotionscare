@@ -3,7 +3,7 @@
  * @module story-synth
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   BookOpen, 
@@ -37,7 +37,6 @@ export default function StorySynthPage() {
     isReading,
     isGenerating,
     isLoadingHistory,
-    readingStartTime,
     generateStory,
     completeReading,
     saveCurrentStory,

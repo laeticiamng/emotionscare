@@ -12,7 +12,7 @@ interface EmotionRecommendationEngineProps {
 }
 
 const EmotionRecommendationEngine: React.FC<EmotionRecommendationEngineProps> = ({
-  currentEmotion, recommendations, alternativeRecommendations
+  recommendations, alternativeRecommendations
 }) => {
   return (
     <div className="space-y-6">

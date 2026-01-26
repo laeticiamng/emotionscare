@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +18,7 @@ import {
   Brain,
   Waves
 } from 'lucide-react';
-import { useRealtimeChat, RealtimeChatMessage } from '@/hooks/api/useRealtimeChat';
+import { useRealtimeChat } from '@/hooks/api/useRealtimeChat';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface RealtimeChatInterfaceProps {

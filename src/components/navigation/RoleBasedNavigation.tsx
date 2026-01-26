@@ -18,7 +18,6 @@ import {
   Home, 
   Briefcase, 
   BarChart3,
-  Heart,
   Music,
   Mic,
   Camera,

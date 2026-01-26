@@ -5,7 +5,7 @@ import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
 import { useFlashGlowSession } from '../useFlashGlowSession';
 
 declare global {
-  // eslint-disable-next-line no-var
+   
   var matchMedia: ((query: string) => MediaQueryList) | undefined;
 }
 

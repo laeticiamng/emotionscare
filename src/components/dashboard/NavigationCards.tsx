@@ -12,8 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
   Brain, Music, Sparkles, FileText, Monitor, Zap, Wind, Camera,
-  Waves, Star, Target, Palette, Users, Trophy, BarChart3, Settings,
-  Heart, Gamepad2, Headphones, Filter, Grid3X3, Calendar, Shield
+  Waves, Star, Users, Trophy, BarChart3, Settings,
+  Heart, Filter, Grid3X3
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

@@ -24,13 +24,10 @@ import {
   Star,
   Check,
   Bookmark,
-  History,
   MessageSquare,
   TrendingUp,
-  Clock,
   MoreHorizontal,
-  Share2,
-  Trash2
+  Share2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -119,7 +116,7 @@ export const SuggestionChip: React.FC<SuggestionChipProps> = ({
   const [showDetails, setShowDetails] = useState(false);
   const [note, setNote] = useState('');
   const [rating, setRating] = useState(0);
-  const [history, setHistory] = useState<SuggestionHistory[]>([]);
+  const [_history, setHistory] = useState<SuggestionHistory[]>([]);
   const [stats, setStats] = useState({
     totalAccepted: 0,
     totalSaved: 0,

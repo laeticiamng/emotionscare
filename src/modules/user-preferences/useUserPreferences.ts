@@ -10,9 +10,7 @@ import type {
   UserSettings,
   PartialUserSettings,
   PrivacySettings,
-  NotificationPreferences,
-  Notification,
-  UserPreferencesBundle
+  NotificationPreferences
 } from './types';
 
 interface UseUserPreferencesOptions {

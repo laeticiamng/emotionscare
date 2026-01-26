@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause, Camera, Brain, Heart, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -55,7 +55,7 @@ export function EmotionalScanHub() {
       });
       refetchHistory();
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast({
         variant: "destructive",
         title: "Erreur de sauvegarde",

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Play, BookOpen, Clock, MessageCircle, ThumbsUp, Star, PlayCircle, PauseCircle } from 'lucide-react';
+import { Play, BookOpen, Clock, ThumbsUp, Star, PlayCircle, PauseCircle } from 'lucide-react';
 
 const LearningCenter: React.FC = () => {
   const [activeVideo, setActiveVideo] = useState<string | null>(null);

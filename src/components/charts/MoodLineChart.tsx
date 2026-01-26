@@ -12,13 +12,11 @@ export interface MoodData {
 
 export interface MoodLineChartProps {
   data: MoodData[];
-  showControls?: boolean;
   height?: number;
 }
 
 export const MoodLineChart: React.FC<MoodLineChartProps> = ({
   data,
-  showControls = true,
   height = 250,
 }) => {
   const { theme } = useTheme();

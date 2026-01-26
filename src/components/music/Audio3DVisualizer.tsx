@@ -7,7 +7,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   Music,
@@ -203,13 +202,6 @@ export const Audio3DVisualizer: React.FC<Audio3DVisualizerProps> = ({
   // Spectrum Visualizer (Circular)
   const renderSpectrum = () => {
     const radius = 60;
-    const points = animationData.slice(0, 16).map((val, i) => {
-      const angle = (i / 16) * Math.PI * 2 - Math.PI / 2;
-      const distance = (val / 100) * radius + 20;
-      const x = 100 + Math.cos(angle) * distance;
-      const y = 100 + Math.sin(angle) * distance;
-      return `${x},${y}`;
-    });
 
     return (
       <div className="w-full h-48 bg-gradient-to-br from-background via-accent/10 to-background rounded-lg flex items-center justify-center p-4">

@@ -33,7 +33,7 @@ const B2CBounceBackBattlePage: React.FC = () => {
   const [stats, setStats] = useState<any>(null);
   const [recentBattles, setRecentBattles] = useState<any[]>([]);
   const [statsLoading, setStatsLoading] = useState(false);
-  const [battleScore, setBattleScore] = useState(0);
+  const [battleScore, _setBattleScore] = useState(0);
   
   const feedback = useBattleFeedback();
 

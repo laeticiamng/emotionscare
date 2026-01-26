@@ -163,7 +163,7 @@ class SeasonService {
   async recordMatchResult(
     seasonId: string,
     won: boolean,
-    tournamentId: string
+    _tournamentId: string
   ): Promise<boolean> {
     try {
       const { data: { user } } = await supabase.auth.getUser();

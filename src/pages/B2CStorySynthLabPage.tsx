@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Play, Pause, RotateCcw, Volume2, VolumeX, BookOpen, Trash2, Star } from 'lucide-react';
+import { ArrowLeft, Play, Pause, RotateCcw, Volume2, VolumeX, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
-import { useStorySynthPersistence, type StorySynthStory } from '@/hooks/useStorySynthPersistence';
+import { useStorySynthPersistence } from '@/hooks/useStorySynthPersistence';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface LocalStory {
@@ -20,16 +20,13 @@ interface LocalStory {
 
 const B2CStorySynthLabPage: React.FC = () => {
   const navigate = useNavigate();
-  const { shouldAnimate } = useMotionPrefs();
+  useMotionPrefs();
   const { user } = useAuth();
-  const { 
-    stories: savedStoriesDB, 
-    isLoading: isLoadingStories, 
-    fetchStories, 
-    saveStory, 
-    toggleFavorite: toggleFavoriteDB,
+  const {
+    stories: savedStoriesDB,
+    fetchStories,
+    saveStory,
     incrementPlayCount,
-    deleteStory 
   } = useStorySynthPersistence();
   
   const [intentions, setIntentions] = useState<string[]>(['', '', '']);
@@ -155,14 +152,6 @@ Laissez cette symphonie de sensations vous porter. Votre respiration s'harmonise
     setIntentions([...story.intention, '', ''].slice(0, 3));
     setPlayTime(0);
     setIsPlaying(false);
-  };
-
-  const toggleFavorite = (storyId: string) => {
-    toggleFavoriteDB(storyId);
-  };
-
-  const handleDeleteStory = (storyId: string) => {
-    deleteStory(storyId);
   };
 
   const handleIntentionChange = (index: number, value: string) => {

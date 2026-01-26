@@ -39,7 +39,7 @@ function shouldSkipFile(filePath: string): boolean {
   );
 }
 
-function replaceConsoleLogs(content: string, filePath: string): { content: string; replaced: number } {
+function replaceConsoleLogs(content: string, _filePath: string): { content: string; replaced: number } {
   let modified = content;
   let count = 0;
   
@@ -62,7 +62,7 @@ function replaceConsoleLogs(content: string, filePath: string): { content: strin
 
   // Remplacer les console.* (sauf ceux avec eslint-disable)
   const lines = modified.split('\n');
-  const newLines = lines.map((line, index) => {
+  const newLines = lines.map((line, _index) => {
     if (line.includes('eslint-disable')) {
       return line;
     }
@@ -113,7 +113,7 @@ function detectHardcodedColors(content: string, filePath: string): void {
 
   lines.forEach((line, index) => {
     const matches = line.matchAll(colorPattern);
-    for (const match of matches) {
+    for (const _match of matches) {
       issues.push({
         file: filePath,
         line: index + 1,

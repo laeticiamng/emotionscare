@@ -9,16 +9,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
 import { 
-  Wand2, Loader2, Heart, History, Star, Share2, Clock, 
-  Music, Sparkles, TrendingUp, Download, Play, Pause,
-  Volume2, Shuffle, BarChart3, Settings, Filter
+  Wand2, Loader2, Heart, History, Star, Share2, Clock, Sparkles, Play, BarChart3, Settings
 } from 'lucide-react';
 import { useMusicGeneration } from '@/hooks/useMusicGeneration';
 import { useMusicControls } from '@/hooks/useMusicControls';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import type { MusicTrack } from '@/types/music';
 import { useMusicSettings } from '@/hooks/music/useMusicSettings';
 
 interface GenerationHistory {

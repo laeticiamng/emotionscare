@@ -46,7 +46,7 @@ function mapNotification(dbNotif: Record<string, unknown>): Notification {
 export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
+  const [_channel, setChannel] = useState<RealtimeChannel | null>(null);
   const { toast } = useToast();
 
   // Load initial notifications

@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Heart, ThumbsUp, MessageCircle, Zap, Award, Flame } from 'lucide-react';
+import { Heart, ThumbsUp, Zap, Award, Flame } from 'lucide-react';
 
 interface MicroInteraction {
   id: string;
@@ -76,7 +76,7 @@ export const CoachMicroInteractions = () => {
     level: 3,
   });
 
-  const [selectedInteraction, setSelectedInteraction] = useState<MicroInteraction | null>(null);
+  const [_selectedInteraction, setSelectedInteraction] = useState<MicroInteraction | null>(null);
   const [completedInteractions, setCompletedInteractions] = useState<string[]>([]);
 
   const handleCompleteInteraction = (id: string, reward?: number) => {

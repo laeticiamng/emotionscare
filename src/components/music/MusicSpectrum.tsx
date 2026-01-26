@@ -13,7 +13,7 @@
  * @module components/music/MusicSpectrum
  */
 
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMusicVisualization } from '@/hooks/music/useMusicVisualization';
 import { cn } from '@/lib/utils';
 

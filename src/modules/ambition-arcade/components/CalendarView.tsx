@@ -8,8 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 
-  Calendar, ChevronLeft, ChevronRight, CheckCircle, 
-  Clock, Zap, Target 
+  Calendar, ChevronLeft, ChevronRight, CheckCircle, Zap, Target 
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -221,7 +220,7 @@ export const CalendarView: React.FC = () => {
           ))}
 
           {/* Days */}
-          {calendarDays.map((day, index) => {
+          {calendarDays.map((day, _index) => {
             const key = format(day, 'yyyy-MM-dd');
             const activity = activityMap.get(key);
             const isCurrentMonth = isSameMonth(day, currentMonth);

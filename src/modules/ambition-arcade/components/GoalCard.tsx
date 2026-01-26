@@ -10,7 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { 
   ChevronDown, ChevronUp, CheckCircle, Clock, 
-  Plus, Star, Target, Trash2, Play, Loader2, Heart, Timer
+  Plus, Star, Trash2, Play, Loader2, Heart
 } from 'lucide-react';
 import { 
   useAmbitionQuests, 

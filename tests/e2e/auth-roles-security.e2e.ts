@@ -48,18 +48,6 @@ const createAuthPayload = (role: 'b2c' | 'b2b_user' | 'b2b_admin', email: string
   };
 };
 
-const createExpiredTokenPayload = () => {
-  const now = Math.floor(Date.now() / 1000);
-  return {
-    access_token: 'expired-access-token',
-    token_type: 'bearer',
-    expires_in: 0,
-    expires_at: now - 3600, // Expired 1 hour ago
-    refresh_token: 'expired-refresh-token',
-    user: null,
-  };
-};
-
 // ============================================================================
 // TEST SUITE: Authentification de base
 // ============================================================================
@@ -539,11 +527,6 @@ test.describe('Auth Input Validation', () => {
       await emailInput.blur();
 
       // Should show validation error or prevent submission
-      const validationMsg = page.locator('[role="alert"], .error, .invalid');
-      // Either shows error or form validation prevents it
-      const hasValidation = await validationMsg.count() > 0 || 
-                           await emailInput.evaluate(el => !(el as HTMLInputElement).validity.valid);
-      
       // Note: HTML5 validation may or may not be present
     }
   });

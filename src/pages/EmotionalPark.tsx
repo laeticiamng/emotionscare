@@ -8,7 +8,7 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useUserStatsQuery } from '@/hooks/useUserStatsQuery';
 import { useUserPreference } from '@/hooks/useSupabaseStorage';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Filter, Search, X, TrendingUp, Target, Award, ChevronDown, Star, Calendar, Sparkles, Trophy, Zap, BarChart3, Map, Clock, Heart, Share2, Download, Settings } from 'lucide-react';
+import { Filter, Search, X, TrendingUp, Target, Award, ChevronDown, Star, Calendar, Sparkles, Trophy, Zap, BarChart3, Map, Clock, Heart, Settings } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ParkAttraction } from '@/components/park/ParkAttraction';
 import type { Attraction } from '@/types/park';
@@ -48,7 +48,6 @@ import { useParkEnergy } from '@/hooks/useParkEnergy';
 import { useParkStreak } from '@/hooks/useParkStreak';
 import { useParkAchievements } from '@/hooks/useParkAchievements';
 import { ParkProgressDashboard } from '@/components/park/ParkProgressDashboard';
-import type { ZoneKey, ZoneProgressData, ParkStat, MoodOption } from '@/types/park';
 import type { WeatherType } from '@/components/park/ParkWeatherWidget';
 
 export default function EmotionalPark() {
@@ -61,7 +60,7 @@ export default function EmotionalPark() {
   const [showTimeline, setShowTimeline] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const [achievementToShare, setAchievementToShare] = useState<ShareableAchievement | null>(null);
+  const [achievementToShare, _setAchievementToShare] = useState<ShareableAchievement | null>(null);
   const [showAchievementsPanel, setShowAchievementsPanel] = useState(false);
   const [showSettingsPanel, setShowSettingsPanel] = useState(false);
   
@@ -70,13 +69,12 @@ export default function EmotionalPark() {
   const [showProgressDashboard, setShowProgressDashboard] = useState(false);
 
   // Energy system (persisté via Supabase)
-  const { 
-    energy, 
-    maxEnergy, 
-    regenRate: energyRegenRate, 
-    consumeEnergy, 
-    canAfford,
-    restoreEnergy
+  const {
+    energy,
+    maxEnergy,
+    regenRate: energyRegenRate,
+    consumeEnergy,
+    canAfford
   } = useParkEnergy();
 
   // Streak system (persisté via Supabase)
@@ -119,10 +117,10 @@ export default function EmotionalPark() {
   const { syncAttractionVisit } = useParkModuleSymbiosis();
   
   // New hooks integration
-  const { notifications, unreadCount, notifyBadgeUnlock } = useParkRealtime();
+ const { notifyBadgeUnlock } = useParkRealtime();
   const { isFavorite, toggleFavorite, recordVisit } = useParkFavorites();
-  const { exportToJSON, isExporting } = useParkExport();
-  const { shareSummary, isSharing } = useParkSharing();
+ const { exportToJSON } = useParkExport();
+ const { shareSummary } = useParkSharing();
   const { achievements: parkAchievements, stats: achievementStats } = useParkAchievements();
 
   // Calculer le type de météo basé sur l'humeur

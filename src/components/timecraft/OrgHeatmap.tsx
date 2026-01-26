@@ -1,7 +1,7 @@
 /**
  * OrgHeatmap - Heatmap organisationnelle pour B2B
  */
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -51,7 +51,6 @@ export const OrgHeatmap = memo(function OrgHeatmap({
   departmentStats,
   hasEnoughData,
   minimumCohortSize,
-  isLoading = false,
 }: OrgHeatmapProps) {
   if (!hasEnoughData) {
     return (

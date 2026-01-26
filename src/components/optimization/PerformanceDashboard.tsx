@@ -1,29 +1,21 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Activity, 
-  Zap, 
-  Database, 
   Wifi, 
   HardDrive,
   RefreshCw,
-  Download,
-  Upload,
-  Clock,
-  Eye,
   AlertTriangle,
   CheckCircle,
-  TrendingUp,
   BarChart3
 } from 'lucide-react';
 import { usePerformanceMonitor } from '@/hooks/usePerformanceMonitor';
 import { useServiceWorker, useCacheManager } from '@/hooks/optimization/useServiceWorker';
-import { performanceMonitor } from '@/lib/performance/performanceMonitor';
 import { logger } from '@/lib/logger';
 
 interface PerformanceMetric {
@@ -54,7 +46,7 @@ const PerformanceDashboard: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const performanceData = usePerformanceMonitor();
+  usePerformanceMonitor();
   const serviceWorker = useServiceWorker();
   const cacheManager = useCacheManager();
 
@@ -242,12 +234,6 @@ const PerformanceDashboard: React.FC = () => {
     if (score >= 90) return 'text-green-600';
     if (score >= 70) return 'text-yellow-600';
     return 'text-red-600';
-  };
-
-  const getScoreStatus = (score: number) => {
-    if (score >= 90) return 'good';
-    if (score >= 70) return 'warning';
-    return 'critical';
   };
 
   const getScoreIndicatorColor = (score: number) => {

@@ -4,9 +4,9 @@
  * Validation des guards et contrôles d'accès
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { ROUTES_REGISTRY } from '../registry';
-import type { RouteMeta, Role } from '../schema';
+import type { Role } from '../schema';
 
 describe('RouterV2 Permissions - Tests complets', () => {
   describe('Validation des rôles', () => {

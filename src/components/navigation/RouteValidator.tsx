@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
-  CheckCircle, XCircle, AlertCircle, RefreshCw, 
+  CheckCircle, XCircle, RefreshCw, 
   Navigation, ExternalLink, Clock, Shield
 } from 'lucide-react';
 import { ROUTES_REGISTRY } from '@/routerV2/registry';

@@ -1,12 +1,6 @@
 import { useEffect } from 'react';
 import { logger } from '@/lib/logger';
 
-interface PerformanceMetrics {
-  loadTime: number;
-  renderTime: number;
-  bundleSize?: number;
-}
-
 export const usePerformanceMonitoring = (componentName: string) => {
   useEffect(() => {
     const startTime = performance.now();

@@ -107,7 +107,7 @@ export const TrainingSystem = () => {
   const submitQuiz = async () => {
     if (!selectedModule) return;
 
-    const score = quizzes.reduce((acc, quiz, idx) => {
+    const score = quizzes.reduce((acc, quiz, _idx) => {
       return acc + (answers[quiz.id] === quiz.correct_answer ? 1 : 0);
     }, 0);
 
@@ -218,7 +218,7 @@ export const TrainingSystem = () => {
           ) : (
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-foreground">Résultats</h3>
-              {quizzes.map((quiz, idx) => {
+              {quizzes.map((quiz, _idx) => {
                 const isCorrect = answers[quiz.id] === quiz.correct_answer;
                 return (
                   <Card key={quiz.id} className="p-4">

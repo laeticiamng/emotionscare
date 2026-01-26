@@ -3,14 +3,12 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { motion } from 'framer-motion';
 import { 
   Download, FileJson, FileSpreadsheet, FileCode, 
-  Database, User, MessageSquare, Activity, 
-  Calendar, Settings, Shield, CheckCircle 
+  Database, User, MessageSquare, Activity, Settings, Shield 
 } from 'lucide-react';
 import { useEthics } from '@/contexts/EthicsContext';
 import { toast } from 'sonner';

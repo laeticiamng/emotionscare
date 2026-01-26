@@ -9,7 +9,7 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Settings, Volume2, Vibrate, Clock, Sparkles } from 'lucide-react';
-import type { FlashGlowConfig, GlowType } from './types';
+import type { FlashGlowConfig } from './types';
 import { GLOW_TYPES } from './types';
 import { cn } from '@/lib/utils';
 

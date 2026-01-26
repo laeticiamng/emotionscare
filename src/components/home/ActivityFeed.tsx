@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -154,7 +154,7 @@ const ActivityFeed: React.FC = () => {
   ]);
 
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
-  const [isAutoRefresh, setIsAutoRefresh] = useState(true);
+  const [isAutoRefresh, _setIsAutoRefresh] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);

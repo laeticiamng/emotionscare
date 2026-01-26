@@ -5,7 +5,7 @@ import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import TypewriterEffect from '@/components/chat/TypewriterEffect';
-import { MessageSquare, User } from 'lucide-react';
+import { User } from 'lucide-react';
 
 interface EnhancedCoachMessageProps {
   message: ChatMessage;
@@ -39,7 +39,6 @@ const getEmotionFromText = (text: string): string => {
 
 const EnhancedCoachMessage: React.FC<EnhancedCoachMessageProps> = ({
   message,
-  isLast = false,
   showTimestamp = true,
   animateText = true,
   emotion: explicitEmotion,

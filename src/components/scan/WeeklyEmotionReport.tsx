@@ -17,7 +17,6 @@ import {
   TrendingDown,
   Minus,
   Sun,
-  Moon,
   Cloud,
   Sparkles,
   Download,
@@ -37,7 +36,7 @@ import {
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { format, startOfWeek, endOfWeek, subWeeks, addWeeks } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 import { useScanSettings, WeekSnapshot } from '@/hooks/useScanSettings';
 import { supabase } from '@/integrations/supabase/client';

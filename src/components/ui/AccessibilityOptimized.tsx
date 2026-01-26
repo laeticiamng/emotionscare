@@ -125,25 +125,10 @@ export const AccessibilityOptimized: React.FC<AccessibilityOptimizedProps> = ({
   children,
   className,
   skipToContent = true,
-  announceChanges = true,
-  focusManagement = true
 }) => {
   const isHighContrast = useHighContrast();
   const prefersReducedMotion = useReducedMotion();
-  const [announcements, setAnnouncements] = React.useState<string[]>([]);
-
-  const announce = React.useCallback((message: string, priority: 'polite' | 'assertive' = 'polite') => {
-    if (announceChanges) {
-      setAnnouncements(prev => [...prev, message]);
-      // Clear announcements after they've been read
-      setTimeout(() => {
-        setAnnouncements(prev => prev.filter(msg => msg !== message));
-      }, 1000);
-    }
-  }, [announceChanges]);
-
-  // Provide announce function to children via context if needed
-  const contextValue = React.useMemo(() => ({ announce }), [announce]);
+  const [announcements] = React.useState<string[]>([]);
 
   return (
     <div 

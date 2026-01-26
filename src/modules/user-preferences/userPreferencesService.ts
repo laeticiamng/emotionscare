@@ -16,7 +16,6 @@ import type {
   Notification,
   NotificationPreferences,
   CreateNotification,
-  NotificationCategory,
   DataExportRequest,
   DataExportResult,
   AccountDeletionRequest,

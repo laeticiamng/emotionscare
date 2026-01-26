@@ -7,7 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
-import { Bell, BellOff, Sparkles, Check, Clock, AlertCircle, Heart, Music, Brain } from 'lucide-react';
+import { Bell, BellOff, Sparkles, Check, Clock, AlertCircle, Heart, Brain } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';

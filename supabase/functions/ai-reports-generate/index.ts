@@ -256,7 +256,7 @@ Format JSON attendu:
 async function generateReportSections(
   userData: any,
   aiAnalysis: any,
-  reportType: string,
+  _reportType: string,
   options: any
 ): Promise<any[]> {
   const sections: any[] = [];
@@ -416,7 +416,7 @@ async function generatePDF(report: any): Promise<string> {
     );
 
     // Uploader le fichier HTML sur Supabase Storage
-    const { data, error } = await supabaseClient.storage
+ const { error } = await supabaseClient.storage
       .from('reports')
       .upload(filePath, new TextEncoder().encode(html), {
         contentType: 'text/html',

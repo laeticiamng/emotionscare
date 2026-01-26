@@ -125,12 +125,8 @@ export const exportAsCSV = (
  */
 export const exportAsPDF = async (
   scans: ScanData[],
-  options: ExportOptions = {}
+  _options: ExportOptions = {}
 ): Promise<void> => {
-  const {
-    filename = `emotion-scans-${new Date().toISOString().split('T')[0]}.pdf`
-  } = options;
-
   try {
     // Générer un HTML formaté pour impression PDF
     const avgValence = scans.length > 0 

@@ -30,7 +30,6 @@ import {
   CheckCircle2,
   XCircle,
   Play,
-  Settings,
   TrendingUp,
   TrendingDown,
   Minus,
@@ -40,7 +39,6 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const anomalyTypeLabels: Record<string, string> = {
   volume_spike: 'Pic de volume',

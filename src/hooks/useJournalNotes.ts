@@ -3,19 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { SanitizedNote } from '@/modules/journal/types';
 
-interface JournalNote {
-  id: string;
-  user_id: string;
-  text: string;
-  tags: string[];
-  summary?: string;
-  mode?: 'text' | 'voice';
-  created_at: string;
-  updated_at: string;
-  is_favorite: boolean;
-  is_archived: boolean;
-}
-
 interface CreateNoteInput {
   text: string;
   tags?: string[];

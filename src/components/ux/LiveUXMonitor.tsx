@@ -1,21 +1,17 @@
 // @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { 
   Eye, 
   Clock, 
   Users, 
-  MousePointer, 
-  Smartphone,
-  AlertTriangle,
+  MousePointer,
   TrendingUp,
   Activity,
-  Target,
-  Zap
+  Target
 } from 'lucide-react';
 import { useUXAnalytics } from '@/hooks/useUXAnalytics';
 

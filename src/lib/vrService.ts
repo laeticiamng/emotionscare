@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { VRSession, VRSessionTemplate, VREnvironment } from '@/types/vr';
+import { VRSession, VRSessionTemplate } from '@/types/vr';
 
 // Simulated VR service
 const VRService = {

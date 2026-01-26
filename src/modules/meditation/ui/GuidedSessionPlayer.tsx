@@ -2,12 +2,11 @@
  * Lecteur de session guidée avec audio
  */
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { 
   Play, Pause, SkipBack, SkipForward, Volume2, 
   VolumeX, RotateCcw, X, Maximize2, Minimize2 

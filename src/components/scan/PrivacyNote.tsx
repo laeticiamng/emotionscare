@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Eye, Trash2, ChevronDown, ChevronUp, Lock, FileText, Settings, CheckCircle, ExternalLink } from 'lucide-react';
+import { Shield, Eye, Trash2, ChevronDown, Lock, FileText, Settings, CheckCircle, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Switch } from '@/components/ui/switch';

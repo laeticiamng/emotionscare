@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Play, Pause, Square, Flag, AlertCircle } from 'lucide-react';
 import { useGritQuest } from '@/hooks/useGritQuest';

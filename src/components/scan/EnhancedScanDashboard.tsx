@@ -1,14 +1,11 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  TrendingUp, Activity, Target, Brain, Zap, Heart, Clock,
-  ChevronRight, Filter, Download, Share2, Settings, Scan
+  TrendingUp, Activity, Target, Brain, Zap, Heart, Filter, Download, Scan
 } from 'lucide-react';
 import { useScanHistory } from '@/hooks/useScanHistory';
-import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
 
 interface EmotionStat {
   label: string;
@@ -16,13 +13,6 @@ interface EmotionStat {
   change?: number;
   icon: React.ReactNode;
   color: string;
-}
-
-interface TrendData {
-  timestamp: string;
-  valence: number;
-  arousal: number;
-  emotion: string;
 }
 
 const EmotionStatsCard: React.FC<{ stat: EmotionStat }> = ({ stat }) => (

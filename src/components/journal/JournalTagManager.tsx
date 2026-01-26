@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Tag, Edit2, Trash2, Plus, TrendingUp } from 'lucide-react';
+import { Tag, Edit2, Trash2, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

@@ -1,7 +1,6 @@
 // @ts-nocheck
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase-client';
 import { useAuth } from './AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';

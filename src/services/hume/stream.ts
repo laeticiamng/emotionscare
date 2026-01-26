@@ -22,15 +22,13 @@ interface HumeConfig {
  * Sécurisé - pas d'exposition de clé API
  */
 export class HumeStreamClient {
-  private config: HumeConfig;
   private smoothedValence = 0.5;
   private smoothedArousal = 0.5;
   private alpha = 0.2; // Facteur EMA
   private isConnected = false;
   private onEmotionCallback?: (emotion: EmotionData) => void;
 
-  constructor(config?: HumeConfig) {
-    this.config = config || {};
+  constructor(_config?: HumeConfig) {
   }
 
   connect(onEmotion: (emotion: EmotionData) => void) {

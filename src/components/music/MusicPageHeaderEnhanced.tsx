@@ -3,8 +3,7 @@
  * Quota, Immersive, Voice, Raccourcis clavier, Stats
  */
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -19,7 +18,6 @@ import {
   Zap,
   AlertTriangle,
   ArrowLeft,
-  HelpCircle,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSunoVinyl } from '@/hooks/useSunoVinyl';

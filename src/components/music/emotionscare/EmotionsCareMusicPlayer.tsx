@@ -23,7 +23,7 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
   compact = false,
   showPlaylist = true,
 }) => {
-  const { state, play, pause, next, previous, setVolume, setPlaylist } = useMusic();
+ const { state, play, pause, next, previous, setVolume } = useMusic();
   const { currentTrack, isPlaying, volume, playlist } = state;
 
   const audioRef = useRef<HTMLAudioElement>(null);

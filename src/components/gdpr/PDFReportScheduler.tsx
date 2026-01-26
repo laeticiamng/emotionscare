@@ -14,7 +14,6 @@ import {
   Trash2, 
   Mail, 
   Calendar,
-  Edit,
   CheckCircle2,
   AlertCircle
 } from 'lucide-react';

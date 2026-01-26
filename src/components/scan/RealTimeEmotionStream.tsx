@@ -36,7 +36,7 @@ const RealTimeEmotionStream: React.FC = () => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [currentEmotion, setCurrentEmotion] = useState<EmotionSnapshot | null>(null);
   const [emotionHistory, setEmotionHistory] = useState<EmotionSnapshot[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, _setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Charger l'historique récent au démarrage

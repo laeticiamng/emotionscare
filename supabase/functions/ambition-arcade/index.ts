@@ -186,7 +186,7 @@ Inclus 5 badges motivants pour célébrer les accomplissements.`;
   }
 });
 
-function getDefaultStructure(goal: string, difficulty: string) {
+function getDefaultStructure(_goal: string, difficulty: string) {
   const basePoints = difficulty === 'easy' ? 75 : difficulty === 'hard' ? 150 : 100;
   const tasksPerLevel = difficulty === 'easy' ? 2 : difficulty === 'hard' ? 5 : 3;
 

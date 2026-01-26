@@ -3,12 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { EyeIcon, EyeOffIcon, Mail, Lock, User, ArrowRight } from 'lucide-react';
-import { useTheme } from '@/hooks/use-theme';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -40,7 +38,6 @@ const EnhancedRegisterForm: React.FC = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
   const { toast } = useToast();
-  const { theme } = useTheme();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

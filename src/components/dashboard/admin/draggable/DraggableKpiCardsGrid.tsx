@@ -4,7 +4,7 @@ import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { Button } from "@/components/ui/button";
-import { DraggableKpiCardsGridProps, KpiCardProps } from '@types/dashboard';
+import { DraggableKpiCardsGridProps } from '@types/dashboard';
 import KpiCard from '../KpiCard';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);

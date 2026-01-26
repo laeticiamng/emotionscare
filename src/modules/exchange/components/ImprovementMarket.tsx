@@ -11,7 +11,6 @@ import {
   Moon,
   Dumbbell,
   BookOpen,
-  Activity,
   Sparkles,
   ArrowUpRight,
   ArrowDownRight,

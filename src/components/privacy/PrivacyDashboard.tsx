@@ -1,13 +1,11 @@
 // @ts-nocheck
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, FileText, Download, Trash2, Bell, Settings, History } from 'lucide-react';
+import { Shield, FileText, Download, Bell, Settings, History } from 'lucide-react';
 import { motion } from 'framer-motion';
 import DataPrivacySettings from '@/components/preferences/DataPrivacySettings';
 import PrivacyAccessLogs from '@/components/privacy/PrivacyAccessLogs';
-import DataExportSection from '@/components/privacy/DataExportSection';
 import GdprRightsSection from '@/components/privacy/GdprRightsSection';
 import SecurityAlerts from '@/components/privacy/SecurityAlerts';
 import GdprActionsSection from '@/components/privacy/GdprActionsSection';

@@ -44,7 +44,7 @@ export const SidebarProvider = ({
 }: SidebarProviderProps) => {
   const [open, setOpen] = useState(defaultOpen);
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
-  const [expanded, setExpanded] = useState(defaultExpanded);
+  const [expanded, _setExpanded] = useState(defaultExpanded);
 
   const handleCollapseChange = (value: boolean) => {
     setCollapsed(value);

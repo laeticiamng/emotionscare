@@ -86,7 +86,7 @@ export class MusicTherapyService {
    * Générer une playlist basée sur l'humeur (version simple)
    */
   static async generatePlaylist(
-    userId: string,
+    _userId: string,
     mood: string,
     preferences?: any
   ): Promise<any> {
@@ -297,7 +297,6 @@ export class MusicTherapyService {
 
     const recentPoints = journey.slice(-5);
     const moodTrend = this.calculateTrend(recentPoints.map(p => p.mood));
-    const energyTrend = this.calculateTrend(recentPoints.map(p => p.energy));
 
     // Stagnation émotionnelle
     if (Math.abs(moodTrend) < 0.1 && journey.length > 10) {

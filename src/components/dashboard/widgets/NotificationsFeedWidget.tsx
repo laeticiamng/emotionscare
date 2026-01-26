@@ -15,7 +15,6 @@ import {
   Check, 
   CheckCheck,
   Trophy,
-  Heart,
   Zap,
   Calendar,
   MessageCircle,

@@ -10,9 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/AuthContext';
-import { useMoodMixerEnriched, type MoodComponent, type MoodPreset } from '@/modules/mood-mixer/useMoodMixerEnriched';
+import { useMoodMixerEnriched, type MoodPreset } from '@/modules/mood-mixer/useMoodMixerEnriched';
 import { 
   Palette, Heart, Zap, Smile, CloudRain, Sun, Moon, Sparkles, 
   Play, Pause, RotateCcw, Save, Star, Clock, TrendingUp, 

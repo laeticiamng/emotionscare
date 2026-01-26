@@ -2,7 +2,7 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { KpiCardProps, KpiCardStatus } from "@types/dashboard";
+import { KpiCardProps } from "@types/dashboard";
 import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 
 export const KpiCard = ({

@@ -61,7 +61,7 @@ const ConsentStatsCard: React.FC<ConsentStatsCardProps> = ({ stats, isLoading })
                 fill="hsl(var(--primary))"
                 dataKey="value"
               >
-                {pieData.map((entry, index) => (
+                {pieData.map((_entry, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={index === 0 ? COLORS.analytics : COLORS.functional}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,12 +11,10 @@ import {
   Settings,
   Contrast,
   Type,
-  ZoomIn,
   X,
   Check,
   AlertTriangle
 } from 'lucide-react';
-import { useAccessibility } from '@/components/common/AccessibilityProvider';
 import {
   safeClassAdd,
   safeClassRemove,
@@ -75,7 +73,6 @@ export function AccessibilityEnhancer() {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
-  const generateId = () => `accessibility-${Math.random().toString(36).substr(2, 9)}`;
 
   useEffect(() => {
     // Load localSettings from localStorage

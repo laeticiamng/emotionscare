@@ -7,11 +7,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle, XCircle, AlertTriangle, Eye, Navigation } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { routes } from '@/routerV2';
 
 interface RouteTest {
   name: string;

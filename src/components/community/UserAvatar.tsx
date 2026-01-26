@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User } from '@/types';
 
 interface UserAvatarProps {
   user: { id: string; name?: string; avatar?: string };

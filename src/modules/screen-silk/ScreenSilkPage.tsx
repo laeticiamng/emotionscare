@@ -3,7 +3,6 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { 
-  Play, Pause, Square, Settings, 
+  Play, Square, Settings, 
   Eye, EyeOff, Timer, Sparkles,
   ArrowLeft, HelpCircle
 } from 'lucide-react';
@@ -83,7 +82,6 @@ export const ScreenSilkPage: React.FC = () => {
   };
 
   const {
-    state,
     data,
     startSession,
     interrupt,

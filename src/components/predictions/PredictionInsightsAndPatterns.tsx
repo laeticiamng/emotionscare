@@ -2,8 +2,7 @@
  * Prediction Insights and Patterns Component
  */
 
-import React from 'react';
-import { TrendingUp, TrendingDown, Zap, Lightbulb } from 'lucide-react';
+import { Zap, Lightbulb } from 'lucide-react';
 import {
   EmotionalForecast,
   IdentifiedPattern,

@@ -1,15 +1,13 @@
 #!/usr/bin/env ts-node
 
 import * as fs from 'fs';
-import * as path from 'path';
 import * as glob from 'glob';
 
 // Function to check if a file has outdated imports
 function checkImports(filePath: string): void {
   try {
     const content = fs.readFileSync(filePath, 'utf8');
-    const lines = content.split('\n');
-    
+
     // Array to store outdated imports
     const outdatedImports: string[] = [];
     

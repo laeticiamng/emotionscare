@@ -77,15 +77,6 @@ const TestPage: React.FC = () => {
     }
   ];
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'success': return 'text-green-500';
-      case 'warning': return 'text-yellow-500';
-      case 'error': return 'text-red-500';
-      default: return 'text-gray-500';
-    }
-  };
-
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'success': return <CheckCircle className="h-4 w-4 text-green-500" />;

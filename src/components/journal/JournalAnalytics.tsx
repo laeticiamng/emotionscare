@@ -13,7 +13,6 @@ import {
   Tag,
   Heart,
   Brain,
-  Target,
   Award,
   Zap,
   Sun,

@@ -99,18 +99,17 @@ export function useMusicTherapyPremium() {
       if (error) throw error;
 
       const sessions = (data || []) as TherapySession[];
-      
+
       // Calculate stats
       const totalMinutes = sessions.reduce((sum, s) => sum + (s.duration_seconds || 0), 0) / 60;
       const moodImprovements = sessions
         .filter(s => s.mood_before && s.mood_after)
         .map(s => (s.mood_after! - s.mood_before!));
-      const avgMoodImprovement = moodImprovements.length > 0 
-        ? moodImprovements.reduce((a, b) => a + b, 0) / moodImprovements.length 
+      const avgMoodImprovement = moodImprovements.length > 0
+        ? moodImprovements.reduce((a, b) => a + b, 0) / moodImprovements.length
         : 0;
 
       // Calculate streak
-      const today = new Date().toISOString().split('T')[0];
       let streak = 0;
       let checkDate = new Date();
       

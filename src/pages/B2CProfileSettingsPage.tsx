@@ -18,7 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { 
   User, Mail, Phone, MapPin, Calendar, Camera, Shield, 
-  Settings, Bell, Lock, Eye, Download, Trash2, 
+  Settings, Lock, Eye, Download, Trash2, 
   Star, Award, TrendingUp, Activity, Heart, Loader2,
   Save, X, Globe, Briefcase, Sparkles, CheckCircle2,
   AlertTriangle, Key, Share2
@@ -27,7 +27,7 @@ import { motion } from 'framer-motion';
 import { useProfile, getProfileCompletionPercentage, getRarityColor } from '@/modules/profile';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import PageRoot from '@/components/common/PageRoot';
-import { format, differenceInMonths } from 'date-fns';
+import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -218,9 +218,6 @@ const B2CProfileSettingsPage: React.FC = () => {
   }
 
   const completionPercentage = getProfileCompletionPercentage(profile);
-  const memberSinceMonths = profile.created_at 
-    ? differenceInMonths(new Date(), new Date(profile.created_at))
-    : 0;
   const memberSinceText = profile.created_at
     ? format(new Date(profile.created_at), 'MMMM yyyy', { locale: fr })
     : 'Inconnu';

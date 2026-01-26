@@ -2,7 +2,6 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { captureException } from '@/lib/ai-monitoring';
 import { Link } from 'react-router-dom';
 import { Sentry } from '@/lib/errors/sentry-compat';
 import { logger } from '@/lib/logger';
@@ -23,7 +22,6 @@ import { computeFlashGlowActions } from '@/features/orchestration/flashGlow.orch
 import { useToast } from '@/hooks/use-toast';
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
 import { useSessionClock } from '@/hooks/useSessionClock';
-import { GlowSurface } from '@/ui/GlowSurface';
 import { WallOfLights } from '@/components/flashglow/WallOfLights';
 import { useFlashPhases } from '@/modules/flash-glow/useFlashPhases';
 import {

@@ -4,9 +4,8 @@
 
 import React, { useState } from 'react';
 import { Star, MessageSquare, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { useSupportChatbot, useConversationHistory, useConversationSatisfaction } from '@/hooks/useSupportChatbot';
+import { useSupportChatbot, useConversationHistory } from '@/hooks/useSupportChatbot';
 import { ChatbotMessageBubble } from './ChatbotMessageBubble';
-import { SupportConversation } from '@/services/supportChatbotService';
 import { cn } from '@/lib/utils';
 
 interface ChatbotPanelProps {
@@ -21,7 +20,6 @@ export function ChatbotPanel({ userId, className }: ChatbotPanelProps) {
     conversation,
     messages,
     loading,
-    sending,
     error,
   } = useSupportChatbot(userId);
 

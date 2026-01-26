@@ -1,7 +1,6 @@
 // @ts-nocheck
 
 import React from 'react';
-import { SpeechRecognition } from '@/types/speech';
 import { logger } from '@/lib/logger';
 
 // Polyfill minimal pour remplacer react-speech-kit

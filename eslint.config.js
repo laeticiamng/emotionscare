@@ -5,6 +5,7 @@ import tsEslintPlugin from "@typescript-eslint/eslint-plugin";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import importPlugin from "eslint-plugin-import";
 import jsxA11yPlugin from "eslint-plugin-jsx-a11y";
+import unusedImportsPlugin from "eslint-plugin-unused-imports";
 
 const createNoNodeImportsRule = ({ patterns = [], paths = [] } = {}) => [
   "error",
@@ -81,6 +82,7 @@ export default [
       "jsx-a11y": jsxA11yPlugin,
       ec,
       import: importPlugin,
+      "unused-imports": unusedImportsPlugin,
     },
     settings: {
       "import/resolver": {
@@ -102,6 +104,12 @@ export default [
       "ec/no-hooks-in-blocks": "error",
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
+      "@typescript-eslint/no-unused-vars": "off",
+      "unused-imports/no-unused-imports": "error",
+      "unused-imports/no-unused-vars": [
+        "warn",
+        { "vars": "all", "varsIgnorePattern": "^_", "args": "after-used", "argsIgnorePattern": "^_" }
+      ],
       // Accessibility rules
       "jsx-a11y/alt-text": "error",
       "jsx-a11y/anchor-has-content": "error",

@@ -4,7 +4,6 @@ import React from 'react';
 import { Eye, BookOpen, Users, Star, HeartPulse, Brain, ArrowRight } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent } from "@/components/ui/card";
 
 const QuickNavGrid: React.FC = () => {
   const navigate = useNavigate();

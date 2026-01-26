@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { BarChart, PieChart, LineChart, Filter, Download } from 'lucide-react';
+import { BarChart, PieChart, LineChart, Download } from 'lucide-react';
 import { SegmentContextType, SegmentDimension, SegmentOption } from '@/types/segment';
 import { useSegment } from '@/contexts/SegmentContext';
 

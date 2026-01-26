@@ -3,32 +3,25 @@
  * @module story-synth
  */
 
-import React, { memo, useState, useEffect, useRef } from 'react';
+import { memo, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, 
   Play, 
-  Pause, 
-  SkipForward,
-  SkipBack,
+  Pause,
   Volume2,
   VolumeX,
-  Book,
   Clock,
   Save,
   Download,
-  Share2,
-  Heart,
   ChevronLeft,
-  ChevronRight,
-  Settings
+  ChevronRight
 } from 'lucide-react';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
-import type { StoryContent, StoryParagraph } from '../types';
+import type { StoryContent } from '../types';
 
 interface StoryReaderProps {
   story: StoryContent | null;

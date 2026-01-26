@@ -1,11 +1,10 @@
 /**
  * Hook pour les statistiques et insights SEUIL
  */
-import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { startOfWeek, subDays, format, isToday, isYesterday, differenceInDays } from 'date-fns';
+import { startOfWeek, subDays, format, differenceInDays } from 'date-fns';
 import type { SeuilZone, SeuilEvent } from '../types';
 
 export interface SeuilStats {

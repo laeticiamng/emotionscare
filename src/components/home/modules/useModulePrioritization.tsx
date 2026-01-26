@@ -1,16 +1,5 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { BookOpen, Music, Headset, MessagesSquare, Brain, Activity } from 'lucide-react';
-
-interface ModuleData {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  to: string;
-  statIcon: React.ReactNode;
-  statText: string;
-  statValue: string | number;
-  priority: number;
-}
 
 export const useModulePrioritization = (isAuthenticated: boolean, selectedMood: string | null) => {
   // Base modules data

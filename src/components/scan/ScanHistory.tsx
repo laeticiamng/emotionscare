@@ -79,7 +79,7 @@ const MiniChart = ({ data }: { data: { valence: number; arousal: number }[] }) =
 };
 
 export const ScanHistory: React.FC = () => {
-  const [limit, setLimit] = useState(5);
+  const [limit, _setLimit] = useState(5);
   const { data: history, isLoading } = useScanHistory(50); // Charger plus pour le filtrage
   const [isExpanded, setIsExpanded] = useState(false);
   const [sourceFilter, setSourceFilter] = useState<ScanSource>('all');

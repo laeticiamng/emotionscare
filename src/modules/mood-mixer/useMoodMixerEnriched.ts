@@ -184,7 +184,6 @@ export function useMoodMixerEnriched(userId?: string): UseMoodMixerEnrichedRetur
   const [startTime, setStartTime] = useState<number | null>(null);
   const [sessionDuration, setSessionDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Load favorites and custom presets from localStorage
   useEffect(() => {

@@ -8,15 +8,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { 
   FileText, 
   Save, 
-  Calendar, 
-  Heart, 
   Smile, 
   Sun, 
   Moon,
   Cloud,
-  Sparkles,
-  Target,
-  CheckCircle,
   Clock,
   Loader2
 } from 'lucide-react';

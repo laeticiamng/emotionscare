@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { 
-  ArrowLeft, Download, FileText, Database, Image, 
-  Calendar, CheckCircle, Clock, AlertCircle, Settings
+  ArrowLeft, Download, FileText, Database, Image, CheckCircle, Clock, AlertCircle, Settings
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';

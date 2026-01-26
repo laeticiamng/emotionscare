@@ -5,9 +5,6 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { 
   ArrowLeft, 
   HelpCircle, 
-  Home, 
-  User, 
-  Settings, 
   ChevronRight 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

@@ -1,5 +1,4 @@
-import React from 'react';
-import { Bell, Check, Trash2, X } from 'lucide-react';
+import { Bell, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';

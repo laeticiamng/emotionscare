@@ -82,24 +82,20 @@ class RGPDService {
       // Générer le fichier selon le format
       let downloadData: string;
       let mimeType: string;
-      let extension: string;
 
       switch (options.format) {
         case 'csv':
           downloadData = this.convertToCSV(userData);
           mimeType = 'text/csv';
-          extension = 'csv';
           break;
         case 'pdf':
           // Pour PDF, on retourne du JSON formaté (PDF nécessiterait une lib externe)
           downloadData = JSON.stringify(userData, null, 2);
           mimeType = 'application/json';
-          extension = 'json';
           break;
         default:
           downloadData = JSON.stringify(userData, null, 2);
           mimeType = 'application/json';
-          extension = 'json';
       }
 
       // Créer un blob et retourner l'URL

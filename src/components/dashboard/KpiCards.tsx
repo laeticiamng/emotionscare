@@ -2,8 +2,7 @@
 
 import React from 'react';
 import { Brain, CalendarDays, Trophy } from 'lucide-react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import KpiCard from './admin/KpiCard';
 import { useNavigate } from 'react-router-dom';

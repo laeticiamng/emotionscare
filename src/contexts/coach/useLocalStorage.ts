@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { ChatMessage } from '@/types/chat';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';

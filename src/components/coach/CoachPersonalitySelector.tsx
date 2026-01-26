@@ -8,9 +8,9 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { 
   Heart, Brain, Zap, Compass, Check, MessageSquare, Star, 
-  ChevronRight, Sparkles, Users, Target, Clock, ThumbsUp
+  ChevronRight, Sparkles, Users, Clock, ThumbsUp
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Dialog,
   DialogContent,
@@ -92,7 +92,7 @@ const CoachPersonalitySelector: React.FC<CoachPersonalitySelectorProps> = ({
   const [quizStep, setQuizStep] = useState(0);
   const [quizScores, setQuizScores] = useState<Record<string, number>>({});
   const [recommendedCoach, setRecommendedCoach] = useState<string | null>(null);
-  const [showPreview, setShowPreview] = useState<string | null>(null);
+  const [_showPreview, _setShowPreview] = useState<string | null>(null);
   const [coachStats, setCoachStats] = useState<Record<string, { sessions: number; rating: number }>>({});
 
   const personalities: CoachPersonality[] = [

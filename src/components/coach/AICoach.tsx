@@ -25,7 +25,7 @@ const AICoach: React.FC = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const [rateLimitCount, setRateLimitCount] = useState(0);
+  const [_rateLimitCount, setRateLimitCount] = useState(0);
   const [isRateLimited, setIsRateLimited] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const rateLimitResetRef = useRef<NodeJS.Timeout | null>(null);

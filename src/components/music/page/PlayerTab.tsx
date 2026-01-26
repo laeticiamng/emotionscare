@@ -14,7 +14,7 @@ interface PlayerTabProps {
 const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
   const [showVolume, setShowVolume] = useState(false);
   const [localVolume, setLocalVolume] = useState(80);
-  const [localMute, setLocalMute] = useState(false);
+  const [localMute] = useState(false);
   const [progress, setProgress] = useState(0);
   
   const { state, play, pause, next, previous, seek, setVolume: setContextVolume } = useMusic();
@@ -36,15 +36,6 @@ const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
   const handleVolumeChange = (values: number[]) => {
     setLocalVolume(values[0]);
     setContextVolume(values[0] / 100);
-  };
-  
-  const handleToggleMute = () => {
-    setLocalMute(!localMute);
-    if (localMute) {
-      setContextVolume(localVolume / 100);
-    } else {
-      setContextVolume(0);
-    }
   };
   
   const handleProgressChange = (values: number[]) => {

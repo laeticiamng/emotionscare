@@ -8,12 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Plus, Swords, CheckCircle, Timer, ListFilter,
   ChevronDown, ChevronUp
 } from 'lucide-react';
-import { useAmbitionQuests, useCreateQuest, type AmbitionQuest } from '../hooks';
+import { useAmbitionQuests, useCreateQuest } from '../hooks';
 import { QuestCard } from './QuestCard';
 
 interface QuestListProps {

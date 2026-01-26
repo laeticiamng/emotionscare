@@ -2,8 +2,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { 
-  Sparkles, Eye, Mouse, Mic, Camera, Bluetooth,
-  Waves, Wind, Sun, Moon, Star, Palette, Volume2,
+  Sparkles, Eye, Mouse, Mic,
   Zap, Heart, Brain, Target, Trophy, Award
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';

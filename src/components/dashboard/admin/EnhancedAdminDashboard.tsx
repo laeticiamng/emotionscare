@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import KpiCardsGrid from './KpiCardsGrid';
 import DashboardAnimatedChart from './DashboardAnimatedChart';
 import EmotionalWeatherWidget from '../widgets/EmotionalWeatherWidget';
 import TeamActivitySummary from '../widgets/TeamActivitySummary';

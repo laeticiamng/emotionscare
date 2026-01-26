@@ -3,9 +3,9 @@
  * Production monitoring and alerting utilities
  */
 
-import { aiMonitoring, captureMessage } from '@/lib/ai-monitoring';
+import { aiMonitoring } from '@/lib/ai-monitoring';
 import { logger } from '@/lib/logger';
-import { initializeSentryAlerts, trackErrorRateAlert, trackPerformanceAlert, alertOnCriticalException } from '@/lib/sentry-alerts-config';
+import { initializeSentryAlerts, trackErrorRateAlert, trackPerformanceAlert } from '@/lib/sentry-alerts-config';
 
 type AlertSeverity = 'info' | 'warning' | 'error' | 'critical';
 

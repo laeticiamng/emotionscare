@@ -6,7 +6,6 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Badge } from '@/components/ui/badge';
 import { Pause, Play, Square, Sparkles } from 'lucide-react';
 import { useMeditation } from '../useMeditation';
 import { MeditationTimer } from '../ui/MeditationTimer';
@@ -20,7 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 export function MeditationMain() {
   const [selectedTechnique, setSelectedTechnique] = useState<MeditationTechnique>('mindfulness');
   const [selectedDuration, setSelectedDuration] = useState<number>(10);
-  const [moodBefore, setMoodBefore] = useState<number>(50);
+  const [moodBefore, _setMoodBefore] = useState<number>(50);
 
   const meditation = useMeditation({
     autoLoadStats: true,

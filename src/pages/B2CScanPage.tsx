@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState, lazy, Suspense } from 'react';
-import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
 import { supabase } from '@/integrations/supabase/client';
 import { Link, useLocation } from 'react-router-dom';
@@ -86,37 +85,35 @@ const B2CScanPage: React.FC = () => {
   const featureEnabled = has('FF_SCAN_SAM');
   
   const scanModes = [
-    { 
-      id: 'scanner', 
-      label: 'Scanner', 
-      icon: Sliders, 
+    {
+      id: 'scanner',
+      label: 'Scanner',
+      icon: Sliders,
       path: '/app/scan',
       description: 'Curseurs et caméra'
     },
-    { 
-      id: 'facial', 
-      label: 'Facial', 
-      icon: Camera, 
+    {
+      id: 'facial',
+      label: 'Facial',
+      icon: Camera,
       path: '/app/scan/facial',
       description: 'Reconnaissance faciale IA'
     },
-    { 
-      id: 'voice', 
-      label: 'Vocal', 
-      icon: Mic, 
+    {
+      id: 'voice',
+      label: 'Vocal',
+      icon: Mic,
       path: '/app/scan/voice',
       description: 'Analyse de la voix'
     },
-    { 
-      id: 'text', 
-      label: 'Texte', 
-      icon: FileText, 
+    {
+      id: 'text',
+      label: 'Texte',
+      icon: FileText,
       path: '/app/scan/text',
       description: 'Analyse textuelle'
     },
   ];
-  
-  const currentMode = scanModes.find(m => m.path === location.pathname) || scanModes[0];
 
   useEffect(() => {
     logger.info('scan:open', undefined, 'SCAN');

@@ -256,7 +256,6 @@ describe('Music Preferences Learning Service - Complete Tests', () => {
     });
 
     it('should handle empty current genres', () => {
-      const currentGenres: string[] = [];
       const suggestions: string[] = [];
 
       expect(suggestions.length).toBe(0);

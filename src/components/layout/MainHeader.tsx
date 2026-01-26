@@ -2,7 +2,7 @@ import React from 'react';
 import { logger } from '@/lib/logger';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Heart, Building2, Loader2 } from 'lucide-react';
+import { Heart, Building2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 

@@ -12,15 +12,13 @@ interface AudioProcessorProps {
   visualize?: boolean;
 }
 
-export const AudioProcessor: React.FC<AudioProcessorProps> = ({ 
+export const AudioProcessor: React.FC<AudioProcessorProps> = ({
   onResult,
   onProcessingChange,
   isRecording: externalIsRecording,
   duration = 15,
   autoStart = false,
   className = '',
-  mode = 'voice',
-  visualize = true,
 }) => {
   const [isRecording, setIsRecording] = useState(autoStart || false);
   const [isProcessing, setIsProcessing] = useState(false);

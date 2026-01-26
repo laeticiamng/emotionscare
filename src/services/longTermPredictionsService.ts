@@ -398,7 +398,7 @@ class LongTermPredictionsService {
       frequency: 'Annuellement',
       emotionImpact: (best.average - 50) * 0.1,
       confidence: 0.7,
-      occurrences: Math.max(...seasonAverages.map((s) => 1)),
+      occurrences: Math.max(...seasonAverages.map((_s) => 1)),
     };
   }
 
@@ -471,7 +471,7 @@ class LongTermPredictionsService {
 
     // Calculer la moyenne de base
     const baselineBalance =
-      data.reduce((sum, d) => d.emotionBalance, 0) / data.length;
+      data.reduce((_sum, d) => d.emotionBalance, 0) / data.length;
 
     // Calculer le trend
     const trendPattern = patterns.find((p) => p.type === 'trend');
@@ -555,7 +555,7 @@ class LongTermPredictionsService {
   /**
    * Prédire les opportunités
    */
-  private predictOpportunity(patterns: IdentifiedPattern[], monthOffset: number): string | null {
+  private predictOpportunity(patterns: IdentifiedPattern[], _monthOffset: number): string | null {
     const positivePatterns = patterns.filter((p) => p.emotionImpact > 0);
     if (positivePatterns.length === 0) return null;
 
@@ -567,7 +567,7 @@ class LongTermPredictionsService {
    */
   private detectRiskIndicators(
     data: HistoricalEmotionData[],
-    forecasts: MonthlyForecast[],
+    _forecasts: MonthlyForecast[],
     patterns: IdentifiedPattern[]
   ): RiskIndicator[] {
     const risks: RiskIndicator[] = [];
@@ -679,7 +679,7 @@ class LongTermPredictionsService {
    */
   private async generateAIInsights(
     patterns: IdentifiedPattern[],
-    forecasts: MonthlyForecast[],
+    _forecasts: MonthlyForecast[],
     risks: RiskIndicator[],
     opportunities: WellnessOpportunity[],
     historicalData: HistoricalEmotionData[]
@@ -791,7 +791,7 @@ Provide warm, actionable, and personalized insights. Respond in French.
   private calculateStats(
     data: HistoricalEmotionData[],
     patterns: IdentifiedPattern[],
-    forecasts: MonthlyForecast[]
+    _forecasts: MonthlyForecast[]
   ): PredictionStats {
     const dataMonthsAvailable = Math.floor(data.length / 30);
 

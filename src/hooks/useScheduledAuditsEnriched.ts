@@ -77,8 +77,6 @@ export interface AuditStats {
   issuesByCategory: { category: string; count: number }[];
 }
 
-const STORAGE_KEY = 'scheduled-audits-local';
-
 export const useScheduledAuditsEnriched = () => {
   const queryClient = useQueryClient();
   const [executionProgress, setExecutionProgress] = useState<Record<string, number>>({});
@@ -302,9 +300,7 @@ export const useScheduledAuditsEnriched = () => {
 
   // Acquitter une alerte
   const acknowledgeAlertMutation = useMutation({
-    mutationFn: async ({ id, notes }: { id: string; notes?: string }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-
+ mutationFn: async ({ id }: { id: string; notes?: string }) => {
       const { error } = await supabase
         .from('audit_alerts')
         .update({

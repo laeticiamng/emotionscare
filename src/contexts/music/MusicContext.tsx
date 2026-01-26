@@ -6,7 +6,7 @@
 import React, { createContext, useReducer, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
 import { musicReducer, initialState } from './reducer';
-import { MusicContextType, MusicTrack } from './types';
+import { MusicContextType } from './types';
 import { useMusicPlayback } from './useMusicPlayback';
 import { useMusicPlaylist } from './useMusicPlaylist';
 import { useMusicGeneration } from './useMusicGeneration';

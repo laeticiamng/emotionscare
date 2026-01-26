@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   TrendingUp, TrendingDown, Brain, Heart, Target, Award, 
   Share2, Download, Calendar, BarChart3, Lightbulb, History,
-  Star, ChevronRight, Sparkles, Activity, Clock, Zap, Filter
+  Star, ChevronRight, Sparkles, Activity, Clock, Zap
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -50,17 +50,16 @@ interface HistoryEntry {
 }
 
 const STORAGE_KEY = 'coach-insights-history';
-const GOALS_KEY = 'coach-insights-goals';
 
 const CoachInsights: React.FC = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('overview');
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year'>('week');
   const [history, setHistory] = useState<HistoryEntry[]>([]);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [_isFavorite, _setIsFavorite] = useState(false);
 
   // Enhanced mock data
-  const [insights, setInsights] = useState<InsightData>({
+  const [insights, _setInsights] = useState<InsightData>({
     emotionalTrend: 'stable',
     wellnessScore: 78,
     previousWellnessScore: 66,

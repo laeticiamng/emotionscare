@@ -8,7 +8,6 @@ import {
   MoreHorizontal,
   Eye,
   Clock,
-  TrendingUp,
   Share2,
   Copy,
   Bookmark,
@@ -17,8 +16,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { BookmarkButton } from './BookmarkButton';
-import { SharePostButton } from './SharePostButton';
 import { UserProfileCard } from './UserProfileCard';
 import { useToast } from '@/hooks/use-toast';
 
@@ -73,7 +70,7 @@ export const EnhancedPostCard: React.FC<EnhancedPostCardProps> = ({
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [userReactions, setUserReactions] = useState<string[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [viewCount, setViewCount] = useState(views);
+  const [viewCount, _setViewCount] = useState(views);
 
   // Load interaction state
   useEffect(() => {

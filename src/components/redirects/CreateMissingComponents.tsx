@@ -4,8 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { CheckCircle, FileX, Plus, AlertTriangle } from 'lucide-react';
+import { Plus, AlertTriangle } from 'lucide-react';
 
 // Liste des composants potentiellement manquants (basé sur l'analyse du registry)
 const POTENTIALLY_MISSING_COMPONENTS = [

@@ -14,7 +14,6 @@ import {
   Star, 
   Flame, 
   Music2,
-  Zap,
   Gift,
   Award,
   Share2

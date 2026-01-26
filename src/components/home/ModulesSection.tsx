@@ -15,12 +15,11 @@ interface ModulesSectionProps {
   selectedMood?: string;
 }
 
-const ModulesSection: React.FC<ModulesSectionProps> = ({ 
-  className, 
-  style, 
+const ModulesSection: React.FC<ModulesSectionProps> = ({
+  className,
+  style,
   collapsed = false,
   onToggle,
-  selectedMood
 }) => {
   if (collapsed) {
     return (

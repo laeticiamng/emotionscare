@@ -6,8 +6,8 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Lightbulb, Brain, Heart, Zap, Music, Sparkles, Coffee,
-  UtensilsCrossed, Dumbbell, Moon, BookOpen, Users, ChevronRight,
-  TrendingUp, Clock, Target, RefreshCw, Play, Wind, Loader2
+  UtensilsCrossed, Dumbbell, Moon, BookOpen, Users,
+  TrendingUp, Clock, Target, RefreshCw, Play
 } from 'lucide-react';
 import { useScanHistory } from '@/hooks/useScanHistory';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
@@ -231,10 +231,10 @@ export const SmartRecommendations: React.FC = () => {
   const { data: history = [] } = useScanHistory(50);
   const [activeTab, setActiveTab] = useState('recommendations');
   const [refreshKey, setRefreshKey] = useState(0);
-  const [isActivating, setIsActivating] = useState(false);
+  const [_isActivating, setIsActivating] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { activateMusicForEmotion, isGenerating } = useMusicEmotionIntegration();
+ const { activateMusicForEmotion } = useMusicEmotionIntegration();
 
   // Action handler pour les recommandations
   const handleRecommendationAction = useCallback(async (rec: Recommendation) => {

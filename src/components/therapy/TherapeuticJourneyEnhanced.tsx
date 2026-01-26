@@ -71,7 +71,7 @@ export const TherapeuticJourneyEnhanced: React.FC = () => {
   const [journeys, setJourneys] = useState<Journey[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
-  const [segmentProgress, setSegmentProgress] = useState(0);
+  const [segmentProgress, _setSegmentProgress] = useState(0);
   const [stats, setStats] = useState({
     totalSessions: 0,
     totalMinutes: 0,
@@ -182,7 +182,7 @@ export const TherapeuticJourneyEnhanced: React.FC = () => {
     if (!currentSession) return;
 
     try {
-      const { data, error } = await supabase.functions.invoke('therapeutic-journey', {
+ const { error } = await supabase.functions.invoke('therapeutic-journey', {
         body: {
           action: 'complete',
           sessionId: currentSession.id,

@@ -15,13 +15,10 @@ import {
   Check, 
   X, 
   Settings, 
-  Zap, 
   Heart, 
-  Target, 
-  Calendar,
+  Target,
   MessageSquare,
   Award,
-  TrendingUp,
   Clock
 } from 'lucide-react';
 

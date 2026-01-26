@@ -15,8 +15,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
 import { 
   Book, Sparkles, Heart, RefreshCw, Volume2, VolumeX,
-  Share2, Download, Calendar, Star, Clock, Copy,
-  BookOpen, Bookmark, Sun, Moon, History
+  Share2, Download, Calendar, Star, Copy,
+  BookOpen, Bookmark
 } from 'lucide-react';
 import { DefusionHaiku } from '@/data/defusionHaikus';
 import { cn } from '@/lib/utils';

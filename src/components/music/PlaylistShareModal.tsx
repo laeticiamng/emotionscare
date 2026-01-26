@@ -3,7 +3,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { LazyMotionWrapper, m, AnimatePresence } from '@/utils/lazy-motion';
+import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 import {
   Dialog,
   DialogContent,
@@ -12,11 +12,9 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Copy,
-  Download,
   Share2,
   Twitter,
   Facebook,
@@ -42,7 +40,7 @@ export const PlaylistShareModal: React.FC<PlaylistShareModalProps> = ({
   playlistId,
   playlistName,
 }) => {
-  const { isSharing, generateShareLink, shareToSocial, getPlaylistStats } = usePlaylistShare();
+ const { generateShareLink, shareToSocial, getPlaylistStats } = usePlaylistShare();
   const [shareData, setShareData] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
 

@@ -28,7 +28,6 @@ import {
 import { toast } from 'sonner';
 import {
   type SystemConfig,
-  type ConfigurationHistory,
   GeneralConfigSection,
   SecurityConfigSection,
   DatabaseConfigSection,

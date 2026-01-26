@@ -16,7 +16,6 @@ import {
   Loader2,
   Play,
   Square,
-  Upload,
   Zap,
   TrendingUp,
   Eye,

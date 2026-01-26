@@ -1,6 +1,5 @@
 // @ts-nocheck
 
-import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
 // Define activity log structure

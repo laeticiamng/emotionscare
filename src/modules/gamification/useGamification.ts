@@ -7,13 +7,8 @@ import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { gamificationService } from './gamificationService';
-import type { 
-  Reward, 
-  DailyChallenge, 
-  GamificationProgress, 
-  Achievement,
-  LeaderboardUser,
-} from './types';
+
+
 
 const QUERY_KEYS = {
   progress: 'gamification-progress',

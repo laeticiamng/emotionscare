@@ -5,7 +5,7 @@
  */
 import React, { Suspense, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -31,7 +31,6 @@ import {
   Loader2,
   Building2,
   FileText,
-  Briefcase,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useB2BTeamStats } from '@/hooks/useB2BTeamStats';

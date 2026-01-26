@@ -4,22 +4,17 @@ import {
   Card, 
   CardContent, 
   CardHeader, 
-  CardTitle, 
-  CardDescription 
+  CardTitle 
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Award,
+import {
   Trophy,
   Medal,
   Zap,
   Download,
-  Users,
-  Smile,
-  ArrowUpRight,
-  BarChart3
+  Users
 } from 'lucide-react';
 import { mockBadges, mockChallenges } from '@/hooks/community-gamification/mockData';
 

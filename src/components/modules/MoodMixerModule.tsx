@@ -7,7 +7,7 @@ import { Slider } from '@/components/ui/slider';
 import { Progress } from '@/components/ui/progress';
 import { 
   Palette, Sparkles, RefreshCw, Target, 
-  Zap, Heart, Smile, Frown, Meh, Sun
+  Zap, Heart, Smile, Sun
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';

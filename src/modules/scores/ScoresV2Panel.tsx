@@ -7,7 +7,7 @@ import {
   TrendingUp, TrendingDown, Minus, Activity, Flame, 
   Brain, Heart, Zap, Target, Calendar, Download, 
   RefreshCw, BarChart3, Grid3X3, LineChart, Award,
-  Sun, Moon, CloudRain, Sparkles, AlertCircle
+  Sun, Sparkles, AlertCircle
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -521,7 +521,6 @@ export default function ScoresV2Panel() {
   const [timeRange, setTimeRange] = useState('12');
   
   const {
-    scores,
     currentVibe,
     heatmapData,
     moodTrends,

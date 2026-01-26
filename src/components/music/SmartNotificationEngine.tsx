@@ -4,11 +4,10 @@
  * Connecté à Supabase pour persistence
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import {
   Bell,
@@ -16,11 +15,8 @@ import {
   Zap,
   Target,
   Music,
-  TrendingUp,
   CheckCircle,
   Trash2,
-  Send,
-  Loader2,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -66,7 +62,7 @@ export const SmartNotificationEngine: React.FC<SmartNotificationEngineProps> = (
 }) => {
   const { toast } = useToast();
   const { user } = useAuth();
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [preferences, setPreferences] = useState<NotificationPreference[]>(DEFAULT_PREFERENCES);
   const [scheduledNotifications, setScheduledNotifications] = useState<ScheduledNotification[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -121,20 +117,6 @@ export const SmartNotificationEngine: React.FC<SmartNotificationEngineProps> = (
     };
 
     loadData();
-  }, [user?.id]);
-
-  // Sauvegarder préférences
-  const savePreferences = useCallback(async (newPrefs: NotificationPreference[]) => {
-    if (!user?.id) return;
-    
-    await supabase
-      .from('user_settings')
-      .upsert({
-        user_id: user.id,
-        key: 'notification_preferences',
-        value: newPrefs,
-        updated_at: new Date().toISOString(),
-      }, { onConflict: 'user_id,key' });
   }, [user?.id]);
 
   // Simulate sending notifications

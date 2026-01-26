@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import type { FC } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -37,8 +36,8 @@ export const useOnboarding = () => {
 export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [emotion, setEmotion] = useState('');
-  const [intensity, setIntensity] = useState(0);
+  const [emotion, _setEmotion] = useState('');
+  const [intensity, _setIntensity] = useState(0);
   const [userResponses, setUserResponses] = useState<Record<string, any>>({});
   
   const { user } = useAuth();

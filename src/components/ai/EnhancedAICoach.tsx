@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
   Brain, 
   Sparkles, 
@@ -68,7 +68,7 @@ const EnhancedAICoach: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [selectedPersonality, setSelectedPersonality] = useState(AI_PERSONALITIES[0]);
-  const [emotionalContext, setEmotionalContext] = useState<any>(null);
+  const [_emotionalContext, _setEmotionalContext] = useState<any>(null);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   
@@ -104,7 +104,7 @@ const EnhancedAICoach: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const analyzeEmotion = async (text: string) => {
+  const analyzeEmotion = async (_text: string) => {
     try {
       // Simuler l'analyse d'émotion (à remplacer par une vraie API)
       const emotions = ['joie', 'tristesse', 'anxiété', 'colère', 'sérénité', 'motivation'];
@@ -176,7 +176,7 @@ const EnhancedAICoach: React.FC = () => {
     }, 2000);
   };
 
-  const generateAIResponse = (userInput: string, personality: AIPersonality, emotion: any): string => {
+  const generateAIResponse = (_userInput: string, personality: AIPersonality, _emotion: any): string => {
     const responses = {
       Luna: [
         "Je comprends ce que vous ressentez. Vos émotions sont valides et importantes.",

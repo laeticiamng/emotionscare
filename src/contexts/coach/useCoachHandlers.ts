@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from '@/types/chat';
 import { useToast } from '@/hooks/use-toast';
-import { chatCompletion, analyzeEmotion } from '@/services/openai';
+import { chatCompletion } from '@/services/openai';
 import { logger } from '@/lib/logger';
 
 // ============================================================================

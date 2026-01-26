@@ -13,7 +13,7 @@
  * @module components/music/QuotaIndicator
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 import { useQuotaUI } from '@/hooks/music/useUserQuota';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,7 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Zap, TrendingUp, AlertCircle, Clock, Sparkles, 
-  History, BarChart3, Target
+  History, Target
 } from '@/components/music/icons';
 import { Bell, BellOff, Calendar, ChevronUp, ChevronDown, Gift } from 'lucide-react';
 import { UserTier } from '@/services/music/quota-service';
@@ -65,7 +65,6 @@ export function QuotaIndicator({
     quotaColor,
     tier,
     isLoading,
-    canGenerate
   } = useQuotaUI();
 
   const { value: savedQuotaData, setValue: setSavedQuotaData } = useQuotaIndicatorData();
@@ -542,7 +541,7 @@ export function QuotaBadge({ className = '' }: { className?: string }) {
  * Composant d'avertissement quand quota insuffisant
  */
 export function QuotaWarning({ className = '' }: { className?: string }) {
-  const { remaining, canGenerate, formattedResetDate, tier } = useQuotaUI();
+ const { canGenerate, formattedResetDate, tier } = useQuotaUI();
 
   if (canGenerate) {
     return null;

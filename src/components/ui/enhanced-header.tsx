@@ -2,7 +2,6 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Menu, Search } from 'lucide-react';
-import { useTheme } from '@/providers/theme';
 import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
 import NotificationBell from '@/components/notifications/NotificationBell';
 
@@ -12,13 +11,11 @@ interface EnhancedHeaderProps {
   scrollProgress?: number;
 }
 
-const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ 
-  onMenuToggle, 
-  showProgress = false, 
-  scrollProgress = 0 
+const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({
+  onMenuToggle,
+  showProgress = false,
+  scrollProgress = 0
 }) => {
-  const { theme } = useTheme();
-  
   return (
     <motion.header 
       className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b"

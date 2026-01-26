@@ -1,6 +1,5 @@
 // @ts-nocheck
 
-import { User } from '@/types/user';
 
 export type SortDirection = 'asc' | 'desc' | null;
 export type SortableField = 'name' | 'email' | 'role' | 'status' | 'location' | 'createdAt' | 'lastActivity' | 'department' | 'emotional_score' | 'anonymity_code';

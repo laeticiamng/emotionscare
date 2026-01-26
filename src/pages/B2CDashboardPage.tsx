@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useMemo, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { routes } from '@/lib/routes';
 import { useOptimizedPage } from '@/hooks/useOptimizedPage';
 import { Button } from '@/components/ui/button';
@@ -30,7 +30,6 @@ import {
   User,
   Bell,
   Activity,
-  Calendar,
   Compass,
 } from 'lucide-react';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
@@ -178,14 +177,13 @@ export default function B2CDashboardPage() {
   const shouldReduceMotion = useReducedMotion();
   const { hints: clinicalHintsList, isLoading: hintsLoading, error: hintsError, refresh: refreshHints } = useClinicalHints('dashboard');
   const clinicalTone = summaryTone;
-  const location = useLocation();
   
   // Stats réelles depuis Supabase
-  const { stats: userStats, loading: statsLoading, refetch: refetchStats, error: statsError } = useUserStatsQuery();
+  const { stats: userStats, loading: statsLoading, refetch: refetchStats, error: _statsError } = useUserStatsQuery();
   useUserStatsRealtime();
   
   // Recommandations dynamiques
-  const { recommendations, loading: recsLoading, refetch: refetchRecs } = useDynamicRecommendations();
+ const { loading: _recsLoading, refetch: refetchRecs } = useDynamicRecommendations();
   
   // Score de bien-être calculé depuis les données réelles
   const { score: wellbeingScore, trend: wellbeingTrend, loading: wellbeingLoading } = useWellbeingScore();
@@ -750,7 +748,6 @@ export default function B2CDashboardPage() {
             <JournalSummaryCard />
           </Suspense>
         </section>
-
 
         {/* Section Achievements & Badges */}
         <section aria-labelledby="achievements-title" className="mb-8">

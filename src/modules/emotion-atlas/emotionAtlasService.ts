@@ -5,7 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
-import type { AtlasData, AtlasFilter, AtlasInsight, EmotionNode, EmotionConnection, EMOTION_COLORS, EMOTION_CATEGORIES } from './types';
+import type { AtlasData, AtlasFilter, AtlasInsight, EmotionNode, EmotionConnection } from './types';
 
 export interface EmotionAtlasStats {
   totalEmotions: number;
@@ -202,7 +202,7 @@ export const EmotionAtlasService = {
   /**
    * Génère des insights basés sur les données
    */
-  async getInsights(userId: string, data: AtlasData): Promise<AtlasInsight[]> {
+  async getInsights(_userId: string, data: AtlasData): Promise<AtlasInsight[]> {
     const insights: AtlasInsight[] = [];
 
     // Insight sur l'émotion dominante

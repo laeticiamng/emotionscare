@@ -1,6 +1,6 @@
 // @ts-nocheck
 // Type fixes pour éviter les erreurs lucide-react et TypeScript
-import { LucideProps, LucideIcon } from 'lucide-react';
+import { LucideProps } from 'lucide-react';
 import { ComponentType, ForwardRefExoticComponent, RefAttributes, createElement } from 'react';
 import { logger } from '@/lib/logger';
 

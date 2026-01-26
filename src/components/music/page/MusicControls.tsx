@@ -31,13 +31,6 @@ export interface MusicControlsProps {
   progress?: number;
 }
 
-const formatTime = (seconds: number): string => {
-  if (!seconds || !isFinite(seconds)) return '0:00';
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
-};
-
 const MusicControls: React.FC<MusicControlsProps> = ({
   isPlaying = false,
   onPlay,
@@ -49,17 +42,12 @@ const MusicControls: React.FC<MusicControlsProps> = ({
   repeatMode = 'none',
   onToggleShuffle,
   onToggleRepeat,
-  currentTime = 0,
-  duration = 0,
-  onSeek,
   volume = 0.7,
   isMuted = false,
   onToggleMute,
   onVolumeChange,
-  track,
   showVolume = false,
   size = 'md',
-  vertical = false,
   className = '',
 }) => {
   const handleTogglePlay = () => {

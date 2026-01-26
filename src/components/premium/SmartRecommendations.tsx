@@ -1,14 +1,13 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
-  Brain, Music, Heart, Zap, Star, Sparkles, 
+  Brain, Music, Heart, Star, Sparkles, 
   TrendingUp, Clock, Target, Users, PlayCircle,
-  BookOpen, Headphones, Activity, Smile
+  BookOpen, Activity
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

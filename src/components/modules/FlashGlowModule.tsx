@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { 
-  Zap, Lightbulb, Eye, Palette, Settings, 
-  Play, Pause, RotateCcw, Monitor, Moon, Sun
+  Zap, Lightbulb, Eye, Settings, 
+  Play, Pause, Monitor
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';

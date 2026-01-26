@@ -9,7 +9,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { BossGritService } from './bossGritService';
 import type {
   BounceBattle,
-  CopingResponse,
   BattleMode,
   BounceEventType,
   BounceEventData,
@@ -185,41 +184,6 @@ export function useBossGrit(): UseBossGritReturn {
     cancelBattle,
     refreshHistory,
   };
-}
-
-// Helper functions
-function calculateStreak(history: BounceBattle[]): number {
-  let streak = 0;
-  const today = new Date().toDateString();
-  
-  for (const battle of history) {
-    const battleDate = new Date(battle.created_at).toDateString();
-    if (battleDate === today || streak > 0) {
-      if (battle.status === 'completed') {
-        streak++;
-      } else {
-        break;
-      }
-    }
-  }
-  
-  return streak;
-}
-
-function calculateLongestStreak(history: BounceBattle[]): number {
-  let longest = 0;
-  let current = 0;
-  
-  for (const battle of history) {
-    if (battle.status === 'completed') {
-      current++;
-      longest = Math.max(longest, current);
-    } else {
-      current = 0;
-    }
-  }
-  
-  return longest;
 }
 
 export default useBossGrit;

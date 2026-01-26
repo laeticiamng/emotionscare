@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { getPrefs, initPrefs } from "../lib/db";
 import { hash as hashUser } from '../../journal/lib/hash';
-export async function getPrivacy(req: IncomingMessage, res: ServerResponse, user: any) {
+export async function getPrivacy(_req: IncomingMessage, res: ServerResponse, user: any) {
   const userHash = hashUser(user.sub);
   let row = getPrefs(userHash);
   if (!row) {

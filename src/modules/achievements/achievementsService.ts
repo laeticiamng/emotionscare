@@ -143,7 +143,7 @@ export const achievementsService = {
     userId: string,
     progress: RecordProgress
   ): Promise<UserAchievementProgress> {
-    const { achievement_id, increment, metadata } = progress;
+ const { achievement_id, increment } = progress;
 
     // Récupérer l'achievement pour connaître les conditions
     const achievement = await this.getAchievementById(achievement_id);

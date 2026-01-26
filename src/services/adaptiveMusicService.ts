@@ -140,7 +140,7 @@ export class AdaptiveMusicService {
     return this.playlists.get(playlistKey) || null;
   }
 
-  getRecommendedTrack(emotion: string, currentMood?: string): MusicTrack | null {
+  getRecommendedTrack(emotion: string, _currentMood?: string): MusicTrack | null {
     const playlist = this.getPlaylistForEmotion(emotion);
     if (!playlist || playlist.tracks.length === 0) return null;
 

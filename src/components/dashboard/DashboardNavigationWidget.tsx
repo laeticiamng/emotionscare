@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
   Grid3X3, Brain, Music, Sparkles, FileText, Zap, Wind, 
-  Users, Trophy, BarChart3, Settings, Search, Star, ArrowRight
+  Users, Trophy, Search, ArrowRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

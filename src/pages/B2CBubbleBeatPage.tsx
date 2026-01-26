@@ -4,13 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
-import { Heart, Play, Pause, Square, Waves, Zap, Target, Trophy, Music } from 'lucide-react';
+import { Heart, Play, Square, Waves, Zap, Target, Trophy, Music } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from '@/hooks/use-toast';
 import PageRoot from '@/components/common/PageRoot';
 import { logger } from '@/lib/logger';
 import { useBubbleBeatPersistence } from '@/hooks/useBubbleBeatPersistence';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface Bubble {

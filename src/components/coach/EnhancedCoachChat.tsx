@@ -7,7 +7,6 @@ import { Send, Mic, MicOff, StopCircle, User, Bot, Image as ImageIcon, Wand2, Lo
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import useOpenAI from '@/hooks/api/useOpenAI';
-import useWhisper from '@/hooks/api/useWhisper';
 import { sanitizeUserContent } from '@/lib/security/sanitize';
 import { logger } from '@/lib/logger';
 
@@ -35,7 +34,6 @@ const EnhancedCoachChat: React.FC<EnhancedCoachChatProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { generateText } = useOpenAI();
-  const { transcribeAudio, isTranscribing } = useWhisper();
   const [isRecording, setIsRecording] = useState(false);
   
   useEffect(() => {

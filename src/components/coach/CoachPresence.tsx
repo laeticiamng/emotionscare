@@ -11,9 +11,8 @@ import {
 import CoachCharacter from './CoachCharacter';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  MessageCircle, Sparkles, Clock, ChevronRight, X, Heart, Brain, Wind,
-  Bell, BellOff, History, TrendingUp, Star
+import { Sparkles, Clock, ChevronRight, X, Heart, Brain, Wind,
+  Bell, BellOff, TrendingUp, Star
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -75,7 +74,7 @@ const CoachPresence: React.FC<CoachPresenceProps> = memo(({
   const { toast } = useToast();
   const [isHovered, setIsHovered] = useState(false);
   const [currentMessage, setCurrentMessage] = useState(message || GREETING_MESSAGES[0]);
-  const [showActions, setShowActions] = useState(false);
+  const [_showActions, setShowActions] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [stats, setStats] = useState<InteractionStats>({

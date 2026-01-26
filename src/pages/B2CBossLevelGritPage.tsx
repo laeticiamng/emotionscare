@@ -77,7 +77,6 @@ const B2CBossLevelGritPage: React.FC = () => {
     isLoading,
     elapsedTime,
     status,
-    pauseCount,
     loadQuest,
     startQuest,
     completeQuest,

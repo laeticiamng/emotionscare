@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -8,7 +8,6 @@ import {
   safeClassRemove,
   safeGetDocumentRoot
 } from '@/lib/safe-helpers';
-import { logger } from '@/lib/logger';
 import { useUserPreference } from '@/hooks/useSupabaseStorage';
 
 const ThemeButton: React.FC = () => {

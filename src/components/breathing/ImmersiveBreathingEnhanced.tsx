@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,10 +11,7 @@ import {
   Pause, 
   Square, 
   Volume2, 
-  VolumeX, 
-  Settings,
-  TrendingUp,
-  Award,
+  VolumeX,
   Calendar,
   Heart,
   Activity,

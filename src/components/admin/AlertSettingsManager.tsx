@@ -25,7 +25,7 @@ interface AlertSetting {
 
 export function AlertSettingsManager() {
   const queryClient = useQueryClient();
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [_editingId, setEditingId] = useState<string | null>(null);
 
   const { data: settings = [], isLoading, error } = useQuery({
     queryKey: ['alert-settings'],

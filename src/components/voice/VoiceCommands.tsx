@@ -17,10 +17,6 @@ interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
 }
 
-interface SpeechRecognitionErrorEvent extends Event {
-  error: string;
-}
-
 // Simplified voice recognition hook
 const useSimpleVoiceRecognition = () => {
   const [isListening, setIsListening] = useState(false);
@@ -72,10 +68,10 @@ const useSimpleVoiceRecognition = () => {
 
 const VoiceCommands: React.FC = () => {
   const musicContext = useMusic();
-  const { state, play, pause, next, previous, stop: stopPlayback, setVolume, shufflePlaylist, setRepeatMode } = musicContext;
+  const { state, play, pause, next, previous, stop: _stopPlayback, setVolume, shufflePlaylist, setRepeatMode } = musicContext;
   const [lastCommand, setLastCommand] = useState<string>('');
   
-  const { isListening, isSupported, transcript, start, stop } = useSimpleVoiceRecognition();
+ const { isListening, isSupported, start, stop } = useSimpleVoiceRecognition();
 
   const processCommand = useCallback((text: string) => {
     logger.debug('Voice command received:', text, 'VOICE');

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { AlertTriangle, Phone, X, Heart, ExternalLink, MessageCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { AlertTriangle, Phone, X, Heart, ExternalLink } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,7 +23,7 @@ const DEFAULT_RESOURCES: CrisisResource[] = [
 export default function CrisisDetectionBanner() {
   const { user } = useAuth();
   const [showBanner, setShowBanner] = useState(false);
-  const [crisisScore, setCrisisScore] = useState(0);
+  const [_crisisScore, setCrisisScore] = useState(0);
   const [resources, setResources] = useState<CrisisResource[]>(DEFAULT_RESOURCES);
   const [isMinimized, setIsMinimized] = useState(false);
 

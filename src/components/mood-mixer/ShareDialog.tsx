@@ -15,7 +15,6 @@ import {
   Copy, 
   Check, 
   Share2, 
-  Link2, 
   MessageCircle,
   Twitter,
   Facebook,

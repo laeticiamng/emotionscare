@@ -12,7 +12,6 @@ interface RecommendedPresetsProps {
 
 const RecommendedPresets: React.FC<RecommendedPresetsProps> = ({
   className = '',
-  currentMood = 'calm'
 }) => {
   const { getRecommendationsForEmotion, setPlaylist } = useMusic();
   const [loading, setLoading] = useState(false);

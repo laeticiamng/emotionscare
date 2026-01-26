@@ -120,7 +120,7 @@ function textToLRC(text: string, title?: string): LRCData {
 }
 
 export function useSyncedLyrics(options: UseSyncedLyricsOptions = {}): UseSyncedLyricsReturn {
-  const { trackId, trackTitle, autoFetch = false } = options;
+ const { trackTitle, autoFetch = false } = options;
 
   const [lrcData, setLrcData] = useState<LRCData | null>(null);
   const [isLoading, setIsLoading] = useState(false);

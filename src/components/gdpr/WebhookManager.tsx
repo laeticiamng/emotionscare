@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { logger } from '@/lib/logger';
 import { 
   Webhook, Plus, Trash2, Edit, Play, RefreshCw, 
-  CheckCircle, XCircle, Clock, Activity, TrendingUp
+  CheckCircle, XCircle, Clock
 } from 'lucide-react';
 import { useWebhooks } from '@/hooks/useWebhooks';
 import { format } from 'date-fns';

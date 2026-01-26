@@ -3,7 +3,6 @@
  * Dashboard principal pour les prédictions IA long-terme
  */
 
-import React from 'react';
 import { RefreshCw, Calendar, TrendingUp } from 'lucide-react';
 import { usePredictions, usePredictionsLoading, usePredictionsActions } from '@/contexts/PredictionsContext';
 import { EmotionalForecastChart } from './EmotionalForecastChart';

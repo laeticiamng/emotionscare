@@ -11,11 +11,7 @@ import {
   Palette, 
   Zap, 
   Heart, 
-  Star, 
-  Trophy, 
-  Clock,
-  Users,
-  TrendingUp,
+  Star,
   Settings
 } from 'lucide-react';
 import { logger } from '@/lib/logger';

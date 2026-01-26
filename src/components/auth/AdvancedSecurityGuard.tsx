@@ -14,14 +14,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Shield, 
   Lock, 
-  Eye, 
   AlertTriangle, 
-  Check, 
-  Clock,
-  Smartphone,
-  Key,
-  Fingerprint,
-  Globe
+  Check,
+  Smartphone
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
@@ -290,7 +285,7 @@ const AdvancedSecurityGuard: React.FC<AdvancedSecurityGuardProps> = ({
     }
 
     // Vérifier les permissions requises
-    const checkPermission = (permission: string): boolean => {
+    const checkPermission = (_permission: string): boolean => {
       // Implémentation simple - à adapter selon votre système de permissions
       return true; // Pour l'instant, on considère que toutes les permissions sont accordées
     };

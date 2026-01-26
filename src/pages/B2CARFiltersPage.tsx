@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Camera, Sparkles, Image, History, BarChart3 } from 'lucide-react';
+import { Camera, Image, History, BarChart3 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useARFilters } from '@/modules/ar-filters/hooks/useARFilters';

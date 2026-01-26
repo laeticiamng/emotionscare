@@ -23,17 +23,12 @@ import {
   Star,
   CheckCircle,
   Play,
-  Sparkles,
   TrendingUp,
-  Award,
   Globe,
   Headphones,
-  BookOpen,
-  Clock,
   Target,
   Smile,
   Activity,
-  LucideIcon
 } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Suspense, lazy, useEffect, useState } from "react";
@@ -46,38 +41,6 @@ const Footer = lazy(() => import("@/components/layout/Footer"));
 
 interface UnifiedHomePageProps {
   variant?: 'full' | 'b2c-simple';
-}
-
-interface Feature {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  color: string;
-  gradient: string;
-  benefits: string[];
-  demo: string;
-}
-
-interface Testimonial {
-  name: string;
-  role: string;
-  company?: string;
-  content: string;
-  rating: number;
-  image?: string;
-}
-
-interface Stat {
-  value: string;
-  label: string;
-  icon: LucideIcon;
-}
-
-interface UseCase {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  color: string;
 }
 
 export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePageProps) {

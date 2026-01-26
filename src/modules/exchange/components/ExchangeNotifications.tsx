@@ -10,7 +10,6 @@ import {
   Shield,
   TrendingUp,
   Heart,
-  CheckCircle,
   X,
   Users
 } from 'lucide-react';

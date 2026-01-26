@@ -242,7 +242,7 @@ export async function notifyProgramProgress(
 export async function suggestTechnique(
   userId: string,
   emotion: string,
-  technique: string
+  _technique: string
 ): Promise<string | null> {
   const emotionMessages: Record<string, string> = {
     stress: '💙 Vous semblez stressé récemment. Essayez cette technique de respiration pour retrouver votre calme.',

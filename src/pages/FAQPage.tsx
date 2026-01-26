@@ -21,15 +21,10 @@ import {
   Zap,
   CreditCard,
   Settings,
-  Camera,
-  Music,
-  Heart,
   Users,
-  Lock,
 } from 'lucide-react';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
-import { cn } from '@/lib/utils';
 
 interface FAQQuestion {
   q: string;

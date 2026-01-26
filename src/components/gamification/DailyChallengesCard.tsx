@@ -2,11 +2,10 @@
  * Composant Défis Quotidiens - EmotionsCare
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Timer, CheckCircle, Star, Zap, Target } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useGamification, type DailyChallenge } from '@/modules/gamification';
@@ -21,7 +20,7 @@ const CATEGORY_ICONS: Record<string, string> = {
 };
 
 export function DailyChallengesCard() {
-  const { dailyChallenges, getTimeRemaining, updateChallengeProgress } = useGamification();
+ const { dailyChallenges, getTimeRemaining } = useGamification();
   const [timeRemaining, setTimeRemaining] = useState(getTimeRemaining());
 
   useEffect(() => {

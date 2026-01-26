@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Smile, Heart, User, Coffee, Sun, Moon, BadgeCheck, X, Search } from 'lucide-react';
+import { Smile, Heart, User, Coffee, Sun, BadgeCheck, X, Search } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
@@ -57,10 +57,6 @@ const EmojiSelector = ({ emojis, onEmojiClick, onClear }: EmojiSelectorProps) =>
   
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
-  };
-  
-  const getActiveCategory = () => {
-    return categories.find(cat => cat.name === activeTab) || categories[0];
   };
 
   // Récupération des émojis récents avec élimination des doublons

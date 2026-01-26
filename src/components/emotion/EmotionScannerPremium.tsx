@@ -2,13 +2,11 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
-  Camera, Mic, MicOff, Video, VideoOff, 
-  Brain, Heart, Smile, Frown, Meh,
-  Play, Square, RotateCcw, Sparkles,
-  Loader2, CheckCircle, AlertCircle
+  Camera, Mic, Video, VideoOff, 
+  Brain, Heart, Square, Sparkles,
+  Loader2
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,8 +23,6 @@ type ScanMode = 'voice' | 'face' | 'mood_cards';
 
 const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
   onEmotionDetected,
-  autoGenerateMusic = false,
-  showRecommendations = true,
 }) => {
   const { user } = useAuth();
   const [scanMode, setScanMode] = useState<ScanMode>('mood_cards');
@@ -69,7 +65,6 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
 
       if (scanMode === 'mood_cards' && selectedMood) {
         // Mood cards analysis
-        const moodData = moodCards.find(m => m.id === selectedMood);
         scanResult = {
           mood: {
             valence: Math.random() * 0.6 + 0.3,

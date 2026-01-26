@@ -289,7 +289,7 @@ export class ARFiltersService {
   /**
    * Check explorer achievement
    */
-  private static checkExplorerAchievement(filterType: string): void {
+  private static checkExplorerAchievement(_filterType: string): void {
     const stored = localStorage.getItem(STORAGE_KEY);
     const stats = stored ? JSON.parse(stored) : { filters: {} };
     const uniqueFilters = Object.keys(stats.filters).filter(f => VALID_FILTERS.includes(f as FilterType)).length;

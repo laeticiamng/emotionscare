@@ -7,12 +7,12 @@ import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Shield, Play, Download, AlertTriangle, CheckCircle, 
-  XCircle, TrendingUp, FileText, Clock
+  Shield, Play, AlertTriangle, CheckCircle, 
+  XCircle, FileText, Clock
 } from 'lucide-react';
 import PDFExportButton from './PDFExportButton';
 import {
-  RadialBarChart, RadialBar, Legend, ResponsiveContainer,
+  RadialBarChart, RadialBar, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip
 } from 'recharts';
 

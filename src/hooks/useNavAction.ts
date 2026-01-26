@@ -19,7 +19,6 @@ import { logger } from '@/lib/logger';
 export function useNavAction() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
-  const { toast } = useToast();
 
   const getContext = useCallback((): NavContext => ({
     isAuthenticated,
@@ -28,8 +27,6 @@ export function useNavAction() {
   }), [isAuthenticated, user]);
 
   const executeAction = useCallback(async (action: NavAction): Promise<ActionResult> => {
-    const context = getContext();
-    
     try {
       switch (action.type) {
         case "route": {
@@ -140,20 +137,6 @@ export function useNavAction() {
     executeAction,
     getContext,
   };
-}
-
-/**
- * Helper pour mapper les IDs de modal aux composants
- */
-function getModalComponent(modalId: string): string {
-  const modalMap: Record<string, string> = {
-    'auth-modal': 'AuthModal',
-    'feedback-modal': 'FeedbackModal',
-    'settings-modal': 'SettingsModal',
-    'confirm-dialog': 'ConfirmDialog',
-  };
-  
-  return modalMap[modalId] || 'DefaultModal';
 }
 
 /**

@@ -3,12 +3,11 @@
  * Visualize emotional state as an immersive AR aura
  */
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import { Heart, X } from 'lucide-react';
 import { useAR } from '@/contexts/ARContext';
 import { useEmotionalAura } from '@/hooks/useARCore';
 import { EmotionData } from '@/services/arService';
-import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 
 export interface EmotionalAuraProps {
@@ -24,7 +23,7 @@ export function EmotionalAura({
   onClose,
   className
 }: EmotionalAuraProps) {
-  const { setAura, arMode } = useAR();
+ const { setAura } = useAR();
   const { aura, generateAura, loading } = useEmotionalAura(userId);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();

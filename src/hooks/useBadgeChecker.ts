@@ -2,7 +2,7 @@
  * Hook pour vérifier et attribuer automatiquement les badges
  */
 
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';

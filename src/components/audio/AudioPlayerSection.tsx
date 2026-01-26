@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-import { AudioTrack } from '@/types/audio';
 import { Play, Pause, SkipForward, SkipBack, Volume, VolumeX } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 
@@ -12,17 +11,7 @@ interface AudioPlayerSectionProps {
   artist?: string;
 }
 
-const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({ audioUrl, title, artist }) => {
-  // Create a track object from props
-  const track: AudioTrack = {
-    id: 'current-track',
-    title,
-    artist: artist || 'Unknown Artist',
-    url: audioUrl,
-    audioUrl,
-    duration: 0,
-  };
-  
+const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({ title, artist }) => {
   const audioPlayer = useAudioPlayer();
   const { 
     isPlaying, 

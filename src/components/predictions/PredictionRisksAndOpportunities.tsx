@@ -2,13 +2,11 @@
  * Prediction Risks and Opportunities Component
  */
 
-import React from 'react';
 import {
   AlertTriangle,
   TrendingUp,
   Lightbulb,
   CheckCircle2,
-  AlertCircle,
 } from 'lucide-react';
 import { EmotionalForecast, RiskIndicator, WellnessOpportunity } from '@/services/longTermPredictionsService';
 import { cn } from '@/lib/utils';

@@ -1,14 +1,14 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
-  Home, Brain, Music, MessageCircle, Users, Settings,
+  Home, Brain, Music, MessageCircle, Users,
   Zap, Wind, Camera, Eye, Mic, Activity, Trophy,
   Target, Gamepad2, Sparkles, Star, Heart, Compass,
   BarChart3, TrendingUp, Calendar, BookOpen,
-  Shield, Search, Bell, Menu, X, ChevronDown,
-  Layers, Wand2, Headphones, Globe, Lock
+  Shield, Menu, ChevronDown,
+  Layers, Headphones, Globe
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -26,7 +26,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { routes } from '@/routerV2';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 

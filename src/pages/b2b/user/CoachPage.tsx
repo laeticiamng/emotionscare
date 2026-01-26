@@ -35,7 +35,6 @@ import { Link } from 'react-router-dom';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
 import { useB2BTeamStats } from '@/hooks/useB2BTeamStats';
-import { cn } from '@/lib/utils';
 
 interface ConversationMessage {
   author: 'coach' | 'manager';

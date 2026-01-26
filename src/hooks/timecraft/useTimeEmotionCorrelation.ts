@@ -4,9 +4,8 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useTimeBlocks, TimeBlock } from './useTimeBlocks';
-import { format, parseISO, getDay, getHours, startOfWeek, endOfWeek, subDays } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { useTimeBlocks } from './useTimeBlocks';
+import { parseISO, getDay, getHours, subDays } from 'date-fns';
 
 interface EmotionDataPoint {
   id: string;

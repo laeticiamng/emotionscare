@@ -1,6 +1,5 @@
 // @ts-nocheck
 
-import { v4 as uuidv4 } from 'uuid';
 import emotionalDataService from '../emotional-data-service';
 
 export const emotionActionHandlers = {

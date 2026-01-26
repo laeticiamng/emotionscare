@@ -4,7 +4,6 @@ import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Music } from 'lucide-react';
-import { useMusic } from '@/hooks/useMusic';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 
 interface EmotionMusicRecommendationsProps {
@@ -16,8 +15,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
   emotion = "calm",
   className = ""
 }) => {
-  const music = useMusic();
-  const { activateMusicForEmotion, getEmotionMusicDescription } = useMusicEmotionIntegration();
+  const { activateMusicForEmotion } = useMusicEmotionIntegration();
   
   const [recommendedEmotion, setRecommendedEmotion] = useState(emotion);
   

@@ -17,12 +17,11 @@ import {
   AlertTriangle,
   Brain,
   Zap,
-  Settings,
   RefreshCw,
   BarChart3,
   Clock
 } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { budgetMonitor } from '@/lib/ai/budgetMonitor';
 
 interface UsageData {
@@ -64,7 +63,7 @@ const MODEL_CONFIG = {
 export const AIBudgetDashboard: React.FC = () => {
   const [usageData, setUsageData] = useState<UsageData[]>([]);
   const [dailyUsage, setDailyUsage] = useState<DailyUsage[]>([]);
-  const [totalBudget, setTotalBudget] = useState(200);
+  const [totalBudget, _setTotalBudget] = useState(200);
   const [currentSpend, setCurrentSpend] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [budgetExceeded, setBudgetExceeded] = useState(false);

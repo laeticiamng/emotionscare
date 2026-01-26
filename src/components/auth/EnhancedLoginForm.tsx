@@ -8,7 +8,6 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { EyeIcon, EyeOffIcon, Mail, Lock, ArrowRight } from 'lucide-react';
-import { useTheme } from '@/hooks/use-theme';
 import { usePreferredAccess } from '@/hooks/use-preferred-access';
 import LoadingAnimation from '@/components/ui/LoadingAnimation';
 import { logger } from '@/lib/logger';
@@ -25,7 +24,6 @@ const EnhancedLoginForm: React.FC = () => {
   const navigate = useNavigate();
   const { signIn } = useAuth();
   const { toast } = useToast();
-  const { theme } = useTheme();
   
   // Use the preferred access hook for redirection
   usePreferredAccess();

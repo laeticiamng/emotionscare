@@ -8,14 +8,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from '@/components/ui/navigation-menu';
+
+
 import {
   Sheet,
   SheetContent,
@@ -28,15 +22,12 @@ import {
   Heart, 
   Building2, 
   Menu, 
-  X, 
   User, 
   Settings, 
   HelpCircle,
   Phone,
-  Mail,
   LogIn,
   UserPlus,
-  Home,
   Sparkles
 } from 'lucide-react';
 import { cn } from '@/lib/utils';

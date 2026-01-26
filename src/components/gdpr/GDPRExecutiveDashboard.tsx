@@ -4,8 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
-  LineChart,
-  Line,
   AreaChart,
   Area,
   BarChart,
@@ -16,11 +14,6 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
 } from 'recharts';
 import {
   FileDown,

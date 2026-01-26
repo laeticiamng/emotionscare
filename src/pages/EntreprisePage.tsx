@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { 
   Building2, 
   Users, 
@@ -121,7 +120,7 @@ const caseStudies = [
 export default function EntreprisePage() {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
-  const [selectedSolution, setSelectedSolution] = useState(1);
+  const [_selectedSolution, setSelectedSolution] = useState(1);
 
   useEffect(() => {
     setIsVisible(true);
@@ -191,7 +190,7 @@ export default function EntreprisePage() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center mb-20"
           >
-            {benefits.map((benefit, index) => (
+            {benefits.map((benefit, _index) => (
               <div key={benefit.label} className="space-y-2">
                 <div className="flex justify-center mb-3">
                   <benefit.icon className="w-8 h-8 text-primary" />

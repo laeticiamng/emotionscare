@@ -4,7 +4,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useAuthFlow } from '../useAuth';
 import { useSimpleAuth } from '@/contexts/SimpleAuth';
 import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 
 vi.mock('@/contexts/SimpleAuth');
 vi.mock('@/hooks/use-toast');

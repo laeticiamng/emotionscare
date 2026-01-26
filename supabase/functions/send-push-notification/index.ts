@@ -66,7 +66,7 @@ function base64UrlDecode(str: string): Uint8Array {
 // Générer un JWT VAPID valide
 async function generateVapidJWT(
   privateKeyBase64: string,
-  publicKeyBase64: string,
+  _publicKeyBase64: string,
   endpoint: string,
   subject: string
 ): Promise<string> {

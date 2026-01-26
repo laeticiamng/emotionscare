@@ -194,7 +194,6 @@ export function useVRBreathingEnriched() {
   const intervalRef = useRef<NodeJS.Timeout>();
   const phaseStartRef = useRef<number>(0);
   const sessionStartRef = useRef<number>(0);
-  const audioContextRef = useRef<AudioContext | null>(null);
   const ambientAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // Check VR support

@@ -9,7 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { AlertTriangle, CheckCircle, Info, Eye, EyeOff, Copy, Settings } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Eye, EyeOff, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 

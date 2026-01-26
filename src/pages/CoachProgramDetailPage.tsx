@@ -10,7 +10,6 @@ import {
   BookOpen,
   Target,
   Sparkles,
-  ChevronRight,
   Download,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

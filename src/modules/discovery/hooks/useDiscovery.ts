@@ -16,7 +16,6 @@ import {
   DiscoverySettings,
   DiscoveryFilters,
   DiscoveryCategory,
-  DifficultyLevel,
 } from '../types';
 
 // Données initiales par défaut
@@ -177,7 +176,7 @@ const DEFAULT_SETTINGS: DiscoverySettings = {
 export function useDiscovery() {
   const { user } = useAuth();
   const [items, setItems] = useState<DiscoveryItem[]>(DEFAULT_ITEMS);
-  const [paths, setPaths] = useState<DiscoveryPath[]>(DEFAULT_PATHS);
+  const [paths, _setPaths] = useState<DiscoveryPath[]>(DEFAULT_PATHS);
   const [sessions, setSessions] = useState<DiscoverySession[]>([]);
   const [settings, setSettings] = useState<DiscoverySettings>(DEFAULT_SETTINGS);
   const [filters, setFilters] = useState<DiscoveryFilters>({});

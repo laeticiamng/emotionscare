@@ -1,5 +1,5 @@
 
-import { Badge, LeaderboardEntry, Challenge, GamificationStats } from './gamification';
+import { Badge, LeaderboardEntry } from './gamification';
 import { ReactNode } from 'react';
 
 export interface BadgesWidgetProps {

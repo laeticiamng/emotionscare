@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { supabase } from '@/integrations/supabase/client';
-import { Music, Play, Pause, SkipForward, Heart, TrendingUp, Clock } from 'lucide-react';
+import { Music, Play, Pause, Heart, TrendingUp, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
 

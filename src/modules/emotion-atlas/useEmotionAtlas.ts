@@ -3,8 +3,8 @@
  * Gestion de la cartographie émotionnelle avec React Query
  */
 
-import { useState, useMemo, useCallback } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { EmotionAtlasService, type EmotionAtlasStats } from './emotionAtlasService';
 import type { AtlasData, AtlasFilter, AtlasInsight } from './types';

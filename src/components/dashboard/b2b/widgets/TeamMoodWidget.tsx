@@ -10,7 +10,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Users, TrendingUp, TrendingDown, Minus, Shield } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { useB2BTeamStats } from '@/hooks/useB2BTeamStats';
-import { cn } from '@/lib/utils';
 
 export const TeamMoodWidget: React.FC = () => {
   const { stats, loading } = useB2BTeamStats();

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { InteractiveTutorial } from '@/components/monitoring/InteractiveTutorial';
@@ -15,12 +15,10 @@ import {
   Activity,
   TrendingUp,
   Clock,
-  AlertTriangle,
   CheckCircle2,
   RefreshCw,
   Brain,
   BarChart3,
-  MessageCircle,
   GraduationCap
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -29,12 +27,12 @@ import { MonitoringChatbot } from '@/components/monitoring/MonitoringChatbot';
 
 const EscalationMonitoringDashboard: React.FC = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [selectedEscalation, setSelectedEscalation] = useState<any>(null);
+  const [_selectedEscalation, _setSelectedEscalation] = useState<any>(null);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const chartsContainerRef = React.useRef<HTMLDivElement>(null);
 
   // Fetch active escalations
-  const { data: activeEscalations, refetch: refetchEscalations } = useQuery({
+  const { data: activeEscalations, refetch: _refetchEscalations } = useQuery({
     queryKey: ['active-escalations'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -406,7 +404,7 @@ const EscalationMonitoringDashboard: React.FC = () => {
                   ))}
                   
                   {/* Data rows */}
-                  {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((day, dayIndex) => (
+                  {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((day, _dayIndex) => (
                     <React.Fragment key={day}>
                       <div className="text-xs pr-2 flex items-center text-muted-foreground">
                         {day}

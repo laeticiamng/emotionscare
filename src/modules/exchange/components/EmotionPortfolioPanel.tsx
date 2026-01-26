@@ -12,7 +12,6 @@ import {
   Brain, 
   Shield,
   Clock,
-  TrendingUp,
   DollarSign,
   Minus,
   Plus

@@ -9,9 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Slider } from '@/components/ui/slider';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Mic,
   MicOff,
@@ -21,9 +18,6 @@ import {
   Send,
   Clock,
   Wand2,
-  Volume2,
-  Pause,
-  Play,
   History,
   Download,
   Share2,
@@ -34,8 +28,7 @@ import {
   Smile,
   Meh,
   Frown,
-  Star,
-  Calendar
+  Star
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';

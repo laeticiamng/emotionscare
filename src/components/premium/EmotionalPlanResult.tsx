@@ -14,8 +14,7 @@ import {
   Bookmark, 
   RotateCcw, 
   ChevronRight,
-  Play,
-  Headphones
+  Play
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 

@@ -6,7 +6,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
-import { useTheme } from '@/providers/theme';
 import CommandMenu from '@/components/layout/CommandMenu';
 import NotificationToast from '@/components/layout/NotificationToast';
 import { cn } from '@/lib/utils';
@@ -28,7 +27,6 @@ const PremiumShell: React.FC<PremiumShellProps> = ({
 }) => {
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { resolvedTheme } = useTheme();
   const location = useLocation();
   
   // Check for reduced motion preference

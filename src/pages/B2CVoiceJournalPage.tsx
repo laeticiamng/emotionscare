@@ -3,12 +3,12 @@
  * Module complet pour l'enregistrement, la transcription et la gestion des notes vocales
  */
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Mic, MicOff, FileText, History, BarChart3, Search, 
   Tag, Calendar, Play, Pause, Trash2, Archive, 
-  Sparkles, Clock, Volume2, X, Plus, Filter
+  Sparkles, Clock, Volume2, X, Plus
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -18,13 +18,12 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { journalService, type JournalEntry } from '@/modules/journal/journalService';
-import { formatDistanceToNow, format } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 // ============= Types =============
@@ -347,7 +346,7 @@ const StatsCard: React.FC<{ stats: VoiceJournalStats; isLoading: boolean }> = ({
 
 // ============= Main Component =============
 const B2CVoiceJournalPage: React.FC = () => {
-  const { user } = useAuth();
+  useAuth();
   const { toast } = useToast();
   
   // Recording state
@@ -368,7 +367,7 @@ const B2CVoiceJournalPage: React.FC = () => {
   const [isLoadingEntries, setIsLoadingEntries] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterMode, setFilterMode] = useState<'all' | 'voice' | 'text'>('all');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedTags, _setSelectedTags] = useState<string[]>([]);
 
   // Text entry state
   const [textEntry, setTextEntry] = useState('');

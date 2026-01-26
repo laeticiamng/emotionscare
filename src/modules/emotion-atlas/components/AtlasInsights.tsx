@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, Lightbulb, AlertCircle, Sparkles, ArrowRight } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TrendingUp, Lightbulb, Sparkles, ArrowRight } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import type { AtlasInsight } from '../types';
 import { cn } from '@/lib/utils';

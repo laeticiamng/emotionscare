@@ -1,9 +1,7 @@
 import React, { useEffect } from 'react';
 import CoachChatInterface from './CoachChatInterface';
-import { useChatMessages } from '@/hooks/chat/useChatMessages';
 import { useCoachChat } from '@/hooks/chat/useCoachChat';
 import { useConversations } from '@/hooks/chat/useConversations';
-import { ChatConversation, ChatMessage } from '@/types/chat';
 
 interface CoachChatContainerProps {
   defaultPrompt?: string;
@@ -20,19 +18,12 @@ const CoachChatContainer: React.FC<CoachChatContainerProps> = ({
     messages: coachMessages,
     sendMessage: sendCoachMessage,
     isProcessing,
-    addMessage: addCoachMessage,
   } = useCoachChat();
 
   const {
     conversations,
-    currentConversation,
-    messages,
-    loading,
-    error,
     loadConversations,
-    selectConversation,
     createConversation,
-    setMessages,
   } = useConversations();
 
   useEffect(() => {

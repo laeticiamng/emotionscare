@@ -8,8 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
   Clock, CheckCircle2, Circle, Download, Share2, Star, 
-  Filter, TrendingUp, Calendar, BarChart3, Heart, Trash2,
-  ChevronDown, Info
+  Filter, TrendingUp, Calendar, BarChart3, Info
 } from 'lucide-react';
 import { format, subDays, isWithinInterval, startOfWeek, endOfWeek } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -56,7 +55,7 @@ export function MeditationHistory({ sessions, isLoading }: MeditationHistoryProp
     return saved ? new Set(JSON.parse(saved)) : new Set();
   });
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-  const [selectedSession, setSelectedSession] = useState<MeditationSession | null>(null);
+  const [_selectedSession, setSelectedSession] = useState<MeditationSession | null>(null);
 
   // Filtrer les sessions
   const filteredSessions = useMemo(() => {

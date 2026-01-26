@@ -3,7 +3,7 @@
  * Immersive music visualization with AR themes
  */
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Music, X, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAR } from '@/contexts/ARContext';
 import { useMusicAR } from '@/hooks/useARCore';
@@ -36,7 +36,7 @@ export function MusicTherapyAR({
   className
 }: MusicTherapyARProps) {
   const { currentVisualTheme, setCurrentVisualTheme } = useAR();
-  const { startMusicSession, updateMetrics, isPlaying, togglePlayPause, nextTrack, previousTrack } =
+ const { startMusicSession, isPlaying, togglePlayPause, nextTrack, previousTrack } =
     useMusicAR(userId);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -51,9 +51,9 @@ export function MusicTherapyAR({
   const animationRef = useRef<number>();
   const timeRef = useRef(0);
 
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
+  const [currentTrackIndex, _setCurrentTrackIndex] = useState(0);
+  const [duration, _setDuration] = useState(0);
+  const [currentTime, _setCurrentTime] = useState(0);
 
   // Initialize audio context
   const initializeAudio = useCallback(() => {

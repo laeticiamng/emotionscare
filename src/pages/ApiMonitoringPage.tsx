@@ -7,7 +7,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsContent as TabsPanel, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Activity, 
   Server, 
@@ -25,9 +25,7 @@ const ApiMonitoringPage: React.FC = () => {
   const {
     report,
     isLoading,
-    refresh,
     quickCheck,
-    healthyApis,
     failedApis,
     averageResponseTime,
     lastUpdate

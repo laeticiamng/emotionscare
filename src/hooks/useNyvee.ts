@@ -40,7 +40,7 @@ export const useNyvee = (userId: string) => {
 
   // Mettre à jour le niveau de confort (placeholder)
   const updateCozyLevel = useMutation({
-    mutationFn: async ({ sessionId, cozyLevel }: { sessionId: string; cozyLevel: number }) => {
+    mutationFn: async (_params: { sessionId: string; cozyLevel: number }) => {
       // Placeholder - would call nyveeService
       return Promise.resolve();
     },
@@ -51,7 +51,7 @@ export const useNyvee = (userId: string) => {
 
   // Compléter une session
   const completeSession = useMutation({
-    mutationFn: ({ sessionId, duration, moodAfter }: { 
+ mutationFn: ({ sessionId, moodAfter }: { 
       sessionId: string; 
       duration: number;
       moodAfter?: number;

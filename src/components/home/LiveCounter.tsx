@@ -3,7 +3,7 @@
  * Affiche les statistiques live de la plateforme avec vraies données
  */
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Activity, Heart, Zap, TrendingUp, RefreshCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';

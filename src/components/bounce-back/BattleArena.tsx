@@ -7,7 +7,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Pause, Play, Heart, Clock, Zap, Trophy, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { StimulusCard } from './StimulusCard';
 import { useBounceStore, StimulusSpec } from '@/store/bounce.store';

@@ -22,7 +22,6 @@ const EmotionMusicIntegration: React.FC<EmotionMusicIntegrationProps> = ({
     currentTrack,
     currentEmotion,
     adaptToEmotion,
-    getRecommendation,
     isAdaptiveEnabled
   } = useAdaptiveMusic({ emotion, autoStart });
 

@@ -5,7 +5,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { enhancedMusicService } from '../enhanced-music-service';
 import { supabase } from '@/integrations/supabase/client';
-import { quotaService } from '../quota-service';
 
 // Mock Supabase
 vi.mock('@/integrations/supabase/client', () => ({

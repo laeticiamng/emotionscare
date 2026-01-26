@@ -13,7 +13,6 @@ import {
   Heart, 
   Zap, 
   Sparkles,
-  Clock,
   TrendingUp,
   TrendingDown,
   Minus,

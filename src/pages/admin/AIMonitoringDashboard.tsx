@@ -69,7 +69,7 @@ const AIMonitoringDashboard = () => {
   const [resolvedFilter, setResolvedFilter] = useState<string>('unresolved');
 
   // Fetch statistics
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  const { data: stats, isLoading: _statsLoading } = useQuery({
     queryKey: ['ai-monitoring-stats'],
     queryFn: async () => {
       const { data, error } = await supabase

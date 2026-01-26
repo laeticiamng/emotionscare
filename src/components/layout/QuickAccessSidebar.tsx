@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { 
   Menu, X, Home, Brain, Music, Sparkles, FileText, Users, 
   Trophy, BarChart3, Settings, Zap, Wind, Camera, Star, 
-  Heart, Grid3X3, Target, Palette, Waves, Gamepad2, Shield
+  Heart, Grid3X3, Waves
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

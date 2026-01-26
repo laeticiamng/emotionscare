@@ -6,7 +6,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import {
   X,
@@ -17,8 +16,6 @@ import {
   Volume2,
   VolumeX,
   Heart,
-  Maximize,
-  Minimize,
   Music,
   Mic2,
   Sparkles,

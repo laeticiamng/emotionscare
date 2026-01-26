@@ -4,7 +4,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { VRSessionTemplate } from '@/types/vr';
-import { durationToNumber, formatDuration } from './utils';
+import { formatDuration } from './utils';
 
 interface VRPromptWidgetProps {
   template: VRSessionTemplate;

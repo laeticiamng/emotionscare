@@ -11,8 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Send, 
   Smile, 
-  Pin, 
-  MoreVertical,
+  Pin,
   MessageCircle
 } from 'lucide-react';
 import { format } from 'date-fns';

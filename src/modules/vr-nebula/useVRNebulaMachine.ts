@@ -14,7 +14,7 @@ import type {
   CreateVRNebulaSession,
   BreathTiming,
 } from './types';
-import { getBreathTiming, calculateCycleDuration } from './types';
+import { getBreathTiming } from './types';
 
 const INITIAL_STATE: VRNebulaState = {
   phase: 'idle',
@@ -186,9 +186,6 @@ export function useVRNebulaMachine() {
         if (timerRef.current) clearInterval(timerRef.current);
         if (breathTimerRef.current) clearTimeout(breathTimerRef.current);
 
-        const cycleDuration = calculateCycleDuration(
-          getBreathTiming(state.session.breathing_pattern),
-        );
         const respRate = state.breathCount > 0 
           ? (state.breathCount * 60) / state.elapsedSeconds 
           : undefined;

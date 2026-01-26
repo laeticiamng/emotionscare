@@ -182,10 +182,6 @@ const EQUALIZER_PRESETS: EqualizerPreset[] = [
 
 const useAudioEnriched = (src?: string, title?: string) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const gainNodeRef = useRef<GainNode | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const equalizerNodesRef = useRef<BiquadFilterNode[]>([]);
   const sessionStartRef = useRef<number>(0);
 
   const [state, setState] = useState<AudioState>({
@@ -205,7 +201,7 @@ const useAudioEnriched = (src?: string, title?: string) => {
   const [preferences, setPreferences] = useState<AudioPreferences>(() => getPreferences());
   const [equalizerBands, setEqualizerBands] = useState<number[]>(() => getEqualizerSettings());
   const [stats, setStats] = useState<AudioStats>(() => getStats());
-  const [frequencyData, setFrequencyData] = useState<Uint8Array>(new Uint8Array(64));
+  const [frequencyData, _setFrequencyData] = useState<Uint8Array>(new Uint8Array(64));
 
   // Check if current track is favorite
   const isFavorite = useMemo(() => 

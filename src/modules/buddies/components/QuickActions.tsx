@@ -29,7 +29,6 @@ import {
   Video, 
   Calendar, 
   Bell,
-  Heart,
   Flag,
   UserMinus,
   Loader2,
@@ -40,7 +39,6 @@ import { toast } from 'sonner';
 
 interface QuickActionsProps {
   buddy: BuddyProfile;
-  matchId: string;
   onStartCall?: () => void;
   onStartVideo?: () => void;
   onScheduleActivity?: (activity: { title: string; type: string; scheduledAt?: string }) => Promise<void>;
@@ -58,7 +56,6 @@ const ACTIVITY_TYPES = [
 
 export const QuickActions: React.FC<QuickActionsProps> = ({
   buddy,
-  matchId,
   onStartCall,
   onStartVideo,
   onScheduleActivity,

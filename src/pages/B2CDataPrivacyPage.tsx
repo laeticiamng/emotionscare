@@ -8,7 +8,6 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Shield, FileText, Download, Eye, Trash2, AlertCircle, CheckCircle, Clock, Database, Key, Lock, Globe } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
 interface DataExport {

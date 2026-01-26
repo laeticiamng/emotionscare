@@ -28,7 +28,7 @@ interface SessionInfo {
   accessed_at: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const moduleComponents: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
   'scan': B2CScanPage,
   'music': B2CMusicEnhancedPage,

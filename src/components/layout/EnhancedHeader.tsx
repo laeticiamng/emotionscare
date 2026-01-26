@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
-import { Link, useLocation, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { routes } from '@/routerV2';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Home, Music, MessageCircle, Users, LayoutDashboard, Settings,
-  Bell, Search, Command, User, Sun, Moon, Menu, X,
+import { motion } from 'framer-motion';
+import { Music, MessageCircle, Users, LayoutDashboard, Settings,
+  Bell, Search, User, Sun, Moon, Menu,
   Brain, Compass, LogOut
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -35,7 +34,6 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
   const { theme, setTheme } = useTheme();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user, signOut } = useAuth();
 
