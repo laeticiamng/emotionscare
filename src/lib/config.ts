@@ -2,18 +2,14 @@
  * Configuration centralisée pour EmotionsCare Production
  */
 
-// ⚠️ MODE TEST - Mettre à true pour bypasser l'authentification
-// IMPORTANT: Remettre à false avant mise en production!
-export const TEST_MODE = {
-  BYPASS_AUTH: true, // ← Désactive toute l'authentification pour les tests
-  MOCK_USER: {
-    id: '00000000-0000-0000-0000-000000000001', // UUID valide pour le mode test
-    email: 'testeur@emotionscare.com',
-    user_metadata: {
-      full_name: 'Testeur EmotionsCare',
-      avatar_url: null,
-    },
-  },
+// ⚠️ MODE TEST - PRODUCTION: BYPASS_AUTH doit être false!
+// Ce flag ne doit JAMAIS être true en production - cause des erreurs RLS 403
+export const TEST_MODE: {
+  BYPASS_AUTH: boolean;
+  MOCK_USER: { id: string; email: string; user_metadata: { full_name: string; avatar_url: null } } | null;
+} = {
+  BYPASS_AUTH: false, // ← PRODUCTION: false obligatoire
+  MOCK_USER: null, // Pas d'utilisateur mock en production
 };
 
 export const CONFIG = {

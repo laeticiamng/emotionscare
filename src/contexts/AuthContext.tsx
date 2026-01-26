@@ -34,15 +34,18 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-// Créer un faux utilisateur pour le mode test
-const createMockUser = (): User => ({
-  id: TEST_MODE.MOCK_USER.id,
-  email: TEST_MODE.MOCK_USER.email,
-  app_metadata: {},
-  user_metadata: TEST_MODE.MOCK_USER.user_metadata,
-  aud: 'authenticated',
-  created_at: new Date().toISOString(),
-} as User);
+// Créer un faux utilisateur pour le mode test (uniquement si mock disponible)
+const createMockUser = (): User | null => {
+  if (!TEST_MODE.BYPASS_AUTH || !TEST_MODE.MOCK_USER) return null;
+  return {
+    id: TEST_MODE.MOCK_USER.id,
+    email: TEST_MODE.MOCK_USER.email,
+    app_metadata: {},
+    user_metadata: TEST_MODE.MOCK_USER.user_metadata,
+    aud: 'authenticated',
+    created_at: new Date().toISOString(),
+  } as User;
+};
 
 // Créer une fausse session pour le mode test
 const createMockSession = (user: User): Session => ({
@@ -55,7 +58,7 @@ const createMockSession = (user: User): Session => ({
 } as Session);
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const isTestMode = TEST_MODE.BYPASS_AUTH;
+  const isTestMode = TEST_MODE.BYPASS_AUTH && TEST_MODE.MOCK_USER !== null;
   
   // En mode test, initialiser directement avec l'utilisateur mock
   const mockUser = isTestMode ? createMockUser() : null;
@@ -67,7 +70,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   
   // Log si mode test activé
   useEffect(() => {
-    if (isTestMode) {
+    if (isTestMode && TEST_MODE.MOCK_USER) {
       logger.warn('⚠️ MODE TEST ACTIVÉ - Authentification bypassée!', undefined, 'AUTH');
       console.warn('🧪 MODE TEST: Authentification désactivée. Utilisateur mock:', TEST_MODE.MOCK_USER.email);
     }
