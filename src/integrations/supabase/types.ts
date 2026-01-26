@@ -28990,11 +28990,11 @@ export type Database = {
       }
       is_owner: { Args: { resource_user_id: string }; Returns: boolean }
       is_room_host: {
-        Args: { _room_id: string; _user_id: string }
+        Args: { p_room_id: string; p_user_id: string }
         Returns: boolean
       }
       is_room_member: {
-        Args: { _room_id: string; _user_id: string }
+        Args: { p_room_id: string; p_user_id: string }
         Returns: boolean
       }
       log_admin_change: {
