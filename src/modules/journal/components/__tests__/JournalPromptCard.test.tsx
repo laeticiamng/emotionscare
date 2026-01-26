@@ -62,7 +62,7 @@ describe('JournalPromptCard', () => {
     expect(onUsePrompt).toHaveBeenCalledWith(mockPrompt.prompt_text);
   });
 
-  it('affiche le bouton "Autre suggestion" si onDismiss fourni', () => {
+  it('affiche le bouton "Autre" si onDismiss fourni', () => {
     const onDismiss = vi.fn();
     render(
       <JournalPromptCard
@@ -72,14 +72,14 @@ describe('JournalPromptCard', () => {
       />
     );
 
-    const dismissButton = screen.getByText('Autre suggestion');
+    const dismissButton = screen.getByText('Autre');
     expect(dismissButton).toBeInTheDocument();
 
     fireEvent.click(dismissButton);
     expect(onDismiss).toHaveBeenCalled();
   });
 
-  it('n\'affiche pas le bouton "Autre suggestion" si onDismiss absent', () => {
+  it('n\'affiche pas le bouton "Autre" si onDismiss absent', () => {
     render(
       <JournalPromptCard
         prompt={mockPrompt}
@@ -87,7 +87,7 @@ describe('JournalPromptCard', () => {
       />
     );
 
-    expect(screen.queryByText('Autre suggestion')).not.toBeInTheDocument();
+    expect(screen.queryByText('Autre')).not.toBeInTheDocument();
   });
 
   it('applique les bonnes couleurs selon la catégorie', () => {
