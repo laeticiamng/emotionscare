@@ -28,9 +28,9 @@ export function useSeuil() {
   });
 
   const startMutation = useMutation({
-    mutationFn: async (params: { trigger: string; intensity: number }) => {
+    mutationFn: async (params: { eventId?: string }) => {
       if (!user?.id) throw new Error('User not authenticated');
-      return SeuilService.startSession(user.id, params.trigger, params.intensity);
+      return SeuilService.startSession(user.id, params.eventId);
     },
     onSuccess: (session) => {
       setCurrentSession(session);
@@ -39,9 +39,9 @@ export function useSeuil() {
   });
 
   const completeMutation = useMutation({
-    mutationFn: async (params: { techniques_used: string[]; mood_after: number }) => {
+    mutationFn: async (params: { strategies_used: string[]; effectiveness: number; mood_after: number; notes?: string }) => {
       if (!currentSession) throw new Error('No active session');
-      return SeuilService.completeSession(currentSession.id, params.techniques_used, params.mood_after);
+      return SeuilService.completeSession(currentSession.id, params);
     },
     onSuccess: () => {
       setCurrentSession(null);
@@ -57,8 +57,12 @@ export function useSeuil() {
     recentSessions,
     isLoadingStats,
     isLoadingRecent,
-    startSession: useCallback((trigger: string, intensity: number) => startMutation.mutateAsync({ trigger, intensity }), [startMutation]),
-    completeSession: useCallback((techniquesUsed: string[], moodAfter: number) => completeMutation.mutateAsync({ techniques_used: techniquesUsed, mood_after: moodAfter }), [completeMutation]),
+    startSession: useCallback((eventId?: string) => startMutation.mutateAsync({ eventId }), [startMutation]),
+    completeSession: useCallback(
+      (strategiesUsed: string[], effectiveness: number, moodAfter: number, notes?: string) =>
+        completeMutation.mutateAsync({ strategies_used: strategiesUsed, effectiveness, mood_after: moodAfter, notes }),
+      [completeMutation]
+    ),
     cancelSession: useCallback(() => setCurrentSession(null), []),
     isStarting: startMutation.isPending,
     isCompleting: completeMutation.isPending,

@@ -153,6 +153,24 @@ export class SeuilService {
   }
 
   /**
+   * Récupérer les sessions récentes
+   */
+  static async getSessions(userId: string, limit: number = 10): Promise<SeuilSession[]> {
+    const { data, error } = await supabase
+      .from('seuil_sessions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('started_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      if (error.code === '42P01') return []; // Table doesn't exist
+      throw error;
+    }
+    return data || [];
+  }
+
+  /**
    * Démarrer une session SEUIL
    */
   static async startSession(
