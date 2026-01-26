@@ -1,12 +1,33 @@
 /**
  * Module Discovery - Exploration émotionnelle
+ * Service, hooks et types pour la découverte personnalisée
+ *
  * @module discovery
  */
 
-// Page principale
-export { DiscoveryPage } from './pages/DiscoveryPage';
+// ============================================================================
+// SERVICE
+// ============================================================================
 
-// Composants
+export { DiscoveryService, discoveryService } from './discoveryService';
+export type {
+  DiscoveryRecommendation as ServiceDiscoveryRecommendation,
+  DiscoveryRecommendationsResponse,
+  TrendingResponse,
+  ExploreResponse,
+  SearchResponse,
+} from './discoveryService';
+
+// ============================================================================
+// PAGES
+// ============================================================================
+
+export { default as DiscoveryPage } from './pages/DiscoveryPage';
+
+// ============================================================================
+// COMPONENTS
+// ============================================================================
+
 export { DiscoveryCard } from './components/DiscoveryCard';
 export { DiscoveryStatsPanel } from './components/DiscoveryStats';
 export { DiscoveryFiltersPanel } from './components/DiscoveryFilters';
@@ -15,8 +36,27 @@ export { DiscoveryRecommendationsPanel } from './components/DiscoveryRecommendat
 export { DiscoverySessionPanel } from './components/DiscoverySession';
 export { DiscoveryAchievementsPanel } from './components/DiscoveryAchievements';
 
-// Hook
+// ============================================================================
+// HOOKS
+// ============================================================================
+
 export { useDiscovery } from './hooks/useDiscovery';
 
-// Types
-export * from './types';
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export type {
+  DiscoveryCategory,
+  DifficultyLevel,
+  DiscoveryStatus,
+  DiscoveryItem,
+  DiscoveryPath,
+  DiscoveryStats,
+  DiscoveryAchievement,
+  DiscoveryRecommendation,
+  DiscoveryFilters,
+  DiscoverySettings,
+  DiscoverySession,
+  DiscoveryState,
+} from './types';
