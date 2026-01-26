@@ -403,6 +403,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
   },
   {
+    name: 'brain-viewer',
+    path: '/app/brain-viewer',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'simple',
+    component: 'BrainViewerPage',
+    guard: true,
+    requireAuth: true,
+  },
+  {
     name: 'music',
     path: '/app/music',
     segment: 'consumer',
