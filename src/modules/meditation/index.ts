@@ -18,6 +18,17 @@ export { MeditationSettingsPanel } from './ui/MeditationSettingsPanel';
 export { StreakWidget } from './ui/StreakWidget';
 export { MeditationCalendar } from './ui/MeditationCalendar';
 
+// Group Meditation
+export { GroupMeditationService, groupMeditationService } from './groupMeditationService';
+export { useGroupMeditation } from './hooks/useGroupMeditation';
+export type {
+  GroupSession,
+  GroupParticipant,
+  GroupSessionState,
+  CreateGroupSessionParams,
+  JoinGroupSessionParams
+} from './groupMeditationService';
+
 export type {
   MeditationTechnique,
   MeditationDuration,

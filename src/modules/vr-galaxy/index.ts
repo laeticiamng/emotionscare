@@ -27,6 +27,18 @@ export { GalaxySessionHistoryPanel } from './components/GalaxySessionHistoryPane
 export { useVRGalaxy } from './hooks/useVRGalaxy';
 export { useVRGalaxyEnriched } from './hooks/useVRGalaxyEnriched';
 
+// WebXR Enhancements
+export { WebXREnhancementService, webxrEnhancementService } from './webxrEnhancements';
+export { useWebXRSession } from './hooks/useWebXRSession';
+export type {
+  WebXRCapabilities,
+  XRSessionConfig,
+  XRControllerState,
+  HapticFeedback,
+  VRTherapeuticZone,
+  ImmersiveSessionStats
+} from './webxrEnhancements';
+
 // ============================================================================
 // TYPES
 // ============================================================================
