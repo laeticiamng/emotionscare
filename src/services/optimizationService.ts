@@ -17,20 +17,23 @@ export interface OptimizationSuggestion {
 
 export async function logEvent(event: OptimizationEvent): Promise<void> {
   try {
-    // Get the current authenticated user's ID from Supabase auth
+    // Get the current authenticated user's ID from Supabase auth (optional for PWA metrics)
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      logger.warn('logEvent skipped: no authenticated user', null, 'ANALYTICS');
-      return;
-    }
+    
+    // Generate a unique session ID for this event
+    const sessionId = `${event.module}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
     const { error } = await supabase.from('pwa_metrics').insert({
-      user_id: user.id, // Use auth.uid() instead of provided userId to satisfy RLS
-      metric_type: event.module,
-      metric_value: { action: event.action },
-      recorded_at: event.timestamp || new Date().toISOString()
+      session_id: sessionId,
+      user_id: user?.id || null, // null for anonymous users (RLS allows this)
+      device_type: navigator.userAgent.includes('Mobile') ? 'mobile' : 'desktop',
+      is_pwa: window.matchMedia('(display-mode: standalone)').matches,
+      page_views: 1
     });
-    if (error) throw error;
+    
+    if (error) {
+      logger.warn('pwa_metrics insert failed', { error: error.message }, 'ANALYTICS');
+    }
   } catch (err) {
     logger.warn('logEvent failed, using fallback', err, 'ANALYTICS');
   }
