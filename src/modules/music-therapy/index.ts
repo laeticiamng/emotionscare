@@ -33,6 +33,19 @@ export type {
 } from './musicTherapyServiceUnified';
 
 // ============================================================================
+// SUNO AI INTEGRATION
+// ============================================================================
+
+export { SunoMusicService, sunoMusicService } from './sunoIntegration';
+export { useSunoMusic } from './hooks/useSunoMusic';
+export type {
+  SunoGenerationRequest,
+  SunoGenerationResult,
+  SunoTrack,
+  TherapeuticPlaylistRequest
+} from './sunoIntegration';
+
+// ============================================================================
 // LEGACY EXPORTS (deprecated - utiliser MusicTherapyService à la place)
 // ============================================================================
 
