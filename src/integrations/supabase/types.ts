@@ -10671,6 +10671,198 @@ export type Database = {
         }
         Relationships: []
       }
+      group_meditation_invitations: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          invited_by: string
+          invited_email: string | null
+          invited_user_id: string | null
+          session_id: string
+          status: string | null
+          token: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          invited_by: string
+          invited_email?: string | null
+          invited_user_id?: string | null
+          session_id: string
+          status?: string | null
+          token?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          invited_by?: string
+          invited_email?: string | null
+          invited_user_id?: string | null
+          session_id?: string
+          status?: string | null
+          token?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_meditation_invitations_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "group_meditation_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_meditation_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          message_type: string | null
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          message_type?: string | null
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          message_type?: string | null
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_meditation_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "group_meditation_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_meditation_participants: {
+        Row: {
+          avatar_url: string | null
+          display_name: string | null
+          id: string
+          joined_at: string
+          left_at: string | null
+          meditation_duration_seconds: number | null
+          metadata: Json | null
+          mood_after: number | null
+          mood_before: number | null
+          session_id: string
+          status: string
+          user_id: string
+          xp_earned: number | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          display_name?: string | null
+          id?: string
+          joined_at?: string
+          left_at?: string | null
+          meditation_duration_seconds?: number | null
+          metadata?: Json | null
+          mood_after?: number | null
+          mood_before?: number | null
+          session_id: string
+          status?: string
+          user_id: string
+          xp_earned?: number | null
+        }
+        Update: {
+          avatar_url?: string | null
+          display_name?: string | null
+          id?: string
+          joined_at?: string
+          left_at?: string | null
+          meditation_duration_seconds?: number | null
+          metadata?: Json | null
+          mood_after?: number | null
+          mood_before?: number | null
+          session_id?: string
+          status?: string
+          user_id?: string
+          xp_earned?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_meditation_participants_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "group_meditation_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_meditation_sessions: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_minutes: number
+          ended_at: string | null
+          host_id: string
+          id: string
+          is_public: boolean | null
+          join_code: string | null
+          max_participants: number | null
+          scheduled_at: string | null
+          settings: Json | null
+          started_at: string | null
+          status: string
+          technique: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          ended_at?: string | null
+          host_id: string
+          id?: string
+          is_public?: boolean | null
+          join_code?: string | null
+          max_participants?: number | null
+          scheduled_at?: string | null
+          settings?: Json | null
+          started_at?: string | null
+          status?: string
+          technique?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          ended_at?: string | null
+          host_id?: string
+          id?: string
+          is_public?: boolean | null
+          join_code?: string | null
+          max_participants?: number | null
+          scheduled_at?: string | null
+          settings?: Json | null
+          started_at?: string | null
+          status?: string
+          technique?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       group_memberships: {
         Row: {
           group_id: string
