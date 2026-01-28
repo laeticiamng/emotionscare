@@ -8119,6 +8119,39 @@ export type Database = {
           },
         ]
       }
+      emotion_scan_results: {
+        Row: {
+          confidence_score: number | null
+          emotion_data: Json | null
+          id: string
+          metadata: Json | null
+          scan_type: string
+          session_id: string | null
+          timestamp: string
+          user_id: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          emotion_data?: Json | null
+          id?: string
+          metadata?: Json | null
+          scan_type: string
+          session_id?: string | null
+          timestamp?: string
+          user_id: string
+        }
+        Update: {
+          confidence_score?: number | null
+          emotion_data?: Json | null
+          id?: string
+          metadata?: Json | null
+          scan_type?: string
+          session_id?: string | null
+          timestamp?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       emotion_scans: {
         Row: {
           confidence: number | null
@@ -12878,6 +12911,51 @@ export type Database = {
           title?: string
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      listening_sessions: {
+        Row: {
+          completed: boolean | null
+          created_at: string
+          duration_seconds: number | null
+          ended_at: string | null
+          id: string
+          item_code: string | null
+          metadata: Json | null
+          play_count: number | null
+          skip_count: number | null
+          started_at: string
+          track_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          completed?: boolean | null
+          created_at?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          item_code?: string | null
+          metadata?: Json | null
+          play_count?: number | null
+          skip_count?: number | null
+          started_at?: string
+          track_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          completed?: boolean | null
+          created_at?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          item_code?: string | null
+          metadata?: Json | null
+          play_count?: number | null
+          skip_count?: number | null
+          started_at?: string
+          track_id?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -27192,6 +27270,7 @@ export type Database = {
           streak_days: number | null
           total_badges: number | null
           total_points: number | null
+          total_sessions: number | null
           updated_at: string | null
           user_id: string
         }
@@ -27204,6 +27283,7 @@ export type Database = {
           streak_days?: number | null
           total_badges?: number | null
           total_points?: number | null
+          total_sessions?: number | null
           updated_at?: string | null
           user_id: string
         }
@@ -27216,6 +27296,7 @@ export type Database = {
           streak_days?: number | null
           total_badges?: number | null
           total_points?: number | null
+          total_sessions?: number | null
           updated_at?: string | null
           user_id?: string
         }
