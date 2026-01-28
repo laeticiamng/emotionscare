@@ -7468,6 +7468,7 @@ export type Database = {
           id: string
           interaction_config: Json | null
           item_code: string
+          mots_cles: string[] | null
           paroles_musicales: string[] | null
           paroles_rang_a: string[] | null
           paroles_rang_ab: string[] | null
@@ -7479,6 +7480,7 @@ export type Database = {
           roman_story: Json | null
           scene_immersive: Json | null
           slug: string | null
+          specialite: string | null
           subtitle: string | null
           tableau_rang_a: Json | null
           tableau_rang_b: Json | null
@@ -7498,6 +7500,7 @@ export type Database = {
           id?: string
           interaction_config?: Json | null
           item_code: string
+          mots_cles?: string[] | null
           paroles_musicales?: string[] | null
           paroles_rang_a?: string[] | null
           paroles_rang_ab?: string[] | null
@@ -7509,6 +7512,7 @@ export type Database = {
           roman_story?: Json | null
           scene_immersive?: Json | null
           slug?: string | null
+          specialite?: string | null
           subtitle?: string | null
           tableau_rang_a?: Json | null
           tableau_rang_b?: Json | null
@@ -7528,6 +7532,7 @@ export type Database = {
           id?: string
           interaction_config?: Json | null
           item_code?: string
+          mots_cles?: string[] | null
           paroles_musicales?: string[] | null
           paroles_rang_a?: string[] | null
           paroles_rang_ab?: string[] | null
@@ -7539,6 +7544,7 @@ export type Database = {
           roman_story?: Json | null
           scene_immersive?: Json | null
           slug?: string | null
+          specialite?: string | null
           subtitle?: string | null
           tableau_rang_a?: Json | null
           tableau_rang_b?: Json | null
@@ -29503,6 +29509,7 @@ export type Database = {
         }[]
       }
       get_latest_quality_metrics: { Args: never; Returns: Json }
+      get_live_platform_stats: { Args: never; Returns: Json }
       get_medical_dashboard_stats: { Args: never; Returns: Json }
       get_ml_assignment_recommendation: {
         Args: {
