@@ -60,7 +60,7 @@ export const BuddyRequests: React.FC<BuddyRequestsProps> = ({
                 <div className="flex items-start gap-4">
                   {/* Avatar */}
                   <Avatar className="h-14 w-14">
-                    <AvatarImage src={request.from_profile?.avatar_url || undefined} />
+                    <AvatarImage src={request.from_profile?.avatar_url || undefined} alt={request.from_profile?.display_name || 'Buddy'} />
                     <AvatarFallback className="bg-primary/10">
                       {request.from_profile?.display_name?.charAt(0) || 'B'}
                     </AvatarFallback>

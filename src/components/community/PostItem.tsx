@@ -71,7 +71,7 @@ const PostItem: React.FC<PostItemProps> = ({
       <CardHeader className="pb-2">
         <div className="flex space-x-2">
           <Avatar>
-            <AvatarImage src={post.user?.avatar || ''} />
+            <AvatarImage src={post.user?.avatar || ''} alt={post.user?.name || 'Utilisateur'} />
             <AvatarFallback>
               {post.user?.name?.charAt(0) || 'U'}
             </AvatarFallback>

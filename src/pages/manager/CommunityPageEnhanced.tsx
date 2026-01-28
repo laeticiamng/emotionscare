@@ -280,7 +280,7 @@ const CommunityPageEnhanced = () => {
                       <div key={contributor.name} className="flex items-center gap-4 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg">
                         <div className="text-2xl font-bold text-yellow-600">#{index + 1}</div>
                         <Avatar>
-                          <AvatarImage src={contributor.avatar} />
+                          <AvatarImage src={contributor.avatar} alt={contributor.name} />
                           <AvatarFallback className="bg-yellow-100 text-yellow-600">
                             {contributor.name.split(' ').map(n => n[0]).join('')}
                           </AvatarFallback>
@@ -445,7 +445,7 @@ const CommunityPageEnhanced = () => {
                       className="text-center p-4 bg-gradient-to-br from-white to-gray-50 rounded-lg border"
                     >
                       <Avatar className="w-16 h-16 mx-auto mb-3">
-                        <AvatarImage src={member.avatar} />
+                        <AvatarImage src={member.avatar} alt={member.name} />
                         <AvatarFallback className="bg-blue-100 text-blue-600 text-lg">
                           {member.name.split(' ').map(n => n[0]).join('')}
                         </AvatarFallback>

@@ -351,7 +351,7 @@ const CollaborativeSession: React.FC<CollaborativeSessionProps> = ({ className }
             {users.map((u) => (
               <div key={u.id} className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={u.avatar} />
+                  <AvatarImage src={u.avatar} alt={u.name} />
                   <AvatarFallback>{u.name.charAt(0).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 

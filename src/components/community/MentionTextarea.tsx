@@ -166,7 +166,7 @@ export function MentionTextarea({
               onMouseEnter={() => setSelectedIndex(index)}
             >
               <Avatar className="h-8 w-8">
-                <AvatarImage src={user.avatar_url} />
+                <AvatarImage src={user.avatar_url} alt={user.full_name || 'Utilisateur'} />
                 <AvatarFallback>
                   {user.full_name?.charAt(0).toUpperCase() || '?'}
                 </AvatarFallback>

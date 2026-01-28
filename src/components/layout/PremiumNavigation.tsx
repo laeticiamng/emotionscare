@@ -514,7 +514,7 @@ const PremiumNavigation: React.FC = () => {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
                 <Avatar className="w-8 h-8">
-                  <AvatarImage src={user?.avatar} />
+                  <AvatarImage src={user?.avatar} alt={user?.name || 'Avatar utilisateur'} />
                   <AvatarFallback>{user?.name?.[0] || 'U'}</AvatarFallback>
                 </Avatar>
                 <div className="text-sm">

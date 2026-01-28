@@ -132,7 +132,7 @@ export const BuddySentRequests: React.FC<BuddySentRequestsProps> = ({ userId }) 
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">
                   <Avatar className="h-12 w-12">
-                    <AvatarImage src={request.to_profile?.avatar_url || undefined} />
+                    <AvatarImage src={request.to_profile?.avatar_url || undefined} alt={request.to_profile?.display_name || 'Buddy'} />
                     <AvatarFallback className="bg-primary/10">
                       {request.to_profile?.display_name?.charAt(0) || 'B'}
                     </AvatarFallback>

@@ -31,7 +31,7 @@ const NewUsersCard: React.FC = () => {
       {mockNewUsers.map(user => (
         <div key={user.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`} />
+            <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`} alt={user.name} />
             <AvatarFallback>{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
           
