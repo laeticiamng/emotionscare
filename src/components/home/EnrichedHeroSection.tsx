@@ -10,12 +10,16 @@ import { Badge } from '@/components/ui/badge';
 import { Link, useNavigate } from 'react-router-dom';
 import { StopCircle, Clock, Heart, Shield, Brain, GraduationCap, Stethoscope, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-// Suppression du composant SessionCard inutilisé (inline dans le rendu)
+import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
+import { EmergencyAccessModal } from './EmergencyAccessModal';
 
 const EnrichedHeroSection: React.FC = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [isHovered, setIsHovered] = useState(false);
+  const [showEmergencyModal, setShowEmergencyModal] = useState(false);
+  const [emergencyMode, setEmergencyMode] = useState<'stop' | 'night' | 'reset'>('stop');
 
   // Action immédiate - lancer une session
   const handleImmediateAction = () => {
@@ -125,7 +129,15 @@ const EnrichedHeroSection: React.FC = () => {
           <div className="pt-8 sm:pt-14 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5 max-w-4xl mx-auto px-2 sm:px-0 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-600">
             {/* Session STOP */}
             <button
-              onClick={() => navigate('/app/scan?mode=stop')}
+              onClick={() => {
+                if (isAuthenticated) {
+                  navigate('/app/scan?mode=stop');
+                } else {
+                  setEmergencyMode('stop');
+                  setShowEmergencyModal(true);
+                  toast.info('Accès rapide au protocole d\'urgence');
+                }
+              }}
               className="text-left bg-gradient-to-br from-red-500/10 to-red-500/5 backdrop-blur-sm rounded-2xl p-6 border border-red-500/20 hover:border-red-500/40 transition-all duration-300 hover:scale-[1.03] hover:-translate-y-1 active:scale-[0.98] cursor-pointer"
             >
               <div className="flex items-center gap-3 mb-3">
@@ -144,7 +156,15 @@ const EnrichedHeroSection: React.FC = () => {
 
             {/* Session Arrêt mental */}
             <button
-              onClick={() => navigate('/app/scan?mode=mental-stop')}
+              onClick={() => {
+                if (isAuthenticated) {
+                  navigate('/app/scan?mode=mental-stop');
+                } else {
+                  setEmergencyMode('night');
+                  setShowEmergencyModal(true);
+                  toast.info('Accès rapide au protocole nuit');
+                }
+              }}
               className="text-left bg-gradient-to-br from-indigo-500/10 to-indigo-500/5 backdrop-blur-sm rounded-2xl p-6 border border-indigo-500/20 hover:border-indigo-500/40 transition-all duration-300 hover:scale-[1.03] hover:-translate-y-1 active:scale-[0.98] cursor-pointer"
             >
               <div className="flex items-center gap-3 mb-3">
@@ -163,7 +183,15 @@ const EnrichedHeroSection: React.FC = () => {
 
             {/* Session Reset */}
             <button
-              onClick={() => navigate('/app/scan?mode=reset')}
+              onClick={() => {
+                if (isAuthenticated) {
+                  navigate('/app/scan?mode=reset');
+                } else {
+                  setEmergencyMode('reset');
+                  setShowEmergencyModal(true);
+                  toast.info('Accès rapide au protocole reset');
+                }
+              }}
               className="text-left bg-gradient-to-br from-amber-500/10 to-amber-500/5 backdrop-blur-sm rounded-2xl p-6 border border-amber-500/20 hover:border-amber-500/40 transition-all duration-300 hover:scale-[1.03] hover:-translate-y-1 active:scale-[0.98] cursor-pointer"
             >
               <div className="flex items-center gap-3 mb-3">
@@ -182,6 +210,13 @@ const EnrichedHeroSection: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal d'urgence pour utilisateurs non connectés */}
+      <EmergencyAccessModal
+        isOpen={showEmergencyModal}
+        onClose={() => setShowEmergencyModal(false)}
+        defaultMode={emergencyMode}
+      />
     </section>
   );
 };
