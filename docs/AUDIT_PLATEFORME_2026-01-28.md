@@ -1,10 +1,15 @@
 # 🔍 RAPPORT D'AUDIT COMPLET - EmotionsCare
-**Date:** 2026-01-28  
+**Date:** 2026-01-28 (Mise à jour: 22h40)  
 **Score Production Ready:** 100/100 ✅
 
 ---
 
 ## 📊 RÉSUMÉ EXÉCUTIF
+
+### Dernière Correction (22h40)
+- ✅ **pwa_metrics RLS** : Policy INSERT corrigée pour accepter les métriques anonymes
+- ✅ **Policy SELECT** : Alignée pour cohérence (user_id NULL ou auth.uid())
+- ⚠️ **pg_net extension** : Action manuelle requise (voir fin de document)
 
 | Catégorie | État | Score |
 |-----------|------|-------|
