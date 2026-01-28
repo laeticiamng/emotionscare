@@ -297,7 +297,7 @@ const B2CProfileSettingsPage: React.FC = () => {
                     <div>
                       <div className="relative inline-block">
                         <Avatar className="w-32 h-32 mx-auto mb-4 ring-4 ring-primary/20">
-                          <AvatarImage src={profile.avatar_url || undefined} />
+                          <AvatarImage src={profile.avatar_url || undefined} alt={profile.name || 'Avatar de profil'} />
                           <AvatarFallback className="text-3xl bg-gradient-to-br from-primary to-secondary text-primary-foreground">
                             {(profile.name?.[0] || profile.email?.[0] || 'U').toUpperCase()}
                           </AvatarFallback>

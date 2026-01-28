@@ -206,7 +206,7 @@ const EnhancedCoachChat: React.FC<EnhancedCoachChatProps> = ({
                   <Avatar className="mt-0.5">
                     {message.role === 'user' ? (
                       <>
-                        <AvatarImage src={user?.user_metadata?.avatar_url} />
+                        <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.user_metadata?.full_name || 'Vous'} />
                         <AvatarFallback>
                           <User className="h-4 w-4" />
                         </AvatarFallback>

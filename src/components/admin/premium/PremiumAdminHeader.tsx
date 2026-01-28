@@ -36,7 +36,7 @@ const PremiumAdminHeader: React.FC<PremiumAdminHeaderProps> = ({
           </div>
           
           <Avatar>
-            <AvatarImage src={user?.avatar} />
+            <AvatarImage src={user?.avatar} alt={user?.name || 'Admin'} />
             <AvatarFallback>{user?.name?.charAt(0) || 'A'}</AvatarFallback>
           </Avatar>
         </div>

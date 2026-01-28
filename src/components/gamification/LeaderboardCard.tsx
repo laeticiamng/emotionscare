@@ -334,7 +334,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = memo(({
                     </div>
                     
                     <Avatar className="h-10 w-10 border-2 border-background">
-                      <AvatarImage src={entry.avatar} />
+                      <AvatarImage src={entry.avatar} alt={entry.name} />
                       <AvatarFallback className="bg-primary/10">
                         {entry.name.charAt(0)}
                       </AvatarFallback>

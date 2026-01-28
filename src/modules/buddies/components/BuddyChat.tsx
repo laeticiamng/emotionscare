@@ -85,7 +85,7 @@ export const BuddyChat: React.FC<BuddyChatProps> = ({
           
           <div className="relative">
             <Avatar className="h-10 w-10">
-              <AvatarImage src={buddy.avatar_url || undefined} />
+              <AvatarImage src={buddy.avatar_url || undefined} alt={buddy.display_name || 'Buddy'} />
               <AvatarFallback>{buddy.display_name?.charAt(0) || 'B'}</AvatarFallback>
             </Avatar>
             <div className={cn(
@@ -149,7 +149,7 @@ export const BuddyChat: React.FC<BuddyChatProps> = ({
                     >
                       {!isOwn && (
                         <Avatar className="h-8 w-8 shrink-0">
-                          <AvatarImage src={buddy.avatar_url || undefined} />
+                          <AvatarImage src={buddy.avatar_url || undefined} alt={buddy.display_name || 'Buddy'} />
                           <AvatarFallback className="text-xs">
                             {buddy.display_name?.charAt(0) || 'B'}
                           </AvatarFallback>

@@ -226,7 +226,7 @@ const AppLayout: React.FC = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="w-full justify-start space-x-3 p-3 h-auto">
                   <Avatar className="w-10 h-10">
-                    <AvatarImage src={user?.user_metadata?.avatar_url} />
+                    <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.user_metadata?.full_name || 'Avatar utilisateur'} />
                     <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-white font-semibold">
                       {getUserInitials()}
                     </AvatarFallback>
@@ -302,7 +302,7 @@ const AppLayout: React.FC = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm">
                     <Avatar className="w-7 h-7">
-                      <AvatarImage src={user?.user_metadata?.avatar_url} />
+                      <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.user_metadata?.full_name || 'Avatar utilisateur'} />
                       <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-white text-xs">
                         {getUserInitials()}
                       </AvatarFallback>

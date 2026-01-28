@@ -373,7 +373,7 @@ export default function EnhancedBuddySystem() {
                     <div className="flex items-center gap-3">
                       <div className="relative">
                         <Avatar className="h-12 w-12">
-                          <AvatarImage src={buddy.avatar} />
+                          <AvatarImage src={buddy.avatar} alt={buddy.name} />
                           <AvatarFallback>{buddy.name[0]}</AvatarFallback>
                         </Avatar>
                         <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${getAvailabilityColor(buddy.availability)} rounded-full border-2 border-background`}></div>

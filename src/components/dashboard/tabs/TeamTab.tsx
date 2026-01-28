@@ -279,7 +279,7 @@ const TeamTab: React.FC<TeamTabProps> = ({ className }) => {
               >
                 <div className="flex items-center gap-4">
                   <Avatar>
-                    <AvatarImage src={member.avatar} />
+                    <AvatarImage src={member.avatar} alt={member.name} />
                     <AvatarFallback>{getInitials(member.name)}</AvatarFallback>
                   </Avatar>
                   <div>

@@ -281,7 +281,7 @@ const NotificationCenter: React.FC = () => {
                           {notification.user && (
                             <div className="flex items-center space-x-2 mt-2 pt-2 border-t border-border/50">
                               <Avatar className="w-6 h-6">
-                                <AvatarImage src={notification.user.avatar} />
+                                <AvatarImage src={notification.user.avatar} alt={notification.user.name} />
                                 <AvatarFallback className="text-xs">
                                   {notification.user.name[0]}
                                 </AvatarFallback>

@@ -92,7 +92,7 @@ export const OnlineBuddiesList: React.FC<OnlineBuddiesListProps> = ({
                 >
                   <div className="relative">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={buddy.avatar_url} />
+                      <AvatarImage src={buddy.avatar_url} alt={buddy.display_name || 'Buddy'} />
                       <AvatarFallback>
                         {buddy.display_name?.charAt(0) || 'B'}
                       </AvatarFallback>
