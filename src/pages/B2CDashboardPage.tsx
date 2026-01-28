@@ -46,6 +46,7 @@ import { useUserStatsQuery, useUserStatsRealtime } from '@/hooks/useUserStatsQue
 import { useDynamicRecommendations } from '@/hooks/useDynamicRecommendations';
 import { useWellbeingScore } from '@/hooks/useWellbeingScore';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFirstTimeGuide } from '@/hooks/useFirstTimeGuide';
 
 const WeeklyPlanCard = React.lazy(() => import('@/components/dashboard/widgets/WeeklyPlanCard'));
 const RecentEmotionScansWidget = React.lazy(() => import('@/components/dashboard/widgets/RecentEmotionScansWidget'));
@@ -55,6 +56,7 @@ const GoalsProgressWidget = React.lazy(() => import('@/components/dashboard/widg
 const NotificationsWidget = React.lazy(() => import('@/components/dashboard/widgets/NotificationsWidget'));
 const DynamicRecommendationsWidget = React.lazy(() => import('@/components/dashboard/widgets/DynamicRecommendationsWidget'));
 const ModulesNavigationGrid = React.lazy(() => import('@/components/dashboard/ModulesNavigationGrid'));
+const FirstTimeGuide = React.lazy(() => import('@/components/onboarding/FirstTimeGuide'));
 
 type QuickAction = {
   id: string;
@@ -180,6 +182,9 @@ export default function B2CDashboardPage() {
   const clinicalTone = summaryTone;
   const location = useLocation();
   
+  // First Time Guide pour nouveaux utilisateurs
+  const { shouldShowGuide, markAsCompleted, markAsDismissed } = useFirstTimeGuide();
+  
   // Stats réelles depuis Supabase
   const { stats: userStats, loading: statsLoading, refetch: refetchStats, error: statsError } = useUserStatsQuery();
   useUserStatsRealtime();
@@ -250,7 +255,15 @@ export default function B2CDashboardPage() {
   }, [runAudit]);
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-background">
+    <>
+      {/* Guide de première visite pour nouveaux utilisateurs */}
+      {shouldShowGuide && (
+        <Suspense fallback={null}>
+          <FirstTimeGuide onComplete={markAsCompleted} onDismiss={markAsDismissed} />
+        </Suspense>
+      )}
+      
+      <div data-testid="page-root" className="min-h-screen bg-background">
       {/* Skip Links pour l'accessibilité */}
       <a 
         href="#main-content" 
@@ -823,5 +836,6 @@ export default function B2CDashboardPage() {
         </div>
       </footer>
     </div>
+    </>
   );
 }
