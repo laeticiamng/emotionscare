@@ -3502,6 +3502,54 @@ export type Database = {
           },
         ]
       }
+      breath_sessions: {
+        Row: {
+          completed_at: string | null
+          cycles_completed: number | null
+          duration_seconds: number
+          hrv_after: number | null
+          hrv_before: number | null
+          id: string
+          metadata: Json | null
+          notes: string | null
+          protocol: string
+          started_at: string
+          stress_after: number | null
+          stress_before: number | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          cycles_completed?: number | null
+          duration_seconds: number
+          hrv_after?: number | null
+          hrv_before?: number | null
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          protocol: string
+          started_at?: string
+          stress_after?: number | null
+          stress_before?: number | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          cycles_completed?: number | null
+          duration_seconds?: number
+          hrv_after?: number | null
+          hrv_before?: number | null
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          protocol?: string
+          started_at?: string
+          stress_after?: number | null
+          stress_before?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       breath_weekly_metrics: {
         Row: {
           coherence_avg: number | null
@@ -6790,6 +6838,33 @@ export type Database = {
           is_read?: boolean | null
           receiver_id?: string
           sender_id?: string
+        }
+        Relationships: []
+      }
+      discovery_log: {
+        Row: {
+          action: string
+          context: Json | null
+          created_at: string
+          id: string
+          module_name: string
+          user_id: string
+        }
+        Insert: {
+          action: string
+          context?: Json | null
+          created_at?: string
+          id?: string
+          module_name: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          context?: Json | null
+          created_at?: string
+          id?: string
+          module_name?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -15095,6 +15170,48 @@ export type Database = {
         }
         Relationships: []
       }
+      mood_presets: {
+        Row: {
+          audio_settings: Json | null
+          color_scheme: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean | null
+          mood_config: Json
+          name: string
+          updated_at: string
+          usage_count: number | null
+          user_id: string | null
+        }
+        Insert: {
+          audio_settings?: Json | null
+          color_scheme?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          mood_config?: Json
+          name: string
+          updated_at?: string
+          usage_count?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          audio_settings?: Json | null
+          color_scheme?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          mood_config?: Json
+          name?: string
+          updated_at?: string
+          usage_count?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       mood_tracking: {
         Row: {
           context: string | null
@@ -15902,6 +16019,51 @@ export type Database = {
           user_id?: string
           weekly_rank?: number | null
           weekly_score?: number | null
+        }
+        Relationships: []
+      }
+      music_listening_history: {
+        Row: {
+          artist: string | null
+          completion_rate: number | null
+          duration_seconds: number | null
+          id: string
+          listened_at: string
+          metadata: Json | null
+          mood_after: string | null
+          mood_before: string | null
+          source: string | null
+          track_id: string
+          track_title: string | null
+          user_id: string
+        }
+        Insert: {
+          artist?: string | null
+          completion_rate?: number | null
+          duration_seconds?: number | null
+          id?: string
+          listened_at?: string
+          metadata?: Json | null
+          mood_after?: string | null
+          mood_before?: string | null
+          source?: string | null
+          track_id: string
+          track_title?: string | null
+          user_id: string
+        }
+        Update: {
+          artist?: string | null
+          completion_rate?: number | null
+          duration_seconds?: number | null
+          id?: string
+          listened_at?: string
+          metadata?: Json | null
+          mood_after?: string | null
+          mood_before?: string | null
+          source?: string | null
+          track_id?: string
+          track_title?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -21347,6 +21509,51 @@ export type Database = {
           updated_at?: string
           user_id?: string
           zone?: string
+        }
+        Relationships: []
+      }
+      seuil_sessions: {
+        Row: {
+          completed_at: string | null
+          effectiveness: number | null
+          event_id: string | null
+          id: string
+          metadata: Json | null
+          mood_after: number | null
+          mood_before: number | null
+          notes: string | null
+          started_at: string
+          strategies_used: string[] | null
+          trigger_type: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          effectiveness?: number | null
+          event_id?: string | null
+          id?: string
+          metadata?: Json | null
+          mood_after?: number | null
+          mood_before?: number | null
+          notes?: string | null
+          started_at?: string
+          strategies_used?: string[] | null
+          trigger_type?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          effectiveness?: number | null
+          event_id?: string | null
+          id?: string
+          metadata?: Json | null
+          mood_after?: number | null
+          mood_before?: number | null
+          notes?: string | null
+          started_at?: string
+          strategies_used?: string[] | null
+          trigger_type?: string | null
+          user_id?: string
         }
         Relationships: []
       }
