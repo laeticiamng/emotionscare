@@ -28577,7 +28577,9 @@ export type Database = {
       }
     }
     Functions: {
-      accept_invitation: { Args: { invitation_token: string }; Returns: Json }
+      accept_invitation:
+        | { Args: { invitation_id: string }; Returns: boolean }
+        | { Args: { invitation_token: string }; Returns: Json }
       archive_expired_data: {
         Args: { p_entity_type: string; p_retention_days: number }
         Returns: {
@@ -28598,7 +28600,18 @@ export type Database = {
           updated_count: number
         }[]
       }
-      audit_consent_compliance: { Args: never; Returns: Json }
+      audit_consent_compliance:
+        | { Args: never; Returns: Json }
+        | {
+            Args: { p_user_id?: string }
+            Returns: {
+              consent_scope: string
+              issues: string[]
+              status: string
+              user_email: string
+              user_id: string
+            }[]
+          }
       audit_retention_compliance: { Args: never; Returns: Json }
       audit_security_compliance: { Args: never; Returns: Json }
       audit_tableau_duplicates: {
@@ -29006,19 +29019,34 @@ export type Database = {
           user_id: string
         }[]
       }
-      get_all_role_audit_logs: {
-        Args: { _limit?: number; _offset?: number }
-        Returns: {
-          action: string
-          changed_at: string
-          changed_by_email: string
-          id: string
-          new_role: string
-          old_role: string
-          role: string
-          user_email: string
-        }[]
-      }
+      get_all_role_audit_logs:
+        | {
+            Args: never
+            Returns: {
+              changed_by: string
+              changed_by_email: string
+              created_at: string
+              id: string
+              new_role: string
+              old_role: string
+              reason: string
+              user_email: string
+              user_id: string
+            }[]
+          }
+        | {
+            Args: { _limit?: number; _offset?: number }
+            Returns: {
+              action: string
+              changed_at: string
+              changed_by_email: string
+              id: string
+              new_role: string
+              old_role: string
+              role: string
+              user_email: string
+            }[]
+          }
       get_anonymous_activity_logs: {
         Args: {
           p_activity_type?: string
@@ -29509,19 +29537,32 @@ export type Database = {
           total_credits: number
         }[]
       }
-      get_user_role_audit_history: {
-        Args: { _limit?: number; _user_id: string }
-        Returns: {
-          action: string
-          changed_at: string
-          changed_by_email: string
-          id: string
-          metadata: Json
-          new_role: string
-          old_role: string
-          role: string
-        }[]
-      }
+      get_user_role_audit_history:
+        | {
+            Args: { _limit?: number; _user_id: string }
+            Returns: {
+              action: string
+              changed_at: string
+              changed_by_email: string
+              id: string
+              metadata: Json
+              new_role: string
+              old_role: string
+              role: string
+            }[]
+          }
+        | {
+            Args: { p_user_id: string }
+            Returns: {
+              changed_by: string
+              changed_by_email: string
+              created_at: string
+              id: string
+              new_role: string
+              old_role: string
+              reason: string
+            }[]
+          }
       get_user_statistics: { Args: { user_uuid: string }; Returns: Json }
       get_user_subscription: {
         Args: { user_uuid: string }
@@ -29593,14 +29634,16 @@ export type Database = {
             Returns: boolean
           }
         | { Args: { _role: string; _user_id: string }; Returns: boolean }
-      has_sitemap_access: {
-        Args: {
-          _min_permission?: Database["public"]["Enums"]["share_permission"]
-          _target_user_id: string
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      has_sitemap_access:
+        | {
+            Args: {
+              _min_permission?: Database["public"]["Enums"]["share_permission"]
+              _target_user_id: string
+              _user_id: string
+            }
+            Returns: boolean
+          }
+        | { Args: { p_user_id: string }; Returns: boolean }
       increment_aura_interaction: {
         Args: { p_user_id: string }
         Returns: undefined
@@ -30049,10 +30092,20 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      share_filter_template: {
-        Args: { template_id: string; user_emails: string[] }
-        Returns: undefined
-      }
+      share_filter_template:
+        | {
+            Args: {
+              p_permission?: string
+              p_shared_with_email?: string
+              p_shared_with_user_id?: string
+              p_template_id: string
+            }
+            Returns: string
+          }
+        | {
+            Args: { template_id: string; user_emails: string[] }
+            Returns: undefined
+          }
       snapshot_aura_weekly: { Args: never; Returns: undefined }
       start_extraction_batch: {
         Args: {
@@ -30126,8 +30179,9 @@ export type Database = {
       validate_campaign_consents: {
         Args: { p_campaign_id: string }
         Returns: {
-          can_contact: boolean
-          reason: string
+          consent_scope: string
+          has_consent: boolean
+          user_email: string
           user_id: string
         }[]
       }
