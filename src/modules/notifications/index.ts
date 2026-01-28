@@ -6,9 +6,13 @@
 // Types
 export * from './types';
 
-// Service
+// Services
 export { notificationService } from './notificationService';
+export { pushNotificationService } from './pushNotificationService';
 
-// Hook principal
+// Hooks
 export { useNotifications } from './useNotifications';
 export type { UseNotificationsReturn } from './useNotifications';
+
+export { usePushNotifications } from './usePushNotifications';
+export type { UsePushNotificationsReturn } from './usePushNotifications';
