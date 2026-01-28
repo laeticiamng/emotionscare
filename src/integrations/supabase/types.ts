@@ -29643,6 +29643,14 @@ export type Database = {
             }
             Returns: boolean
           }
+        | {
+            Args: {
+              _min_permission?: string
+              _target_user_id: string
+              _user_id: string
+            }
+            Returns: boolean
+          }
         | { Args: { p_user_id: string }; Returns: boolean }
         | {
             Args: { p_sitemap_id: string; p_user_id: string }
