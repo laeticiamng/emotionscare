@@ -682,7 +682,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'simple',
-    component: 'VRBreathGuidePage',
+    component: 'B2CVRBreathGuidePage',
     guard: true,
     requireAuth: true,
     aliases: ['/vr-breath'],
