@@ -29035,16 +29035,17 @@ export type Database = {
             }[]
           }
         | {
-            Args: { _limit?: number; _offset?: number }
+            Args: { p_limit?: number; p_offset?: number }
             Returns: {
               action: string
-              changed_at: string
-              changed_by_email: string
+              created_at: string
               id: string
-              new_role: string
-              old_role: string
+              performed_by: string
+              performed_by_email: string
+              reason: string
               role: string
               user_email: string
+              user_id: string
             }[]
           }
       get_anonymous_activity_logs: {
@@ -29539,19 +29540,6 @@ export type Database = {
       }
       get_user_role_audit_history:
         | {
-            Args: { _limit?: number; _user_id: string }
-            Returns: {
-              action: string
-              changed_at: string
-              changed_by_email: string
-              id: string
-              metadata: Json
-              new_role: string
-              old_role: string
-              role: string
-            }[]
-          }
-        | {
             Args: { p_user_id: string }
             Returns: {
               changed_by: string
@@ -29561,6 +29549,18 @@ export type Database = {
               new_role: string
               old_role: string
               reason: string
+            }[]
+          }
+        | {
+            Args: { p_limit?: number; p_user_id: string }
+            Returns: {
+              action: string
+              created_at: string
+              id: string
+              performed_by: string
+              performed_by_email: string
+              reason: string
+              role: string
             }[]
           }
       get_user_statistics: { Args: { user_uuid: string }; Returns: Json }
@@ -29644,6 +29644,10 @@ export type Database = {
             Returns: boolean
           }
         | { Args: { p_user_id: string }; Returns: boolean }
+        | {
+            Args: { p_sitemap_id: string; p_user_id: string }
+            Returns: boolean
+          }
       increment_aura_interaction: {
         Args: { p_user_id: string }
         Returns: undefined
