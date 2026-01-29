@@ -32,3 +32,4 @@ export { default as ContextLensDashboard } from './components/ContextLensDashboa
 export { default as InsightCard } from './components/InsightCard';
 export { default as EmotionGauge } from './components/EmotionGauge';
 export { default as PatternCard } from './components/PatternCard';
+export { default as EmotionHistoryChart, EmotionHistoryWithTabs } from './components/EmotionHistoryChart';

@@ -15,6 +15,7 @@ import { useContextLens, useEmotionPatterns, useWeeklyReport } from '../hooks/us
 import InsightCard from './InsightCard';
 import EmotionGauge from './EmotionGauge';
 import PatternCard from './PatternCard';
+import { EmotionHistoryWithTabs } from './EmotionHistoryChart';
 import { cn } from '@/lib/utils';
 
 const ContextLensDashboard: React.FC = memo(() => {
@@ -223,18 +224,7 @@ const ContextLensDashboard: React.FC = memo(() => {
 
         {/* History Tab */}
         <TabsContent value="history">
-          <Card>
-            <CardHeader>
-              <CardTitle>Historique émotionnel</CardTitle>
-              <CardDescription>Évolution sur les 7 derniers jours</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64 flex items-center justify-center text-muted-foreground">
-                <Activity className="h-8 w-8 mr-2" />
-                Graphique d'évolution à venir
-              </div>
-            </CardContent>
-          </Card>
+          <EmotionHistoryWithTabs />
         </TabsContent>
       </Tabs>
     </div>
