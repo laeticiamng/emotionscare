@@ -1006,3 +1006,201 @@ p, li, td {
     color-scheme: light;
   }
 }
+
+/* ============================================
+   HARMONIE PARFAITE - RESPONSIVE FINAL
+   ============================================ */
+
+/* Système de grille harmonieux */
+.grid-harmony {
+  display: grid;
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+}
+
+.grid-harmony-1 { grid-template-columns: 1fr; }
+
+@media (min-width: 480px) {
+  .grid-harmony-2 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 768px) {
+  .grid-harmony-3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 1024px) {
+  .grid-harmony-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* Espacements harmonieux entre sections */
+.section-harmony {
+  padding-top: clamp(2rem, 6vh, 4rem);
+  padding-bottom: clamp(2rem, 6vh, 4rem);
+}
+
+.section-harmony-lg {
+  padding-top: clamp(3rem, 8vh, 6rem);
+  padding-bottom: clamp(3rem, 8vh, 6rem);
+}
+
+/* Conteneur avec max-width harmonieux */
+.max-w-harmony {
+  max-width: min(100% - 2rem, 1200px);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Footer optimisé mobile avec safe-area */
+.footer-harmony {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
+@media (max-width: 639px) {
+  .footer-harmony {
+    padding-bottom: max(1.5rem, calc(env(safe-area-inset-bottom, 0px) + 0.5rem));
+  }
+}
+
+/* Header sticky harmonieux */
+.header-harmony {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+  background: hsl(var(--background) / 0.85);
+}
+
+/* Cartes avec proportions harmonieuses */
+.card-harmony {
+  border-radius: clamp(0.75rem, 2vw, 1.25rem);
+  padding: clamp(1rem, 3vw, 1.5rem);
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  transition: all 0.3s ease;
+}
+
+.card-harmony:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px hsl(var(--primary) / 0.15);
+  border-color: hsl(var(--primary) / 0.3);
+}
+
+/* Boutons avec taille harmonieuse sur mobile */
+@media (max-width: 639px) {
+  .btn-harmony {
+    width: 100%;
+    min-height: 52px;
+    font-size: 1rem;
+  }
+}
+
+/* Typographie harmonieuse */
+.title-harmony {
+  font-size: clamp(1.5rem, 5vw, 3rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.subtitle-harmony {
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  font-weight: 400;
+  line-height: 1.5;
+  color: hsl(var(--muted-foreground));
+}
+
+/* Images et médias harmonieux */
+.media-harmony {
+  width: 100%;
+  height: auto;
+  border-radius: clamp(0.5rem, 1.5vw, 1rem);
+  object-fit: cover;
+}
+
+/* Animations harmonieuses */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* Skeleton loading harmonieux */
+.skeleton-harmony {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--muted-foreground) / 0.1) 50%,
+    hsl(var(--muted)) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Navigation mobile harmonieuse */
+@media (max-width: 1023px) {
+  .nav-mobile-harmony {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: hsl(var(--background));
+    padding: env(safe-area-inset-top, 1rem) 1rem env(safe-area-inset-bottom, 1rem);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Modal harmonieux */
+.modal-harmony {
+  width: min(100% - 2rem, 32rem);
+  max-height: min(100% - 2rem, 90vh);
+  border-radius: clamp(1rem, 3vw, 1.5rem);
+  overflow: hidden;
+}
+
+/* Input fields harmonieux */
+.input-harmony {
+  height: clamp(2.75rem, 8vw, 3rem);
+  padding: 0 clamp(0.75rem, 2vw, 1rem);
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+  border-radius: clamp(0.5rem, 1.5vw, 0.75rem);
+}
+
+/* Badge harmonieux */
+.badge-harmony {
+  padding: clamp(0.25rem, 0.5vw, 0.375rem) clamp(0.5rem, 1vw, 0.75rem);
+  font-size: clamp(0.7rem, 2vw, 0.75rem);
+  border-radius: 9999px;
+}
+
+/* Icônes harmonieuses */
+.icon-harmony-sm { width: clamp(1rem, 3vw, 1.25rem); height: auto; }
+.icon-harmony-md { width: clamp(1.25rem, 4vw, 1.5rem); height: auto; }
+.icon-harmony-lg { width: clamp(1.5rem, 5vw, 2rem); height: auto; }
+
+/* Focus visible harmonieux */
+.focus-harmony:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}

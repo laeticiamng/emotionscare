@@ -109,7 +109,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-background border-t mt-auto">
+    <footer className="bg-background border-t mt-auto footer-harmony">
       {/* Newsletter Section */}
       <div className="border-b bg-muted/30">
         <div className="container mx-auto px-4 py-12">
