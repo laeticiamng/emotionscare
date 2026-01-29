@@ -11,6 +11,7 @@ export { useJournalMachine } from './useJournalMachine';
 export { useJournalComposer } from './useJournalComposer';
 export { usePanasSuggestions } from './usePanasSuggestions';
 export { useJournalEnriched } from './useJournalEnriched';
+export { useJournalAutoSave } from './useJournalAutoSave';
 
 // ============ UI Components ============
 export { default as WhisperInput } from './ui/WhisperInput';

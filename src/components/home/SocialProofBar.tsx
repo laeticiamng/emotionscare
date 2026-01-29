@@ -112,9 +112,11 @@ const SocialProofBar: React.FC<SocialProofBarProps> = ({
   return (
     <div
       className={cn(
-        'fixed z-50 left-4 transition-all duration-300 ease-out',
-        position === 'bottom' ? 'bottom-4' : 'top-4',
-        !showOnMobile && 'hidden md:block',
+        // Fix z-index mobile: éviter chevauchement avec bannière cookies (z-[100]) et modals
+        'fixed z-40 left-4 right-4 md:right-auto md:max-w-sm transition-all duration-300 ease-out pointer-events-none',
+        position === 'bottom' ? 'bottom-20 md:bottom-4' : 'top-20 md:top-4',
+        // Toujours visible sur mobile avec showOnMobile, sinon hidden sur mobile
+        showOnMobile ? 'block' : 'hidden md:block',
         isVisible 
           ? 'opacity-100 translate-y-0 scale-100' 
           : cn(
@@ -125,7 +127,7 @@ const SocialProofBar: React.FC<SocialProofBarProps> = ({
       )}
     >
       <div 
-        className="flex items-center gap-3 px-4 py-3 bg-card/95 backdrop-blur-sm rounded-lg border border-border shadow-lg max-w-sm"
+        className="flex items-center gap-3 px-4 py-3 bg-card/95 backdrop-blur-sm rounded-lg border border-border shadow-lg pointer-events-auto"
         role="status"
         aria-live="polite"
         aria-label={`${currentProof.name} ${currentProof.action} - ${currentProof.time}`}
