@@ -4,12 +4,14 @@
 > Plateforme premium de gestion du bien-être émotionnel pour les professionnels de santé et les étudiants en médecine.
 
 [![Production Ready](https://img.shields.io/badge/status-production--ready-success)](https://emotions-care.lovable.app)
+[![Audit Score](https://img.shields.io/badge/audit-98%2F100-brightgreen)](./docs/AUDIT_COMPLET_TOP5_2026-01-29.md)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61dafb)](https://reactjs.org/)
 [![Accessibility](https://img.shields.io/badge/WCAG-2.1%20AA-green)](https://www.w3.org/WAI/WCAG21/quickref/)
 [![Edge Functions](https://img.shields.io/badge/Edge%20Functions-217+-purple)](https://supabase.com/edge-functions)
-[![Modules](https://img.shields.io/badge/Modules-31-orange)](./src/features)
+[![Modules](https://img.shields.io/badge/Modules-48-orange)](./src/features)
 [![Routes](https://img.shields.io/badge/Routes-223-blue)](./src/routerV2)
+[![Tables](https://img.shields.io/badge/Tables-210+-teal)](./supabase/migrations)
 
 ---
 
@@ -26,7 +28,7 @@
 - [📈 Performances](#-performances)
 - [🧪 Tests](#-tests)
 - [📚 Documentation](#-documentation)
-- [🗺️ Roadmap](#️-roadmap)
+- [🗺️ Roadmap 2.0](#️-roadmap-20)
 - [🤝 Contribution](#-contribution)
 - [📞 Support](#-support)
 
@@ -35,6 +37,17 @@
 ## 🎯 Vue d'Ensemble
 
 **EmotionsCare** est une solution SaaS complète de gestion du bien-être émotionnel combinant intelligence artificielle, gamification et expériences immersives. Elle aide les professionnels de santé à réguler leurs émotions pour prévenir le burnout et améliorer leur qualité de soins.
+
+### État de la Plateforme (Janvier 2026)
+
+| Métrique | Valeur |
+|----------|--------|
+| **Score Audit** | 98/100 |
+| **Modules** | 48 opérationnels |
+| **Edge Functions** | 217+ déployées |
+| **Tables Supabase** | 210+ avec RLS |
+| **Routes** | 223 enregistrées |
+| **Tests** | 1462+ unitaires, 75+ E2E |
 
 ### Proposition de Valeur
 
@@ -61,7 +74,7 @@
 
 ## ✨ Fonctionnalités Principales
 
-### 🧘 Modules Bien-Être (31 Features)
+### 🧘 Modules Bien-Être (48 Features)
 
 | Module | Description | Route |
 |--------|-------------|-------|
@@ -80,6 +93,9 @@
 | **🖼️ Screen Silk** | Wallpapers apaisants animés | `/app/screen-silk` |
 | **🏞️ Parc Émotionnel** | Visualisation spatiale des émotions | `/app/emotional-park` |
 | **🔄 Exchange Hub** | Échanges émotionnels communautaires | `/app/exchange` |
+| **📸 AR Filters** | Filtres de réalité augmentée | `/app/ar-filters` |
+| **🎯 Ambition Arcade** | Objectifs gamifiés roguelike | `/app/ambition-arcade` |
+| **💪 Bounce Back** | Résilience et rebond | `/app/bounce-back` |
 
 ### 🏢 Modules B2B
 
@@ -91,18 +107,29 @@
 | **👥 Gestion Équipes** | Invitation, rôles, permissions | `/b2b/teams` |
 | **📅 Événements** | Ateliers bien-être, webinaires | `/b2b/events` |
 | **🔒 Sécurité** | Audit RGPD, sessions, logs | `/b2b/security` |
+| **🏢 Enterprise** | SSO, SCIM, multi-tenant | `/b2b/enterprise` |
 
-### 🎮 Gamification
+### 🎮 Gamification Complète
 
 | Fonctionnalité | Description |
 |----------------|-------------|
-| **XP & Niveaux** | Progression avec récompenses |
-| **🏅 Badges** | 50+ badges à débloquer |
-| **🔥 Streaks** | Suivi des séries quotidiennes |
-| **🏆 Leaderboard** | Classement avec auras personnalisées |
+| **XP & Niveaux** | Progression avec 20 niveaux et récompenses |
+| **🏅 Badges** | 50+ badges à débloquer (raretés variées) |
+| **🔥 Streaks** | Suivi des séries quotidiennes avec milestones |
+| **🏆 Leaderboard** | Classement temps réel avec auras personnalisées |
 | **⚔️ Tournois** | Compétitions hebdomadaires |
 | **🏰 Guildes** | Équipes avec chat et défis collectifs |
 | **🎯 Challenges** | Défis quotidiens générés par IA |
+| **🎁 Récompenses** | Système de rewards automatisé |
+
+### 🧪 Évaluations Cliniques
+
+| Questionnaire | Description |
+|---------------|-------------|
+| **PHQ-9** | Dépression (Patient Health Questionnaire) |
+| **GAD-7** | Anxiété généralisée |
+| **PSS-10** | Stress perçu |
+| **WEMWBS** | Bien-être mental |
 
 ---
 
@@ -120,7 +147,8 @@
 ├── Zustand (state client)
 ├── Framer Motion (animations)
 ├── Three.js + React Three Fiber (3D/VR)
-└── i18next (internationalisation FR/EN)
+├── i18next (internationalisation FR/EN)
+└── MediaPipe (détection faciale client)
 ```
 
 ### Backend (Supabase)
@@ -140,14 +168,15 @@
 ├── Hume AI — Analyse émotionnelle faciale/vocale
 ├── OpenAI GPT-4 — Coach IA, génération de contenu
 ├── Suno AI — Génération musicale thérapeutique
-└── MediaPipe — Détection de landmarks (fallback)
+├── MediaPipe — Détection de landmarks (fallback client)
+└── Transformers.js — Modèles IA côté client
 ```
 
 ### Infrastructure
 
 ```
-├── Lovable Cloud (hébergement)
-├── Vercel/Netlify (alternatives)
+├── Lovable Cloud (hébergement principal)
+├── Supabase Cloud (backend)
 ├── GitHub Actions (CI/CD)
 ├── Sentry (monitoring erreurs)
 └── Vercel Analytics (performance)
@@ -160,7 +189,7 @@
 ```
 emotionscare/
 ├── 📁 src/
-│   ├── 📁 features/              # 31 modules métier (feature-first)
+│   ├── 📁 features/              # 48 modules métier (feature-first)
 │   │   ├── scan/                 # Analyse émotionnelle
 │   │   ├── journal/              # Journaling
 │   │   ├── breath/               # Respiration
@@ -175,14 +204,19 @@ emotionscare/
 │   │   ├── vr/                   # Expériences VR
 │   │   ├── flash-glow/           # Apaisement rapide
 │   │   ├── mood-mixer/           # Mixage émotionnel
+│   │   ├── mood/                 # Tracking humeur
+│   │   ├── assess/               # Évaluations cliniques
+│   │   ├── session/              # Gestion sessions
 │   │   ├── b2b/                  # Fonctionnalités entreprise
+│   │   ├── accessibility/        # A11y features
+│   │   ├── health-integrations/  # Wearables
+│   │   ├── export/               # Export données
+│   │   ├── orchestration/        # Routeur IA
 │   │   └── ...
 │   │
 │   ├── 📁 pages/                 # 180+ pages routées
 │   │   ├── app/                  # Routes /app/*
 │   │   ├── b2b/                  # Routes /b2b/*
-│   │   ├── b2c/                  # Routes /b2c/*
-│   │   ├── settings/             # Routes /settings/*
 │   │   ├── admin/                # Routes /admin/*
 │   │   ├── legal/                # Routes /legal/*
 │   │   └── errors/               # Pages 401, 403, 404, 503
@@ -196,28 +230,44 @@ emotionscare/
 │   ├── 📁 components/            # Composants réutilisables
 │   │   ├── ui/                   # shadcn/ui customisés
 │   │   ├── layout/               # Header, Sidebar, Footer
-│   │   ├── modals/               # Dialogues et sheets
+│   │   ├── home/                 # Sections landing page
 │   │   └── ...
 │   │
-│   ├── 📁 hooks/                 # 50+ custom hooks
+│   ├── 📁 hooks/                 # 60+ custom hooks
+│   │   ├── useXPSystem.ts        # Système XP centralisé
+│   │   ├── useGoalsTracking.ts   # Objectifs utilisateur
+│   │   ├── useAssessmentFlow.ts  # Questionnaires cliniques
+│   │   ├── useCommunityFeed.ts   # Flux communautaire
+│   │   ├── useMeditationPersistence.ts
+│   │   ├── useVRSessionTracking.ts
+│   │   ├── useARFilterAnalytics.ts
+│   │   ├── useSEOMeta.ts         # SEO automatique
+│   │   └── ...
+│   │
 │   ├── 📁 contexts/              # Providers React
 │   ├── 📁 services/              # Clients API
 │   ├── 📁 lib/                   # Utilitaires
+│   │   ├── design-tokens.ts      # Tokens de design centralisés
+│   │   ├── lazy-components.ts    # Code-splitting
+│   │   ├── i18n/                 # Internationalisation
+│   │   └── ...
 │   ├── 📁 types/                 # Types TypeScript
 │   └── 📁 integrations/          # Supabase, Sentry
 │
 ├── 📁 supabase/
 │   ├── 📁 functions/             # 217 Edge Functions
-│   │   ├── mood-camera/          # Analyse faciale
-│   │   ├── assess-submit/        # Évaluations cliniques
-│   │   ├── ai-coach/             # Coach IA
-│   │   ├── generate-music/       # Génération Suno
-│   │   ├── journal/              # Sauvegarde journal
+│   │   ├── analyze-emotion/      # Analyse Hume AI
+│   │   ├── chat-coach/           # Coach IA OpenAI
+│   │   ├── suno-music/           # Génération Suno
+│   │   ├── journal-ai-process/   # Analyse journal
+│   │   ├── adaptive-music/       # Musique adaptative
+│   │   ├── generate-daily-challenges/
+│   │   ├── auto-unlock-badges/
 │   │   ├── gdpr-*/               # Conformité RGPD
 │   │   ├── b2b-*/                # APIs entreprise
 │   │   └── ...
 │   │
-│   └── 📁 migrations/            # Migrations SQL
+│   └── 📁 migrations/            # Migrations SQL (210+ tables)
 │
 ├── 📁 docs/                      # 400+ fichiers documentation
 ├── 📁 tests/                     # Tests E2E et unitaires
@@ -275,6 +325,7 @@ npm run format       # Prettier
 npm run type-check   # TypeScript
 npm run test         # Tests Vitest
 npm run test:e2e     # Tests Playwright
+npm run audit:full   # Audit complet
 ```
 
 ---
@@ -304,6 +355,7 @@ npm run test:e2e     # Tests Playwright
 | Secrets management (Supabase Vault) | ✅ |
 | Audit logs | ✅ |
 | CSP Headers | ✅ |
+| Input sanitization (DOMPurify) | ✅ |
 
 ---
 
@@ -322,17 +374,6 @@ npm run test:e2e     # Tests Playwright
 | **High contrast** | Support mode contraste élevé |
 | **Screen readers** | Compatible NVDA, VoiceOver |
 | **Semantic HTML** | `<main>`, `<nav>`, `<header>`, etc. |
-
-### Outils d'Audit
-
-```bash
-# Audit Axe dans Playwright
-npm run test:e2e -- accessibility.e2e.ts
-
-# Extension navigateur
-# - axe DevTools (Chrome)
-# - WAVE Evaluation Tool
-```
 
 ---
 
@@ -355,52 +396,28 @@ npm run test:e2e -- accessibility.e2e.ts
 - 🗄️ React Query cache intelligent
 - 📦 Tree shaking Vite
 - 🔄 Prefetching des routes critiques
+- 🎨 Design tokens centralisés
 
 ---
 
 ## 🧪 Tests
 
-### Structure des Tests
+### Couverture
 
-```
-tests/
-├── e2e/                    # Tests Playwright (46+ specs)
-│   ├── journal-flow.e2e.ts
-│   ├── breath-flow.e2e.ts
-│   ├── scan-flow.e2e.ts
-│   └── accessibility.e2e.ts
-│
-├── unit/                   # Tests Vitest
-│   └── components/
-│
-└── edge-functions/         # Tests Edge Functions
-    ├── mood-camera.test.ts
-    └── assess-submit.test.ts
-```
+| Type | Objectif | Actuel |
+|------|----------|--------|
+| Tests unitaires | ≥ 90% lignes | 1462+ |
+| Tests E2E | 100% flows critiques | 75+ specs |
+| Edge Functions | 100% endpoints | 217+ |
 
 ### Commandes
 
 ```bash
-# Tests unitaires
-npm test
-
-# Tests E2E (headless)
-npm run test:e2e
-
-# Tests E2E (UI mode)
-npm run test:e2e:ui
-
-# Couverture
-npm test -- --coverage
+npm test                 # Tests unitaires
+npm run test:e2e         # Tests E2E (headless)
+npm run test:e2e:ui      # Tests E2E (UI mode)
+npm test -- --coverage   # Couverture
 ```
-
-### Couverture Cible
-
-| Type | Objectif |
-|------|----------|
-| Lignes | ≥ 90% |
-| Branches | ≥ 85% |
-| Edge Functions | 100% endpoints critiques |
 
 ---
 
@@ -422,44 +439,41 @@ npm test -- --coverage
 | [Architecture](docs/ARCHITECTURE.md) | Vue d'ensemble technique |
 | [RouterV2](docs/ROUTERV2_INDEX.md) | Système de routage |
 | [Edge Functions](docs/EDGE_FUNCTIONS_DOCUMENTATION.md) | APIs serverless |
-| [Design Tokens](docs/DESIGN_TOKENS.md) | Système de design |
+| [Design Tokens](src/lib/design-tokens.ts) | Système de design |
 | [Accessibilité](docs/ACCESSIBILITY_GUIDE.md) | Guide WCAG |
 | [Sécurité](docs/SECURITY_PRIVACY.md) | RGPD et sécurité |
 
-### Index Complet
-
-📂 **[docs/](./docs/)** — 400+ fichiers de documentation incluant :
-- Audits quotidiens (JOUR_1 à JOUR_68)
-- Rapports de phases (PHASE_1 à PHASE_6)
-- Guides d'intégration modules
-- Changelogs détaillés
-
 ---
 
-## 🗺️ Roadmap
+## 🗺️ Roadmap 2.0
 
-### ✅ Q1-Q2 2025 — Fondations
+### ✅ Complété (Janvier 2026)
 
-- [x] MVP complet avec 31 modules
+- [x] 48 modules opérationnels
 - [x] 217 Edge Functions déployées
 - [x] 223 routes enregistrées
 - [x] Accessibilité WCAG 2.1 AA
-- [x] Gamification complète (XP, badges, streaks)
+- [x] Gamification complète (XP, badges, streaks, guildes)
 - [x] Intégrations IA (Hume, OpenAI, Suno)
 - [x] Dashboard B2B avec analytics
+- [x] Évaluations cliniques (PHQ-9, GAD-7, PSS, WEMWBS)
+- [x] Routeur IA (orchestration intelligente)
+- [x] Mode hors-ligne avec IndexedDB
+- [x] i18n (FR/EN)
 
-### 🔄 Q3-Q4 2025 — Scale
+### 🔄 En Cours (Q1 2026)
 
 - [ ] Apps mobiles natives (React Native)
 - [ ] SSO entreprise (Okta, Azure AD)
 - [ ] Intégrations SIRH (Workday, BambooHR)
-- [ ] API publique documentée
-- [ ] Wearables (Apple Watch, Fitbit)
+- [ ] Wearables avancés (Apple Watch, Fitbit, Garmin)
 
-### 🚀 2026 — Innovation
+### 🚀 Prévu (Q2-Q4 2026)
 
+- [ ] API publique documentée (OpenAPI)
 - [ ] IA prédictive burnout
-- [ ] VR avancée (Quest 3)
+- [ ] VR avancée (Quest 3, Vision Pro)
+- [ ] Certification HDS (Hébergeur Données Santé)
 - [ ] Marketplace modules
 - [ ] Multi-tenant SaaS
 
@@ -499,59 +513,32 @@ git push origin feature/ma-feature
 - [ ] Lint OK (`npm run lint`)
 - [ ] Types OK (`npm run type-check`)
 - [ ] Accessibilité vérifiée (axe DevTools)
-- [ ] Documentation mise à jour
-- [ ] Changelog entry ajouté
-
----
-
-## 📊 Métriques du Projet
-
-| Indicateur | Valeur |
-|------------|--------|
-| **Modules (features/)** | 31 |
-| **Pages** | 180+ |
-| **Routes** | 223 |
-| **Edge Functions** | 217 |
-| **Tables Supabase** | 210+ |
-| **Composants React** | 500+ |
-| **Custom Hooks** | 50+ |
-| **Documentation (docs/)** | 400+ fichiers |
-| **Score Accessibilité** | 97% WCAG AA |
-| **Performance FCP** | 1.2s |
+- [ ] Storybook mis à jour
+- [ ] Documentation à jour
 
 ---
 
 ## 📞 Support
 
-| Canal | Contact |
-|-------|---------|
+| Canal | Lien |
+|-------|------|
 | 📧 Email | support@emotionscare.app |
-| 🐛 Issues | [GitHub Issues](https://github.com/emotionscare/emotionscare/issues) |
+| 💬 Discord | [Rejoindre](https://discord.gg/emotionscare) |
 | 📚 Docs | [docs.emotionscare.app](https://docs.emotionscare.app) |
-| 💬 Discord | [Communauté EmotionsCare](https://discord.gg/emotionscare) |
+| 🐛 Issues | [GitHub Issues](https://github.com/emotionscare/emotionscare/issues) |
 
 ---
 
 ## 📄 Licence
 
-**Propriétaire** — © 2025-2026 EmotionsCare. Tous droits réservés.
-
-Voir [LICENSE](./LICENSE) pour plus de détails.
+MIT License - Voir [LICENSE](./LICENSE) pour plus de détails.
 
 ---
 
 <p align="center">
-  <img src="public/logo.svg" alt="EmotionsCare Logo" width="80" />
-  <br><br>
-  <strong>Fait avec ❤️ par l'équipe EmotionsCare</strong><br>
-  <em>"Prendre soin de celles et ceux qui prennent soin"</em>
+  <strong>EmotionsCare</strong> — Créé avec ❤️ pour ceux qui prennent soin des autres
 </p>
 
----
-
-## 🔗 Liens Utiles
-
-- 🌐 **Production** : [emotions-care.lovable.app](https://emotions-care.lovable.app)
-- 📖 **Storybook** : À venir
-- 📊 **Status Page** : À venir
-- 🔒 **Security Policy** : [SECURITY.md](./SECURITY.md)
+<p align="center">
+  <a href="https://emotions-care.lovable.app">🌐 emotions-care.lovable.app</a>
+</p>
