@@ -57,6 +57,8 @@ verify_jwt = false
 [functions.marketplace-api]
 verify_jwt = false
 
+[functions.implicit-assess]
+verify_jwt = false
 # ========================================
 # API CONFIGURATION
 # ========================================
