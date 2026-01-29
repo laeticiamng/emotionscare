@@ -1,220 +1,65 @@
 project_id = "yaincoxihiqdksxgrsrk"
 
-[functions.ai-monitoring]
+# ========================================
+# ROUTEURS CONSOLIDÉS (v2.0)
+# Réduction de ~235 fonctions → 10 routeurs
+# ========================================
+
+[functions.router-ai]
 verify_jwt = false
 
-[functions.send-weekly-email]
-verify_jwt = true
-
-[functions.send-notification-email]
-verify_jwt = true
-
-[functions.track-email-open]
+[functions.router-music]
 verify_jwt = false
 
-[functions.emotion-music-ai]
+[functions.router-b2b]
 verify_jwt = false
 
-[functions.gamification]
-verify_jwt = true
-
-[functions.automix-context]
-verify_jwt = true
-
-[functions.health-edge]
+[functions.router-system]
 verify_jwt = false
 
-[functions.silk-wallpaper]
-verify_jwt = true
-
-[functions.bubble-sessions]
-verify_jwt = true
-
-[functions.suno-status-check]
+[functions.router-wellness]
 verify_jwt = false
 
-[functions.music-queue-worker]
+[functions.router-gdpr]
 verify_jwt = false
 
-[functions.send-weekly-report]
+[functions.router-context-lens]
 verify_jwt = false
 
-[functions.send-error-alert]
+[functions.router-community]
 verify_jwt = false
 
-[functions.send-slack-alert]
-verify_jwt = false
-
-[functions.send-discord-alert]
-verify_jwt = false
-
-[functions.generate-analytics-report]
-verify_jwt = false
-
-[functions.check-scheduled-reports]
-verify_jwt = false
-
-[functions.check-alert-escalation]
-verify_jwt = false
-
-[functions.analyze-error-patterns]
-verify_jwt = false
-
-[functions.ml-alert-predictor]
-verify_jwt = false
-
-[functions.optimize-escalation-rules]
-verify_jwt = false
-
-[functions.monitoring-chatbot]
-verify_jwt = true
-
-[functions.create-ticket]
-verify_jwt = true
-
-[functions.ab-test-manager]
-verify_jwt = true
-
-[functions.send-notification]
-verify_jwt = false
-
-[functions.send-weekly-monitoring-report]
-verify_jwt = false
-
-[functions.generate-incident-report]
-verify_jwt = false
-
-[functions.proactive-incident-detector]
-verify_jwt = false
-
-[functions.collect-system-metrics]
-verify_jwt = false
-
-[functions.exchange-ai]
-verify_jwt = true
-
-[functions.ai-coach]
-verify_jwt = true
-
-[functions.ai-analysis]
-verify_jwt = true
-
-[functions.chat-coach]
-verify_jwt = true
-
-[functions.crisis-detection]
-verify_jwt = false
-
-[functions.data-export]
-verify_jwt = true
-
-[functions.community-groups]
-verify_jwt = true
-
-[functions.wearables-sync]
-verify_jwt = true
-
-[functions.suno-lyrics]
-verify_jwt = true
-
-[functions.suno-music]
-verify_jwt = true
-
-[functions.suno-callback]
-verify_jwt = false
-
-[functions.download-audio]
-verify_jwt = false
-
-[functions.adaptive-music]
-verify_jwt = true
-
-[functions.generate-music]
-verify_jwt = true
-
-[functions.music-recommendations]
-verify_jwt = true
-
-[functions.generate-therapeutic-music]
-verify_jwt = true
-
-[functions.music-api]
-verify_jwt = true
-
-[functions.process-music-session]
-verify_jwt = true
-
-[functions.send-invitation]
-verify_jwt = true
-
-[functions.music-pregeneration-engine]
-verify_jwt = true
-
-[functions.emotion-analysis]
-verify_jwt = true
-
-[functions.analyze-voice-hume]
-verify_jwt = true
-
-[functions.hume-analysis]
-verify_jwt = true
-
-[functions.scans-api]
-verify_jwt = true
-
-[functions.story-synth]
-verify_jwt = true
-
-[functions.flash-glow-sessions]
-verify_jwt = true
-
-[functions.global-leaderboard]
-verify_jwt = true
-
-[functions.sessions-api]
-verify_jwt = true
-
-[functions.seuil-api]
-verify_jwt = true
-
-[functions.context-lens-auth]
-verify_jwt = false
-
-[functions.context-lens-patients]
-verify_jwt = false
-
-[functions.context-lens-brain]
-verify_jwt = false
-
-[functions.context-lens-notes]
-verify_jwt = false
-
-[functions.context-lens-reports]
-verify_jwt = false
-
-[functions.context-lens-websocket]
-verify_jwt = false
-
-[functions.context-lens-anatomy]
-verify_jwt = false
-
-[functions.context-lens-insights]
-verify_jwt = false
-
-[functions.context-lens-patterns]
-verify_jwt = false
-
-[functions.context-lens-nlp]
-verify_jwt = false
-
-[functions.context-lens-emotions]
-verify_jwt = false
+# ========================================
+# FONCTIONS LEGACY (à migrer progressivement)
+# ========================================
 
 [functions.ai-router]
 verify_jwt = false
 
-[functions.wearables-dashboard]
+[functions.suno-callback]
 verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.shopify-webhook]
+verify_jwt = false
+
+[functions.sentry-webhook-handler]
+verify_jwt = false
+
+[functions.health-edge]
+verify_jwt = false
+
+[functions.unified-api]
+verify_jwt = false
+
+[functions.marketplace-api]
+verify_jwt = false
+
+# ========================================
+# API CONFIGURATION
+# ========================================
 
 [api]
 enabled = true
@@ -226,7 +71,9 @@ extra_allowed_origins = [
   "http://localhost:5173",
   "http://localhost:3000",
   "https://app.emotionscare.com",
-  "https://admin.emotionscare.com"
+  "https://admin.emotionscare.com",
+  "https://emotions-care.lovable.app",
+  "https://id-preview--9e5840a2-4948-4a34-a85a-d7f1e9f4027e.lovable.app"
 ]
 
 [db]
@@ -256,6 +103,7 @@ additional_redirect_urls = [
   "http://localhost:5173",
   "https://app.emotionscare.com",
   "https://admin.emotionscare.com",
+  "https://emotions-care.lovable.app",
   "https://lovable.dev"
 ]
 jwt_expiry = 3600
