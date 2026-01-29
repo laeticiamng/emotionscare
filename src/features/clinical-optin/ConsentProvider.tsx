@@ -5,6 +5,7 @@ import React, { createContext, useContext, useEffect, useMemo, useRef, useState 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
+import { logger } from '@/lib/logger';
 
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -157,8 +158,11 @@ export const ConsentProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       // Récupérer l'utilisateur actuel
       const { data: { user } } = await supabase.auth.getUser();
+      
+      // Si non authentifié, accepter en mémoire sans persister
       if (!user) {
-        throw new Error('User not authenticated');
+        logger.info('optin.accept.anonymous', { scope: CONSENT_SCOPE }, 'CONSENT');
+        return; // Acceptation anonyme - stockée seulement en mémoire via optimisticSnapshot
       }
 
       // Vérifier s'il existe déjà un consentement actif
