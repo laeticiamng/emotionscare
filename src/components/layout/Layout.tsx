@@ -1,20 +1,16 @@
-// @ts-nocheck
+/**
+ * Layout - Layout de base avec style Apple élégant
+ */
+
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import GlobalNav from '@/components/GlobalNav';
-import SecurityFooter from '@/components/SecurityFooter';
+import AppleStyleShell from '@/components/layout/AppleStyleShell';
 
 const Layout: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/10" data-testid="page-root">
-      <GlobalNav />
-      
-      <main id="main-content" className="flex-1">
-        <Outlet />
-      </main>
-      
-      <SecurityFooter />
-    </div>
+    <AppleStyleShell showBackButton={true}>
+      <Outlet />
+    </AppleStyleShell>
   );
 };
 
