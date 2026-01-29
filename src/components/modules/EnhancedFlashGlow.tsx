@@ -270,14 +270,20 @@ export default function EnhancedFlashGlow({
   }, [isActive, currentPhase, cycleCount, totalCycles, selectedPattern]);
 
   const playGuidanceSound = (phase: string) => {
-    const frequencies = {
+    // Protection: vérifier que playTone existe avant d'appeler
+    if (typeof playTone !== 'function') return;
+    
+    const frequencies: Record<string, number> = {
       inhale: 440,    // A4 - montant
       hold1: 523,     // C5 - stable aigu
       exhale: 349,    // F4 - descendant
       hold2: 294      // D4 - stable grave
     };
     
-    playTone(frequencies[phase], 0.3, 0.3);
+    const freq = frequencies[phase];
+    if (freq) {
+      playTone(freq, 0.3, 0.3);
+    }
   };
 
   const checkPerfectBreath = () => {
