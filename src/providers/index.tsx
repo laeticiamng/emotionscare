@@ -19,7 +19,7 @@ import { UnifiedProvider } from '@/core/UnifiedStateManager';
 import { MusicProvider } from '@/contexts/music';
 import { ThemeProvider } from '@/providers/theme';
 import { PolicyAcceptanceModal } from '@/components/gdpr/PolicyAcceptanceModal';
-import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
+import AccessibilitySkipLinks from '@/components/accessibility/AccessibilitySkipLinks';
 
 // Create query client outside component to avoid recreation
 const queryClient = new QueryClient({
