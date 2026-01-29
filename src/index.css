@@ -134,36 +134,67 @@ body {
   }
 
   :root {
+    /* === COULEURS PRINCIPALES AMÉLIORÉES === */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
     
-    /* Landing page premium colors - palette apaisante */
+    /* Primary - Bleu vibrant et professionnel santé */
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --primary-hover: 221 83% 48%;
+    --primary-glow: 221 100% 60%;
+    
+    /* Landing page premium colors - palette apaisante enrichie */
     --landing-cream: 40 40% 97%;
     --landing-beige: 35 30% 90%;
-    --landing-sage: 150 25% 50%;
-    --landing-sage-dark: 150 30% 35%;
-    --landing-sky: 200 60% 70%;
-    --landing-sky-dark: 200 50% 45%;
-    --landing-text: 220 15% 20%;
-    --landing-text-muted: 220 10% 50%;
-    --secondary: 210 40% 96%;
+    --landing-sage: 160 35% 45%;
+    --landing-sage-dark: 160 40% 32%;
+    --landing-sky: 200 70% 65%;
+    --landing-sky-dark: 200 60% 42%;
+    --landing-text: 220 20% 16%;
+    --landing-text-muted: 220 12% 45%;
+    
+    /* Secondary - Plus de contraste */
+    --secondary: 210 35% 95%;
     --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    
+    /* Muted - Subtile mais lisible */
+    --muted: 210 30% 96%;
+    --muted-foreground: 215 20% 40%;
+    
+    /* Accent - Violet premium */
+    --accent: 262 83% 58%;
+    --accent-foreground: 0 0% 100%;
+    
+    /* Destructive - Rouge plus vif */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Borders & Inputs - Plus définis */
+    --border: 214 25% 88%;
+    --input: 214 25% 88%;
+    --ring: 221 83% 53%;
     --radius: 0.75rem;
+    
+    /* === GRADIENTS PREMIUM === */
+    --gradient-primary: linear-gradient(135deg, hsl(221 83% 53%) 0%, hsl(262 83% 58%) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(221 83% 53% / 0.05) 0%, transparent 50%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(210 30% 98%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(160 60% 40%) 100%);
+    --gradient-warning: linear-gradient(135deg, hsl(38 92% 50%) 0%, hsl(25 95% 53%) 100%);
+    --gradient-error: linear-gradient(135deg, hsl(0 72% 51%) 0%, hsl(340 82% 52%) 100%);
+    
+    /* === SHADOWS PREMIUM === */
+    --shadow-sm: 0 1px 2px 0 hsl(221 83% 53% / 0.03);
+    --shadow-md: 0 4px 6px -1px hsl(221 83% 53% / 0.05), 0 2px 4px -2px hsl(221 83% 53% / 0.05);
+    --shadow-lg: 0 10px 15px -3px hsl(221 83% 53% / 0.08), 0 4px 6px -4px hsl(221 83% 53% / 0.05);
+    --shadow-xl: 0 20px 25px -5px hsl(221 83% 53% / 0.1), 0 8px 10px -6px hsl(221 83% 53% / 0.08);
+    --shadow-glow: 0 0 20px hsl(221 83% 53% / 0.25);
+    --shadow-glow-lg: 0 0 40px hsl(221 83% 53% / 0.35);
     
     /* Sidebar variables */
     --sidebar: 0 0% 98%;
@@ -220,33 +251,61 @@ body {
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    /* === DARK MODE PREMIUM === */
+    --background: 222 47% 6%;
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --card: 222 47% 8%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 222 47% 8%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
+    
+    /* Primary - Bleu lumineux en dark */
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 8%;
+    --primary-hover: 217 91% 65%;
+    --primary-glow: 217 100% 70%;
+    
+    /* Secondary - Subtil mais visible */
+    --secondary: 217 33% 15%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
+    
+    /* Muted - Équilibré */
+    --muted: 217 33% 15%;
+    --muted-foreground: 215 20% 65%;
+    
+    /* Accent - Violet lumineux */
+    --accent: 262 80% 65%;
+    --accent-foreground: 0 0% 100%;
+    
+    /* Destructive - Rouge visible en dark */
+    --destructive: 0 63% 45%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.1%;
+    
+    /* Borders & Inputs */
+    --border: 217 33% 18%;
+    --input: 217 33% 18%;
+    --ring: 217 91% 60%;
     
     /* Sidebar variables (dark mode) */
-    --sidebar: 222.2 84% 4.9%;
+    --sidebar: 222 47% 6%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-border: 217.2 32.6% 17.5%;
-    --sidebar-accent: 217.2 32.6% 17.5%;
+    --sidebar-border: 217 33% 18%;
+    --sidebar-accent: 217 33% 15%;
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-ring: 224.3 76.3% 94.1%;
+    --sidebar-ring: 217 91% 60%;
+    
+    /* === GRADIENTS DARK MODE === */
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(262 80% 65%) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(217 91% 60% / 0.08) 0%, transparent 50%);
+    --gradient-card: linear-gradient(145deg, hsl(222 47% 8%) 0%, hsl(222 47% 10%) 100%);
+    
+    /* === SHADOWS DARK MODE === */
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.3);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.4);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.5);
+    --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.6);
+    --shadow-glow: 0 0 20px hsl(217 91% 60% / 0.3);
+    --shadow-glow-lg: 0 0 40px hsl(217 91% 60% / 0.4);
     
     --focus-ring-color: 217.2 91.2% 59.8%;
     --high-contrast-bg: 0 0% 0%;
@@ -299,6 +358,133 @@ body {
       --primary-foreground: var(--high-contrast-bg);
     }
   }
+}
+
+/* === STYLES PREMIUM POUR AMÉLIORER L'APPARENCE === */
+
+/* Cartes avec effet de survol premium */
+.premium-card {
+  background: var(--gradient-card);
+  border-radius: var(--radius);
+  border: 1px solid hsl(var(--border));
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.premium-card:hover {
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-4px);
+  border-color: hsl(var(--primary) / 0.3);
+}
+
+/* Boutons avec effet glow */
+.btn-glow {
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-glow);
+  transition: all 0.3s ease;
+}
+
+.btn-glow:hover {
+  box-shadow: var(--shadow-glow-lg);
+  transform: translateY(-2px);
+}
+
+.btn-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.2), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.btn-glow:hover::before {
+  transform: translateX(100%);
+}
+
+/* Section hero avec gradient subtil */
+.hero-gradient {
+  background: var(--gradient-hero);
+}
+
+/* Texte avec gradient premium */
+.text-gradient-premium {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Badge premium animé */
+.badge-premium {
+  background: var(--gradient-primary);
+  color: hsl(var(--primary-foreground));
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  box-shadow: var(--shadow-glow);
+}
+
+/* Séparateur avec gradient */
+.divider-gradient {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, hsl(var(--border)), transparent);
+}
+
+/* Fond avec motif subtil */
+.bg-pattern {
+  background-image: radial-gradient(hsl(var(--primary) / 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Glass morphism amélioré */
+.glass-premium {
+  backdrop-filter: blur(20px) saturate(180%);
+  background: hsl(var(--background) / 0.7);
+  border: 1px solid hsl(var(--border) / 0.5);
+}
+
+.dark .glass-premium {
+  background: hsl(var(--background) / 0.8);
+  border: 1px solid hsl(var(--border) / 0.3);
+}
+
+/* Ombre colorée pour les éléments interactifs */
+.shadow-colored {
+  box-shadow: 0 10px 40px -10px hsl(var(--primary) / 0.25);
+}
+
+.shadow-success {
+  box-shadow: 0 10px 40px -10px hsl(var(--success) / 0.25);
+}
+
+.shadow-warning {
+  box-shadow: 0 10px 40px -10px hsl(var(--warning) / 0.25);
+}
+
+.shadow-error {
+  box-shadow: 0 10px 40px -10px hsl(var(--destructive) / 0.25);
+}
+
+/* Bordure avec gradient */
+.border-gradient {
+  position: relative;
+  border: none !important;
+}
+
+.border-gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: var(--gradient-primary);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
 }
 
 @layer utilities {
