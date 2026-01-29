@@ -62,11 +62,20 @@ import { MeditationExportButton } from '@/components/meditation/MeditationExport
 
 const TECHNIQUE_OPTIONS = [
   { 
+    id: 'pause-soignant', 
+    title: 'Pause Soignant', 
+    description: 'Récupération rapide entre deux patients',
+    icon: Heart,
+    color: 'bg-primary/10 text-primary',
+    durations: [3, 5, 10],
+    isNew: true
+  },
+  { 
     id: 'mindfulness', 
     title: 'Pleine conscience', 
     description: 'Observer le moment présent sans jugement',
     icon: Brain,
-    color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
+    color: 'bg-info/10 text-info',
     durations: [5, 10, 15, 20]
   },
   { 
@@ -74,31 +83,40 @@ const TECHNIQUE_OPTIONS = [
     title: 'Focus respiration', 
     description: 'Se concentrer sur le souffle naturel',
     icon: Wind,
-    color: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
+    color: 'bg-info/10 text-info',
     durations: [5, 10, 15]
   },
   { 
     id: 'body-scan', 
     title: 'Scan corporel', 
-    description: 'Explorer les sensations progressivement',
+    description: 'Relâcher les tensions accumulées',
     icon: Heart,
-    color: 'bg-pink-500/10 text-pink-600 dark:text-pink-400',
+    color: 'bg-accent/10 text-accent-foreground',
     durations: [10, 15, 20, 30]
+  },
+  { 
+    id: 'decompression', 
+    title: 'Décompression', 
+    description: 'Après une situation difficile ou stressante',
+    icon: Waves,
+    color: 'bg-success/10 text-success',
+    durations: [5, 10, 15],
+    isNew: true
   },
   { 
     id: 'visualization', 
     title: 'Visualisation', 
     description: 'Créer des images mentales apaisantes',
     icon: Sparkles,
-    color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
+    color: 'bg-accent/10 text-accent-foreground',
     durations: [10, 15, 20]
   },
   { 
     id: 'loving-kindness', 
     title: 'Bienveillance', 
-    description: 'Cultiver la compassion',
+    description: 'Cultiver la compassion envers soi et les autres',
     icon: Heart,
-    color: 'bg-rose-500/10 text-rose-600 dark:text-rose-400',
+    color: 'bg-destructive/10 text-destructive',
     durations: [10, 15, 20]
   },
   { 
@@ -106,15 +124,17 @@ const TECHNIQUE_OPTIONS = [
     title: 'Mantra', 
     description: 'Répéter un son calmant',
     icon: Volume2,
-    color: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
+    color: 'bg-primary/10 text-primary',
     durations: [5, 10, 15, 20]
   },
 ];
 
 const TECHNIQUE_LABELS: Record<string, string> = {
+  'pause-soignant': 'Pause Soignant',
   'mindfulness': 'Pleine conscience',
   'breath-focus': 'Focus respiration',
   'body-scan': 'Scan corporel',
+  'decompression': 'Décompression',
   'visualization': 'Visualisation',
   'loving-kindness': 'Bienveillance',
   'mantra': 'Mantra',
