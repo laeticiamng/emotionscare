@@ -2552,6 +2552,34 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
   },
+  {
+    name: 'platform-audit',
+    path: '/admin/platform-audit',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'PlatformAuditPage',
+    guard: true,
+    requireAuth: true,
+    meta: {
+      title: 'Audit Plateforme - EmotionsCare',
+      description: 'Rapport de santé et audit complet de la plateforme',
+    },
+  },
+  {
+    name: 'context-lens',
+    path: '/app/context-lens',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'ContextLensPage',
+    guard: true,
+    requireAuth: true,
+    meta: {
+      title: 'Context Lens - EmotionsCare',
+      description: 'Analyse contextuelle et insights émotionnels',
+    },
+  },
 
   // 404 FALLBACK ROUTE - Le fallback '*' est géré directement dans router.tsx
   // Cette entrée est gardée pour documentation mais n'est pas utilisée
