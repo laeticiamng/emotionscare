@@ -12,10 +12,13 @@
  * - PSS-10: Intégré dans les exercices de respiration (niveau de stress ressenti)
  * - ISI: Questions sur le sommeil dans le check-in du matin
  * - BRS: Intégré dans les défis de résilience
+ * 
+ * Les données sont persistées en backend et mappées aux instruments cliniques.
  */
 
 import { useCallback, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export type ImplicitAssessmentType = 
   | 'wellbeing'      // WHO-5 style
@@ -205,6 +208,46 @@ export function useImplicitAssessment() {
     answers: {},
     questions: [],
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  /**
+   * Soumet les réponses au backend pour persistance clinique
+   */
+  const submitToBackend = useCallback(async (
+    type: ImplicitAssessmentType,
+    answers: Record<string, number>,
+    context?: { module?: string; session_id?: string }
+  ): Promise<{ level: number; message: string } | null> => {
+    try {
+      setIsSubmitting(true);
+      
+      const { data, error } = await supabase.functions.invoke('implicit-assess', {
+        body: {
+          type,
+          answers,
+          context: {
+            ...context,
+            timestamp: new Date().toISOString(),
+          },
+        },
+      });
+
+      if (error) {
+        console.error('[useImplicitAssessment] Backend error:', error);
+        return null;
+      }
+
+      return {
+        level: data?.level ?? 2,
+        message: data?.message ?? 'Merci pour ce moment',
+      };
+    } catch (err) {
+      console.error('[useImplicitAssessment] Submit error:', err);
+      return null;
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, []);
 
   /**
    * Démarre une évaluation implicite
@@ -227,36 +270,54 @@ export function useImplicitAssessment() {
 
   /**
    * Enregistre une réponse et retourne la question suivante ou null si terminé
+   * Quand terminé, soumet automatiquement au backend
    */
-  const answerQuestion = useCallback((questionId: string, value: number): ImplicitQuestion | null => {
-    setState(prev => {
-      const newAnswers = { ...prev.answers, [questionId]: value };
-      const nextIndex = prev.currentQuestionIndex + 1;
-      
-      if (nextIndex >= prev.questions.length) {
-        // Évaluation terminée - on pourrait envoyer les résultats ici
-        return {
-          ...prev,
-          isActive: false,
-          answers: newAnswers,
-          currentQuestionIndex: nextIndex,
-        };
-      }
-
-      return {
-        ...prev,
-        answers: newAnswers,
-        currentQuestionIndex: nextIndex,
-      };
-    });
-
-    // Retourner la prochaine question
+  const answerQuestion = useCallback(async (
+    questionId: string, 
+    value: number,
+    context?: { module?: string; session_id?: string }
+  ): Promise<{ nextQuestion: ImplicitQuestion | null; result?: { level: number; message: string } }> => {
+    const newAnswers = { ...state.answers, [questionId]: value };
     const nextIndex = state.currentQuestionIndex + 1;
-    if (nextIndex < state.questions.length) {
-      return state.questions[nextIndex];
+    const isComplete = nextIndex >= state.questions.length;
+
+    setState(prev => ({
+      ...prev,
+      answers: newAnswers,
+      currentQuestionIndex: nextIndex,
+      isActive: !isComplete,
+    }));
+
+    if (isComplete && state.type) {
+      // Soumettre au backend de façon transparente
+      const backendResult = await submitToBackend(state.type, newAnswers, context);
+      
+      return {
+        nextQuestion: null,
+        result: backendResult || calculateLocalScore(newAnswers),
+      };
     }
-    return null;
-  }, [state.currentQuestionIndex, state.questions]);
+
+    return {
+      nextQuestion: state.questions[nextIndex] || null,
+    };
+  }, [state.answers, state.currentQuestionIndex, state.questions, state.type, submitToBackend]);
+
+  /**
+   * Calcul local en fallback si le backend échoue
+   */
+  const calculateLocalScore = (answers: Record<string, number>): { level: number; message: string } => {
+    const values = Object.values(answers);
+    if (values.length === 0) return { level: 2, message: 'Merci pour ce moment' };
+
+    const avg = values.reduce((a, b) => a + b, 0) / values.length;
+    
+    if (avg <= 0.5) return { level: 0, message: 'Tu as l\'air d\'aller bien 😊' };
+    if (avg <= 1.5) return { level: 1, message: 'Ça va globalement 🙂' };
+    if (avg <= 2) return { level: 2, message: 'Quelques tensions mais c\'est normal' };
+    if (avg <= 2.5) return { level: 3, message: 'Prends soin de toi 💙' };
+    return { level: 4, message: 'N\'hésite pas à te faire accompagner' };
+  };
 
   /**
    * Obtient une question aléatoire d'un type donné
@@ -269,20 +330,10 @@ export function useImplicitAssessment() {
   }, []);
 
   /**
-   * Calcule un score simplifié basé sur les réponses
-   * Retourne un niveau de 0 à 4 (bien à préoccupant)
+   * Calcule un score simplifié basé sur les réponses actuelles
    */
   const calculateSimpleScore = useCallback((): { level: number; message: string } => {
-    const values = Object.values(state.answers);
-    if (values.length === 0) return { level: 2, message: 'Pas assez de données' };
-
-    const avg = values.reduce((a, b) => a + b, 0) / values.length;
-    
-    if (avg <= 0.5) return { level: 0, message: 'Tu as l\'air d\'aller bien 😊' };
-    if (avg <= 1.5) return { level: 1, message: 'Ça va globalement 🙂' };
-    if (avg <= 2) return { level: 2, message: 'Quelques tensions mais c\'est normal' };
-    if (avg <= 2.5) return { level: 3, message: 'Prends soin de toi 💙' };
-    return { level: 4, message: 'N\'hésite pas à te faire accompagner' };
+    return calculateLocalScore(state.answers);
   }, [state.answers]);
 
   const currentQuestion = state.isActive && state.currentQuestionIndex < state.questions.length
@@ -301,6 +352,7 @@ export function useImplicitAssessment() {
 
   return {
     isActive: state.isActive,
+    isSubmitting,
     type: state.type,
     currentQuestion,
     answers: state.answers,
@@ -311,6 +363,7 @@ export function useImplicitAssessment() {
     answerQuestion,
     getRandomQuestion,
     calculateSimpleScore,
+    submitToBackend,
     reset,
   };
 }

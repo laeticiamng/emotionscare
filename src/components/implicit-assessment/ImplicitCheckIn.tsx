@@ -46,17 +46,18 @@ export const ImplicitCheckIn: React.FC<ImplicitCheckInProps> = ({
     }
   }, [isActive, type, startImplicitAssessment]);
 
-  const handleAnswer = useCallback((questionId: string, value: number) => {
-    const nextQuestion = answerQuestion(questionId, value);
+  const handleAnswer = useCallback(async (questionId: string, value: number) => {
+    const { nextQuestion, result } = await answerQuestion(questionId, value, {
+      module: 'implicit-checkin',
+    });
     
-    if (!nextQuestion) {
+    if (!nextQuestion && result) {
       // Terminé - afficher un message positif (pas un score clinique)
-      const score = calculateSimpleScore();
-      setResult(score);
+      setResult(result);
       setShowResult(true);
-      onComplete?.(score);
+      onComplete?.(result);
     }
-  }, [answerQuestion, calculateSimpleScore, onComplete]);
+  }, [answerQuestion, onComplete]);
 
   const handleDismiss = useCallback(() => {
     reset();
