@@ -45,21 +45,9 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
       { path: '/app/emotion-atlas', label: 'Atlas Émotions', icon: '🗺️', description: 'Cartographie émotionnelle' },
     ],
   },
-  {
-    id: 'assess',
-    label: 'Évaluations',
-    emoji: '📋',
-    modules: [
-      { path: '/app/assess', label: 'Centre Évaluations', icon: '📊', description: 'Tests psychométriques', isNew: true },
-      { path: '/app/assess?instrument=WHO5', label: 'WHO-5', icon: '😊', description: 'Bien-être OMS' },
-      { path: '/app/assess?instrument=PHQ9', label: 'PHQ-9', icon: '💭', description: 'Dépression' },
-      { path: '/app/assess?instrument=GAD7', label: 'GAD-7', icon: '😰', description: 'Anxiété généralisée' },
-      { path: '/app/assess?instrument=PSS10', label: 'PSS-10', icon: '😤', description: 'Stress perçu' },
-      { path: '/app/assess?instrument=STAI6', label: 'STAI-6', icon: '😟', description: 'Anxiété état/trait' },
-      { path: '/app/assess?instrument=ISI', label: 'ISI', icon: '😴', description: 'Insomnie' },
-      { path: '/app/assess?instrument=BRS', label: 'BRS', icon: '💪', description: 'Résilience' },
-    ],
-  },
+  // NOTE: Les évaluations psychométriques (WHO-5, PHQ-9, GAD-7, etc.) sont 
+  // intégrées de façon implicite et ludique dans les modules existants
+  // (coach, méditation, journal, etc.) sans être visibles comme catégorie séparée
   {
     id: 'wellbeing',
     label: 'Bien-être',
