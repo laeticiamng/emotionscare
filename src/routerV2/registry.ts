@@ -864,16 +864,31 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/voice-journal', '/vocal-journal'],
   },
   // Route /app/emotions supprimée - alias vers /app/scan
+  // ═══════════════════════════════════════════════════════════
+  // MODULE ENTRAIDE UNIFIÉ (consolide Community, Groups, Buddies, Guilds, Social Cocon)
+  // ═══════════════════════════════════════════════════════════
   {
-    name: 'community',
+    name: 'entraide',
+    path: '/app/entraide',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'EntraidePage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/community', '/community-groups', '/groups', '/buddies-hub', '/social', '/entraide'],
+  },
+  // Routes legacy maintenues pour compatibilité (redirigent vers entraide)
+  {
+    name: 'community-legacy',
     path: '/app/community',
     segment: 'consumer',
     role: 'consumer',
     layout: 'app-sidebar',
-    component: 'CommunityPage',
+    component: 'EntraidePage',
     guard: true,
     requireAuth: true,
-    aliases: ['/community', '/community-groups', '/groups'],
+    deprecated: true,
   },
   // ═══════════════════════════════════════════════════════════
   // EXCHANGE HUB V2.0 - 4 Marchés
