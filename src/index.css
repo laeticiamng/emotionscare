@@ -2,6 +2,7 @@
 @import './styles/design-system.css';
 @import './styles/accessibility.css';
 @import './styles/base.css';
+@import './styles/responsive-harmony.css';
 @tailwind base;
 
 /* Animation pulse lente pour CTA */

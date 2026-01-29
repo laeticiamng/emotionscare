@@ -1,0 +1,257 @@
+/**
+ * Responsive Harmony - Styles globaux pour harmonie parfaite sur tous les écrans
+ * @version 1.0.0
+ */
+
+/* Base container responsive avec padding adaptatif */
+.container-responsive {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1rem, 3vw, 2rem);
+  padding-right: clamp(1rem, 3vw, 2rem);
+}
+
+/* Breakpoints adaptatifs avec transitions douces */
+@media (prefers-reduced-motion: no-preference) {
+  * {
+    transition: padding 0.2s ease, margin 0.2s ease;
+  }
+}
+
+/* ============================================
+   MOBILE FIRST - Base (< 640px)
+   ============================================ */
+
+/* Espacement vertical harmonieux */
+.section-spacing {
+  padding-top: clamp(2rem, 5vh, 3rem);
+  padding-bottom: clamp(2rem, 5vh, 3rem);
+}
+
+/* Titres responsifs */
+.text-hero {
+  font-size: clamp(1.75rem, 6vw, 4rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.text-section {
+  font-size: clamp(1.25rem, 4vw, 2.25rem);
+  line-height: 1.2;
+}
+
+.text-card {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  line-height: 1.4;
+}
+
+/* Grilles responsives harmonieuses */
+.grid-responsive-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.grid-responsive-3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.grid-responsive-4 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+/* ============================================
+   TABLET (640px - 1024px)
+   ============================================ */
+@media (min-width: 640px) {
+  .section-spacing {
+    padding-top: clamp(3rem, 8vh, 5rem);
+    padding-bottom: clamp(3rem, 8vh, 5rem);
+  }
+
+  .grid-responsive-2 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .grid-responsive-3 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .grid-responsive-4 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* ============================================
+   DESKTOP (> 1024px)
+   ============================================ */
+@media (min-width: 1024px) {
+  .section-spacing {
+    padding-top: clamp(4rem, 10vh, 6rem);
+    padding-bottom: clamp(4rem, 10vh, 6rem);
+  }
+
+  .grid-responsive-3 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .grid-responsive-4 {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* ============================================
+   LARGE DESKTOP (> 1280px)
+   ============================================ */
+@media (min-width: 1280px) {
+  .container-responsive {
+    max-width: 1280px;
+  }
+}
+
+/* ============================================
+   ULTRA WIDE (> 1536px)
+   ============================================ */
+@media (min-width: 1536px) {
+  .container-responsive {
+    max-width: 1440px;
+  }
+}
+
+/* ============================================
+   MOBILE SPECIFIC FIXES
+   ============================================ */
+
+/* Éviter le débordement horizontal */
+html, body {
+  overflow-x: hidden;
+}
+
+/* Fix pour les éléments fixed sur mobile */
+@media (max-width: 639px) {
+  .fixed-bottom-mobile {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    padding: 0.75rem;
+    background: hsl(var(--background) / 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid hsl(var(--border));
+  }
+}
+
+/* Touch targets minimum 44px sur mobile */
+@media (max-width: 639px) {
+  button, 
+  a, 
+  [role="button"],
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* ============================================
+   SAFE AREAS (iOS)
+   ============================================ */
+@supports (padding: max(0px)) {
+  .safe-area-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  
+  .safe-area-x {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+/* ============================================
+   HARMONIE DES ESPACEMENTS
+   ============================================ */
+
+/* Spacing scale harmonieux */
+.space-section {
+  margin-bottom: clamp(2rem, 6vw, 4rem);
+}
+
+.space-component {
+  margin-bottom: clamp(1rem, 3vw, 2rem);
+}
+
+.space-element {
+  margin-bottom: clamp(0.5rem, 1.5vw, 1rem);
+}
+
+/* ============================================
+   ACCESSIBILITÉ RESPONSIVE
+   ============================================ */
+
+/* Focus visible sur tous les écrans */
+:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Skip to content button */
+.skip-to-content {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  padding: 1rem 2rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: top 0.2s ease;
+}
+
+.skip-to-content:focus {
+  top: 1rem;
+}
+
+/* ============================================
+   DARK MODE RESPONSIVE
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  .fixed-bottom-mobile {
+    background: hsl(var(--background) / 0.9);
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+  
+  body {
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+}
