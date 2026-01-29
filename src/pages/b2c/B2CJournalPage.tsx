@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import PageRoot from '@/components/common/PageRoot'
-import JournalView from './journal/JournalView'
+import JournalView from '@/pages/journal/JournalView'
 import { Sparkles, Mic, PenLine } from 'lucide-react'
 import { useFlags } from '@/core/flags'
 import { Alert, AlertDescription } from '@/components/ui/alert'

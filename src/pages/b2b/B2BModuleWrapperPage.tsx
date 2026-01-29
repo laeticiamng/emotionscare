@@ -12,14 +12,14 @@ import { Link } from 'react-router-dom';
 import LoadingAnimation from '@/components/ui/loading-animation';
 
 // Lazy load des modules
-const B2CScanPage = lazy(() => import('@/pages/B2CScanPage'));
-const B2CMusicEnhancedPage = lazy(() => import('@/pages/B2CMusicEnhanced'));
+const B2CScanPage = lazy(() => import('@/pages/b2c/B2CScanPage'));
+const B2CMusicEnhancedPage = lazy(() => import('@/pages/b2c/B2CMusicEnhanced'));
 const BreathPage = lazy(() => import('@/pages/b2c/B2CBreathworkPage'));
 const MeditationPage = lazy(() => import('@/pages/MeditationPage'));
-const FlashGlowPage = lazy(() => import('@/pages/B2CFlashGlowPage'));
-const MoodMixerPage = lazy(() => import('@/pages/B2CMoodMixerPage'));
-const JournalPage = lazy(() => import('@/pages/B2CJournalPage'));
-const VRPage = lazy(() => import('@/pages/B2CVRGalaxyPage'));
+const FlashGlowPage = lazy(() => import('@/pages/b2c/B2CFlashGlowPage'));
+const MoodMixerPage = lazy(() => import('@/pages/b2c/B2CMoodMixerPage'));
+const JournalPage = lazy(() => import('@/pages/b2c/B2CJournalPage'));
+const VRPage = lazy(() => import('@/pages/b2c/B2CVRGalaxyPage'));
 const QuickSessionPage = lazy(() => import('@/pages/b2c/B2CBreathworkPage'));
 
 interface SessionInfo {

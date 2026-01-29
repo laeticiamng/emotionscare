@@ -8,7 +8,7 @@ import { Trophy, Star, Clock, Target, RotateCcw, Home, Sparkles } from 'lucide-r
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import confetti from 'canvas-confetti';
-import type { Quest } from './QuestPanel';
+import type { Quest } from './BossGritQuestPanel';
 
 interface QuestCompleteProps {
   quest: Quest;

@@ -24,7 +24,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
 import { useSessionClock } from '@/hooks/useSessionClock';
 import { GlowSurface } from '@/ui/GlowSurface';
-import { WallOfLights } from '@/components/flashglow/WallOfLights';
+import { WallOfLights } from '@/components/flash-glow';
 import { useFlashPhases } from '@/modules/flash-glow/useFlashPhases';
 import {
   computeMoodDelta,
