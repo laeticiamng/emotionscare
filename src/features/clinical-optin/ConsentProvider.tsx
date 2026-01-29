@@ -124,25 +124,20 @@ export const ConsentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [consentQuery.error, toast, t]);
 
+  // Sync optimistic snapshot with server data (une seule fois après fetch initial)
+  const hasSyncedRef = useRef(false);
+  
   useEffect(() => {
-    if (optimisticSnapshot) {
+    // Ne synchroniser qu'une fois au chargement initial
+    if (hasSyncedRef.current) {
       return;
     }
-
-    if (consentQuery.data) {
+    
+    if (consentQuery.data && !consentQuery.isPending) {
       setOptimisticSnapshot(consentQuery.data);
+      hasSyncedRef.current = true;
     }
-  }, [consentQuery.data, optimisticSnapshot]);
-
-  useEffect(() => {
-    if (!consentQuery.isFetching || !optimisticSnapshot) {
-      return;
-    }
-
-    if (consentQuery.data && consentQuery.data !== optimisticSnapshot) {
-      setOptimisticSnapshot(consentQuery.data);
-    }
-  }, [consentQuery.data, consentQuery.isFetching, optimisticSnapshot]);
+  }, [consentQuery.data, consentQuery.isPending]);
 
   const mutationErrorHandler = () => {
     toast({
