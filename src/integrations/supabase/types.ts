@@ -29781,6 +29781,10 @@ export type Database = {
             }
             Returns: number
           }
+      calculate_new_ease_factor: {
+        Args: { current_ease: number; quality: number }
+        Returns: number
+      }
       calculate_next_audit_run: {
         Args: {
           p_day_of_month: number
@@ -29805,6 +29809,10 @@ export type Database = {
       }
       calculate_risk_score: { Args: never; Returns: number }
       calculate_sla_metrics: { Args: never; Returns: undefined }
+      calculate_srs_interval: {
+        Args: { current_interval: number; ease_factor: number; quality: number }
+        Returns: number
+      }
       calculate_streak_bonus: { Args: { streak_days: number }; Returns: number }
       calculate_trust_score: { Args: { profile_uuid: string }; Returns: number }
       calculate_user_learning_path: {
