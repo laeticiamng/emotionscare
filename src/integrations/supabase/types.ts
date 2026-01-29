@@ -25591,24 +25591,33 @@ export type Database = {
       user_gamification_stats: {
         Row: {
           created_at: string
+          current_streak: number | null
           id: string
           longest_streak: number | null
+          total_points: number | null
           updated_at: string
           user_id: string
+          weekly_points: number | null
         }
         Insert: {
           created_at?: string
+          current_streak?: number | null
           id?: string
           longest_streak?: number | null
+          total_points?: number | null
           updated_at?: string
           user_id: string
+          weekly_points?: number | null
         }
         Update: {
           created_at?: string
+          current_streak?: number | null
           id?: string
           longest_streak?: number | null
+          total_points?: number | null
           updated_at?: string
           user_id?: string
+          weekly_points?: number | null
         }
         Relationships: []
       }
@@ -30456,6 +30465,7 @@ export type Database = {
       refresh_analytics_dashboards: { Args: never; Returns: undefined }
       refresh_dashboard_stats: { Args: never; Returns: undefined }
       refresh_edn_items_unified: { Args: never; Returns: undefined }
+      refresh_leaderboard_entries: { Args: never; Returns: undefined }
       regenerate_hearts: { Args: never; Returns: undefined }
       reset_monthly_quotas: { Args: never; Returns: undefined }
       reset_monthly_scores: { Args: never; Returns: undefined }
