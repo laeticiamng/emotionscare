@@ -20383,6 +20383,8 @@ export type Database = {
           items_again: number
           items_correct: number
           items_reviewed: number
+          last_activity_at: string | null
+          session_state: Json | null
           session_type: string
           started_at: string
           total_time_seconds: number | null
@@ -20395,6 +20397,8 @@ export type Database = {
           items_again?: number
           items_correct?: number
           items_reviewed?: number
+          last_activity_at?: string | null
+          session_state?: Json | null
           session_type?: string
           started_at?: string
           total_time_seconds?: number | null
@@ -20407,6 +20411,8 @@ export type Database = {
           items_again?: number
           items_correct?: number
           items_reviewed?: number
+          last_activity_at?: string | null
+          session_state?: Json | null
           session_type?: string
           started_at?: string
           total_time_seconds?: number | null
@@ -26431,6 +26437,7 @@ export type Database = {
           medical_consents: Json | null
           nyvee_tutorial_seen: boolean | null
           preferences: Json
+          timezone_offset: number | null
           updated_at: string
           user_id: string
         }
@@ -26441,6 +26448,7 @@ export type Database = {
           medical_consents?: Json | null
           nyvee_tutorial_seen?: boolean | null
           preferences?: Json
+          timezone_offset?: number | null
           updated_at?: string
           user_id: string
         }
@@ -26451,6 +26459,7 @@ export type Database = {
           medical_consents?: Json | null
           nyvee_tutorial_seen?: boolean | null
           preferences?: Json
+          timezone_offset?: number | null
           updated_at?: string
           user_id?: string
         }
