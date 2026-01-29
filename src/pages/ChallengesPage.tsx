@@ -248,10 +248,62 @@ export default function ChallengesPage() {
                       <Skeleton key={i} className="h-16 w-full" />
                     ))}
                   </div>
+                ) : stats && stats.totalCompleted > 0 ? (
+                  <div className="space-y-6">
+                    {/* Stats Summary */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="text-center p-4 bg-muted/30 rounded-lg">
+                        <div className="text-2xl font-bold text-primary">{stats.totalCompleted}</div>
+                        <div className="text-xs text-muted-foreground">Défis complétés</div>
+                      </div>
+                      <div className="text-center p-4 bg-muted/30 rounded-lg">
+                        <div className="text-2xl font-bold text-success">{stats.currentStreak}</div>
+                        <div className="text-xs text-muted-foreground">Série actuelle</div>
+                      </div>
+                      <div className="text-center p-4 bg-muted/30 rounded-lg">
+                        <div className="text-2xl font-bold text-warning">{stats.bestStreak}</div>
+                        <div className="text-xs text-muted-foreground">Meilleure série</div>
+                      </div>
+                      <div className="text-center p-4 bg-muted/30 rounded-lg">
+                        <div className="text-2xl font-bold text-info">{Math.round(stats.completionRate)}%</div>
+                        <div className="text-xs text-muted-foreground">Taux réussite</div>
+                      </div>
+                    </div>
+                    
+                    {/* Weekly average */}
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div>
+                        <p className="font-medium">Moyenne hebdomadaire</p>
+                        <p className="text-sm text-muted-foreground">Sur les 4 dernières semaines</p>
+                      </div>
+                      <div className="text-2xl font-bold">{stats.weeklyAverage.toFixed(1)} défis/semaine</div>
+                    </div>
+                    
+                    {/* Breakdown by type */}
+                    {Object.keys(stats.completionByType).length > 0 && (
+                      <div>
+                        <h4 className="font-medium mb-3">Par type de défi</h4>
+                        <div className="space-y-2">
+                          {Object.entries(stats.completionByType).map(([type, data]) => (
+                            <div key={type} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
+                              <span className="capitalize">{type}</span>
+                              <div className="flex items-center gap-3">
+                                <Progress value={(data.completed / data.total) * 100} className="w-24 h-2" />
+                                <span className="text-sm text-muted-foreground">
+                                  {data.completed}/{data.total}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">
                     <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>L'historique détaillé sera disponible prochainement</p>
+                    <p>Aucun défi complété pour l'instant</p>
+                    <p className="text-sm mt-2">Participez à votre premier défi pour voir votre historique ici !</p>
                   </div>
                 )}
               </CardContent>
