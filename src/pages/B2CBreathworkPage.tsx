@@ -55,7 +55,7 @@ export default function B2CBreathworkPage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex items-center justify-between h-16">
                 <div className="flex items-center gap-4">
-                  <Link to="/dashboard">
+                  <Link to="/app/home">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -221,7 +221,7 @@ export default function B2CBreathworkPage() {
                   À découvrir aussi
                 </h2>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <Link to="/vr-breath">
+                  <Link to="/app/vr-breath">
                     <Card className="p-4 hover:bg-muted/50 transition-colors cursor-pointer">
                       <h3 className="font-medium mb-1">🌌 VR Breath</h3>
                       <p className="text-sm text-muted-foreground">
@@ -229,7 +229,7 @@ export default function B2CBreathworkPage() {
                       </p>
                     </Card>
                   </Link>
-                  <Link to="/flash-glow">
+                  <Link to="/app/flash-glow">
                     <Card className="p-4 hover:bg-muted/50 transition-colors cursor-pointer">
                       <h3 className="font-medium mb-1">✨ Flash Glow</h3>
                       <p className="text-sm text-muted-foreground">
@@ -237,7 +237,7 @@ export default function B2CBreathworkPage() {
                       </p>
                     </Card>
                   </Link>
-                  <Link to="/meditation">
+                  <Link to="/app/meditation">
                     <Card className="p-4 hover:bg-muted/50 transition-colors cursor-pointer">
                       <h3 className="font-medium mb-1">🧠 Méditation</h3>
                       <p className="text-sm text-muted-foreground">
