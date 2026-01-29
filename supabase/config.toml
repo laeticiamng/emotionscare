@@ -210,6 +210,12 @@ verify_jwt = false
 [functions.context-lens-emotions]
 verify_jwt = false
 
+[functions.ai-router]
+verify_jwt = false
+
+[functions.wearables-dashboard]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321
