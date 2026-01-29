@@ -198,6 +198,18 @@ verify_jwt = false
 [functions.context-lens-anatomy]
 verify_jwt = false
 
+[functions.context-lens-insights]
+verify_jwt = false
+
+[functions.context-lens-patterns]
+verify_jwt = false
+
+[functions.context-lens-nlp]
+verify_jwt = false
+
+[functions.context-lens-emotions]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321
