@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Music } from 'lucide-react';
 
 // Lazy load B2CMusicEnhanced
-const B2CMusicEnhanced = lazy(() => import('@/pages/B2CMusicEnhanced'));
+const B2CMusicEnhanced = lazy(() => import('@/pages/b2c/B2CMusicEnhanced'));
 
 // Loading skeleton
 const MusicLoadingSkeleton: React.FC = () => (

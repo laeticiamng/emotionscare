@@ -11,13 +11,13 @@ import { useGritQuest } from '@/hooks/useGritQuest';
 import { useBossGritPersistence } from '@/hooks/useBossGritPersistence';
 import { toast } from '@/hooks/use-toast';
 import {
-  ChallengeCard,
+  BossGritChallengeCard as ChallengeCard,
   QuestPanel,
   PlayerStats,
   QuestComplete,
   type Challenge,
   type Quest
-} from '@/components/boss-grit';
+} from '@/components/boss-level-grit';
 
 type ViewMode = 'challenges' | 'stats' | 'history';
 

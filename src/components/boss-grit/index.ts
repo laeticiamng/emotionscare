@@ -1,14 +1,5 @@
 /**
- * Boss Grit Components - Exports
+ * @deprecated Ce dossier a été fusionné avec boss-level-grit/
+ * Utilisez @/components/boss-level-grit à la place
  */
-
-export { ChallengeCard } from './ChallengeCard';
-export type { Challenge } from './ChallengeCard';
-
-export { QuestPanel } from './QuestPanel';
-export type { Quest, QuestTask } from './QuestPanel';
-
-export { PlayerStats } from './PlayerStats';
-export type { PlayerStatsData } from './PlayerStats';
-
-export { QuestComplete } from './QuestComplete';
+export * from '../boss-level-grit';

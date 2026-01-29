@@ -63,8 +63,8 @@ const B2BRHDashboard = lazy(() => import('@/pages/b2b/B2BRHDashboard'));
 const AppGatePage = lazy(() => import('@/pages/AppGatePage'));
 
 // Modules fonctionnels
-const B2CScanPage = lazy(() => import('@/pages/B2CScanPage'));
-const B2CMusicEnhanced = lazy(() => import('@/pages/B2CMusicEnhanced'));
+const B2CScanPage = lazy(() => import('@/pages/b2c/B2CScanPage'));
+const B2CMusicEnhanced = lazy(() => import('@/pages/b2c/B2CMusicEnhanced'));
 const MusicTherapyPage = lazy(() => import('@/pages/MusicTherapyPage'));
 const MusicAnalyticsPage = lazy(() => import('@/pages/MusicAnalyticsPage'));
 const MusicProfilePage = lazy(() => import('@/pages/MusicProfilePage'));
@@ -72,31 +72,31 @@ const CollaborativePlaylistPage = lazy(() => import('@/pages/CollaborativePlayli
 const AdvancedAnalyticsPage = lazy(() => import('@/pages/AdvancedAnalyticsPage'));
 // EmotionMusicPage supprimé - utiliser MusicTherapyPage ou B2CMusicEnhanced
 const B2CAICoachPage = lazy(() => import('@/pages/b2c/B2CAICoachPage'));
-const B2CJournalPage = lazy(() => import('@/pages/B2CJournalPage'));
-const B2CVoiceJournalPage = lazy(() => import('@/pages/B2CVoiceJournalPage'));
+const B2CJournalPage = lazy(() => import('@/pages/b2c/B2CJournalPage'));
+const B2CVoiceJournalPage = lazy(() => import('@/pages/b2c/B2CVoiceJournalPage'));
 const EmotionSessionNewPage = lazy(() => import('@/pages/EmotionSessionNewPage'));
 const EmotionSessionHistoryPage = lazy(() => import('@/pages/EmotionSessionHistoryPage'));
-const B2CVRBreathGuidePage = lazy(() => import('@/pages/B2CVRBreathGuidePage'));
-const B2CVRGalaxyPage = lazy(() => import('@/pages/B2CVRGalaxyPage'));
+const B2CVRBreathGuidePage = lazy(() => import('@/pages/b2c/B2CVRBreathGuidePage'));
+const B2CVRGalaxyPage = lazy(() => import('@/pages/b2c/B2CVRGalaxyPage'));
 // VRBreathPage supprimé - utiliser B2CVRBreathGuidePage
 
 // Modules Fun-First
-const B2CFlashGlowPage = lazy(() => import('@/pages/B2CFlashGlowPage'));
+const B2CFlashGlowPage = lazy(() => import('@/pages/b2c/B2CFlashGlowPage'));
 const B2CBreathworkPage = lazy(() => import('@/pages/b2c/B2CBreathworkPage'));
 const B2CARFiltersPage = lazy(() => import('@/pages/b2c/B2CARFiltersPage'));
 const B2CBubbleBeatPage = lazy(() => import('@/pages/b2c/B2CBubbleBeatPage'));
-const B2CScreenSilkBreakPage = lazy(() => import('@/pages/B2CScreenSilkBreakPage'));
+const B2CScreenSilkBreakPage = lazy(() => import('@/pages/b2c/B2CScreenSilkBreakPage'));
 const MeditationPage = lazy(() => import('@/pages/MeditationPage'));
 const SeuilPage = lazy(() => import('@/pages/SeuilPage'));
 
 // Analytics - nettoyage (pages non utilisées dans registry)
 
 // Paramètres
-const B2CSettingsPage = lazy(() => import('@/pages/B2CSettingsPage'));
-const B2CProfileSettingsPage = lazy(() => import('@/pages/B2CProfileSettingsPage'));
+const B2CSettingsPage = lazy(() => import('@/pages/b2c/B2CSettingsPage'));
+const B2CProfileSettingsPage = lazy(() => import('@/pages/b2c/B2CProfileSettingsPage'));
 const DataSettingsPage = lazy(() => import('@/pages/DataSettingsPage'));
-const B2CPrivacyTogglesPage = lazy(() => import('@/pages/B2CPrivacyTogglesPage'));
-const B2CNotificationsPage = lazy(() => import('@/pages/B2CNotificationsPage'));
+const B2CPrivacyTogglesPage = lazy(() => import('@/pages/b2c/B2CPrivacyTogglesPage'));
+const B2CNotificationsPage = lazy(() => import('@/pages/b2c/B2CNotificationsPage'));
 const HowItAdaptsPage = lazy(() => import('@/pages/HowItAdaptsPage'));
 
 // B2B Features - use dedicated pages
@@ -161,10 +161,10 @@ const K6AnalyticsDashboard = lazy(() => import('@/pages/K6AnalyticsDashboard'));
 const B2CAmbitionArcadePage = lazy(() => import('@/pages/b2c/B2CAmbitionArcadePage'));
 const B2CBossLevelGritPage = lazy(() => import('@/pages/b2c/B2CBossLevelGritPage'));
 const B2CBounceBackBattlePage = lazy(() => import('@/pages/b2c/B2CBounceBackBattlePage'));
-const B2CMoodMixerPage = lazy(() => import('@/pages/B2CMoodMixerPage'));
+const B2CMoodMixerPage = lazy(() => import('@/pages/b2c/B2CMoodMixerPage'));
 const MoodPresetsAdminPage = lazy(() => import('@/pages/MoodPresetsAdminPage'));
-const B2CSocialCoconPage = lazy(() => import('@/pages/B2CSocialCoconPage'));
-const B2CStorySynthLabPage = lazy(() => import('@/pages/B2CStorySynthLabPage'));
+const B2CSocialCoconPage = lazy(() => import('@/pages/b2c/B2CSocialCoconPage'));
+const B2CStorySynthLabPage = lazy(() => import('@/pages/b2c/B2CStorySynthLabPage'));
 const B2CCommunautePage = lazy(() => import('@/pages/b2c/B2CCommunautePage'));
 const GroupSessionsPage = lazy(() => import('@/pages/GroupSessionsPage'));
 const BuddiesPage = lazy(() => import('@/pages/BuddiesPage'));
@@ -185,11 +185,11 @@ const B2BInstitutionalReportsPage = lazy(() => import('@/pages/b2b/reports/Repor
 const TimeCraftPage = lazy(() => import('@/pages/timecraft/TimeCraftPage'));
 const TimeCraftB2BPage = lazy(() => import('@/pages/timecraft/TimeCraftB2BPage'));
 
-const B2CMusicTherapyPremiumPage = lazy(() => import('@/pages/B2CMusicTherapyPremiumPage'));
+const B2CMusicTherapyPremiumPage = lazy(() => import('@/pages/b2c/B2CMusicTherapyPremiumPage'));
 const B2CAICoachMicroPage = lazy(() => import('@/pages/b2c/B2CAICoachMicroPage'));
 const B2CActivitePage = lazy(() => import('@/pages/b2c/B2CActivitePage'));
 const SubscribePage = lazy(() => import('@/pages/SubscribePage'));
-const B2CNyveeCoconPage = lazy(() => import('@/pages/B2CNyveeCoconPage'));
+const B2CNyveeCoconPage = lazy(() => import('@/pages/b2c/B2CNyveeCoconPage'));
 const NyveeTestPage = lazy(() => import('@/pages/NyveeTestPage'));
 const ValidationPage = lazy(() => import('@/pages/ValidationPage'));
 
@@ -219,7 +219,7 @@ const TournamentsPage = lazy(() => import('@/pages/TournamentsPage'));
 const MatchSpectatorPage = lazy(() => import('@/pages/MatchSpectatorPage'));
 const CompetitiveSeasonsPage = lazy(() => import('@/pages/CompetitiveSeasonsPage'));
 const DailyChallengesPage = lazy(() => import('@/pages/DailyChallengesPage'));
-const B2CGamificationPage = lazy(() => import('@/pages/B2CGamificationPage'));
+const B2CGamificationPage = lazy(() => import('@/pages/b2c/B2CGamificationPage'));
 const ScoresPage = lazy(() => import('@/pages/ScoresPage'));
 const PricingPageWorking = lazy(() => import('@/pages/PricingPageWorking'));
 
@@ -235,12 +235,12 @@ const TestPage = lazy(() => import('@/pages/TestPage'));
 // Import des nouveaux modules optimisés
 const FlashGlowPage = lazy(() => import('@/pages/flash-glow/index'));
 // JournalPage supprimé - utiliser B2CJournalPage
-const ScanPage = lazy(() => import('@/pages/B2CScanPage'));
+const ScanPage = lazy(() => import('@/pages/b2c/B2CScanPage'));
 const CoachPage = lazy(() => import('@/pages/b2c/B2CAICoachPage'));
-const MoodMixerPage = lazy(() => import('@/pages/B2CMoodMixerPage'));
+const MoodMixerPage = lazy(() => import('@/pages/b2c/B2CMoodMixerPage'));
 const BossGritPage = lazy(() => import('@/modules/boss-grit/BossGritPage'));
 const BubbleBeatPage = lazy(() => import('@/pages/b2c/B2CBubbleBeatPage'));
-const StorySynthPage = lazy(() => import('@/pages/B2CStorySynthLabPage'));
+const StorySynthPage = lazy(() => import('@/pages/b2c/B2CStorySynthLabPage'));
 
 // Pages DEV uniquement
 const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
@@ -254,7 +254,7 @@ const RecommendationEngineAdminPage = lazy(() => import('@/pages/RecommendationE
 const ActivityLogsPage = lazy(() => import('@/pages/ActivityLogsPage'));
 
 // Analytics & Weekly Bars
-const B2CWeeklyBarsPage = lazy(() => import('@/pages/B2CWeeklyBarsPage'));
+const B2CWeeklyBarsPage = lazy(() => import('@/pages/b2c/B2CWeeklyBarsPage'));
 const AnalyticsPage = lazy(() => import('@/pages/AnalyticsPage'));
 
 // Pages système unifiées
@@ -284,7 +284,7 @@ const TextScanPage = lazy(() => import('@/pages/TextScanPage'));
 // MusicGeneratePage supprimé - fonctionnalité dans B2CMusicEnhanced
 // MusicLibraryPage supprimé - fonctionnalité dans B2CMusicEnhanced
 const ModeSelectionPage = lazy(() => import('@/pages/ModeSelectionPage'));
-const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
+const B2CDashboardPage = lazy(() => import('@/pages/b2c/B2CDashboardPage'));
 // B2CMoodPage supprimé - fonctionnalité intégrée dans B2CScanPage
 // B2CMusicPage supprimé - utiliser B2CMusicEnhanced
 const EmotionalPark = lazy(() => import('@/pages/EmotionalPark'));
