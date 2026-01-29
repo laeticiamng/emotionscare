@@ -6503,31 +6503,46 @@ export type Database = {
         Row: {
           challenge_date: string
           created_at: string | null
+          description: string | null
+          difficulty: string | null
           emotional_profile: string | null
           id: string
           objective: string
           reward_type: string
           reward_value: Json
+          reward_xp: number | null
+          target_value: number | null
+          title: string | null
           type: string
         }
         Insert: {
           challenge_date?: string
           created_at?: string | null
+          description?: string | null
+          difficulty?: string | null
           emotional_profile?: string | null
           id?: string
           objective: string
           reward_type: string
           reward_value: Json
+          reward_xp?: number | null
+          target_value?: number | null
+          title?: string | null
           type: string
         }
         Update: {
           challenge_date?: string
           created_at?: string | null
+          description?: string | null
+          difficulty?: string | null
           emotional_profile?: string | null
           id?: string
           objective?: string
           reward_type?: string
           reward_value?: Json
+          reward_xp?: number | null
+          target_value?: number | null
+          title?: string | null
           type?: string
         }
         Relationships: []
@@ -15141,25 +15156,34 @@ export type Database = {
         Row: {
           created_at: string | null
           emotions: string[] | null
+          energy_level: number | null
+          factors: string[] | null
           id: string
           mood_level: number
           notes: string | null
+          stress_level: number | null
           user_id: string
         }
         Insert: {
           created_at?: string | null
           emotions?: string[] | null
+          energy_level?: number | null
+          factors?: string[] | null
           id?: string
           mood_level: number
           notes?: string | null
+          stress_level?: number | null
           user_id: string
         }
         Update: {
           created_at?: string | null
           emotions?: string[] | null
+          energy_level?: number | null
+          factors?: string[] | null
           id?: string
           mood_level?: number
           notes?: string | null
+          stress_level?: number | null
           user_id?: string
         }
         Relationships: [
@@ -18914,6 +18938,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pomodoro_sessions: {
+        Row: {
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          duration_minutes: number
+          id: string
+          preset: string | null
+          session_type: string
+          started_at: string | null
+          task_name: string | null
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          duration_minutes: number
+          id?: string
+          preset?: string | null
+          session_type: string
+          started_at?: string | null
+          task_name?: string | null
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          duration_minutes?: number
+          id?: string
+          preset?: string | null
+          session_type?: string
+          started_at?: string | null
+          task_name?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       post_reactions: {
         Row: {
@@ -24868,6 +24931,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_challenge_progress: {
+        Row: {
+          challenge_id: string
+          claimed_at: string | null
+          created_at: string | null
+          current_value: number | null
+          id: string
+          is_completed: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          claimed_at?: string | null
+          created_at?: string | null
+          current_value?: number | null
+          id?: string
+          is_completed?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          claimed_at?: string | null
+          created_at?: string | null
+          current_value?: number | null
+          id?: string
+          is_completed?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_challenge_progress_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "daily_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_challenges_progress: {
         Row: {
           challenge_id: string
@@ -25583,6 +25687,7 @@ export type Database = {
           description: string | null
           end_date: string | null
           id: string
+          priority: string | null
           reward_points: number | null
           start_date: string
           status: string | null
@@ -25600,6 +25705,7 @@ export type Database = {
           description?: string | null
           end_date?: string | null
           id?: string
+          priority?: string | null
           reward_points?: number | null
           start_date: string
           status?: string | null
@@ -25617,6 +25723,7 @@ export type Database = {
           description?: string | null
           end_date?: string | null
           id?: string
+          priority?: string | null
           reward_points?: number | null
           start_date?: string
           status?: string | null
