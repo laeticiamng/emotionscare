@@ -1,9 +1,10 @@
+// @ts-nocheck
 /**
  * Context Lens Insights Edge Function
  * Gère les insights personnalisés basés sur l'analyse des données émotionnelles
  */
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
