@@ -40,22 +40,21 @@ export function ConsentGate({ children, fallback = null, scope = 'coach' }: Cons
     return <>{children}</>;
   }
 
-  // Laisser passer si accepté, révoqué, ou si l'utilisateur a refusé
-  if (consent.status === 'accepted' || consent.status === 'revoked' || consent.wasRevoked) {
+  // Laisser passer si accepté, révoqué, refusé, ou statut inconnu/none
+  // Ne jamais bloquer l'utilisateur indéfiniment
+  if (
+    consent.status === 'accepted' ||
+    consent.status === 'revoked' ||
+    consent.status === 'none' ||
+    consent.status === 'unknown' ||
+    consent.wasRevoked ||
+    consent.loading
+  ) {
     return <>{children}</>;
   }
 
-  // Ne pas bloquer l'affichage indéfiniment - afficher le contenu même si le statut est inconnu
-  if (consent.status === 'unknown' || consent.loading) {
-    return <>{children}</>;
-  }
-
-  return (
-    <>
-      {fallback}
-      <ConsentDialog {...dialogProps} />
-    </>
-  );
+  // Fallback: afficher le contenu si aucune condition n'est remplie
+  return <>{children}</>;
 }
 
 export default ConsentGate;

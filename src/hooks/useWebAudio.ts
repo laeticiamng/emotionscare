@@ -225,6 +225,41 @@ export const useWebAudio = () => {
     }, fadeOutDuration * 1000);
   }, [state.volume, loadAudio, play]);
 
+  // Jouer une tonalité pure (pour guidage respiratoire)
+  const playTone = useCallback(async (
+    frequency: number, 
+    duration: number = 0.3, 
+    volume: number = 0.3
+  ) => {
+    try {
+      await initAudioContext();
+      if (!audioContextRef.current) return;
+      
+      const oscillator = audioContextRef.current.createOscillator();
+      const envelope = audioContextRef.current.createGain();
+      
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(frequency, audioContextRef.current.currentTime);
+      
+      envelope.gain.setValueAtTime(0, audioContextRef.current.currentTime);
+      envelope.gain.linearRampToValueAtTime(volume, audioContextRef.current.currentTime + 0.05);
+      envelope.gain.linearRampToValueAtTime(0, audioContextRef.current.currentTime + duration);
+      
+      oscillator.connect(envelope);
+      envelope.connect(audioContextRef.current.destination);
+      
+      oscillator.start(audioContextRef.current.currentTime);
+      oscillator.stop(audioContextRef.current.currentTime + duration);
+    } catch (error) {
+      // Silencieux en cas d'échec (non bloquant)
+    }
+  }, [initAudioContext]);
+
+  // Arrêter tous les sons
+  const stopAll = useCallback(() => {
+    stop();
+  }, [stop]);
+
   // Cleanup
   useEffect(() => {
     return () => {
@@ -243,9 +278,11 @@ export const useWebAudio = () => {
     play,
     pause,
     stop,
+    stopAll,
     setVolume,
     seekTo,
     crossfade,
+    playTone,
     isSupported: !!(window.AudioContext || (window as any).webkitAudioContext)
   };
 };
