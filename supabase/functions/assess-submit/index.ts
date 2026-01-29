@@ -18,7 +18,7 @@ import type { InstrumentCode } from '../_shared/assess.ts';
 const answerValueSchema = z.union([z.string(), z.number(), z.boolean()]);
 
 const submitSchema = z.object({
-  instrument: z.enum(['WHO5', 'STAI6', 'SAM', 'SUDS']),
+  instrument: z.enum(['WHO5', 'STAI6', 'SAM', 'SUDS', 'AAQ2', 'PHQ9', 'GAD7', 'PSS10', 'PANAS', 'ISI', 'BRS']),
   answers: z.record(answerValueSchema).refine(
     (value) => Object.keys(value).length > 0,
     'answers_required',
@@ -31,11 +31,18 @@ const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 const SIGNAL_TTL_MS = 24 * 60 * 60 * 1000; // 24h
 const SIGNAL_MODULE_CONTEXT = 'assessment_submit';
 
-const FEATURE_FLAGS: Record<InstrumentCode, string> = {
+const FEATURE_FLAGS: Record<string, string> = {
   WHO5: Deno.env.get('FF_ASSESS_WHO5') ?? 'true',
   STAI6: Deno.env.get('FF_ASSESS_STAI6') ?? 'true',
   SAM: Deno.env.get('FF_ASSESS_SAM') ?? 'true',
   SUDS: Deno.env.get('FF_ASSESS_SUDS') ?? 'true',
+  AAQ2: Deno.env.get('FF_ASSESS_AAQ2') ?? 'true',
+  PHQ9: Deno.env.get('FF_ASSESS_PHQ9') ?? 'true',
+  GAD7: Deno.env.get('FF_ASSESS_GAD7') ?? 'true',
+  PSS10: Deno.env.get('FF_ASSESS_PSS10') ?? 'true',
+  PANAS: Deno.env.get('FF_ASSESS_PANAS') ?? 'true',
+  ISI: Deno.env.get('FF_ASSESS_ISI') ?? 'true',
+  BRS: Deno.env.get('FF_ASSESS_BRS') ?? 'true',
 };
 
 type OrchestrationHint = {
@@ -45,11 +52,18 @@ type OrchestrationHint = {
   duration?: 'short' | 'medium' | 'long';
 };
 
-const instrumentDomains: Record<InstrumentCode, string> = {
+const instrumentDomains: Record<string, string> = {
   WHO5: 'wellbeing',
   STAI6: 'anxiety',
   SAM: 'valence_arousal',
   SUDS: 'distress',
+  AAQ2: 'flexibility',
+  PHQ9: 'depression',
+  GAD7: 'anxiety',
+  PSS10: 'stress',
+  PANAS: 'affect',
+  ISI: 'sleep',
+  BRS: 'resilience',
 };
 
 function getInstrumentDomain(instrument: InstrumentCode): string {

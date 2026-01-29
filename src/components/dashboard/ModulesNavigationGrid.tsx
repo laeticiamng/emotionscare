@@ -39,6 +39,8 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
       { path: '/app/scan/text', label: 'Scan Texte', icon: '📝', description: 'Analyse textuelle' },
       { path: '/app/hume-ai', label: 'Hume AI', icon: '🤖', description: 'IA émotionnelle avancée', isNew: true },
       { path: '/app/voice-analysis', label: 'Voice Analysis', icon: '🔊', description: 'Analyse vocale détaillée' },
+      { path: '/app/context-lens', label: 'Context Lens', icon: '🔬', description: 'Analyse contextuelle IA', isNew: true },
+      { path: '/app/brain-viewer', label: 'Brain Viewer', icon: '🧠', description: 'Visualisation cérébrale', isPremium: true },
     ],
   },
   {
@@ -187,6 +189,9 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
       { path: '/settings/notifications', label: 'Notifications', icon: '🔔', description: 'Alertes' },
       { path: '/app/themes', label: 'Thèmes', icon: '🎨', description: 'Apparence' },
       { path: '/app/accessibility-settings', label: 'Accessibilité', icon: '♿', description: 'Options a11y' },
+      { path: '/app/consent', label: 'Consentements', icon: '📋', description: 'Gérer consentements', isNew: true },
+      { path: '/app/delete-account', label: 'Suppression compte', icon: '🗑️', description: 'RGPD' },
+      { path: '/app/activity-logs', label: 'Logs Activité', icon: '📜', description: 'Historique actions' },
     ],
   },
 ];
