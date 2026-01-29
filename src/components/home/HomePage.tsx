@@ -3,9 +3,9 @@
  */
 
 import React from 'react';
-import ModernHomePage from './modern-features/ModernHomePage';
+import ModernHomePage from '@/components/modern-features/ModernHomePage';
 import { usePageSEO } from '@/hooks/usePageSEO';
-import HomePageErrorBoundary from './error/HomePageErrorBoundary';
+import HomePageErrorBoundary from '@/components/error/HomePageErrorBoundary';
 import { useOptimizedPage } from '@/hooks/useOptimizedPage';
 
 const HomePage: React.FC = () => {

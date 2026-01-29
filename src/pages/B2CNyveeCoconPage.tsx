@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 
-import ZeroNumberBoundary from '@/components/ZeroNumberBoundary';
+import ZeroNumberBoundary from '@/components/common/ZeroNumberBoundary';
 import { Button } from '@/components/ui/button';
 import { useFlags } from '@/core/flags';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';

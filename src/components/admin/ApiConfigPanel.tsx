@@ -14,7 +14,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Key, RefreshCw, CheckCircle, XCircle, Shield } from 'lucide-react';
-import ApiStatus from './ApiStatus';
+import ApiStatus from '@/components/status/ApiStatus';
 import { supabase } from '@/integrations/supabase/client';
 
 interface ApiConfigPanelProps {

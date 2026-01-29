@@ -17,7 +17,7 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { BlockchainRestore } from '@/components/BlockchainRestore';
+import { BlockchainRestore } from '@/components/security/BlockchainRestore';
 
 /**
  * Page complète de gestion des backups blockchain

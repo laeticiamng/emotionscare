@@ -1,4 +1,8 @@
 // @ts-nocheck
+/**
+ * Setup global des tests - fichier consolidé
+ * Combine les configurations de test et les mocks Supabase/Auth/Router
+ */
 import '@testing-library/jest-dom';
 import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
@@ -22,7 +26,7 @@ const createDefaultTable = () => {
     select: vi.fn(() => table),
     eq: vi.fn(() => table),
     is: vi.fn(() => table),
-    not: vi.fn(() => table), // Added for .not() queries
+    not: vi.fn(() => table),
     in: vi.fn(() => table),
     neq: vi.fn(() => table),
     gt: vi.fn(() => table),
@@ -141,7 +145,6 @@ global.Audio = class Audio {
   duration = 0;
   constructor(src?: string) {
     if (src) this.src = src;
-    // Auto-trigger loadedmetadata after a tick
     setTimeout(() => {
       if (this.onloadedmetadata) this.onloadedmetadata();
     }, 0);
