@@ -20,6 +20,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
+type LucideIcon = React.ComponentType<{ className?: string }>;
+
 interface ModuleStatus {
   name: string;
   status: 'healthy' | 'warning' | 'error' | 'not-implemented';
@@ -27,7 +29,7 @@ interface ModuleStatus {
   tests: number;
   issues: string[];
   recommendations: string[];
-  icon: React.ElementType;
+  icon: LucideIcon;
 }
 
 interface AuditReport {
@@ -413,7 +415,7 @@ export default function PlatformAuditPage() {
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
                         <CardTitle className="flex items-center gap-2 text-lg">
-                          {React.createElement(module.icon, { className: "h-5 w-5 text-primary" })}
+                          <module.icon className="h-5 w-5 text-primary" />
                           {module.name}
                         </CardTitle>
                         {getStatusBadge(module.status)}
