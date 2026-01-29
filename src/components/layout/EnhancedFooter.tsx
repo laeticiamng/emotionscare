@@ -1,235 +1,148 @@
-// @ts-nocheck
+/**
+ * EnhancedFooter - Footer élégant style Apple
+ * Design minimaliste avec gradient subtil et animations fluides
+ */
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { routes } from '@/routerV2';
 import { motion } from 'framer-motion';
-import { useTheme } from '@/providers/theme';
 import { cn } from '@/lib/utils';
-import { 
-  Heart, 
-  Mail, 
-  Phone, 
-  Shield, 
-  Clock, 
-  Calendar,
-  Twitter,
-  Facebook,
-  Instagram,
-  Linkedin,
-  Github
-} from 'lucide-react';
+import { Heart, Mail, Shield, Twitter, Linkedin, Instagram } from 'lucide-react';
 
 const EnhancedFooter: React.FC = () => {
-  const { isDarkMode } = useTheme();
   const currentYear = new Date().getFullYear();
   
-  // Obtenir l'heure locale au format hh:mm
-  const getLocalTime = () => {
-    const now = new Date();
-    return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const footerLinks = {
+    product: [
+      { label: 'Fonctionnalités', to: '/navigation' },
+      { label: 'Tarifs', to: '/pricing' },
+      { label: 'Entreprise', to: '/b2b' },
+      { label: 'Témoignages', to: routes.public.testimonials() },
+    ],
+    resources: [
+      { label: 'Blog', to: routes.public.blog() },
+      { label: 'Aide', to: '/help' },
+      { label: 'Contact', to: routes.public.contact() },
+      { label: 'À propos', to: routes.public.about() },
+    ],
+    legal: [
+      { label: 'Confidentialité', to: '/legal/privacy' },
+      { label: 'Conditions', to: '/legal/terms' },
+      { label: 'Cookies', to: '/legal/cookies' },
+      { label: 'Mentions légales', to: '/legal/mentions' },
+    ],
   };
   
-  // Obtenir la date au format localisé
-  const getLocalDate = () => {
-    const now = new Date();
-    return now.toLocaleDateString([], { 
-      weekday: 'long', 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
-    });
-  };
-  
+  const socialLinks = [
+    { icon: Twitter, href: 'https://twitter.com/emotionscare', label: 'Twitter' },
+    { icon: Linkedin, href: 'https://linkedin.com/company/emotionscare', label: 'LinkedIn' },
+    { icon: Instagram, href: 'https://instagram.com/emotionscare', label: 'Instagram' },
+  ];
+
   return (
-    <footer className={cn(
-      "border-t transition-colors duration-300 mt-auto",
-      isDarkMode 
-        ? "bg-background/90 text-foreground" 
-        : "bg-background/80 text-foreground"
-    )}>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {/* Logo & About Column */}
-          <div className="space-y-4">
-            <Link to={routes.public.home()} className="flex items-center space-x-2">
-              <motion.div 
-                whileHover={{ rotate: 10 }}
-                transition={{ duration: 0.2 }}
-                className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center"
-              >
-                <span className="text-white font-bold text-sm">EC</span>
-              </motion.div>
-              <span className="text-xl font-semibold">EmotionsCare</span>
+    <footer className="relative border-t border-border/50 bg-gradient-to-b from-background to-muted/30">
+      {/* Subtle gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/[0.02] via-transparent to-accent/[0.02] pointer-events-none" />
+      
+      <div className="container relative mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+        {/* Main footer content */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12">
+          {/* Brand column */}
+          <div className="col-span-2">
+            <Link to="/" className="inline-block">
+              <span className="text-xl font-bold tracking-tight">EmotionsCare</span>
             </Link>
-            
-            <p className="text-sm text-muted-foreground max-w-xs">
-              Votre compagnon pour l'équilibre émotionnel et le bien-être mental au quotidien.
+            <p className="mt-4 text-sm text-muted-foreground max-w-xs leading-relaxed">
+              Votre compagnon pour l'équilibre émotionnel. Scan IA, coaching personnalisé et outils de bien-être mental.
             </p>
             
-            {/* Date & Time - Interactive Element */}
-            <div className="pt-4 text-sm">
-              <div className="flex items-center space-x-2 text-muted-foreground">
-                <Clock className="h-4 w-4" />
-                <span>{getLocalTime()}</span>
-              </div>
-              <div className="flex items-center space-x-2 mt-1 text-muted-foreground">
-                <Calendar className="h-4 w-4" />
-                <span>{getLocalDate()}</span>
-              </div>
+            {/* Social links */}
+            <div className="flex gap-4 mt-6">
+              {socialLinks.map((social) => (
+                <motion.a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  whileHover={{ y: -2 }}
+                  aria-label={social.label}
+                >
+                  <social.icon className="h-5 w-5" />
+                </motion.a>
+              ))}
             </div>
           </div>
-          
-          {/* Links Column */}
+
+          {/* Product links */}
           <div>
-            <h3 className="text-sm font-medium mb-4">Liens rapides</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>
-                <Link to={routes.public.about()} className="hover:text-foreground transition-colors">
-                  À propos
-                </Link>
-              </li>
-              <li>
-                <Link to={routes.public.services()} className="hover:text-foreground transition-colors">
-                  Nos services
-                </Link>
-              </li>
-              <li>
-                <Link to={routes.public.testimonials()} className="hover:text-foreground transition-colors">
-                  Témoignages
-                </Link>
-              </li>
-              <li>
-                <Link to={routes.public.blog()} className="hover:text-foreground transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link to={routes.public.contact()} className="hover:text-foreground transition-colors">
-                  Contact
-                </Link>
-              </li>
+            <h3 className="text-sm font-semibold mb-4">Produit</h3>
+            <ul className="space-y-3">
+              {footerLinks.product.map((link) => (
+                <li key={link.to}>
+                  <Link 
+                    to={link.to} 
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
-          
-          {/* Legal Column */}
+
+          {/* Resources links */}
           <div>
-            <h3 className="text-sm font-medium mb-4">Mentions légales</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>
-                <Link to="/legal/mentions" className="hover:text-foreground transition-colors">
-                  Mentions légales
-                </Link>
-              </li>
-              <li>
-                <Link to="/legal/terms" className="hover:text-foreground transition-colors">
-                  Conditions d'utilisation
-                </Link>
-              </li>
-              <li>
-                <Link to="/legal/sales" className="hover:text-foreground transition-colors">
-                  Conditions de vente
-                </Link>
-              </li>
-              <li>
-                <Link to="/legal/privacy" className="hover:text-foreground transition-colors">
-                  Politique de confidentialité
-                </Link>
-              </li>
-              <li>
-                <Link to="/legal/cookies" className="hover:text-foreground transition-colors">
-                  Politique cookies
-                </Link>
-              </li>
-              <li>
-                <div className="flex items-center text-xs mt-4">
-                  <Shield className="h-3 w-3 mr-1" />
-                  <span>Données sécurisées & RGPD</span>
-                </div>
-              </li>
+            <h3 className="text-sm font-semibold mb-4">Ressources</h3>
+            <ul className="space-y-3">
+              {footerLinks.resources.map((link) => (
+                <li key={link.to}>
+                  <Link 
+                    to={link.to} 
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
-          
-          {/* Contact Column */}
+
+          {/* Legal links */}
           <div>
-            <h3 className="text-sm font-medium mb-4">Nous contacter</h3>
-            <ul className="space-y-3 text-sm text-muted-foreground">
-              <li className="flex items-center">
-                <Mail className="h-4 w-4 mr-2" />
-                <a href="mailto:contact@emotions-care.com" className="hover:text-foreground transition-colors">
-                  contact@emotions-care.com
-                </a>
-              </li>
-              <li className="flex items-center">
-                <Phone className="h-4 w-4 mr-2" />
-                <a href="tel:+33123456789" className="hover:text-foreground transition-colors">
-                  +33 1 23 45 67 89
-                </a>
-              </li>
+            <h3 className="text-sm font-semibold mb-4">Légal</h3>
+            <ul className="space-y-3">
+              {footerLinks.legal.map((link) => (
+                <li key={link.to}>
+                  <Link 
+                    to={link.to} 
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
-            
-            {/* Social Media */}
-            <div className="mt-4">
-              <h4 className="text-xs font-medium mb-2">Suivez-nous</h4>
-              <div className="flex space-x-3">
-                <motion.a 
-                  href="https://twitter.com" 
-                  target="_blank" 
-                  rel="noreferrer"
-                  whileHover={{ y: -2, scale: 1.1 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <Twitter className="h-4 w-4" />
-                  <span className="sr-only">Twitter</span>
-                </motion.a>
-                <motion.a 
-                  href="https://facebook.com" 
-                  target="_blank" 
-                  rel="noreferrer"
-                  whileHover={{ y: -2, scale: 1.1 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <Facebook className="h-4 w-4" />
-                  <span className="sr-only">Facebook</span>
-                </motion.a>
-                <motion.a 
-                  href="https://instagram.com" 
-                  target="_blank" 
-                  rel="noreferrer"
-                  whileHover={{ y: -2, scale: 1.1 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <Instagram className="h-4 w-4" />
-                  <span className="sr-only">Instagram</span>
-                </motion.a>
-                <motion.a 
-                  href="https://linkedin.com" 
-                  target="_blank" 
-                  rel="noreferrer"
-                  whileHover={{ y: -2, scale: 1.1 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <Linkedin className="h-4 w-4" />
-                  <span className="sr-only">LinkedIn</span>
-                </motion.a>
-              </div>
-            </div>
           </div>
         </div>
-        
-        {/* Copyright & Credits - Bottom Section */}
-        <div className="mt-8 pt-6 border-t flex flex-col md:flex-row justify-between items-center">
-          <p className="text-xs text-muted-foreground text-center md:text-left">
-            &copy; {currentYear} EmotionsCare. Tous droits réservés.
-          </p>
-          
-          <div className="flex items-center mt-4 md:mt-0">
-            <span className="text-xs text-muted-foreground flex items-center">
-              Fait avec <Heart className="h-3 w-3 mx-1 text-red-500" /> en France
-            </span>
+
+        {/* Bottom bar */}
+        <div className="mt-12 pt-8 border-t border-border/50">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-6 text-xs text-muted-foreground">
+              <span>© {currentYear} EmotionsCare</span>
+              <span className="flex items-center gap-1">
+                <Shield className="h-3 w-3" />
+                RGPD
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span>Fait avec</span>
+              <Heart className="h-3 w-3 text-destructive" />
+              <span>en France</span>
+            </div>
           </div>
         </div>
       </div>

@@ -1,11 +1,14 @@
+/**
+ * B2CLayout - Layout consommateur avec style Apple élégant
+ */
+
 import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import EnhancedShell from '@/components/layout/EnhancedShell';
+import AppleStyleShell from '@/components/layout/AppleStyleShell';
 import '@/styles/b2c-theme.css';
 
 const B2CLayout: React.FC = () => {
   useEffect(() => {
-    // Add B2C class to body for theming
     document.body.classList.add('b2c-layout');
     return () => {
       document.body.classList.remove('b2c-layout');
@@ -13,13 +16,9 @@ const B2CLayout: React.FC = () => {
   }, []);
 
   return (
-    <div className="b2c-smooth-scroll">
-      <EnhancedShell>
-        <div className="b2c-page-enter b2c-page-enter-active">
-          <Outlet />
-        </div>
-      </EnhancedShell>
-    </div>
+    <AppleStyleShell showBackButton={true}>
+      <Outlet />
+    </AppleStyleShell>
   );
 };
 

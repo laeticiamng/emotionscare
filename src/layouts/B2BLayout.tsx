@@ -1,12 +1,16 @@
+/**
+ * B2BLayout - Layout entreprise avec style Apple élégant
+ */
+
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import EnhancedShell from '@/components/layout/EnhancedShell';
+import AppleStyleShell from '@/components/layout/AppleStyleShell';
 
 const B2BLayout: React.FC = () => {
   return (
-    <EnhancedShell>
+    <AppleStyleShell showBackButton={true}>
       <Outlet />
-    </EnhancedShell>
+    </AppleStyleShell>
   );
 };
 
