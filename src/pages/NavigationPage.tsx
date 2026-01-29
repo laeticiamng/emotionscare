@@ -552,9 +552,6 @@ export default function NavigationPage() {
                                 <p className="text-xs text-muted-foreground line-clamp-2">
                                   {route.description}
                                 </p>
-                                <p className="text-xs text-muted-foreground/60 mt-1 font-mono truncate">
-                                  {route.path}
-                                </p>
                               </div>
                               <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                             </div>
