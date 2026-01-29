@@ -46,7 +46,7 @@ const GuildListPage: React.FC = () => {
     if (!newGuildName.trim()) {
       toast({
         title: 'Erreur',
-        description: 'Le nom de la guilde est requis.',
+        description: 'Le nom du cercle est requis.',
         variant: 'destructive',
       });
       return;
@@ -61,8 +61,8 @@ const GuildListPage: React.FC = () => {
 
     if (guild) {
       toast({
-        title: 'Guilde créée !',
-        description: `La guilde "${guild.name}" a été créée avec succès.`,
+        title: 'Cercle créé !',
+        description: `Le cercle "${guild.name}" a été créé avec succès.`,
       });
       setCreateDialogOpen(false);
       setNewGuildName('');
@@ -73,7 +73,7 @@ const GuildListPage: React.FC = () => {
     } else {
       toast({
         title: 'Erreur',
-        description: 'Impossible de créer la guilde.',
+        description: 'Impossible de créer le cercle.',
         variant: 'destructive',
       });
     }
@@ -83,14 +83,14 @@ const GuildListPage: React.FC = () => {
     const success = await guildService.joinGuild(guildId);
     if (success) {
       toast({
-        title: 'Guilde rejointe !',
-        description: 'Vous avez rejoint la guilde avec succès.',
+        title: 'Cercle rejoint !',
+        description: 'Vous avez rejoint le cercle de soutien avec succès.',
       });
       navigate(`/app/guilds/${guildId}`);
     } else {
       toast({
         title: 'Erreur',
-        description: 'Impossible de rejoindre la guilde.',
+        description: 'Impossible de rejoindre le cercle.',
         variant: 'destructive',
       });
     }
@@ -108,34 +108,34 @@ const GuildListPage: React.FC = () => {
           <div>
             <h1 className="text-4xl font-bold flex items-center gap-3">
               <Shield className="w-10 h-10 text-primary" />
-              Guildes Musicales
+              Cercles de Soutien
             </h1>
             <p className="text-muted-foreground mt-2">
-              Rejoignez une communauté et relevez des défis ensemble
+              Rejoignez un groupe d'entraide et progressez ensemble
             </p>
           </div>
           <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
             <DialogTrigger asChild>
               <Button className="gap-2">
                 <Plus className="w-4 h-4" />
-                Créer une guilde
+                Créer un cercle
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Créer une nouvelle guilde</DialogTitle>
+                <DialogTitle>Créer un nouveau cercle de soutien</DialogTitle>
                 <DialogDescription>
-                  Créez votre propre guilde musicale et invitez des membres
+                  Créez votre propre groupe d'entraide et invitez des collègues
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div>
-                  <Label htmlFor="name">Nom de la guilde *</Label>
+                  <Label htmlFor="name">Nom du cercle *</Label>
                   <Input
                     id="name"
                     value={newGuildName}
                     onChange={(e) => setNewGuildName(e.target.value)}
-                    placeholder="Les Mélomanes"
+                    placeholder="Équipe Urgences"
                   />
                 </div>
                 <div>
@@ -172,7 +172,7 @@ const GuildListPage: React.FC = () => {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
           <Input
-            placeholder="Rechercher une guilde par nom, description ou genre..."
+            placeholder="Rechercher un cercle par nom, description ou spécialité..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -249,12 +249,12 @@ const GuildListPage: React.FC = () => {
         {filteredGuilds?.length === 0 && !isLoading && (
           <Card className="p-12 text-center">
             <Shield className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Aucune guilde trouvée</h3>
+            <h3 className="text-xl font-semibold mb-2">Aucun cercle trouvé</h3>
             <p className="text-muted-foreground mb-4">
-              Soyez le premier à créer une guilde !
+              Soyez le premier à créer un cercle de soutien !
             </p>
             <Button onClick={() => setCreateDialogOpen(true)}>
-              Créer une guilde
+              Créer un cercle
             </Button>
           </Card>
         )}

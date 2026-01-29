@@ -54,15 +54,15 @@ const TournamentsPage: React.FC = () => {
       registration: { label: 'Inscriptions ouvertes', variant: 'default' as const },
       in_progress: { label: 'En cours', variant: 'default' as const },
       completed: { label: 'Terminé', variant: 'secondary' as const },
-      cancelled: { label: 'Annulé', variant: 'destructive' as const },
+      cancelled: { label: 'Reporté', variant: 'destructive' as const },
     };
     return statusConfig[status];
   };
 
   const getTypeBadge = (type: Tournament['tournament_type']) => {
     const typeConfig = {
-      weekly_xp: { label: 'XP Hebdo', icon: TrendingUp },
-      monthly_challenge: { label: 'Défi Mensuel', icon: Target },
+      weekly_xp: { label: 'Défi Semaine', icon: TrendingUp },
+      monthly_challenge: { label: 'Objectif Mensuel', icon: Target },
       special_event: { label: 'Événement Spécial', icon: Sparkles },
     };
     return typeConfig[type] || { label: type, icon: Trophy };
@@ -80,10 +80,10 @@ const TournamentsPage: React.FC = () => {
           <div>
             <h1 className="text-4xl font-bold flex items-center gap-3">
               <Trophy className="w-10 h-10 text-primary" />
-              Tournois
+              Défis Collaboratifs
             </h1>
             <p className="text-muted-foreground mt-2">
-              Participez aux tournois et remportez des récompenses exclusives
+              Participez aux défis d'équipe et progressez ensemble vers le bien-être
             </p>
           </div>
         </div>
@@ -183,8 +183,8 @@ const TournamentsPage: React.FC = () => {
                             onClick={() => handleRegister(tournament.id)}
                             className="w-full gap-2"
                           >
-                            <Swords className="w-4 h-4" />
-                            S'inscrire
+                            <Users className="w-4 h-4" />
+                            Participer
                           </Button>
                         ) : (
                           <Button
@@ -205,9 +205,9 @@ const TournamentsPage: React.FC = () => {
             {tournaments?.length === 0 && !isLoading && (
               <Card className="p-12 text-center">
                 <Trophy className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Aucun tournoi trouvé</h3>
+                <h3 className="text-xl font-semibold mb-2">Aucun défi en cours</h3>
                 <p className="text-muted-foreground">
-                  Revenez plus tard pour découvrir de nouveaux tournois !
+                  Revenez plus tard pour découvrir de nouveaux défis collaboratifs !
                 </p>
               </Card>
             )}
