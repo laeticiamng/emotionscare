@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Save, Mic, MicOff, Camera, Image, Calendar, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, Mic, MicOff, Camera, Image, Calendar, Loader2, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,12 +7,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import { MedicalDisclaimerDialog, useMedicalDisclaimer } from '@/components/medical/MedicalDisclaimerDialog';
 import { useJournalMutations } from '@/hooks/useJournalMutations';
 import { useToast } from '@/hooks/use-toast';
+import { JournalTemplatesSelector, JournalTemplate } from '@/components/journal/JournalTemplatesSelector';
 
 const JournalNewPage: React.FC = () => {
   const navigate = useNavigate();
@@ -26,18 +28,20 @@ const JournalNewPage: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isPrivate, setIsPrivate] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [showTemplates, setShowTemplates] = useState(true);
+  const [selectedTemplate, setSelectedTemplate] = useState<JournalTemplate | null>(null);
   const { prefersReducedMotion } = useMotionPrefs();
   const [moodAnnouncement, setMoodAnnouncement] = useState('Aucune humeur sélectionnée pour le moment');
   const [journalAnnouncement, setJournalAnnouncement] = useState('Contenu du journal vide');
 
   const moodOptions = [
-    { value: 'happy', label: '😊 Joyeux', color: 'bg-yellow-100 text-yellow-800' },
-    { value: 'calm', label: '😌 Calme', color: 'bg-blue-100 text-blue-800' },
-    { value: 'anxious', label: '😰 Anxieux', color: 'bg-orange-100 text-orange-800' },
-    { value: 'sad', label: '😢 Triste', color: 'bg-gray-100 text-gray-800' },
-    { value: 'excited', label: '🤩 Excité', color: 'bg-purple-100 text-purple-800' },
-    { value: 'tired', label: '😴 Fatigué', color: 'bg-indigo-100 text-indigo-800' },
-    { value: 'grateful', label: '🙏 Reconnaissant', color: 'bg-green-100 text-green-800' },
+    { value: 'happy', label: '😊 Joyeux', color: 'bg-warning/20 text-warning-foreground' },
+    { value: 'calm', label: '😌 Calme', color: 'bg-info/20 text-info-foreground' },
+    { value: 'anxious', label: '😰 Anxieux', color: 'bg-warning/30 text-warning-foreground' },
+    { value: 'sad', label: '😢 Triste', color: 'bg-muted text-muted-foreground' },
+    { value: 'excited', label: '🤩 Excité', color: 'bg-accent text-accent-foreground' },
+    { value: 'tired', label: '😴 Fatigué', color: 'bg-secondary text-secondary-foreground' },
+    { value: 'grateful', label: '🙏 Reconnaissant', color: 'bg-success/20 text-success-foreground' },
   ];
 
   const suggestedTags = [
@@ -98,6 +102,19 @@ const JournalNewPage: React.FC = () => {
     // Ici, implémenter la reconnaissance vocale
   };
 
+  const handleSelectTemplate = (template: JournalTemplate) => {
+    setSelectedTemplate(template);
+    setShowTemplates(false);
+    // Auto-remplir le titre avec le nom du template
+    if (!title) {
+      setTitle(template.title + ' - ' + new Date().toLocaleDateString('fr-FR'));
+    }
+    // Ajouter les prompts comme contenu d'aide
+    if (!content) {
+      setContent(template.prompts.map((p, i) => `${i + 1}. ${p}\n\n`).join(''));
+    }
+  };
+
   const selectedMoodData = moodOptions.find(m => m.value === mood);
 
   useEffect(() => {
@@ -117,7 +134,7 @@ const JournalNewPage: React.FC = () => {
   }, [content]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-100 dark:from-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-gradient-to-b from-background via-primary/5 to-background">
       <div aria-live="polite" role="status" className="sr-only" data-testid="journal-live-region">
         <span>{moodAnnouncement}</span>
         <span>{journalAnnouncement}</span>
@@ -157,6 +174,34 @@ const JournalNewPage: React.FC = () => {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        
+        {/* Templates Selector */}
+        <Collapsible open={showTemplates} onOpenChange={setShowTemplates}>
+          <Card className="p-4">
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" className="w-full justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <span className="font-medium">Templates guidés</span>
+                  {selectedTemplate && (
+                    <Badge variant="secondary" className="ml-2">
+                      {selectedTemplate.title}
+                    </Badge>
+                  )}
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  {showTemplates ? 'Masquer' : 'Afficher'}
+                </span>
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-4">
+              <JournalTemplatesSelector
+                onSelectTemplate={handleSelectTemplate}
+                selectedTemplateId={selectedTemplate?.id}
+              />
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
         
         {/* Métadonnées */}
         <Card className="p-4">
@@ -250,7 +295,7 @@ const JournalNewPage: React.FC = () => {
                   aria-pressed={isRecording}
                   aria-label={isRecording ? 'Arrêter la dictée vocale' : 'Commencer la dictée vocale'}
                   className={cn(
-                    isRecording ? 'bg-red-100 text-red-700' : '',
+                    isRecording ? 'bg-destructive/20 text-destructive' : '',
                     isRecording && !prefersReducedMotion ? 'animate-pulse' : ''
                   )}
                 >
@@ -329,9 +374,9 @@ const JournalNewPage: React.FC = () => {
         </Card>
 
         {/* Conseils d'écriture */}
-        <Card className="p-4 bg-blue-50 border-blue-200">
-          <h3 className="font-medium text-blue-900 mb-2">💡 Conseils pour bien écrire</h3>
-          <ul className="text-sm text-blue-700 space-y-1">
+        <Card className="p-4 bg-info/10 border-info/20">
+          <h3 className="font-medium text-info-foreground mb-2">💡 Conseils pour bien écrire</h3>
+          <ul className="text-sm text-muted-foreground space-y-1">
             <li>• Soyez authentique et honnête avec vos émotions</li>
             <li>• Décrivez les détails qui ont marqué votre journée</li>
             <li>• Notez ce pour quoi vous êtes reconnaissant</li>
