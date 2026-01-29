@@ -1290,6 +1290,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/premium'],
   },
   {
+    name: 'payment-success',
+    path: '/payment-success',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'PaymentSuccessPage',
+    guard: false,
+  },
+  {
     name: 'billing',
     path: '/app/billing',
     segment: 'consumer',

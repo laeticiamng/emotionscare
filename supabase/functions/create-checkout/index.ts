@@ -1,148 +1,109 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.43.4";
+import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Liste blanche des origines autorisées
-const ALLOWED_ORIGINS = [
-  'https://emotionscare.com',
-  'https://www.emotionscare.com',
-  'https://app.emotionscare.com',
-  'http://localhost:3000',
-  'http://localhost:5173',
-  'http://localhost:8080',
-];
-
-// Helper logging function for enhanced debugging
 const logStep = (step: string, details?: Record<string, unknown>) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
 };
 
-// Stripe API wrapper without external dependency
-async function createStripeCheckout(
-  stripeKey: string,
-  email: string,
-  userId: string,
-  origin: string,
-  customerId?: string
-): Promise<{ url: string | null; sessionId: string }> {
-  const baseUrl = 'https://api.stripe.com/v1';
-  
-  // Create checkout session
-  const sessionParams = new URLSearchParams();
-  if (customerId) {
-    sessionParams.append('customer', customerId);
-  } else {
-    sessionParams.append('customer_email', email);
+// Plan configuration - EmotionsCare tiers
+const PLANS = {
+  pro: {
+    price_id: "price_1Sv0NUDFa5Y9NR1IA3GWcJgi",
+    product_id: "prod_TslvzqesvBi9fL",
+    name: "EmotionsCare Pro",
+    price: 14.90
+  },
+  business: {
+    price_id: "price_1Sv0NVDFa5Y9NR1I10Tjjxwh",
+    product_id: "prod_TslvIwwBhG1EHZ",
+    name: "EmotionsCare Business",
+    price: 49.90
   }
-  sessionParams.append('mode', 'subscription');
-  sessionParams.append('success_url', `${origin}/app/premium?success=true`);
-  sessionParams.append('cancel_url', `${origin}/app/premium?cancelled=true`);
-  sessionParams.append('line_items[0][price_data][currency]', 'eur');
-  sessionParams.append('line_items[0][price_data][product_data][name]', 'EmotionsCare Premium');
-  sessionParams.append('line_items[0][price_data][product_data][description]', 'Accès aux fonctionnalités Premium : Musique thérapeutique, Coach IA, VR Premium');
-  sessionParams.append('line_items[0][price_data][unit_amount]', '999');
-  sessionParams.append('line_items[0][price_data][recurring][interval]', 'month');
-  sessionParams.append('line_items[0][quantity]', '1');
-  sessionParams.append('metadata[user_id]', userId);
-  sessionParams.append('metadata[user_email]', email);
-
-  const response = await fetch(`${baseUrl}/checkout/sessions`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${stripeKey}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: sessionParams.toString(),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Stripe API error: ${response.status} - ${errorText}`);
-  }
-
-  const session = await response.json();
-  return { url: session.url, sessionId: session.id };
-}
-
-async function findStripeCustomer(stripeKey: string, email: string): Promise<string | undefined> {
-  const response = await fetch(`https://api.stripe.com/v1/customers?email=${encodeURIComponent(email)}&limit=1`, {
-    headers: {
-      'Authorization': `Bearer ${stripeKey}`,
-    },
-  });
-
-  if (!response.ok) return undefined;
-  
-  const data = await response.json();
-  return data.data?.[0]?.id;
-}
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const supabaseClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+  );
+
   try {
     logStep("Function started");
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
-    logStep("Stripe key verified");
 
-    // Initialize Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-    );
+    // Parse request body
+    const body = await req.json().catch(() => ({}));
+    const plan = body.plan || 'pro';
+    
+    if (!PLANS[plan as keyof typeof PLANS]) {
+      throw new Error(`Invalid plan: ${plan}. Valid plans are: pro, business`);
+    }
+    
+    const selectedPlan = PLANS[plan as keyof typeof PLANS];
+    logStep("Plan selected", { plan, priceId: selectedPlan.price_id });
 
+    // Authenticate user
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header provided");
-    logStep("Authorization header found");
-
+    
     const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError) throw new Error(`Authentication error: ${userError.message}`);
-    const user = userData.user;
+    const { data } = await supabaseClient.auth.getUser(token);
+    const user = data.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    logStep("User authenticated", { email: user.email });
 
-    // Check if customer already exists
-    const customerId = await findStripeCustomer(stripeKey, user.email);
-    if (customerId) {
+    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+
+    // Check existing customer
+    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    let customerId;
+    if (customers.data.length > 0) {
+      customerId = customers.data[0].id;
       logStep("Existing customer found", { customerId });
-    } else {
-      logStep("No existing customer found, will create new one");
     }
 
-    // Valider l'origine
-    const requestOrigin = req.headers.get("origin");
-    const origin = requestOrigin && ALLOWED_ORIGINS.includes(requestOrigin)
-      ? requestOrigin
-      : ALLOWED_ORIGINS[0];
-    logStep("Origin validated", { requestOrigin, usedOrigin: origin });
+    const origin = req.headers.get("origin") || "https://emotions-care.lovable.app";
     
-    const { url, sessionId } = await createStripeCheckout(
-      stripeKey,
-      user.email,
-      user.id,
-      origin,
-      customerId
-    );
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      customer_email: customerId ? undefined : user.email,
+      line_items: [
+        {
+          price: selectedPlan.price_id,
+          quantity: 1,
+        },
+      ],
+      mode: "subscription",
+      success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/pricing`,
+      metadata: {
+        user_id: user.id,
+        plan: plan
+      }
+    });
 
-    logStep("Checkout session created", { sessionId, url });
+    logStep("Checkout session created", { sessionId: session.id, url: session.url });
 
-    return new Response(JSON.stringify({ url }), {
+    return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR in create-checkout", { message: errorMessage });
+    logStep("ERROR", { message: errorMessage });
     return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

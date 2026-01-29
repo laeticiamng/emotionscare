@@ -311,6 +311,7 @@ const ChallengeDetailPage = lazy(() => import('@/pages/gamification/ChallengeDet
 const ChallengeCreatePage = lazy(() => import('@/pages/gamification/ChallengeCreatePage'));
 const NotificationsCenterPage = lazy(() => import('@/pages/NotificationsCenterPage'));
 const PremiumPage = lazy(() => import('@/pages/PremiumPage'));
+const PaymentSuccessPage = lazy(() => import('@/pages/PaymentSuccess'));
 const BillingPage = lazy(() => import('@/pages/BillingPage'));
 const SupportPage = lazy(() => import('@/pages/SupportPage'));
 const FAQPage = lazy(() => import('@/pages/FAQPage'));
@@ -475,6 +476,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CPrivacyTogglesPage,
   B2CNotificationsPage,
   HowItAdaptsPage,
+  PaymentSuccessPage,
   
   // B2B
   B2BTeamsPage,
