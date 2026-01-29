@@ -362,6 +362,9 @@ const AurasLeaderboardPage = lazy(() => import('@/pages/AurasLeaderboardPage'));
 const ConsentManagementPage = lazy(() => import('@/pages/ConsentManagementPage'));
 const AccountDeletionPage = lazy(() => import('@/pages/AccountDeletionPage'));
 
+// PWA Install Page
+const InstallPage = lazy(() => import('@/pages/InstallPage'));
+
 // ═══════════════════════════════════════════════════════════
 // MAPPING DES COMPOSANTS
 // ═══════════════════════════════════════════════════════════
@@ -672,6 +675,9 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   AurasLeaderboardPage,
   ConsentManagementPage,
   AccountDeletionPage,
+  
+  // PWA Install Page
+  InstallPage,
   
   // GDPR & Compliance - avec alias pour registry
   UnifiedGDPRDashboard,
