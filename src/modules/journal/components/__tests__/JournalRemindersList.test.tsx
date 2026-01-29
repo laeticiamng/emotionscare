@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@/test/test-utils';
+import { render, screen, fireEvent, waitFor } from '@/tests/test-utils';
 import { JournalRemindersList } from '../JournalRemindersList';
 import type { JournalReminder } from '@/services/journalReminders';
 
