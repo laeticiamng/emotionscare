@@ -26,7 +26,7 @@ const B2CGamificationPage: React.FC = () => {
   const achievementsUnlocked = achievements.filter(a => a.unlocked).length;
 
   useEffect(() => {
-    document.title = "Progression et Récompenses | EmotionsCare";
+    document.title = "Ma Progression | EmotionsCare";
   }, []);
 
   const progressPercentage = (experience / nextLevelXp) * 100;
@@ -82,7 +82,7 @@ const B2CGamificationPage: React.FC = () => {
         >
           <ArrowLeft className="w-5 h-5" aria-hidden="true" />
         </button>
-        <h1 className="text-lg font-medium">Progression</h1>
+        <h1 className="text-lg font-medium">Ma Progression</h1>
         <div className="w-9" aria-hidden="true" />
       </header>
 
