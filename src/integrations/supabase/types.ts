@@ -30445,6 +30445,15 @@ export type Database = {
           value: string
         }[]
       }
+      get_profile_by_user_id: {
+        Args: { p_user_id: string }
+        Returns: {
+          avatar_url: string
+          email: string
+          id: string
+          name: string
+        }[]
+      }
       get_pseudonymization_statistics: {
         Args: { p_end_date?: string; p_rule_id?: string; p_start_date?: string }
         Returns: {

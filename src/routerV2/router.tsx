@@ -346,6 +346,9 @@ const SecuritySettingsPage = lazy(() => import('@/pages/settings/SecuritySetting
 // Exchange Hub V2.0
 const ExchangeHubPage = lazy(() => import('@/pages/ExchangeHubPage'));
 
+// Entraide - Module Social Unifié
+const EntraidePage = lazy(() => import('@/pages/EntraidePage'));
+
 // Nouvelles fonctionnalités V2.1 - Community, Wearables, Export
 const DataExportPage = lazy(() => import('@/pages/DataExportPage'));
 const CommunityPage = lazy(() => import('@/pages/social/CommunityPage'));
@@ -659,6 +662,9 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // Exchange Hub V2.0
   ExchangeHubPage,
+  
+  // Entraide - Module Social Unifié
+  EntraidePage,
   
   // Nouvelles fonctionnalités V2.1
   DataExportPage,
