@@ -31,7 +31,7 @@ interface InstrumentConfig {
   id: string;
   name: string;
   description: string;
-  icon: React.ElementType;
+  icon: typeof ClipboardList;
   color: string;
   items: InstrumentItem[];
   scaleLabels: string[];
@@ -418,80 +418,6 @@ export default function AssessPage() {
           </p>
         </Card>
       )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {INSTRUMENT_LIST.map((inst) => (
-          <Link key={inst.id} to={`/app/assess?instrument=${inst.id}`}>
-            <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer group">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <div className={`p-2 rounded-lg ${inst.color} text-white`}>
-                    <inst.icon className="h-5 w-5" />
-                  </div>
-                  <Badge variant="secondary">{inst.items} Q</Badge>
-                </div>
-                <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                  {inst.name}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">{inst.description}</p>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
-}
-  const [searchParams] = useSearchParams();
-  const selectedInstrument = searchParams.get('instrument');
-
-  if (selectedInstrument) {
-    const instrument = INSTRUMENTS.find(i => i.id === selectedInstrument);
-    if (instrument) {
-      return (
-        <div className="container mx-auto px-4 py-8 max-w-2xl" data-testid="page-root">
-          <Link to="/app/assess" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6">
-            <ArrowLeft className="h-4 w-4" />
-            Retour aux évaluations
-          </Link>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${instrument.color} text-white`}>
-                  <instrument.icon className="h-5 w-5" />
-                </div>
-                {instrument.name}
-              </CardTitle>
-              <CardDescription>{instrument.description} • {instrument.items} questions</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                Cette évaluation vous aidera à mesurer votre {instrument.description.toLowerCase()}.
-                Répondez honnêtement aux questions suivantes.
-              </p>
-              <Button className="w-full" size="lg">
-                Commencer l'évaluation
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      );
-    }
-  }
-
-  return (
-    <div className="container mx-auto px-4 py-8" data-testid="page-root">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="p-3 rounded-xl bg-primary/10">
-          <ClipboardList className="h-8 w-8 text-primary" />
-        </div>
-        <div>
-          <h1 className="text-3xl font-bold">Évaluations Cliniques</h1>
-          <p className="text-muted-foreground">11 instruments psychométriques validés scientifiquement</p>
-        </div>
-      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {INSTRUMENT_LIST.map((inst) => (
