@@ -1,20 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { 
-  Play, Pause, Volume2, Star, Crown, Headphones, Music, 
-  Heart, Brain, Download, Share, Bookmark, Settings,
-  SkipBack, SkipForward, Shuffle, Repeat, Clock,
-  Sparkles, Award, Target
+  Play, Pause, Crown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Slider } from '@/components/ui/slider';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
-import { useMusic } from '@/contexts/MusicContext';
-import { cn } from '@/lib/utils';
+import { usePageSEO } from '@/hooks/usePageSEO';
 import PageRoot from '@/components/common/PageRoot';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import { SoundForestVisualizer } from '@/components/music/SoundForestVisualizer';
@@ -56,6 +46,12 @@ const PREMIUM_TRACKS: PremiumTrack[] = [
 const B2CMusicTherapyPremiumPage: React.FC = () => {
   const [selectedTrack, setSelectedTrack] = useState<PremiumTrack | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  
+  usePageSEO({
+    title: 'Musicothérapie Premium - Fréquences binaurales',
+    description: 'Thérapie musicale avancée avec fréquences binaurales, ondes alpha et theta. Compositions exclusives pour focus, relaxation et guérison émotionnelle.',
+    keywords: 'musicothérapie, fréquences binaurales, ondes alpha, theta, relaxation, focus'
+  });
 
   const handlePlayPause = (track: PremiumTrack) => {
     if (selectedTrack?.id === track.id) {
@@ -66,10 +62,10 @@ const B2CMusicTherapyPremiumPage: React.FC = () => {
     }
   };
 
-    return (
+  return (
       <ConsentGate>
         <PageRoot>
-          <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900">
+          <div className="min-h-screen bg-gradient-to-br from-primary/20 via-secondary/10 to-background">
             <div className="container mx-auto px-4 py-16">
               <div className="mb-12 text-center">
                 <div className="mb-4 flex items-center justify-center gap-3">
@@ -86,15 +82,15 @@ const B2CMusicTherapyPremiumPage: React.FC = () => {
 
               {/* Sound Forest 3D Visualizer */}
               {selectedTrack && (
-                <div className="mb-8 rounded-2xl overflow-hidden border border-emerald-500/20">
+                <div className="mb-8 rounded-2xl overflow-hidden border border-primary/20">
                   <div className="h-[400px]">
                     <SoundForestVisualizer isPlaying={isPlaying} />
                   </div>
-                  <div className="bg-slate-900/90 backdrop-blur-sm p-4 border-t border-emerald-500/20">
+                  <div className="bg-card/90 backdrop-blur-sm p-4 border-t border-primary/20">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-emerald-300">{selectedTrack.title}</p>
-                        <p className="text-xs text-emerald-300/60">{selectedTrack.artist}</p>
+                        <p className="text-sm font-medium text-primary">{selectedTrack.title}</p>
+                        <p className="text-xs text-muted-foreground">{selectedTrack.artist}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <Button
