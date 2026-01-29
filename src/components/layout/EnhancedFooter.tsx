@@ -41,7 +41,7 @@ const EnhancedFooter: React.FC = () => {
   ];
 
   return (
-    <footer className="relative border-t border-border/50 bg-gradient-to-b from-background to-muted/30">
+    <footer className="relative border-t border-border/50 bg-gradient-to-b from-background to-muted/30 safe-area-bottom">
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-primary/[0.02] via-transparent to-accent/[0.02] pointer-events-none" />
       

@@ -104,7 +104,7 @@ const AppleStyleShell: React.FC<AppleStyleShellProps> = memo(({
       {!hideNav && (
         <header 
           className={cn(
-            "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+            "fixed top-0 left-0 right-0 z-50 transition-all duration-300 safe-area-top",
             scrolled 
               ? "bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm" 
               : "bg-transparent"
