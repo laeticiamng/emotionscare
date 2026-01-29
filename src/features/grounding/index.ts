@@ -111,3 +111,165 @@ export const DEFAULT_GROUNDING_TECHNIQUES: GroundingTechnique[] = [
     category: 'safe-place',
   },
 ];
+
+// ============================================================================
+// HOOKS
+// ============================================================================
+import { useState, useCallback, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+
+export function useGroundingSession() {
+  const { user } = useAuth();
+  const [currentTechnique, setCurrentTechnique] = useState<GroundingTechnique | null>(null);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [isActive, setIsActive] = useState(false);
+  const [anxietyBefore, setAnxietyBefore] = useState<number | null>(null);
+  const [startTime, setStartTime] = useState<string | null>(null);
+
+  const startSession = useCallback((techniqueId: string, anxiety?: number) => {
+    const technique = DEFAULT_GROUNDING_TECHNIQUES.find(t => t.id === techniqueId);
+    if (!technique) return;
+
+    setCurrentTechnique(technique);
+    setCurrentStep(0);
+    setIsActive(true);
+    setAnxietyBefore(anxiety ?? null);
+    setStartTime(new Date().toISOString());
+  }, []);
+
+  const nextStep = useCallback(() => {
+    if (!currentTechnique) return;
+    
+    if (currentStep < currentTechnique.steps.length - 1) {
+      setCurrentStep(prev => prev + 1);
+    }
+  }, [currentTechnique, currentStep]);
+
+  const completeSession = useCallback(async (anxietyAfter?: number) => {
+    if (!user?.id || !currentTechnique || !startTime) {
+      setIsActive(false);
+      return;
+    }
+
+    const completedAt = new Date().toISOString();
+    const duration = Math.round((new Date(completedAt).getTime() - new Date(startTime).getTime()) / 1000);
+
+    try {
+      await supabase.from('activity_sessions').insert({
+        user_id: user.id,
+        activity_id: currentTechnique.id,
+        started_at: startTime,
+        completed_at: completedAt,
+        duration_seconds: duration,
+        mood_before: anxietyBefore,
+        mood_after: anxietyAfter,
+        completed: true,
+        metadata: { type: 'grounding', technique: currentTechnique.name },
+      });
+    } catch (error) {
+      console.error('Error saving grounding session:', error);
+    }
+
+    setIsActive(false);
+    setCurrentTechnique(null);
+    setCurrentStep(0);
+    setAnxietyBefore(null);
+    setStartTime(null);
+  }, [user?.id, currentTechnique, startTime, anxietyBefore]);
+
+  const cancelSession = useCallback(() => {
+    setIsActive(false);
+    setCurrentTechnique(null);
+    setCurrentStep(0);
+    setAnxietyBefore(null);
+    setStartTime(null);
+  }, []);
+
+  return {
+    techniques: DEFAULT_GROUNDING_TECHNIQUES,
+    currentTechnique,
+    currentStep,
+    currentStepData: currentTechnique?.steps[currentStep] || null,
+    isActive,
+    progress: currentTechnique 
+      ? ((currentStep + 1) / currentTechnique.steps.length) * 100 
+      : 0,
+    startSession,
+    nextStep,
+    completeSession,
+    cancelSession,
+  };
+}
+
+export function useGroundingProgress() {
+  const { user } = useAuth();
+  const [progress, setProgress] = useState<GroundingProgress | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchProgress = async () => {
+      setLoading(true);
+      
+      const { data } = await supabase
+        .from('activity_sessions')
+        .select('*')
+        .eq('user_id', user.id)
+        .contains('metadata', { type: 'grounding' });
+
+      if (data && data.length > 0) {
+        const techniqueCounts: Record<string, number> = {};
+        let totalReduction = 0;
+        let reductionCount = 0;
+
+        data.forEach(s => {
+          const technique = s.activity_id;
+          techniqueCounts[technique] = (techniqueCounts[technique] || 0) + 1;
+          
+          if (s.mood_before && s.mood_after) {
+            totalReduction += s.mood_before - s.mood_after;
+            reductionCount++;
+          }
+        });
+
+        const favorite = Object.entries(techniqueCounts).sort(([,a], [,b]) => b - a)[0]?.[0] || '';
+        const mastered = Object.entries(techniqueCounts)
+          .filter(([, count]) => count >= 5)
+          .map(([id]) => id);
+
+        setProgress({
+          total_sessions: data.length,
+          techniques_mastered: mastered,
+          favorite_technique: favorite,
+          avg_anxiety_reduction: reductionCount > 0 ? Math.round(totalReduction / reductionCount) : 0,
+          streak_days: 0,
+        });
+      }
+      
+      setLoading(false);
+    };
+
+    fetchProgress();
+  }, [user?.id]);
+
+  return { progress, loading };
+}
+
+// ============================================================================
+// SERVICE
+// ============================================================================
+
+export const groundingService = {
+  getTechniques: () => DEFAULT_GROUNDING_TECHNIQUES,
+  
+  getTechniqueById: (id: string) => 
+    DEFAULT_GROUNDING_TECHNIQUES.find(t => t.id === id),
+  
+  getTechniquesByCategory: (category: GroundingCategory) =>
+    DEFAULT_GROUNDING_TECHNIQUES.filter(t => t.category === category),
+  
+  getBeginnerTechniques: () =>
+    DEFAULT_GROUNDING_TECHNIQUES.filter(t => t.difficulty === 'beginner'),
+};
