@@ -1103,6 +1103,42 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_voice_sessions: {
+        Row: {
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          language: string | null
+          mode: string | null
+          model: string | null
+          transcript_length: number | null
+          user_id: string
+          voice_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          language?: string | null
+          mode?: string | null
+          model?: string | null
+          transcript_length?: number | null
+          user_id: string
+          voice_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          language?: string | null
+          mode?: string | null
+          model?: string | null
+          transcript_length?: number | null
+          user_id?: string
+          voice_id?: string | null
+        }
+        Relationships: []
+      }
       alert_configurations: {
         Row: {
           created_at: string
@@ -10080,6 +10116,51 @@ export type Database = {
           item_codes?: string[] | null
           name?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      flashcard_imports: {
+        Row: {
+          cards_failed: number | null
+          cards_imported: number | null
+          completed_at: string | null
+          created_at: string
+          deck_id: string | null
+          error_message: string | null
+          file_name: string
+          file_type: string
+          id: string
+          metadata: Json | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          cards_failed?: number | null
+          cards_imported?: number | null
+          completed_at?: string | null
+          created_at?: string
+          deck_id?: string | null
+          error_message?: string | null
+          file_name: string
+          file_type: string
+          id?: string
+          metadata?: Json | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          cards_failed?: number | null
+          cards_imported?: number | null
+          completed_at?: string | null
+          created_at?: string
+          deck_id?: string | null
+          error_message?: string | null
+          file_name?: string
+          file_type?: string
+          id?: string
+          metadata?: Json | null
+          status?: string | null
           user_id?: string
         }
         Relationships: []
@@ -27258,6 +27339,7 @@ export type Database = {
       user_preferences: {
         Row: {
           created_at: string
+          dashboard_widgets: Json | null
           id: string
           language: string | null
           medical_consents: Json | null
@@ -27269,6 +27351,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          dashboard_widgets?: Json | null
           id?: string
           language?: string | null
           medical_consents?: Json | null
@@ -27280,6 +27363,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          dashboard_widgets?: Json | null
           id?: string
           language?: string | null
           medical_consents?: Json | null
