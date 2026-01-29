@@ -27,16 +27,16 @@ const EnrichedHeroSection: React.FC = () => {
   };
 
   return (
-    <section className="relative overflow-hidden min-h-[90vh] flex items-center py-12 lg:py-20 bg-gradient-to-b from-primary/[0.03] via-background to-background">
+    <section className="relative overflow-hidden min-h-[90vh] flex items-center section-harmony-lg bg-gradient-to-b from-primary/[0.03] via-background to-background">
       {/* Background decoration - orbes premium */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial from-primary/5 to-transparent rounded-full" />
+        <div className="absolute -top-40 -right-40 w-64 sm:w-80 lg:w-96 h-64 sm:h-80 lg:h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -bottom-40 -left-40 w-52 sm:w-64 lg:w-80 h-52 sm:h-64 lg:h-80 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[450px] lg:w-[600px] h-[300px] sm:h-[450px] lg:h-[600px] bg-gradient-radial from-primary/5 to-transparent rounded-full" />
       </div>
       
-      <div className="container relative z-10">
-        <div className="text-center space-y-10 max-w-5xl mx-auto animate-in fade-in duration-500">
+      <div className="container relative z-10 px-4 sm:px-6 lg:px-8">
+        <div className="text-center space-y-8 sm:space-y-10 max-w-5xl mx-auto animate-in fade-in duration-500">
           {/* Badge contextuel - effet glow premium */}
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
             <Badge
