@@ -101,6 +101,22 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: false,
   },
   {
+    name: 'marketplace',
+    path: '/marketplace',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'MarketplacePage',
+    guard: false,
+  },
+  {
+    name: 'creator-dashboard',
+    path: '/creator/dashboard',
+    segment: 'b2c',
+    layout: 'app',
+    component: 'CreatorDashboardPage',
+    guard: 'auth',
+  },
+  {
     name: 'privacy',
     path: '/privacy',
     segment: 'public',

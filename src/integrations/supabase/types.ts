@@ -1055,6 +1055,54 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_tutor_sessions: {
+        Row: {
+          accuracy_rate: number | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          items_completed: string[] | null
+          items_proposed: string[] | null
+          new_items_ratio: number | null
+          review_items_ratio: number | null
+          session_type: string
+          started_at: string | null
+          total_xp_earned: number | null
+          user_id: string
+          weak_items_ratio: number | null
+        }
+        Insert: {
+          accuracy_rate?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          items_completed?: string[] | null
+          items_proposed?: string[] | null
+          new_items_ratio?: number | null
+          review_items_ratio?: number | null
+          session_type: string
+          started_at?: string | null
+          total_xp_earned?: number | null
+          user_id: string
+          weak_items_ratio?: number | null
+        }
+        Update: {
+          accuracy_rate?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          items_completed?: string[] | null
+          items_proposed?: string[] | null
+          new_items_ratio?: number | null
+          review_items_ratio?: number | null
+          session_type?: string
+          started_at?: string | null
+          total_xp_earned?: number | null
+          user_id?: string
+          weak_items_ratio?: number | null
+        }
+        Relationships: []
+      }
       alert_configurations: {
         Row: {
           created_at: string
@@ -2771,6 +2819,60 @@ export type Database = {
           id?: string
           payment_status?: string | null
           person_name?: string
+        }
+        Relationships: []
+      }
+      bkt_student_knowledge: {
+        Row: {
+          concept_id: string
+          correct_attempts: number | null
+          created_at: string | null
+          id: string
+          item_code: string
+          last_attempt_at: string | null
+          mastery_date: string | null
+          mastery_reached: boolean | null
+          p_guess: number | null
+          p_know: number | null
+          p_learn: number | null
+          p_slip: number | null
+          total_attempts: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          concept_id: string
+          correct_attempts?: number | null
+          created_at?: string | null
+          id?: string
+          item_code: string
+          last_attempt_at?: string | null
+          mastery_date?: string | null
+          mastery_reached?: boolean | null
+          p_guess?: number | null
+          p_know?: number | null
+          p_learn?: number | null
+          p_slip?: number | null
+          total_attempts?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          concept_id?: string
+          correct_attempts?: number | null
+          created_at?: string | null
+          id?: string
+          item_code?: string
+          last_attempt_at?: string | null
+          mastery_date?: string | null
+          mastery_reached?: boolean | null
+          p_guess?: number | null
+          p_know?: number | null
+          p_learn?: number | null
+          p_slip?: number | null
+          total_attempts?: number | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -6978,6 +7080,51 @@ export type Database = {
         }
         Relationships: []
       }
+      ecn_predictions: {
+        Row: {
+          confidence_interval: number | null
+          created_at: string | null
+          id: string
+          model_version: string | null
+          predicted_percentile: number | null
+          predicted_rank_max: number | null
+          predicted_rank_min: number | null
+          prediction_date: string | null
+          recommended_study_plan: Json | null
+          strong_items: string[] | null
+          user_id: string
+          weak_items: string[] | null
+        }
+        Insert: {
+          confidence_interval?: number | null
+          created_at?: string | null
+          id?: string
+          model_version?: string | null
+          predicted_percentile?: number | null
+          predicted_rank_max?: number | null
+          predicted_rank_min?: number | null
+          prediction_date?: string | null
+          recommended_study_plan?: Json | null
+          strong_items?: string[] | null
+          user_id: string
+          weak_items?: string[] | null
+        }
+        Update: {
+          confidence_interval?: number | null
+          created_at?: string | null
+          id?: string
+          model_version?: string | null
+          predicted_percentile?: number | null
+          predicted_rank_max?: number | null
+          predicted_rank_min?: number | null
+          prediction_date?: string | null
+          recommended_study_plan?: Json | null
+          strong_items?: string[] | null
+          user_id?: string
+          weak_items?: string[] | null
+        }
+        Relationships: []
+      }
       ecos_scenarios: {
         Row: {
           clinical_case: string
@@ -7366,6 +7513,7 @@ export type Database = {
           interaction_config: Json | null
           is_validated: boolean | null
           item_code: string
+          last_audit_date: string | null
           migration_notes: string | null
           mots_cles: string[] | null
           niveau_complexite: string | null
@@ -7376,6 +7524,12 @@ export type Database = {
           payload_v2: Json | null
           pitch_intro: string | null
           quiz_questions: Json | null
+          reviewer_1_date: string | null
+          reviewer_1_id: string | null
+          reviewer_1_notes: string | null
+          reviewer_2_date: string | null
+          reviewer_2_id: string | null
+          reviewer_2_notes: string | null
           reward_messages: Json | null
           scene_immersive: Json | null
           slug: string
@@ -7388,6 +7542,8 @@ export type Database = {
           title: string
           updated_at: string
           validation_date: string | null
+          validation_sources: Json | null
+          validation_status: string | null
           visual_ambiance: Json | null
         }
         Insert: {
@@ -7405,6 +7561,7 @@ export type Database = {
           interaction_config?: Json | null
           is_validated?: boolean | null
           item_code: string
+          last_audit_date?: string | null
           migration_notes?: string | null
           mots_cles?: string[] | null
           niveau_complexite?: string | null
@@ -7415,6 +7572,12 @@ export type Database = {
           payload_v2?: Json | null
           pitch_intro?: string | null
           quiz_questions?: Json | null
+          reviewer_1_date?: string | null
+          reviewer_1_id?: string | null
+          reviewer_1_notes?: string | null
+          reviewer_2_date?: string | null
+          reviewer_2_id?: string | null
+          reviewer_2_notes?: string | null
           reward_messages?: Json | null
           scene_immersive?: Json | null
           slug: string
@@ -7427,6 +7590,8 @@ export type Database = {
           title: string
           updated_at?: string
           validation_date?: string | null
+          validation_sources?: Json | null
+          validation_status?: string | null
           visual_ambiance?: Json | null
         }
         Update: {
@@ -7444,6 +7609,7 @@ export type Database = {
           interaction_config?: Json | null
           is_validated?: boolean | null
           item_code?: string
+          last_audit_date?: string | null
           migration_notes?: string | null
           mots_cles?: string[] | null
           niveau_complexite?: string | null
@@ -7454,6 +7620,12 @@ export type Database = {
           payload_v2?: Json | null
           pitch_intro?: string | null
           quiz_questions?: Json | null
+          reviewer_1_date?: string | null
+          reviewer_1_id?: string | null
+          reviewer_1_notes?: string | null
+          reviewer_2_date?: string | null
+          reviewer_2_id?: string | null
+          reviewer_2_notes?: string | null
           reward_messages?: Json | null
           scene_immersive?: Json | null
           slug?: string
@@ -7466,6 +7638,8 @@ export type Database = {
           title?: string
           updated_at?: string
           validation_date?: string | null
+          validation_sources?: Json | null
+          validation_status?: string | null
           visual_ambiance?: Json | null
         }
         Relationships: []
@@ -7714,6 +7888,50 @@ export type Database = {
             columns: ["lyrics_version_id"]
             isOneToOne: false
             referencedRelation: "edn_lyrics_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edn_validation_history: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          item_id: string
+          new_status: string
+          notes: string | null
+          previous_status: string | null
+          reviewer_id: string
+          sources_verified: string[] | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          item_id: string
+          new_status: string
+          notes?: string | null
+          previous_status?: string | null
+          reviewer_id: string
+          sources_verified?: string[] | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          item_id?: string
+          new_status?: string
+          notes?: string | null
+          previous_status?: string | null
+          reviewer_id?: string
+          sources_verified?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edn_validation_history_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "edn_items_complete"
             referencedColumns: ["id"]
           },
         ]
@@ -12797,6 +13015,104 @@ export type Database = {
         }
         Relationships: []
       }
+      karaoke_quiz_data: {
+        Row: {
+          created_at: string | null
+          difficulty_level: number | null
+          fill_blank_terms: Json | null
+          id: string
+          item_code: string | null
+          medical_concepts: string[] | null
+          qcm_questions: Json | null
+          quiz_type: string
+          song_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          difficulty_level?: number | null
+          fill_blank_terms?: Json | null
+          id?: string
+          item_code?: string | null
+          medical_concepts?: string[] | null
+          qcm_questions?: Json | null
+          quiz_type: string
+          song_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          difficulty_level?: number | null
+          fill_blank_terms?: Json | null
+          id?: string
+          item_code?: string | null
+          medical_concepts?: string[] | null
+          qcm_questions?: Json | null
+          quiz_type?: string
+          song_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      karaoke_sessions: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          fill_blank_correct: number | null
+          fill_blank_total: number | null
+          id: string
+          max_score: number | null
+          qcm_correct: number | null
+          qcm_total: number | null
+          quiz_data_id: string | null
+          score: number | null
+          session_type: string
+          song_id: string
+          time_spent_seconds: number | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          fill_blank_correct?: number | null
+          fill_blank_total?: number | null
+          id?: string
+          max_score?: number | null
+          qcm_correct?: number | null
+          qcm_total?: number | null
+          quiz_data_id?: string | null
+          score?: number | null
+          session_type: string
+          song_id: string
+          time_spent_seconds?: number | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          fill_blank_correct?: number | null
+          fill_blank_total?: number | null
+          id?: string
+          max_score?: number | null
+          qcm_correct?: number | null
+          qcm_total?: number | null
+          quiz_data_id?: string | null
+          score?: number | null
+          session_type?: string
+          song_id?: string
+          time_spent_seconds?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "karaoke_sessions_quiz_data_id_fkey"
+            columns: ["quiz_data_id"]
+            isOneToOne: false
+            referencedRelation: "karaoke_quiz_data"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leaderboard_entries: {
         Row: {
           activities_completed: number | null
@@ -13190,6 +13506,275 @@ export type Database = {
             columns: ["purpose_id"]
             isOneToOne: false
             referencedRelation: "consent_purposes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketplace_creators: {
+        Row: {
+          avatar_url: string | null
+          badges: Json | null
+          bio: string | null
+          commission_rate: number | null
+          created_at: string | null
+          credentials: Json | null
+          display_name: string
+          id: string
+          rating: number | null
+          review_count: number | null
+          status: string
+          stripe_account_id: string | null
+          total_earnings: number | null
+          total_sales: number | null
+          updated_at: string | null
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          badges?: Json | null
+          bio?: string | null
+          commission_rate?: number | null
+          created_at?: string | null
+          credentials?: Json | null
+          display_name: string
+          id?: string
+          rating?: number | null
+          review_count?: number | null
+          status?: string
+          stripe_account_id?: string | null
+          total_earnings?: number | null
+          total_sales?: number | null
+          updated_at?: string | null
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          badges?: Json | null
+          bio?: string | null
+          commission_rate?: number | null
+          created_at?: string | null
+          credentials?: Json | null
+          display_name?: string
+          id?: string
+          rating?: number | null
+          review_count?: number | null
+          status?: string
+          stripe_account_id?: string | null
+          total_earnings?: number | null
+          total_sales?: number | null
+          updated_at?: string | null
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
+      marketplace_payouts: {
+        Row: {
+          amount_cents: number
+          completed_at: string | null
+          created_at: string | null
+          creator_id: string
+          currency: string | null
+          id: string
+          status: string
+          stripe_transfer_id: string | null
+        }
+        Insert: {
+          amount_cents: number
+          completed_at?: string | null
+          created_at?: string | null
+          creator_id: string
+          currency?: string | null
+          id?: string
+          status?: string
+          stripe_transfer_id?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          completed_at?: string | null
+          created_at?: string | null
+          creator_id?: string
+          currency?: string | null
+          id?: string
+          status?: string
+          stripe_transfer_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_payouts_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketplace_programs: {
+        Row: {
+          category: string
+          cover_image_url: string | null
+          created_at: string | null
+          creator_id: string
+          currency: string | null
+          description: string | null
+          duration_minutes: number | null
+          format: string
+          id: string
+          is_featured: boolean | null
+          modules: Json | null
+          preview_url: string | null
+          price_cents: number
+          published_at: string | null
+          rating: number | null
+          review_count: number | null
+          short_description: string | null
+          status: string
+          tags: string[] | null
+          title: string
+          total_purchases: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          cover_image_url?: string | null
+          created_at?: string | null
+          creator_id: string
+          currency?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          format: string
+          id?: string
+          is_featured?: boolean | null
+          modules?: Json | null
+          preview_url?: string | null
+          price_cents?: number
+          published_at?: string | null
+          rating?: number | null
+          review_count?: number | null
+          short_description?: string | null
+          status?: string
+          tags?: string[] | null
+          title: string
+          total_purchases?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          cover_image_url?: string | null
+          created_at?: string | null
+          creator_id?: string
+          currency?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          format?: string
+          id?: string
+          is_featured?: boolean | null
+          modules?: Json | null
+          preview_url?: string | null
+          price_cents?: number
+          published_at?: string | null
+          rating?: number | null
+          review_count?: number | null
+          short_description?: string | null
+          status?: string
+          tags?: string[] | null
+          title?: string
+          total_purchases?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_programs_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketplace_purchases: {
+        Row: {
+          amount_cents: number
+          completed_modules: string[] | null
+          currency: string | null
+          id: string
+          program_id: string
+          progress_percent: number | null
+          purchased_at: string | null
+          status: string
+          stripe_payment_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          completed_modules?: string[] | null
+          currency?: string | null
+          id?: string
+          program_id: string
+          progress_percent?: number | null
+          purchased_at?: string | null
+          status?: string
+          stripe_payment_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          completed_modules?: string[] | null
+          currency?: string | null
+          id?: string
+          program_id?: string
+          progress_percent?: number | null
+          purchased_at?: string | null
+          status?: string
+          stripe_payment_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_purchases_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketplace_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          helpful_count: number | null
+          id: string
+          program_id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          helpful_count?: number | null
+          id?: string
+          program_id: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          helpful_count?: number | null
+          id?: string
+          program_id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_reviews_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_programs"
             referencedColumns: ["id"]
           },
         ]
@@ -14415,6 +15000,48 @@ export type Database = {
           item_code?: string
           metadata?: Json | null
           score?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      medical_reviewers: {
+        Row: {
+          avg_review_time_hours: number | null
+          created_at: string | null
+          full_name: string
+          hospital: string | null
+          id: string
+          is_active: boolean | null
+          qualification: string
+          reviews_count: number | null
+          specialties: string[] | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          avg_review_time_hours?: number | null
+          created_at?: string | null
+          full_name: string
+          hospital?: string | null
+          id?: string
+          is_active?: boolean | null
+          qualification: string
+          reviews_count?: number | null
+          specialties?: string[] | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          avg_review_time_hours?: number | null
+          created_at?: string | null
+          full_name?: string
+          hospital?: string | null
+          id?: string
+          is_active?: boolean | null
+          qualification?: string
+          reviews_count?: number | null
+          specialties?: string[] | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -30573,6 +31200,15 @@ export type Database = {
       update_aura_from_who5: {
         Args: { p_user_id: string; p_who5_score: number }
         Returns: undefined
+      }
+      update_bkt_knowledge: {
+        Args: {
+          p_concept_id: string
+          p_is_correct: boolean
+          p_item_code: string
+          p_user_id: string
+        }
+        Returns: Json
       }
       update_competences_counters: {
         Args: never
