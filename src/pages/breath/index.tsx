@@ -36,7 +36,7 @@ import { BreathStreakWidget } from '@/components/breath/BreathStreakWidget';
 import { BreathSessionHistory } from '@/components/breath/BreathSessionHistory';
 import { useBreathSessions } from '@/hooks/useBreathSessions';
 
-import ZeroNumberBoundary from '@/components/a11y/ZeroNumberBoundary';
+import ZeroNumberBoundary from '@/components/accessibility/ZeroNumberBoundary';
 import BreathFlowController from '@/features/breath/BreathFlowController';
 import SleepPreset from '@/features/breath/sleep/SleepPreset';
 import useBreathworkOrchestration from '@/features/orchestration/useBreathworkOrchestration';
