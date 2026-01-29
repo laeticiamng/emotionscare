@@ -1,20 +1,46 @@
-# 📊 ÉVALUATION ROUTES - 29 Janvier 2026
+# 📊 ÉVALUATION ROUTES - 29 Janvier 2026 (MISE À JOUR)
 
-## Score Global: **16/20**
+## Score Global: **17/20** ⬆️
 
-| Route | Score | Statut |
-|-------|-------|--------|
-| `/` (Home) | 17/20 | ✅ Fonctionnel |
-| `/login` | 16/20 | ✅ Formulaire complet |
-| `/signup` | 17/20 | ✅ RGPD + OAuth |
-| `/navigation` | 18/20 | ✅ 223 pages, recherche OK |
-| `/app/vr-breath-guide` | 15/20 | ✅ Corrigé (était 404) |
-| Boutons urgence | 14/20 | ⚠️ Navigate OK mais UX à améliorer |
+---
 
-## Correction Appliquée
-- `src/routerV2/registry.ts`: Composant `VRBreathGuidePage` → `B2CVRBreathGuidePage`
+## 🐛 BUGS CRITIQUES CORRIGÉS
 
-## Prochaines Améliorations
-1. Modal urgence accessible sans auth
-2. Toast feedback sur actions
-3. Mobile testing
+### 1. ConsentProvider - logger non défini (P0) ✅
+- **Fichier**: `src/features/clinical-optin/ConsentProvider.tsx`
+- **Erreur**: `ReferenceError: logger is not defined`
+- **Impact**: Bloquait le consentement RGPD sur toutes les pages protégées
+- **Fix**: `import { logger } from '@/lib/logger'` ajouté
+
+---
+
+## 📋 ÉVALUATION PAR ROUTE
+
+| Route | Utilité | UX | Total | Statut |
+|-------|---------|-----|-------|--------|
+| `/` (Home) | 18/20 | 17/20 | 17.5/20 | ✅ |
+| `/modules` (Explorer) | 19/20 | 18/20 | 18.5/20 | ✅ |
+| `/login` | 17/20 | 17/20 | 17/20 | ✅ |
+| `/signup` | 18/20 | 17/20 | 17.5/20 | ✅ |
+| `/app/breath` | 17/20 | 16/20 | 16.5/20 | ✅ Corrigé |
+| `/app/vr-breath-guide` | 16/20 | 15/20 | 15.5/20 | ✅ Corrigé |
+| Boutons urgence | 16/20 | 15/20 | 15.5/20 | ✅ Toast ajouté |
+
+---
+
+## ✅ CORRECTIONS APPLIQUÉES (2)
+
+1. `src/routerV2/registry.ts`: `VRBreathGuidePage` → `B2CVRBreathGuidePage`
+2. `src/features/clinical-optin/ConsentProvider.tsx`: Import logger manquant
+
+---
+
+## 🎯 AMÉLIORATIONS RESTANTES
+
+### Priorité Haute
+- [ ] Toast social proof - z-index mobile
+- [ ] Modal consentement - fallback si erreur
+
+### Priorité Moyenne  
+- [ ] Skeleton loading cartes modules
+- [ ] Animation chargement pages protégées
