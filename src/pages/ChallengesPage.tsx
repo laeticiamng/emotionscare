@@ -29,15 +29,46 @@ export default function ChallengesPage() {
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <Trophy className="h-8 w-8 text-primary" />
-              Défis Communautaires
+              Défis Collaboratifs
             </h1>
-            <p className="text-muted-foreground">Participez et progressez ensemble</p>
+            <p className="text-muted-foreground">Progressez ensemble, soutenez-vous mutuellement</p>
           </div>
           <Button onClick={() => navigate('/app/challenges/create')}>
             <Plus className="h-4 w-4 mr-2" />
-            Créer un Défi
+            Proposer un Défi
           </Button>
         </header>
+
+        {/* Défis métier soignants */}
+        <div className="grid gap-3 md:grid-cols-3 mb-4">
+          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Badge variant="outline" className="text-xs">Nouveau</Badge>
+                <span className="text-sm font-medium">Pause Inter-Garde</span>
+              </div>
+              <p className="text-xs text-muted-foreground">3 min de respiration entre deux patients</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-gradient-to-br from-success/5 to-success/10 border-success/20">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Badge variant="outline" className="text-xs bg-success/10">Populaire</Badge>
+                <span className="text-sm font-medium">Décompression Post-Urgence</span>
+              </div>
+              <p className="text-xs text-muted-foreground">Session de 5 min après une situation intense</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-gradient-to-br from-info/5 to-info/10 border-info/20">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Badge variant="outline" className="text-xs bg-info/10">Équipe</Badge>
+                <span className="text-sm font-medium">Rituel d'Équipe</span>
+              </div>
+              <p className="text-xs text-muted-foreground">5 min de cohésion avant la relève</p>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-4">
