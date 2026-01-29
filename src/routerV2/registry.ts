@@ -93,6 +93,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: false,
   },
   {
+    name: 'install',
+    path: '/install',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'InstallPage',
+    guard: false,
+  },
+  {
     name: 'privacy',
     path: '/privacy',
     segment: 'public',

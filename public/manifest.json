@@ -1,63 +1,131 @@
-
 {
   "name": "EmotionsCare - Bien-être émotionnel",
   "short_name": "EmotionsCare",
-  "description": "Plateforme complète de bien-être émotionnel avec IA et coaching personnalisé",
-  "start_url": "/",
+  "description": "Plateforme complète de bien-être émotionnel avec IA et coaching personnalisé. Scan émotions, musicothérapie, respiration guidée, journal.",
+  "start_url": "/app/home",
   "scope": "/",
+  "id": "emotionscare-pwa",
   "display": "standalone",
-  "orientation": "portrait-primary",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
   "theme_color": "#6366f1",
-  "background_color": "#ffffff",
-  "categories": ["health", "lifestyle", "productivity"],
+  "background_color": "#0f0f23",
+  "categories": ["health", "lifestyle", "productivity", "medical"],
   "lang": "fr",
   "dir": "ltr",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/icon-512.png",
-      "sizes": "512x512", 
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     }
   ],
   "screenshots": [
     {
-      "src": "/screenshot-mobile.png",
+      "src": "/images/screenshot-mobile.png",
       "sizes": "390x844",
       "type": "image/png",
-      "form_factor": "narrow"
+      "form_factor": "narrow",
+      "label": "Dashboard mobile EmotionsCare"
     },
     {
-      "src": "/screenshot-desktop.png", 
+      "src": "/images/screenshot-desktop.png",
       "sizes": "1920x1080",
       "type": "image/png",
-      "form_factor": "wide"
+      "form_factor": "wide",
+      "label": "Dashboard desktop EmotionsCare"
     }
   ],
   "shortcuts": [
     {
       "name": "Dashboard",
-      "short_name": "Dashboard", 
+      "short_name": "Dashboard",
       "description": "Accéder au tableau de bord",
-      "url": "/b2c/dashboard",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "url": "/app/home",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Scanner émotions",
+      "short_name": "Scan",
+      "description": "Analyser vos émotions",
+      "url": "/app/scan",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
     },
     {
       "name": "Coach IA",
       "short_name": "Coach",
-      "description": "Parler avec le coach IA",
-      "url": "/b2c/dashboard?tab=coach",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "description": "Parler avec Nyvée",
+      "url": "/app/coach",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Musicothérapie",
+      "short_name": "Musique",
+      "description": "Musique adaptative",
+      "url": "/app/music",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
     }
   ],
+  "related_applications": [],
   "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
+  "handle_links": "preferred",
   "edge_side_panel": {
     "preferred_width": 400
+  },
+  "share_target": {
+    "action": "/app/journal/new",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
   }
 }
