@@ -65,10 +65,10 @@ const AppGatePage = lazy(() => import('@/pages/AppGatePage'));
 // Modules fonctionnels
 const B2CScanPage = lazy(() => import('@/pages/b2c/B2CScanPage'));
 const B2CMusicEnhanced = lazy(() => import('@/pages/b2c/B2CMusicEnhanced'));
-const MusicTherapyPage = lazy(() => import('@/pages/MusicTherapyPage'));
-const MusicAnalyticsPage = lazy(() => import('@/pages/MusicAnalyticsPage'));
-const MusicProfilePage = lazy(() => import('@/pages/MusicProfilePage'));
-const CollaborativePlaylistPage = lazy(() => import('@/pages/CollaborativePlaylistPage'));
+const MusicTherapyPage = lazy(() => import('@/pages/music/MusicTherapyPage'));
+const MusicAnalyticsPage = lazy(() => import('@/pages/music/MusicAnalyticsPage'));
+const MusicProfilePage = lazy(() => import('@/pages/music/MusicProfilePage'));
+const CollaborativePlaylistPage = lazy(() => import('@/pages/music/CollaborativePlaylistPage'));
 const AdvancedAnalyticsPage = lazy(() => import('@/pages/AdvancedAnalyticsPage'));
 // EmotionMusicPage supprimé - utiliser MusicTherapyPage ou B2CMusicEnhanced
 const B2CAICoachPage = lazy(() => import('@/pages/b2c/B2CAICoachPage'));
@@ -166,8 +166,8 @@ const MoodPresetsAdminPage = lazy(() => import('@/pages/MoodPresetsAdminPage'));
 const B2CSocialCoconPage = lazy(() => import('@/pages/b2c/B2CSocialCoconPage'));
 const B2CStorySynthLabPage = lazy(() => import('@/pages/b2c/B2CStorySynthLabPage'));
 const B2CCommunautePage = lazy(() => import('@/pages/b2c/B2CCommunautePage'));
-const GroupSessionsPage = lazy(() => import('@/pages/GroupSessionsPage'));
-const BuddiesPage = lazy(() => import('@/pages/BuddiesPage'));
+const GroupSessionsPage = lazy(() => import('@/pages/social/GroupSessionsPage'));
+const BuddiesPage = lazy(() => import('@/pages/social/BuddiesPage'));
 const B2BSelectionPage = lazy(() => import('@/pages/b2b/B2BSelectionPage'));
 
 // B2B Enterprise
@@ -212,19 +212,19 @@ const JournalGoalsPage = lazy(() => import('@/pages/journal/JournalGoalsPage'));
 const JournalNotesPage = lazy(() => import('@/pages/journal/JournalNotesPage'));
 const JournalSearchPage = lazy(() => import('@/pages/journal/JournalSearchPage'));
 const LeaderboardPage = lazy(() => import('@/pages/AurasLeaderboardPage'));
-const GuildListPage = lazy(() => import('@/pages/GuildListPage'));
-const GuildPage = lazy(() => import('@/pages/GuildPage'));
+const GuildListPage = lazy(() => import('@/pages/gamification/GuildListPage'));
+const GuildPage = lazy(() => import('@/pages/gamification/GuildPage'));
 const PremiumRewardsPage = lazy(() => import('@/pages/PremiumRewardsPage'));
-const TournamentsPage = lazy(() => import('@/pages/TournamentsPage'));
+const TournamentsPage = lazy(() => import('@/pages/gamification/TournamentsPage'));
 const MatchSpectatorPage = lazy(() => import('@/pages/MatchSpectatorPage'));
 const CompetitiveSeasonsPage = lazy(() => import('@/pages/CompetitiveSeasonsPage'));
-const DailyChallengesPage = lazy(() => import('@/pages/DailyChallengesPage'));
+const DailyChallengesPage = lazy(() => import('@/pages/gamification/DailyChallengesPage'));
 const B2CGamificationPage = lazy(() => import('@/pages/b2c/B2CGamificationPage'));
-const ScoresPage = lazy(() => import('@/pages/ScoresPage'));
+const ScoresPage = lazy(() => import('@/pages/gamification/ScoresPage'));
 const PricingPageWorking = lazy(() => import('@/pages/PricingPageWorking'));
 
 // Pages existantes à consolider
-const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
+const MessagesPage = lazy(() => import('@/pages/social/MessagesPage'));
 const CalendarPage = lazy(() => import('@/pages/CalendarPage'));
 const Point20Page = lazy(() => import('@/pages/Point20Page'));
 const TestPage = lazy(() => import('@/pages/TestPage'));
@@ -291,10 +291,10 @@ const EmotionalPark = lazy(() => import('@/pages/EmotionalPark'));
 const ParkJourney = lazy(() => import('@/pages/ParkJourney'));
 const EmotionAtlasPage = lazy(() => import('@/modules/emotion-atlas/pages/EmotionAtlasPage'));
 const DiscoveryPage = lazy(() => import('@/modules/discovery/pages/DiscoveryPage'));
-const CoachProgramsPage = lazy(() => import('@/pages/CoachProgramsPage'));
-const CoachProgramDetailPage = lazy(() => import('@/pages/CoachProgramDetailPage'));
-const CoachSessionsPage = lazy(() => import('@/pages/CoachSessionsPage'));
-const CoachAnalyticsPage = lazy(() => import('@/pages/CoachAnalyticsPage'));
+const CoachProgramsPage = lazy(() => import('@/pages/coach/CoachProgramsPage'));
+const CoachProgramDetailPage = lazy(() => import('@/pages/coach/CoachProgramDetailPage'));
+const CoachSessionsPage = lazy(() => import('@/pages/coach/CoachSessionsPage'));
+const CoachAnalyticsPage = lazy(() => import('@/pages/coach/CoachAnalyticsPage'));
 const ParcoursXL = lazy(() => import('@/pages/ParcoursXL'));
 
 // Nouvelles pages créées
@@ -303,12 +303,12 @@ const SessionDetailPage = lazy(() => import('@/pages/SessionDetailPage'));
 const GoalsPage = lazy(() => import('@/pages/GoalsPage'));
 const GoalDetailPage = lazy(() => import('@/pages/GoalDetailPage'));
 const GoalNewPage = lazy(() => import('@/pages/GoalNewPage'));
-const AchievementsPage = lazy(() => import('@/pages/AchievementsPage'));
-const BadgesPage = lazy(() => import('@/pages/BadgesPage'));
-const RewardsPage = lazy(() => import('@/pages/RewardsPage'));
-const ChallengesPage = lazy(() => import('@/pages/ChallengesPage'));
-const ChallengeDetailPage = lazy(() => import('@/pages/ChallengeDetailPage'));
-const ChallengeCreatePage = lazy(() => import('@/pages/ChallengeCreatePage'));
+const AchievementsPage = lazy(() => import('@/pages/gamification/AchievementsPage'));
+const BadgesPage = lazy(() => import('@/pages/gamification/BadgesPage'));
+const RewardsPage = lazy(() => import('@/pages/gamification/RewardsPage'));
+const ChallengesPage = lazy(() => import('@/pages/gamification/ChallengesPage'));
+const ChallengeDetailPage = lazy(() => import('@/pages/gamification/ChallengeDetailPage'));
+const ChallengeCreatePage = lazy(() => import('@/pages/gamification/ChallengeCreatePage'));
 const NotificationsCenterPage = lazy(() => import('@/pages/NotificationsCenterPage'));
 const PremiumPage = lazy(() => import('@/pages/PremiumPage'));
 const BillingPage = lazy(() => import('@/pages/BillingPage'));
@@ -319,8 +319,8 @@ const InsightsPage = lazy(() => import('@/pages/InsightsPage'));
 const TrendsPage = lazy(() => import('@/pages/TrendsPage'));
 // JournalAudioPage supprimé - fonctionnalité dans B2CJournalPage
 const VoiceAnalysisPage = lazy(() => import('@/pages/VoiceAnalysisPage'));
-const FriendsPage = lazy(() => import('@/pages/FriendsPage'));
-const GroupsPage = lazy(() => import('@/pages/GroupsPage'));
+const FriendsPage = lazy(() => import('@/pages/social/FriendsPage'));
+const GroupsPage = lazy(() => import('@/pages/social/GroupsPage'));
 const ThemesPage = lazy(() => import('@/pages/ThemesPage'));
 const CustomizationPage = lazy(() => import('@/pages/CustomizationPage'));
 const WidgetsPage = lazy(() => import('@/pages/WidgetsPage'));
@@ -348,7 +348,7 @@ const ExchangeHubPage = lazy(() => import('@/pages/ExchangeHubPage'));
 
 // Nouvelles fonctionnalités V2.1 - Community, Wearables, Export
 const DataExportPage = lazy(() => import('@/pages/DataExportPage'));
-const CommunityPage = lazy(() => import('@/pages/CommunityPage'));
+const CommunityPage = lazy(() => import('@/pages/social/CommunityPage'));
 const WearablesPage = lazy(() => import('@/pages/WearablesPage'));
 const NotificationSettingsPage = lazy(() => import('@/pages/NotificationSettingsPage'));
 
@@ -357,7 +357,7 @@ const ContextLensPage = lazy(() => import('@/pages/ContextLensPage'));
 
 // Pages manquantes - ajoutées pour cohérence registry
 const HumeAIRealtimePage = lazy(() => import('@/pages/HumeAIRealtimePage'));
-const SunoMusicGeneratorPage = lazy(() => import('@/pages/SunoMusicGeneratorPage'));
+const SunoMusicGeneratorPage = lazy(() => import('@/pages/music/SunoMusicGeneratorPage'));
 const AurasLeaderboardPage = lazy(() => import('@/pages/AurasLeaderboardPage'));
 const ConsentManagementPage = lazy(() => import('@/pages/ConsentManagementPage'));
 const AccountDeletionPage = lazy(() => import('@/pages/AccountDeletionPage'));
