@@ -888,6 +888,17 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/health-sync', '/devices'],
   },
   {
+    name: 'context-lens',
+    path: '/app/context-lens',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'ContextLensPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/insights', '/patterns'],
+  },
+  {
     name: 'data-export',
     path: '/app/data-export',
     segment: 'consumer',

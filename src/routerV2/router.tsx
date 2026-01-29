@@ -352,6 +352,9 @@ const CommunityPage = lazy(() => import('@/pages/CommunityPage'));
 const WearablesPage = lazy(() => import('@/pages/WearablesPage'));
 const NotificationSettingsPage = lazy(() => import('@/pages/NotificationSettingsPage'));
 
+// Context Lens - Module 8 EmotionsCare 2.0
+const ContextLensPage = lazy(() => import('@/pages/ContextLensPage'));
+
 // Pages manquantes - ajoutées pour cohérence registry
 const HumeAIRealtimePage = lazy(() => import('@/pages/HumeAIRealtimePage'));
 const SunoMusicGeneratorPage = lazy(() => import('@/pages/SunoMusicGeneratorPage'));
@@ -659,6 +662,9 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   CommunityPage,
   WearablesPage,
   NotificationSettingsPage,
+  
+  // Context Lens - Module 8 EmotionsCare 2.0
+  ContextLensPage,
   
   // Pages manquantes - cohérence registry
   HumeAIRealtimePage,
