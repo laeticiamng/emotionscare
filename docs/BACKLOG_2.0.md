@@ -105,10 +105,10 @@
 
 | Tâche | Priorité | Status | Notes |
 |-------|----------|--------|-------|
-| Stripe Connect (commission 20%) | P0 | 🔴 À faire | Infrastructure paiement |
-| Onboarding créateurs avec vérification diplômes | P1 | 🔴 À faire | Process manuel d'abord |
-| Gestion programmes multi-formats (audio, vidéo, PDF) | P0 | 🔴 À faire | Upload + streaming |
-| Système reviews + badges (bestseller, recommandé) | P2 | 🔴 À faire | Gamification créateurs |
+| Stripe Connect (commission 20%) | P0 | 🟡 En cours | Infrastructure paiement |
+| Onboarding créateurs avec vérification diplômes | P1 | 🟢 Fait | `marketplace-api` Edge Function |
+| Gestion programmes multi-formats (audio, vidéo, PDF) | P0 | 🟢 Fait | `MarketplaceBrowser.tsx` |
+| Système reviews + badges (bestseller, recommandé) | P2 | 🟢 Fait | Tables + RLS |
 
 ---
 
