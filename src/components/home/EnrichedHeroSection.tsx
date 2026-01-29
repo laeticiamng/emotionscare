@@ -27,16 +27,23 @@ const EnrichedHeroSection: React.FC = () => {
   };
 
   return (
-    <section className="relative overflow-hidden min-h-[90vh] flex items-center py-12 lg:py-20 bg-background">
+    <section className="relative overflow-hidden min-h-[90vh] flex items-center py-12 lg:py-20 bg-gradient-to-b from-primary/[0.03] via-background to-background">
+      {/* Background decoration - orbes premium */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial from-primary/5 to-transparent rounded-full" />
+      </div>
+      
       <div className="container relative z-10">
         <div className="text-center space-y-10 max-w-5xl mx-auto animate-in fade-in duration-500">
-          {/* Badge contextuel - pas de jargon tech */}
+          {/* Badge contextuel - effet glow premium */}
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
             <Badge
               variant="secondary"
-              className="px-5 py-2.5 text-sm font-medium bg-gradient-to-r from-primary/10 to-blue-500/10 border-primary/20 backdrop-blur-sm"
+              className="px-5 py-2.5 text-sm font-medium bg-gradient-to-r from-primary/15 via-accent/10 to-primary/15 border-primary/25 backdrop-blur-md shadow-lg shadow-primary/10 hover:shadow-xl hover:shadow-primary/20 transition-all duration-300"
             >
-              <Heart className="h-3.5 w-3.5 mr-2 text-primary" />
+              <Heart className="h-3.5 w-3.5 mr-2 text-primary animate-pulse" />
               Si tu es ici, ce n'est probablement pas par curiosité.
             </Badge>
           </div>
@@ -65,7 +72,7 @@ const EnrichedHeroSection: React.FC = () => {
             {/* CTA Principal - Essai gratuit vers /b2c */}
             <div
               className={cn(
-                "transition-transform duration-300",
+                "transition-all duration-300",
                 isHovered ? "scale-105" : "animate-pulse-slow"
               )}
               onMouseEnter={() => setIsHovered(true)}
@@ -74,16 +81,16 @@ const EnrichedHeroSection: React.FC = () => {
               <Link to="/b2c">
                 <Button
                   size="lg"
-                  className="relative overflow-hidden bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary shadow-2xl hover:shadow-primary/25 transition-all duration-500 px-10 py-7 text-lg font-semibold group"
+                  className="relative overflow-hidden bg-gradient-to-r from-primary via-primary to-accent hover:from-primary hover:via-accent hover:to-primary shadow-2xl shadow-primary/30 hover:shadow-primary/50 transition-all duration-500 px-10 py-7 text-lg font-bold group border-0 ring-2 ring-primary/20 hover:ring-primary/40"
                 >
-                  <Heart className="h-5 w-5 mr-3" aria-hidden="true" />
+                  <Heart className="h-5 w-5 mr-3 group-hover:scale-110 transition-transform" aria-hidden="true" />
                   <span>Essai gratuit 30 jours</span>
                   
                   {/* Effet de brillance au hover - CSS only */}
                   <span 
                     className={cn(
-                      "absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent",
-                      "transition-transform duration-600",
+                      "absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent",
+                      "transition-transform duration-700",
                       isHovered ? "translate-x-full" : "-translate-x-full"
                     )}
                   />
