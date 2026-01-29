@@ -34,6 +34,31 @@
 
 ---
 
+## 🚀 Nouvel Utilisateur ? Commencez Ici !
+
+> **Essai gratuit 30 jours** — Aucune carte bancaire requise
+
+| Étape | Action |
+|-------|--------|
+| 1️⃣ | **[Créer un compte](https://emotions-care.lovable.app/signup)** - Inscription en 30 secondes |
+| 2️⃣ | **Scan émotionnel** - Laissez l'IA analyser votre état en temps réel |
+| 3️⃣ | **Parcours guidé** - Respiration → Coach IA → Journal |
+
+### Parcours utilisateur principal (Onboarding Loop)
+
+```
+📊 Scan Émotionnel → 🤖 Coach IA Nyvée → 📓 Journal
+         ↑                                    ↓
+         └──────────── Répéter ──────────────┘
+```
+
+Ce cycle de 15 minutes maximum vous aide à :
+- **Identifier** votre état émotionnel actuel
+- **Réguler** avec des techniques validées scientifiquement
+- **Consolider** vos apprentissages par l'écriture
+
+---
+
 ## 🎯 Vue d'Ensemble
 
 **EmotionsCare** est une solution SaaS complète de gestion du bien-être émotionnel combinant intelligence artificielle, gamification et expériences immersives. Elle aide les professionnels de santé à réguler leurs émotions pour prévenir le burnout et améliorer leur qualité de soins.
