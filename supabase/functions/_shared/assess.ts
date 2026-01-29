@@ -8,7 +8,8 @@ import { z } from './zod.ts';
 export const instrumentSchema = z.enum([
   'WHO5', 'STAI6', 'PANAS', 'PSS10', 'UCLA3', 'MSPSS',
   'AAQ2', 'POMS', 'SSQ', 'ISI', 'GAS', 'GRITS',
-  'BRS', 'WEMWBS', 'UWES', 'CBI', 'CVSQ', 'SAM', 'SUDS'
+  'BRS', 'WEMWBS', 'UWES', 'CBI', 'CVSQ', 'SAM', 'SUDS',
+  'PHQ9', 'GAD7'
 ]);
 
 export const localeSchema = z.enum(['fr', 'en', 'es', 'de', 'it']);
@@ -283,14 +284,236 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
       ]
     }
   },
-  // Placeholder for other instruments - truncated for brevity
-  'PANAS': {} as any,
-  'PSS10': {} as any,
+  // PHQ-9 - Patient Health Questionnaire (Depression)
+  'PHQ9': {
+    'fr': {
+      code: 'PHQ9',
+      locale: 'fr',
+      name: 'Questionnaire sur la santé du patient (PHQ-9)',
+      version: '1.0',
+      expiry_minutes: 30,
+      items: [
+        { id: '1', prompt: 'Peu d\'intérêt ou de plaisir à faire les choses', type: 'scale', min: 0, max: 3 },
+        { id: '2', prompt: 'Se sentir triste, déprimé(e) ou désespéré(e)', type: 'scale', min: 0, max: 3 },
+        { id: '3', prompt: 'Difficultés à s\'endormir ou à rester endormi(e), ou trop dormir', type: 'scale', min: 0, max: 3 },
+        { id: '4', prompt: 'Se sentir fatigué(e) ou avoir peu d\'énergie', type: 'scale', min: 0, max: 3 },
+        { id: '5', prompt: 'Peu d\'appétit ou manger trop', type: 'scale', min: 0, max: 3 },
+        { id: '6', prompt: 'Mauvaise opinion de soi-même', type: 'scale', min: 0, max: 3 },
+        { id: '7', prompt: 'Difficultés à se concentrer', type: 'scale', min: 0, max: 3 },
+        { id: '8', prompt: 'Bouger ou parler lentement, ou au contraire être agité(e)', type: 'scale', min: 0, max: 3 },
+        { id: '9', prompt: 'Penser qu\'il vaudrait mieux mourir ou se faire du mal', type: 'scale', min: 0, max: 3 }
+      ]
+    },
+    'en': {
+      code: 'PHQ9',
+      locale: 'en',
+      name: 'Patient Health Questionnaire (PHQ-9)',
+      version: '1.0',
+      expiry_minutes: 30,
+      items: [
+        { id: '1', prompt: 'Little interest or pleasure in doing things', type: 'scale', min: 0, max: 3 },
+        { id: '2', prompt: 'Feeling down, depressed, or hopeless', type: 'scale', min: 0, max: 3 },
+        { id: '3', prompt: 'Trouble falling or staying asleep, or sleeping too much', type: 'scale', min: 0, max: 3 },
+        { id: '4', prompt: 'Feeling tired or having little energy', type: 'scale', min: 0, max: 3 },
+        { id: '5', prompt: 'Poor appetite or overeating', type: 'scale', min: 0, max: 3 },
+        { id: '6', prompt: 'Feeling bad about yourself', type: 'scale', min: 0, max: 3 },
+        { id: '7', prompt: 'Trouble concentrating on things', type: 'scale', min: 0, max: 3 },
+        { id: '8', prompt: 'Moving or speaking slowly, or being restless', type: 'scale', min: 0, max: 3 },
+        { id: '9', prompt: 'Thoughts that you would be better off dead or hurting yourself', type: 'scale', min: 0, max: 3 }
+      ]
+    }
+  },
+  // GAD-7 - Generalized Anxiety Disorder
+  'GAD7': {
+    'fr': {
+      code: 'GAD7',
+      locale: 'fr',
+      name: 'Échelle d\'anxiété généralisée (GAD-7)',
+      version: '1.0',
+      expiry_minutes: 30,
+      items: [
+        { id: '1', prompt: 'Se sentir nerveux/nerveuse, anxieux/anxieuse ou tendu(e)', type: 'scale', min: 0, max: 3 },
+        { id: '2', prompt: 'Être incapable d\'arrêter de s\'inquiéter ou de contrôler ses inquiétudes', type: 'scale', min: 0, max: 3 },
+        { id: '3', prompt: 'S\'inquiéter trop de différentes choses', type: 'scale', min: 0, max: 3 },
+        { id: '4', prompt: 'Avoir du mal à se détendre', type: 'scale', min: 0, max: 3 },
+        { id: '5', prompt: 'Être si agité(e) qu\'il est difficile de tenir en place', type: 'scale', min: 0, max: 3 },
+        { id: '6', prompt: 'Devenir facilement contrarié(e) ou irritable', type: 'scale', min: 0, max: 3 },
+        { id: '7', prompt: 'Avoir peur que quelque chose d\'affreux puisse arriver', type: 'scale', min: 0, max: 3 }
+      ]
+    },
+    'en': {
+      code: 'GAD7',
+      locale: 'en',
+      name: 'Generalized Anxiety Disorder Scale (GAD-7)',
+      version: '1.0',
+      expiry_minutes: 30,
+      items: [
+        { id: '1', prompt: 'Feeling nervous, anxious, or on edge', type: 'scale', min: 0, max: 3 },
+        { id: '2', prompt: 'Not being able to stop or control worrying', type: 'scale', min: 0, max: 3 },
+        { id: '3', prompt: 'Worrying too much about different things', type: 'scale', min: 0, max: 3 },
+        { id: '4', prompt: 'Trouble relaxing', type: 'scale', min: 0, max: 3 },
+        { id: '5', prompt: 'Being so restless that it\'s hard to sit still', type: 'scale', min: 0, max: 3 },
+        { id: '6', prompt: 'Becoming easily annoyed or irritable', type: 'scale', min: 0, max: 3 },
+        { id: '7', prompt: 'Feeling afraid as if something awful might happen', type: 'scale', min: 0, max: 3 }
+      ]
+    }
+  },
+  // PSS-10 - Perceived Stress Scale
+  'PSS10': {
+    'fr': {
+      code: 'PSS10',
+      locale: 'fr',
+      name: 'Échelle de stress perçu (PSS-10)',
+      version: '1.0',
+      expiry_minutes: 30,
+      items: [
+        { id: '1', prompt: 'Avez-vous été dérangé(e) par un événement inattendu?', type: 'scale', min: 0, max: 4 },
+        { id: '2', prompt: 'Avez-vous senti que vous étiez incapable de contrôler les choses importantes de votre vie?', type: 'scale', min: 0, max: 4 },
+        { id: '3', prompt: 'Vous êtes-vous senti(e) nerveux/nerveuse ou stressé(e)?', type: 'scale', min: 0, max: 4 },
+        { id: '4', prompt: 'Avez-vous géré avec succès les petits problèmes irritants de la vie?', type: 'scale', min: 0, max: 4, reversed: true },
+        { id: '5', prompt: 'Avez-vous senti que vous faisiez face efficacement aux changements importants?', type: 'scale', min: 0, max: 4, reversed: true },
+        { id: '6', prompt: 'Avez-vous eu confiance en votre capacité à gérer vos problèmes personnels?', type: 'scale', min: 0, max: 4, reversed: true },
+        { id: '7', prompt: 'Avez-vous senti que les choses allaient comme vous le vouliez?', type: 'scale', min: 0, max: 4, reversed: true },
+        { id: '8', prompt: 'Avez-vous trouvé que vous ne pouviez pas faire face à tout ce que vous deviez faire?', type: 'scale', min: 0, max: 4 },
+        { id: '9', prompt: 'Avez-vous été capable de maîtriser les irritations de la vie?', type: 'scale', min: 0, max: 4, reversed: true },
+        { id: '10', prompt: 'Avez-vous senti que les difficultés s\'accumulaient au point que vous ne pouviez les surmonter?', type: 'scale', min: 0, max: 4 }
+      ]
+    },
+    'en': {
+      code: 'PSS10',
+      locale: 'en',
+      name: 'Perceived Stress Scale (PSS-10)',
+      version: '1.0',
+      expiry_minutes: 30,
+      items: [
+        { id: '1', prompt: 'Been upset because of something that happened unexpectedly?', type: 'scale', min: 0, max: 4 },
+        { id: '2', prompt: 'Felt that you were unable to control the important things in your life?', type: 'scale', min: 0, max: 4 },
+        { id: '3', prompt: 'Felt nervous and stressed?', type: 'scale', min: 0, max: 4 },
+        { id: '4', prompt: 'Dealt successfully with irritating life hassles?', type: 'scale', min: 0, max: 4, reversed: true },
+        { id: '5', prompt: 'Felt that you were effectively coping with important changes?', type: 'scale', min: 0, max: 4, reversed: true },
+        { id: '6', prompt: 'Felt confident about your ability to handle your personal problems?', type: 'scale', min: 0, max: 4, reversed: true },
+        { id: '7', prompt: 'Felt that things were going your way?', type: 'scale', min: 0, max: 4, reversed: true },
+        { id: '8', prompt: 'Found that you could not cope with all the things you had to do?', type: 'scale', min: 0, max: 4 },
+        { id: '9', prompt: 'Been able to control irritations in your life?', type: 'scale', min: 0, max: 4, reversed: true },
+        { id: '10', prompt: 'Felt difficulties were piling up so high that you could not overcome them?', type: 'scale', min: 0, max: 4 }
+      ]
+    }
+  },
+  // PANAS - Positive and Negative Affect Schedule
+  'PANAS': {
+    'fr': {
+      code: 'PANAS',
+      locale: 'fr',
+      name: 'Échelle d\'affects positifs et négatifs',
+      version: '1.0',
+      expiry_minutes: 20,
+      items: [
+        { id: '1', prompt: 'Intéressé(e)', type: 'scale', min: 1, max: 5, subscale: 'positive' },
+        { id: '2', prompt: 'Angoissé(e)', type: 'scale', min: 1, max: 5, subscale: 'negative' },
+        { id: '3', prompt: 'Enthousiaste', type: 'scale', min: 1, max: 5, subscale: 'positive' },
+        { id: '4', prompt: 'Contrarié(e)', type: 'scale', min: 1, max: 5, subscale: 'negative' },
+        { id: '5', prompt: 'Fort(e)', type: 'scale', min: 1, max: 5, subscale: 'positive' },
+        { id: '6', prompt: 'Coupable', type: 'scale', min: 1, max: 5, subscale: 'negative' },
+        { id: '7', prompt: 'Effrayé(e)', type: 'scale', min: 1, max: 5, subscale: 'negative' },
+        { id: '8', prompt: 'Hostile', type: 'scale', min: 1, max: 5, subscale: 'negative' },
+        { id: '9', prompt: 'Inspiré(e)', type: 'scale', min: 1, max: 5, subscale: 'positive' },
+        { id: '10', prompt: 'Fier/Fière', type: 'scale', min: 1, max: 5, subscale: 'positive' }
+      ]
+    },
+    'en': {
+      code: 'PANAS',
+      locale: 'en',
+      name: 'Positive and Negative Affect Schedule',
+      version: '1.0',
+      expiry_minutes: 20,
+      items: [
+        { id: '1', prompt: 'Interested', type: 'scale', min: 1, max: 5, subscale: 'positive' },
+        { id: '2', prompt: 'Distressed', type: 'scale', min: 1, max: 5, subscale: 'negative' },
+        { id: '3', prompt: 'Enthusiastic', type: 'scale', min: 1, max: 5, subscale: 'positive' },
+        { id: '4', prompt: 'Upset', type: 'scale', min: 1, max: 5, subscale: 'negative' },
+        { id: '5', prompt: 'Strong', type: 'scale', min: 1, max: 5, subscale: 'positive' },
+        { id: '6', prompt: 'Guilty', type: 'scale', min: 1, max: 5, subscale: 'negative' },
+        { id: '7', prompt: 'Scared', type: 'scale', min: 1, max: 5, subscale: 'negative' },
+        { id: '8', prompt: 'Hostile', type: 'scale', min: 1, max: 5, subscale: 'negative' },
+        { id: '9', prompt: 'Inspired', type: 'scale', min: 1, max: 5, subscale: 'positive' },
+        { id: '10', prompt: 'Proud', type: 'scale', min: 1, max: 5, subscale: 'positive' }
+      ]
+    }
+  },
+  // ISI - Insomnia Severity Index
+  'ISI': {
+    'fr': {
+      code: 'ISI',
+      locale: 'fr',
+      name: 'Index de sévérité de l\'insomnie',
+      version: '1.0',
+      expiry_minutes: 20,
+      items: [
+        { id: '1', prompt: 'Difficulté à s\'endormir', type: 'scale', min: 0, max: 4 },
+        { id: '2', prompt: 'Difficulté à rester endormi(e)', type: 'scale', min: 0, max: 4 },
+        { id: '3', prompt: 'Problème de réveil trop tôt le matin', type: 'scale', min: 0, max: 4 },
+        { id: '4', prompt: 'Satisfaction par rapport au sommeil actuel', type: 'scale', min: 0, max: 4 },
+        { id: '5', prompt: 'Impact sur le fonctionnement quotidien', type: 'scale', min: 0, max: 4 },
+        { id: '6', prompt: 'Visibilité des problèmes de sommeil par les autres', type: 'scale', min: 0, max: 4 },
+        { id: '7', prompt: 'Niveau d\'inquiétude concernant le sommeil', type: 'scale', min: 0, max: 4 }
+      ]
+    },
+    'en': {
+      code: 'ISI',
+      locale: 'en',
+      name: 'Insomnia Severity Index',
+      version: '1.0',
+      expiry_minutes: 20,
+      items: [
+        { id: '1', prompt: 'Difficulty falling asleep', type: 'scale', min: 0, max: 4 },
+        { id: '2', prompt: 'Difficulty staying asleep', type: 'scale', min: 0, max: 4 },
+        { id: '3', prompt: 'Problem waking up too early', type: 'scale', min: 0, max: 4 },
+        { id: '4', prompt: 'Satisfaction with current sleep pattern', type: 'scale', min: 0, max: 4 },
+        { id: '5', prompt: 'Impact on daily functioning', type: 'scale', min: 0, max: 4 },
+        { id: '6', prompt: 'Noticeability of sleep problems to others', type: 'scale', min: 0, max: 4 },
+        { id: '7', prompt: 'Level of worry about sleep', type: 'scale', min: 0, max: 4 }
+      ]
+    }
+  },
+  // BRS - Brief Resilience Scale
+  'BRS': {
+    'fr': {
+      code: 'BRS',
+      locale: 'fr',
+      name: 'Échelle brève de résilience',
+      version: '1.0',
+      expiry_minutes: 15,
+      items: [
+        { id: '1', prompt: 'J\'ai tendance à me remettre rapidement des moments difficiles', type: 'scale', min: 1, max: 5 },
+        { id: '2', prompt: 'J\'ai du mal à traverser les événements stressants', type: 'scale', min: 1, max: 5, reversed: true },
+        { id: '3', prompt: 'Je ne mets pas longtemps à récupérer d\'un événement stressant', type: 'scale', min: 1, max: 5 },
+        { id: '4', prompt: 'Il m\'est difficile de rebondir quand quelque chose de mal arrive', type: 'scale', min: 1, max: 5, reversed: true },
+        { id: '5', prompt: 'Je traverse généralement les moments difficiles avec peu de problèmes', type: 'scale', min: 1, max: 5 },
+        { id: '6', prompt: 'Je mets longtemps à me remettre des revers dans ma vie', type: 'scale', min: 1, max: 5, reversed: true }
+      ]
+    },
+    'en': {
+      code: 'BRS',
+      locale: 'en',
+      name: 'Brief Resilience Scale',
+      version: '1.0',
+      expiry_minutes: 15,
+      items: [
+        { id: '1', prompt: 'I tend to bounce back quickly after hard times', type: 'scale', min: 1, max: 5 },
+        { id: '2', prompt: 'I have a hard time making it through stressful events', type: 'scale', min: 1, max: 5, reversed: true },
+        { id: '3', prompt: 'It does not take me long to recover from a stressful event', type: 'scale', min: 1, max: 5 },
+        { id: '4', prompt: 'It is hard for me to snap back when something bad happens', type: 'scale', min: 1, max: 5, reversed: true },
+        { id: '5', prompt: 'I usually come through difficult times with little trouble', type: 'scale', min: 1, max: 5 },
+        { id: '6', prompt: 'I tend to take a long time to get over set-backs in my life', type: 'scale', min: 1, max: 5, reversed: true }
+      ]
+    }
+  },
   'UCLA3': {} as any,
   'MSPSS': {} as any,
   'AAQ2': {
     'fr': {
       code: 'AAQ2',
+      locale: 'fr',
       name: "Questionnaire d'acceptation et d'action", 
       version: '1.0',
       expiry_minutes: 30,
@@ -306,6 +529,7 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
     },
     'en': {
       code: 'AAQ2',
+      locale: 'en',
       name: 'Acceptance and Action Questionnaire II',
       version: '1.0',
       expiry_minutes: 30,
@@ -322,10 +546,8 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
   },
   'POMS': {} as any,
   'SSQ': {} as any,
-  'ISI': {} as any,
   'GAS': {} as any,
   'GRITS': {} as any,
-  'BRS': {} as any,
   'WEMWBS': {} as any,
   'UWES': {} as any,
   'CBI': {} as any,
@@ -437,20 +659,72 @@ function determineLevel(instrument: InstrumentCode, total: number, itemCount: nu
       return 4;
     }
 
+    // PHQ-9: 0-4 minimal, 5-9 mild, 10-14 moderate, 15-19 moderately severe, 20-27 severe
+    case 'PHQ9':
+      if (total <= 4) return 0; // Minimal
+      if (total <= 9) return 1; // Léger
+      if (total <= 14) return 2; // Modéré
+      if (total <= 19) return 3; // Modéré-sévère
+      return 4; // Sévère
+
+    // GAD-7: 0-4 minimal, 5-9 mild, 10-14 moderate, 15-21 severe
+    case 'GAD7':
+      if (total <= 4) return 0; // Minimal
+      if (total <= 9) return 1; // Léger
+      if (total <= 14) return 2; // Modéré
+      return 4; // Sévère
+
+    // PSS-10: 0-13 low, 14-26 moderate, 27-40 high
+    case 'PSS10':
+      if (total <= 13) return 0; // Faible
+      if (total <= 20) return 1; // Modéré bas
+      if (total <= 26) return 2; // Modéré
+      if (total <= 33) return 3; // Élevé
+      return 4; // Très élevé
+
+    // PANAS: Utilise le ratio positif/négatif
+    case 'PANAS': {
+      const positive = subscales.positive || 0;
+      const negative = subscales.negative || 0;
+      const ratio = positive - negative;
+      if (ratio >= 15) return 4; // Très positif
+      if (ratio >= 5) return 3; // Positif
+      if (ratio >= -5) return 2; // Neutre
+      if (ratio >= -15) return 1; // Négatif
+      return 0; // Très négatif
+    }
+
+    // ISI: 0-7 none, 8-14 subthreshold, 15-21 moderate, 22-28 severe
+    case 'ISI':
+      if (total <= 7) return 0; // Aucune insomnie
+      if (total <= 14) return 1; // Sous-seuil
+      if (total <= 21) return 2; // Modérée
+      return 4; // Sévère
+
+    // BRS: 1-2.99 low, 3-4.3 normal, 4.31-5 high
+    case 'BRS': {
+      if (!itemCount) return 2;
+      const avg = total / itemCount;
+      if (avg >= 4.3) return 4; // Résilience élevée
+      if (avg >= 3.5) return 3; // Bonne résilience
+      if (avg >= 3.0) return 2; // Résilience normale
+      if (avg >= 2.0) return 1; // Résilience faible
+      return 0; // Résilience très faible
+    }
+
     default:
       return 2; // Neutral fallback
   }
 }
 
 function generateSummary(instrument: InstrumentCode, level: number): string {
-  const summaries: Record<InstrumentCode, Record<number, string>> = {
+  const summaries: Record<string, Record<number, string>> = {
     'WHO5': {
       0: 'bien-être fragile, besoin de douceur',
       1: 'bien-être à renforcer',
       2: 'bien-être stable',
       3: 'bien-être élevé',
       4: 'bien-être rayonnant'
-
     },
     'STAI6': {
       0: 'tension apaisée',
@@ -479,6 +753,48 @@ function generateSummary(instrument: InstrumentCode, level: number): string {
       2: 'souplesse fluctuante',
       3: 'moment plus rigide',
       4: 'rigidité marquée, soutien renforcé'
+    },
+    'PHQ9': {
+      0: 'humeur stable, aucun signe dépressif',
+      1: 'signes légers, vigilance recommandée',
+      2: 'signes modérés, soutien conseillé',
+      3: 'signes modérés-sévères, accompagnement nécessaire',
+      4: 'signes sévères, aide professionnelle recommandée'
+    },
+    'GAD7': {
+      0: 'anxiété minimale',
+      1: 'anxiété légère',
+      2: 'anxiété modérée',
+      3: 'anxiété modérée-sévère',
+      4: 'anxiété sévère, consultation recommandée'
+    },
+    'PSS10': {
+      0: 'stress perçu faible',
+      1: 'stress perçu modéré-bas',
+      2: 'stress perçu modéré',
+      3: 'stress perçu élevé',
+      4: 'stress perçu très élevé'
+    },
+    'PANAS': {
+      0: 'affects négatifs dominants',
+      1: 'affects mitigés, tendance négative',
+      2: 'affects équilibrés',
+      3: 'affects positifs dominants',
+      4: 'affects très positifs'
+    },
+    'ISI': {
+      0: 'sommeil de qualité',
+      1: 'difficultés légères de sommeil',
+      2: 'insomnie modérée',
+      3: 'insomnie modérée-sévère',
+      4: 'insomnie sévère'
+    },
+    'BRS': {
+      0: 'résilience très faible',
+      1: 'résilience faible',
+      2: 'résilience normale',
+      3: 'bonne résilience',
+      4: 'résilience élevée'
     }
   };
 
