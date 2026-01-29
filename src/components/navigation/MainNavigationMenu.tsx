@@ -76,6 +76,7 @@ const navigationItems: NavigationItem[] = [
   { id: 'home', label: 'Accueil', icon: Home, href: '/', category: 'Accueil', description: 'Page d\'accueil' },
   { id: 'dashboard', label: 'Mon Espace', icon: LayoutDashboard, href: '/app/home', category: 'Accueil', description: 'Tableau de bord' },
   { id: 'modules', label: 'Tous les Modules', icon: Compass, href: '/app/modules', category: 'Accueil', description: 'Explorer les modules' },
+  { id: 'navigation', label: 'Plan du site', icon: Map, href: '/navigation', category: 'Accueil', description: 'Toutes les pages' },
   
   // ═══════════════════════════════════════════════════════════
   // ANALYSE ÉMOTIONNELLE
@@ -84,7 +85,17 @@ const navigationItems: NavigationItem[] = [
   { id: 'scan-facial', label: 'Scan Facial', icon: Camera, href: '/app/scan/facial', category: 'Analyse', description: 'Détection visage' },
   { id: 'scan-voice', label: 'Scan Vocal', icon: Mic, href: '/app/scan/voice', category: 'Analyse', description: 'Analyse vocale' },
   { id: 'scan-text', label: 'Scan Texte', icon: FileText, href: '/app/scan/text', category: 'Analyse', description: 'Analyse textuelle' },
-  { id: 'hume-realtime', label: 'Hume AI Realtime', icon: Activity, href: '/app/hume-realtime', category: 'Analyse', description: 'Détection temps réel', isNew: true },
+  { id: 'hume-ai', label: 'Hume AI', icon: Activity, href: '/app/hume-ai', category: 'Analyse', description: 'IA émotionnelle avancée', isNew: true },
+  { id: 'brain-viewer', label: 'Brain Viewer', icon: Brain, href: '/app/brain-viewer', category: 'Analyse', description: 'Visualisation cérébrale', isPremium: true },
+  { id: 'context-lens', label: 'Context Lens', icon: Eye, href: '/app/context-lens', category: 'Analyse', description: 'Analyse contextuelle', isNew: true },
+  
+  // ═══════════════════════════════════════════════════════════
+  // ÉVALUATIONS CLINIQUES
+  // ═══════════════════════════════════════════════════════════
+  { id: 'assess', label: 'Évaluations', icon: FileText, href: '/app/assess', category: 'Évaluations', description: 'Tests psychométriques', isNew: true },
+  { id: 'assess-who5', label: 'WHO-5', icon: Smile, href: '/app/assess?instrument=WHO5', category: 'Évaluations', description: 'Bien-être OMS' },
+  { id: 'assess-phq9', label: 'PHQ-9', icon: Heart, href: '/app/assess?instrument=PHQ9', category: 'Évaluations', description: 'Dépression' },
+  { id: 'assess-gad7', label: 'GAD-7', icon: Activity, href: '/app/assess?instrument=GAD7', category: 'Évaluations', description: 'Anxiété' },
   
   // ═══════════════════════════════════════════════════════════
   // BIEN-ÊTRE & RELAXATION
@@ -101,6 +112,7 @@ const navigationItems: NavigationItem[] = [
   { id: 'music', label: 'Musicothérapie', icon: Music, href: '/app/music', category: 'Musique', description: 'Vinyls adaptatifs' },
   { id: 'music-premium', label: 'Music Premium', icon: Crown, href: '/app/music-premium', category: 'Musique', description: 'Génération IA', isPremium: true },
   { id: 'mood-mixer', label: 'Mood Mixer', icon: Palette, href: '/app/mood-mixer', category: 'Musique', description: 'Mix personnalisé' },
+  { id: 'suno-ai', label: 'Suno AI', icon: Music, href: '/app/suno', category: 'Musique', description: 'Génération musicale', isNew: true },
   { id: 'voice-journal', label: 'Journal Vocal', icon: Volume2, href: '/app/voice-journal', category: 'Musique', description: 'Dictée vocale' },
   
   // ═══════════════════════════════════════════════════════════
@@ -148,6 +160,8 @@ const navigationItems: NavigationItem[] = [
   { id: 'badges', label: 'Badges', icon: Star, href: '/app/badges', category: 'Gamification', description: 'Vos récompenses' },
   { id: 'rewards', label: 'Récompenses', icon: Gift, href: '/app/rewards', category: 'Gamification', description: 'Débloquer bonus' },
   { id: 'leaderboard', label: 'Classements', icon: Trophy, href: '/app/leaderboard', category: 'Gamification', description: 'Top joueurs' },
+  { id: 'tournaments', label: 'Tournois', icon: Trophy, href: '/app/tournaments', category: 'Gamification', description: 'Compétitions' },
+  { id: 'guilds', label: 'Guildes', icon: Users, href: '/app/guilds', category: 'Gamification', description: 'Équipes' },
   
   // ═══════════════════════════════════════════════════════════
   // ANALYTICS & STATISTIQUES
@@ -159,6 +173,7 @@ const navigationItems: NavigationItem[] = [
   { id: 'trends', label: 'Tendances', icon: TrendingUp, href: '/app/trends', category: 'Analytics', description: 'Évolution' },
   { id: 'sessions', label: 'Sessions', icon: Clock, href: '/app/sessions', category: 'Analytics', description: 'Historique complet' },
   { id: 'goals', label: 'Objectifs', icon: Target, href: '/app/goals', category: 'Analytics', description: 'Suivi objectifs' },
+  { id: 'auras', label: 'Auras', icon: Sparkles, href: '/app/auras', category: 'Analytics', description: 'Classement aura', isNew: true },
   
   // ═══════════════════════════════════════════════════════════
   // SOCIAL & COMMUNAUTÉ
@@ -169,6 +184,7 @@ const navigationItems: NavigationItem[] = [
   { id: 'group-sessions', label: 'Sessions Groupe', icon: Users, href: '/app/group-sessions', category: 'Social', description: 'Pratique collective' },
   { id: 'exchange', label: 'Exchange Hub', icon: RefreshCw, href: '/app/exchange', category: 'Social', description: 'Partage ressources' },
   { id: 'messages', label: 'Messages', icon: MessageCircle, href: '/messages', category: 'Social', description: 'Messagerie' },
+  { id: 'friends', label: 'Amis', icon: Users, href: '/app/friends', category: 'Social', description: 'Liste d\'amis' },
   
   // ═══════════════════════════════════════════════════════════
   // OUTILS & INTÉGRATIONS
@@ -178,6 +194,7 @@ const navigationItems: NavigationItem[] = [
   { id: 'calendar', label: 'Calendrier', icon: Calendar, href: '/calendar', category: 'Outils', description: 'Planning' },
   { id: 'notifications', label: 'Notifications', icon: Bell, href: '/app/notifications', category: 'Outils', description: 'Centre notifs' },
   { id: 'timecraft', label: 'TimeCraft', icon: Clock, href: '/app/timecraft', category: 'Outils', description: 'Gestion du temps' },
+  { id: 'integrations', label: 'Intégrations', icon: Database, href: '/app/integrations', category: 'Outils', description: 'Apps tierces' },
   
   // ═══════════════════════════════════════════════════════════
   // PARAMÈTRES
@@ -187,6 +204,8 @@ const navigationItems: NavigationItem[] = [
   { id: 'privacy', label: 'Confidentialité', icon: Lock, href: '/settings/privacy', category: 'Paramètres', description: 'Données privées' },
   { id: 'premium', label: 'Premium', icon: Crown, href: '/app/premium', category: 'Paramètres', description: 'Abonnement', isPremium: true },
   { id: 'billing', label: 'Facturation', icon: FileText, href: '/app/billing', category: 'Paramètres', description: 'Paiements' },
+  { id: 'consent', label: 'Consentements', icon: Shield, href: '/app/consent', category: 'Paramètres', description: 'Gérer consentements', isNew: true },
+  { id: 'delete-account', label: 'Suppression', icon: Shield, href: '/app/delete-account', category: 'Paramètres', description: 'Supprimer compte' },
   
   // ═══════════════════════════════════════════════════════════
   // SUPPORT
@@ -200,6 +219,7 @@ const navigationItems: NavigationItem[] = [
 const categories = [
   'Accueil',
   'Analyse',
+  'Évaluations',
   'Bien-être',
   'Musique',
   'Journal',
