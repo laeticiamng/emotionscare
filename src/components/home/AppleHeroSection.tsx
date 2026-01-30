@@ -40,12 +40,13 @@ const AppleHeroSection: React.FC = () => {
   return (
     <section 
       ref={containerRef}
-      className="relative min-h-[100vh] flex items-center justify-center overflow-hidden bg-background"
+      className="relative min-h-dvh flex items-center justify-center overflow-hidden bg-background"
+      style={{ minHeight: '100dvh' }}
     >
-      {/* Gradient orbs - subtle and premium */}
+      {/* Gradient orbs - subtle and premium, responsive sizes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
         <motion.div 
-          className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-gradient-radial from-primary/20 via-primary/5 to-transparent rounded-full blur-3xl"
+          className="absolute top-1/4 left-1/4 w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] lg:w-[600px] lg:h-[600px] bg-gradient-radial from-primary/20 via-primary/5 to-transparent rounded-full blur-3xl"
           animate={{ 
             scale: [1, 1.2, 1],
             x: [0, 50, 0],
@@ -58,7 +59,7 @@ const AppleHeroSection: React.FC = () => {
           }}
         />
         <motion.div 
-          className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-gradient-radial from-accent/15 via-accent/5 to-transparent rounded-full blur-3xl"
+          className="absolute bottom-1/4 right-1/4 w-[250px] h-[250px] sm:w-[350px] sm:h-[350px] lg:w-[500px] lg:h-[500px] bg-gradient-radial from-accent/15 via-accent/5 to-transparent rounded-full blur-3xl"
           animate={{ 
             scale: [1, 1.1, 1],
             x: [0, -40, 0],
@@ -93,7 +94,7 @@ const AppleHeroSection: React.FC = () => {
           </motion.div>
 
           {/* Main headline - word by word reveal */}
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-[0.9] mb-8">
+          <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-[0.95] mb-6 sm:mb-8 px-2 sm:px-0">
             {words.map((word, i) => (
               <motion.span
                 key={i}
