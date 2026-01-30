@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Wifi, WifiOff, AlertTriangle } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { isAdminRole } from "@/utils/roleUtils";
 
 type HealthState = "online" | "degraded" | "offline";
 
 export function HealthBadge() {
   const [state, setState] = useState<HealthState>("online");
-  const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  // Ne pas afficher le badge pour les utilisateurs non-admin
+  const isAdmin = isAdminRole(user?.role);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -36,6 +40,11 @@ export function HealthBadge() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Masquer complètement pour les non-admins
+  if (!isAdmin) {
+    return null;
+  }
+
   const getIcon = () => {
     switch (state) {
       case "online": return <Wifi className="h-3 w-3" />;
@@ -63,8 +72,7 @@ export function HealthBadge() {
   return (
     <Badge
       variant={getVariant()}
-      className="cursor-pointer hover:opacity-80 transition-opacity"
-      onClick={() => navigate("/admin/api-monitoring")}
+      className="cursor-default"
       aria-label={`Santé du système: ${getLabel()}`}
     >
       {getIcon()}
