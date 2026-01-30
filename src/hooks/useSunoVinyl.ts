@@ -116,20 +116,21 @@ export function useSunoVinyl(): UseSunoVinylReturn {
     
     const loadCache = async () => {
       try {
+        // Query without cache_version - filter old URLs client-side
         const { data } = await supabase
           .from('suno_generated_tracks')
-          .select('vinyl_id, audio_url, is_fallback, expires_at, cache_version')
+          .select('vinyl_id, audio_url, is_fallback, expires_at')
           .eq('status', 'completed')
           .gt('expires_at', new Date().toISOString());
         
         if (data) {
           const cache: Record<string, CachedTrack> = {};
           data.forEach((track: any) => {
-            // Invalider les anciennes URLs Pixabay cassées
+            // Invalider les anciennes URLs Pixabay cassées et OGG non supportés
             const isOldPixabayUrl = track.audio_url?.includes('cdn.pixabay.com');
-            const isOldCache = !track.cache_version || track.cache_version < CACHE_VERSION;
+            const isOggUrl = track.audio_url?.includes('.ogg');
             
-            if (!isOldPixabayUrl && !isOldCache) {
+            if (!isOldPixabayUrl && !isOggUrl) {
               cache[track.vinyl_id] = {
                 id: track.vinyl_id,
                 audio_url: track.audio_url,
