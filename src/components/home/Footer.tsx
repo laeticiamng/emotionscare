@@ -42,8 +42,8 @@ const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-muted/30 border-t border-border/50" role="contentinfo">
-      <div className="container mx-auto px-4 py-12">
+    <footer className="bg-muted/30 border-t border-border/50 safe-area-bottom" role="contentinfo">
+      <div className="container mx-auto px-4 py-12 pb-safe-bottom">
         {/* Main Footer Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
           {/* Brand */}
