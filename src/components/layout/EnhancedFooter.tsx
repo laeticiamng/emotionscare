@@ -80,7 +80,7 @@ const EnhancedFooter: React.FC = () => {
             <h3 className="text-sm font-semibold mb-4">Produit</h3>
             <ul className="space-y-3">
               {footerLinks.product.map((link) => (
-                <li key={link.to}>
+                <li key={`product-${link.label}`}>
                   <Link 
                     to={link.to} 
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -97,7 +97,7 @@ const EnhancedFooter: React.FC = () => {
             <h3 className="text-sm font-semibold mb-4">Ressources</h3>
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
-                <li key={link.to}>
+                <li key={`resources-${link.label}`}>
                   <Link 
                     to={link.to} 
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -114,7 +114,7 @@ const EnhancedFooter: React.FC = () => {
             <h3 className="text-sm font-semibold mb-4">Légal</h3>
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
-                <li key={link.to}>
+                <li key={`legal-${link.label}`}>
                   <Link 
                     to={link.to} 
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
