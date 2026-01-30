@@ -86,26 +86,26 @@ const AppleStatsSection: React.FC = () => {
         </motion.div>
 
         {/* Stats grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 max-w-6xl mx-auto">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 md:gap-12 max-w-6xl mx-auto">
           {stats.map((stat, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 50 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: index * 0.1 }}
-              className="text-center px-2"
+              className="text-center px-1 sm:px-2"
             >
-              <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-4 leading-tight">
+              <div className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2 sm:mb-4 leading-tight whitespace-nowrap">
                 <AnimatedCounter 
                   value={stat.value} 
                   suffix={stat.suffix} 
                   isInView={isInView} 
                 />
               </div>
-              <div className="text-lg md:text-xl font-semibold text-foreground mb-1">
+              <div className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-foreground mb-1">
                 {stat.label}
               </div>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-xs sm:text-sm text-muted-foreground">
                 {stat.description}
               </div>
             </motion.div>
