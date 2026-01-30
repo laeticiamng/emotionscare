@@ -4,7 +4,7 @@
  * Envoie des notifications automatiques pour les seuils RGPD critiques
  */
 
-import { Sentry } from './monitoring-wrapper.ts';
+import { captureSentryException, addSentryBreadcrumb } from './sentry.ts';
 
 interface AlertPayload {
   severity: 'info' | 'warning' | 'error' | 'critical';
@@ -97,12 +97,8 @@ export async function sendSlackAlert(alert: AlertPayload): Promise<void> {
     console.error('[Alert] Failed to send Slack notification:', error);
     
     // Reporter à Sentry
-    if (Sentry) {
-      Sentry.captureException(error, {
-        contexts: {
-          alert: alert,
-        },
-      });
+    if (error instanceof Error) {
+      captureSentryException(error, { alert });
     }
   }
 }
@@ -153,12 +149,8 @@ export async function sendEmailAlert(alert: AlertPayload): Promise<void> {
     console.error('[Alert] Failed to send email notification:', error);
     
     // Reporter à Sentry
-    if (Sentry) {
-      Sentry.captureException(error, {
-        contexts: {
-          alert: alert,
-        },
-      });
+    if (error instanceof Error) {
+      captureSentryException(error, { alert });
     }
   }
 }
@@ -179,18 +171,16 @@ export async function sendAlert(alert: AlertPayload): Promise<void> {
 
   // Reporter à Sentry si critique ou erreur
   if (alert.severity === 'critical' || alert.severity === 'error') {
-    if (Sentry) {
-      Sentry.captureMessage(alert.title, {
-        level: alert.severity === 'critical' ? 'fatal' : 'error',
-        contexts: {
-          alert: {
-            message: alert.message,
-            context: alert.context,
-            functionName: alert.functionName,
-          },
-        },
-      });
-    }
+    addSentryBreadcrumb({
+      category: 'alert',
+      message: alert.title,
+      data: {
+        severity: alert.severity,
+        message: alert.message,
+        context: alert.context,
+        functionName: alert.functionName,
+      },
+    });
   }
 }
 
