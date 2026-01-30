@@ -7,7 +7,7 @@ import React, { memo, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Heart } from 'lucide-react';
+import { ArrowRight, Heart, Download } from 'lucide-react';
 
 const AppleCTASection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -61,11 +61,12 @@ const AppleCTASection: React.FC = () => {
             Annule quand tu veux.
           </motion.p>
 
-          {/* CTA Button */}
+          {/* CTA Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.4 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <Link to="/signup">
               <Button 
@@ -83,6 +84,18 @@ const AppleCTASection: React.FC = () => {
                   whileHover={{ x: 0 }}
                   transition={{ duration: 0.3 }}
                 />
+              </Button>
+            </Link>
+            
+            {/* Lien installation PWA */}
+            <Link to="/install">
+              <Button 
+                variant="outline"
+                size="lg" 
+                className="group px-8 py-6 text-lg font-medium rounded-full border-2 border-muted-foreground/30 hover:border-primary hover:bg-primary/5 transition-all duration-300"
+              >
+                <Download className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
+                Installer l'app
               </Button>
             </Link>
           </motion.div>
