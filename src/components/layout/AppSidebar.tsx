@@ -34,6 +34,8 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { routes } from '@/lib/routes';
+import { useAuth } from '@/contexts/AuthContext';
+import { isAdminRole } from '@/utils/roleUtils';
 
 const coreModules = [
   { title: 'Dashboard', url: routes.b2c.dashboard(), icon: Home },
@@ -85,6 +87,10 @@ export function AppSidebar() {
   const { state, open, setOpenMobile, isMobile } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
+  const { user } = useAuth();
+  
+  // Vérification stricte du rôle admin
+  const userIsAdmin = isAdminRole(user?.role);
   
   const collapsed = state === 'collapsed' || !open;
 
@@ -259,8 +265,8 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Admin Tools (conditionally rendered) */}
-        {currentPath.includes('/admin') && (
+        {/* Admin Tools - UNIQUEMENT visible pour les admins */}
+        {userIsAdmin && (
           <SidebarGroup>
             <SidebarGroupLabel className={collapsed ? 'px-2' : ''}>
               {!collapsed && 'Administration'}

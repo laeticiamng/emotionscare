@@ -4,6 +4,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { isAdminRole } from '@/utils/roleUtils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -54,7 +55,7 @@ const UserMenu: React.FC = () => {
       .substring(0, 2);
   };
 
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = isAdminRole(user?.role);
 
   return (
     <DropdownMenu>
