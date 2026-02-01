@@ -57,6 +57,7 @@ const NotificationsWidget = React.lazy(() => import('@/components/dashboard/widg
 const DynamicRecommendationsWidget = React.lazy(() => import('@/components/dashboard/widgets/DynamicRecommendationsWidget'));
 const ModulesNavigationGrid = React.lazy(() => import('@/components/dashboard/ModulesNavigationGrid'));
 const FirstTimeGuide = React.lazy(() => import('@/components/onboarding/FirstTimeGuide'));
+const AIRecommendationsWidget = React.lazy(() => import('@/components/dashboard/AIRecommendationsWidget'));
 
 type QuickAction = {
   id: string;
@@ -365,6 +366,22 @@ export default function B2CDashboardPage() {
             Découvrez vos outils d'intelligence émotionnelle personnalisés
           </p>
         </header>
+
+        {/* Widget IA Recommandations Proactives - Prioritaire */}
+        <section aria-labelledby="ai-recommendations" className="mb-8">
+          <h2 id="ai-recommendations" className="sr-only">
+            Suggestions personnalisées IA
+          </h2>
+          <Suspense
+            fallback={(
+              <div aria-busy="true" aria-live="polite">
+                <DashboardWidgetSkeleton lines={4} />
+              </div>
+            )}
+          >
+            <AIRecommendationsWidget />
+          </Suspense>
+        </section>
 
         {has('FF_MUSIC') && (
           <section aria-labelledby="music-reminder" className="mb-8">
