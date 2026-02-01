@@ -30293,6 +30293,21 @@ export type Database = {
               user_id: string
             }[]
           }
+      get_all_role_changes: {
+        Args: { _limit?: number }
+        Returns: {
+          action: string
+          changed_at: string
+          changed_by: string
+          changed_by_email: string
+          id: string
+          new_role: string
+          old_role: string
+          role: string
+          user_email: string
+          user_id: string
+        }[]
+      }
       get_anonymous_activity_logs: {
         Args: {
           p_activity_type?: string
@@ -30819,6 +30834,21 @@ export type Database = {
               role: string
             }[]
           }
+      get_user_role_history: {
+        Args: { _user_id: string }
+        Returns: {
+          action: string
+          changed_at: string
+          changed_by: string
+          changed_by_email: string
+          id: string
+          metadata: Json
+          new_role: string
+          old_role: string
+          role: string
+          user_id: string
+        }[]
+      }
       get_user_statistics: { Args: { user_uuid: string }; Returns: Json }
       get_user_subscription: {
         Args: { user_uuid: string }
