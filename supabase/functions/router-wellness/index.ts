@@ -103,6 +103,22 @@ serve(async (req) => {
       case 'recommendations':
         return await handleRecommendations(user, supabase);
 
+      // ============ VR ACTIONS ============
+      case 'vr-start':
+        return await handleVRStart(payload, user, supabase);
+      
+      case 'vr-complete':
+        return await handleVRComplete(payload, user, supabase);
+      
+      case 'vr-history':
+        return await handleVRHistory(payload, user, supabase);
+      
+      case 'vr-templates':
+        return await handleVRTemplates(supabase);
+      
+      case 'vr-metrics':
+        return await handleVRMetrics(payload, user, supabase);
+
       default:
         return errorResponse(`Unknown action: ${action}`, 400);
     }
@@ -480,6 +496,161 @@ async function handleRecommendations(user: any, supabase: any): Promise<Response
   });
 
   return successResponse({ recommendations });
+}
+
+// ============ VR HANDLERS ============
+
+async function handleVRStart(payload: any, user: any, supabase: any): Promise<Response> {
+  const { templateId, type = 'galaxy', environment = 'default' } = payload;
+
+  const { data: session, error } = await supabase
+    .from('vr_sessions')
+    .insert({
+      user_id: user.id,
+      template_id: templateId,
+      session_type: type,
+      environment,
+      started_at: new Date().toISOString(),
+      status: 'active',
+    })
+    .select()
+    .single();
+
+  if (error) {
+    return errorResponse('Failed to start VR session', 500);
+  }
+
+  return successResponse({ session });
+}
+
+async function handleVRComplete(payload: any, user: any, supabase: any): Promise<Response> {
+  const { sessionId, duration, rating, stressReduction, moodBefore, moodAfter, metrics } = payload;
+
+  if (!sessionId) {
+    return errorResponse('Session ID is required', 400);
+  }
+
+  const { error } = await supabase
+    .from('vr_sessions')
+    .update({
+      duration_seconds: duration,
+      rating,
+      stress_reduction: stressReduction,
+      mood_before: moodBefore,
+      mood_after: moodAfter,
+      metrics,
+      completed_at: new Date().toISOString(),
+      status: 'completed',
+    })
+    .eq('id', sessionId)
+    .eq('user_id', user.id);
+
+  if (error) {
+    return errorResponse('Failed to complete VR session', 500);
+  }
+
+  // Update streak
+  await updateStreak(user.id, supabase, 'vr');
+
+  // Log metrics to dedicated table
+  if (metrics) {
+    await supabase.from('metrics_vr_galaxy').insert({
+      user_id: user.id,
+      session_id: sessionId,
+      ...metrics,
+    });
+  }
+
+  return successResponse({ completed: true });
+}
+
+async function handleVRHistory(payload: any, user: any, supabase: any): Promise<Response> {
+  const { limit = 20, offset = 0, type } = payload;
+
+  let query = supabase
+    .from('vr_sessions')
+    .select('*, vr_session_templates(name, description, thumbnail_url)')
+    .eq('user_id', user.id)
+    .order('started_at', { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (type) {
+    query = query.eq('session_type', type);
+  }
+
+  const { data: sessions, error } = await query;
+
+  if (error) {
+    return errorResponse('Failed to fetch VR history', 500);
+  }
+
+  // Calculate stats
+  const completed = sessions?.filter((s: any) => s.status === 'completed') || [];
+  const avgDuration = completed.length > 0
+    ? completed.reduce((sum: number, s: any) => sum + (s.duration_seconds || 0), 0) / completed.length
+    : 0;
+  const avgRating = completed.length > 0
+    ? completed.reduce((sum: number, s: any) => sum + (s.rating || 0), 0) / completed.length
+    : 0;
+
+  return successResponse({
+    sessions: sessions || [],
+    stats: {
+      totalSessions: sessions?.length || 0,
+      completedSessions: completed.length,
+      avgDuration: Math.round(avgDuration),
+      avgRating: Math.round(avgRating * 10) / 10,
+    },
+  });
+}
+
+async function handleVRTemplates(supabase: any): Promise<Response> {
+  const { data: templates, error } = await supabase
+    .from('vr_session_templates')
+    .select('*')
+    .eq('is_active', true)
+    .order('popularity_score', { ascending: false });
+
+  if (error) {
+    return errorResponse('Failed to fetch VR templates', 500);
+  }
+
+  return successResponse({ templates: templates || [] });
+}
+
+async function handleVRMetrics(payload: any, user: any, supabase: any): Promise<Response> {
+  const { days = 30 } = payload;
+
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+
+  const { data: metrics } = await supabase
+    .from('vr_sessions')
+    .select('completed_at, duration_seconds, rating, stress_reduction, mood_before, mood_after')
+    .eq('user_id', user.id)
+    .eq('status', 'completed')
+    .gte('completed_at', startDate.toISOString())
+    .order('completed_at', { ascending: true });
+
+  const sessions = metrics || [];
+  
+  const totalDuration = sessions.reduce((sum: number, s: any) => sum + (s.duration_seconds || 0), 0);
+  const avgStressReduction = sessions.length > 0
+    ? sessions.reduce((sum: number, s: any) => sum + (s.stress_reduction || 0), 0) / sessions.length
+    : 0;
+  const avgMoodImprovement = sessions.length > 0
+    ? sessions.reduce((sum: number, s: any) => sum + ((s.mood_after || 0) - (s.mood_before || 0)), 0) / sessions.length
+    : 0;
+
+  return successResponse({
+    metrics: sessions,
+    summary: {
+      totalSessions: sessions.length,
+      totalMinutes: Math.round(totalDuration / 60),
+      avgStressReduction: Math.round(avgStressReduction * 10) / 10,
+      avgMoodImprovement: Math.round(avgMoodImprovement * 10) / 10,
+    },
+  });
 }
 
 // ============ HELPERS ============
