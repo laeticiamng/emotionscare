@@ -1,10 +1,8 @@
-// @ts-nocheck
 "use client";
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
-import { Loader2, Wind, BookOpen, Zap, Trophy, Calendar, History, Sparkles } from 'lucide-react';
+import { Loader2, Wind, BookOpen, Zap, Trophy, History } from 'lucide-react';
 
 import PageHeader from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/button';
@@ -199,7 +197,7 @@ const AssessmentDialog: React.FC<AssessmentDialogProps> = ({ assessment, kind, l
             <Button type="submit" disabled={items.some((item) => answers[item.id] === undefined)}>
               Envoyer
             </Button>
-            {assessment.state.status === 'submitted' && (
+            {assessment.state.isSubmitting && (
               <span className="text-sm text-success">Merci ! Tes réponses ont été prises en compte.</span>
             )}
           </DialogFooter>
@@ -219,7 +217,7 @@ const BreathPage: React.FC = () => {
 
   const staiAssessment = orchestration.assessments.stai;
   const isiAssessment = orchestration.assessments.isi;
-  const { stats, sessions } = useBreathSessions();
+  const { stats } = useBreathSessions();
 
   useEffect(() => {
     if (orchestration.mode === 'sleep_preset') {
@@ -238,7 +236,6 @@ const BreathPage: React.FC = () => {
   };
 
   const handleStartRecommendedSession = (pattern: string, duration: number) => {
-    // Start a session with the recommended pattern
     setSessionActive(true);
     Sentry.addBreadcrumb({
       category: 'breath',
@@ -277,7 +274,6 @@ const BreathPage: React.FC = () => {
 
   const skipAssessment = () => undefined;
 
-  // Calculate longest streak (simulated - would come from backend)
   const longestStreak = Math.max(stats.currentStreak, 7);
 
   return (
@@ -286,7 +282,7 @@ const BreathPage: React.FC = () => {
         <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 sm:px-6">
           <PageHeader
             title="Respiration orchestrée"
-            description="Une bulle de calme qui s'ajuste à ton état intérieur, sans chiffres ni pression."
+            subtitle="Une bulle de calme qui s'ajuste à ton état intérieur, sans chiffres ni pression."
           />
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
@@ -315,7 +311,6 @@ const BreathPage: React.FC = () => {
 
             {/* Session Tab */}
             <TabsContent value="session" className="space-y-6">
-              {/* Streak Widget */}
               <BreathStreakWidget
                 currentStreak={stats.currentStreak}
                 longestStreak={longestStreak}
@@ -323,7 +318,6 @@ const BreathPage: React.FC = () => {
                 weeklyProgress={stats.weeklyMinutes}
               />
 
-              {/* Recommendations */}
               <BreathRecommendationWidget onStartSession={handleStartRecommendedSession} />
 
               <Card className="border-border/70 bg-card/60" data-zero-number-check="true">
@@ -348,7 +342,7 @@ const BreathPage: React.FC = () => {
                 </CardContent>
               </Card>
 
-              {showStaiPrompt ? (
+              {showStaiPrompt && (
                 <AssessmentPrompt
                   title="Envie d'un court check-in ?"
                   description="Réponds à quelques ressentis pour ajuster la cadence."
@@ -358,9 +352,9 @@ const BreathPage: React.FC = () => {
                   }}
                   onSkip={skipAssessment}
                 />
-              ) : null}
+              )}
 
-              {showIsiPrompt ? (
+              {showIsiPrompt && (
                 <AssessmentPrompt
                   title="Suivi discret du sommeil"
                   description="Quelques questions sur ton repos cette semaine pour optimiser la routine d'endormissement."
@@ -370,13 +364,21 @@ const BreathPage: React.FC = () => {
                   }}
                   onSkip={skipAssessment}
                 />
-              ) : null}
+              )}
 
               {sessionActive ? (
                 sleepMode ? (
-                  <SleepPreset onSessionFinish={handleSessionFinish} />
+                  <SleepPreset active={sleepMode} onToggle={setSleepMode} />
                 ) : (
-                  <BreathFlowController profile={orchestration.profile} onSessionFinish={handleSessionFinish} />
+                  <BreathFlowController 
+                    profile={orchestration.profile} 
+                    ambience="soft"
+                    guidance="soft_anchor"
+                    summaryLabel={orchestration.summaryLabel}
+                    mode={orchestration.mode}
+                    next={orchestration.next}
+                    onFinish={handleSessionFinish} 
+                  />
                 )
               ) : (
                 <Card className="border-border/60 bg-card/40" data-zero-number-check="true">
@@ -410,7 +412,7 @@ const BreathPage: React.FC = () => {
               <BreathSessionHistory limit={15} />
             </TabsContent>
 
-            {/* Library Tab - Techniques & Programs */}
+            {/* Library Tab */}
             <TabsContent value="library" className="space-y-6">
               <Tabs defaultValue="techniques" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 bg-muted/30">
