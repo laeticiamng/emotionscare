@@ -100,6 +100,9 @@ serve(async (req) => {
       case 'emotion-analyze':
         return await handleEmotionAnalyze(payload, user, supabase);
 
+      case 'context-recommend':
+        return await handleContextRecommend(payload, user, supabase);
+
       default:
         return errorResponse(`Unknown action: ${action}`, 400);
     }
@@ -451,6 +454,177 @@ async function handleEmotionAnalyze(payload: any, user: any, supabase: any): Pro
       summary: 'Analyse non disponible',
     });
   }
+}
+
+async function handleContextRecommend(payload: any, user: any, supabase: any): Promise<Response> {
+  const { 
+    valence = 0.5, 
+    arousal = 0.5, 
+    timeOfDay = getTimeOfDay(),
+    recentActivity,
+    streakDays = 0 
+  } = payload;
+
+  // Récupérer le contexte utilisateur depuis la DB
+  const [moodHistory, activityHistory, preferences] = await Promise.all([
+    supabase
+      .from('mood_entries')
+      .select('valence, arousal, created_at, primary_emotion')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(7),
+    supabase
+      .from('activity_sessions')
+      .select('activity_id, completed, rating, completed_at')
+      .eq('user_id', user.id)
+      .order('completed_at', { ascending: false })
+      .limit(10),
+    supabase
+      .from('user_preferences')
+      .select('preferred_activities, notification_frequency')
+      .eq('user_id', user.id)
+      .single(),
+  ]);
+
+  // Construire le contexte pour l'IA
+  const contextSummary = {
+    currentMood: { valence, arousal },
+    timeOfDay,
+    moodTrend: analyzeMoodTrend(moodHistory.data || []),
+    recentCompletions: (activityHistory.data || []).filter(a => a.completed).length,
+    streakDays,
+    preferences: preferences.data,
+  };
+
+  const systemPrompt = `Tu es un moteur de recommandation IA pour EmotionsCare. 
+Analyse le contexte utilisateur et recommande les 3 meilleurs modules.
+
+Modules disponibles:
+- scan: Scanner émotionnel (pour prise de conscience)
+- breath: Respiration guidée (stress, anxiété)
+- music: Musicothérapie (régulation émotionnelle)
+- coach: Coach IA Nyvée (support conversationnel)
+- journal: Journal émotionnel (introspection)
+- gamification: Défis et progression (motivation)
+- vr: Expériences immersives (évasion)
+- social-cocon: Communauté (soutien social)
+
+Retourne un JSON valide:
+{
+  "recommendations": [
+    {
+      "module": "string",
+      "priority": 1-3,
+      "reason": "explication courte",
+      "confidence": 0-1,
+      "urgency": "immediate" | "suggested" | "optional"
+    }
+  ],
+  "insight": "observation personnalisée sur l'état actuel",
+  "microAction": "action rapide 30s recommandée"
+}`;
+
+  const response = await callAI({
+    model: MODELS.default,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: JSON.stringify(contextSummary) },
+    ],
+    maxTokens: 512,
+  });
+
+  if (!response.ok) {
+    // Fallback intelligent sans IA
+    return successResponse(getFallbackRecommendations(valence, arousal, timeOfDay));
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content || '';
+
+  try {
+    const result = JSON.parse(content);
+    
+    // Logger pour analytics
+    await supabase.from('ai_recommendations').insert({
+      user_id: user.id,
+      recommendation_type: 'context-aware',
+      content_type: 'module',
+      content_id: result.recommendations?.[0]?.module || 'scan',
+      reason: result.recommendations?.[0]?.reason || '',
+      confidence_score: result.recommendations?.[0]?.confidence || 0.5,
+      priority_level: 'high',
+    }).catch(() => {});
+
+    return successResponse({
+      ...result,
+      context: contextSummary,
+      generatedAt: new Date().toISOString(),
+    });
+  } catch {
+    return successResponse(getFallbackRecommendations(valence, arousal, timeOfDay));
+  }
+}
+
+function getTimeOfDay(): string {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) return 'morning';
+  if (hour >= 12 && hour < 17) return 'afternoon';
+  if (hour >= 17 && hour < 21) return 'evening';
+  return 'night';
+}
+
+function analyzeMoodTrend(moodHistory: any[]): string {
+  if (moodHistory.length < 2) return 'insufficient_data';
+  const recentAvg = moodHistory.slice(0, 3).reduce((sum, m) => sum + (m.valence || 0), 0) / 3;
+  const olderAvg = moodHistory.slice(3).reduce((sum, m) => sum + (m.valence || 0), 0) / Math.max(1, moodHistory.length - 3);
+  if (recentAvg > olderAvg + 0.1) return 'improving';
+  if (recentAvg < olderAvg - 0.1) return 'declining';
+  return 'stable';
+}
+
+function getFallbackRecommendations(valence: number, arousal: number, timeOfDay: string) {
+  const recommendations = [];
+
+  // Logique heuristique basée sur valence/arousal
+  if (valence < 0.3 && arousal > 0.6) {
+    // Stress/anxiété
+    recommendations.push(
+      { module: 'breath', priority: 1, reason: 'Respiration pour calmer le stress', confidence: 0.85, urgency: 'immediate' },
+      { module: 'music', priority: 2, reason: 'Musique apaisante', confidence: 0.75, urgency: 'suggested' },
+    );
+  } else if (valence < 0.3 && arousal < 0.4) {
+    // Tristesse/fatigue
+    recommendations.push(
+      { module: 'coach', priority: 1, reason: 'Support émotionnel avec Nyvée', confidence: 0.8, urgency: 'immediate' },
+      { module: 'music', priority: 2, reason: 'Musique énergisante douce', confidence: 0.7, urgency: 'suggested' },
+    );
+  } else if (valence > 0.6) {
+    // État positif
+    recommendations.push(
+      { module: 'journal', priority: 1, reason: 'Capturer ce moment positif', confidence: 0.8, urgency: 'suggested' },
+      { module: 'gamification', priority: 2, reason: 'Continuer sur la lancée', confidence: 0.7, urgency: 'optional' },
+    );
+  } else {
+    // État neutre
+    recommendations.push(
+      { module: 'scan', priority: 1, reason: 'Explorer votre état actuel', confidence: 0.7, urgency: 'suggested' },
+      { module: 'breath', priority: 2, reason: 'Micro-session de recentrage', confidence: 0.65, urgency: 'optional' },
+    );
+  }
+
+  // Ajouter recommandation contextuelle basée sur l'heure
+  if (timeOfDay === 'morning') {
+    recommendations.push({ module: 'breath', priority: 3, reason: 'Routine matinale énergisante', confidence: 0.6, urgency: 'optional' });
+  } else if (timeOfDay === 'night') {
+    recommendations.push({ module: 'music', priority: 3, reason: 'Détente nocturne', confidence: 0.6, urgency: 'optional' });
+  }
+
+  return {
+    recommendations: recommendations.slice(0, 3),
+    insight: 'Recommandations basées sur votre état émotionnel actuel',
+    microAction: valence < 0.4 ? '3 respirations profondes' : 'Sourire 10 secondes',
+    fallback: true,
+  };
 }
 
 // ============ HELPERS ============
