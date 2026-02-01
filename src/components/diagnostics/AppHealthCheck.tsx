@@ -1,6 +1,4 @@
-// @ts-nocheck
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { logger } from '@/lib/logger';
@@ -85,10 +83,10 @@ const AppHealthCheck: React.FC = () => {
     }
 
     // Check console errors
-    const consoleErrors = [];
+    const consoleErrors: string[] = [];
     const originalError = console.error;
-    console.error = (...args) => {
-      const errorMessage = args.join(' ');
+    console.error = (...args: unknown[]) => {
+      const errorMessage = args.map(a => String(a)).join(' ');
       consoleErrors.push(errorMessage);
       logger.error(errorMessage, undefined, 'SYSTEM');
     };
@@ -117,13 +115,13 @@ const AppHealthCheck: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'ok':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
+        return <CheckCircle className="h-5 w-5 text-success" />;
       case 'warning':
-        return <AlertCircle className="h-5 w-5 text-yellow-500" />;
+        return <AlertCircle className="h-5 w-5 text-warning" />;
       case 'error':
-        return <XCircle className="h-5 w-5 text-red-500" />;
+        return <XCircle className="h-5 w-5 text-destructive" />;
       default:
-        return <AlertCircle className="h-5 w-5 text-gray-500" />;
+        return <AlertCircle className="h-5 w-5 text-muted-foreground" />;
     }
   };
 

@@ -1,20 +1,19 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
-import PageRoot from '@/components/common/PageRoot'
-import JournalView from '@/pages/journal/JournalView'
-import { Sparkles, Mic, PenLine } from 'lucide-react'
-import { useFlags } from '@/core/flags'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { JournalSettingsLink } from '@/components/journal/JournalSettingsLink'
-import { JournalOnboarding } from '@/components/journal/JournalOnboarding'
-import { JournalQuickTips } from '@/components/journal/JournalQuickTips'
-import { MedicalDisclaimerDialog, useMedicalDisclaimer } from '@/components/medical/MedicalDisclaimerDialog'
+import { useState, lazy, Suspense } from 'react';
+import PageRoot from '@/components/common/PageRoot';
+import JournalView from '@/pages/journal/JournalView';
+import { Sparkles, Mic, PenLine } from 'lucide-react';
+import { useFlags } from '@/core/flags';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { JournalSettingsLink } from '@/components/journal/JournalSettingsLink';
+import { JournalOnboarding } from '@/components/journal/JournalOnboarding';
+import { JournalQuickTips } from '@/components/journal/JournalQuickTips';
+import { MedicalDisclaimerDialog, useMedicalDisclaimer } from '@/components/medical/MedicalDisclaimerDialog';
 import { usePageSEO } from '@/hooks/usePageSEO';
+import { useJournalOnboarding } from '@/hooks/useJournalOnboarding';
 
 // Lazy load le composant vocal pour performance
 const VoiceJournalEntry = lazy(() => import('@/components/journal/VoiceJournalEntry'));
-
-const ONBOARDING_KEY = 'journal-onboarding-completed';
 
 export default function B2CJournalPage() {
   const [activeTab, setActiveTab] = useState<'write' | 'voice'>('write');
@@ -24,32 +23,17 @@ export default function B2CJournalPage() {
     keywords: 'journal émotionnel, diary, suivi humeur, analyse émotions, développement personnel'
   });
 
-  const { has } = useFlags()
-  const journalEnabled = has('FF_JOURNAL')
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  const [showTips, setShowTips] = useState(false);
+  const { has } = useFlags();
+  const journalEnabled = has('FF_JOURNAL');
+  const { shouldShowOnboarding, shouldShowTips, markOnboardingComplete } = useJournalOnboarding();
   const { showDisclaimer, handleAccept, handleDecline } = useMedicalDisclaimer('journal');
 
-  useEffect(() => {
-    // Vérifier si l'utilisateur a déjà vu l'onboarding
-    const hasSeenOnboarding = localStorage.getItem(ONBOARDING_KEY);
-    if (!hasSeenOnboarding) {
-      setShowOnboarding(true);
-    } else {
-      // Afficher les conseils pour les utilisateurs qui reviennent
-      setShowTips(true);
-    }
-  }, []);
-
   const handleOnboardingComplete = () => {
-    localStorage.setItem(ONBOARDING_KEY, 'true');
-    setShowOnboarding(false);
-    setShowTips(true);
+    markOnboardingComplete();
   };
 
   const handleOnboardingDismiss = () => {
-    localStorage.setItem(ONBOARDING_KEY, 'true');
-    setShowOnboarding(false);
+    markOnboardingComplete();
   };
 
   return (
@@ -71,7 +55,7 @@ export default function B2CJournalPage() {
         </header>
         {journalEnabled ? (
           <>
-            {showTips && <JournalQuickTips className="mb-6" />}
+            {shouldShowTips && <JournalQuickTips className="mb-6" />}
             
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'write' | 'voice')} className="w-full">
               <TabsList className="mb-6">
@@ -110,7 +94,7 @@ export default function B2CJournalPage() {
         )}
       </section>
       
-      {showOnboarding && (
+      {shouldShowOnboarding && (
         <JournalOnboarding
           onComplete={handleOnboardingComplete}
           onDismiss={handleOnboardingDismiss}
@@ -124,5 +108,5 @@ export default function B2CJournalPage() {
         onDecline={handleDecline}
       />
     </PageRoot>
-  )
+  );
 }
