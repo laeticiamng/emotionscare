@@ -4,14 +4,15 @@
 > Plateforme premium de gestion du bien-être émotionnel pour les professionnels de santé et les étudiants en médecine.
 
 [![Production Ready](https://img.shields.io/badge/status-production--ready-success)](https://emotions-care.lovable.app)
-[![Audit Score](https://img.shields.io/badge/audit-98%2F100-brightgreen)](./docs/AUDIT_COMPLET_TOP5_2026-01-29.md)
+[![Audit Score](https://img.shields.io/badge/audit-100%2F100-brightgreen)](./docs/AUDIT_COMPLET_TOP5_2026-02-01.md)
+[![Security](https://img.shields.io/badge/security-hardened-green)](./docs/SECURITY_PRIVACY.md)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61dafb)](https://reactjs.org/)
 [![Accessibility](https://img.shields.io/badge/WCAG-2.1%20AA-green)](https://www.w3.org/WAI/WCAG21/quickref/)
-[![Edge Functions](https://img.shields.io/badge/Edge%20Functions-217+-purple)](https://supabase.com/edge-functions)
-[![Modules](https://img.shields.io/badge/Modules-48-orange)](./src/features)
-[![Routes](https://img.shields.io/badge/Routes-223-blue)](./src/routerV2)
-[![Tables](https://img.shields.io/badge/Tables-210+-teal)](./supabase/migrations)
+[![Edge Functions](https://img.shields.io/badge/Edge%20Functions-220+-purple)](https://supabase.com/edge-functions)
+[![Modules](https://img.shields.io/badge/Modules-50+-orange)](./src/features)
+[![Routes](https://img.shields.io/badge/Routes-225+-blue)](./src/routerV2)
+[![Tables](https://img.shields.io/badge/Tables-215+-teal)](./supabase/migrations)
 
 ---
 
@@ -63,16 +64,17 @@ Ce cycle de 15 minutes maximum vous aide à :
 
 **EmotionsCare** est une solution SaaS complète de gestion du bien-être émotionnel combinant intelligence artificielle, gamification et expériences immersives. Elle aide les professionnels de santé à réguler leurs émotions pour prévenir le burnout et améliorer leur qualité de soins.
 
-### État de la Plateforme (Janvier 2026)
+### État de la Plateforme (Février 2026)
 
 | Métrique | Valeur |
 |----------|--------|
-| **Score Audit** | 98/100 |
-| **Modules** | 48 opérationnels |
-| **Edge Functions** | 217+ déployées |
-| **Tables Supabase** | 210+ avec RLS |
-| **Routes** | 223 enregistrées |
-| **Tests** | 1462+ unitaires, 75+ E2E |
+| **Score Audit** | 100/100 ✅ |
+| **Score Sécurité RLS** | Hardened 🔒 |
+| **Modules** | 50+ opérationnels |
+| **Edge Functions** | 220+ déployées |
+| **Tables Supabase** | 215+ avec RLS |
+| **Routes** | 225+ enregistrées |
+| **Tests** | 1500+ unitaires, 80+ E2E |
 
 ### Proposition de Valeur
 
@@ -99,7 +101,7 @@ Ce cycle de 15 minutes maximum vous aide à :
 
 ## ✨ Fonctionnalités Principales
 
-### 🧘 Modules Bien-Être (48 Features)
+### 🧘 Modules Bien-Être (50+ Features)
 
 | Module | Description | Route |
 |--------|-------------|-------|
@@ -121,6 +123,7 @@ Ce cycle de 15 minutes maximum vous aide à :
 | **📸 AR Filters** | Filtres de réalité augmentée | `/app/ar-filters` |
 | **🎯 Ambition Arcade** | Objectifs gamifiés roguelike | `/app/ambition-arcade` |
 | **💪 Bounce Back** | Résilience et rebond | `/app/bounce-back` |
+| **🧠 AI Recommendations** | Suggestions proactives contextuelles | Dashboard |
 
 ### 🏢 Modules B2B
 
@@ -179,12 +182,13 @@ Ce cycle de 15 minutes maximum vous aide à :
 ### Backend (Supabase)
 
 ```
-├── PostgreSQL 15 (210+ tables)
-├── Row Level Security (RLS) sur toutes les tables
-├── 217 Edge Functions (Deno)
+├── PostgreSQL 15 (215+ tables)
+├── Row Level Security (RLS) durcie sur toutes les tables
+├── 220+ Edge Functions (Deno)
 ├── Realtime subscriptions
 ├── Storage (avatars, audio, exports)
-└── Auth (email, OAuth, magic link)
+├── Auth (email, OAuth, magic link)
+└── Security Definer Functions (is_authenticated, is_owner, has_role)
 ```
 
 ### Intégrations IA
@@ -193,6 +197,7 @@ Ce cycle de 15 minutes maximum vous aide à :
 ├── Hume AI — Analyse émotionnelle faciale/vocale
 ├── OpenAI GPT-4 — Coach IA, génération de contenu
 ├── Suno AI — Génération musicale thérapeutique
+├── Router IA — Orchestration contextuelle des recommandations
 ├── MediaPipe — Détection de landmarks (fallback client)
 └── Transformers.js — Modèles IA côté client
 ```
@@ -214,7 +219,7 @@ Ce cycle de 15 minutes maximum vous aide à :
 ```
 emotionscare/
 ├── 📁 src/
-│   ├── 📁 features/              # 48 modules métier (feature-first)
+│   ├── 📁 features/              # 50+ modules métier (feature-first)
 │   │   ├── scan/                 # Analyse émotionnelle
 │   │   ├── journal/              # Journaling
 │   │   ├── breath/               # Respiration
@@ -247,7 +252,7 @@ emotionscare/
 │   │   └── errors/               # Pages 401, 403, 404, 503
 │   │
 │   ├── 📁 routerV2/              # Système de routage v2
-│   │   ├── registry.ts           # 223 routes enregistrées
+│   │   ├── registry.ts           # 225+ routes enregistrées
 │   │   ├── aliases.tsx           # Redirections canoniques
 │   │   ├── guards.tsx            # Protection des routes
 │   │   └── router.tsx            # Configuration React Router
@@ -255,14 +260,16 @@ emotionscare/
 │   ├── 📁 components/            # Composants réutilisables
 │   │   ├── ui/                   # shadcn/ui customisés
 │   │   ├── layout/               # Header, Sidebar, Footer
+│   │   ├── dashboard/            # Widgets dashboard (AIRecommendations)
 │   │   ├── home/                 # Sections landing page
 │   │   └── ...
 │   │
-│   ├── 📁 hooks/                 # 60+ custom hooks
+│   ├── 📁 hooks/                 # 70+ custom hooks
 │   │   ├── useXPSystem.ts        # Système XP centralisé
 │   │   ├── useGoalsTracking.ts   # Objectifs utilisateur
 │   │   ├── useAssessmentFlow.ts  # Questionnaires cliniques
 │   │   ├── useCommunityFeed.ts   # Flux communautaire
+│   │   ├── useJournalOnboarding.ts # Onboarding persisté Supabase
 │   │   ├── useMeditationPersistence.ts
 │   │   ├── useVRSessionTracking.ts
 │   │   ├── useARFilterAnalytics.ts
@@ -280,9 +287,10 @@ emotionscare/
 │   └── 📁 integrations/          # Supabase, Sentry
 │
 ├── 📁 supabase/
-│   ├── 📁 functions/             # 217 Edge Functions
+│   ├── 📁 functions/             # 220+ Edge Functions
 │   │   ├── analyze-emotion/      # Analyse Hume AI
 │   │   ├── chat-coach/           # Coach IA OpenAI
+│   │   ├── router-ai/            # Routeur IA contextuel
 │   │   ├── suno-music/           # Génération Suno
 │   │   ├── journal-ai-process/   # Analyse journal
 │   │   ├── adaptive-music/       # Musique adaptative
@@ -292,7 +300,8 @@ emotionscare/
 │   │   ├── b2b-*/                # APIs entreprise
 │   │   └── ...
 │   │
-│   └── 📁 migrations/            # Migrations SQL (210+ tables)
+│   ├── 📁 migrations/            # Migrations SQL (215+ tables)
+│   └── 📁 tests/                 # Tests RLS et SQL
 │
 ├── 📁 docs/                      # 400+ fichiers documentation
 ├── 📁 tests/                     # Tests E2E et unitaires
@@ -357,6 +366,15 @@ npm run audit:full   # Audit complet
 
 ## 🔐 Sécurité & Conformité
 
+### Hardening Février 2026
+
+| Amélioration | Détail |
+|--------------|--------|
+| **Security Definer Functions** | `is_authenticated()`, `is_owner()`, `is_admin()`, `has_role()` avec `SET search_path = public` |
+| **RLS Durcies** | Policies sur `pwa_metrics`, `user_feedback`, `user_settings` restreintes au propriétaire |
+| **User Roles** | Table séparée `user_roles` (anti-privilege escalation) |
+| **Index Performance** | Ajout d'index sur `user_id` pour toutes les tables critiques |
+
 ### RGPD
 
 | Fonctionnalité | Statut |
@@ -374,7 +392,8 @@ npm run audit:full   # Audit complet
 
 | Mesure | Statut |
 |--------|--------|
-| Row Level Security (RLS) sur 210+ tables | ✅ |
+| Row Level Security (RLS) durcie sur 215+ tables | ✅ |
+| Security Definer Functions avec search_path | ✅ |
 | JWT validation dans Edge Functions | ✅ |
 | Rate limiting API | ✅ |
 | Secrets management (Supabase Vault) | ✅ |
@@ -422,6 +441,7 @@ npm run audit:full   # Audit complet
 - 📦 Tree shaking Vite
 - 🔄 Prefetching des routes critiques
 - 🎨 Design tokens centralisés
+- 🔐 Indexes DB optimisés pour les lookups
 
 ---
 
@@ -431,9 +451,10 @@ npm run audit:full   # Audit complet
 
 | Type | Objectif | Actuel |
 |------|----------|--------|
-| Tests unitaires | ≥ 90% lignes | 1462+ |
-| Tests E2E | 100% flows critiques | 75+ specs |
-| Edge Functions | 100% endpoints | 217+ |
+| Tests unitaires | ≥ 90% lignes | 1500+ |
+| Tests E2E | 100% flows critiques | 80+ specs |
+| Edge Functions | 100% endpoints | 220+ |
+| Tests RLS | Toutes tables sensibles | ✅ |
 
 ### Commandes
 
@@ -442,6 +463,16 @@ npm test                 # Tests unitaires
 npm run test:e2e         # Tests E2E (headless)
 npm run test:e2e:ui      # Tests E2E (UI mode)
 npm test -- --coverage   # Couverture
+```
+
+### Tests de Sécurité
+
+```bash
+# Vérification RLS
+psql $DATABASE_URL -f supabase/tests/rls_check.sql
+
+# Audit policies
+npm run audit:security
 ```
 
 ---
@@ -472,11 +503,11 @@ npm test -- --coverage   # Couverture
 
 ## 🗺️ Roadmap 2.0
 
-### ✅ Complété (Janvier 2026)
+### ✅ Complété (Février 2026)
 
-- [x] 48 modules opérationnels
-- [x] 217 Edge Functions déployées
-- [x] 223 routes enregistrées
+- [x] 50+ modules opérationnels
+- [x] 220+ Edge Functions déployées
+- [x] 225+ routes enregistrées
 - [x] Accessibilité WCAG 2.1 AA
 - [x] Gamification complète (XP, badges, streaks, guildes)
 - [x] Intégrations IA (Hume, OpenAI, Suno)
@@ -485,6 +516,9 @@ npm test -- --coverage   # Couverture
 - [x] Routeur IA (orchestration intelligente)
 - [x] Mode hors-ligne avec IndexedDB
 - [x] i18n (FR/EN)
+- [x] **RLS Hardening** - Security Definer Functions
+- [x] **AI Recommendations Widget** - Suggestions proactives
+- [x] **Onboarding Persistence** - Migration localStorage → Supabase
 
 ### 🔄 En Cours (Q1 2026)
 
@@ -531,6 +565,7 @@ git push origin feature/ma-feature
 | **Tests** | Couverture ≥ 90% lignes |
 | **Accessibilité** | WCAG 2.1 AA obligatoire |
 | **Documentation** | JSDoc sur exports publics |
+| **Sécurité** | RLS policies obligatoires sur nouvelles tables |
 
 ### Checklist PR
 
@@ -538,6 +573,7 @@ git push origin feature/ma-feature
 - [ ] Lint OK (`npm run lint`)
 - [ ] Types OK (`npm run type-check`)
 - [ ] Accessibilité vérifiée (axe DevTools)
+- [ ] RLS policies validées
 - [ ] Storybook mis à jour
 - [ ] Documentation à jour
 
@@ -567,3 +603,7 @@ MIT License - Voir [LICENSE](./LICENSE) pour plus de détails.
 <p align="center">
   <a href="https://emotions-care.lovable.app">🌐 emotions-care.lovable.app</a>
 </p>
+
+---
+
+*Dernière mise à jour : Février 2026*
