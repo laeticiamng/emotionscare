@@ -3,6 +3,18 @@
  * Ces hooks ne sont pas liés à une feature métier spécifique
  */
 
+// ===== UNIFIED HOOKS (RECOMMANDÉS) =====
+export { 
+  useMoodUnified, 
+  useAIRouter,
+  type MoodState,
+  type MoodEntry,
+  type SessionState,
+  type MoodStats,
+  type AIRecommendation,
+  type UserContext,
+} from '@/hooks/unified';
+
 // ===== ÉTAT & STOCKAGE =====
 export { useLocalStorage } from '@/hooks/useLocalStorage';
 export { useDebounce } from '@/hooks/useDebounce';
