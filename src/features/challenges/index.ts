@@ -12,6 +12,18 @@
 export { WeeklyChallengesPanel } from '@/components/challenges/WeeklyChallengesPanel';
 
 // ============================================================================
+// SERVICE
+// ============================================================================
+
+export { ChallengesService } from './challengesService';
+export type {
+  WeeklyChallenge,
+  DailyChallenge,
+  ChallengeProgress,
+  ChallengeStats
+} from './challengesService';
+
+// ============================================================================
 // HOOKS
 // ============================================================================
 export { useWeeklyChallenges } from '@/hooks/useWeeklyChallenges';
@@ -25,7 +37,7 @@ export { useNeonChallenge } from '@/hooks/useNeonChallenge';
 // ============================================================================
 // TYPES
 // ============================================================================
-export type { WeeklyChallenge, UserWeeklyProgress } from '@/hooks/useWeeklyChallenges';
+export type { UserWeeklyProgress } from '@/hooks/useWeeklyChallenges';
 
 export interface Challenge {
   id: string;
@@ -38,12 +50,4 @@ export interface Challenge {
   progress: number;
   completed: boolean;
   expires_at?: string;
-}
-
-export interface ChallengeProgress {
-  challenge_id: string;
-  user_id: string;
-  progress: number;
-  completed_at?: string;
-  streak: number;
 }
