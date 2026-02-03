@@ -1,105 +1,65 @@
 # 🧠 EmotionsCare — Plateforme de Bien-Être Émotionnel
 
 > **"Prendre soin de celles et ceux qui prennent soin"**  
-> Plateforme premium de gestion du bien-être émotionnel pour les professionnels de santé et les étudiants en médecine.
+> Plateforme de gestion du bien-être émotionnel pour les professionnels de santé et les étudiants en médecine.
 
-[![Production Ready](https://img.shields.io/badge/status-production--ready-success)](https://emotions-care.lovable.app)
-[![Audit Score](https://img.shields.io/badge/audit-100%2F100-brightgreen)](./docs/AUDIT_COMPLET_TOP5_2026-02-01.md)
-[![Security](https://img.shields.io/badge/security-hardened-green)](./docs/SECURITY_PRIVACY.md)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61dafb)](https://reactjs.org/)
-[![Accessibility](https://img.shields.io/badge/WCAG-2.1%20AA-green)](https://www.w3.org/WAI/WCAG21/quickref/)
-[![Edge Functions](https://img.shields.io/badge/Edge%20Functions-235+-purple)](https://supabase.com/edge-functions)
-[![Modules](https://img.shields.io/badge/Modules-33+-orange)](./src/features)
-[![Routes](https://img.shields.io/badge/Routes-225+-blue)](./src/routerV2)
-[![Tables](https://img.shields.io/badge/Tables-723+-teal)](./supabase/migrations)
-[![Premium APIs](https://img.shields.io/badge/Premium%20APIs-11-gold)](./docs/INTEGRATIONS.md)
+[![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E.svg)](https://supabase.io/)
 
 ---
 
-## 📋 Table des Matières
+## 📊 État Réel du Projet (Février 2026)
 
-- [🎯 Vue d'Ensemble](#-vue-densemble)
-- [🏥 Public Cible](#-public-cible)
-- [✨ Fonctionnalités Principales](#-fonctionnalités-principales)
-- [🚀 Stack Technique Premium](#-stack-technique-premium)
-- [🔌 Intégrations Premium (11 APIs)](#-intégrations-premium-11-apis)
-- [🗂️ Architecture du Projet](#️-architecture-du-projet)
-- [🚀 Démarrage Rapide](#-démarrage-rapide)
-- [🔐 Sécurité & Conformité](#-sécurité--conformité)
-- [♿ Accessibilité](#-accessibilité)
-- [📈 Performances](#-performances)
-- [🧪 Tests](#-tests)
-- [📚 Documentation](#-documentation)
-- [🗺️ Roadmap 2026](#️-roadmap-2026)
-- [🤝 Contribution](#-contribution)
-- [📞 Support](#-support)
+### Métriques Vérifiées
 
----
+| Métrique | Valeur | Vérification |
+|----------|--------|--------------|
+| **Tables Supabase** | 723 | ✅ `SELECT COUNT(*) FROM information_schema.tables` |
+| **Edge Functions (avec serve())** | 261 | ✅ Scan `serve(async` dans supabase/functions |
+| **Features Modules** | 33 | ✅ Comptage dossiers src/features/ |
+| **Fichiers de Tests** | 194 | ✅ Scan fichiers `.test.ts/.spec.ts` |
 
-## 🚀 Nouvel Utilisateur ? Commencez Ici !
+### Maturité des Modules
 
-> **Essai gratuit 30 jours** — Aucune carte bancaire requise
+| Module | Statut | Détails |
+|--------|--------|---------|
+| **Scan Émotionnel** | ✅ Production | Analyse IA (Gemini), multi-sources |
+| **Respiration** | ✅ Production | 3 patterns, stats, streaks |
+| **Journal** | ✅ Production | Vocal/texte, analyse IA, prompts |
+| **Coach IA** | ✅ Production | Chat conversationnel, mémoire |
+| **Musicothérapie** | ✅ Production | Génération Suno, playlists |
+| **Gamification XP** | ✅ Production | XP, badges, niveaux, streaks |
+| **VR Galaxy/Breath** | 🔶 Partiel | Orchestrateurs OK, UI basique |
+| **Mood Mixer** | 🔶 Partiel | Backend OK, UI à compléter |
+| **Story Synth Lab** | 🔶 Partiel | Génération OK, streaming SSE |
+| **Guildes/Tournois** | 🔶 Partiel | Edge functions OK, UI en maquette |
+| **AR Filters** | 🔸 Maquette | Infrastructure prête, non finalisé |
+| **Boss Level Grit** | 🔸 Maquette | Backend existe, UI incomplète |
+| **Dashboard B2B RH** | 🔶 Partiel | Métriques basiques, heatmaps en cours |
 
-| Étape | Action |
-|-------|--------|
-| 1️⃣ | **[Créer un compte](https://emotions-care.lovable.app/signup)** - Inscription en 30 secondes |
-| 2️⃣ | **Scan émotionnel** - Laissez l'IA analyser votre état en temps réel |
-| 3️⃣ | **Parcours guidé** - Respiration → Coach IA → Journal |
+**Légende :** ✅ Production-ready | 🔶 Fonctionnel mais incomplet | 🔸 Maquette/Prototype
 
-### Parcours utilisateur principal (Onboarding Loop)
+### Tests - État Réel
 
-```
-📊 Scan Émotionnel → 🤖 Coach IA Nyvée → 📓 Journal
-         ↑                                    ↓
-         └──────────── Répéter ──────────────┘
-```
-
-Ce cycle de 15 minutes maximum vous aide à :
-- **Identifier** votre état émotionnel actuel
-- **Réguler** avec des techniques validées scientifiquement
-- **Consolider** vos apprentissages par l'écriture
-
----
-
-## 🎯 Vue d'Ensemble
-
-**EmotionsCare** est une solution SaaS complète de gestion du bien-être émotionnel combinant intelligence artificielle de pointe, gamification immersive et expériences multisensorielles. Elle aide les professionnels de santé à réguler leurs émotions pour prévenir le burnout et améliorer leur qualité de soins.
-
-### État de la Plateforme (Février 2026)
-
-| Métrique | Valeur |
-|----------|--------|
-| **Score Audit** | 100/100 ✅ |
-| **Score Sécurité RLS** | Hardened 🔒 |
-| **Modules Features** | 33 opérationnels |
-| **Edge Functions** | 235+ déployées |
-| **Tables Supabase** | 723+ avec RLS |
-| **Routes** | 225+ enregistrées |
-| **Services** | 120+ services métier |
-| **Hooks** | 549+ custom hooks |
-| **Pages** | 150+ pages complètes |
-| **Premium APIs** | 11 intégrées |
-| **Tests** | 1500+ unitaires, 80+ E2E |
-
-### Proposition de Valeur
-
-| Pour | Bénéfice |
-|------|----------|
-| **Étudiants en santé** | Développer la résilience émotionnelle dès la formation |
-| **Soignants** | Prévenir le burnout et maintenir l'empathie |
-| **Établissements** | Analytics RH anonymisés pour améliorer le bien-être collectif |
+| Type | Fichiers | Couverture | Notes |
+|------|----------|------------|-------|
+| Types/Validation | ~50 | ✅ Bonne | GroupSessions, Journal, etc. |
+| Hooks | ~20 | 🔶 Partielle | Couverture à améliorer |
+| Services | ~15 | 🔶 Partielle | Tests basiques |
+| E2E Playwright | ~30 | 🔶 Partielle | Navigation, RGPD |
+| Accessibilité auto | ~5 | 🔸 Faible | À développer |
 
 ---
 
 ## 🏥 Public Cible
 
-> **Focus vertical : Healthcare**
+> **Focus : Professionnels de santé**
 
 - 👨‍⚕️ **Médecins** (généralistes, spécialistes)
 - 👩‍⚕️ **Infirmiers/Infirmières**
 - 🎓 **Étudiants en médecine/soins infirmiers**
-- 🏥 **Personnel EHPAD**
+- 🏥 **Personnel hospitalier**
 - 🏨 **Cliniques et hôpitaux** (B2B)
 - 🎓 **Écoles de médecine** (B2B)
 
@@ -506,15 +466,15 @@ npm run update:matrix # Mise à jour feature matrix
 
 ## 🧪 Tests
 
-### Couverture
+### État Réel de la Couverture
 
-| Type | Objectif | Actuel |
-|------|----------|--------|
-| **Unitaires** | ≥ 90% lignes | 92% ✅ |
-| **Intégration** | ≥ 80% | 85% ✅ |
-| **E2E** | Parcours critiques | 80+ scénarios ✅ |
-| **Accessibilité** | 0 erreurs axe-core | ✅ |
-| **RLS** | 100% tables critiques | ✅ |
+| Type | Fichiers | État |
+|------|----------|------|
+| **Types/Validation** | ~50 | ✅ Bonne couverture |
+| **Hooks** | ~20 | 🔶 Partielle - à améliorer |
+| **Services** | ~15 | 🔶 Tests basiques |
+| **E2E Playwright** | ~30 | 🔶 Navigation, RGPD |
+| **Accessibilité** | ~5 | 🔸 À développer |
 
 ### Commandes
 
@@ -522,45 +482,77 @@ npm run update:matrix # Mise à jour feature matrix
 npm run test              # Tests unitaires Vitest
 npm run test:coverage     # Avec couverture
 npm run test:e2e          # Tests Playwright
-npm run test:a11y         # Tests accessibilité
 ```
+
+### Axes d'Amélioration
+
+- [ ] Tests unitaires exhaustifs pour tous les hooks
+- [ ] Tests d'intégration des Edge Functions
+- [ ] Tests accessibilité automatisés (axe-core)
+- [ ] Couverture > 80% sur modules critiques
+
+---
+
+## ⚠️ Limitations Connues
+
+### Modules Partiels
+
+1. **VR Galaxy/Breath** : Orchestrateurs backend fonctionnels, UI 3D basique
+2. **AR Filters** : Infrastructure MediaPipe prête, filtres non finalisés
+3. **Boss Level Grit** : Edge function existe, interface utilisateur incomplète
+4. **Mood Mixer** : Backend OK avec simulation, UI à enrichir
+5. **Guildes/Tournois** : Backend OK, composants UI en maquette
+
+### Tests
+
+- Couverture inférieure aux objectifs sur certains modules
+- Tests d'accessibilité automatisés à développer
+- Tests de performance (Lighthouse) non automatisés
+
+### Documentation
+
+- Certains guides API référencés sont à compléter
+- Documentation des Edge Functions à enrichir
+
+### B2B
+
+- Dashboard RH avec métriques basiques
+- Heatmaps émotionnels en cours de développement
+- SSO/SCIM non finalisé
 
 ---
 
 ## 📚 Documentation
 
-| Document | Description |
-|----------|-------------|
-| [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) | Architecture technique complète |
-| [`docs/SECURITY_PRIVACY.md`](./docs/SECURITY_PRIVACY.md) | Sécurité et conformité RGPD |
-| [`docs/API_REFERENCE.md`](./docs/API_REFERENCE.md) | Référence des Edge Functions |
-| [`docs/INTEGRATIONS.md`](./docs/INTEGRATIONS.md) | Guide des 11 APIs premium |
-| [`docs/GAMIFICATION.md`](./docs/GAMIFICATION.md) | Système de gamification |
-| [`docs/B2B_FEATURES.md`](./docs/B2B_FEATURES.md) | Fonctionnalités entreprise |
-| [`docs/ACCESSIBILITY.md`](./docs/ACCESSIBILITY.md) | Guide accessibilité |
-| [`CONTRIBUTING.md`](./CONTRIBUTING.md) | Guide de contribution |
+| Document | Description | Statut |
+|----------|-------------|--------|
+| [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) | Architecture technique | ✅ |
+| [`docs/SECURITY_PRIVACY.md`](./docs/SECURITY_PRIVACY.md) | Sécurité et RGPD | ✅ |
+| [`docs/API_REFERENCE.md`](./docs/API_REFERENCE.md) | Référence Edge Functions | 🔶 |
+| [`docs/INTEGRATIONS.md`](./docs/INTEGRATIONS.md) | Guide APIs premium | ✅ |
+| [`docs/GAMIFICATION.md`](./docs/GAMIFICATION.md) | Système gamification | ✅ |
+| [`CONTRIBUTING.md`](./CONTRIBUTING.md) | Guide contribution | ✅ |
 
 ---
 
 ## 🗺️ Roadmap 2026
 
-### Q1 2026 (Actuel)
-- [x] ✅ Intégration 11 APIs premium
-- [x] ✅ Gamification complète (Guildes, Tournois, Challenges)
-- [x] ✅ AI Wellness Assistant (Perplexity + ElevenLabs)
-- [x] ✅ 723+ tables avec RLS durcie
-- [ ] 🔄 Application mobile React Native
+### Q1 2026 (En cours)
+- [x] ✅ Modules core opérationnels (Scan, Breath, Journal, Coach, Music)
+- [x] ✅ Gamification de base (XP, badges, streaks)
+- [x] ✅ 261 Edge Functions déployées
+- [ ] 🔄 Finalisation modules partiels (VR, Guildes, Tournois)
+- [ ] 🔄 Amélioration couverture tests
 
 ### Q2 2026
-- [ ] 🎯 Wearables avancés (Apple Watch, Garmin, Oura)
-- [ ] 🎯 VR standalone (Meta Quest 3)
-- [ ] 🎯 Marketplace d'exercices communautaires
-- [ ] 🎯 Certifications professionnelles
+- [ ] Application mobile React Native
+- [ ] VR standalone (Meta Quest 3)
+- [ ] Dashboard B2B complet
 
 ### Q3-Q4 2026
-- [ ] 🔮 IA prédictive burnout
-- [ ] 🔮 Intégration DMP (Dossier Médical Partagé)
-- [ ] 🔮 Expansion internationale (EU, US, CA)
+- [ ] Wearables avancés (Apple Watch, Garmin)
+- [ ] IA prédictive burnout
+- [ ] Certification HDS
 
 ---
 
@@ -584,14 +576,12 @@ npm run test
 |-------|---------|
 | **Email** | support@emotionscare.app |
 | **Documentation** | [docs.emotionscare.app](https://docs.emotionscare.app) |
-| **Status** | [status.emotionscare.app](https://status.emotionscare.app) |
-| **DPO** | dpo@emotionscare.app |
 
 ---
 
 ## 📄 Licence
 
-MIT License — Voir [`LICENSE`](./LICENSE)
+Propriétaire — © 2024-2026 EmotionsCare. Tous droits réservés.
 
 ---
 
@@ -599,8 +589,6 @@ MIT License — Voir [`LICENSE`](./LICENSE)
 
 **Fait avec ❤️ pour les soignants**
 
-[![EmotionsCare](https://img.shields.io/badge/EmotionsCare-Bien--être%20Émotionnel-blue?style=for-the-badge)](https://emotions-care.lovable.app)
-
-*Dernière mise à jour : Février 2026*
+*Dernière mise à jour : 3 février 2026*
 
 </div>
