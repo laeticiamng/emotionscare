@@ -57,7 +57,8 @@ vi.mock('@/contexts/AuthContext', () => ({
     isAuthenticated: true,
     isLoading: false,
   }),
-  AuthProvider: ({ children }: { children: ReactNode }) => <>{children}</>,
+  AuthProvider: ({ children }: { children: ReactNode }) => 
+    React.createElement(React.Fragment, null, children),
 }));
 
 // Test wrapper
@@ -69,13 +70,12 @@ function createWrapper() {
     },
   });
   
-  const Wrapper = ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        {children}
-      </BrowserRouter>
-    </QueryClientProvider>
-  );
+  const Wrapper = ({ children }: { children: ReactNode }) => 
+    React.createElement(
+      QueryClientProvider,
+      { client: queryClient },
+      React.createElement(BrowserRouter, null, children)
+    );
   
   return Wrapper;
 }
