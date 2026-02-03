@@ -5,49 +5,62 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock Supabase
+// Mock Supabase avec chaînage complet
+const createMockChain = (finalData: unknown, finalError: unknown = null) => {
+  const chain: Record<string, unknown> = {};
+  const methods = ['select', 'eq', 'order', 'limit', 'insert', 'update', 'delete', 'upsert', 'single', 'gte', 'lte'];
+  
+  methods.forEach(method => {
+    chain[method] = vi.fn(() => chain);
+  });
+  
+  // Make it thenable
+  Object.defineProperty(chain, 'then', {
+    value: (resolve: (value: unknown) => void) => Promise.resolve({ data: finalData, error: finalError }).then(resolve)
+  });
+  
+  return chain;
+};
+
+const mockConnections = [
+  {
+    id: 'conn-1',
+    user_id: 'user-1',
+    provider: 'apple_health',
+    connected_at: '2026-01-15',
+    last_sync_at: '2026-02-01',
+    status: 'connected',
+    permissions: ['heart_rate', 'steps', 'sleep'],
+    device_name: 'Apple Watch Series 9'
+  },
+  {
+    id: 'conn-2',
+    user_id: 'user-1',
+    provider: 'garmin',
+    connected_at: '2026-01-20',
+    last_sync_at: '2026-02-01',
+    status: 'connected',
+    permissions: ['heart_rate', 'hrv', 'stress'],
+    device_name: 'Garmin Venu 3'
+  }
+];
+
+const mockDataPoints = [
+  { id: 'dp-1', user_id: 'user-1', provider: 'apple_health', metric_type: 'heart_rate', value: 72, unit: 'bpm', recorded_at: '2026-02-01T10:00:00Z', synced_at: '2026-02-01T10:05:00Z' },
+  { id: 'dp-2', user_id: 'user-1', provider: 'garmin', metric_type: 'steps', value: 8500, unit: 'steps', recorded_at: '2026-02-01T18:00:00Z', synced_at: '2026-02-01T18:05:00Z' }
+];
+
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => Promise.resolve({
-          data: [
-            {
-              id: 'conn-1',
-              user_id: 'user-1',
-              provider: 'apple_health',
-              connected_at: '2026-01-15',
-              last_sync_at: '2026-02-01',
-              status: 'connected',
-              permissions: ['heart_rate', 'steps', 'sleep'],
-              device_name: 'Apple Watch Series 9'
-            },
-            {
-              id: 'conn-2',
-              user_id: 'user-1',
-              provider: 'garmin',
-              connected_at: '2026-01-20',
-              last_sync_at: '2026-02-01',
-              status: 'connected',
-              permissions: ['heart_rate', 'hrv', 'stress'],
-              device_name: 'Garmin Venu 3'
-            }
-          ],
-          error: null
-        })),
-        gte: vi.fn(() => ({
-          order: vi.fn(() => Promise.resolve({
-            data: [
-              { id: 'dp-1', metric_type: 'heart_rate', value: 72, recorded_at: '2026-02-01' }
-            ],
-            error: null
-          }))
-        }))
-      })),
-      update: vi.fn(() => ({
-        eq: vi.fn(() => Promise.resolve({ error: null }))
-      }))
-    })),
+    from: vi.fn((table: string) => {
+      if (table === 'wearable_connections') {
+        return createMockChain(mockConnections);
+      }
+      if (table === 'health_data_points') {
+        return createMockChain(mockDataPoints);
+      }
+      return createMockChain([]);
+    }),
     functions: {
       invoke: vi.fn((fnName) => {
         if (fnName === 'wearables-sync') {
