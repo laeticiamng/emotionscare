@@ -21,14 +21,8 @@ import {
 } from '@/lib/validations/auth';
 import { B2CLoginPage } from '@/pages/b2c/login';
 
-const UnifiedLoginPage: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const segment = (searchParams.get('segment') as 'b2c' | 'b2b' | null) ?? 'b2c';
-
-  if (segment === 'b2c') {
-    return <B2CLoginPage />;
-  }
-
+/** Inner component for B2B login – all hooks called unconditionally */
+const B2BLoginForm: React.FC<{ segment: string }> = ({ segment }) => {
   const navigate = useNavigate();
 
   // État pour les formulaires
@@ -368,6 +362,17 @@ const UnifiedLoginPage: React.FC = () => {
       </div>
     </div>
   );
+};
+
+const UnifiedLoginPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const segment = (searchParams.get('segment') as 'b2c' | 'b2b' | null) ?? 'b2c';
+
+  if (segment === 'b2c') {
+    return <B2CLoginPage />;
+  }
+
+  return <B2BLoginForm segment={segment} />;
 };
 
 export default UnifiedLoginPage;

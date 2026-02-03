@@ -197,7 +197,7 @@ export default defineConfig(({ mode }) => ({
   build: {
     target: 'esnext',
     minify: 'terser',
-    sourcemap: mode === 'production' ? false : true,
+    sourcemap: mode === 'production' ? 'hidden' : true,
     chunkSizeWarningLimit: 500, // 500KB warning
     // Ignorer les erreurs TypeScript des edge functions
     rollupOptions: {

@@ -582,7 +582,6 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
         <section
           ref={featuresSection.ref}
           className="py-20 bg-background"
-          role="region"
           aria-labelledby="features-section-heading"
         >
           {featuresSection.isVisible ? (
@@ -763,7 +762,6 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
         <section
           ref={testimonialsSection.ref}
           className="py-20 bg-background"
-          role="region"
           aria-labelledby="testimonials-heading"
         >
           {testimonialsSection.isVisible ? (

@@ -48,10 +48,6 @@ export function PanasSuggestionsCard({ composer }: PanasSuggestionsCardProps) {
     hasConsent,
   } = usePanasSuggestions({ enabled: assessEnabled })
 
-  if (!assessEnabled) {
-    return null
-  }
-
   const sanitizedSuggestions = useMemo(
     () =>
       suggestions.map(item => ({
@@ -60,6 +56,10 @@ export function PanasSuggestionsCard({ composer }: PanasSuggestionsCardProps) {
       })),
     [suggestions],
   )
+
+  if (!assessEnabled) {
+    return null
+  }
 
   const handleUseSuggestion = (suggestion: PanasSuggestion) => {
     const plain = suggestionToPlainText(suggestion)

@@ -474,8 +474,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     role: 'consumer',
     layout: 'simple',
     component: 'CollaborativePlaylistPage',
-    guard: false,
-    requireAuth: false,
+    guard: true,
+    requireAuth: true,
   },
   {
     name: 'parcours-xl',
@@ -1317,7 +1317,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
   },
   {
-    name: 'faq',
+    name: 'app-faq',
     path: '/app/faq',
     segment: 'public',
     layout: 'simple',
@@ -1479,13 +1479,13 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   },
   {
     name: 'settings-notifications',
-    path: '/settings/notifications',
+    path: '/app/settings/notifications',
     segment: 'consumer',
     role: 'consumer',
     layout: 'app-sidebar',
     component: 'B2CNotificationsPage',
     guard: true,
-    aliases: ['/notifications'],
+    aliases: ['/notifications', '/settings/notifications'],
   },
   {
     name: 'settings-journal',
@@ -2613,20 +2613,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       description: 'Rapport de santé et audit complet de la plateforme',
     },
   },
-  {
-    name: 'context-lens',
-    path: '/app/context-lens',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'ContextLensPage',
-    guard: true,
-    requireAuth: true,
-    meta: {
-      title: 'Context Lens - EmotionsCare',
-      description: 'Analyse contextuelle et insights émotionnels',
-    },
-  },
+  // context-lens duplicate removed — primary at /app/context-lens (line ~930)
 
   // 404 FALLBACK ROUTE - Le fallback '*' est géré directement dans router.tsx
   // Cette entrée est gardée pour documentation mais n'est pas utilisée
