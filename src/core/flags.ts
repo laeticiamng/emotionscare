@@ -89,30 +89,33 @@ export interface FeatureFlags {
 export type FeatureFlagKey = keyof FeatureFlags;
 
 // Default flags - can be overridden by API or role
+// ⚠️ IMPORTANT: Ces flags reflètent l'état RÉEL des modules
+// true = Production/Beta (fonctionnel)
+// false = Alpha/Planifié (non prêt)
 export const DEFAULT_FLAGS: FeatureFlags = {
-  // Core features
+  // Core features - PRODUCTION ✅
   FF_JOURNAL: true,
-  FF_NYVEE: false,
+  FF_NYVEE: false, // Planifié
   FF_DASHBOARD: true,
   FF_COACH: true,
   FF_MUSIC: true,
-  FF_PREMIUM_SUNO: true,
-  FF_VR: true,
+  FF_PREMIUM_SUNO: false, // Alpha - requiert API payante
+  FF_VR: false, // Alpha - orchestrateurs uniquement
   FF_COMMUNITY: true,
   FF_SOCIAL_COCON: true,
   
-  // B2C Features
+  // B2C Features - BETA 🔶
   FF_B2C_PORTAL: true,
   FF_MUSIC_THERAPY: true,
   FF_COACHING_AI: true,
-  FF_IMMERSIVE_SESSIONS: true,
+  FF_IMMERSIVE_SESSIONS: false, // Planifié
   
-  // Orchestration
+  // Orchestration - BETA 🔶
   FF_ORCH_COMMUNITY: true,
   FF_ORCH_SOCIAL_COCON: true,
-  FF_ORCH_AURAS: true,
+  FF_ORCH_AURAS: false, // Alpha
   FF_ORCH_AMBITION: true,
-  FF_ORCH_GRIT: true,
+  FF_ORCH_GRIT: false, // Alpha
   FF_ORCH_BUBBLE: true,
   FF_ORCH_MIXER: true,
   FF_ORCH_STORY: true,
@@ -120,19 +123,19 @@ export const DEFAULT_FLAGS: FeatureFlags = {
   FF_ORCH_SCREENSILK: true,
   FF_ORCH_WEEKLYBARS: true,
   
-  // B2B Features
+  // B2B Features - BETA 🔶
   FF_MANAGER_DASH: true,
   FF_B2B_RH: true,
-  FF_B2B_HEATMAP: true,
+  FF_B2B_HEATMAP: false, // Alpha
   FF_B2B_AGGREGATES: true,
   FF_B2B_ANALYTICS: true,
   
-  // Scores & Scan
+  // Scores & Scan - PRODUCTION ✅
   FF_SCORES: true,
   FF_SCAN: true,
   FF_SCAN_SAM: true,
   
-  // Clinical assessments
+  // Clinical assessments - PRODUCTION ✅
   FF_ASSESS_AGGREGATE: true,
   FF_ASSESS_WHO5: true,
   FF_ASSESS_STAI6: true,
@@ -155,10 +158,10 @@ export const DEFAULT_FLAGS: FeatureFlags = {
   FF_ASSESS_CVSQ: true,
   FF_ASSESS_SAM: true,
   
-  // Parcours XL Features
+  // Parcours XL Features - BETA 🔶
   FF_PARCOURS_XL: true,
   FF_AUTO_DETECT_HUME: true,
-  FF_VOICEOVER_VOCALS: false, // Suno vocals en phase 2
+  FF_VOICEOVER_VOCALS: false, // Phase 2
   FF_PARCOURS_EXTEND: true,
   FF_PARCOURS_FALLBACK: true,
   
