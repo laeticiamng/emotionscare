@@ -4,7 +4,7 @@ import { initReactI18next, useTranslation } from 'react-i18next';
 import fr from './locales/fr';
 import type { LocaleResources } from './types';
 
-export const SUPPORTED_LOCALES = ['fr', 'en'] as const;
+export const SUPPORTED_LOCALES = ['fr', 'en', 'es', 'de'] as const;
 export type AppLocale = (typeof SUPPORTED_LOCALES)[number];
 export const DEFAULT_LOCALE: AppLocale = 'fr';
 export const DEFAULT_NAMESPACE = 'common';
@@ -15,6 +15,8 @@ const loadedLocales = new Set<AppLocale>();
 const localeLoaders: Record<AppLocale, () => Promise<LocaleResources>> = {
   fr: async () => fr,
   en: () => import('./locales/en').then((module) => module.default),
+  es: () => import('./locales/es').then((module) => module.default),
+  de: () => import('./locales/de').then((module) => module.default),
 };
 
 let initPromise: Promise<I18nInstance> | null = null;
