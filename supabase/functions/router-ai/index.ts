@@ -45,22 +45,33 @@ serve(async (req) => {
   const startTime = Date.now();
 
   try {
-    // Auth
+    // Auth - Utiliser getClaims pour validation JWT
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return errorResponse('Authorization required', 401);
     }
 
+    const token = authHeader.replace('Bearer ', '');
+    
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
+    // Utiliser getClaims au lieu de getUser (plus fiable avec signing-keys)
+    const { data: claims, error: claimsError } = await supabase.auth.getClaims(token);
+    if (claimsError || !claims?.claims?.sub) {
+      console.error('[router-ai] Auth error:', claimsError);
       return errorResponse('Invalid token', 401);
     }
+
+    // Construire un objet user minimal depuis les claims
+    const user = {
+      id: claims.claims.sub,
+      email: claims.claims.email,
+      role: claims.claims.role,
+    };
 
     const body: RouterRequest = await req.json();
     const { action, payload = {} } = body;
