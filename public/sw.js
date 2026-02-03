@@ -1,16 +1,32 @@
 // Service Worker pour EmotionsCare PWA
 // Gère les notifications push en arrière-plan et le cache offline
 
-const CACHE_NAME = 'emotionscare-v2';
+const CACHE_NAME = 'emotionscare-v3';
 const OFFLINE_URL = '/offline.html';
+const OFFLINE_DATA_CACHE = 'emotionscare-offline-data';
 
-// Assets à mettre en cache
+// Assets statiques à mettre en cache
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/favicon.ico'
+  '/favicon.ico',
+  '/offline.html'
 ];
+
+// Routes disponibles hors ligne (fonctionnalités core)
+const OFFLINE_ROUTES = [
+  '/app/breath',
+  '/app/journal'
+];
+
+// Données de respiration disponibles hors ligne
+const BREATH_PATTERNS = {
+  '4-7-8': { inhale: 4, hold: 7, exhale: 8, name: 'Relaxation' },
+  '4-4-4-4': { inhale: 4, hold: 4, exhale: 4, holdEmpty: 4, name: 'Carré' },
+  '4-6-8': { inhale: 4, hold: 6, exhale: 8, name: 'Cohérence' },
+  '2-0-4': { inhale: 2, hold: 0, exhale: 4, name: 'Calmant' }
+};
 
 // Installation du Service Worker
 self.addEventListener('install', (event) => {
@@ -208,11 +224,19 @@ self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-offline-data') {
     event.waitUntil(syncOfflineData());
   }
+  
+  if (event.tag === 'sync-journal-drafts') {
+    event.waitUntil(syncJournalDrafts());
+  }
+  
+  if (event.tag === 'sync-breath-sessions') {
+    event.waitUntil(syncBreathSessions());
+  }
 });
 
 async function syncOfflineData() {
   try {
-    const cache = await caches.open('offline-data');
+    const cache = await caches.open(OFFLINE_DATA_CACHE);
     const requests = await cache.keys();
     
     for (const request of requests) {
@@ -234,6 +258,74 @@ async function syncOfflineData() {
   }
 }
 
+// Sync brouillons journal
+async function syncJournalDrafts() {
+  try {
+    const cache = await caches.open(OFFLINE_DATA_CACHE);
+    const draftResponse = await cache.match('journal-drafts');
+    
+    if (draftResponse) {
+      const drafts = await draftResponse.json();
+      
+      for (const draft of drafts) {
+        await fetch('/functions/v1/journal-ai-process', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(draft)
+        });
+      }
+      
+      await cache.delete('journal-drafts');
+      console.log('[SW] Journal drafts synced');
+    }
+  } catch (error) {
+    console.error('[SW] Journal sync failed:', error);
+    throw error;
+  }
+}
+
+// Sync sessions respiration
+async function syncBreathSessions() {
+  try {
+    const cache = await caches.open(OFFLINE_DATA_CACHE);
+    const sessionsResponse = await cache.match('breath-sessions');
+    
+    if (sessionsResponse) {
+      const sessions = await sessionsResponse.json();
+      
+      for (const session of sessions) {
+        await fetch('/functions/v1/breath-complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(session)
+        });
+      }
+      
+      await cache.delete('breath-sessions');
+      console.log('[SW] Breath sessions synced');
+    }
+  } catch (error) {
+    console.error('[SW] Breath sync failed:', error);
+    throw error;
+  }
+}
+
+// API pour sauvegarder données offline depuis l'app
+async function saveOfflineData(type, data) {
+  const cache = await caches.open(OFFLINE_DATA_CACHE);
+  const existing = await cache.match(type);
+  let items = [];
+  
+  if (existing) {
+    items = await existing.json();
+  }
+  
+  items.push({ ...data, savedAt: Date.now() });
+  
+  await cache.put(type, new Response(JSON.stringify(items)));
+  console.log(`[SW] Saved offline ${type}:`, items.length, 'items');
+}
+
 // Message handler pour communication avec l'app
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
@@ -247,6 +339,28 @@ self.addEventListener('message', (event) => {
       })
     );
   }
+  
+  // Sauvegarder brouillon journal hors ligne
+  if (event.data && event.data.type === 'SAVE_JOURNAL_DRAFT') {
+    event.waitUntil(saveOfflineData('journal-drafts', event.data.draft));
+    event.ports[0]?.postMessage({ success: true });
+  }
+  
+  // Sauvegarder session respiration hors ligne
+  if (event.data && event.data.type === 'SAVE_BREATH_SESSION') {
+    event.waitUntil(saveOfflineData('breath-sessions', event.data.session));
+    event.ports[0]?.postMessage({ success: true });
+  }
+  
+  // Récupérer patterns de respiration (toujours disponible offline)
+  if (event.data && event.data.type === 'GET_BREATH_PATTERNS') {
+    event.ports[0]?.postMessage({ patterns: BREATH_PATTERNS });
+  }
+  
+  // Vérifier si en mode offline
+  if (event.data && event.data.type === 'CHECK_ONLINE_STATUS') {
+    event.ports[0]?.postMessage({ online: navigator.onLine });
+  }
 });
 
-console.log('[SW] Service Worker loaded v2');
+console.log('[SW] Service Worker loaded v3 - Offline mode enabled');
