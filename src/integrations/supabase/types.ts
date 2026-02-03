@@ -851,6 +851,36 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_content_feedback: {
+        Row: {
+          comment: string | null
+          content_id: string
+          content_type: string
+          created_at: string | null
+          feedback_type: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          content_id: string
+          content_type: string
+          created_at?: string | null
+          feedback_type?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          content_id?: string
+          content_type?: string
+          created_at?: string | null
+          feedback_type?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_exam_history: {
         Row: {
           ai_generated: boolean | null
@@ -1942,6 +1972,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      audio_transcriptions: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          is_auto_generated: boolean | null
+          language: string | null
+          track_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          is_auto_generated?: boolean | null
+          language?: string | null
+          track_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_auto_generated?: boolean | null
+          language?: string | null
+          track_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       audit_alerts: {
         Row: {
@@ -15158,6 +15218,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      medical_content_validations: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string | null
+          id: string
+          review_notes: string | null
+          reviewed_at: string | null
+          status: string | null
+          updated_at: string | null
+          validator_credentials: string | null
+          validator_id: string | null
+          validator_name: string | null
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string | null
+          id?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+          validator_credentials?: string | null
+          validator_id?: string | null
+          validator_name?: string | null
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string | null
+          id?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+          validator_credentials?: string | null
+          validator_id?: string | null
+          validator_name?: string | null
+        }
+        Relationships: []
       }
       medical_learning_analytics: {
         Row: {
@@ -29952,6 +30054,10 @@ export type Database = {
       }
       check_recommendation_alerts: { Args: never; Returns: undefined }
       check_slow_generations: { Args: never; Returns: undefined }
+      check_user_owns_resource: {
+        Args: { _resource_user_id: string; _user_id: string }
+        Returns: boolean
+      }
       check_wellness_streak: {
         Args: { p_user_id: string }
         Returns: {
