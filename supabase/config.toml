@@ -57,6 +57,15 @@ verify_jwt = false
 [functions.marketplace-api]
 verify_jwt = false
 
+[functions.elevenlabs-tts]
+verify_jwt = false
+
+[functions.perplexity-search]
+verify_jwt = false
+
+[functions.firecrawl-scrape]
+verify_jwt = false
+
 [functions.implicit-assess]
 verify_jwt = false
 # ========================================

@@ -20,6 +20,22 @@ export * from './excelExportService';
 export * from './reportTemplateService';
 export * from './userRolesService';
 
+// ========================================
+// NOUVELLES APIs PREMIUM (#1 Mondiales)
+// ========================================
+
+// ElevenLabs - Text-to-Speech #1 mondial
+export { elevenlabsService } from './elevenlabs';
+export type { TTSOptions, TTSResult, WellnessVoice } from './elevenlabs';
+
+// Perplexity - AI Search #1 mondial
+export { perplexityService } from './perplexity';
+export type { SearchContext, SearchOptions, SearchResult, Citation } from './perplexity';
+
+// Firecrawl - Web Scraping #1 mondial
+export { firecrawlService } from './firecrawl';
+export type { ScrapeFormat, ScrapeOptions, CrawlOptions, ScrapeResult, CrawlResult } from './firecrawl';
+
 // Types et interfaces
 export type * from './types';
 
