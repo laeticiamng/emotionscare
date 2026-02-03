@@ -1,9 +1,14 @@
+/** Seuil de confidentialité minimum pour afficher une cellule */
+export const CONFIDENTIALITY_THRESHOLD = 5;
+
 export interface HeatmapCellInput {
   instrument: string;
   period: string;
   text: string;
   team?: string;
   action?: string;
+  /** Nombre de répondants - si < CONFIDENTIALITY_THRESHOLD, cellule masquée */
+  n?: number;
 }
 
 export interface HeatmapCell {
@@ -35,6 +40,13 @@ export function labelInstrument(key: string): string {
 
 export function mapSummariesToCells(entries: HeatmapCellInput[]): HeatmapCell[] {
   return entries
+    .filter((entry) => {
+      // Filtre par seuil de confidentialité si n est défini
+      if (entry.n !== undefined && entry.n < CONFIDENTIALITY_THRESHOLD) {
+        return false;
+      }
+      return true;
+    })
     .map((entry) => ({
       instrument: entry.instrument,
       period: entry.period,
@@ -42,7 +54,7 @@ export function mapSummariesToCells(entries: HeatmapCellInput[]): HeatmapCell[] 
       team: entry.team?.trim() || undefined,
       action: entry.action?.trim() || undefined,
     }))
-    .filter((entry) => entry.text.length > 0);
+    .filter((cell) => cell.text.length > 0);
 }
 
 interface DescriptorPattern {
