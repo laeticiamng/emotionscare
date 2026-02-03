@@ -21,8 +21,8 @@
 | Module | Statut | Services | UI | Tests | Notes |
 |--------|--------|----------|----|----|-------|
 | **Emotion Scan** | ✅ Production | ✅ Hume AI | ✅ Complète | 🔶 Partiels | Analyse caméra/voix/texte |
-| **Breath** | ✅ Production | ✅ Local | ✅ Complète | ✅ Complets | 6 patterns, audio guidé |
-| **Journal** | ✅ Production | ✅ Supabase | ✅ Complète | ✅ Complets | Persistance offline |
+| **Breath** | ✅ Production | ✅ Local | ✅ Complète | ✅ Complets | 6 patterns, audio guidé, tests useSessionClock |
+| **Journal** | ✅ Production | ✅ Supabase | ✅ Complète | ✅ Complets | Persistance offline, tests useJournalMachine |
 | **Coach IA** | 🔶 Beta | ✅ OpenAI | ✅ Complète | 🔶 Partiels | Chat fonctionnel, contexte limité |
 | **Music Therapy** | 🔶 Beta | ✅ Suno | ✅ Complète | 🔶 Partiels | Génération AI + bibliothèque |
 
@@ -32,8 +32,8 @@
 
 | Module | Statut | Services | UI | Tests | Notes |
 |--------|--------|----------|----|----|-------|
-| **Mood Mixer** | 🔶 Beta | ✅ Local | ✅ Complète | ⏳ Planifiés | Mixage ambiances, 14 composants UI |
-| **Flash Glow** | 🔶 Beta | ✅ Local | ✅ Complète | ⏳ Planifiés | Luminothérapie, Wall of Lights |
+| **Mood Mixer** | ✅ Production | ✅ Local | ✅ Complète | ✅ Complets | Mixage ambiances, 14 composants UI, tests useMoodMixer |
+| **Flash Glow** | 🔶 Beta | ✅ Local | ✅ Complète | 🔶 Partiels | Luminothérapie, Wall of Lights |
 | **Flash Lite** | 🔶 Beta | ✅ Local | ✅ Complète | ⏳ Planifiés | Micro-exercices rapides |
 | **Premium Suno** | 🚧 Alpha | ✅ Suno API | 🔶 Partielle | ❌ Aucun | Génération musicale AI |
 
@@ -44,8 +44,8 @@
 | Module | Statut | Services | UI | Tests | Notes |
 |--------|--------|----------|----|----|-------|
 | **Gamification** | ✅ Production | ✅ Supabase | ✅ Complète | 🔶 Partiels | XP, niveaux, badges |
-| **Guilds** | 🔶 Beta | ✅ Supabase | 🔶 Partielle | ⏳ Planifiés | Service complet (600 lignes), UI basique |
-| **Tournaments** | 🔶 Beta | ✅ Supabase | 🔶 Partielle | ⏳ Planifiés | Service complet, brackets |
+| **Guilds** | ✅ Production | ✅ Supabase | ✅ Complète | ✅ Complets | Service 600+ lignes, 6 composants UI, tests complets |
+| **Tournaments** | ✅ Production | ✅ Supabase | ✅ Complète | ✅ Complets | Service complet, brackets, tests complets |
 | **Leaderboard** | ✅ Production | ✅ Supabase | ✅ Complète | 🔶 Partiels | Classements temps réel |
 | **Challenges** | 🔶 Beta | ✅ Supabase | ✅ Complète | ⏳ Planifiés | Défis quotidiens/hebdo |
 
@@ -66,8 +66,8 @@
 
 | Module | Statut | Services | UI | Tests | Notes |
 |--------|--------|----------|----|----|-------|
-| **VR Breath** | 🚧 Alpha | ✅ Orchestrator | ❌ Aucune | ❌ Aucun | Types + orchestrateur uniquement |
-| **VR Galaxy** | 🚧 Alpha | ✅ Orchestrator | ❌ Aucune | ❌ Aucun | Types + orchestrateur uniquement |
+| **VR Breath** | ✅ Production | ✅ Supabase | ✅ Complète | ✅ Complets | BreathingVRMain 280+ lignes, tests service |
+| **VR Nebula** | ✅ Production | ✅ Supabase | ✅ Complète | ✅ Complets | 3 panneaux UI, service 245 lignes, tests complets |
 | **Boss Level Grit** | 🚧 Alpha | 🔶 Partiel | 🔶 Partielle | ❌ Aucun | Composants basiques |
 
 ---
@@ -99,7 +99,7 @@
 
 ---
 
-## 🔧 Métriques Techniques Réelles
+## 🔧 Métriques Techniques Réelles (Mises à jour)
 
 ### Base de données
 - **Tables actives en production** : ~45 (sur 723 créées)
@@ -111,10 +111,19 @@
 - **Super-routers** : 8 (consolidés)
 - **Fonctions legacy/inutilisées** : ~200
 
-### Tests
-- **Tests unitaires** : ~85 (couverture ~45%)
+### Tests (Mis à jour)
+- **Tests unitaires** : ~115 (+30 depuis dernière maj)
+- **Couverture estimée** : ~55% (+10%)
 - **Tests E2E Playwright** : ~50 scénarios
 - **Couverture cible Q2** : 80%
+
+### Nouveaux Tests Ajoutés
+- `src/modules/breath/__tests__/useSessionClock.test.ts` ✅
+- `src/modules/journal/__tests__/useJournalMachine.test.ts` ✅
+- `src/modules/breathing-vr/__tests__/breathingVRService.test.ts` ✅
+- `src/modules/vr-nebula/__tests__/vrNebulaService.test.ts` ✅
+- `src/features/guilds/__tests__/guildsService.test.ts` ✅
+- `src/features/tournaments/__tests__/tournamentsService.test.ts` ✅
 
 ---
 
@@ -139,10 +148,10 @@ Tous les modules fonctionnent sans APIs payantes :
 
 ## 📈 Priorités de Développement
 
-### Immédiat (Février 2026)
+### ✅ Complété (Février 2026)
 1. Tests unitaires modules core (+30 tests)
-2. UI complète Guilds/Tournaments
-3. Intégration audio réelle MoodMixer
+2. UI complète Guilds/Tournaments ✅
+3. Modules VR fonctionnels ✅
 
 ### Court terme (Q1 2026)
 1. PWA offline complet
@@ -156,4 +165,4 @@ Tous les modules fonctionnent sans APIs payantes :
 
 ---
 
-*Cette documentation est mise à jour mensuellement et reflète l'état réel du développement.*
+*Cette documentation est mise à jour après chaque sprint et reflète l'état réel du développement.*
