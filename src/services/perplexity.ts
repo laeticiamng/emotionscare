@@ -25,7 +25,7 @@ export interface Citation {
 
 export interface SearchResult {
   answer: string;
-  citations: Citation[];
+  citations: (string | Citation)[];
   model: string;
 }
 
