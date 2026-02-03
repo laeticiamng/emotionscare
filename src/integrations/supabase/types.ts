@@ -262,6 +262,57 @@ export type Database = {
           },
         ]
       }
+      accessibility_settings: {
+        Row: {
+          audio_descriptions: boolean | null
+          captions_enabled: boolean | null
+          color_blind_mode: string | null
+          created_at: string
+          dyslexia_friendly_font: boolean | null
+          focus_indicators_enhanced: boolean | null
+          font_size_scale: number | null
+          high_contrast: boolean | null
+          id: string
+          keyboard_only_navigation: boolean | null
+          reduce_motion: boolean | null
+          screen_reader_optimized: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          audio_descriptions?: boolean | null
+          captions_enabled?: boolean | null
+          color_blind_mode?: string | null
+          created_at?: string
+          dyslexia_friendly_font?: boolean | null
+          focus_indicators_enhanced?: boolean | null
+          font_size_scale?: number | null
+          high_contrast?: boolean | null
+          id?: string
+          keyboard_only_navigation?: boolean | null
+          reduce_motion?: boolean | null
+          screen_reader_optimized?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          audio_descriptions?: boolean | null
+          captions_enabled?: boolean | null
+          color_blind_mode?: string | null
+          created_at?: string
+          dyslexia_friendly_font?: boolean | null
+          focus_indicators_enhanced?: boolean | null
+          font_size_scale?: number | null
+          high_contrast?: boolean | null
+          id?: string
+          keyboard_only_navigation?: boolean | null
+          reduce_motion?: boolean | null
+          screen_reader_optimized?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       achievements: {
         Row: {
           category: string
@@ -1982,6 +2033,7 @@ export type Database = {
           language: string | null
           track_id: string
           updated_at: string | null
+          user_id: string | null
         }
         Insert: {
           content: string
@@ -1991,6 +2043,7 @@ export type Database = {
           language?: string | null
           track_id: string
           updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
           content?: string
@@ -2000,6 +2053,7 @@ export type Database = {
           language?: string | null
           track_id?: string
           updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -6520,6 +6574,57 @@ export type Database = {
           user_agent?: string | null
           user_id?: string
           video_consent?: boolean | null
+        }
+        Relationships: []
+      }
+      content_validation_queue: {
+        Row: {
+          assigned_validator: string | null
+          content_id: string
+          content_text: string
+          content_type: string
+          created_at: string
+          id: string
+          medical_accuracy_score: number | null
+          priority: string
+          source_references: string[] | null
+          status: string
+          submitted_by: string | null
+          updated_at: string
+          validated_at: string | null
+          validation_notes: string | null
+        }
+        Insert: {
+          assigned_validator?: string | null
+          content_id: string
+          content_text: string
+          content_type: string
+          created_at?: string
+          id?: string
+          medical_accuracy_score?: number | null
+          priority?: string
+          source_references?: string[] | null
+          status?: string
+          submitted_by?: string | null
+          updated_at?: string
+          validated_at?: string | null
+          validation_notes?: string | null
+        }
+        Update: {
+          assigned_validator?: string | null
+          content_id?: string
+          content_text?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          medical_accuracy_score?: number | null
+          priority?: string
+          source_references?: string[] | null
+          status?: string
+          submitted_by?: string | null
+          updated_at?: string
+          validated_at?: string | null
+          validation_notes?: string | null
         }
         Relationships: []
       }
@@ -26913,6 +27018,69 @@ export type Database = {
           total_badges?: number
           user_id?: string
           zones_completed?: Json
+        }
+        Relationships: []
+      }
+      user_learning_preferences: {
+        Row: {
+          accessibility_mode: boolean | null
+          created_at: string
+          daily_goal_minutes: number | null
+          difficulty_preference: string | null
+          exam_date: string | null
+          focus_areas: string[] | null
+          gamification_enabled: boolean | null
+          id: string
+          music_enabled: boolean | null
+          notification_frequency: string | null
+          preferred_learning_style: string | null
+          session_duration_minutes: number | null
+          study_time_preference: string | null
+          updated_at: string
+          user_id: string
+          voice_enabled: boolean | null
+          weak_areas: string[] | null
+          weekly_goal_items: number | null
+        }
+        Insert: {
+          accessibility_mode?: boolean | null
+          created_at?: string
+          daily_goal_minutes?: number | null
+          difficulty_preference?: string | null
+          exam_date?: string | null
+          focus_areas?: string[] | null
+          gamification_enabled?: boolean | null
+          id?: string
+          music_enabled?: boolean | null
+          notification_frequency?: string | null
+          preferred_learning_style?: string | null
+          session_duration_minutes?: number | null
+          study_time_preference?: string | null
+          updated_at?: string
+          user_id: string
+          voice_enabled?: boolean | null
+          weak_areas?: string[] | null
+          weekly_goal_items?: number | null
+        }
+        Update: {
+          accessibility_mode?: boolean | null
+          created_at?: string
+          daily_goal_minutes?: number | null
+          difficulty_preference?: string | null
+          exam_date?: string | null
+          focus_areas?: string[] | null
+          gamification_enabled?: boolean | null
+          id?: string
+          music_enabled?: boolean | null
+          notification_frequency?: string | null
+          preferred_learning_style?: string | null
+          session_duration_minutes?: number | null
+          study_time_preference?: string | null
+          updated_at?: string
+          user_id?: string
+          voice_enabled?: boolean | null
+          weak_areas?: string[] | null
+          weekly_goal_items?: number | null
         }
         Relationships: []
       }
