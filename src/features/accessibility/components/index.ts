@@ -4,5 +4,4 @@
  */
 
 // Components
-export { AccessibilityPanel, default as AccessibilityPanelDefault } from './AccessibilityPanel';
-export type { AccessibilitySettings } from './AccessibilityPanel';
+export { AccessibilityPanel } from './AccessibilityPanel';
