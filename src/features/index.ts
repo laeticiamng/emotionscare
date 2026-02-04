@@ -1,7 +1,7 @@
 /**
  * Features Registry - Index central des features
  * Architecture Feature-First pour EmotionsCare
- * v3.1 - Audit Final
+ * v3.6 - Audit Final (37 features)
  */
 
 // ============================================================================
