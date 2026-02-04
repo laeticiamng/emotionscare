@@ -6,6 +6,9 @@
 // Export Utils
 export { exportNodeToPng } from './exportPng';
 
+// Components
+export { ExportDialog } from './components/ExportDialog';
+
 // Re-exports from hooks for compatibility
 export { useExportJob } from '@/hooks/useExportJob';
 export { useMultiFormatExport } from '@/hooks/useMultiFormatExport';
