@@ -4,10 +4,14 @@
  */
 
 // ============================================================================
+// COMPONENTS
+// ============================================================================
+export { FlashGlowSessionCard } from './components/FlashGlowSessionCard';
+
+// ============================================================================
 // HOOKS
 // ============================================================================
 export { useFlashGlowSession } from './hooks/useFlashGlowSession';
-
 // Re-exports from modules
 export {
   useFlashGlowMachine,

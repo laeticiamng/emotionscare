@@ -42,6 +42,8 @@ export { useCommunityRecommendations } from '@/hooks/useCommunityRecommendations
 // ============================================================================
 export { default as EmpathicRepliesPanel } from './EmpathicRepliesPanel';
 export { default as ListenTwoMinutesBanner } from './ListenTwoMinutesBanner';
+export { CommunityPostCard, type CommunityPost as CommunityPostCardProps } from './components/CommunityPostCard';
+export { SupportCircleWidget, type SupportCircle } from './components/SupportCircleWidget';
 export { CommunityPresetsGallery } from '@/components/community/CommunityPresetsGallery';
 
 // ============================================================================

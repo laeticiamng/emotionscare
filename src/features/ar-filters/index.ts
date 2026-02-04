@@ -310,3 +310,5 @@ export function useARFilters() {
 export { ARFiltersView } from './components/ARFiltersView';
 export { FilterCard } from './components/FilterCard';
 export { FilterPreview } from './components/FilterPreview';
+export { ARFilterCard } from './components/ARFilterCard';
+export { ARCameraPreview } from './components/ARCameraPreview';

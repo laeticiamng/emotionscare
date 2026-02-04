@@ -16,5 +16,9 @@ export { deriveBreathProfile, deriveGalaxyProfile } from './deriveProfile';
 // Types
 export * from './types';
 
+// Components
+export { VREnvironmentCard, type VREnvironment } from './components/VREnvironmentCard';
+export { VRSessionControls } from './components/VRSessionControls';
+
 // Re-exports from modules for compatibility
 export { VRGalaxyMain, useVRGalaxy } from '@/modules/vr-galaxy';
