@@ -281,13 +281,13 @@ describe('🔐 SECURITY - RGPD Compliance', () => {
     expect(exportData).toContain('sessions');
   });
 
-  it('should support data deletion', () => {
+  it('should support data deletion', async () => {
     const deleteUserData = async (userId: string) => {
       // Simulated deletion
       return { success: true, userId };
     };
     
-    expect(deleteUserData('user-123')).resolves.toHaveProperty('success', true);
+    await expect(deleteUserData('user-123')).resolves.toHaveProperty('success', true);
   });
 
   it('should track consent', () => {
