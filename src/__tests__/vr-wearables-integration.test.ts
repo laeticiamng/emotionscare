@@ -236,13 +236,15 @@ describe('Data Persistence', () => {
     expect(['vr', 'breath', 'meditation']).toContain(sessionData.type);
   });
 
-  it('should handle offline queue correctly', () => {
+  it('should handle offline queue correctly', async () => {
     const offlineQueue: any[] = [];
+    let timestampCounter = 0;
     
     const addToQueue = (action: any) => {
+      timestampCounter++; // Ensure unique incrementing timestamps
       offlineQueue.push({
         ...action,
-        timestamp: Date.now(),
+        timestamp: Date.now() + timestampCounter,
         retries: 0
       });
     };
@@ -251,6 +253,7 @@ describe('Data Persistence', () => {
     addToQueue({ type: 'session_end', data: {} });
     
     expect(offlineQueue.length).toBe(2);
+    // With incrementing counter, first timestamp is strictly less than second
     expect(offlineQueue[0].timestamp).toBeLessThan(offlineQueue[1].timestamp);
   });
 });

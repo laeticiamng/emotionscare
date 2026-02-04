@@ -335,6 +335,7 @@ describe('Sécurité et validation', () => {
   it('devrait valider les entrées utilisateur', () => {
     const validateDuration = (value: number) => {
       if (typeof value !== 'number') return false;
+      if (Number.isNaN(value)) return false;
       if (value < 1 || value > 60) return false;
       return true;
     };
