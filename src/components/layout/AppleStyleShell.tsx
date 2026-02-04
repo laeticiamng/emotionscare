@@ -82,7 +82,7 @@ const AppleStyleShell: React.FC<AppleStyleShellProps> = memo(({
 
   return (
     <div className={cn(
-      "min-h-screen bg-background text-foreground",
+      "relative min-h-screen bg-background text-foreground",
       className
     )} data-testid="page-root">
       {/* Skip to main content */}

@@ -37,7 +37,7 @@ logger.debug('✅ Root element found', undefined, 'SYSTEM');
 createRoot(rootElement).render(
   <StrictMode>
     <RootProvider>
-      <RouterProvider router={router} />
+      <RouterProvider router={router} future={{ v7_startTransition: true }} />
     </RootProvider>
   </StrictMode>
 );
