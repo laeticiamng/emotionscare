@@ -7,7 +7,9 @@
 // COMPONENTS
 // ============================================================================
 export { default as FiveFourThreeTwoOneCard } from './FiveFourThreeTwoOneCard';
-
+export { GroundingSessionPlayer } from './components/GroundingSessionPlayer';
+export { GroundingTechniqueCard } from './components/GroundingTechniqueCard';
+export { GroundingProgressDashboard } from './components/GroundingProgressDashboard';
 // ============================================================================
 // TYPES
 // ============================================================================

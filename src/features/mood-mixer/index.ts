@@ -35,9 +35,16 @@ export {
 } from '@/modules/mood-mixer';
 
 // ============================================================================
+// LOCAL COMPONENTS
+// ============================================================================
+export { SoundLayerCard, type SoundLayer } from './components/SoundLayerCard';
+export { SoundLibrary, type Sound } from './components/SoundLibrary';
+
+// ============================================================================
 // LOCAL HOOKS
 // ============================================================================
 export { useMoodMixerSession } from './hooks/useMoodMixerSession';
+
 // ============================================================================
 // ADDITIONAL TYPES
 // ============================================================================
