@@ -30654,6 +30654,7 @@ export type Database = {
           schedule: string
         }[]
       }
+      get_current_user_id: { Args: never; Returns: string }
       get_current_user_role: { Args: never; Returns: string }
       get_current_week_bounds: {
         Args: never
