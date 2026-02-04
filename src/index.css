@@ -1,4 +1,7 @@
+/* Font loading optimized with font-display: swap */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Design system imports - defer non-critical styles */
 @import './styles/design-system.css';
 @import './styles/accessibility.css';
 @import './styles/base.css';

@@ -46,14 +46,26 @@
     <meta name="apple-mobile-web-app-orientations" content="portrait" />
     <link rel="apple-touch-startup-image" href="/icons/icon-512x512.png" />
     
-    <!-- Inter font (SF Pro alternative) -->
-    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <!-- Critical CSS: Inline basic styles for FCP -->
+    <style>
+      html, body, #root { height: 100%; margin: 0; }
+      #root { display: flex; flex-direction: column; min-height: 100vh; }
+      .loading-initial { display: flex; align-items: center; justify-content: center; height: 100vh; background: #fafafa; }
+      @media (prefers-color-scheme: dark) { .loading-initial { background: #0a0a0a; } }
+    </style>
+
+    <!-- Inter font with display=swap for faster FCP -->
+    <link rel="preload" href="https://rsms.me/inter/inter.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://rsms.me/inter/inter.css"></noscript>
     
-    <!-- Preload critical resources -->
+    <!-- Preconnect for faster resource loading -->
     <link rel="preconnect" href="https://rsms.me" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" as="audio" href="/audio/lofi-120.mp3" />
+    <link rel="preconnect" href="https://yaincoxihiqdksxgrsrk.supabase.co" crossorigin>
+    
+    <!-- Defer non-critical audio preload -->
+    <link rel="prefetch" as="audio" href="/audio/lofi-120.mp3" />
   </head>
   <body>
     <div id="root"></div>
