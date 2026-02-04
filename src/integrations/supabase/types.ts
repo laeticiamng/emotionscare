@@ -31298,7 +31298,7 @@ export type Database = {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
       }
-      is_owner: { Args: { resource_user_id: string }; Returns: boolean }
+      is_owner: { Args: { record_user_id: string }; Returns: boolean }
       is_room_host: {
         Args: { p_room_id: string; p_user_id: string }
         Returns: boolean
@@ -31306,6 +31306,13 @@ export type Database = {
       is_room_member: {
         Args: { p_room_id: string; p_user_id: string }
         Returns: boolean
+      }
+      list_changes: {
+        Args: never
+        Returns: {
+          change_data: Json
+          change_id: string
+        }[]
       }
       list_rls_policies: {
         Args: never
