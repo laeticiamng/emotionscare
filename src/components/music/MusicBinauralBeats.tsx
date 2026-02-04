@@ -20,7 +20,7 @@ interface BinauralPreset {
   description: string;
   baseFrequency: number;
   beatFrequency: number;
-  icon: React.ElementType;
+  icon: typeof Moon;
   color: string;
   benefits: string[];
 }
@@ -236,8 +236,8 @@ const MusicBinauralBeats = memo(() => {
 
           {!isCustomMode && (
             <div className="grid gap-2">
-                  {BINAURAL_PRESETS.map(preset => {
-                    const IconComponent = preset.icon;
+              {BINAURAL_PRESETS.map(preset => {
+                    const Icon = preset.icon;
                     const isSelected = selectedPreset.id === preset.id;
                     return (
                       <button
@@ -252,7 +252,7 @@ const MusicBinauralBeats = memo(() => {
                   >
                     <div className="flex items-center gap-3">
                       <div className={`p-2 rounded-full ${preset.color}`}>
-                        <IconComponent className="h-4 w-4 text-white" />
+                        <Icon className="h-4 w-4 text-white" />
                       </div>
                       <div className="flex-1">
                         <div className="font-medium">{preset.name}</div>
