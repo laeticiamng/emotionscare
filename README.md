@@ -556,6 +556,19 @@ npm run test:e2e          # Tests Playwright
 
 ---
 
+## 📚 Documentation Technique
+
+| Document | Description |
+|----------|-------------|
+| [`docs/API_REFERENCE.md`](./docs/API_REFERENCE.md) | Référence complète des 8 super-routers |
+| [`docs/GAMIFICATION_GUIDE.md`](./docs/GAMIFICATION_GUIDE.md) | Système XP, badges, guildes, tournois |
+| [`docs/RGPD_COMPLIANCE.md`](./docs/RGPD_COMPLIANCE.md) | Conformité RGPD, sécurité, droits utilisateurs |
+| [`docs/MODULE_STATUS.md`](./docs/MODULE_STATUS.md) | État réel de chaque module |
+| [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) | Architecture technique |
+| [`CONTRIBUTING.md`](./CONTRIBUTING.md) | Guide de contribution |
+
+---
+
 ## 🤝 Contribution
 
 Voir [`CONTRIBUTING.md`](./CONTRIBUTING.md) pour les guidelines.
@@ -575,6 +588,7 @@ npm run test
 | Canal | Contact |
 |-------|---------|
 | **Email** | support@emotionscare.app |
+| **DPO** | dpo@emotionscare.app |
 | **Documentation** | [docs.emotionscare.app](https://docs.emotionscare.app) |
 
 ---
@@ -589,6 +603,6 @@ Propriétaire — © 2024-2026 EmotionsCare. Tous droits réservés.
 
 **Fait avec ❤️ pour les soignants**
 
-*Dernière mise à jour : 3 février 2026*
+*Dernière mise à jour : 4 février 2026 - v2.7*
 
 </div>
