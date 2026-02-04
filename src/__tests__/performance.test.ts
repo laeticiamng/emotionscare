@@ -219,29 +219,29 @@ describe('⚡ PERFORMANCE - Rendering', () => {
 });
 
 describe('⚡ PERFORMANCE - Network', () => {
-  it('should implement request deduplication', () => {
+  it('should implement request deduplication', async () => {
     const pendingRequests = new Map<string, Promise<unknown>>();
     
-    const dedupedFetch = async (url: string) => {
+    const dedupedFetch = (url: string) => {
       if (pendingRequests.has(url)) {
-        return pendingRequests.get(url);
+        return pendingRequests.get(url)!;
       }
       
       const promise = Promise.resolve({ data: 'response' });
       pendingRequests.set(url, promise);
-      
-      try {
-        return await promise;
-      } finally {
-        pendingRequests.delete(url);
-      }
+      return promise;
     };
     
     // Multiple calls to same URL should return same promise
     const p1 = dedupedFetch('/api/data');
     const p2 = dedupedFetch('/api/data');
     
+    // Same promise reference means deduplication works
     expect(p1).toBe(p2);
+    
+    // Wait for resolution
+    const result = await p1;
+    expect(result).toEqual({ data: 'response' });
   });
 
   it('should batch API calls', async () => {

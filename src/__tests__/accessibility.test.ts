@@ -9,10 +9,14 @@ describe('♿ ACCESSIBILITY - ARIA Labels', () => {
   it('should have aria-label on icon buttons', () => {
     const button = document.createElement('button');
     button.setAttribute('aria-label', 'Fermer le menu');
-    button.innerHTML = '<svg>...</svg>';
+    // Use SVG without text content (icon only)
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    button.appendChild(svg);
     
     expect(button.getAttribute('aria-label')).toBe('Fermer le menu');
-    expect(button.textContent?.trim()).not.toBeTruthy(); // Icon only
+    // Icon buttons should not have visible text (only child is SVG)
+    expect(button.childNodes.length).toBe(1);
+    expect(button.firstChild?.nodeName.toLowerCase()).toBe('svg');
   });
 
   it('should have aria-labelledby for complex components', () => {
