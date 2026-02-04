@@ -462,3 +462,10 @@ export const scoresService = {
     return { level: 'Critique', color: 'text-red-500' };
   },
 };
+
+// ============================================================================
+// COMPONENTS
+// ============================================================================
+
+export { TrendIndicator, ScoreBreakdown } from './components';
+export type { TrendDirection, ScoreComponent } from './components';

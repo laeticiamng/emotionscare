@@ -11,6 +11,10 @@
 
 export { WeeklyChallengesPanel } from '@/components/challenges/WeeklyChallengesPanel';
 
+// Nouveaux composants enrichis
+export { ChallengeCard, DailyMissionsWidget } from './components';
+export type { Challenge as ChallengeCardType, DailyMission, DailyMissionsData } from './components';
+
 // ============================================================================
 // SERVICE
 // ============================================================================
