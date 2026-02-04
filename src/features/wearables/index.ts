@@ -120,3 +120,17 @@ export const wearablesUtils = {
     return factors > 0 ? Math.round(score / (factors + 1)) : 50;
   }
 };
+
+// ============================================================================
+// HOOKS
+// ============================================================================
+
+export { useWearables } from './hooks/useWearables';
+export type { UseWearablesReturn, HealthMetrics } from './hooks/useWearables';
+
+// ============================================================================
+// COMPONENTS
+// ============================================================================
+
+export { WearableCard } from './components/WearableCard';
+export { WearableHealthDashboard } from './components/WearableHealthDashboard';
