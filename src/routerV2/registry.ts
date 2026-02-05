@@ -431,6 +431,17 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
   },
   {
+    name: 'scan-questionnaire',
+    path: '/dashboard/scanner',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'simple',
+    component: 'QuestionnaireScannerPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/app/scan/questionnaire', '/scanner'],
+  },
+  {
     name: 'brain-viewer',
     path: '/app/brain-viewer',
     segment: 'consumer',
