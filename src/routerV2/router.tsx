@@ -250,6 +250,7 @@ const StorySynthPage = lazy(() => import('@/pages/b2c/B2CStorySynthLabPage'));
 const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
 const ErrorBoundaryTestPage = lazy(() => import('@/pages/dev/ErrorBoundaryTestPage'));
 const TestAccountsPage = lazy(() => import('@/pages/TestAccountsPage'));
+const SEOAuditPage = lazy(() => import('@/pages/admin/SEOAuditPage'));
 
 // Pages supplémentaires existantes
 const PublicAPIPage = lazy(() => import('@/pages/PublicAPIPage'));
@@ -578,6 +579,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ComprehensiveSystemAuditPage,
   ErrorBoundaryTestPage,
   TestAccountsPage,
+  SEOAuditPage,
   
   // Analytics & Weekly Bars
   B2CWeeklyBarsPage,
