@@ -53,13 +53,13 @@ export const PrivacyPolicyPage: React.FC = () => {
               </h2>
               <div className="bg-muted/50 p-4 rounded-lg space-y-2">
                 <p><strong>Responsable du traitement :</strong> EmotionsCare SASU</p>
-                <p><strong>Siège social :</strong> [Adresse du siège social à compléter]</p>
-                <p><strong>RCS :</strong> [Numéro RCS à compléter]</p>
-                <p><strong>SIRET :</strong> [Numéro SIRET à compléter]</p>
+                <p><strong>Siège social :</strong> Appartement 1, 5 rue Caudron, 80000 Amiens</p>
+                <p><strong>RCS :</strong> 944 505 445 R.C.S. Amiens</p>
+                <p><strong>SIRET :</strong> 944 505 445 00014</p>
                 <p><strong>Email :</strong> <a href="mailto:contact@emotionscare.com" className="text-primary">contact@emotionscare.com</a></p>
                 <p><strong>Délégué à la Protection des Données (DPO) :</strong><br />
                   Email : <a href="mailto:dpo@emotionscare.com" className="text-primary">dpo@emotionscare.com</a><br />
-                  Adresse : EmotionsCare SASU – DPO, [Adresse à compléter]
+                  Adresse : EmotionsCare SASU – DPO, 5 rue Caudron, 80000 Amiens
                 </p>
               </div>
             </section>
@@ -316,7 +316,7 @@ export const PrivacyPolicyPage: React.FC = () => {
                 </p>
                 <ul>
                   <li><strong>Email :</strong> <a href="mailto:dpo@emotionscare.com" className="text-primary hover:underline">dpo@emotionscare.com</a></li>
-                  <li><strong>Courrier :</strong> EmotionsCare SASU – DPO, [Adresse à compléter]</li>
+                  <li><strong>Courrier :</strong> EmotionsCare SASU – DPO, 5 rue Caudron, 80000 Amiens</li>
                   <li><strong>Formulaire en ligne :</strong> <Link to="/app/settings/privacy" className="text-primary hover:underline">Paramètres compte → RGPD</Link></li>
                 </ul>
                 <p className="text-sm mt-3">

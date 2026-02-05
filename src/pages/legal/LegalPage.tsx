@@ -81,20 +81,20 @@ export const LegalPage: React.FC = () => {
               <div>
                 <h3 className="font-semibold mb-2">Éditeur</h3>
                 <p className="text-sm text-muted-foreground">
-                  EmotionsCare
+                  EmotionsCare SASU
                   <br />
-                  Société par Actions Simplifiée
+                  Société par Actions Simplifiée Unipersonnelle
                   <br />
-                  Capital social : 10 000 €<br />
-                  SIRET : [À compléter]
+                  Capital social : 100,00 €<br />
+                  SIRET : 944 505 445 00014
                   <br />
-                  Siège social : France
+                  Siège social : Appartement 1, 5 rue Caudron, 80000 Amiens
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">Directeur de la publication</h3>
-                <p className="text-sm text-muted-foreground">[Nom du directeur]</p>
+                <h3 className="font-semibold mb-2">Directrice de la publication</h3>
+                <p className="text-sm text-muted-foreground">Laeticia Motongane, Présidente</p>
               </div>
 
               <div>

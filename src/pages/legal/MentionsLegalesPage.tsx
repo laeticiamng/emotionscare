@@ -43,12 +43,12 @@ export const MentionsLegalesPage: React.FC = () => {
               <div className="bg-muted/50 p-4 rounded-lg space-y-2">
                 <p><strong>Raison sociale :</strong> EmotionsCare SASU</p>
                 <p><strong>Forme juridique :</strong> Société par Actions Simplifiée Unipersonnelle</p>
-                <p><strong>Capital social :</strong> [À compléter]</p>
-                <p><strong>Siège social :</strong> [Adresse à compléter]</p>
-                <p><strong>RCS :</strong> [Numéro RCS à compléter]</p>
-                <p><strong>SIRET :</strong> [Numéro SIRET à compléter]</p>
-                <p><strong>N° TVA intracommunautaire :</strong> [À compléter]</p>
-                <p><strong>Directrice de la publication :</strong> Laeticia M., Présidente</p>
+                <p><strong>Capital social :</strong> 100,00 €</p>
+                <p><strong>Siège social :</strong> Appartement 1, 5 rue Caudron, 80000 Amiens</p>
+                <p><strong>RCS :</strong> 944 505 445 R.C.S. Amiens</p>
+                <p><strong>SIRET :</strong> 944 505 445 00014</p>
+                <p><strong>N° TVA intracommunautaire :</strong> FR71944505445</p>
+                <p><strong>Directrice de la publication :</strong> Laeticia Motongane, Présidente</p>
                 <p><strong>Email :</strong> contact@emotionscare.com</p>
               </div>
             </section>
@@ -77,7 +77,7 @@ export const MentionsLegalesPage: React.FC = () => {
               <p>
                 <strong>Délégué à la Protection des Données (DPO) :</strong><br />
                 Email : <a href="mailto:dpo@emotionscare.com" className="text-primary hover:underline">dpo@emotionscare.com</a><br />
-                Adresse : EmotionsCare SASU – DPO, [Adresse à compléter]
+                Adresse : EmotionsCare SASU – DPO, 5 rue Caudron, 80000 Amiens
               </p>
               <p>
                 Pour plus d'informations sur le traitement de vos données personnelles, consultez notre{' '}
@@ -171,7 +171,7 @@ export const MentionsLegalesPage: React.FC = () => {
               <p>Pour toute question concernant ces mentions légales :</p>
               <ul>
                 <li><strong>Email :</strong> <a href="mailto:legal@emotionscare.com" className="text-primary hover:underline">legal@emotionscare.com</a></li>
-                <li><strong>Courrier :</strong> EmotionsCare SASU - Service Juridique - [Adresse à compléter]</li>
+                <li><strong>Courrier :</strong> EmotionsCare SASU - Service Juridique - 5 rue Caudron, 80000 Amiens</li>
               </ul>
             </section>
 

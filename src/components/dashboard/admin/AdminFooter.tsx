@@ -1,11 +1,9 @@
-// @ts-nocheck
-
 import React from 'react';
 
 const AdminFooter: React.FC = () => {
   return (
     <div className="mt-8 text-center text-xs text-muted-foreground">
-      <p>Données sécurisées avec chiffrement AES-256 • Conforme RGPD</p>
+      <p>EmotionsCare SASU • SIRET 944 505 445 00014 • Données sécurisées • Conforme RGPD</p>
     </div>
   );
 };
