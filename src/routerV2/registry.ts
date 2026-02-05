@@ -1973,7 +1973,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       guard: false,
     },
     {
-      name: 'dev-error-boundary',
+      name: 'seo-audit',
+      path: '/admin/seo-audit',
+      segment: 'public',
+      layout: 'marketing',
+      component: 'SEOAuditPage',
+      guard: false,
+    },
+    {
       path: '/dev/error-boundary',
       segment: 'public',
       layout: 'marketing',
