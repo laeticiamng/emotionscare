@@ -474,10 +474,10 @@ const ActivityFeed: React.FC = () => {
               className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8"
             >
               {[
-                { label: '25K+', desc: 'Utilisateurs actifs', color: 'text-blue-500' },
-                { label: '150K+', desc: 'Sessions quotidiennes', color: 'text-green-500' },
-                { label: '98.7%', desc: 'Satisfaction', color: 'text-purple-500' },
-                { label: '24/7', desc: 'Support premium', color: 'text-orange-500' },
+                { label: '37', desc: 'Modules bien-être', color: 'text-blue-500' },
+                { label: '6', desc: 'Protocoles respiration', color: 'text-green-500' },
+                { label: '100%', desc: 'RGPD Conforme', color: 'text-purple-500' },
+                { label: '24/7', desc: 'Disponibilité', color: 'text-orange-500' },
               ].map((stat, i) => (
                 <motion.div
                   key={i}

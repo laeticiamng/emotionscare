@@ -177,19 +177,19 @@ const DemoPage: React.FC = () => {
       description: "Vos données restent privées et chiffrées"
     },
     {
-      icon: <Users className="w-5 h-5" />,
-      title: "50,000+ Utilisateurs",
-      description: "Une communauté active et bienveillante"
+      icon: <Zap className="w-5 h-5" />,
+      title: "Accessible 24/7",
+      description: "Disponible quand vous en avez besoin"
     },
     {
       icon: <Star className="w-5 h-5" />,
-      title: "4.8/5 étoiles",
-      description: "Note moyenne de satisfaction"
+      title: "Scientifiquement validé",
+      description: "Basé sur des protocoles reconnus"
     },
     {
-      icon: <Zap className="w-5 h-5" />,
-      title: "Résultats Rapides",
-      description: "Améliorations visibles en 7 jours"
+      icon: <Users className="w-5 h-5" />,
+      title: "Conforme RGPD",
+      description: "Protection totale de vos données"
     }
   ];
 

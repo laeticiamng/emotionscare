@@ -51,15 +51,15 @@
     </text>
   </g>
 
-  <!-- Stats badges -->
+  <!-- Features badges -->
   <g transform="translate(750, 430)">
     <text x="0" y="0" font-family="'Inter', sans-serif" font-size="18" font-weight="600" fill="#fff" opacity="0.9">
-      ⭐ 4.8/5
+      🧘 Respiration
     </text>
-    <text x="100" y="0" font-family="'Inter', sans-serif" font-size="18" font-weight="600" fill="#fff" opacity="0.9">
-      👥 50K+ users
+    <text x="120" y="0" font-family="'Inter', sans-serif" font-size="18" font-weight="600" fill="#fff" opacity="0.9">
+      📝 Journal
     </text>
-    <text x="240" y="0" font-family="'Inter', sans-serif" font-size="18" font-weight="600" fill="#fff" opacity="0.9">
+    <text x="220" y="0" font-family="'Inter', sans-serif" font-size="18" font-weight="600" fill="#fff" opacity="0.9">
       🔒 RGPD
     </text>
   </g>
