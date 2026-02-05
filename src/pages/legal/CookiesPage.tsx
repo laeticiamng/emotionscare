@@ -223,7 +223,7 @@ const sections: Section[] = [
         </p>
         <ul className="mt-3 list-disc list-inside space-y-1">
           <li>Email : dpo@emotionscare.com</li>
-          <li>Adresse : EmotionsCare SASU – DPO, [Adresse à compléter]</li>
+          <li>Adresse : EmotionsCare SASU – DPO, 5 rue Caudron, 80000 Amiens</li>
           <li>Si besoin, saisissez la CNIL (www.cnil.fr) après nous avoir contactés.</li>
         </ul>
         <p className="mt-3 text-sm text-muted-foreground">
