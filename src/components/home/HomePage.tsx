@@ -22,16 +22,16 @@ const HomePage: React.FC = () => {
     twitterCard: 'summary_large_image',
     twitterImage: '/twitter-card.svg',
     // Canonical URL
-    canonical: 'https://emotions-care.lovable.app/',
+    canonical: 'https://emotionscare.com/',
     // Inclure le schema Organization
     includeOrganization: true,
     // Structured Data sans données fictives
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'WebApplication',
-      '@id': 'https://emotions-care.lovable.app/#webapp',
+      '@id': 'https://emotionscare.com/#webapp',
       name: 'EmotionsCare',
-      url: 'https://emotions-care.lovable.app',
+      url: 'https://emotionscare.com',
       applicationCategory: 'HealthApplication',
       operatingSystem: 'Web',
       browserRequirements: 'Requires JavaScript. Requires HTML5.',

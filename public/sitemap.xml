@@ -2,43 +2,43 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Pages publiques principales -->
   <url>
-    <loc>https://emotions-care.lovable.app/</loc>
+    <loc>https://emotionscare.com/</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://emotions-care.lovable.app/features</loc>
+    <loc>https://emotionscare.com/features</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://emotions-care.lovable.app/pricing</loc>
+    <loc>https://emotionscare.com/pricing</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://emotions-care.lovable.app/about</loc>
+    <loc>https://emotionscare.com/about</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://emotions-care.lovable.app/contact</loc>
+    <loc>https://emotionscare.com/contact</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://emotions-care.lovable.app/faq</loc>
+    <loc>https://emotionscare.com/faq</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://emotions-care.lovable.app/help</loc>
+    <loc>https://emotionscare.com/help</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -46,13 +46,13 @@
   
   <!-- Pages B2B -->
   <url>
-    <loc>https://emotions-care.lovable.app/entreprise</loc>
+    <loc>https://emotionscare.com/entreprise</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://emotions-care.lovable.app/b2c</loc>
+    <loc>https://emotionscare.com/b2c</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -60,31 +60,31 @@
   
   <!-- Pages légales -->
   <url>
-    <loc>https://emotions-care.lovable.app/legal/mentions</loc>
+    <loc>https://emotionscare.com/legal/mentions</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://emotions-care.lovable.app/legal/terms</loc>
+    <loc>https://emotionscare.com/legal/terms</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://emotions-care.lovable.app/legal/privacy</loc>
+    <loc>https://emotionscare.com/legal/privacy</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://emotions-care.lovable.app/legal/cookies</loc>
+    <loc>https://emotionscare.com/legal/cookies</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://emotions-care.lovable.app/legal/sales</loc>
+    <loc>https://emotionscare.com/legal/sales</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
@@ -92,13 +92,13 @@
   
   <!-- Auth pages -->
   <url>
-    <loc>https://emotions-care.lovable.app/login</loc>
+    <loc>https://emotionscare.com/login</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://emotions-care.lovable.app/signup</loc>
+    <loc>https://emotionscare.com/signup</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

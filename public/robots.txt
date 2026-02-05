@@ -11,7 +11,7 @@ Disallow: /dev/
 Disallow: /api/
 
 # Sitemap
-Sitemap: https://emotions-care.lovable.app/sitemap.xml
+Sitemap: https://emotionscare.com/sitemap.xml
 
 # Crawl delay
 Crawl-delay: 1
