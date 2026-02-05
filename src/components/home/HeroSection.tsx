@@ -1,9 +1,9 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Heart, Stethoscope, GraduationCap, Shield, Brain, Sparkles, ArrowRight, Star, Play } from 'lucide-react';
+import { Heart, Stethoscope, GraduationCap, Shield, Brain, Sparkles, ArrowRight, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const HeroSection: React.FC = () => {
   const navigate = useNavigate();
@@ -122,14 +122,16 @@ const HeroSection: React.FC = () => {
               <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
             
-            <Button
-              variant="outline"
-              size="lg"
-              className="group border-2 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl hover:bg-muted/50 transition-all duration-300 min-h-[52px] touch-manipulation"
-            >
-              <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-              Voir la démo
-            </Button>
+            <Link to="/features">
+              <Button
+                variant="outline"
+                size="lg"
+                className="group border-2 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl hover:bg-muted/50 transition-all duration-300 min-h-[52px] touch-manipulation"
+              >
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                Découvrir
+              </Button>
+            </Link>
           </motion.div>
 
           {/* Features Preview - Mobile optimized grid */}
