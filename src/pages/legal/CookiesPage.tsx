@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React from 'react';
+import { usePageSEO } from '@/hooks/usePageSEO';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -249,6 +250,12 @@ const sections: Section[] = [
 ];
 
 const CookiesPage: React.FC = () => {
+  usePageSEO({
+    title: 'Politique Cookies - EmotionsCare',
+    description: 'Politique cookies EmotionsCare : types de cookies utilisés, finalités, durées de conservation et gestion de vos préférences. Conformité ePrivacy.',
+    keywords: 'cookies, traceurs, politique cookies, consentement, analytics, EmotionsCare'
+  });
+
   return (
     <main className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-10 max-w-4xl">

@@ -4,12 +4,19 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Building, Mail, Phone, Shield } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { routes } from '@/lib/routes';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 /**
  * Page Mentions Légales - Conforme Art. L111-7 Code de la consommation
  */
 export const MentionsLegalesPage: React.FC = () => {
   const navigate = useNavigate();
+
+  usePageSEO({
+    title: 'Mentions Légales - EmotionsCare',
+    description: 'Mentions légales EmotionsCare SASU : éditeur, hébergement, protection des données RGPD, propriété intellectuelle et médiation de la consommation. Conforme LCEN.',
+    keywords: 'mentions légales, EmotionsCare, RGPD, DPO, hébergement, propriété intellectuelle, médiation consommation'
+  });
 
   return (
     <div className="min-h-screen bg-background p-6">

@@ -4,12 +4,19 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { routes } from '@/lib/routes';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 /**
  * Page Conditions Générales d'Utilisation
  */
 export const TermsPage: React.FC = () => {
   const navigate = useNavigate();
+
+  usePageSEO({
+    title: 'Conditions Générales d\'Utilisation - EmotionsCare',
+    description: 'Conditions générales d\'utilisation de la plateforme EmotionsCare : règles d\'accès, responsabilités, propriété intellectuelle et modération du contenu.',
+    keywords: 'CGU, conditions utilisation, règles, responsabilités, EmotionsCare, plateforme bien-être'
+  });
 
   return (
     <div className="min-h-screen bg-background p-6">
