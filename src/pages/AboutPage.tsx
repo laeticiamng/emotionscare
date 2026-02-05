@@ -89,38 +89,22 @@ const AboutPage: React.FC = () => {
   ];
 
   const stats = [
-    { number: "50,000+", label: "Utilisateurs Actifs" },
-    { number: "1M+", label: "Analyses Émotionnelles" },
-    { number: "95%", label: "Satisfaction Client" },
-    { number: "24/7", label: "Support Disponible" }
+    { number: "🚀", label: "Plateforme en lancement" },
+    { number: "✓", label: "Approche scientifique" },
+    { number: "🔒", label: "Données protégées" },
+    { number: "24/7", label: "Support disponible" }
   ];
 
-  const team = [
-    {
-      name: "Dr. Sarah Chen",
-      role: "Directrice Scientifique",
-      speciality: "Neurosciences & IA",
-      description: "Experte en neurosciences cognitives et intelligence artificielle émotionnelle."
-    },
-    {
-      name: "Marc Dubois",
-      role: "CTO",
-      speciality: "Architecture Technique",
-      description: "15 ans d'expérience dans le développement de solutions de santé numérique."
-    },
-    {
-      name: "Dr. Emma Rodriguez",
-      role: "Responsable Bien-être",
-      speciality: "Psychologie Positive",
-      description: "Psychologue clinicienne spécialisée dans la thérapie cognitivo-comportementale."
-    }
-  ];
+  const founder = {
+    name: "Laeticia M.",
+    role: "Médecin-Fondatrice",
+    speciality: "Médecine d'Urgence",
+    description: "Médecin et fondatrice d'EmotionsCare. Passionnée par le bien-être émotionnel des soignants et étudiants en santé, elle a créé cette plateforme pour répondre aux besoins spécifiques de ceux qui prennent soin des autres."
+  };
 
   const certifications = [
-    { name: "ISO 27001", description: "Sécurité de l'information" },
     { name: "RGPD", description: "Protection des données" },
-    { name: "HDS", description: "Hébergement de données de santé" },
-    { name: "CE Médical", description: "Dispositif médical certifié" }
+    { name: "En cours", description: "Certifications sécurité" }
   ];
 
   return (
@@ -341,7 +325,7 @@ const AboutPage: React.FC = () => {
           </div>
         </motion.div>
 
-        {/* Team Section */}
+        {/* Founder Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -349,27 +333,25 @@ const AboutPage: React.FC = () => {
           className="mb-16"
         >
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Notre Équipe</h2>
+            <h2 className="text-3xl font-bold mb-4">Fondatrice</h2>
             <p className="text-lg text-muted-foreground">
-              Des experts passionnés au service de votre bien-être
+              Une médecin au service du bien-être des soignants
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {team.map((member, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-full mx-auto mb-4 flex items-center justify-center text-primary-foreground text-2xl font-bold">
-                    {member.name.split(' ').map(n => n[0]).join('')}
-                  </div>
-                  <h3 className="font-semibold text-lg mb-2">{member.name}</h3>
-                  <CardDescription>{member.role}</CardDescription>
-                  <Badge variant="secondary">{member.speciality}</Badge>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">{member.description}</p>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="max-w-md mx-auto">
+            <Card className="text-center hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-full mx-auto mb-4 flex items-center justify-center text-primary-foreground text-2xl font-bold">
+                  {founder.name.split(' ').map((n: string) => n[0]).join('')}
+                </div>
+                <h3 className="font-semibold text-lg mb-2">{founder.name}</h3>
+                <CardDescription>{founder.role}</CardDescription>
+                <Badge variant="secondary">{founder.speciality}</Badge>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">{founder.description}</p>
+              </CardContent>
+            </Card>
           </div>
         </motion.div>
 
@@ -393,7 +375,7 @@ const AboutPage: React.FC = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 gap-6 max-w-md mx-auto">
                 {certifications.map((cert, index) => (
                   <div key={index} className="text-center">
                     <div className="p-4 border rounded-lg hover:border-primary/50 transition-colors">
@@ -416,14 +398,14 @@ const AboutPage: React.FC = () => {
                 transition={{ delay: 1.4 }}
                 className="text-center"
               >
-                <Card className="bg-gradient-to-r from-primary/10 to-purple-500/10 border-primary/20">
+                <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
                   <CardContent className="py-12">
                     <h2 id="cta-title" className="text-3xl font-bold mb-4">
                       Prêt à Transformer Votre Bien-être ?
                     </h2>
                     <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-                      Rejoignez des milliers d'utilisateurs qui ont déjà commencé leur parcours 
-                      vers un meilleur équilibre émotionnel avec EmotionsCare.
+                      Découvrez une plateforme conçue pour accompagner les soignants
+                      vers un meilleur équilibre émotionnel.
                     </p>
                     <nav aria-label="Actions finales" className="flex flex-wrap justify-center gap-4">
                       <Button 

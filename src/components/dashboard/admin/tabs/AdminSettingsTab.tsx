@@ -38,7 +38,7 @@ const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({ isLoading = false }
             <div className="grid gap-6">
               <div>
                 <label htmlFor="company-name" className="text-lg font-medium mb-2 block">Nom de l'entreprise</label>
-                <input id="company-name" type="text" className="w-full p-2 border rounded" defaultValue="EmotionsCare SAS" aria-label="Nom de l'entreprise" />
+                <input id="company-name" type="text" className="w-full p-2 border rounded" defaultValue="EmotionsCare SASU" aria-label="Nom de l'entreprise" />
               </div>
               
               <div>

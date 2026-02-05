@@ -170,20 +170,18 @@ const AppleHeroSection: React.FC = () => {
             className="mt-16 pt-16 border-t border-border/50"
           >
             <p className="text-sm text-muted-foreground mb-6">
-              Déjà adopté par des milliers de professionnels de santé
+              Conçue avec des soignants, pour les soignants
             </p>
-            <div className="flex flex-wrap justify-center gap-8 items-center opacity-60">
-              {['APHP', 'CHU Lyon', 'IFSI Paris', 'CHRU Lille', 'Hospices Civils'].map((name, i) => (
-                <motion.span
-                  key={name}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.5, delay: 1.5 + i * 0.1 }}
-                  className="text-sm font-medium text-muted-foreground tracking-wide"
-                >
-                  {name}
-                </motion.span>
-              ))}
+            <div className="flex flex-wrap justify-center gap-4 items-center">
+              <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
+                Approche scientifique
+              </span>
+              <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
+                Données protégées
+              </span>
+              <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
+                Made in France
+              </span>
             </div>
           </motion.div>
         </div>

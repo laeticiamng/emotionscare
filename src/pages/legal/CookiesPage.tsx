@@ -31,7 +31,7 @@ const sections: Section[] = [
     content: (
       <>
         <p>
-          La présente politique explique comment EmotionsCare SAS utilise les cookies et traceurs au sein de ses sites web
+          La présente politique explique comment EmotionsCare SASU utilise les cookies et traceurs au sein de ses sites web
           et applications. Elle complète notre{' '}
           <Link to="/legal/privacy" className="text-primary underline underline-offset-4">
             Politique de confidentialité

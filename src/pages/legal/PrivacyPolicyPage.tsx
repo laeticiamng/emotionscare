@@ -52,14 +52,14 @@ export const PrivacyPolicyPage: React.FC = () => {
                 1. Identité du responsable de traitement
               </h2>
               <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-                <p><strong>Responsable du traitement :</strong> EmotionsCare SAS</p>
-                <p><strong>Siège social :</strong> 123 Avenue de l'Innovation, 75001 Paris, France</p>
-                <p><strong>RCS :</strong> Paris B 987 654 321</p>
-                <p><strong>SIRET :</strong> 987 654 321 00012</p>
+                <p><strong>Responsable du traitement :</strong> EmotionsCare SASU</p>
+                <p><strong>Siège social :</strong> [Adresse du siège social à compléter]</p>
+                <p><strong>RCS :</strong> [Numéro RCS à compléter]</p>
+                <p><strong>SIRET :</strong> [Numéro SIRET à compléter]</p>
                 <p><strong>Email :</strong> <a href="mailto:contact@emotionscare.com" className="text-primary">contact@emotionscare.com</a></p>
                 <p><strong>Délégué à la Protection des Données (DPO) :</strong><br />
                   Email : <a href="mailto:dpo@emotionscare.com" className="text-primary">dpo@emotionscare.com</a><br />
-                  Adresse : EmotionsCare – DPO, 123 Avenue de l'Innovation, 75001 Paris
+                  Adresse : EmotionsCare SASU – DPO, [Adresse à compléter]
                 </p>
               </div>
             </section>
@@ -316,7 +316,7 @@ export const PrivacyPolicyPage: React.FC = () => {
                 </p>
                 <ul>
                   <li><strong>Email :</strong> <a href="mailto:dpo@emotionscare.com" className="text-primary hover:underline">dpo@emotionscare.com</a></li>
-                  <li><strong>Courrier :</strong> EmotionsCare SAS – DPO, 123 Avenue de l'Innovation, 75001 Paris</li>
+                  <li><strong>Courrier :</strong> EmotionsCare SASU – DPO, [Adresse à compléter]</li>
                   <li><strong>Formulaire en ligne :</strong> <Link to="/app/settings/privacy" className="text-primary hover:underline">Paramètres compte → RGPD</Link></li>
                 </ul>
                 <p className="text-sm mt-3">

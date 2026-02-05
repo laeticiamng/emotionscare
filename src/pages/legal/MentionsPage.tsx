@@ -30,15 +30,13 @@ const sections: Section[] = [
     content: (
       <>
         <p>
-          Le site et les applications EmotionsCare sont édités par la société EmotionsCare SAS, société par actions
-          simplifiée au capital social de 120 000 €, immatriculée au Registre du Commerce et des Sociétés de Paris sous le
-          numéro RCS 902 345 678.
+          Le site et les applications EmotionsCare sont édités par la société EmotionsCare SASU, société par actions
+          simplifiée unipersonnelle immatriculée au Registre du Commerce et des Sociétés sous le numéro [RCS à compléter].
         </p>
         <ul className="mt-3 list-disc list-inside space-y-1">
-          <li>Siège social : 12 rue des Émotions, 75011 Paris, France.</li>
-          <li>Numéro de TVA intracommunautaire : FR 92 902345678.</li>
-          <li>Adresse électronique : contact@emotionscare.com.</li>
-          <li>Téléphone : +33 (0)1 86 95 12 34.</li>
+          <li>Siège social : [Adresse à compléter]</li>
+          <li>Numéro de TVA intracommunautaire : [À compléter]</li>
+          <li>Adresse électronique : contact@emotionscare.com</li>
         </ul>
       </>
     ),
@@ -50,7 +48,7 @@ const sections: Section[] = [
     content: (
       <>
         <p>
-          La directrice de la publication est Léa Martin, en sa qualité de Présidente de EmotionsCare SAS. Elle est
+          La directrice de la publication est Laeticia M., en sa qualité de Présidente de EmotionsCare SASU. Elle est
           joignable à l'adresse legal@emotionscare.com pour toute question relative au contenu éditorial.
         </p>
       </>
@@ -101,7 +99,7 @@ const sections: Section[] = [
       <>
         <p>
           Tous les éléments du site (textes, graphismes, logos, vidéos, animations, bases de données, logiciels) sont la
-          propriété exclusive de EmotionsCare SAS ou de ses partenaires et sont protégés par le Code de la propriété
+          propriété exclusive de EmotionsCare SASU ou de ses partenaires et sont protégés par le Code de la propriété
           intellectuelle. Toute reproduction totale ou partielle est interdite sans autorisation écrite préalable.
         </p>
       </>
