@@ -87,20 +87,14 @@ const contactInfo = [
   { 
     icon: Mail, 
     label: 'Email', 
-    value: 'contact@emotionscare.com',
-    href: 'mailto:contact@emotionscare.com'
-  },
-  { 
-    icon: Phone, 
-    label: 'Téléphone', 
-    value: '+33 1 23 45 67 89',
-    href: 'tel:+33123456789'
+    value: 'contact@emotionscare.app',
+    href: 'mailto:contact@emotionscare.app'
   },
   { 
     icon: MapPin, 
-    label: 'Adresse', 
-    value: 'Paris, France',
-    href: 'https://maps.google.com/?q=Paris,France'
+    label: 'Localisation', 
+    value: 'France',
+    href: '#'
   },
 ];
 
