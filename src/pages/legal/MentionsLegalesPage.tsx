@@ -41,16 +41,15 @@ export const MentionsLegalesPage: React.FC = () => {
                 1. Identification de l'éditeur
               </h2>
               <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-                <p><strong>Raison sociale :</strong> EmotionsCare SAS</p>
-                <p><strong>Forme juridique :</strong> Société par Actions Simplifiée</p>
-                <p><strong>Capital social :</strong> 50 000 €</p>
-                <p><strong>Siège social :</strong> 123 Avenue de l'Innovation, 75001 Paris, France</p>
-                <p><strong>RCS :</strong> Paris B 987 654 321</p>
-                <p><strong>SIRET :</strong> 987 654 321 00012</p>
-                <p><strong>N° TVA intracommunautaire :</strong> FR 12 987654321</p>
-                <p><strong>Directeur de la publication :</strong> Jean Dupont, Président</p>
+                <p><strong>Raison sociale :</strong> EmotionsCare SASU</p>
+                <p><strong>Forme juridique :</strong> Société par Actions Simplifiée Unipersonnelle</p>
+                <p><strong>Capital social :</strong> [À compléter]</p>
+                <p><strong>Siège social :</strong> [Adresse à compléter]</p>
+                <p><strong>RCS :</strong> [Numéro RCS à compléter]</p>
+                <p><strong>SIRET :</strong> [Numéro SIRET à compléter]</p>
+                <p><strong>N° TVA intracommunautaire :</strong> [À compléter]</p>
+                <p><strong>Directrice de la publication :</strong> Laeticia M., Présidente</p>
                 <p><strong>Email :</strong> contact@emotionscare.com</p>
-                <p><strong>Téléphone :</strong> +33 1 23 45 67 89</p>
               </div>
             </section>
 
@@ -73,12 +72,12 @@ export const MentionsLegalesPage: React.FC = () => {
             <section>
               <h2>3. Données personnelles et RGPD</h2>
               <p>
-                <strong>Responsable du traitement :</strong> EmotionsCare SAS
+                <strong>Responsable du traitement :</strong> EmotionsCare SASU
               </p>
               <p>
                 <strong>Délégué à la Protection des Données (DPO) :</strong><br />
                 Email : <a href="mailto:dpo@emotionscare.com" className="text-primary hover:underline">dpo@emotionscare.com</a><br />
-                Adresse : EmotionsCare – DPO, 123 Avenue de l'Innovation, 75001 Paris
+                Adresse : EmotionsCare SASU – DPO, [Adresse à compléter]
               </p>
               <p>
                 Pour plus d'informations sur le traitement de vos données personnelles, consultez notre{' '}
@@ -95,7 +94,7 @@ export const MentionsLegalesPage: React.FC = () => {
               <h2>4. Propriété intellectuelle</h2>
               <p>
                 L'ensemble du contenu de ce site (textes, images, vidéos, graphismes, logo, icônes, sons, logiciels) 
-                est la propriété exclusive d'EmotionsCare SAS ou de ses partenaires, sauf mention contraire.
+                est la propriété exclusive d'EmotionsCare SASU ou de ses partenaires, sauf mention contraire.
               </p>
               <p>
                 Toute reproduction, représentation, modification, publication, adaptation de tout ou partie des 
@@ -172,8 +171,7 @@ export const MentionsLegalesPage: React.FC = () => {
               <p>Pour toute question concernant ces mentions légales :</p>
               <ul>
                 <li><strong>Email :</strong> <a href="mailto:legal@emotionscare.com" className="text-primary hover:underline">legal@emotionscare.com</a></li>
-                <li><strong>Téléphone :</strong> +33 1 23 45 67 89</li>
-                <li><strong>Courrier :</strong> EmotionsCare SAS - Service Juridique - 123 Avenue de l'Innovation - 75001 Paris</li>
+                <li><strong>Courrier :</strong> EmotionsCare SASU - Service Juridique - [Adresse à compléter]</li>
               </ul>
             </section>
 

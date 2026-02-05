@@ -21,10 +21,9 @@ const Footer: React.FC = () => {
     ],
     resources: [
       { label: 'FAQ', href: '/#faq' },
-      { label: 'Modules', href: '/app/modules' },
-      { label: 'Communauté', href: '/app/community' },
+      { label: 'À propos', href: '/about' },
       { label: 'Aide & Support', href: '/help' },
-      { label: 'Accessibilité', href: '/accessibility' },
+      { label: 'Contact', href: '/contact' },
     ],
     legal: [
       { label: 'Mentions légales', href: '/legal/mentions' },

@@ -18,13 +18,11 @@ const EnhancedFooter: React.FC = () => {
       { label: 'Fonctionnalités', to: '/navigation' },
       { label: 'Tarifs', to: '/pricing' },
       { label: 'Entreprise', to: '/b2b' },
-      { label: 'Témoignages', to: routes.public.testimonials() },
     ],
     resources: [
-      { label: 'Blog', to: routes.public.blog() },
+      { label: 'À propos', to: routes.public.about() },
       { label: 'Aide', to: '/help' },
       { label: 'Contact', to: routes.public.contact() },
-      { label: 'À propos', to: routes.public.about() },
     ],
     legal: [
       { label: 'Confidentialité', to: '/legal/privacy' },

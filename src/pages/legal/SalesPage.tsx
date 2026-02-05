@@ -31,7 +31,7 @@ const sections: Section[] = [
       <>
         <p>
           Les présentes Conditions Générales de Vente (CGV) encadrent la souscription et l'utilisation des offres
-          payantes proposées par EmotionsCare SAS. Elles complètent les{' '}
+          payantes proposées par EmotionsCare SASU. Elles complètent les{' '}
           <Link to="/legal/terms" className="text-primary underline underline-offset-4">
             Conditions Générales d'Utilisation
           </Link>{' '}

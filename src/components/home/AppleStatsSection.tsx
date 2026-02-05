@@ -14,10 +14,10 @@ interface StatItem {
 }
 
 const stats: StatItem[] = [
-  { value: 10000, suffix: '+', label: 'Utilisateurs actifs', description: 'Soignants et étudiants' },
-  { value: 94, suffix: '%', label: 'Taux de satisfaction', description: 'Efficacité ressentie' },
-  { value: 3, suffix: 'min', label: 'Durée moyenne', description: "D'une intervention" },
-  { value: 50, suffix: '+', label: 'Protocoles', description: 'Validés scientifiquement' },
+  { value: 37, suffix: '', label: 'Modules bien-être', description: 'Outils personnalisés' },
+  { value: 3, suffix: 'min', label: 'Par session', description: 'Micro-interventions efficaces' },
+  { value: 100, suffix: '%', label: 'Données protégées', description: 'Chiffrement & RGPD' },
+  { value: 24, suffix: '/7', label: 'Disponibilité', description: 'Accès permanent' },
 ];
 
 const AnimatedCounter: React.FC<{ value: number; suffix: string; isInView: boolean }> = ({ 
