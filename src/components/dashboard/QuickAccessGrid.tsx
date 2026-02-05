@@ -18,7 +18,7 @@ const QUICK_ACCESS_ITEMS = [
     title: 'Respiration',
     description: 'Exercices guidés',
     icon: Wind,
-    to: '/app/breath',
+    to: '/dashboard/breathing',
     color: 'bg-sky-500/10 text-sky-600 hover:bg-sky-500/20',
   },
   {
