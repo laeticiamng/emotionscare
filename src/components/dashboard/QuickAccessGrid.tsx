@@ -26,15 +26,15 @@ const QUICK_ACCESS_ITEMS = [
     title: 'Journal',
     description: 'Écriture émotionnelle',
     icon: BookOpen,
-    to: '/app/journal',
+    to: '/dashboard/journal',
     color: 'bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20',
   },
   {
     id: 'evaluations',
     title: 'Évaluations',
-    description: 'Tests et bilans',
+    description: 'WHO-5, PHQ-9',
     icon: ClipboardCheck,
-    to: '/assessments',
+    to: '/dashboard/assessments',
     color: 'bg-violet-500/10 text-violet-600 hover:bg-violet-500/20',
   },
 ];

@@ -4732,6 +4732,39 @@ export type Database = {
         }
         Relationships: []
       }
+      clinical_assessments: {
+        Row: {
+          answers: Json
+          category: string | null
+          created_at: string
+          id: string
+          max_score: number
+          score: number
+          type: string
+          user_id: string
+        }
+        Insert: {
+          answers: Json
+          category?: string | null
+          created_at?: string
+          id?: string
+          max_score: number
+          score: number
+          type: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          category?: string | null
+          created_at?: string
+          id?: string
+          max_score?: number
+          score?: number
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       clinical_case_history: {
         Row: {
           case_id: string
