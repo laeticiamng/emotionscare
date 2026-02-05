@@ -77,6 +77,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: false,
   },
   {
+    name: 'features',
+    path: '/features',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'FeaturesPage',
+    guard: false,
+    aliases: ['/fonctionnalites'],
+  },
+  {
     name: 'demo',
     path: '/demo',
     segment: 'public',
@@ -473,6 +482,17 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
     aliases: ['/assessments', '/app/assessments'],
+  },
+  {
+    name: 'dashboard-settings',
+    path: '/dashboard/settings',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'simple',
+    component: 'DashboardSettingsPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/settings/account', '/parametres'],
   },
   {
     name: 'brain-viewer',

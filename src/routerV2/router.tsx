@@ -40,6 +40,8 @@ const ContactPage = lazy(() => import('@/pages/ContactPage'));
 const HelpPage = lazy(() => import('@/pages/HelpPage'));
 const DemoPage = lazy(() => import('@/pages/DemoPage'));
 const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
+const FeaturesPage = lazy(() => import('@/pages/features/FeaturesPage'));
+const DashboardSettingsPage = lazy(() => import('@/pages/settings/DashboardSettingsPage'));
 
 // Pages légales
 const MentionsLegalesPage = lazy(() => import('@/pages/legal/MentionsLegalesPage'));
