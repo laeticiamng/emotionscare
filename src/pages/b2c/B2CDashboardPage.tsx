@@ -47,6 +47,9 @@ import { useDynamicRecommendations } from '@/hooks/useDynamicRecommendations';
 import { useWellbeingScore } from '@/hooks/useWellbeingScore';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFirstTimeGuide } from '@/hooks/useFirstTimeGuide';
+import { useDashboardOnboarding } from '@/hooks/useDashboardOnboarding';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 const WeeklyPlanCard = React.lazy(() => import('@/components/dashboard/widgets/WeeklyPlanCard'));
 const RecentEmotionScansWidget = React.lazy(() => import('@/components/dashboard/widgets/RecentEmotionScansWidget'));
@@ -58,6 +61,10 @@ const DynamicRecommendationsWidget = React.lazy(() => import('@/components/dashb
 const ModulesNavigationGrid = React.lazy(() => import('@/components/dashboard/ModulesNavigationGrid'));
 const FirstTimeGuide = React.lazy(() => import('@/components/onboarding/FirstTimeGuide'));
 const AIRecommendationsWidget = React.lazy(() => import('@/components/dashboard/AIRecommendationsWidget'));
+const DashboardOnboarding = React.lazy(() => import('@/components/onboarding/DashboardOnboarding'));
+const MoodQuickLog = React.lazy(() => import('@/components/dashboard/MoodQuickLog'));
+const QuickAccessGrid = React.lazy(() => import('@/components/dashboard/QuickAccessGrid'));
+const ProgressionWidget = React.lazy(() => import('@/components/dashboard/ProgressionWidget'));
 
 type QuickAction = {
   id: string;
@@ -186,6 +193,13 @@ export default function B2CDashboardPage() {
   // First Time Guide pour nouveaux utilisateurs
   const { shouldShowGuide, markAsCompleted, markAsDismissed } = useFirstTimeGuide();
   
+  // Onboarding 3 étapes pour nouveaux utilisateurs
+  const { 
+    shouldShowOnboarding, 
+    completeOnboarding, 
+    skipOnboarding 
+  } = useDashboardOnboarding();
+  
   // Stats réelles depuis Supabase
   const { stats: userStats, loading: statsLoading, refetch: refetchStats, error: statsError } = useUserStatsQuery();
   useUserStatsRealtime();
@@ -257,8 +271,18 @@ export default function B2CDashboardPage() {
 
   return (
     <>
+      {/* Onboarding 3 étapes pour nouveaux utilisateurs */}
+      {shouldShowOnboarding && (
+        <Suspense fallback={null}>
+          <DashboardOnboarding 
+            onComplete={completeOnboarding} 
+            onSkip={skipOnboarding} 
+          />
+        </Suspense>
+      )}
+      
       {/* Guide de première visite pour nouveaux utilisateurs */}
-      {shouldShowGuide && (
+      {shouldShowGuide && !shouldShowOnboarding && (
         <Suspense fallback={null}>
           <FirstTimeGuide onComplete={markAsCompleted} onDismiss={markAsDismissed} />
         </Suspense>
@@ -357,15 +381,42 @@ export default function B2CDashboardPage() {
 
       {/* Contenu principal */}
       <main id="main-content" role="main" className="container mx-auto px-4 py-8">
-        {/* En-tête de bienvenue */}
+        {/* En-tête de bienvenue avec date */}
         <header className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">
-            Bienvenue{user?.user_metadata?.first_name ? `, ${user.user_metadata.first_name}` : ''} sur votre espace bien-être
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Découvrez vos outils d'intelligence émotionnelle personnalisés
-          </p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <div>
+              <h1 className="text-3xl font-bold mb-1">
+                Bonjour{user?.user_metadata?.first_name ? ` ${user.user_metadata.first_name}` : ''} 👋
+              </h1>
+              <p className="text-muted-foreground text-lg">
+                Prends soin de toi aujourd'hui
+              </p>
+            </div>
+            <div className="text-right text-muted-foreground">
+              <p className="text-sm capitalize">{format(new Date(), 'EEEE d MMMM yyyy', { locale: fr })}</p>
+            </div>
+          </div>
         </header>
+
+        {/* Section Humeur du jour + Accès rapide */}
+        <section className="mb-8 grid md:grid-cols-2 gap-6">
+          <Suspense fallback={<DashboardWidgetSkeleton lines={3} />}>
+            <MoodQuickLog />
+          </Suspense>
+          <Suspense fallback={<DashboardWidgetSkeleton lines={3} />}>
+            <ProgressionWidget />
+          </Suspense>
+        </section>
+
+        {/* Accès rapide - 4 cartes */}
+        <section aria-labelledby="quick-access-title" className="mb-8">
+          <h2 id="quick-access-title" className="text-xl font-semibold mb-4">
+            Accès rapide
+          </h2>
+          <Suspense fallback={<DashboardWidgetSkeleton lines={2} />}>
+            <QuickAccessGrid />
+          </Suspense>
+        </section>
 
         {/* Widget IA Recommandations Proactives - Prioritaire */}
         <section aria-labelledby="ai-recommendations" className="mb-8">

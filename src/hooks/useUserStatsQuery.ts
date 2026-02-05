@@ -16,6 +16,7 @@ export interface UserStats {
   currentStreak: number;
   level: number;
   rank: string;
+  journalEntries: number;
 }
 
 const DEFAULT_STATS: UserStats = {
@@ -24,7 +25,8 @@ const DEFAULT_STATS: UserStats = {
   totalPoints: 0,
   currentStreak: 0,
   level: 1,
-  rank: 'Débutant'
+  rank: 'Débutant',
+  journalEntries: 0,
 };
 
 function calculateLevel(points: number): number {
@@ -42,7 +44,7 @@ function calculateRank(level: number): string {
 async function fetchUserStats(userId: string): Promise<UserStats> {
   try {
     // Paralléliser les requêtes pour optimiser les performances
-    const [userStatsData, sessionsCount, weeklyGoalsCount] = await Promise.all([
+    const [userStatsData, sessionsCount, weeklyGoalsCount, journalCount] = await Promise.all([
       supabase
         .from('user_stats')
         .select('total_points, streak_days')
@@ -71,6 +73,15 @@ async function fetchUserStats(userId: string): Promise<UserStats> {
         .then(({ count, error }) => {
           if (error) logger.warn('Error loading weekly goals', error, 'DB');
           return count || 0;
+        }),
+      
+      supabase
+        .from('journal_entries')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .then(({ count, error }) => {
+          if (error) logger.warn('Error loading journal entries', error, 'DB');
+          return count || 0;
         })
     ]);
 
@@ -83,7 +94,8 @@ async function fetchUserStats(userId: string): Promise<UserStats> {
       completedSessions: sessionsCount,
       weeklyGoals: weeklyGoalsCount,
       level,
-      rank: calculateRank(level)
+      rank: calculateRank(level),
+      journalEntries: journalCount,
     };
   } catch (error) {
     logger.error('Error fetching user stats', error as Error, 'DB');
