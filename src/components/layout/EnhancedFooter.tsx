@@ -17,7 +17,7 @@ const EnhancedFooter: React.FC = () => {
     product: [
       { label: 'Fonctionnalités', to: '/navigation' },
       { label: 'Tarifs', to: '/pricing' },
-      { label: 'Entreprise', to: '/b2b' },
+      { label: 'Entreprise', to: '/entreprise' },
     ],
     resources: [
       { label: 'À propos', to: routes.public.about() },
@@ -25,10 +25,11 @@ const EnhancedFooter: React.FC = () => {
       { label: 'Contact', to: routes.public.contact() },
     ],
     legal: [
-      { label: 'Confidentialité', to: '/legal/privacy' },
-      { label: 'Conditions', to: '/legal/terms' },
-      { label: 'Cookies', to: '/legal/cookies' },
       { label: 'Mentions légales', to: '/legal/mentions' },
+      { label: 'CGU', to: '/legal/terms' },
+      { label: 'CGV', to: '/legal/sales' },
+      { label: 'Confidentialité', to: '/legal/privacy' },
+      { label: 'Cookies', to: '/legal/cookies' },
     ],
   };
   

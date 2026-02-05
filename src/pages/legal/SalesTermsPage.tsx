@@ -65,16 +65,15 @@ export const SalesTermsPage: React.FC = () => {
                 1. Identification du vendeur
               </h2>
               <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-                <p><strong>Raison sociale :</strong> EmotionsCare SAS</p>
-                <p><strong>Forme juridique :</strong> Société par Actions Simplifiée</p>
-                <p><strong>Capital social :</strong> 50 000 €</p>
-                <p><strong>Siège social :</strong> 123 Avenue de l'Innovation, 75001 Paris, France</p>
-                <p><strong>RCS :</strong> Paris B 987 654 321</p>
-                <p><strong>SIRET :</strong> 987 654 321 00012</p>
-                <p><strong>N° TVA intracommunautaire :</strong> FR 12 987654321</p>
-                <p><strong>Email :</strong> <a href="mailto:ventes@emotionscare.com" className="text-primary">ventes@emotionscare.com</a></p>
-                <p><strong>Téléphone :</strong> +33 1 23 45 67 89</p>
-                <p><strong>Directeur de la publication :</strong> Jean Dupont</p>
+                <p><strong>Raison sociale :</strong> EmotionsCare SASU</p>
+                <p><strong>Forme juridique :</strong> Société par Actions Simplifiée Unipersonnelle</p>
+                <p><strong>Capital social :</strong> [À compléter]</p>
+                <p><strong>Siège social :</strong> [Adresse à compléter]</p>
+                <p><strong>RCS :</strong> [Numéro RCS à compléter]</p>
+                <p><strong>SIRET :</strong> [Numéro SIRET à compléter]</p>
+                <p><strong>N° TVA intracommunautaire :</strong> [À compléter]</p>
+                <p><strong>Email :</strong> <a href="mailto:contact@emotionscare.com" className="text-primary">contact@emotionscare.com</a></p>
+                <p><strong>Directrice de la publication :</strong> Laeticia M., Présidente</p>
               </div>
             </section>
 
@@ -82,7 +81,7 @@ export const SalesTermsPage: React.FC = () => {
             <section>
               <h2>2. Objet et champ d'application</h2>
               <p>
-                Les présentes CGV ont pour objet de définir les conditions dans lesquelles EmotionsCare SAS (ci-après « le Vendeur ») 
+                Les présentes CGV ont pour objet de définir les conditions dans lesquelles EmotionsCare SASU (ci-après « le Vendeur ») 
                 propose à la vente ses services d'abonnement Premium permettant d'accéder à des fonctionnalités avancées de 
                 bien-être émotionnel et de suivi psychologique.
               </p>
@@ -90,9 +89,8 @@ export const SalesTermsPage: React.FC = () => {
                 <strong>Services concernés :</strong>
               </p>
               <ul>
-                <li>Abonnement EmotionsCare Premium Mensuel</li>
-                <li>Abonnement EmotionsCare Premium Annuel</li>
-                <li>Abonnement EmotionsCare Premium Familial (jusqu'à 5 utilisateurs)</li>
+                <li>Offre Gratuite : accès limité aux fonctionnalités de base</li>
+                <li>Abonnement EmotionsCare Premium Mensuel : 14,99 € TTC/mois</li>
               </ul>
               <p className="text-sm text-muted-foreground">
                 Les offres B2B (Entreprises) sont régies par des Conditions Générales de Vente B2B distinctes.
@@ -119,22 +117,16 @@ export const SalesTermsPage: React.FC = () => {
                   </thead>
                   <tbody>
                     <tr className="border-t">
+                      <td className="p-2">Offre Gratuite</td>
+                      <td className="text-right p-2">0,00 €</td>
+                      <td className="text-right p-2">0,00 €</td>
+                      <td className="text-right p-2 font-semibold">Gratuit</td>
+                    </tr>
+                    <tr className="border-t">
                       <td className="p-2">Premium Mensuel</td>
-                      <td className="text-right p-2">9,99 €</td>
-                      <td className="text-right p-2">2,00 €</td>
-                      <td className="text-right p-2 font-semibold">11,99 € TTC</td>
-                    </tr>
-                    <tr className="border-t">
-                      <td className="p-2">Premium Annuel</td>
-                      <td className="text-right p-2">99,99 €</td>
-                      <td className="text-right p-2">20,00 €</td>
-                      <td className="text-right p-2 font-semibold">119,99 € TTC</td>
-                    </tr>
-                    <tr className="border-t">
-                      <td className="p-2">Premium Familial (5 profils)</td>
-                      <td className="text-right p-2">16,66 €</td>
-                      <td className="text-right p-2">3,34 €</td>
-                      <td className="text-right p-2 font-semibold">20,00 € TTC/mois</td>
+                      <td className="text-right p-2">12,49 €</td>
+                      <td className="text-right p-2">2,50 €</td>
+                      <td className="text-right p-2 font-semibold">14,99 € TTC</td>
                     </tr>
                   </tbody>
                 </table>
@@ -244,7 +236,7 @@ export const SalesTermsPage: React.FC = () => {
                   <strong>Email :</strong> <a href="mailto:retractation@emotionscare.com" className="text-primary hover:underline">retractation@emotionscare.com</a>
                 </li>
                 <li>
-                  <strong>Courrier recommandé :</strong> EmotionsCare SAS - Service Rétractation - 123 Avenue de l'Innovation - 75001 Paris
+                  <strong>Courrier recommandé :</strong> EmotionsCare SASU - Service Rétractation - [Adresse à compléter]
                 </li>
                 <li>
                   <strong>Formulaire type (annexe) :</strong> <a href="#formulaire-type" className="text-primary hover:underline">Télécharger le formulaire</a>
@@ -270,10 +262,10 @@ export const SalesTermsPage: React.FC = () => {
                 <div className="space-y-2 text-sm">
                   <p>À l'attention de :</p>
                   <p className="ml-4">
-                    <strong>EmotionsCare SAS - Service Rétractation</strong><br />
-                    123 Avenue de l'Innovation<br />
-                    75001 Paris, France<br />
-                    Email : retractation@emotionscare.com
+                    <strong>EmotionsCare SASU - Service Rétractation</strong><br />
+                    [Adresse à compléter]<br />
+                    France<br />
+                    Email : contact@emotionscare.com
                   </p>
                   <p className="mt-4">
                     Je vous notifie par la présente ma rétractation du contrat portant sur la souscription à l'abonnement Premium 
@@ -365,7 +357,7 @@ export const SalesTermsPage: React.FC = () => {
                 conformément au RGPD et à notre <Link to="/legal/privacy" className="text-primary hover:underline">Politique de Confidentialité</Link>.
               </p>
               <p>
-                <strong>Responsable du traitement :</strong> EmotionsCare SAS<br />
+                <strong>Responsable du traitement :</strong> EmotionsCare SASU<br />
                 <strong>DPO :</strong> <a href="mailto:dpo@emotionscare.com" className="text-primary hover:underline">dpo@emotionscare.com</a>
               </p>
               <p>

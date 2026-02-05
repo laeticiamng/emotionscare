@@ -20,17 +20,17 @@ const Footer: React.FC = () => {
       { label: 'Parc émotionnel', href: '/app/emotional-park' },
     ],
     resources: [
-      { label: 'FAQ', href: '/#faq' },
+      { label: 'FAQ', href: '/faq' },
       { label: 'À propos', href: '/about' },
       { label: 'Aide & Support', href: '/help' },
       { label: 'Contact', href: '/contact' },
     ],
     legal: [
       { label: 'Mentions légales', href: '/legal/mentions' },
-      { label: 'Confidentialité', href: '/legal/privacy' },
+      { label: 'CGU', href: '/legal/terms' },
       { label: 'CGV', href: '/legal/sales' },
+      { label: 'Confidentialité', href: '/legal/privacy' },
       { label: 'Cookies', href: '/legal/cookies' },
-      { label: 'Conditions d\'utilisation', href: '/legal/terms' },
     ],
     social: [
       { label: 'Twitter', href: 'https://twitter.com/emotionscare', icon: Twitter },

@@ -20,6 +20,7 @@ import { MusicProvider } from '@/contexts/music';
 import { ThemeProvider } from '@/providers/theme';
 import { PolicyAcceptanceModal } from '@/components/gdpr/PolicyAcceptanceModal';
 import AccessibilitySkipLinks from '@/components/accessibility/AccessibilitySkipLinks';
+import { CookieBanner } from '@/components/cookies/CookieBanner';
 
 // Create query client outside component to avoid recreation
 const queryClient = new QueryClient({
@@ -65,6 +66,7 @@ export function RootProvider({ children }: RootProviderProps) {
                                   {children}
                                   <Toaster />
                                   <PolicyAcceptanceModal />
+                                  <CookieBanner />
                                 </NotificationProvider>
                               </TooltipProvider>
                             </ThemeProvider>
