@@ -13128,7 +13128,9 @@ export type Database = {
           color_palette: Json | null
           content: string
           created_at: string | null
+          emotion: string | null
           id: string
+          intensity: number | null
           is_favorite: boolean | null
           is_precious: boolean | null
           mode: string | null
@@ -13147,7 +13149,9 @@ export type Database = {
           color_palette?: Json | null
           content: string
           created_at?: string | null
+          emotion?: string | null
           id?: string
+          intensity?: number | null
           is_favorite?: boolean | null
           is_precious?: boolean | null
           mode?: string | null
@@ -13166,7 +13170,9 @@ export type Database = {
           color_palette?: Json | null
           content?: string
           created_at?: string | null
+          emotion?: string | null
           id?: string
+          intensity?: number | null
           is_favorite?: boolean | null
           is_precious?: boolean | null
           mode?: string | null
