@@ -72,7 +72,9 @@ const CollaborativePlaylistPage = lazy(() => import('@/pages/music/Collaborative
 const AdvancedAnalyticsPage = lazy(() => import('@/pages/AdvancedAnalyticsPage'));
 // EmotionMusicPage supprimé - utiliser MusicTherapyPage ou B2CMusicEnhanced
 const B2CAICoachPage = lazy(() => import('@/pages/b2c/B2CAICoachPage'));
+const ClinicalAssessmentsPage = lazy(() => import('@/pages/assessments/ClinicalAssessmentsPage'));
 const B2CJournalPage = lazy(() => import('@/pages/b2c/B2CJournalPage'));
+const EmotionalJournalPage = lazy(() => import('@/pages/journal/EmotionalJournalPage'));
 const B2CVoiceJournalPage = lazy(() => import('@/pages/b2c/B2CVoiceJournalPage'));
 const EmotionSessionNewPage = lazy(() => import('@/pages/EmotionSessionNewPage'));
 const EmotionSessionHistoryPage = lazy(() => import('@/pages/EmotionSessionHistoryPage'));
