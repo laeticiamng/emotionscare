@@ -1,12 +1,17 @@
 # EmotionsCare Platform - Robots.txt
 User-agent: *
 Allow: /
+
+# Pages protégées
 Disallow: /app/
-Disallow: /api/
+Disallow: /dashboard/
 Disallow: /admin/
+Disallow: /b2b/admin/
+Disallow: /dev/
+Disallow: /api/
 
 # Sitemap
-Sitemap: https://emotionscare.app/sitemap.xml
+Sitemap: https://emotions-care.lovable.app/sitemap.xml
 
 # Crawl delay
 Crawl-delay: 1
@@ -20,4 +25,3 @@ Allow: /
 
 User-agent: GPTBot
 Disallow: /
-
