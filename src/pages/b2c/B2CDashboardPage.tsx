@@ -342,7 +342,7 @@ export default function B2CDashboardPage() {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button variant="ghost" size="sm" asChild aria-label="Mon profil">
-                      <Link to="/settings/profile">
+                      <Link to="/dashboard/settings">
                         <User className="h-4 w-4" aria-hidden="true" />
                       </Link>
                     </Button>
@@ -354,7 +354,7 @@ export default function B2CDashboardPage() {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button variant="ghost" size="sm" asChild aria-label="Paramètres">
-                      <Link to="/settings/general">
+                      <Link to="/dashboard/settings">
                         <Settings className="h-4 w-4" aria-hidden="true" />
                       </Link>
                     </Button>

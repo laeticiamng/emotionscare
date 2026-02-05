@@ -40,11 +40,11 @@ const footerSections: FooterSection[] = [
   {
     title: 'Produits',
     links: [
-      { name: 'Scanner Émotionnel', href: '/app/scan', icon: Sparkles },
-      { name: 'Coach IA', href: '/app/coach', icon: Heart, badge: 'IA' },
-      { name: 'Thérapie Musicale', href: '/app/music', badge: 'Premium' },
-      { name: 'Respiration Guidée', href: '/app/breath' },
-      { name: 'Journal Numérique', href: '/app/journal' },
+      { name: 'Fonctionnalités', href: '/features', icon: Sparkles },
+      { name: 'Scanner Émotionnel', href: '/app/scan' },
+      { name: 'Respiration Guidée', href: '/dashboard/breathing' },
+      { name: 'Journal Émotionnel', href: '/dashboard/journal' },
+      { name: 'Évaluations', href: '/dashboard/assessments' },
     ]
   },
   {
@@ -53,15 +53,14 @@ const footerSections: FooterSection[] = [
       { name: 'Solutions B2B', href: '/entreprise', icon: Building2 },
       { name: 'Dashboard RH', href: '/app/rh' },
       { name: 'Rapports & Analytics', href: '/b2b/reports' },
-      { name: 'Gestion Équipes', href: '/app/teams' },
       { name: 'Tarifs Entreprise', href: '/pricing' },
     ]
   },
   {
     title: 'Support',
     links: [
-      { name: 'Centre d\'aide', href: '/faq', icon: HelpCircle },
-      { name: 'Documentation', href: '/faq' },
+      { name: 'Centre d\'aide', href: '/help', icon: HelpCircle },
+      { name: 'FAQ', href: '/faq' },
       { name: 'Nous contacter', href: '/contact', icon: Mail },
     ]
   },
