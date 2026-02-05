@@ -10,7 +10,7 @@ const QUICK_ACCESS_ITEMS = [
     title: 'Scanner',
     description: 'Analyse émotionnelle',
     icon: Brain,
-    to: '/app/scan',
+    to: '/dashboard/scanner',
     color: 'bg-primary/10 text-primary hover:bg-primary/20',
   },
   {
