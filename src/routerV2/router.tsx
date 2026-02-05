@@ -282,6 +282,7 @@ const ScanTextPage = lazy(() => import('@/pages/app/ScanTextPage'));
 const VoiceScanPage = lazy(() => import('@/pages/VoiceScanPage'));
 const TextScanPage = lazy(() => import('@/pages/TextScanPage'));
 const QuestionnaireScannerPage = lazy(() => import('@/pages/scanner/QuestionnaireScannerPage'));
+const BreathingPage = lazy(() => import('@/pages/breathing/BreathingPage'));
 // MusicGeneratePage supprimé - fonctionnalité dans B2CMusicEnhanced
 // MusicLibraryPage supprimé - fonctionnalité dans B2CMusicEnhanced
 const ModeSelectionPage = lazy(() => import('@/pages/ModeSelectionPage'));

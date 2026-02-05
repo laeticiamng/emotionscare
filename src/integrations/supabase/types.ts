@@ -3913,6 +3913,36 @@ export type Database = {
         }
         Relationships: []
       }
+      breathing_sessions: {
+        Row: {
+          completed: boolean | null
+          created_at: string
+          duration_seconds: number
+          feedback: string | null
+          id: string
+          protocol: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          created_at?: string
+          duration_seconds?: number
+          feedback?: string | null
+          id?: string
+          protocol: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          created_at?: string
+          duration_seconds?: number
+          feedback?: string | null
+          id?: string
+          protocol?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       breathing_vr_sessions: {
         Row: {
           average_pace: number | null
