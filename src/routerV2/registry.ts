@@ -453,6 +453,17 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/app/breathing', '/respiration'],
   },
   {
+    name: 'emotional-journal',
+    path: '/dashboard/journal',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'simple',
+    component: 'EmotionalJournalPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/app/journal/emotional', '/journal'],
+  },
+  {
     name: 'brain-viewer',
     path: '/app/brain-viewer',
     segment: 'consumer',
