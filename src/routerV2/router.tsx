@@ -388,6 +388,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   HelpPage,
   DemoPage,
   OnboardingPage,
+  FeaturesPage,
   UnifiedLoginPage,
   SignupPage,
   ExamModePage,
@@ -600,6 +601,13 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   EmojiScanPage: B2CScanPage, // Alias pour registry
   VoiceScanPage,
   TextScanPage,
+  
+  // Dashboard core modules - NOUVELLEMENT AJOUTÉS
+  QuestionnaireScannerPage,
+  BreathingPage,
+  EmotionalJournalPage,
+  ClinicalAssessmentsPage,
+  DashboardSettingsPage,
   // MusicGeneratePage supprimé
   // MusicLibraryPage supprimé
   PricingPageWorking,
