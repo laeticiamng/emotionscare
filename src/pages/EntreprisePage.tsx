@@ -28,6 +28,7 @@ import {
   Globe
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 interface Solution {
   title: string;
@@ -122,6 +123,12 @@ export default function EntreprisePage() {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [selectedSolution, setSelectedSolution] = useState(1);
+
+  usePageSEO({
+    title: 'Solutions Entreprise - EmotionsCare B2B',
+    description: 'Transformez le bien-être de vos équipes avec EmotionsCare. Réduction du stress de 47%, analytics RH, conformité RGPD, support 24/7. Démo personnalisée.',
+    keywords: 'bien-être entreprise, QVT, qualité vie travail, RH, analytics, burn-out, stress équipes, EmotionsCare B2B'
+  });
 
   useEffect(() => {
     setIsVisible(true);

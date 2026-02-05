@@ -4,12 +4,19 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { routes } from '@/lib/routes';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 /**
  * Page Politique de Confidentialité
  */
 export const PrivacyPage: React.FC = () => {
   const navigate = useNavigate();
+
+  usePageSEO({
+    title: 'Politique de Confidentialité - EmotionsCare',
+    description: 'Politique de confidentialité EmotionsCare : collecte, traitement et protection de vos données personnelles. Droits RGPD, durées de conservation et sécurité des données.',
+    keywords: 'politique confidentialité, RGPD, données personnelles, vie privée, protection données, EmotionsCare'
+  });
 
   return (
     <div className="min-h-screen bg-background p-6">

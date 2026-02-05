@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React from 'react';
+import { usePageSEO } from '@/hooks/usePageSEO';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -187,6 +188,12 @@ const sections: Section[] = [
 ];
 
 const SalesPage: React.FC = () => {
+  usePageSEO({
+    title: 'Conditions Générales de Vente - EmotionsCare',
+    description: 'Consultez les conditions générales de vente EmotionsCare : abonnements, tarifs, paiements, garanties de service et droits des consommateurs. Conforme au droit français.',
+    keywords: 'CGV, conditions de vente, abonnement EmotionsCare, tarifs, garanties, paiement sécurisé'
+  });
+
   return (
     <main className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-10 max-w-4xl">
