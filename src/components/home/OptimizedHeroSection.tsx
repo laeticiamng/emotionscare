@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
-import { Heart, Building2, Sparkles, Users, Brain, Music, ArrowRight, Star, Play } from 'lucide-react';
+import { Heart, Building2, Sparkles, Users, Brain, Music, ArrowRight, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const OptimizedHeroSection: React.FC = () => {
   const navigate = useNavigate();
@@ -151,14 +151,16 @@ const OptimizedHeroSection: React.FC = () => {
               <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
             
-            <Button
-              variant="outline"
-              size="lg"
-              className="group border-2 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl hover:bg-muted/50 transition-all duration-200 min-h-[52px] touch-manipulation will-change-transform"
-            >
-              <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-              Voir la démo
-            </Button>
+            <Link to="/features">
+              <Button
+                variant="outline"
+                size="lg"
+                className="group border-2 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl hover:bg-muted/50 transition-all duration-200 min-h-[52px] touch-manipulation will-change-transform"
+              >
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                Découvrir
+              </Button>
+            </Link>
           </motion.div>
 
           {/* Optimized Features Preview - Lazy rendered */}

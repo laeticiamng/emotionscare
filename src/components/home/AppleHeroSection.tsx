@@ -154,11 +154,11 @@ const AppleHeroSection: React.FC = () => {
             <Button 
               size="lg" 
               variant="ghost"
-              onClick={() => navigate('/demo')}
+              onClick={() => navigate('/features')}
               className="group px-8 py-7 text-lg font-medium text-muted-foreground hover:text-foreground rounded-full"
             >
-              <Play className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
-              Voir la démo
+              <Sparkles className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
+              Découvrir
             </Button>
           </motion.div>
 
