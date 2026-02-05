@@ -132,6 +132,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'marketing',
     component: 'MentionsLegalesPage',
     guard: false,
+    aliases: ['/mentions-legales'],
   },
   {
     name: 'legal-privacy',
@@ -148,6 +149,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'marketing',
     component: 'TermsPage',
     guard: false,
+    aliases: ['/cgu'],
   },
   {
     name: 'legal-sales',
@@ -156,6 +158,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'marketing',
     component: 'SalesTermsPage',
     guard: false,
+    aliases: ['/cgv'],
   },
   {
     name: 'legal-cookies',
@@ -164,6 +167,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'marketing',
     component: 'CookiesPage',
     guard: false,
+    aliases: ['/cookies'],
   },
   {
     name: 'legal-licenses',
