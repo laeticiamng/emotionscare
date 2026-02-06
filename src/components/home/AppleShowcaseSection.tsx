@@ -27,7 +27,7 @@ const AppleShowcaseSection: React.FC = () => {
   return (
     <section 
       ref={sectionRef}
-      className="relative py-32 md:py-48 bg-foreground text-background overflow-hidden"
+      className="relative py-20 md:py-28 bg-foreground text-background overflow-hidden"
     >
       <div className="container px-4 sm:px-6 lg:px-8">
         <div ref={contentRef} className="max-w-6xl mx-auto">
