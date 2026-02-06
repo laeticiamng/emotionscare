@@ -1,201 +1,113 @@
 
+# Audit critique pre-publication -- EmotionsCare
 
-# Audit C-Suite Multi-Perspectives -- EmotionsCare
+## BLOCAGE P0 : Inscription toujours cassee (500)
+
+**Test live effectue** : POST `/auth/v1/signup` retourne `500 - "Database error saving new user"`.
+
+**Cause racine confirmee** : Le trigger `handle_new_user_settings()` sur `auth.users` execute :
+```sql
+INSERT INTO public.user_settings (user_id) VALUES (NEW.id)
+ON CONFLICT (user_id) DO NOTHING;
+```
+Mais la table `user_settings` n'a **pas** de contrainte unique sur `user_id` seul -- la contrainte est sur `(user_id, key)`. PostgreSQL rejette le `ON CONFLICT (user_id)` avec : `"there is no unique or exclusion constraint matching the ON CONFLICT specification"`.
+
+**Correction** : Migration SQL pour ajouter une contrainte unique sur `user_id` OU modifier le trigger pour utiliser `ON CONFLICT DO NOTHING` (sans specifier de colonne).
 
 ---
 
-## BLOCAGE CRITIQUE No1 : Inscription impossible (500)
+## BLOCAGE P1 : Cookie banner masque le bouton "Creer mon compte"
 
-**Cause racine identifiee** (confirmee par test live et logs Supabase) :
+Le cookie banner utilise `fixed bottom-0 z-50` et recouvre le bouton submit du formulaire d'inscription. L'utilisateur ne peut pas cliquer sur "Creer mon compte" tant qu'il n'a pas interagi avec le banner -- un probleme UX critique car :
+- L'utilisateur ne comprend pas pourquoi le clic ne marche pas
+- Sur mobile, le banner occupe encore plus d'espace ecran
 
-Le trigger `audit_profile_changes()` sur la table `profiles` insere `TG_OP` (= `'INSERT'`) dans `admin_changelog.action_type`, mais le check constraint n'autorise que `['update', 'create', 'delete', 'correction']`.
+**Correction** : Ajouter du padding-bottom au formulaire de signup quand le banner est visible, et s'assurer que le banner ne bloque pas les interactions.
 
-Resultat : toute inscription plante avec `500 - Database error saving new user`.
+---
 
-**Correction** : Modifier la fonction `audit_profile_changes()` pour mapper `TG_OP` vers les valeurs autorisees (`INSERT` -> `create`, `UPDATE` -> `update`, `DELETE` -> `delete`).
+## Resultats d'audit par role
 
+### CEO -- Strategie
+- Proposition de valeur claire ("bien-etre emotionnel pour soignants")
+- **STOP BUSINESS** : inscription impossible = 0 croissance
+- 6 comptes en base dont 1 actif -- priorite absolue : debloquer le signup
+
+### CISO -- Securite
+- 4 warnings du linter Supabase :
+  1. Fonctions sans `SET search_path` (risque de detournement)
+  2. Extensions dans le schema `public` (risque d'escalade)
+  3. 2x RLS policies trop permissives (`USING(true)` sur INSERT/UPDATE/DELETE)
+- Anon key correctement exposee (normal pour Supabase)
+- `TEST_MODE.BYPASS_AUTH = false` en prod -- correct
+
+### DPO -- RGPD
+- Bandeau cookies conforme avec 3 niveaux (essentiels, fonctionnels, analytics)
+- Edge functions GDPR presentes (export, deletion, retention)
+- Risque : 733+ tables = surface de donnees personnelles non cartographiee
+
+### CDO -- Data
+- KPIs homepage factuels (pas de donnees gonflees)
+- Pipeline analytics basique (`analytics_events` table)
+
+### COO -- Operations
+- Scripts de health check et monitoring presents
+- Complexite operationnelle excessive (250+ edge functions)
+
+### Head of Design -- UX
+- Homepage Apple-style reussie, messaging clair
+- **Bug UX critique** : cookie banner bloque le CTA signup
+- Indicateur de force mot de passe : bien implemente
+- Accessibilite : skip-links, aria-labels presents
+
+### Beta testeur -- Test reel
+1. Homepage : design agreable mais chargement lent (FCP 5.7s, LCP 6.8s)
+2. Page signup : formulaire clair avec validation temps reel
+3. Cookie banner bloque le bouton submit -- confusion utilisateur
+4. Apres acceptation du banner : clic sur "Creer" -> erreur 500
+5. Message d'erreur en francais ("Erreur lors de la creation du compte") -- traduction OK
+6. **Produit inutilisable** : impossible de s'inscrire
+
+---
+
+## Plan de corrections (3 actions)
+
+### 1. Migration SQL -- Fix trigger `handle_new_user_settings`
+
+Modifier le trigger pour ne pas specifier de colonne dans `ON CONFLICT` :
 ```sql
--- Migration SQL a executer
-CREATE OR REPLACE FUNCTION audit_profile_changes()
+CREATE OR REPLACE FUNCTION handle_new_user_settings()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO admin_changelog (
-    table_name, record_id, action_type,
-    admin_user_id, old_value, new_value
-  ) VALUES (
-    TG_TABLE_NAME,
-    COALESCE(NEW.id::text, OLD.id::text),
-    CASE TG_OP
-      WHEN 'INSERT' THEN 'create'
-      WHEN 'UPDATE' THEN 'update'
-      WHEN 'DELETE' THEN 'delete'
-      ELSE 'update'
-    END,
-    auth.uid(),
-    CASE WHEN TG_OP IN ('UPDATE','DELETE') THEN row_to_json(OLD) ELSE NULL END,
-    CASE WHEN TG_OP IN ('INSERT','UPDATE') THEN row_to_json(NEW) ELSE NULL END
-  );
-  RETURN COALESCE(NEW, OLD);
+  INSERT INTO public.user_settings (user_id)
+  VALUES (NEW.id)
+  ON CONFLICT DO NOTHING;
+  RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 ```
 
----
+### 2. Fix cookie banner UX -- `src/components/cookies/CookieBanner.tsx`
 
-## Audit CEO -- Strategie
+Modifier le positionnement du banner pour qu'il n'empeche pas le clic sur les elements en dessous :
+- Ajouter `pointer-events: none` sur le container fixe et `pointer-events: auto` uniquement sur le contenu du banner
+- OU ajouter un padding-bottom dynamique au body quand le banner est visible
 
-| Critere | Constat | Gravite |
-|---------|---------|---------|
-| Proposition de valeur | Claire : "bien-etre emotionnel pour soignants". Coherente avec le positionnement healthcare | OK |
-| KPIs homepage | Stats factuelles (37 modules, 3 min/session, 100% RGPD, 24/7). Pas de faux chiffres | OK |
-| Base utilisateurs | 6 comptes en base, dont 1 actif recemment | Attention |
-| Inscription bloquee | 500 error -- stop business absolu | Critique |
-| Volume de code vs usage | 733 tables, 467 fonctions DB, 250+ edge functions, 150+ pages pour 6 utilisateurs | Desequilibre majeur |
-| Roadmap | Documentee dans docs/ROADMAP_2026.md mais priorites mal alignees (features vs stabilite) | A revoir |
+### 3. Fix signup page padding -- `src/pages/SignupPage.tsx`
 
-**Recommandation CEO** : Geler tout developpement de features. Priorite absolue : fix signup, reduire la complexite, obtenir 50 vrais utilisateurs.
+Ajouter un `pb-24` (padding-bottom) au container du formulaire pour garantir que le bouton "Creer mon compte" est toujours visible au-dessus du cookie banner, meme sans scroll.
 
 ---
 
-## Audit CTO -- Technique
-
-| Critere | Constat | Gravite |
-|---------|---------|---------|
-| Performance Web Vitals | FCP: 5636ms (poor), LCP: 6836ms (poor), TTFB: 1718ms (needs-improvement) | Critique |
-| Build size | 150+ pages, lazy loading partiel, bundle probablement > 2MB | Majeur |
-| Dependencies | 130+ packages, dont beaucoup inutilises cote front (sharp, pg, fastify encore references) | Majeur |
-| 733 tables DB | Massif pour le stade du produit. Maintenance impossible | Critique |
-| Edge Functions | 250+ fonctions separees + 8 super-routers = redondance | Majeur |
-| `@ts-nocheck` | Encore present dans `src/lib/env.ts` et potentiellement d'autres fichiers | Moyen |
-| Triggers en cascade | 5 triggers sur auth.users + 7 sur profiles = chaine fragile (cause du bug signup) | Critique |
-| Autocomplete manquant | Champs password sans `autocomplete="new-password"` | Mineur |
-
-**Recommandation CTO** : Fix DB trigger immediat. Audit et suppression des triggers cascades non essentiels. Reduire les tables a < 100. Optimiser le bundle.
-
----
-
-## Audit CPO -- Produit
-
-| Critere | Constat | Gravite |
-|---------|---------|---------|
-| Onboarding | Impossible (signup casse) | Critique |
-| Parcours premiere utilisation | Non testable | Bloquant |
-| Homepage UX | Design Apple-style reussi, messaging clair | Bien |
-| Password strength | Indicateur temps reel ajoute, validation 8+ chars | Bien |
-| Cookie banner | Bloque potentiellement le CTA signup (overlay) | Moyen |
-| Nombre de modules | 37+ annonces mais la plupart ne sont pas testables | Majeur |
-| Coherence navigation | 150+ routes, navigation complexe pour un nouvel utilisateur | Majeur |
-
-**Recommandation CPO** : Reduire le scope visible a 5 modules core fonctionnels. Les autres en "coming soon" avec feature flags.
-
----
-
-## Audit CISO/RSSI -- Securite
-
-| Critere | Constat | Gravite |
-|---------|---------|---------|
-| RLS | Active sur toutes les tables, 3 policies trop permissives (USING true sur non-SELECT) | Moyen |
-| Secrets frontend | Anon key exposee dans `config.ts` ET `.env` (normal pour anon key) | OK |
-| Function search_path | Certaines fonctions sans `SET search_path` (linter warning) | Moyen |
-| Extensions public | Extensions dans le schema public au lieu d'un schema dedie | Mineur |
-| CSP Headers | Configures dans `_headers`, incluant unsafe-inline pour scripts | Acceptable |
-| Logger PII scrubbing | Implemente dans `logger.ts` avec filtrage des mots-cles sensibles | Bien |
-| TEST_MODE | BYPASS_AUTH = false en prod. Correct | OK |
-| Triggers SECURITY DEFINER | `audit_profile_changes` devrait utiliser `SET search_path = public` | Moyen |
-
-**Recommandation CISO** : Corriger les 3 RLS policies permissives. Ajouter `SET search_path` aux fonctions flaggees.
-
----
-
-## Audit DPO -- RGPD
-
-| Critere | Constat | Gravite |
-|---------|---------|---------|
-| Consentement | Banners cookies + checkboxes CGU/Privacy au signup | Bien |
-| Data export | Infrastructure GDPR (data-export, data-deletion edge functions) | Bien |
-| Retention | `data-retention-processor` edge function presente | Bien |
-| Droit a l'oubli | Page `/account-deletion` et edge function `purge_deleted_users` | Bien |
-| Privacy policies | Table `privacy_policies` en base, requetee au chargement | Bien |
-| Donnees en base | 733 tables = surface d'attaque enorme pour la conformite | Risque |
-
-**Recommandation DPO** : Documenter quelles tables contiennent des donnees personnelles. Les 600+ tables superflues representent un risque RGPD car chaque table avec des donnees utilisateur doit etre couverte par l'export/suppression.
-
----
-
-## Audit CDO -- Data
-
-| Critere | Constat | Gravite |
-|---------|---------|---------|
-| Qualite KPIs | Stats homepage factuelles, pas de donnees gonflees | Bien |
-| Pipeline analytics | `analytics_events` table presente, edge functions analytics | Partiel |
-| 733 tables | Impossible de maintenir la gouvernance sur autant de tables | Critique |
-| Sources de donnees | Supabase unique source (coherent) | Bien |
-
----
-
-## Audit COO -- Operations
-
-| Critere | Constat | Gravite |
-|---------|---------|---------|
-| CI/CD | Scripts de health check et audit presents | Bien |
-| Monitoring | Web Vitals tracking, logger structure | Bien |
-| Alerting | Edge functions pour alertes (Discord, Slack, email) | Bien |
-| Automatisations | Cron monitoring, scheduled reports | Bien |
-| Complexite operationnelle | 250+ edge functions a maintenir | Critique |
-
----
-
-## Audit Head of Design -- UX
-
-| Critere | Constat | Gravite |
-|---------|---------|---------|
-| Homepage | Apple-style, minimaliste, bien structure | Excellent |
-| Hierarchie visuelle | Titres clairs, espacement genereux, gradient subtils | Bien |
-| Mobile | Menu hamburger, responsive grid, tailles adaptatives | Bien |
-| Signup form | Design soigne avec indicateur de force password | Bien |
-| Cookie banner | Potentiellement intrusif sur mobile | Mineur |
-| Accessibilite | Skip-to-content, aria-labels, focus management | Bien |
-
----
-
-## Audit Beta Testeur
-
-**Test en conditions reelles realise :**
-
-1. Homepage : Chargement lent (6.8s LCP) mais design agreable. Message clair en 5 secondes.
-2. Clic "Essai gratuit" -> page signup OK, formulaire clair.
-3. Remplissage du formulaire -> indicateur de force password utile.
-4. Soumission -> **ECHEC TOTAL** : erreur 500, message affiche en francais grace au fix authErrorService.
-5. Impossible d'acceder au produit -> **test arrete**.
-
-**Verdict beta testeur** : Le produit est inutilisable. Le blocage signup empeche toute evaluation.
-
----
-
-## Plan de corrections (par priorite)
-
-### P0 -- Immediat (fix signup)
-
-1. **Corriger `audit_profile_changes()`** : Mapper `TG_OP` ('INSERT' -> 'create', 'UPDATE' -> 'update', 'DELETE' -> 'delete') pour respecter la check constraint de `admin_changelog`
-2. **Ajouter `SET search_path = public`** a cette fonction
-3. **Traduire l'erreur 500** dans `authErrorService.ts` : ajouter un pattern pour "Database error" -> message francais ("Erreur lors de la creation du compte. Veuillez reessayer.")
-
-### P1 -- Court terme (UX signup)
-
-4. **Ajouter `autocomplete="new-password"`** aux champs mot de passe du signup et `autocomplete="email"` au champ email
-5. **Verifier que le cookie banner ne bloque pas** les CTAs sur mobile
-6. **Gerer le cas `email_confirmed_at = null`** avec un message explicite apres inscription reussie
-
-### P2 -- Performance
-
-7. **Optimiser le bundle** : Identifier et supprimer les imports inutilises
-8. **Ameliorer LCP/FCP** : Precharger les fonts, reduire le JavaScript initial
-
-### Section technique -- Fichiers modifies
+## Section technique
 
 | Fichier/Ressource | Modification |
 |---|---|
-| Migration SQL (Supabase) | `CREATE OR REPLACE FUNCTION audit_profile_changes()` avec mapping TG_OP |
-| `src/lib/auth/authErrorService.ts` | Ajouter pattern "database error" -> message francais |
-| `src/pages/SignupPage.tsx` | Ajouter `autoComplete="new-password"` et `autoComplete="email"` |
+| Migration SQL (Supabase) | Fix `handle_new_user_settings()` : `ON CONFLICT DO NOTHING` + `SET search_path = public` |
+| `src/components/cookies/CookieBanner.tsx` | Ajouter `pointer-events-none` sur le wrapper fixe |
+| `src/pages/SignupPage.tsx` | Ajouter `pb-24` au container pour eviter le masquage par le banner |
 
+## Action manuelle requise
+
+- **Desactiver "Confirm email"** dans le [dashboard Supabase > Auth > Email](https://supabase.com/dashboard/project/yaincoxihiqdksxgrsrk/auth/providers) pour permettre le test immediat
+- **Configurer les Redirect URLs** : ajouter `https://emotions-care.lovable.app` dans Authentication > URL Configuration
