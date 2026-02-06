@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -265,7 +266,7 @@ export const SuggestionChip: React.FC<SuggestionChipProps> = ({
     if (navigator.share) {
       try {
         await navigator.share({ title: 'EmotionsCare', text: shareText });
-      } catch (err) {}
+      } catch (err) { logger.warn('Navigator share failed', err instanceof Error ? err : undefined, 'UI'); }
     } else {
       await navigator.clipboard.writeText(shareText);
       toast({

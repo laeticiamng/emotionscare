@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { logger } from '@/lib/logger';
 import { Sparkles, Wind, Wand2, Music, Star, Clock, TrendingUp, Share2, Download, Filter, BarChart3, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -214,7 +215,7 @@ export function ARExperienceSelector({ onSelect, className }: ARExperienceSelect
     if (navigator.share) {
       try {
         await navigator.share({ title: 'Expériences AR EmotionsCare', text: shareText });
-      } catch (err) {}
+      } catch (err) { logger.warn('Navigator share failed', err instanceof Error ? err : undefined, 'UI'); }
     } else {
       await navigator.clipboard.writeText(shareText);
       toast({ title: 'Copié !' });

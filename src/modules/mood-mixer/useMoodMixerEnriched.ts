@@ -379,7 +379,7 @@ export function useMoodMixerEnriched(userId?: string): UseMoodMixerEnrichedRetur
 
       // Stop existing oscillators
       oscillatorsRef.current.forEach(osc => {
-        try { osc.stop(); osc.disconnect(); } catch (e) {}
+        try { osc.stop(); osc.disconnect(); } catch (e) { /* oscillator already stopped */ }
       });
       oscillatorsRef.current = [];
 
@@ -420,7 +420,7 @@ export function useMoodMixerEnriched(userId?: string): UseMoodMixerEnrichedRetur
 
   const stopAudio = useCallback(() => {
     oscillatorsRef.current.forEach(osc => {
-      try { osc.stop(); osc.disconnect(); } catch (e) {}
+      try { osc.stop(); osc.disconnect(); } catch (e) { /* oscillator already stopped */ }
     });
     oscillatorsRef.current = [];
   }, []);
