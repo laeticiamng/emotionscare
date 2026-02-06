@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import { 
   Scan, Wind, BookOpen, ClipboardCheck, 
   Bot, Music, Headphones, Sparkles,
-  ArrowRight, CheckCircle2, Clock
+  ArrowRight, CheckCircle2
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -78,9 +78,6 @@ const availableFeatures: Feature[] = [
     highlights: ['WHO-5 (OMS)', 'PHQ-9 (Dépression)', 'Graphiques évolution'],
     available: true,
   },
-];
-
-const comingSoonFeatures: Feature[] = [
   {
     id: 'coach',
     title: 'Coach IA',
@@ -88,10 +85,10 @@ const comingSoonFeatures: Feature[] = [
     longDescription: 'Un coach conversationnel alimenté par l\'IA qui vous accompagne dans vos moments difficiles avec empathie et des techniques validées scientifiquement.',
     icon: Bot,
     href: '/app/coach',
-    color: 'text-accent',
-    bgGradient: 'from-accent/20 to-primary/20',
+    color: 'text-primary',
+    bgGradient: 'from-primary/20 to-accent/20',
     highlights: ['Conversations naturelles', 'Techniques CBT', 'Disponible 24/7'],
-    available: false,
+    available: true,
   },
   {
     id: 'music',
@@ -100,10 +97,10 @@ const comingSoonFeatures: Feature[] = [
     longDescription: 'Bibliothèque de paysages sonores, musiques relaxantes et battements binauraux scientifiquement conçus pour réguler votre humeur et améliorer votre concentration.',
     icon: Music,
     href: '/app/music',
-    color: 'text-accent',
-    bgGradient: 'from-accent/20 to-primary/20',
+    color: 'text-primary',
+    bgGradient: 'from-primary/20 to-accent/20',
     highlights: ['Sons nature', 'Battements binauraux', 'Playlists personnalisées'],
-    available: false,
+    available: true,
   },
   {
     id: 'immersive',
@@ -112,10 +109,10 @@ const comingSoonFeatures: Feature[] = [
     longDescription: 'Plongez dans des environnements virtuels apaisants grâce à la réalité virtuelle et augmentée. Méditations guidées et exercices de pleine conscience immersifs.',
     icon: Headphones,
     href: '/app/vr',
-    color: 'text-accent',
-    bgGradient: 'from-accent/20 to-primary/20',
+    color: 'text-primary',
+    bgGradient: 'from-primary/20 to-accent/20',
     highlights: ['Réalité virtuelle', 'Filtres AR', 'Environnements 3D'],
-    available: false,
+    available: true,
   },
 ];
 
@@ -134,12 +131,6 @@ const FeatureCard: React.FC<{ feature: Feature; index: number }> = ({ feature, i
             <div className={`p-3 rounded-xl bg-gradient-to-br ${feature.bgGradient}`}>
               <Icon className={`h-8 w-8 ${feature.color}`} />
             </div>
-            {!feature.available && (
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                Bientôt
-              </Badge>
-            )}
           </div>
           <CardTitle className="text-xl mt-4">{feature.title}</CardTitle>
           <CardDescription className="text-base">{feature.description}</CardDescription>
@@ -235,28 +226,6 @@ const FeaturesPage: React.FC = () => {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {availableFeatures.map((feature, index) => (
-              <FeatureCard key={feature.id} feature={feature} index={index} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Coming Soon Features */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <Badge variant="secondary" className="mb-4">
-              <Clock className="h-3 w-3 mr-1" />
-              En développement
-            </Badge>
-            <h2 className="text-3xl font-bold mb-4">Bientôt disponible</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Nous travaillons activement sur ces nouvelles fonctionnalités passionnantes
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {comingSoonFeatures.map((feature, index) => (
               <FeatureCard key={feature.id} feature={feature} index={index} />
             ))}
           </div>
