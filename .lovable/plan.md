@@ -1,67 +1,59 @@
 
 
-# Audit UX Detaille - EmotionsCare
+# Audit UX Utilisateur Final - EmotionsCare
 
-## Problemes Identifies
+## Pages testees et statut
 
-### P0 - Bloquants pour l'utilisateur
+| Page | Statut | Remarques |
+|------|--------|-----------|
+| Accueil `/` | OK | Navigation, CTA, demo respiration fonctionnels |
+| Login `/login` | Minor | Checkbox "Se souvenir" utilise un input natif peu visible sur fond sombre |
+| Signup `/signup` | OK | Formulaire complet, social login present |
+| Pricing `/pricing` | OK | "Gratuit" affiche correctement, toggle mensuel/annuel fonctionne |
+| Contact `/contact` | OK | Lien centre d'aide fonctionne |
+| Features `/features` | OK | Cartes fonctionnalites bien presentees |
+| About `/about` | OK | Page complete |
+| Help `/help` | OK | Centre d'aide accessible |
+| FAQ `/faq` | OK | Recherche et categories fonctionnelles |
+| Enterprise `/b2b` | OK | Page B2B complete |
+| Legal `/legal/mentions` | **404** | Page introuvable |
+| Legal `/legal/terms` | **404** | Page introuvable |
+| Install `/install` | OK | Page PWA accessible |
 
-#### 1. Lien "Mot de passe oublie" mene vers une page 404
-- **Fichier** : `src/pages/LoginPage.tsx` ligne 330
-- **Impact** : Un utilisateur qui a oublie son mot de passe ne peut pas le reinitialiser. Impasse totale dans le parcours d'authentification.
-- **Correction** : Remplacer le `<Link to="/forgot-password">` par un dialog inline (comme le `ForgotPasswordDialog` qui existe deja dans `src/pages/b2c/login/ForgotPasswordDialog.tsx`) qui appelle `supabase.auth.resetPasswordForEmail()` directement depuis la page de login.
+## Problemes restants
 
-#### 2. Bouton "Acceder au centre d'aide" non fonctionnel (page Contact)
-- **Fichier** : `src/pages/ContactPage.tsx` ligne 356-362
-- **Impact** : L'utilisateur clique sur le bouton et rien ne se passe. Perte de confiance immediate.
-- **Correction** : Transformer le `<Button>` en `<Link to="/help">` qui navigue vers la page d'aide existante.
+### P0 - Liens du footer menant vers des 404
 
----
+**Impact** : Les 5 liens legaux du footer (`/legal/mentions`, `/legal/terms`, `/legal/sales`, `/legal/privacy`, `/legal/cookies`) menent tous vers la page 404. Un utilisateur qui cherche les mentions legales ou la politique de confidentialite ne trouve rien. Ceci est aussi un probleme de conformite RGPD.
 
-### P1 - Accessibilite
+**Fichier** : `src/components/home/Footer.tsx` lignes 28-34
 
-#### 3. Bouton afficher/masquer mot de passe sans aria-label (page Login)
-- **Fichier** : `src/pages/LoginPage.tsx` ligne 307-312
-- **Impact** : Les lecteurs d'ecran ne peuvent pas identifier le bouton. Non conforme WCAG AA.
-- **Correction** : Ajouter `aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}`.
+**Correction** : Verifier les routes dans le routeur et corriger les chemins du footer pour correspondre aux routes existantes. Si les pages legales existent sous d'autres chemins (ex: `/privacy`, `/terms`), mettre a jour les liens. Sinon, les pages doivent etre creees.
 
-#### 4. Bouton afficher/masquer mot de passe sans aria-label (page Signup)
-- **Fichier** : `src/pages/SignupPage.tsx` (boutons similaires)
-- **Impact** : Meme probleme que sur la page Login.
-- **Correction** : Ajouter les `aria-label` correspondants.
+### P1 - Checkbox "Se souvenir de moi" peu visible
 
----
+**Fichier** : `src/pages/LoginPage.tsx` lignes 322-329
 
-### P2 - Ameliorations UX
+**Impact** : La checkbox native `<input type="checkbox">` est quasiment invisible sur le fond sombre de la page de login. L'utilisateur ne voit pas s'il l'a cochee ou non.
 
-#### 5. Prix "0 euro" sur la page Tarifs
-- **Fichier** : `src/pages/PricingPageWorking.tsx` ligne 122-124
-- **Impact** : Afficher "0 euro" est ambigu. "Gratuit" est plus clair et plus engageant pour l'utilisateur.
-- **Correction** : Afficher "Gratuit" au lieu de "0 euro" quand le prix est 0.
+**Correction** : Remplacer par le composant `Checkbox` de shadcn/ui (Radix) deja installe, qui offre un meilleur contraste et un feedback visuel clair.
 
-#### 6. Footer expose des liens proteges sans indication
-- **Fichier** : `src/components/home/Footer.tsx` lignes 17-21
-- **Impact** : L'utilisateur clique sur "Scanner emotionnel" ou "Mon espace" et se retrouve redirige vers /login sans comprendre pourquoi.
-- **Correction** : Ajouter une icone cadenas ou une indication visuelle "(connexion requise)" a cote des liens proteges dans le footer.
+### P2 - Banniere cookies persistante
+
+**Impact** : La banniere cookies reste affichee en permanence en bas de chaque page, meme apres interaction. Elle masque partiellement le contenu du footer. Si l'utilisateur clique "Accepter" ou "Refuser", elle doit disparaitre et ne plus revenir.
+
+**Correction** : Verifier que le composant cookie banner sauvegarde bien le choix de l'utilisateur (localStorage) et ne s'affiche plus une fois le choix fait.
 
 ---
 
 ## Corrections a implementer
 
-### Fichier 1 : `src/pages/LoginPage.tsx`
-1. Remplacer `<Link to="/forgot-password">` par un composant dialog qui utilise `supabase.auth.resetPasswordForEmail()`.
-2. Ajouter `aria-label` au bouton toggle password.
-3. Remplacer `catch (error: any)` par `catch (error: unknown)`.
+### Fichier 1 : Liens legaux du footer
+Identifier les bonnes routes pour les pages legales et corriger les href dans `Footer.tsx` pour eviter les 404.
 
-### Fichier 2 : `src/pages/ContactPage.tsx`
-4. Transformer le bouton "Acceder au centre d'aide" en lien vers `/help`.
+### Fichier 2 : Checkbox login
+Remplacer `<input type="checkbox">` par `<Checkbox>` de shadcn/ui dans `LoginPage.tsx` pour une meilleure visibilite sur fond sombre.
 
-### Fichier 3 : `src/pages/PricingPageWorking.tsx`
-5. Afficher "Gratuit" quand le prix est 0.
-
-### Fichier 4 : `src/pages/SignupPage.tsx`
-6. Ajouter `aria-label` aux boutons toggle password.
-
-### Fichier 5 : `src/components/home/Footer.tsx`
-7. Ajouter une indication visuelle "(connexion requise)" aux liens proteges du footer.
+### Fichier 3 : Cookie banner
+Verifier la persistance du choix utilisateur dans le composant de banniere cookies.
 
