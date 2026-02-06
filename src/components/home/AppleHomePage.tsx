@@ -10,13 +10,13 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Menu, X, HelpCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppleHeroSection from '@/components/home/AppleHeroSection';
-import AppleFeatureSection from '@/components/home/AppleFeatureSection';
-import AppleShowcaseSection from '@/components/home/AppleShowcaseSection';
-import AppleStatsSection from '@/components/home/AppleStatsSection';
-import AppleCTASection from '@/components/home/AppleCTASection';
 import { cn } from '@/lib/utils';
 
-// Lazy load non-critical sections
+// Lazy load below-the-fold sections for better FCP/LCP
+const AppleFeatureSection = lazy(() => import('@/components/home/AppleFeatureSection'));
+const AppleShowcaseSection = lazy(() => import('@/components/home/AppleShowcaseSection'));
+const AppleStatsSection = lazy(() => import('@/components/home/AppleStatsSection'));
+const AppleCTASection = lazy(() => import('@/components/home/AppleCTASection'));
 const Footer = lazy(() => import('@/components/home/Footer'));
 
 // Skeleton for lazy sections
@@ -230,17 +230,22 @@ const AppleHomePage: React.FC = () => {
         {/* Hero Section - Full viewport, impactant */}
         <AppleHeroSection />
 
-        {/* Features Section - Scroll reveal */}
-        <AppleFeatureSection />
+        {/* Below-fold sections - lazy loaded */}
+        <Suspense fallback={<SectionSkeleton />}>
+          <AppleFeatureSection />
+        </Suspense>
 
-        {/* Showcase Section - Immersive demo */}
-        <AppleShowcaseSection />
+        <Suspense fallback={<SectionSkeleton />}>
+          <AppleShowcaseSection />
+        </Suspense>
 
-        {/* Stats Section - Chiffres animés */}
-        <AppleStatsSection />
+        <Suspense fallback={<SectionSkeleton />}>
+          <AppleStatsSection />
+        </Suspense>
 
-        {/* CTA Section - Final push */}
-        <AppleCTASection />
+        <Suspense fallback={<SectionSkeleton />}>
+          <AppleCTASection />
+        </Suspense>
       </main>
 
       {/* Footer */}
