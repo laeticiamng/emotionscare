@@ -32,7 +32,7 @@ const features: Feature[] = [
     title: "3 minutes.",
     subtitle: "C'est tout ce qu'il faut.",
     description: "Nos protocoles d'urgence sont conçus pour agir vite. Parce qu'en situation de stress, chaque seconde compte.",
-    gradient: "from-amber-500 to-orange-500",
+    gradient: "from-primary to-accent",
     stat: { value: "180s", label: "temps moyen d'intervention" }
   },
   {
@@ -40,24 +40,24 @@ const features: Feature[] = [
     title: "Basé sur la science.",
     subtitle: "Validé par les neurosciences.",
     description: "Chaque exercice repose sur des données probantes : cohérence cardiaque, pleine conscience, thérapies comportementales.",
-    gradient: "from-primary to-accent",
+    gradient: "from-accent to-primary",
     stat: { value: "94%", label: "efficacité ressentie" }
   },
   {
     icon: <Shield className="h-12 w-12" />,
     title: "100% confidentiel.",
-    subtitle: "Tes données t'appartiennent.",
-    description: "Aucune donnée partagée, jamais. Conforme RGPD, hébergement HDS, et respect total de ton intimité.",
-    gradient: "from-emerald-500 to-green-500",
+    subtitle: "Vos données vous appartiennent.",
+    description: "Aucune donnée partagée, jamais. Conforme RGPD, hébergement HDS, et respect total de votre intimité.",
+    gradient: "from-primary/80 to-primary",
     stat: { value: "0", label: "données vendues" }
   },
   {
     icon: <Heart className="h-12 w-12" />,
     title: "Par des soignants.",
     subtitle: "Pour des soignants.",
-    description: "Créé avec et pour les professionnels de santé. On connaît ton quotidien, tes contraintes, ta réalité.",
-    gradient: "from-rose-500 to-pink-500",
-    stat: { value: "50+", label: "soignants consultés" }
+    description: "Créé avec et pour les professionnels de santé. Nous connaissons votre quotidien, vos contraintes, votre réalité.",
+    gradient: "from-accent/80 to-accent",
+    stat: { value: "4", label: "protocoles co-construits" }
   },
 ];
 
