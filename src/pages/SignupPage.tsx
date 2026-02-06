@@ -138,15 +138,16 @@ const SignupPage: React.FC = () => {
                 <label className="text-sm font-medium text-foreground/80">
                   Nom complet
                 </label>
-                <Input
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="h-11 border-2 focus:border-primary"
-                  placeholder="Votre nom complet"
-                  required
-                  disabled={isLoading}
-                />
+                  <Input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="h-11 border-2 focus:border-primary"
+                    placeholder="Votre nom complet"
+                    required
+                    disabled={isLoading}
+                    autoComplete="name"
+                  />
               </div>
 
               {/* Email */}
@@ -156,7 +157,7 @@ const SignupPage: React.FC = () => {
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input
+                   <Input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -164,6 +165,7 @@ const SignupPage: React.FC = () => {
                     placeholder="votre@email.com"
                     required
                     disabled={isLoading}
+                    autoComplete="email"
                   />
                 </div>
               </div>
@@ -175,7 +177,7 @@ const SignupPage: React.FC = () => {
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input
+                   <Input
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -183,6 +185,7 @@ const SignupPage: React.FC = () => {
                     placeholder="••••••••"
                     required
                     disabled={isLoading}
+                    autoComplete="new-password"
                   />
                   <button
                     type="button"
@@ -215,7 +218,7 @@ const SignupPage: React.FC = () => {
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input
+                   <Input
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -223,6 +226,7 @@ const SignupPage: React.FC = () => {
                     placeholder="••••••••"
                     required
                     disabled={isLoading}
+                    autoComplete="new-password"
                   />
                   <button
                     type="button"
