@@ -22,10 +22,12 @@ const ConsentBanner: React.FC = () => {
       return;
     }
 
+    // Vérifier UNE SEULE FOIS au montage si les préférences existent
+    const hasStored = hasStoredConsentPreferences();
     const preferences = getConsentPreferences();
     setAnalyticsEnabled(preferences.categories.analytics);
 
-    if (!hasStoredConsentPreferences()) {
+    if (!hasStored) {
       setIsVisible(true);
       
       // ✅ OPT-IN STRICT CNIL: Bloquer TOUS les trackers AVANT choix
@@ -38,7 +40,11 @@ const ConsentBanner: React.FC = () => {
       if (typeof window !== 'undefined' && import.meta.env.VITE_GA_MEASUREMENT_ID) {
         (window as any)[`ga-disable-${import.meta.env.VITE_GA_MEASUREMENT_ID}`] = true;
       }
+    } else {
+      // Préférences déjà enregistrées - ne jamais réafficher
+      setIsVisible(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const persistChoice = (analytics: boolean) => {

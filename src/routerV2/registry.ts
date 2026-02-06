@@ -310,7 +310,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'public',
     layout: 'marketing',
     component: 'UnifiedLoginPage',
-    aliases: ['/auth', '/b2c/login', '/b2b/user/login', '/b2b/admin/login'],
+    aliases: ['/auth', '/auth/login', '/b2c/login', '/b2b/user/login', '/b2b/admin/login'],
     guard: false,
   },
   {
