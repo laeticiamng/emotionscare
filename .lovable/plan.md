@@ -1,15 +1,16 @@
 
 
-# Audit Exhaustif 3 Phases - Iteration 2
+# Audit Exhaustif 3 Phases - Iteration 3
 
-Les corrections de l'iteration precedente (T2-T5, U2-U4, T3 sur 5 fichiers) sont toutes en place et verifiees. Ce nouvel audit cible les problemes restants.
+Les corrections de l'iteration 2 n'ont pas pris effet sur la plupart des fichiers. Ce plan cible les problemes restants verifies dans le code actuel.
 
 ---
 
 ## Phase 1 : Audit Technique (Dev Senior)
 
-### T1 - `console.log/error/warn` restants dans 20 pages
-Les 5 fichiers prioritaires ont ete corriges, mais il reste **20 pages** avec des `console.error/warn` en production. Fichiers a corriger en priorite :
+### T1 - `console.error/warn` restants dans 20 pages (TOUJOURS PRESENT)
+
+Les fichiers suivants contiennent encore des `console.error/warn` malgre le plan precedent :
 
 | Fichier | Occurrences |
 |---------|-------------|
@@ -30,13 +31,63 @@ Les 5 fichiers prioritaires ont ete corriges, mais il reste **20 pages** avec de
 | `src/pages/NotificationSettingsPage.tsx` | 1x console.warn |
 | `src/pages/music/CollaborativePlaylistPage.tsx` | 1x console.error |
 | `src/pages/journal/EmotionalJournalPage.tsx` | 1x console.error |
-| `src/pages/DataExportPage.tsx` | 1x console.error |
-| `src/pages/ExamModePage.tsx` | 1x console.error (deja `logger.error` apres) |
+| `src/pages/DataExportPage.tsx` | 2x console.error |
+| `src/pages/ExamModePage.tsx` | 1x catch(error: any) |
 
-**Correction** : Remplacer chaque `console.error/warn` par `logger.error` / `logger.warn` du module `@/lib/logger`. Ajouter l'import du logger si absent.
+**Correction** : Remplacer chaque `console.error/warn` par `logger.error`/`logger.warn`. Ajouter `import { logger } from '@/lib/logger'` si absent.
 
-### T2 - `catch (error: any)` restants (59 fichiers, ~580 occurrences)
-Le fichier `UnifiedLoginPage.tsx` a ete corrige, mais il reste **59 fichiers** avec `catch (error: any)`. Les 10 fichiers les plus critiques a corriger :
+### T2 - `console.error/warn` dans 34 hooks
+
+| Fichier | Occurrences |
+|---------|-------------|
+| `src/hooks/useWebAudioContext.ts` | 1x error + 1x warn |
+| `src/hooks/useImplicitAssessment.ts` | 2x error |
+| `src/hooks/useJournalSettingsSupabase.ts` | 2x error |
+| `src/hooks/b2b/useAccessCodes.ts` | 1x error |
+| `src/hooks/useMoodTrendData.ts` | 1x error |
+| `src/hooks/useClinicalAssessments.ts` | 3x error |
+| `src/hooks/b2b/useOrgAggregates.ts` | 1x error |
+| `src/hooks/useGamificationRealData.ts` | 1x error |
+| `src/hooks/useVRStats.ts` | 1x error |
+| `src/hooks/useVRSettings.ts` | 3x error |
+| `src/hooks/useEmotionalJournalEntries.ts` | 5x error |
+| `src/hooks/useFirstTimeGuide.ts` | 2x error |
+
+**Correction** : Meme approche - remplacer par `logger`. Priorite aux 12 hooks ci-dessus.
+
+### T3 - `console.error/warn` dans 42 composants
+
+Les 10 plus critiques :
+
+| Fichier | Occurrences |
+|---------|-------------|
+| `src/components/dashboard/MoodQuickLog.tsx` | 1x |
+| `src/components/dashboard/tabs/TeamTab.tsx` | 1x |
+| `src/components/scan/WeeklyEmotionReport.tsx` | 1x |
+| `src/components/scan/ScanInsightsPanel.tsx` | 1x |
+| `src/components/music/page/CollaborativePlaylistSection.tsx` | 3x |
+| `src/components/home/NewsletterSection.tsx` | 1x |
+| `src/components/admin/AIBudgetDashboard.tsx` | 1x |
+| `src/components/feedback/FeedbackCollector.tsx` | 1x |
+| `src/components/dashboard/tabs/EmotionalOverviewTab.tsx` | 1x |
+| `src/components/analytics/AdvancedAnalyticsDashboard.tsx` | 1x |
+
+**Correction** : Remplacer par `logger` dans les 10 composants les plus critiques.
+
+### T4 - `console.error` dans les services/lib
+
+| Fichier | Occurrences |
+|---------|-------------|
+| `src/services/coach/coachApi.ts` | 1x console.error |
+| `src/lib/vrService.ts` | 5x console.error |
+| `src/lib/monitoring.ts` | 1x console.error |
+| `src/lib/services/router-adapter.ts` | 2x console.error + 1x console.log + 1x console.warn |
+
+**Correction** : Remplacer par `logger` dans ces 4 fichiers.
+
+### T5 - `catch (error: any)` restants (59 fichiers)
+
+Les 10 fichiers prioritaires du plan precedent sont toujours a corriger, plus `ExamModePage.tsx` :
 
 | Fichier | Occurrences |
 |---------|-------------|
@@ -50,36 +101,45 @@ Le fichier `UnifiedLoginPage.tsx` a ete corrige, mais il reste **59 fichiers** a
 | `src/components/auth/EnhancedLoginForm.tsx` | 1x |
 | `src/components/auth/EnhancedRegisterForm.tsx` | 1x |
 | `src/services/unified/EmotionAnalysisService.ts` | 1x |
+| `src/pages/ExamModePage.tsx` | 1x |
 
-**Correction** : Remplacer `catch (error: any)` par `catch (error: unknown)` avec garde de type `error instanceof Error ? error.message : 'Erreur inconnue'`.
+**Correction** : Remplacer `catch (error: any)` par `catch (error: unknown)` avec garde de type.
 
 ---
 
 ## Phase 2 : Audit UX (UX Designer Senior)
 
 ### U1 - Corrections precedentes verifiees
-- Boutons sociaux "Bientot" sur LoginPage : OK (disabled + badge)
-- Boutons sociaux "Bientot" sur SignupPage : OK (disabled + badge)
-- Footer liens proteges avec title : OK
-- Checkbox "Se souvenir de moi" avec Radix : OK
+Les corrections UX des iterations 1-2 sont en place (boutons sociaux disabled, footer tooltips, checkbox Radix).
 
-### U2 - Aucun nouveau probleme UX identifie
-Les pages publiques sont coherentes. Les formulaires sont bien structures avec feedback visuel.
+### U2 - Pas de nouveau probleme UX identifie
+Les pages publiques et les formulaires sont coherents.
 
 ---
 
 ## Phase 3 : Audit Utilisateur Final (Beta Testeur)
 
-### B1 - Toutes les verifications precedentes OK
-- Pages legales, cookie banner, checkbox, mot de passe oublie, "Gratuit", centre d'aide : tous fonctionnels.
+### B1 - Verifications precedentes OK
+Pages legales, cookie banner, mot de passe oublie, "Gratuit", centre d'aide : tous fonctionnels.
 
 ---
 
 ## Plan d'implementation
 
-### Lot 1 : console.log/error dans 18 pages (priorite haute)
-Remplacer tous les `console.error/warn` par `logger.error/warn` dans les 18 fichiers listes ci-dessus, en ajoutant `import { logger } from '@/lib/logger'` si absent.
+### Lot 1 (priorite haute) : Pages - 20 fichiers
+Remplacer `console.error/warn` par `logger.error/warn` dans les 20 pages listees en T1.
 
-### Lot 2 : catch (error: any) dans 10 fichiers critiques
-Remplacer `catch (error: any)` par `catch (error: unknown)` dans les 10 fichiers listes ci-dessus, avec garde de type adaptee au contexte (certains acceent a `error.message` ou `error.name`).
+### Lot 2 (priorite haute) : Hooks - 12 fichiers
+Remplacer `console.error/warn` par `logger` dans les 12 hooks listes en T2.
+
+### Lot 3 (priorite moyenne) : Composants - 10 fichiers
+Remplacer `console.error/warn` par `logger` dans les 10 composants les plus critiques listes en T3.
+
+### Lot 4 (priorite moyenne) : Services/lib - 4 fichiers
+Remplacer `console.error/warn/log` par `logger` dans les 4 fichiers listes en T4.
+
+### Lot 5 (priorite haute) : catch(error: any) - 11 fichiers
+Remplacer `catch (error: any)` par `catch (error: unknown)` avec garde de type dans les 11 fichiers listes en T5.
+
+**Approche technique** : Pour chaque fichier, ajouter `import { logger } from '@/lib/logger'` si absent, puis remplacer chaque `console.error(msg, err)` par `logger.error(msg, err)` et chaque `console.warn(msg)` par `logger.warn(msg)`.
 
