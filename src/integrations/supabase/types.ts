@@ -7795,6 +7795,7 @@ export type Database = {
           metadata: Json | null
           order_index: number | null
           slug: string
+          specialty: string | null
           title: string
           updated_at: string | null
         }
@@ -7813,6 +7814,7 @@ export type Database = {
           metadata?: Json | null
           order_index?: number | null
           slug: string
+          specialty?: string | null
           title: string
           updated_at?: string | null
         }
@@ -7831,6 +7833,7 @@ export type Database = {
           metadata?: Json | null
           order_index?: number | null
           slug?: string
+          specialty?: string | null
           title?: string
           updated_at?: string | null
         }
