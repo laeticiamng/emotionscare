@@ -101,36 +101,40 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     };
 
-    getInitialSession();
-
-    // Écouter les changements d'authentification
+    // Écouter les changements d'authentification AVANT getSession()
+    // pour ne perdre aucun événement auth entre les deux appels
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, currentSession) => {
         if (!mounted) return;
 
-        logger.info(`Auth state changed: ${event}`, { email: session?.user?.email }, 'AUTH');
+        logger.info(`Auth state changed: ${event}`, { email: currentSession?.user?.email }, 'AUTH');
         
-        setSession(session);
-        setUser(session?.user ?? null);
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
         setIsLoading(false);
 
-        // Gestion des événements spécifiques
-        switch (event) {
-          case 'SIGNED_IN':
-            logger.info('Utilisateur connecté', undefined, 'AUTH');
-            break;
-          case 'SIGNED_OUT':
-            logger.info('Utilisateur déconnecté', undefined, 'AUTH');
-            break;
-          case 'TOKEN_REFRESHED':
-            logger.debug('Token rafraîchi', undefined, 'AUTH');
-            break;
-          case 'USER_UPDATED':
-            logger.info('Utilisateur mis à jour', undefined, 'AUTH');
-            break;
-        }
+        // Gestion des événements spécifiques (déféré pour éviter deadlock)
+        setTimeout(() => {
+          switch (event) {
+            case 'SIGNED_IN':
+              logger.info('Utilisateur connecté', undefined, 'AUTH');
+              break;
+            case 'SIGNED_OUT':
+              logger.info('Utilisateur déconnecté', undefined, 'AUTH');
+              break;
+            case 'TOKEN_REFRESHED':
+              logger.debug('Token rafraîchi', undefined, 'AUTH');
+              break;
+            case 'USER_UPDATED':
+              logger.info('Utilisateur mis à jour', undefined, 'AUTH');
+              break;
+          }
+        }, 0);
       }
     );
+
+    // PUIS récupérer la session initiale
+    getInitialSession();
 
     return () => {
       mounted = false;
@@ -146,6 +150,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         password,
         options: {
           data: metadata,
+          emailRedirectTo: `${window.location.origin}/`,
         },
       });
 

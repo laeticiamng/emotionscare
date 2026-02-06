@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Link } from 'react-router-dom';
 import {
   Dialog,
@@ -298,7 +299,7 @@ export const useMedicalDisclaimer = (feature: 'scan' | 'assessment' | 'coach' | 
             setIsLoading(false);
             return;
           }
-        } catch (e) {}
+        } catch (e) { logger.warn('MedicalDisclaimer parse error', e instanceof Error ? e : undefined, 'UI'); }
       }
       
       // Pas de consentement valide

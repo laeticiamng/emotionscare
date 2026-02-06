@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { logger } from '@/lib/logger';
 import { Line, Bar, Area, ComposedChart } from 'recharts';
 import { LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, BarChart } from 'recharts';
 import { EmotionResult } from '@/types/emotion';
@@ -213,7 +214,7 @@ const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({
     if (navigator.share) {
       try {
         await navigator.share({ title: 'Mes Tendances Émotionnelles', text: shareText });
-      } catch (err) {}
+      } catch (err) { logger.warn('Navigator share failed', err instanceof Error ? err : undefined, 'UI'); }
     } else {
       await navigator.clipboard.writeText(shareText);
       toast({ title: 'Copié !' });
