@@ -87,13 +87,13 @@ const contactInfo = [
   { 
     icon: Mail, 
     label: 'Email', 
-    value: 'contact@emotionscare.app',
-    href: 'mailto:contact@emotionscare.app'
+    value: 'contact@emotionscare.com',
+    href: 'mailto:contact@emotionscare.com'
   },
   { 
     icon: MapPin, 
     label: 'Localisation', 
-    value: 'France',
+    value: 'Amiens, France',
     href: '#'
   },
 ];

@@ -157,11 +157,11 @@ const Footer: React.FC = () => {
             {/* Contact & Status */}
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
               <a 
-                href="mailto:contact@emotionscare.app" 
+                href="mailto:contact@emotionscare.com" 
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 <Mail className="h-4 w-4" aria-hidden="true" />
-                contact@emotionscare.app
+                contact@emotionscare.com
               </a>
               
               {/* Status indicator */}
