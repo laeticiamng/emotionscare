@@ -7,7 +7,7 @@ import React, { lazy, Suspense, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Menu, X, HelpCircle } from 'lucide-react';
+import { ArrowRight, Menu, X, HelpCircle, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppleHeroSection from '@/components/home/AppleHeroSection';
 import { cn } from '@/lib/utils';
@@ -54,6 +54,7 @@ const AppleHomePage: React.FC = () => {
               to="/" 
               className="font-bold text-xl tracking-tight hover:opacity-80 transition-opacity"
             >
+              <Heart className="h-5 w-5 text-primary inline-block mr-1.5" />
               EmotionsCare
             </Link>
 
