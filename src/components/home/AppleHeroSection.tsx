@@ -94,7 +94,7 @@ const AppleHeroSection: React.FC = () => {
           </motion.div>
 
           {/* Main headline - word by word reveal */}
-          <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-[0.95] mb-6 sm:mb-8 px-2 sm:px-0">
+          <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-[0.95] mb-6 sm:mb-8 px-2 sm:px-0">
             {words.map((word, i) => (
               <motion.span
                 key={i}

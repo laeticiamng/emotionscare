@@ -40,7 +40,7 @@ const AppleCTASection: React.FC = () => {
             initial={{ opacity: 0, y: 80 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight mb-8 leading-[0.9]"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-8 leading-[0.9]"
           >
             Prêt à prendre soin
             <br />
