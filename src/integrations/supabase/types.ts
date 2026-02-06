@@ -16320,6 +16320,7 @@ export type Database = {
           notes: string | null
           stress_level: number | null
           user_id: string
+          valence: number | null
         }
         Insert: {
           created_at?: string | null
@@ -16331,6 +16332,7 @@ export type Database = {
           notes?: string | null
           stress_level?: number | null
           user_id: string
+          valence?: number | null
         }
         Update: {
           created_at?: string | null
@@ -16342,6 +16344,7 @@ export type Database = {
           notes?: string | null
           stress_level?: number | null
           user_id?: string
+          valence?: number | null
         }
         Relationships: [
           {
@@ -27774,6 +27777,7 @@ export type Database = {
           medical_consents: Json | null
           nyvee_tutorial_seen: boolean | null
           preferences: Json
+          preferred_activities: string[] | null
           timezone_offset: number | null
           updated_at: string
           user_id: string
@@ -27786,6 +27790,7 @@ export type Database = {
           medical_consents?: Json | null
           nyvee_tutorial_seen?: boolean | null
           preferences?: Json
+          preferred_activities?: string[] | null
           timezone_offset?: number | null
           updated_at?: string
           user_id: string
@@ -27798,6 +27803,7 @@ export type Database = {
           medical_consents?: Json | null
           nyvee_tutorial_seen?: boolean | null
           preferences?: Json
+          preferred_activities?: string[] | null
           timezone_offset?: number | null
           updated_at?: string
           user_id?: string
