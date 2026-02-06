@@ -1,4 +1,4 @@
-// @ts-nocheck
+// Auth error service - translates Supabase errors to French
 /**
  * AuthErrorService - Service de gestion des erreurs d'authentification
  * Traduit les erreurs Supabase en messages utilisateur-friendly
@@ -133,27 +133,44 @@ const ERROR_MESSAGES: Record<string, FriendlyError> = {
  * Analyse une erreur d'authentification et retourne un message convivial
  */
 export function getFriendlyAuthError(error: unknown): FriendlyError {
-  // Silent: auth error logged internally
+  // Check error code first (Supabase returns structured error codes)
+  if (error && typeof error === 'object') {
+    const errorObj = error as Record<string, unknown>;
+    const code = typeof errorObj.code === 'string' ? errorObj.code : '';
+    
+    if (code === 'weak_password') {
+      return ERROR_MESSAGES['weak_password'];
+    }
+    if (code === 'email_not_confirmed') {
+      return ERROR_MESSAGES['email_not_confirmed'];
+    }
+    if (code === 'user_already_exists' || code === 'user_already_registered') {
+      return ERROR_MESSAGES['user_already_registered'];
+    }
+    if (code === 'over_request_rate_limit') {
+      return ERROR_MESSAGES['too_many_requests'];
+    }
+  }
 
-  // Erreur Supabase
+  // Then check message content
   if (error && typeof error === 'object' && 'message' in error) {
     const authError = error as AuthError;
     const message = authError.message?.toLowerCase() || '';
 
-    // Mapper les messages d'erreur Supabase vers nos messages personnalisés
-    if (message.includes('invalid login credentials')) {
+    if (message.includes('invalid login credentials') || message.includes('invalid email or password')) {
       return ERROR_MESSAGES['invalid_credentials'];
     }
-    if (message.includes('user already registered')) {
+    if (message.includes('user already registered') || message.includes('already been registered')) {
       return ERROR_MESSAGES['user_already_registered'];
     }
-    if (message.includes('email not confirmed')) {
+    if (message.includes('email not confirmed') || message.includes('email_not_confirmed')) {
       return ERROR_MESSAGES['email_not_confirmed'];
     }
-    if (message.includes('too many requests')) {
+    if (message.includes('too many requests') || message.includes('rate limit')) {
       return ERROR_MESSAGES['too_many_requests'];
     }
-    if (message.includes('weak password')) {
+    // Catch all weak password variants: "weak password", "Password is known to be weak..."
+    if (message.includes('weak') || message.includes('pwned') || message.includes('easy to guess')) {
       return ERROR_MESSAGES['weak_password'];
     }
     if (message.includes('invalid email')) {

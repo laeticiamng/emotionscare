@@ -70,8 +70,13 @@ const SignupPage: React.FC = () => {
       return;
     }
 
-    if (password.length < 6) {
-      setError('Le mot de passe doit contenir au moins 6 caractères');
+    if (password.length < 8) {
+      setError('Le mot de passe doit contenir au moins 8 caractères');
+      return;
+    }
+
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+      setError('Le mot de passe doit contenir au moins une minuscule, une majuscule et un chiffre');
       return;
     }
 
@@ -187,9 +192,22 @@ const SignupPage: React.FC = () => {
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
-                </div>
-              </div>
-
+                 </div>
+               </div>
+               {/* Password strength hints */}
+               {password.length > 0 && (
+                 <div className="space-y-1 text-xs">
+                   <p className={password.length >= 8 ? 'text-green-600' : 'text-muted-foreground'}>
+                     {password.length >= 8 ? '✓' : '○'} Au moins 8 caractères
+                   </p>
+                   <p className={/[a-z]/.test(password) && /[A-Z]/.test(password) ? 'text-green-600' : 'text-muted-foreground'}>
+                     {/[a-z]/.test(password) && /[A-Z]/.test(password) ? '✓' : '○'} Majuscule et minuscule
+                   </p>
+                   <p className={/\d/.test(password) ? 'text-green-600' : 'text-muted-foreground'}>
+                     {/\d/.test(password) ? '✓' : '○'} Au moins un chiffre
+                   </p>
+                 </div>
+               )}
               {/* Confirmation mot de passe */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground/80">

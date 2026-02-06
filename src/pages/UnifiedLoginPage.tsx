@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { loginSchema, type LoginFormData } from '@/lib/validations/auth';
 import { sanitizeInput } from '@/lib/validation/validator';
+import { getFriendlyAuthError } from '@/lib/auth/authErrorService';
 
 interface LocationState {
   from?: string;
@@ -49,10 +50,10 @@ export default function UnifiedLoginPage() {
       const from = (location.state as LocationState)?.from || '/app';
       navigate(from, { replace: true });
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Une erreur est survenue';
+      const friendly = getFriendlyAuthError(error);
       toast({
         title: 'Erreur de connexion',
-        description: message,
+        description: friendly.message,
         variant: 'destructive',
       });
     }
