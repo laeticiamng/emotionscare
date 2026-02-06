@@ -1,106 +1,59 @@
 
+# Audit pre-publication -- Round 4 (final)
 
-# Audit critique pre-publication -- Round final
+## Score actuel : 9.7/10 -- Objectif : 9.9/10
 
-## Score actuel : 9.2/10 -- Objectif : 9.7/10
-
-Les rounds precedents ont corrige les problemes majeurs (header/footer sur /features, donnees fictives "des milliers d'utilisateurs", faux temoignage, hover glow, tokens hardcodes). Cet audit final se concentre sur les dernieres incoherences detectees.
-
----
-
-## SYNTHESE UNIQUE
-
-| # | Probleme | Gravite | Cause | Solution | Temps |
-|---|---------|---------|-------|----------|-------|
-| C1 | "Support 24/7" affiche dans le CTA final -- pas de support 24/7 reel | P0 | Texte marketing copie sans verification | Remplacer par "Made in France" ou "Approche scientifique" |  1 min |
-| C2 | "30 jours d'essai gratuit. Aucune carte bancaire requise." -- offre non confirmee | P1 | Texte marketing non valide | Remplacer par "Gratuit pour commencer. Sans engagement." | 1 min |
-| C3 | Dead code : 6+ composants homepage obsoletes avec donnees fictives (10K+, 95%, ISO 27001) | P1 | Accumulation de versions precedentes | Supprimer les fichiers non utilises | 5 min |
-| C4 | "Certifie ISO 27001" dans les anciens composants (non acquis) | P0 (si affiche) | Donnee marketing fausse | Fichiers a supprimer (dead code, non affiches actuellement) | Inclus dans C3 |
-| C5 | Font preload warning (inter-var.woff2 preloaded but not used) | P2 | Lien preload dans index.html sans utilisation | Retirer le preload ou s'assurer que la font est utilisee | 1 min |
+Les rounds precedents ont corrige la majorite des problemes. Ce dernier round cible les incoherences residuelles detectees.
 
 ---
 
-## BLOC A -- Corrections obligatoires
+## SYNTHESE
 
-### C1 -- "Support 24/7" faux dans AppleCTASection (P0)
-
-**Fichier** : `src/components/home/AppleCTASection.tsx`, ligne 119-121
-
-Le trust badge "Support 24/7" est affiche en bas du CTA final. La plateforme n'a pas de support 24/7 en place. C'est une affirmation mensongere.
-
-**Correction** : Remplacer par "Made in France" (factuel et coherent avec le hero).
-
-```
-// Avant (ligne 119-121)
-<span className="flex items-center gap-2">
-  <div className="w-2 h-2 bg-accent rounded-full" />
-  Support 24/7
-</span>
-
-// Apres
-<span className="flex items-center gap-2">
-  <div className="w-2 h-2 bg-accent rounded-full" />
-  Made in France
-</span>
-```
-
-### C2 -- "30 jours d'essai gratuit" non confirme (P1)
-
-**Fichier** : `src/components/home/AppleCTASection.tsx`, lignes 58-61
-
-La mention "30 jours d'essai gratuit. Aucune carte bancaire requise." engage contractuellement sans que l'offre soit definie. En phase de lancement, il vaut mieux une formulation souple.
-
-**Correction** : Remplacer par "Gratuit pour commencer. Sans engagement. Annulez quand vous voulez."
-
-### C3 -- Nettoyage dead code : composants homepage obsoletes (P1)
-
-Les composants suivants ne sont PAS utilises par la homepage Apple active mais contiennent des donnees fictives (10K+ utilisateurs, 95% satisfaction, ISO 27001) qui pourraient etre accidentellement reutilises :
-
-- `src/components/home/OptimizedHeroSection.tsx` (10K+, 95%, 24/7, 50+)
-- `src/components/home/CtaSection.tsx` (ISO 27001, Support 24/7)
-- `src/components/home/HeroSection.tsx` (10K+, 95%)
-- `src/components/home/OptimizedFeaturesSection.tsx` (ISO 27001)
-- `src/components/home/FeaturesSection.tsx` (ISO 27001)
-- `src/components/home/TrustBadges.tsx` ("Certifie")
-
-**Correction** : Ces fichiers sont du dead code. Ils doivent etre supprimes pour eviter toute reutilisation accidentelle de donnees fictives et pour reduire la taille du bundle. Avant suppression, verifier qu'aucune route ou import ne les reference.
+| # | Probleme | Gravite | Fichier | Solution | Temps |
+|---|---------|---------|---------|----------|-------|
+| D1 | "50,000+ utilisateurs" encore present a 2 endroits dans HomeB2CPage (route /b2c) | P0 | `HomeB2CPage.tsx` L32 et L166-167 | Remplacer par formulation factuelle | 2 min |
+| D2 | "50 000+ utilisateurs" dans PremiumLandingPage (dead code, non route) | P1 | `PremiumLandingPage.tsx` L157 | Supprimer le fichier ou corriger le texte | 1 min |
+| D3 | "50,000 utilisateurs" dans PricingPage (dead code, non route) | P1 | `PricingPage.tsx` L291 | Supprimer le fichier ou corriger le texte | 1 min |
 
 ---
 
-## BLOC B -- Verifications confirmees OK
+## Corrections a appliquer
 
-Les elements suivants ont ete audites et sont conformes :
+### D1 -- HomeB2CPage : "50,000+ utilisateurs" (P0 -- page active a /b2c)
 
-- **Navigation** : MarketingLayout fonctionne sur /features, /login, /signup, /legal/* -- header et footer presents partout
-- **Homepage Apple** : Hero clair en 3 secondes, CTA visible, badges factuels (Approche scientifique, Donnees protegees, Made in France)
-- **Feature cards** : Statistiques factuelles (180s, 6 protocoles, 0 donnees vendues, 4 protocoles co-construits)
-- **Stats section** : 4 protocoles, 3min, 100% RGPD, 24/7 disponibilite (plateforme accessible = OK)
-- **Footer** : Liens sociaux desactives (spans non cliquables), liens legaux fonctionnels
-- **Hover glow** : Corrige (opacity via Tailwind, pas de style inline)
-- **Tokens** : `bg-green-500` au lieu de `bg-emerald-500` (corrige)
-- **Tutoiement** : CommunityEngagement corrige en "vous"
-- **Securite** : RLS actives, pas de secrets en frontend, CORS configure
-- **RGPD** : Cookie banner, pages legales, infrastructure GDPR
-- **Console** : Aucune erreur applicative (seulement des warnings Lovable postMessage et manifest CORS -- normaux en mode preview)
-- **Mobile** : Hero responsive, header hamburger, CTA accessible, spacing correct
+**Fichier** : `src/pages/HomeB2CPage.tsx`
 
----
+1. **Ligne 32** (SEO description) : Remplacer `Rejoignez 50,000+ utilisateurs pour une vie plus equilibree.` par `Outils scientifiques pour une vie plus equilibree.`
 
-## BLOC C -- Tickets "Ready-to-ship"
+2. **Lignes 166-167** (social proof visuel) : Remplacer le bloc "50,000+ utilisateurs / nous font confiance" par `Plateforme en lancement` / `Rejoignez les premiers utilisateurs`
 
-| # | Titre | Priorite | Fichier(s) | Fix exact | Definition of Done |
-|---|-------|----------|------------|-----------|-------------------|
-| C1 | Remplacer "Support 24/7" par "Made in France" | P0 | `AppleCTASection.tsx` L119-121 | Changer le texte du trust badge | Le CTA final n'affiche aucune promesse non tenue |
-| C2 | Reformuler l'offre d'essai gratuit | P1 | `AppleCTASection.tsx` L58-61 | "Gratuit pour commencer. Sans engagement." | Aucun engagement contractuel non defini |
-| C3 | Supprimer les composants homepage obsoletes | P1 | 6 fichiers | Supprimer les fichiers apres verification d'imports | 0 composant avec donnees fictives dans le repo |
+### D2-D3 -- Dead code avec donnees fictives (P1)
+
+`PremiumLandingPage.tsx` et `PricingPage.tsx` (dans `src/components/pages/` et `src/components/landing/`) ne sont PAS routes. Ils contiennent des donnees fictives dangereuses. La correction la plus sure est de supprimer ces fichiers morts. Alternativement, corriger les textes pour eviter une reutilisation accidentelle.
+
+**Recommandation** : Supprimer les 2 fichiers. Verification faite qu'aucune route ne les reference dans le registre.
 
 ---
 
-## Verdict pre-publication
+## Verifications confirmees OK (aucune correction necessaire)
 
-**Apres application de C1 et C2 : READY TO PUBLISH = OUI**
+- Homepage Apple (/) : tous les textes sont factuels et verifies
+- AppleCTASection : "Made in France", "Gratuit pour commencer", badges OK
+- AppleFeatureSection : stats factuelles (180s, 6 protocoles, 0 donnees vendues, 4 protocoles)
+- AppleStatsSection : 4 protocoles, 3min, 100%, 24/7 -- tout factuel
+- AppleShowcaseSection : aucune donnee fictive
+- FeaturesPage (/features) : toutes les features marquees "available", aucune donnee fictive
+- Footer : liens sociaux desactives, email coherent (contact@emotionscare.com partout)
+- MarketingLayout : header/footer presents sur toutes les pages marketing
+- PricingPageWorking (/pricing) : aucune donnee fictive detectee
+- Console : 0 erreur
+- Securite : RLS actives, pas de secrets en frontend
+- RGPD : pages legales OK, cookie banner OK
 
-C3 (nettoyage dead code) est fortement recommande mais non bloquant car ces composants ne sont pas affiches sur les pages actives.
+---
 
-Les 2 corrections bloquantes (C1 + C2) sont des changements de texte dans un seul fichier, realisables en moins de 2 minutes.
+## Verdict apres corrections D1-D3
 
+**READY TO PUBLISH = OUI**
+
+Seule D1 est un vrai bloquant (page active avec donnees fictives). D2/D3 sont du nettoyage recommande (fichiers non routes).
