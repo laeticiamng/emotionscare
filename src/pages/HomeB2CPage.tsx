@@ -29,7 +29,7 @@ import { usePageSEO } from '@/hooks/usePageSEO';
 const HomeB2CPage: React.FC = () => {
   usePageSEO({
     title: 'EmotionsCare - Votre Compagnon de Bien-Être Émotionnel IA',
-    description: 'Transformez votre bien-être mental avec EmotionsCare. Scan émotionnel IA, musicothérapie personnalisée, coach virtuel 24/7. Rejoignez 50,000+ utilisateurs pour une vie plus équilibrée.',
+    description: 'Transformez votre bien-être mental avec EmotionsCare. Scan émotionnel IA, musicothérapie personnalisée, coach virtuel 24/7. Outils scientifiques pour une vie plus équilibrée.',
     keywords: 'bien-être mental, intelligence artificielle, scan émotionnel, musicothérapie, coach virtuel, santé mentale, développement personnel'
   });
 
@@ -163,8 +163,8 @@ const HomeB2CPage: React.FC = () => {
                   ))}
                 </div>
                 <div className="text-sm">
-                  <div className="font-semibold">50,000+ utilisateurs</div>
-                  <div className="text-muted-foreground">nous font confiance</div>
+                  <div className="font-semibold">Plateforme en lancement</div>
+                  <div className="text-muted-foreground">Rejoignez les premiers utilisateurs</div>
                 </div>
               </div>
             </motion.div>
