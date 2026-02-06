@@ -94,6 +94,14 @@ const ERROR_MESSAGES: Record<string, FriendlyError> = {
     action: 'Demandez un nouveau lien de réinitialisation.'
   },
 
+  // Erreurs serveur / base de données
+  'database_error': {
+    message: 'Erreur lors de la création du compte. Veuillez réessayer.',
+    code: 'DATABASE_ERROR',
+    severity: 'error',
+    action: 'Si le problème persiste, contactez le support.'
+  },
+
   // Erreurs réseau
   'network_error': {
     message: 'Problème de connexion réseau.',
@@ -181,6 +189,9 @@ export function getFriendlyAuthError(error: unknown): FriendlyError {
     }
     if (message.includes('network') || message.includes('fetch')) {
       return ERROR_MESSAGES['network_error'];
+    }
+    if (message.includes('database error') || message.includes('database_error') || message.includes('saving new user')) {
+      return ERROR_MESSAGES['database_error'];
     }
   }
 
