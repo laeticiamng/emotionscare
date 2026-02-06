@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Download, FileJson, FileSpreadsheet, FileText, Check, Loader2, Shield, Eye, Clock, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -165,7 +166,7 @@ export default function DataExportPage() {
         setPreviewData(data);
       }
     } catch (err) {
-      console.error('Preview error:', err);
+      logger.error('Preview error:', err, 'SYSTEM');
     }
   };
 
@@ -252,7 +253,7 @@ export default function DataExportPage() {
         description: 'Vos données ont été téléchargées.',
       });
     } catch (err) {
-      console.error('Export error:', err);
+      logger.error('Export error:', err, 'SYSTEM');
       toast({
         title: 'Erreur d\'export',
         description: 'Impossible d\'exporter vos données. Réessayez.',

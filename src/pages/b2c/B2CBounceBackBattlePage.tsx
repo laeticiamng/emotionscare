@@ -3,6 +3,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { motion } from 'framer-motion';
 import { Shield, BarChart2, ArrowLeft, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -107,7 +108,7 @@ const B2CBounceBackBattlePage: React.FC = () => {
         setRecentBattles(battlesResponse.data.battles);
       }
     } catch (error) {
-      console.error('Failed to load stats', error);
+      logger.error('Failed to load stats', error, 'SYSTEM');
       setStats(null);
     } finally {
       setStatsLoading(false);

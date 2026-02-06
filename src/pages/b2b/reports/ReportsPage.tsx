@@ -3,6 +3,7 @@
  * Page de rapports B2B - Affiche les rapports mensuels générés
  */
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -67,7 +68,7 @@ const ReportsPage: React.FC = () => {
           setSelectedReport(data[0]);
         }
       } catch (err) {
-        console.error('Error fetching reports:', err);
+        logger.error('Error fetching reports:', err, 'SYSTEM');
       } finally {
         setLoading(false);
       }
@@ -87,7 +88,7 @@ const ReportsPage: React.FC = () => {
         setSelectedReport(response.data.report);
       }
     } catch (err) {
-      console.error('Error generating report:', err);
+      logger.error('Error generating report:', err, 'SYSTEM');
     }
   };
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Bell, BellOff, Clock, Smartphone, Mail, MessageSquare, Heart, Trophy, Calendar } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -82,7 +83,7 @@ export default function NotificationSettingsPage() {
           updated_at: new Date().toISOString()
         }, { onConflict: 'user_id' });
         // Ignorer les erreurs silencieusement (table peut ne pas exister)
-        if (error) console.warn('Notification prefs sync failed:', error.message);
+        if (error) logger.warn('Notification prefs sync failed:', error.message, 'SYSTEM');
       }
       
       // Programmer le rappel quotidien si activé

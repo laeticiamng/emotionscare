@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -117,7 +118,7 @@ const EmotionalOverviewTab: React.FC<EmotionalOverviewTabProps> = ({ className }
         setSummary(null);
       }
     } catch (error) {
-      console.error('Error fetching emotion data:', error);
+      logger.error('Error fetching emotion data:', error, 'ANALYTICS');
     } finally {
       setLoading(false);
     }

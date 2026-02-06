@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -205,7 +206,7 @@ const B2CSettingsPage = () => {
         }
       });
     } catch (err) {
-      console.error('Failed to load storage info:', err);
+      logger.error('Failed to load storage info:', err, 'SYSTEM');
     } finally {
       setLoadingStorage(false);
     }

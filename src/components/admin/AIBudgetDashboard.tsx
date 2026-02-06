@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -103,7 +104,7 @@ export const AIBudgetDashboard: React.FC = () => {
       setBudgetExceeded(exceeded);
       setLastUpdate(new Date());
     } catch (error) {
-      console.error('Erreur chargement budget:', error);
+      logger.error('Erreur chargement budget:', error, 'SYSTEM');
     } finally {
       setIsLoading(false);
     }

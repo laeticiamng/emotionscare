@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
@@ -90,7 +91,7 @@ export function useMoodTrendData(days: number = 7): MoodTrendResult {
 
         setData(chartData);
       } catch (error) {
-        console.error('Error fetching mood trend data:', error);
+        logger.error('Error fetching mood trend data:', error, 'ANALYTICS');
         setData([]);
       } finally {
         setIsLoading(false);

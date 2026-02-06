@@ -68,12 +68,12 @@ const EnhancedLoginForm: React.FC = () => {
         navigate('/app/consumer/home');
       }, 500);
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Erreur de connexion', { error }, 'AUTH');
       
       toast({
         title: "Connexion impossible",
-        description: error.message || "Vérifiez vos identifiants et réessayez.",
+        description: error instanceof Error ? error.message : "Vérifiez vos identifiants et réessayez.",
         variant: "destructive"
       });
       

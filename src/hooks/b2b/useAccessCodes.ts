@@ -3,6 +3,7 @@
  * Hook pour gérer les codes d'accès institutionnels
  */
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 
 interface AccessCode {
@@ -62,7 +63,7 @@ export function useAccessCodes(orgId: string) {
         }))
       );
     } catch (err) {
-      console.error('Error fetching access codes:', err);
+      logger.error('Error fetching access codes:', err, 'SYSTEM');
       setError(err as Error);
     } finally {
       setLoading(false);

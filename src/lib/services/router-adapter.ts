@@ -7,6 +7,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 // Types pour les routeurs
 type RouterName = 
@@ -45,13 +46,13 @@ export async function callRouter<TPayload = any, TResponse = any>(
     });
 
     if (error) {
-      console.error(`[Router] ${router}/${action} error:`, error);
+      logger.error(`[Router] ${router}/${action} error:`, error, 'API');
       return { success: false, error: error.message };
     }
 
     return data as RouterResponse<TResponse>;
   } catch (err) {
-    console.error(`[Router] ${router}/${action} exception:`, err);
+    logger.error(`[Router] ${router}/${action} exception:`, err, 'API');
     return { 
       success: false, 
       error: err instanceof Error ? err.message : 'Unknown error' 
@@ -505,12 +506,12 @@ export async function callLegacyOrRouter(
   const mapper = legacyMapping[functionName as keyof typeof legacyMapping];
   
   if (mapper) {
-    console.log(`[Migration] Routing ${functionName} to consolidated router`);
+    logger.info(`[Migration] Routing ${functionName} to consolidated router`, undefined, 'API');
     return mapper(payload);
   }
 
   // Fallback sur l'ancienne fonction
-  console.warn(`[Migration] No router mapping for ${functionName}, using legacy`);
+  logger.warn(`[Migration] No router mapping for ${functionName}, using legacy`, undefined, 'API');
   const { data, error } = await supabase.functions.invoke(functionName, {
     body: payload,
   });

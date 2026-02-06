@@ -251,11 +251,11 @@ class EmotionAnalysisServiceClass {
       }
 
       return { data, error };
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') {
         return { data: null, error: new Error(`Timeout après ${this.TIMEOUT_MS}ms`) };
       }
-      return { data: null, error };
+      return { data: null, error: error instanceof Error ? error : new Error('Unknown error') };
     }
   }
 

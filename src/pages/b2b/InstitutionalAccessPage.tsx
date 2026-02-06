@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -138,7 +139,7 @@ export default function InstitutionalAccessPage() {
       setStep('charter');
 
     } catch (err) {
-      console.error('Erreur vérification code:', err);
+      logger.error('Erreur vérification code:', err, 'SYSTEM');
       toast({
         title: 'Erreur',
         description: 'Une erreur est survenue. Veuillez réessayer.',
@@ -193,7 +194,7 @@ export default function InstitutionalAccessPage() {
       });
 
     } catch (err) {
-      console.error('Erreur acceptation charte:', err);
+      logger.error('Erreur acceptation charte:', err, 'SYSTEM');
       toast({
         title: 'Erreur',
         description: 'Une erreur est survenue. Veuillez réessayer.',

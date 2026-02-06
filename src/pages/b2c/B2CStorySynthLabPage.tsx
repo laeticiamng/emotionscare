@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { ArrowLeft, Play, Pause, RotateCcw, Volume2, VolumeX, BookOpen, Trash2, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -97,11 +98,11 @@ const B2CStorySynthLabPage: React.FC = () => {
         setCurrentStory(generatedStory);
       } else {
         // Fallback en cas d'erreur API
-        console.warn('Story Synth API error, using fallback');
+        logger.warn('Story Synth API error, using fallback', undefined, 'SYSTEM');
         setCurrentStory(createFallbackStory(validIntentions));
       }
     } catch (error) {
-      console.error('Story generation error:', error);
+      logger.error('Story generation error:', error, 'SYSTEM');
       // Fallback graceful
       setCurrentStory(createFallbackStory(validIntentions));
     } finally {

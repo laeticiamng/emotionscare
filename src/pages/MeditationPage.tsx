@@ -3,6 +3,7 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -259,7 +260,7 @@ export default function MeditationPage() {
         }
       }
     } catch (err) {
-      console.error('Error creating session:', err);
+      logger.error('Error creating session:', err, 'SYSTEM');
     }
     
     if (settings.hapticFeedback && navigator.vibrate) {
@@ -300,7 +301,7 @@ export default function MeditationPage() {
           description: `${Math.round(currentTime / 60)} minutes de ${TECHNIQUE_LABELS[selectedTechnique || ''] || 'méditation'}${moodText}`,
         });
       } catch (err) {
-        console.error('Error completing session:', err);
+        logger.error('Error completing session:', err, 'SYSTEM');
       }
     }
     

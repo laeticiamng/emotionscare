@@ -3,6 +3,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import type { VRNebulaStats } from '@/modules/vr-nebula/types';
 
@@ -147,7 +148,7 @@ async function fetchVRHistory(limit = 20): Promise<VRSessionSummary[]> {
     .limit(limit);
 
   if (error) {
-    console.error('Error fetching VR history:', error);
+    logger.error('Error fetching VR history:', error, 'VR');
     return [];
   }
 

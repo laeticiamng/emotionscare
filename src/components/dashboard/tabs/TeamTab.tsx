@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -123,7 +124,7 @@ const TeamTab: React.FC<TeamTabProps> = ({ className }) => {
         });
       }
     } catch (error) {
-      console.error('Error fetching team data:', error);
+      logger.error('Error fetching team data:', error, 'SYSTEM');
     } finally {
       setLoading(false);
     }

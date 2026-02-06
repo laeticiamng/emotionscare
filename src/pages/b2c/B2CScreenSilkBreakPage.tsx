@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { logger } from '@/lib/logger';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -151,7 +152,7 @@ const BreakTimer: React.FC<{
       oscillator.start();
       oscillator.stop(audioRef.current.currentTime + duration);
     } catch (e) {
-      console.warn('Audio not supported');
+      logger.warn('Audio not supported', undefined, 'SYSTEM');
     }
   }, [isMuted]);
 

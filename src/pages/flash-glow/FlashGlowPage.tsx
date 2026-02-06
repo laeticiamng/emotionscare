@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { logger } from '@/lib/logger';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sun,
@@ -172,7 +173,7 @@ function useFlashGlowStats() {
           });
         }
       } catch (error) {
-        console.error('Error fetching flash glow stats:', error);
+        logger.error('Error fetching flash glow stats:', error, 'FLASH');
       } finally {
         setLoading(false);
       }
@@ -283,7 +284,7 @@ const FlashGlowPage: React.FC = () => {
           description: `Excellent travail avec ${selectedPreset.name}`
         });
       } catch (error) {
-        console.error('Error saving flash glow session:', error);
+        logger.error('Error saving flash glow session:', error, 'FLASH');
       }
     }
 

@@ -47,10 +47,10 @@ export const useAuthFlow = () => {
         description: 'Bienvenue !',
       });
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur de connexion',
-        description: error.message || 'Vérifiez vos identifiants',
+        description: error instanceof Error ? error.message : 'Vérifiez vos identifiants',
         variant: 'destructive',
       });
     } finally {
@@ -82,10 +82,10 @@ export const useAuthFlow = () => {
         });
       }
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur',
-        description: error.message || 'Une erreur est survenue',
+        description: error instanceof Error ? error.message : 'Une erreur est survenue',
         variant: 'destructive',
       });
     } finally {

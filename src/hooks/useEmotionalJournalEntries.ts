@@ -3,6 +3,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { EmotionalJournalEntryData } from '@/components/journal/EmotionalJournalEntryForm';
@@ -49,7 +50,7 @@ export const useEmotionalJournalEntries = (filters?: EmotionalJournalFilters) =>
       const { data, error } = await query.limit(100);
 
       if (error) {
-        console.error('Error fetching journal entries:', error);
+        logger.error('Error fetching journal entries:', error, 'SYSTEM');
         throw error;
       }
 
@@ -77,7 +78,7 @@ export const useEmotionalJournalEntries = (filters?: EmotionalJournalFilters) =>
         .single();
 
       if (error) {
-        console.error('Error creating journal entry:', error);
+        logger.error('Error creating journal entry:', error, 'SYSTEM');
         throw error;
       }
 
@@ -88,7 +89,7 @@ export const useEmotionalJournalEntries = (filters?: EmotionalJournalFilters) =>
       toast.success('Entrée enregistrée !');
     },
     onError: (error) => {
-      console.error('Error creating entry:', error);
+      logger.error('Error creating entry:', error, 'SYSTEM');
       toast.error('Erreur lors de l\'enregistrement');
     },
   });
@@ -105,7 +106,7 @@ export const useEmotionalJournalEntries = (filters?: EmotionalJournalFilters) =>
         .eq('user_id', user.id);
 
       if (error) {
-        console.error('Error deleting journal entry:', error);
+        logger.error('Error deleting journal entry:', error, 'SYSTEM');
         throw error;
       }
     },
@@ -114,7 +115,7 @@ export const useEmotionalJournalEntries = (filters?: EmotionalJournalFilters) =>
       toast.success('Entrée supprimée');
     },
     onError: (error) => {
-      console.error('Error deleting entry:', error);
+      logger.error('Error deleting entry:', error, 'SYSTEM');
       toast.error('Erreur lors de la suppression');
     },
   });

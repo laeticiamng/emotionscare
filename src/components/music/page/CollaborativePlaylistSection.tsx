@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -124,7 +125,7 @@ export const CollaborativePlaylistSection: React.FC = () => {
           setPlaylist(newPlaylist);
         }
       } catch (error) {
-        console.error('Error loading playlist:', error);
+        logger.error('Error loading playlist:', error, 'MUSIC');
       } finally {
         setLoading(false);
       }
@@ -198,7 +199,7 @@ export const CollaborativePlaylistSection: React.FC = () => {
 
         if (error) throw error;
       } catch (error) {
-        console.error('Error saving playlist:', error);
+        logger.error('Error saving playlist:', error, 'MUSIC');
       }
     }, 500);
 
@@ -281,7 +282,7 @@ export const CollaborativePlaylistSection: React.FC = () => {
       setInviteEmail('');
       setShowInvite(false);
     } catch (error) {
-      console.error('Failed to send invitation:', error);
+      logger.error('Failed to send invitation:', error, 'MUSIC');
       toast({
         title: '❌ Erreur',
         description: 'Impossible d\'envoyer l\'invitation',

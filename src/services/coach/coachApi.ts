@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface CoachSuggestions {
   techniques: string[];
@@ -48,7 +49,7 @@ export async function sendMessage(options: SendCoachMessageOptions): Promise<Coa
   });
 
   if (error) {
-    console.error('[coachApi] Request failed:', error);
+    logger.error('[coachApi] Request failed:', error, 'COACH');
     throw new Error(`coach_failed: ${error.message}`);
   }
 

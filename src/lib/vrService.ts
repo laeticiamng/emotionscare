@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 import { VRSession, VRSessionTemplate, VRSessionFeedback } from '@/types/vr';
 
 /**
@@ -36,7 +37,7 @@ const VRService = {
         recommendedMood: t.recommended_mood || 'calm'
       }));
     } catch (error) {
-      console.error('[VRService] Error fetching templates:', error);
+      logger.error('[VRService] Error fetching templates:', error, 'VR');
       // Fallback to default templates
       return getDefaultTemplates();
     }
@@ -61,7 +62,7 @@ const VRService = {
 
       return (data?.sessions || []).map(mapSessionFromDB);
     } catch (error) {
-      console.error('[VRService] Error fetching sessions:', error);
+      logger.error('[VRService] Error fetching sessions:', error, 'VR');
       return [];
     }
   },
@@ -85,7 +86,7 @@ const VRService = {
 
       return mapSessionFromDB(data?.session);
     } catch (error) {
-      console.error('[VRService] Error starting session:', error);
+      logger.error('[VRService] Error starting session:', error, 'VR');
       throw error;
     }
   },
@@ -138,7 +139,7 @@ const VRService = {
         } : undefined
       };
     } catch (error) {
-      console.error('[VRService] Error ending session:', error);
+      logger.error('[VRService] Error ending session:', error, 'VR');
       throw error;
     }
   },
@@ -171,7 +172,7 @@ const VRService = {
         metrics: data?.metrics || []
       };
     } catch (error) {
-      console.error('[VRService] Error fetching metrics:', error);
+      logger.error('[VRService] Error fetching metrics:', error, 'VR');
       return {
         totalSessions: 0,
         totalMinutes: 0,

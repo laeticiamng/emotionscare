@@ -3,6 +3,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -49,7 +50,7 @@ export const useClinicalAssessments = (type?: 'WHO5' | 'PHQ9') => {
       const { data, error } = await query.limit(50);
 
       if (error) {
-        console.error('Error fetching clinical assessments:', error);
+        logger.error('Error fetching clinical assessments:', error, 'SYSTEM');
         throw error;
       }
 
@@ -78,7 +79,7 @@ export const useClinicalAssessments = (type?: 'WHO5' | 'PHQ9') => {
         .single();
 
       if (error) {
-        console.error('Error creating clinical assessment:', error);
+        logger.error('Error creating clinical assessment:', error, 'SYSTEM');
         throw error;
       }
 
@@ -89,7 +90,7 @@ export const useClinicalAssessments = (type?: 'WHO5' | 'PHQ9') => {
       toast.success('Évaluation enregistrée');
     },
     onError: (error) => {
-      console.error('Error saving assessment:', error);
+      logger.error('Error saving assessment:', error, 'SYSTEM');
       toast.error('Erreur lors de l\'enregistrement');
     },
   });

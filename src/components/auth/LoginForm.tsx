@@ -28,10 +28,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await signIn(data.email, data.password);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur de connexion",
-        description: error.message || "Email ou mot de passe incorrect",
+        description: error instanceof Error ? error.message : "Email ou mot de passe incorrect",
         variant: "destructive",
       });
     }

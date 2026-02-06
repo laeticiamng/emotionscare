@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useJournalPrompts } from '@/hooks/useJournalPrompts';
@@ -63,7 +64,7 @@ export const useJournalSettingsSupabase = () => {
             }
           }
         } catch (error) {
-          console.error('Error loading journal settings:', error);
+          logger.error('Error loading journal settings:', error, 'SYSTEM');
           // Fallback to localStorage
           const stored = localStorage.getItem('journal-settings');
           if (stored) {
@@ -106,7 +107,7 @@ export const useJournalSettingsSupabase = () => {
         })
         .eq('id', userId);
     } catch (error) {
-      console.error('Error saving journal settings to Supabase:', error);
+      logger.error('Error saving journal settings to Supabase:', error, 'SYSTEM');
     }
   };
 

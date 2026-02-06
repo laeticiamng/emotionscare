@@ -59,7 +59,7 @@ export const usePrivacyPolicyVersions = () => {
 
       if (error) throw error;
       setPolicies(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Error loading policies:', error, 'HOOK');
       toast({
         title: 'Erreur',
@@ -99,7 +99,7 @@ export const usePrivacyPolicyVersions = () => {
           setNeedsAcceptance(data.requires_acceptance && !acceptance);
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Error loading current policy:', error, 'HOOK');
     } finally {
       setLoading(false);
@@ -129,7 +129,7 @@ export const usePrivacyPolicyVersions = () => {
 
       await loadPolicies();
       return data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Error creating policy:', error, 'HOOK');
       toast({
         title: 'Erreur',
@@ -161,7 +161,7 @@ export const usePrivacyPolicyVersions = () => {
 
       await loadPolicies();
       await loadCurrentPolicy();
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Error publishing policy:', error, 'HOOK');
       toast({
         title: 'Erreur',
@@ -189,7 +189,7 @@ export const usePrivacyPolicyVersions = () => {
         );
 
       if (error) throw error;
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Error logging changes:', error, 'HOOK');
     }
   }, []);
@@ -217,7 +217,7 @@ export const usePrivacyPolicyVersions = () => {
       });
 
       await loadCurrentPolicy();
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Error accepting policy:', error, 'HOOK');
       toast({
         title: 'Erreur',
@@ -238,7 +238,7 @@ export const usePrivacyPolicyVersions = () => {
 
       if (error) throw error;
       return data || [];
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Error loading policy changes:', error, 'HOOK');
       return [];
     }
@@ -262,7 +262,7 @@ export const usePrivacyPolicyVersions = () => {
         pending: (totalUsers || 0) - (acceptedUsers || 0),
         percentage: totalUsers ? ((acceptedUsers || 0) / totalUsers) * 100 : 0,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Error loading acceptance stats:', error, 'HOOK');
       return { total: 0, accepted: 0, pending: 0, percentage: 0 };
     }

@@ -4,6 +4,7 @@
  */
 
 import React, { useState, memo, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -72,7 +73,7 @@ const FeedbackCollector: React.FC = memo(() => {
         description: 'Votre retour nous aide à améliorer EmotionsCare'
       });
     } catch (error) {
-      console.error('Error submitting feedback:', error);
+      logger.error('Error submitting feedback:', error, 'SYSTEM');
       toast({
         title: 'Erreur',
         description: 'Impossible d\'envoyer le feedback. Réessayez.',

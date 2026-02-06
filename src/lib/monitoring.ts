@@ -68,7 +68,7 @@ export function sendAlert(alert: Alert): void {
       });
     } catch (edgeFnError) {
       // Fail silently - don't break the app if monitoring fails
-      console.error('[Monitoring] Edge function call failed:', edgeFnError);
+      logger.error('[Monitoring] Edge function call failed:', edgeFnError, 'SYSTEM');
     }
   }
 }

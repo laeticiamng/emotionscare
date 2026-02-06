@@ -32,7 +32,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
         title: "Inscription réussie",
         description: "Vérifiez votre email pour confirmer votre compte.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       const { message } = getFriendlyAuthError(error);
       toast({
         title: "Erreur d'inscription",
