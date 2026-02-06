@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 export interface Goal {
   id: string;
@@ -73,7 +74,7 @@ export const useGoals = () => {
         successRate,
       });
     } catch (err) {
-      console.error('Error fetching goals:', err);
+      logger.error('Error fetching goals', err instanceof Error ? err : new Error(String(err)), 'UI');
       setError(err instanceof Error ? err.message : 'Failed to fetch goals');
       toast({
         title: 'Erreur',
@@ -118,7 +119,7 @@ export const useGoals = () => {
 
       return data as Goal;
     } catch (err) {
-      console.error('Error creating goal:', err);
+      logger.error('Error creating goal', err instanceof Error ? err : new Error(String(err)), 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible de créer l\'objectif',
@@ -156,7 +157,7 @@ export const useGoals = () => {
 
       return data as Goal;
     } catch (err) {
-      console.error('Error updating goal:', err);
+      logger.error('Error updating goal', err instanceof Error ? err : new Error(String(err)), 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible de mettre à jour l\'objectif',
@@ -203,7 +204,7 @@ export const useGoals = () => {
 
       return true;
     } catch (err) {
-      console.error('Error deleting goal:', err);
+      logger.error('Error deleting goal', err instanceof Error ? err : new Error(String(err)), 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible de supprimer l\'objectif',

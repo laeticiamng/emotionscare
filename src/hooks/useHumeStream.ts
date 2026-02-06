@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface EmotionData {
   valence: number;
@@ -89,7 +90,7 @@ export const useHumeStream = () => {
         setCurrentEmotion(emotion);
       }
     } catch (err) {
-      console.error('Audio analysis error:', err);
+      logger.error('Audio analysis error', err instanceof Error ? err : new Error(String(err)), 'SCAN');
     } finally {
       setIsAnalyzing(false);
     }
@@ -123,7 +124,7 @@ export const useHumeStream = () => {
         setCurrentEmotion(emotion);
       }
     } catch (err) {
-      console.error('Text analysis error:', err);
+      logger.error('Text analysis error', err instanceof Error ? err : new Error(String(err)), 'SCAN');
     } finally {
       setIsAnalyzing(false);
     }

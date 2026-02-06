@@ -232,7 +232,7 @@ const AIRecommendationsWidget: React.FC<AIRecommendationsWidgetProps> = ({
 
         return contextRecommendations.slice(0, maxItems);
       } catch (err) {
-        console.warn('AI recommendations fallback:', err);
+        // Silent: AI recommendations fallback to defaults
         return DEFAULT_RECOMMENDATIONS;
       }
     },

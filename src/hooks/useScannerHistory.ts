@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ScannerAnswers } from '@/components/scanner/QuestionnaireScanner';
 import { calculateWellbeingScore, getDominantEmotion, generateRecommendations } from '@/components/scanner/ScannerResults';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 export interface ScanRecord {
   id: string;
@@ -39,7 +40,7 @@ export const useScannerHistory = () => {
         .limit(30);
 
       if (error) {
-        console.error('Error fetching scan history:', error);
+        logger.error('Error fetching scan history', error instanceof Error ? error : new Error(String(error)), 'SCAN');
         throw error;
       }
 
@@ -83,7 +84,7 @@ export const useScannerHistory = () => {
         .single();
 
       if (error) {
-        console.error('Error saving scan:', error);
+        logger.error('Error saving scan', error instanceof Error ? error : new Error(String(error)), 'SCAN');
         throw error;
       }
 
@@ -94,7 +95,7 @@ export const useScannerHistory = () => {
       toast.success('Scan enregistré !');
     },
     onError: (error) => {
-      console.error('Error saving scan:', error);
+      logger.error('Error saving scan', error instanceof Error ? error : new Error(String(error)), 'SCAN');
       toast.error('Erreur lors de l\'enregistrement');
     },
   });

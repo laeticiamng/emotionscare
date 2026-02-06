@@ -91,11 +91,11 @@ export function ReportManualTrigger() {
         title: 'Prévisualisation générée',
         description: 'Le rapport a été généré avec succès',
       });
-    } catch (error: any) {
-      logger.error('Erreur génération rapport:', error, 'COMPONENT');
+    } catch (error: unknown) {
+      logger.error('Erreur génération rapport', error instanceof Error ? error : new Error(String(error)), 'SYSTEM');
       toast({
         title: 'Erreur',
-        description: error.message || 'Impossible de générer la prévisualisation',
+        description: error instanceof Error ? error.message : 'Impossible de générer la prévisualisation',
         variant: 'destructive',
       });
     } finally {
@@ -149,11 +149,11 @@ export function ReportManualTrigger() {
       // Réinitialiser le formulaire
       setRecipientEmails('');
       setReportData(null);
-    } catch (error: any) {
-      logger.error('Erreur envoi rapport:', error, 'COMPONENT');
+    } catch (error: unknown) {
+      logger.error('Erreur envoi rapport', error instanceof Error ? error : new Error(String(error)), 'SYSTEM');
       toast({
         title: 'Erreur',
-        description: error.message || 'Impossible d\'enregistrer le rapport',
+        description: error instanceof Error ? error.message : 'Impossible d\'enregistrer le rapport',
         variant: 'destructive',
       });
     } finally {

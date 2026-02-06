@@ -78,8 +78,8 @@ export const AdaptiveMusicDashboard: React.FC = () => {
       if (response.error) throw response.error;
 
       setRecommendations(response.data.recommendations || []);
-    } catch (error: any) {
-      logger.error('Erreur lors du chargement des recommandations', error as Error, 'UI');
+    } catch (error: unknown) {
+      logger.error('Erreur lors du chargement des recommandations', error instanceof Error ? error : new Error(String(error)), 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les recommandations musicales',

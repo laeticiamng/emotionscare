@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import humeService from './hume.service';
 import openaiService from './openai.service';
@@ -124,10 +123,10 @@ class EmotionAnalysisService {
         timestamp: new Date()
       };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Erreur inconnue',
         timestamp: new Date()
       };
     }
@@ -171,10 +170,10 @@ class EmotionAnalysisService {
         timestamp: new Date()
       };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Erreur inconnue',
         timestamp: new Date()
       };
     }
@@ -249,10 +248,10 @@ class EmotionAnalysisService {
 
       return this.getDefaultRecommendations(currentEmotions);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Erreur inconnue',
         timestamp: new Date()
       };
     }
@@ -297,10 +296,10 @@ class EmotionAnalysisService {
         timestamp: new Date()
       };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Erreur inconnue',
         timestamp: new Date()
       };
     }
@@ -311,9 +310,9 @@ class EmotionAnalysisService {
     const emotionMap: Map<string, number[]> = new Map();
 
     // Traiter les résultats de chaque modalité
-    Object.entries(results).forEach(([modality, data]) => {
+    Object.entries(results).forEach(([modality, data]: [string, any]) => {
       if (data?.emotions) {
-        data.emotions.forEach((emotion: EmotionData) => {
+        (data.emotions as EmotionData[]).forEach((emotion: EmotionData) => {
           const existing = emotionMap.get(emotion.emotion) || [];
           existing.push(emotion.confidence);
           emotionMap.set(emotion.emotion, existing);

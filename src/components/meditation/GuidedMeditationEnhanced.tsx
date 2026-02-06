@@ -150,10 +150,10 @@ export default function GuidedMeditationEnhanced() {
       if (data.meditation) {
         setCurrentMeditation(data.meditation);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Erreur inconnue',
         variant: 'destructive',
       });
     } finally {

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -100,8 +98,8 @@ const NotificationCenter: React.FC = () => {
 
       toast.success(`${data.notifications?.length || 0} nouvelles notifications générées ! 🎉`);
       await loadNotifications();
-    } catch (error: any) {
-      logger.error('Erreur génération:', error as Error, 'UI');
+    } catch (error: unknown) {
+      logger.error('Erreur génération', error instanceof Error ? error : new Error(String(error)), 'UI');
       toast.error('Erreur lors de la génération des notifications');
     } finally {
       setGenerating(false);

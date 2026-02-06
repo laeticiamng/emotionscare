@@ -47,10 +47,11 @@ export const useInAppNotifications = () => {
         const notifs = data || [];
         setNotifications(notifs);
         setUnreadCount(notifs.filter(n => !n.read).length);
-      } catch (error: any) {
+      } catch (error: unknown) {
         // Only log if it's not a "table doesn't exist" error
-        if (error?.code !== '42P01') {
-          logger.warn('Error fetching notifications:', error, 'HOOK');
+        const errorCode = (error as any)?.code;
+        if (errorCode !== '42P01') {
+          logger.warn('Error fetching notifications', error, 'SYSTEM');
         }
       } finally {
         setLoading(false);

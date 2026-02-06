@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 export interface BreathingSessionRecord {
   id: string;
@@ -43,7 +44,7 @@ export const useBreathingHistory = () => {
         .limit(50);
 
       if (error) {
-        console.error('Error fetching breathing history:', error);
+        logger.error('Error fetching breathing history', error instanceof Error ? error : new Error(String(error)), 'BREATH');
         throw error;
       }
 
@@ -107,7 +108,7 @@ export const useBreathingHistory = () => {
         .single();
 
       if (error) {
-        console.error('Error saving breathing session:', error);
+        logger.error('Error saving breathing session', error instanceof Error ? error : new Error(String(error)), 'BREATH');
         throw error;
       }
 
@@ -118,7 +119,7 @@ export const useBreathingHistory = () => {
       toast.success('Session enregistrée !');
     },
     onError: (error) => {
-      console.error('Error saving session:', error);
+      logger.error('Error saving session', error instanceof Error ? error : new Error(String(error)), 'BREATH');
       toast.error('Erreur lors de l\'enregistrement');
     },
   });
