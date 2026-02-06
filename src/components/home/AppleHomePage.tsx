@@ -14,7 +14,6 @@ import AppleFeatureSection from '@/components/home/AppleFeatureSection';
 import AppleShowcaseSection from '@/components/home/AppleShowcaseSection';
 import AppleStatsSection from '@/components/home/AppleStatsSection';
 import AppleCTASection from '@/components/home/AppleCTASection';
-import ConsentBanner from '@/components/consent/ConsentBanner';
 import { cn } from '@/lib/utils';
 
 // Lazy load non-critical sections
@@ -249,8 +248,6 @@ const AppleHomePage: React.FC = () => {
         <Footer />
       </Suspense>
 
-      {/* Cookie Consent - Unified CNIL-compliant banner */}
-      <ConsentBanner />
     </div>
   );
 };
