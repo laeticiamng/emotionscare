@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Send, MessageCircle, CheckCircle, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -357,8 +358,9 @@ const ContactPage: React.FC = () => {
                         variant="outline" 
                         className="w-full focus:ring-2 focus:ring-primary focus:ring-offset-2"
                         aria-label="Accéder au centre d'aide EmotionsCare"
+                        asChild
                       >
-                        Accéder au centre d'aide
+                        <Link to="/help">Accéder au centre d'aide</Link>
                       </Button>
                     </CardContent>
                   </Card>
