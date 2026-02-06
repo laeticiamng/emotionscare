@@ -41,7 +41,7 @@ const features: Feature[] = [
     subtitle: "Validé par les neurosciences.",
     description: "Chaque exercice repose sur des données probantes : cohérence cardiaque, pleine conscience, thérapies comportementales.",
     gradient: "from-accent to-primary",
-    stat: { value: "94%", label: "efficacité ressentie" }
+    stat: { value: "6", label: "protocoles scientifiques" }
   },
   {
     icon: <Shield className="h-12 w-12" />,
@@ -121,11 +121,11 @@ const FeatureCard: React.FC<{ feature: Feature; index: number }> = ({ feature, i
 
         {/* Hover glow effect */}
         <div className={cn(
-          "absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500",
+          "absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-[0.08] transition-opacity duration-500",
           "bg-gradient-to-br pointer-events-none",
           feature.gradient,
           "blur-3xl -z-10"
-        )} style={{ opacity: 0.05 }} />
+        )} />
       </div>
     </motion.div>
   );

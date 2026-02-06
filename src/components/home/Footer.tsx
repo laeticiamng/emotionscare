@@ -33,10 +33,10 @@ const Footer: React.FC = () => {
       { label: 'Cookies', href: '/legal/cookies' },
     ],
     social: [
-      { label: 'Twitter', href: 'https://twitter.com/emotionscare', icon: Twitter },
-      { label: 'LinkedIn', href: 'https://linkedin.com/company/emotionscare', icon: Linkedin },
-      { label: 'Instagram', href: 'https://instagram.com/emotionscare', icon: Instagram },
-      { label: 'YouTube', href: 'https://youtube.com/@emotionscare', icon: Youtube },
+      { label: 'Twitter', href: '#', icon: Twitter },
+      { label: 'LinkedIn', href: '#', icon: Linkedin },
+      { label: 'Instagram', href: '#', icon: Instagram },
+      { label: 'YouTube', href: '#', icon: Youtube },
     ],
   };
 
@@ -71,16 +71,13 @@ const Footer: React.FC = () => {
             {/* Réseaux sociaux */}
             <div className="flex items-center gap-3 pt-2">
               {links.social.map((social) => (
-                <a
+                <span
                   key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-lg bg-muted hover:bg-primary/10 hover:text-primary transition-colors"
-                  aria-label={`Suivez-nous sur ${social.label}`}
+                  className="p-2 rounded-lg bg-muted text-muted-foreground cursor-default"
+                  aria-label={`${social.label} (bientôt disponible)`}
                 >
                   <social.icon className="h-4 w-4" aria-hidden="true" />
-                </a>
+                </span>
               ))}
             </div>
           </div>

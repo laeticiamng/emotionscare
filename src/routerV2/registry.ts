@@ -14,7 +14,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     name: 'home',
     path: '/',
     segment: 'public',
-    layout: 'marketing',
+    layout: 'simple', // Homepage has its own header/footer in AppleHomePage
     component: 'HomePage',
     guard: false, // Pas de guard - accessible à tous
   },
