@@ -127,7 +127,7 @@ export default function ExamModePage() {
         });
 
         logger.info('SSO login successful for exam mode', 'EXAM_MODE');
-      } catch (error: any) {
+      } catch (error: unknown) {
         logger.error('SSO login failed', error, 'EXAM_MODE');
 
         // Nettoyer l'URL même en cas d'erreur

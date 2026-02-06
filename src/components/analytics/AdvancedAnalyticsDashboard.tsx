@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -137,7 +138,7 @@ export const AdvancedAnalyticsDashboard: React.FC = () => {
 
         setAnalyticsData({ labels, userPoints, averagePoints, predictions, sessions, streaks });
       } catch (error) {
-        console.error('Analytics fetch error:', error);
+        logger.error('Analytics fetch error:', error, 'ANALYTICS');
         // Fallback vers données simulées
         setAnalyticsData(generateFallbackData(days));
       } finally {

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -64,7 +65,7 @@ const SEOAuditPage: React.FC = () => {
         toast.error(data.error || 'Erreur lors de l\'audit');
       }
     } catch (error) {
-      console.error('Audit error:', error);
+      logger.error('Audit error:', error, 'SYSTEM');
       toast.error('Erreur lors de l\'audit SEO');
     } finally {
       setIsLoading(false);

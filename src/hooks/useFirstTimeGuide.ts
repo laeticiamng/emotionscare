@@ -3,6 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -29,7 +30,7 @@ export const useFirstTimeGuide = () => {
           .limit(1);
 
         if (error) {
-          console.error('Error checking first time status:', error);
+          logger.error('Error checking first time status:', error, 'SYSTEM');
           setIsLoading(false);
           return;
         }
@@ -37,7 +38,7 @@ export const useFirstTimeGuide = () => {
         // Afficher le guide si aucune action précédente
         setShouldShowGuide(!data || data.length === 0);
       } catch (error) {
-        console.error('Error in useFirstTimeGuide:', error);
+        logger.error('Error in useFirstTimeGuide:', error, 'SYSTEM');
       } finally {
         setIsLoading(false);
       }

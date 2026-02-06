@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import { 
   Users, MessageCircle, Heart, Send, ArrowLeft, Smile, Search, Plus,
   TrendingUp, Bookmark, Flag, Settings, BarChart3, UserPlus
@@ -93,7 +94,7 @@ export default function CommunityPage() {
         const ids = await CommunitySavedPostsService.getSavedPosts();
         setSavedPostIds(ids);
       } catch (err) {
-        console.error('Failed to load saved posts:', err);
+        logger.error('Failed to load saved posts:', err, 'SOCIAL');
       }
     };
     if (user) loadSavedPosts();
@@ -120,7 +121,7 @@ export default function CommunityPage() {
         reactions: []
       })));
     } catch (err) {
-      console.error('Failed to load messages:', err);
+      logger.error('Failed to load messages:', err, 'SOCIAL');
     }
   }, []);
 
@@ -144,7 +145,7 @@ export default function CommunityPage() {
         profile: m.profiles
       })));
     } catch (err) {
-      console.error('Failed to load members:', err);
+      logger.error('Failed to load members:', err, 'SOCIAL');
     }
   }, []);
 

@@ -4,6 +4,7 @@
  */
 
 import { useRef, useCallback, useEffect, useState } from 'react';
+import { logger } from '@/lib/logger';
 
 interface EqualizerBand {
   frequency: number;
@@ -63,7 +64,7 @@ export function useWebAudioContext(): UseWebAudioContextReturn {
 
       return ctx;
     } catch (error) {
-      console.error('Failed to create AudioContext:', error);
+      logger.error('Failed to create AudioContext:', error, 'MUSIC');
       return null;
     }
   }, []);
@@ -119,7 +120,7 @@ export function useWebAudioContext(): UseWebAudioContextReturn {
       setIsConnected(true);
     } catch (error) {
       // Element might already be connected to a context
-      console.warn('Audio element connection warning:', error);
+      logger.warn('Audio element connection warning:', error, 'MUSIC');
       setIsConnected(false);
     }
   }, [initContext, isConnected]);

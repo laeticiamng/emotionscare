@@ -17,6 +17,7 @@
  */
 
 import { useCallback, useState } from 'react';
+import { logger } from '@/lib/logger';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -233,7 +234,7 @@ export function useImplicitAssessment() {
       });
 
       if (error) {
-        console.error('[useImplicitAssessment] Backend error:', error);
+        logger.error('[useImplicitAssessment] Backend error:', error, 'SYSTEM');
         return null;
       }
 
@@ -242,7 +243,7 @@ export function useImplicitAssessment() {
         message: data?.message ?? 'Merci pour ce moment',
       };
     } catch (err) {
-      console.error('[useImplicitAssessment] Submit error:', err);
+      logger.error('[useImplicitAssessment] Submit error:', err, 'SYSTEM');
       return null;
     } finally {
       setIsSubmitting(false);

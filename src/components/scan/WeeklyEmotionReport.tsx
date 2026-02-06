@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -186,7 +187,7 @@ export const WeeklyEmotionReport: React.FC = () => {
 
         setWeeklyData(realData);
       } catch (err) {
-        console.error('[WeeklyEmotionReport] Error loading data:', err);
+        logger.error('[WeeklyEmotionReport] Error loading data:', err, 'SCAN');
         setWeeklyData(MOCK_WEEKLY_DATA);
       } finally {
         setIsLoadingData(false);

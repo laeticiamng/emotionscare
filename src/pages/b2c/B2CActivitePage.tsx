@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -119,7 +120,7 @@ const B2CActivitePage: React.FC = () => {
           ]);
         }
       } catch (error) {
-        console.error('Error loading data:', error);
+        logger.error('Error loading data:', error, 'SYSTEM');
       } finally {
         setLoading(false);
       }

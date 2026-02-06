@@ -3,6 +3,7 @@
  * Hook pour récupérer les données agrégées anonymisées d'une organisation
  */
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 
 interface PathwayUsage {
@@ -143,7 +144,7 @@ export function useOrgAggregates(orgId: string) {
         uniqueUsers,
       });
     } catch (err) {
-      console.error('Error fetching org aggregates:', err);
+      logger.error('Error fetching org aggregates:', err, 'SYSTEM');
       setError(err as Error);
       // Utiliser les données par défaut en cas d'erreur
       setData({

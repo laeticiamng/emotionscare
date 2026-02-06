@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react';
+import { logger } from '@/lib/logger';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -69,7 +70,7 @@ const EmotionalJournalPage: React.FC = () => {
       URL.revokeObjectURL(url);
       toast.success('Export téléchargé !');
     } catch (error) {
-      console.error('Export error:', error);
+      logger.error('Export error:', error, 'SYSTEM');
       toast.error('Erreur lors de l\'export');
     }
   };

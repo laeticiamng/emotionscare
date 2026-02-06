@@ -22,8 +22,8 @@ export const notificationService = {
       if (error) throw error;
       
       return { notifications: data || [], error: null };
-    } catch (error: any) {
-      logger.error('Error fetching notifications', error as Error, 'SYSTEM');
+    } catch (error: unknown) {
+      logger.error('Error fetching notifications', error instanceof Error ? error : undefined, 'SYSTEM');
       return { notifications: [], error };
     }
   },
@@ -42,8 +42,8 @@ export const notificationService = {
       if (error) throw error;
       
       return { notification: data, error: null };
-    } catch (error: any) {
-      logger.error('Error creating notification', error as Error, 'SYSTEM');
+    } catch (error: unknown) {
+      logger.error('Error creating notification', error instanceof Error ? error : undefined, 'SYSTEM');
       return { notification: null, error };
     }
   },
@@ -61,8 +61,8 @@ export const notificationService = {
       if (error) throw error;
       
       return { success: true, error: null };
-    } catch (error: any) {
-      logger.error('Error marking notification as read', error as Error, 'SYSTEM');
+    } catch (error: unknown) {
+      logger.error('Error marking notification as read', error instanceof Error ? error : undefined, 'SYSTEM');
       return { success: false, error };
     }
   },
@@ -81,8 +81,8 @@ export const notificationService = {
       if (error) throw error;
       
       return { success: true, error: null };
-    } catch (error: any) {
-      logger.error('Error marking all notifications as read', error as Error, 'SYSTEM');
+    } catch (error: unknown) {
+      logger.error('Error marking all notifications as read', error instanceof Error ? error : undefined, 'SYSTEM');
       return { success: false, error };
     }
   },
@@ -100,8 +100,8 @@ export const notificationService = {
       if (error) throw error;
       
       return { success: true, error: null };
-    } catch (error: any) {
-      logger.error('Error deleting notification', error as Error, 'SYSTEM');
+    } catch (error: unknown) {
+      logger.error('Error deleting notification', error instanceof Error ? error : undefined, 'SYSTEM');
       return { success: false, error };
     }
   },
@@ -120,8 +120,8 @@ export const notificationService = {
       if (error) throw error;
       
       return { count: count || 0, error: null };
-    } catch (error: any) {
-      logger.error('Error getting unread count', error as Error, 'SYSTEM');
+    } catch (error: unknown) {
+      logger.error('Error getting unread count', error instanceof Error ? error : undefined, 'SYSTEM');
       return { count: 0, error };
     }
   },
@@ -166,8 +166,8 @@ export const notificationService = {
         error: null,
         total: count || 0
       };
-    } catch (error: any) {
-      logger.error('Error fetching filtered notifications', error as Error, 'SYSTEM');
+    } catch (error: unknown) {
+      logger.error('Error fetching filtered notifications', error instanceof Error ? error : undefined, 'SYSTEM');
       return { 
         notifications: [], 
         error,

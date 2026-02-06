@@ -133,8 +133,8 @@ export const useOptimizedEmotionsCare = (config: OptimizedEmotionsCareConfig = {
 
         return result;
       }
-    } catch (error: any) {
-      if (error.name !== 'AbortError') {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name !== 'AbortError') {
         const errorMessage = error.message || 'Erreur lors de l\'analyse émotionnelle';
         updateState({ 
           isAnalyzing: false, 
@@ -192,8 +192,8 @@ export const useOptimizedEmotionsCare = (config: OptimizedEmotionsCareConfig = {
 
         return track;
       }
-    } catch (error: any) {
-      const errorMessage = error.message || 'Erreur lors de la génération musicale';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la génération musicale';
       updateState({ 
         isGenerating: false, 
         error: errorMessage 
@@ -221,8 +221,8 @@ export const useOptimizedEmotionsCare = (config: OptimizedEmotionsCareConfig = {
         description: `"${track.title}" en cours`,
         duration: 2000
       });
-    } catch (error: any) {
-      const errorMessage = error.message || 'Erreur lors de la lecture';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la lecture';
       updateState({ 
         isPlaying: false, 
         error: errorMessage 

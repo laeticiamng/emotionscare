@@ -3,6 +3,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 
 export interface VRSettings {
   defaultScene: 'galaxy' | 'ocean' | 'forest' | 'space' | 'aurora' | 'cosmos';
@@ -45,7 +46,7 @@ export function useVRSettings() {
         setSettings({ ...DEFAULT_SETTINGS, ...parsed });
       }
     } catch (err) {
-      console.error('Error loading VR settings:', err);
+      logger.error('Error loading VR settings:', err, 'VR');
     }
     setIsLoaded(true);
   }, []);
@@ -57,7 +58,7 @@ export function useVRSettings() {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       } catch (err) {
-        console.error('Error saving VR settings:', err);
+        logger.error('Error saving VR settings:', err, 'VR');
       }
       return updated;
     });
@@ -69,7 +70,7 @@ export function useVRSettings() {
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch (err) {
-      console.error('Error resetting VR settings:', err);
+      logger.error('Error resetting VR settings:', err, 'VR');
     }
   }, []);
 

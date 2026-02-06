@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react';
+import { logger } from '@/lib/logger';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -87,7 +88,7 @@ const NewsletterSection: React.FC<NewsletterSectionProps> = ({
 
       setEmail('');
     } catch (err) {
-      console.error('Newsletter subscription error:', err);
+      logger.error('Newsletter subscription error:', err, 'SYSTEM');
       // Fallback : simule le succès si la table n'existe pas encore
       setIsSubscribed(true);
       setEmail('');

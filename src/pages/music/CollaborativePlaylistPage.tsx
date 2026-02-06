@@ -4,6 +4,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import { logger } from '@/lib/logger';
 import { useParams, useNavigate } from 'react-router-dom';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { useAuth } from '@/contexts/AuthContext';
@@ -84,7 +85,7 @@ const CollaborativePlaylistPage: React.FC = () => {
           }
         }
       } catch (error) {
-        console.error('Error loading playlist:', error);
+        logger.error('Error loading playlist:', error, 'MUSIC');
         toast({
           title: 'Erreur',
           description: 'Impossible de charger la playlist',

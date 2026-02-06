@@ -79,12 +79,12 @@ const EnhancedRegisterForm: React.FC = () => {
         navigate('/app/consumer/home');
       }, 500);
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error("Erreur d'inscription", { error }, 'AUTH');
       
       toast({
         title: "Inscription impossible",
-        description: error.message || "Une erreur s'est produite lors de l'inscription.",
+        description: error instanceof Error ? error.message : "Une erreur s'est produite lors de l'inscription.",
         variant: "destructive"
       });
       

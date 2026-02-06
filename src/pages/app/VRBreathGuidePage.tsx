@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { logger } from '@/lib/logger';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -136,7 +137,7 @@ export default function VRBreathGuidePage() {
         }
       }
     } catch (err) {
-      console.error('Error creating session:', err);
+      logger.error('Error creating session:', err, 'VR');
     }
     
     // Haptic feedback
@@ -168,7 +169,7 @@ export default function VRBreathGuidePage() {
           description: `${cyclesCompleted} cycles de respiration complétés.`,
         });
       } catch (err) {
-        console.error('Error completing session:', err);
+        logger.error('Error completing session:', err, 'VR');
       }
     }
     

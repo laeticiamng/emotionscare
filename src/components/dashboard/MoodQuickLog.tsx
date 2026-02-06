@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -55,7 +56,7 @@ export const MoodQuickLog: React.FC<MoodQuickLogProps> = ({ onMoodLogged, classN
         setSelectedMood(null);
       }, 3000);
     } catch (error) {
-      console.error('Error logging mood:', error);
+      logger.error('Error logging mood:', error, 'SYSTEM');
       toast.error('Erreur lors de l\'enregistrement');
       setSelectedMood(null);
     } finally {

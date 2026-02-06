@@ -180,9 +180,9 @@ export const useHelpEnriched = () => {
         });
       }
 
-    } catch (error: any) {
-      logger.error('Search failed', error as Error, 'SYSTEM');
-      setError(error.message);
+    } catch (error: unknown) {
+      logger.error('Search failed', error instanceof Error ? error : undefined, 'SYSTEM');
+      setError(error instanceof Error ? error.message : 'Erreur inconnue');
       setSearchResults([]);
     } finally {
       setLoading(false);
@@ -215,9 +215,9 @@ export const useHelpEnriched = () => {
         window.gtag('event', 'help.article.view', { slug });
       }
 
-    } catch (error: any) {
-      logger.error('Load article failed', error as Error, 'SYSTEM');
-      setError(error.message);
+    } catch (error: unknown) {
+      logger.error('Load article failed', error instanceof Error ? error : undefined, 'SYSTEM');
+      setError(error instanceof Error ? error.message : 'Erreur inconnue');
     } finally {
       setLoading(false);
     }
@@ -281,8 +281,8 @@ export const useHelpEnriched = () => {
 
       return true;
 
-    } catch (error: any) {
-      logger.error('Send feedback failed', error as Error, 'SYSTEM');
+    } catch (error: unknown) {
+      logger.error('Send feedback failed', error instanceof Error ? error : undefined, 'SYSTEM');
       
       toast({
         title: "Erreur",
@@ -422,9 +422,9 @@ export const useHelpEnriched = () => {
       } else {
         setArticles([]);
       }
-    } catch (error: any) {
-      logger.error('Load articles failed', error as Error, 'SYSTEM');
-      setError(error.message);
+    } catch (error: unknown) {
+      logger.error('Load articles failed', error instanceof Error ? error : undefined, 'SYSTEM');
+      setError(error instanceof Error ? error.message : 'Erreur inconnue');
     } finally {
       setLoading(false);
     }

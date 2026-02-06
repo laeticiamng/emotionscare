@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Watch, Activity, Heart, Moon, Footprints, RefreshCw, Check, X, TrendingUp, TrendingDown, Minus, History, Settings } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -80,7 +81,7 @@ export default function WearablesPage() {
         setProviders(enrichedProviders);
       }
     } catch (err) {
-      console.error('Failed to load providers:', err);
+      logger.error('Failed to load providers:', err, 'SYSTEM');
     }
   };
 
@@ -96,7 +97,7 @@ export default function WearablesPage() {
         setSummary(data.summary);
       }
     } catch (err) {
-      console.error('Failed to load health data:', err);
+      logger.error('Failed to load health data:', err, 'SYSTEM');
     }
   };
 

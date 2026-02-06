@@ -3,6 +3,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -127,7 +128,7 @@ export const ScanInsightsPanel: React.FC = () => {
         const newInsights = await emotionInsightsGenerator.generateInsights(context);
         setInsights(newInsights.slice(0, 10));
       } catch (error) {
-        console.error('Error generating insights:', error);
+        logger.error('Error generating insights:', error, 'SCAN');
       } finally {
         setIsLoading(false);
       }
