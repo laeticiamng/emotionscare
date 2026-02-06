@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { 
@@ -318,17 +319,22 @@ const LoginPage: React.FC = () => {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <label className="flex items-center space-x-2 text-sm">
-                    <input
-                      type="checkbox"
-                      name="remember"
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="remember"
                       checked={formData.remember}
-                      onChange={handleChange}
-                      className="rounded border-2 border-muted"
+                      onCheckedChange={(checked) =>
+                        setFormData((prev) => ({ ...prev, remember: Boolean(checked) }))
+                      }
                       disabled={isLoading || submitted}
                     />
-                    <span className="text-muted-foreground">Se souvenir de moi</span>
-                  </label>
+                    <label
+                      htmlFor="remember"
+                      className="text-sm text-muted-foreground cursor-pointer select-none"
+                    >
+                      Se souvenir de moi
+                    </label>
+                  </div>
                   
                   <button 
                     type="button"
