@@ -155,10 +155,10 @@ const CommunityDashboard: React.FC = () => {
       setIsAnonymous(false);
       loadPosts();
       loadStats();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Erreur inconnue',
         variant: 'destructive',
       });
     } finally {

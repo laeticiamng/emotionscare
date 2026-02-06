@@ -64,8 +64,8 @@ const ChallengesHistory = () => {
       URL.revokeObjectURL(url);
 
       toast.success('Export généré avec succès !');
-    } catch (error: any) {
-      logger.error('Export error:', error, 'PAGE');
+    } catch (error: unknown) {
+      logger.error('Export error:', error instanceof Error ? error : new Error('Unknown error'), 'PAGE');
       toast.error('Erreur lors de l\'export');
     } finally {
       setExportLoading(false);

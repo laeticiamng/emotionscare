@@ -94,8 +94,8 @@ export const BlockchainAuditTrail = () => {
 
       toast({ title: 'Block ajouté', description: 'Nouveau block créé dans la blockchain' });
       loadBlocks();
-    } catch (error: any) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+    } catch (error: unknown) {
+      toast({ title: 'Erreur', description: error instanceof Error ? error.message : 'Erreur inconnue', variant: 'destructive' });
     }
   };
 

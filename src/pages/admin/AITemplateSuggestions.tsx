@@ -51,10 +51,10 @@ export default function AITemplateSuggestions() {
 
       if (error) throw error;
       setSuggestions(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Erreur inconnue',
         variant: 'destructive',
       });
     } finally {
@@ -75,10 +75,10 @@ export default function AITemplateSuggestions() {
       });
 
       await loadSuggestions();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Erreur inconnue',
         variant: 'destructive',
       });
     } finally {
@@ -105,10 +105,10 @@ export default function AITemplateSuggestions() {
 
       await loadSuggestions();
       setSelectedSuggestion(null);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Erreur inconnue',
         variant: 'destructive',
       });
     }

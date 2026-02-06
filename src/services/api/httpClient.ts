@@ -132,7 +132,7 @@ class HttpClient {
         message: 'Success',
         success: true,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       await this.applyErrorInterceptors(error);
       throw error;
     }

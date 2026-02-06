@@ -80,11 +80,11 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       });
       
       navigate('/');
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Login error
       toast({
         title: "Erreur de connexion",
-        description: error.message || "Identifiants invalides",
+        description: error instanceof Error ? error.message : "Identifiants invalides",
         variant: "destructive",
       });
     }

@@ -52,10 +52,10 @@ export default function AlertEscalationConfig() {
 
       if (error) throw error;
       setRules(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Erreur inconnue',
         variant: 'destructive',
       });
     } finally {
@@ -83,10 +83,10 @@ export default function AlertEscalationConfig() {
 
       await loadRules();
       setEditingRule(null);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Erreur inconnue',
         variant: 'destructive',
       });
     }

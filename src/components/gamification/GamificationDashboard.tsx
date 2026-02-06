@@ -129,10 +129,10 @@ const GamificationDashboard: React.FC = () => {
       });
 
       await loadData();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Erreur inconnue',
         variant: 'destructive',
       });
     } finally {
@@ -166,10 +166,10 @@ const GamificationDashboard: React.FC = () => {
       });
 
       await loadData();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Erreur inconnue',
         variant: 'destructive',
       });
     } finally {

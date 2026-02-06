@@ -53,11 +53,11 @@ export class SecureAnalytics {
       // Reset offline flag si succès
       this.isOffline = false;
 
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') {
         logger.warn('[Analytics] Request timeout - marking as offline', {}, 'ANALYTICS');
       } else {
-        logger.warn('[Analytics] Error sending event', { message: error.message }, 'ANALYTICS');
+        logger.warn('[Analytics] Error sending event', { message: error instanceof Error ? error.message : 'Unknown error' }, 'ANALYTICS');
       }
       
       this.markAsOffline();

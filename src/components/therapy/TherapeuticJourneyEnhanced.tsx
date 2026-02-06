@@ -135,11 +135,11 @@ export const TherapeuticJourneyEnhanced: React.FC = () => {
           description: "Votre parcours thérapeutique personnalisé est prêt",
         });
       }
-    } catch (error: any) {
-      logger.error('Error generating journey', error as Error, 'UI');
+    } catch (error: unknown) {
+      logger.error('Error generating journey', error instanceof Error ? error : new Error('Unknown error'), 'UI');
       toast({
         title: "Erreur",
-        description: error.message || "Impossible de générer le parcours",
+        description: error instanceof Error ? error.message : "Impossible de générer le parcours",
         variant: "destructive"
       });
     } finally {
@@ -169,10 +169,10 @@ export const TherapeuticJourneyEnhanced: React.FC = () => {
           description: "Prenez une profonde inspiration et commençons",
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur",
-        description: error.message || "Impossible de démarrer la session",
+        description: error instanceof Error ? error.message : "Impossible de démarrer la session",
         variant: "destructive"
       });
     }
@@ -204,10 +204,10 @@ export const TherapeuticJourneyEnhanced: React.FC = () => {
       setCurrentSession(null);
       loadJourneys();
       loadStats();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur",
-        description: error.message || "Impossible de terminer la session",
+        description: error instanceof Error ? error.message : "Impossible de terminer la session",
         variant: "destructive"
       });
     }
