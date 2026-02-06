@@ -56,7 +56,7 @@ const AppleCTASection: React.FC = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-12"
           >
-            30 jours d'essai gratuit. Aucune carte bancaire requise.
+            Gratuit pour commencer. Sans engagement.
             <br className="hidden sm:block" />
             Annulez quand vous voulez.
           </motion.p>
@@ -117,7 +117,7 @@ const AppleCTASection: React.FC = () => {
             </span>
             <span className="flex items-center gap-2">
               <div className="w-2 h-2 bg-accent rounded-full" />
-              Support 24/7
+              Made in France
             </span>
           </motion.div>
         </div>
