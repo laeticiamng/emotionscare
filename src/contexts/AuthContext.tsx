@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 import { TEST_MODE } from '@/lib/config';
+import { getFriendlyAuthError } from '@/lib/auth/authErrorService';
 
 interface AuthContextType {
   user: User | null;
@@ -156,15 +157,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       if (error) {
         logger.error('Erreur lors de l\'inscription', error as Error, 'AUTH');
-        throw error; // Lancer l'erreur pour que le composant puisse la gérer
+        const friendly = getFriendlyAuthError(error);
+        throw new Error(friendly.message);
       }
 
       if (data.user && !data.user.email_confirmed_at) {
         logger.info('Email de confirmation envoyé', undefined, 'AUTH');
       }
-    } catch (error) {
-      logger.error('Erreur lors de l\'inscription', error as Error, 'AUTH');
-      throw error; // Relancer pour compatibilité avec les composants existants
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      const friendly = getFriendlyAuthError(error);
+      throw new Error(friendly.message);
     } finally {
       setIsLoading(false);
     }
@@ -173,20 +178,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const signIn = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
         logger.error('Erreur lors de la connexion', error as Error, 'AUTH');
-        throw error; // Lancer l'erreur pour que le composant puisse la gérer
+        const friendly = getFriendlyAuthError(error);
+        throw new Error(friendly.message);
       }
 
       logger.info('Connexion réussie', { email }, 'AUTH');
-    } catch (error) {
-      logger.error('Erreur lors de la connexion', error as Error, 'AUTH');
-      throw error; // Relancer pour compatibilité avec les composants existants
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      const friendly = getFriendlyAuthError(error);
+      throw new Error(friendly.message);
     } finally {
       setIsLoading(false);
     }
