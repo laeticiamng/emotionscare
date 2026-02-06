@@ -303,8 +303,8 @@ const SecuritySettings: React.FC = () => {
         
         <div className="bg-muted/30 p-4 rounded-lg">
           <p className="text-xs text-center text-muted-foreground">
-            EmotionsCare est certifié ISO 27001, ISO 27701, SOC 2 Type II et RGPD pour garantir
-            la protection optimale de vos données personnelles.
+            EmotionsCare applique les principes du RGPD et les bonnes pratiques de sécurité
+            pour garantir la protection de vos données personnelles.
           </p>
         </div>
       </CardContent>

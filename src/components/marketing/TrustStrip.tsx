@@ -34,8 +34,8 @@ const TRUST_INDICATORS = [
   },
   {
     icon: Award,
-    title: 'ISO 27001',
-    description: 'Sécurité information certifiée'
+    title: 'Données protégées',
+    description: 'Sécurité et confidentialité garanties'
   },
   {
     icon: Heart,
