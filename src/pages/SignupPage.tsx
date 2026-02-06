@@ -79,9 +79,9 @@ const SignupPage: React.FC = () => {
         full_name: fullName.trim()
       });
       setSuccess('Compte créé avec succès ! Vérifiez votre email pour confirmer votre compte.');
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Erreur d\'inscription', error as Error, 'AUTH');
-      setError(error.message || 'Erreur lors de la création du compte');
+      setError(error instanceof Error ? error.message : 'Erreur lors de la création du compte');
     }
   };
 
@@ -182,6 +182,7 @@ const SignupPage: React.FC = () => {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -208,6 +209,7 @@ const SignupPage: React.FC = () => {
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    aria-label={showConfirmPassword ? "Masquer la confirmation" : "Afficher la confirmation"}
                   >
                     {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>

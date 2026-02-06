@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import ForgotPasswordDialog from '@/pages/b2c/login/ForgotPasswordDialog';
 
 interface LoginFormData {
   email: string;
@@ -49,6 +50,7 @@ const LoginPage: React.FC = () => {
   
   const [showPassword, setShowPassword] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   
   const { signIn, isLoading, isAuthenticated, user } = useAuth();
 
@@ -80,7 +82,7 @@ const LoginPage: React.FC = () => {
         description: "Bienvenue sur EmotionsCare !",
       });
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Erreur de connexion', error as Error, 'AUTH');
       
       const errorMessages: Record<string, string> = {
@@ -90,7 +92,8 @@ const LoginPage: React.FC = () => {
         'User not found': 'Aucun compte trouvé avec cet email'
       };
       
-      const message = errorMessages[error.message] || error.message || 'Une erreur est survenue';
+      const errMsg = error instanceof Error ? error.message : 'Une erreur est survenue';
+      const message = errorMessages[errMsg] || errMsg;
       
       toast({
         title: "Erreur de connexion",
@@ -307,6 +310,7 @@ const LoginPage: React.FC = () => {
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -326,12 +330,13 @@ const LoginPage: React.FC = () => {
                     <span className="text-muted-foreground">Se souvenir de moi</span>
                   </label>
                   
-                  <Link 
-                    to="/forgot-password" 
-                    className="text-sm text-primary hover:underline focus:underline"
+                  <button 
+                    type="button"
+                    onClick={() => setForgotPasswordOpen(true)}
+                    className="text-sm text-primary hover:underline focus:underline bg-transparent border-none cursor-pointer"
                   >
                     Mot de passe oublié ?
-                  </Link>
+                  </button>
                 </div>
 
                 <Button 
@@ -417,6 +422,11 @@ const LoginPage: React.FC = () => {
           </motion.div>
         )}
       </motion.div>
+      <ForgotPasswordDialog
+        open={forgotPasswordOpen}
+        onOpenChange={setForgotPasswordOpen}
+        email={formData.email}
+      />
     </div>
   );
 };

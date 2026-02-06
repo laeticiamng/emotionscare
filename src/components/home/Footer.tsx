@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Mail, Shield, BookOpen, Users, Accessibility, Twitter, Linkedin, Instagram, Youtube, ExternalLink } from 'lucide-react';
+import { Heart, Mail, Shield, BookOpen, Users, Accessibility, Twitter, Linkedin, Instagram, Youtube, ExternalLink, LockKeyhole } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const Footer: React.FC = () => {
@@ -13,11 +13,11 @@ const Footer: React.FC = () => {
 
   const links = {
     platform: [
-      { label: 'Accueil', href: '/' },
-      { label: 'Mon espace', href: '/app/home' },
-      { label: 'Scanner émotionnel', href: '/app/scan' },
-      { label: 'Musique thérapeutique', href: '/app/music' },
-      { label: 'Parc émotionnel', href: '/app/emotional-park' },
+      { label: 'Accueil', href: '/', protected: false },
+      { label: 'Mon espace', href: '/app/home', protected: true },
+      { label: 'Scanner émotionnel', href: '/app/scan', protected: true },
+      { label: 'Musique thérapeutique', href: '/app/music', protected: true },
+      { label: 'Parc émotionnel', href: '/app/emotional-park', protected: true },
     ],
     resources: [
       { label: 'FAQ', href: '/faq' },
@@ -96,9 +96,12 @@ const Footer: React.FC = () => {
                 <li key={link.href}>
                   <Link 
                     to={link.href} 
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
                   >
                     {link.label}
+                    {link.protected && (
+                      <LockKeyhole className="h-3 w-3 opacity-60" aria-hidden="true" />
+                    )}
                   </Link>
                 </li>
               ))}

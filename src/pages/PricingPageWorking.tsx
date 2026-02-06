@@ -120,10 +120,12 @@ export default function PricingPageWorking() {
                 <div className="mt-4">
                   <div className="text-4xl font-bold">
                     {typeof plan.price[billingPeriod] === 'number'
-                      ? `${plan.price[billingPeriod]}€`
+                      ? plan.price[billingPeriod] === 0
+                        ? 'Gratuit'
+                        : `${plan.price[billingPeriod]}€`
                       : plan.price[billingPeriod]}
                   </div>
-                  {typeof plan.price[billingPeriod] === 'number' && (
+                  {typeof plan.price[billingPeriod] === 'number' && plan.price[billingPeriod] > 0 && (
                     <div className="text-sm text-muted-foreground">
                       par {billingPeriod === 'monthly' ? 'mois' : 'an'}
                     </div>
