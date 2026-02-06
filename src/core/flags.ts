@@ -95,12 +95,12 @@ export type FeatureFlagKey = keyof FeatureFlags;
 export const DEFAULT_FLAGS: FeatureFlags = {
   // Core features - PRODUCTION ✅
   FF_JOURNAL: true,
-  FF_NYVEE: false, // Planifié
+  FF_NYVEE: true, // Activé
   FF_DASHBOARD: true,
   FF_COACH: true,
   FF_MUSIC: true,
-  FF_PREMIUM_SUNO: false, // Alpha - requiert API payante
-  FF_VR: false, // Alpha - orchestrateurs uniquement
+  FF_PREMIUM_SUNO: true, // Activé - mode dégradé si API absente
+  FF_VR: true, // Activé
   FF_COMMUNITY: true,
   FF_SOCIAL_COCON: true,
   
@@ -108,14 +108,14 @@ export const DEFAULT_FLAGS: FeatureFlags = {
   FF_B2C_PORTAL: true,
   FF_MUSIC_THERAPY: true,
   FF_COACHING_AI: true,
-  FF_IMMERSIVE_SESSIONS: false, // Planifié
+  FF_IMMERSIVE_SESSIONS: true, // Activé
   
   // Orchestration - BETA 🔶
   FF_ORCH_COMMUNITY: true,
   FF_ORCH_SOCIAL_COCON: true,
-  FF_ORCH_AURAS: false, // Alpha
+  FF_ORCH_AURAS: true, // Activé
   FF_ORCH_AMBITION: true,
-  FF_ORCH_GRIT: false, // Alpha
+  FF_ORCH_GRIT: true, // Activé
   FF_ORCH_BUBBLE: true,
   FF_ORCH_MIXER: true,
   FF_ORCH_STORY: true,
@@ -126,7 +126,7 @@ export const DEFAULT_FLAGS: FeatureFlags = {
   // B2B Features - BETA 🔶
   FF_MANAGER_DASH: true,
   FF_B2B_RH: true,
-  FF_B2B_HEATMAP: false, // Alpha
+  FF_B2B_HEATMAP: true, // Activé
   FF_B2B_AGGREGATES: true,
   FF_B2B_ANALYTICS: true,
   
@@ -161,7 +161,7 @@ export const DEFAULT_FLAGS: FeatureFlags = {
   // Parcours XL Features - BETA 🔶
   FF_PARCOURS_XL: true,
   FF_AUTO_DETECT_HUME: true,
-  FF_VOICEOVER_VOCALS: false, // Phase 2
+  FF_VOICEOVER_VOCALS: true, // Activé
   FF_PARCOURS_EXTEND: true,
   FF_PARCOURS_FALLBACK: true,
   
