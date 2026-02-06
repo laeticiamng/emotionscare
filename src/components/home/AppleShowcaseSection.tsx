@@ -38,7 +38,7 @@ const AppleShowcaseSection: React.FC = () => {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="text-center mb-16 md:mb-24"
           >
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
               Une expérience{' '}
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 immersive

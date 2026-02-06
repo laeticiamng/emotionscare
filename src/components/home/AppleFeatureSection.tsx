@@ -88,7 +88,7 @@ const FeatureCard: React.FC<{ feature: Feature; index: number }> = ({ feature, i
         </div>
 
         {/* Title */}
-        <h3 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2 tracking-tight">
+        <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-2 tracking-tight">
           {feature.title}
         </h3>
         
@@ -149,7 +149,7 @@ const AppleFeatureSection: React.FC = () => {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-4xl"
         >
-          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
             Pourquoi personne n'y avait{' '}
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               pensé avant ?

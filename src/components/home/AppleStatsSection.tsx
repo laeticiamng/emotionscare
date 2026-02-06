@@ -77,7 +77,7 @@ const AppleStatsSection: React.FC = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-20 md:mb-32"
         >
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
             Les chiffres parlent{' '}
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               d'eux-mêmes.
@@ -95,7 +95,7 @@ const AppleStatsSection: React.FC = () => {
               transition={{ duration: 0.8, delay: index * 0.1 }}
               className="text-center px-1 sm:px-2"
             >
-              <div className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2 sm:mb-4 leading-tight whitespace-nowrap">
+              <div className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2 sm:mb-4 leading-tight whitespace-nowrap">
                 <AnimatedCounter 
                   value={stat.value} 
                   suffix={stat.suffix} 
