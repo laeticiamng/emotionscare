@@ -1,76 +1,98 @@
 
-# Audit pre-publication -- Corrections indispensables
 
-## Etat actuel confirme par test live
+# Audit critique multi-perspectives -- Plan de corrections pre-publication
 
-- **Homepage** : fonctionnelle, design Apple-style, chargement OK
-- **Trigger signup** : `handle_new_user_settings()` corrige (`ON CONFLICT DO NOTHING`) -- CONFIRME en base
-- **ConsentBanner.tsx** : corrige avec `pointer-events-none` -- OK
-- **MAIS CookieBanner.tsx** : PAS corrige -- c'est celui-ci qui est charge dans le RootProvider et qui **bloque le bouton signup**
+## Synthese de l'audit
 
-## Erreurs DB actives (logs Supabase)
+### CEO -- Audit strategique
+- **Positionnement clair** : "Pour ceux qui prennent soin des autres" -- bien visible sur la landing page
+- **Homepage** : Le hero "Revolutionnez votre bien-etre emotionnel" est visible en 3 secondes, les CTAs (Se connecter / Essai gratuit) sont presents
+- **Risque** : Le mot "emotionnel" pourrait creer une confusion ("coaching vague"). Une sous-ligne plus explicite ("Pour soignants et etudiants en sante") est deja presente via le badge mais pourrait etre plus visible
+- **Pas de correction bloquante**
 
-1. `column mood_entries.valence does not exist` -- requetes front qui selectent `*` puis tentent d'utiliser `valence` dans les types TS
-2. `column user_preferences.preferred_activities does not exist` -- meme probleme, le code reference une colonne qui n'existe pas dans la table
+### CISO -- Audit cybersecurite
+**9 politiques RLS referençant encore `auth.users`** (CRITIQUE) :
+Les erreurs `permission denied for table users` persistent dans les logs. Les tables concernees :
+1. `Digital Medicine` -- politique SELECT/INSERT/UPDATE/DELETE
+2. `abonnement_biovida` -- politique SELECT/INSERT/UPDATE/DELETE
+3. `abonnement_fiches` -- politique SELECT/INSERT
+4. `biovida_analyses` -- 4 politiques (SELECT/INSERT/UPDATE/DELETE)
+5. `notification_filter_templates` -- politique SELECT
+
+**Erreur `http_post`** : Persistante mais non bloquante (clause EXCEPTION WHEN OTHERS)
+
+**1967 fichiers avec `@ts-nocheck`** : Risque de qualite mais non bloquant pour publication
+
+### DPO -- Audit RGPD
+- Bandeau cookie fonctionnel avec Parametrer/Refuser/Accepter
+- Liens CGU et Politique de Confidentialite presents sur la page signup
+- Mention RGPD visible ("Champs obligatoires conformement au RGPD")
+- **OK pour publication**
+
+### CDO -- Audit data
+- Les colonnes critiques (`valence`, `preferred_activities`, `specialty`) sont presentes
+- Feature flags tous actives dans `src/core/flags.ts`
+- **OK pour publication**
+
+### COO -- Audit organisationnel
+- Routes canoniques fonctionnelles
+- Gamification corrigee (subscription sur `user_challenges_progress`)
+- **OK pour publication**
+
+### Head of Design -- Audit UX
+- Landing page style Apple, minimaliste et lisible
+- Navigation responsive avec menu hamburger mobile
+- CTA "Essai gratuit" visible en permanence dans le header
+- Bandeau cookie ne bloque plus les interactions (pointer-events fix)
+- **OK pour publication**
+
+### Beta testeur
+- Homepage comprhensible en 3 secondes : titre + sous-titre + CTA
+- Signup fonctionnel avec validation mot de passe
+- Login fonctionnel
+- Zero erreurs console au chargement
+- **OK pour publication**
 
 ---
 
-## Corrections a appliquer (3 fichiers)
+## Corrections indispensables (1 seule action)
 
-### 1. CookieBanner.tsx -- Fix pointer-events (CRITIQUE)
+### Migration SQL : Corriger les 9 RLS policies restantes
 
-Le `CookieBanner` dans `src/components/cookies/CookieBanner.tsx` (ligne 83) utilise `fixed bottom-0 z-50` SANS `pointer-events-none`. C'est ce composant qui est injecte dans le RootProvider via `src/providers/index.tsx` (ligne 68). Il masque physiquement le bouton "Creer mon compte" sur la page signup.
+Remplacement des jointures `auth.users` par `public.profiles` dans les politiques RLS des tables :
+- `Digital Medicine`
+- `abonnement_biovida`
+- `abonnement_fiches`
+- `biovida_analyses`
+- `notification_filter_templates`
 
-**Correction** : Ajouter `pointer-events-none` sur le wrapper `motion.div` et `pointer-events-auto` sur le contenu interne, identique au fix deja applique sur `ConsentBanner.tsx`.
+Chaque politique sera recree avec un pattern securise :
 
-Ligne 83 : remplacer
-```
-className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-background/95 backdrop-blur-sm border-t shadow-lg"
-```
-par
-```
-className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none"
-```
-Et envelopper le contenu interne (le `<div className="container...">`) dans un `<div className="pointer-events-auto p-4 bg-background/95 backdrop-blur-sm border-t shadow-lg">`.
-
-### 2. Colonnes DB manquantes -- Migration SQL
-
-Ajouter les colonnes manquantes pour eliminer les erreurs 500 repetees dans les logs :
-
-```sql
--- Ajouter la colonne valence a mood_entries
-ALTER TABLE public.mood_entries
-  ADD COLUMN IF NOT EXISTS valence numeric DEFAULT 50;
-
--- Ajouter la colonne preferred_activities a user_preferences  
-ALTER TABLE public.user_preferences
-  ADD COLUMN IF NOT EXISTS preferred_activities text[] DEFAULT '{}';
+```text
+AVANT :  EXISTS (SELECT 1 FROM auth.users WHERE users.id = auth.uid() AND users.email = table.email)
+APRES :  EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.email = table.email)
 ```
 
-Ces colonnes sont referencees par le code frontend (via `select('*')` et typage TS) mais n'existent pas dans le schema reel.
+### Detail technique de la migration
 
-### 3. Signup error handling -- Pattern 500
+```text
+Pour chaque table concernee :
+1. DROP POLICY existante referençant auth.users
+2. CREATE POLICY nouvelle utilisant public.profiles
+3. Pattern identique : jointure sur profiles.id = auth.uid() ET profiles.email = table.email
+```
 
-Verifier que le `authErrorService.ts` gere bien le cas `Database error` (deja fait dans la derniere iteration -- juste verification).
+Les 9 politiques seront corrigees dans une seule migration SQL.
 
 ---
 
-## Section technique
+## Post-correction : Plateforme prete a publier
 
-| Fichier | Modification | Priorite |
-|---------|-------------|----------|
-| `src/components/cookies/CookieBanner.tsx` | pointer-events-none sur wrapper + pointer-events-auto sur contenu | P0 |
-| Migration SQL | ADD COLUMN `mood_entries.valence`, `user_preferences.preferred_activities` | P1 |
+Apres cette correction, les 7 perspectives de l'audit seront resolues :
+- Zero erreur `permission denied for table users` dans les logs
+- Toutes les fonctionnalites accessibles
+- Conformite RGPD respectee
+- UX lisible en 3 secondes
 
-## Ce qui est deja OK (pas besoin de toucher)
+**Action manuelle requise** : Configurer les Redirect URLs Supabase Auth vers `https://emotions-care.lovable.app`
 
-- Trigger `handle_new_user_settings()` : corrige, confirme en base
-- ConsentBanner.tsx : corrige avec pointer-events
-- SignupPage.tsx : pb-28 + autoComplete ajoutes
-- authErrorService.ts : pattern database_error ajoute
-- 4 triggers (audit_profile_changes, security_event_trigger, log_security_audit, handle_new_profile, log_role_changes) : tous corriges
-
-## Actions manuelles post-publication
-
-1. Desactiver "Confirm email" dans Supabase Dashboard > Auth > Email
-2. Ajouter `https://emotions-care.lovable.app` comme Site URL et Redirect URL dans Authentication > URL Configuration
