@@ -45,7 +45,7 @@ const AppleShowcaseSection: React.FC = () => {
               </span>
             </h2>
             <p className="text-xl md:text-2xl text-background/70 max-w-2xl mx-auto">
-              Des protocoles conçus pour t'absorber totalement. 
+              Des protocoles conçus pour vous absorber totalement. 
               Quand le monde extérieur s'efface, la paix intérieure émerge.
             </p>
           </motion.div>
@@ -63,43 +63,51 @@ const AppleShowcaseSection: React.FC = () => {
               {/* Screen */}
               <div className="relative bg-gradient-to-br from-background to-muted rounded-[2.5rem] p-2 shadow-2xl">
                 <div className="relative aspect-[16/10] rounded-[2rem] overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20">
-                  {/* Placeholder for app screenshot/video */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center p-8">
-                      {/* Abstract UI representation */}
-                      <div className="grid grid-cols-3 gap-4 mb-8 max-w-md mx-auto">
-                        {[...Array(3)].map((_, i) => (
-                          <motion.div
-                            key={i}
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                            transition={{ delay: 0.5 + i * 0.1, duration: 0.5 }}
-                            className={cn(
-                              "aspect-square rounded-2xl",
-                              i === 0 && "bg-gradient-to-br from-red-500 to-rose-500",
-                              i === 1 && "bg-gradient-to-br from-indigo-500 to-purple-500",
-                              i === 2 && "bg-gradient-to-br from-amber-500 to-orange-500"
-                            )}
-                          />
-                        ))}
-                      </div>
-                      
-                      {/* Breathing circle animation */}
+                  {/* Immersive breathing experience */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/10 via-accent/5 to-primary/10">
+                    {/* Ambient rings */}
+                    {[1, 2, 3].map((ring) => (
                       <motion.div
+                        key={ring}
+                        className="absolute rounded-full border border-primary/10"
+                        style={{
+                          width: `${ring * 120 + 80}px`,
+                          height: `${ring * 120 + 80}px`,
+                        }}
                         animate={{
-                          scale: [1, 1.2, 1],
-                          opacity: [0.5, 1, 0.5],
+                          scale: [1, 1.05, 1],
+                          opacity: [0.2, 0.4, 0.2],
                         }}
                         transition={{
                           duration: 4,
                           repeat: Infinity,
-                          ease: "easeInOut"
+                          ease: "easeInOut",
+                          delay: ring * 0.5,
                         }}
-                        className="w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center"
+                      />
+                    ))}
+                    
+                    {/* Main breathing circle - premium size */}
+                    <motion.div
+                      animate={{
+                        scale: [1, 1.25, 1],
+                        opacity: [0.6, 1, 0.6],
+                      }}
+                      transition={{
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                      className="w-48 h-48 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-2xl shadow-primary/30"
+                    >
+                      <motion.span 
+                        className="text-primary-foreground text-xl font-medium tracking-wide"
+                        animate={{ opacity: [0.7, 1, 0.7] }}
+                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                       >
-                        <span className="text-white text-lg font-medium">Respire</span>
-                      </motion.div>
-                    </div>
+                        Respirez
+                      </motion.span>
+                    </motion.div>
                   </div>
 
                   {/* Play button overlay */}

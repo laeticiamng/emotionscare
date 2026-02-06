@@ -158,7 +158,7 @@ const AppleHeroSection: React.FC = () => {
               className="group px-8 py-7 text-lg font-medium text-muted-foreground hover:text-foreground rounded-full"
             >
               <Sparkles className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
-              Découvrir
+              Comment ça marche
             </Button>
           </motion.div>
 
@@ -169,8 +169,11 @@ const AppleHeroSection: React.FC = () => {
             transition={{ duration: 1, delay: 1.3 }}
             className="mt-16 pt-16 border-t border-border/50"
           >
-            <p className="text-sm text-muted-foreground mb-6">
-              Conçue avec des soignants, pour les soignants
+            <blockquote className="text-base italic text-muted-foreground max-w-lg mx-auto mb-6">
+              « Ce qui m'a manqué pendant mes gardes de nuit. Enfin un outil qui comprend notre réalité. »
+            </blockquote>
+            <p className="text-sm font-medium text-foreground/70 mb-8">
+              — Dr. Sarah M., infirmière urgentiste
             </p>
             <div className="flex flex-wrap justify-center gap-4 items-center">
               <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
@@ -180,7 +183,7 @@ const AppleHeroSection: React.FC = () => {
                 Données protégées
               </span>
               <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
-                Made in France
+                Made in France 🇫🇷
               </span>
             </div>
           </motion.div>

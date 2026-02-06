@@ -122,7 +122,7 @@ const AppleHomePage: React.FC = () => {
                     <Button variant="ghost" size="sm">Se connecter</Button>
                   </Link>
                   <Link to="/signup">
-                    <Button size="sm" className="rounded-full px-6">Essai gratuit</Button>
+                    <Button size="sm" className="rounded-full px-6">Commencer</Button>
                   </Link>
                 </>
               )}
@@ -215,7 +215,7 @@ const AppleHomePage: React.FC = () => {
                         <Button variant="outline" className="w-full">Se connecter</Button>
                       </Link>
                       <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
-                        <Button className="w-full">Essai gratuit</Button>
+                        <Button className="w-full">Commencer</Button>
                       </Link>
                     </>
                   )}

@@ -14,7 +14,7 @@ interface StatItem {
 }
 
 const stats: StatItem[] = [
-  { value: 37, suffix: '', label: 'Modules bien-être', description: 'Outils personnalisés' },
+  { value: 4, suffix: '', label: 'Protocoles validés', description: 'Approche scientifique' },
   { value: 3, suffix: 'min', label: 'Par session', description: 'Micro-interventions efficaces' },
   { value: 100, suffix: '%', label: 'Données protégées', description: 'Chiffrement & RGPD' },
   { value: 24, suffix: '/7', label: 'Disponibilité', description: 'Accès permanent' },

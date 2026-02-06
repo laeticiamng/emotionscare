@@ -45,7 +45,7 @@ const AppleCTASection: React.FC = () => {
             Prêt à prendre soin
             <br />
             <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient-shift">
-              de toi ?
+              de vous ?
             </span>
           </motion.h2>
 
@@ -58,7 +58,7 @@ const AppleCTASection: React.FC = () => {
           >
             30 jours d'essai gratuit. Aucune carte bancaire requise.
             <br className="hidden sm:block" />
-            Annule quand tu veux.
+            Annulez quand vous voulez.
           </motion.p>
 
           {/* CTA Buttons */}
