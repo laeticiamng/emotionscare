@@ -295,7 +295,7 @@ const SubscribePage: React.FC = () => {
           </div>
           
           <p className="text-sm text-muted-foreground">
-            Plus de 10 000 utilisateurs font confiance à EmotionsCare pour leur bien-être quotidien
+            Rejoignez les premiers utilisateurs d'EmotionsCare pour votre bien-être quotidien
           </p>
         </div>
       </div>
