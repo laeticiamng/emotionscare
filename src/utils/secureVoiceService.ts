@@ -69,14 +69,15 @@ export class SecureVoiceService {
 
       const result = await response.json();
       return result.text || null;
-    } catch (error: any) {
-      logger.error('[Voice] Transcription error', error as Error, 'VR');
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error('Unknown error');
+      logger.error('[Voice] Transcription error', err, 'VR');
       
       if (buttonId) {
         this.disableButton(buttonId);
       }
 
-      if (error.message.includes('timeout')) {
+      if (err.message.includes('timeout')) {
         toast({
           title: "Délai d'attente dépassé",
           description: "La transcription prend trop de temps. Réessayez dans 30 secondes.",
@@ -125,14 +126,15 @@ export class SecureVoiceService {
 
       const result = await response.json();
       return result.audioContent || null;
-    } catch (error: any) {
-      logger.error('[Voice] Synthesis error', error as Error, 'VR');
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error('Unknown error');
+      logger.error('[Voice] Synthesis error', err, 'VR');
       
       if (buttonId) {
         this.disableButton(buttonId);
       }
 
-      if (error.message.includes('timeout')) {
+      if (err.message.includes('timeout')) {
         toast({
           title: "Délai d'attente dépassé",
           description: "La synthèse vocale prend trop de temps. Réessayez dans 30 secondes.",
@@ -181,14 +183,15 @@ export class SecureVoiceService {
 
       const result = await response.json();
       return result.response || null;
-    } catch (error: any) {
-      logger.error('[Voice] Assistant error', error as Error, 'VR');
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error('Unknown error');
+      logger.error('[Voice] Assistant error', err, 'VR');
       
       if (buttonId) {
         this.disableButton(buttonId);
       }
 
-      if (error.message.includes('timeout')) {
+      if (err.message.includes('timeout')) {
         toast({
           title: "Délai d'attente dépassé",
           description: "L'assistant vocal met trop de temps à répondre. Réessayez dans 30 secondes.",

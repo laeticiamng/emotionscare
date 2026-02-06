@@ -61,9 +61,9 @@ export const useCustomChallenges = () => {
       toast.success('Défi personnalisé créé avec succès');
       fetchChallenges();
       return data;
-    } catch (error: any) {
-      logger.error('Error creating challenge:', error, 'HOOK');
-      toast.error(error.message || 'Erreur lors de la création du défi');
+    } catch (error: unknown) {
+      logger.error('Error creating challenge:', error instanceof Error ? error : new Error('Unknown error'), 'HOOK');
+      toast.error(error instanceof Error ? error.message : 'Erreur lors de la création du défi');
       return null;
     }
   };
@@ -80,9 +80,9 @@ export const useCustomChallenges = () => {
       toast.success('Défi mis à jour');
       fetchChallenges();
       return true;
-    } catch (error: any) {
-      logger.error('Error updating challenge:', error, 'HOOK');
-      toast.error(error.message || 'Erreur lors de la mise à jour');
+    } catch (error: unknown) {
+      logger.error('Error updating challenge:', error instanceof Error ? error : new Error('Unknown error'), 'HOOK');
+      toast.error(error instanceof Error ? error.message : 'Erreur lors de la mise à jour');
       return false;
     }
   };
@@ -98,9 +98,9 @@ export const useCustomChallenges = () => {
 
       toast.success('Défi supprimé');
       fetchChallenges();
-    } catch (error: any) {
-      logger.error('Error deleting challenge:', error, 'HOOK');
-      toast.error(error.message || 'Erreur lors de la suppression');
+    } catch (error: unknown) {
+      logger.error('Error deleting challenge:', error instanceof Error ? error : new Error('Unknown error'), 'HOOK');
+      toast.error(error instanceof Error ? error.message : 'Erreur lors de la suppression');
     }
   };
 

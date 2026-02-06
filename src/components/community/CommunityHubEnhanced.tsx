@@ -107,10 +107,10 @@ export default function CommunityHubEnhanced() {
       setNewPost('');
       loadPosts();
       loadStats();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur',
-        description: error.message || 'Impossible de créer le post',
+        description: error instanceof Error ? error.message : 'Impossible de créer le post',
         variant: 'destructive'
       });
     } finally {
@@ -136,10 +136,10 @@ export default function CommunityHubEnhanced() {
       });
 
       loadPosts();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Erreur inconnue',
         variant: 'destructive'
       });
     }
@@ -167,10 +167,10 @@ export default function CommunityHubEnhanced() {
       setCommentText('');
       setSelectedPost(null);
       loadPosts();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Erreur inconnue',
         variant: 'destructive'
       });
     }

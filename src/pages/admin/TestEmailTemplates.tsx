@@ -95,11 +95,11 @@ export default function TestEmailTemplates() {
         message: 'Email envoyé avec succès',
         messageId: data?.messageId,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         template: template.name,
         status: 'error',
-        message: error.message || 'Erreur inconnue',
+        message: error instanceof Error ? error.message : 'Erreur inconnue',
       };
     }
   };
