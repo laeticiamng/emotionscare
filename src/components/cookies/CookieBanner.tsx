@@ -80,8 +80,9 @@ export const CookieBanner: React.FC = () => {
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
-          className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-background/95 backdrop-blur-sm border-t shadow-lg"
+          className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none"
         >
+          <div className="pointer-events-auto p-4 bg-background/95 backdrop-blur-sm border-t shadow-lg">
           <div className="container mx-auto max-w-5xl">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
               <div className="flex items-start gap-3 flex-1">
@@ -126,6 +127,7 @@ export const CookieBanner: React.FC = () => {
                 </Button>
               </div>
             </div>
+          </div>
           </div>
         </motion.div>
       </AnimatePresence>
