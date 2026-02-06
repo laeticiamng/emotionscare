@@ -35,6 +35,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'marketing',
     component: 'AboutPage',
     guard: false,
+    aliases: ['/a-propos'],
   },
   {
     name: 'contact',
