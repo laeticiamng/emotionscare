@@ -131,19 +131,19 @@ const B2BAuditPage: React.FC = () => {
   const complianceFrameworks = [
     {
       name: 'ISO 27001',
-      status: 'certified',
-      score: 94,
-      expiry: '2024-12-31',
+      status: 'in_progress',
+      score: 72,
+      expiry: '—',
       controls: 114,
-      passed: 108
+      passed: 82
     },
     {
       name: 'SOC 2 Type II',
-      status: 'certified', 
-      score: 96,
-      expiry: '2024-10-15',
+      status: 'in_progress', 
+      score: 65,
+      expiry: '—',
       controls: 64,
-      passed: 61
+      passed: 42
     },
     {
       name: 'RGPD/GDPR',
@@ -154,12 +154,12 @@ const B2BAuditPage: React.FC = () => {
       passed: 28
     },
     {
-      name: 'SOX (Sarbanes-Oxley)',
-      status: 'compliant',
-      score: 92,
-      expiry: 'Annual',
+      name: 'HDS (Hébergement Données Santé)',
+      status: 'in_progress',
+      score: 45,
+      expiry: '—',
       controls: 24,
-      passed: 22
+      passed: 11
     }
   ];
 

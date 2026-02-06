@@ -19,7 +19,8 @@ import {
   Heart,
   HelpCircle,
   ChevronDown,
-  X
+  X,
+  CheckCircle2
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -353,12 +354,10 @@ export default function SupportChatbotPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-green-600">4.8/5</div>
-                  <div className="text-sm text-muted-foreground">Basé sur 1,247 avis</div>
+                  <div className="text-3xl font-bold text-primary">24/7</div>
+                  <div className="text-sm text-muted-foreground">Assistance disponible</div>
                   <div className="flex justify-center mt-2">
-                    {[1,2,3,4,5].map((star) => (
-                      <Star key={star} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
+                    <CheckCircle2 className="h-5 w-5 text-primary" />
                   </div>
                 </div>
               </CardContent>

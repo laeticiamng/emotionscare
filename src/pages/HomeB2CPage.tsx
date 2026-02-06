@@ -65,10 +65,10 @@ const HomeB2CPage: React.FC = () => {
   ];
 
   const stats = [
-    { icon: Users, value: '50,000+', label: 'Utilisateurs actifs' },
-    { icon: Star, value: '4.8/5', label: 'Note moyenne' },
-    { icon: Award, value: '98%', label: 'Satisfaction' },
-    { icon: TrendingUp, value: '+35%', label: 'Amélioration moyenne' }
+    { icon: Users, value: '7', label: 'Modules disponibles' },
+    { icon: Star, value: '6', label: 'Protocoles scientifiques' },
+    { icon: Award, value: '100%', label: 'Conforme RGPD' },
+    { icon: TrendingUp, value: '3 min', label: 'Intervention rapide' }
   ];
 
   const benefits = [
