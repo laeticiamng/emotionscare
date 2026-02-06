@@ -37,8 +37,8 @@ const availableFeatures: Feature[] = [
     longDescription: 'Notre technologie d\'IA analyse vos expressions faciales et votre voix pour identifier vos émotions avec précision. Obtenez un rapport détaillé de votre état émotionnel.',
     icon: Scan,
     href: '/app/scan',
-    color: 'text-blue-600',
-    bgGradient: 'from-blue-500/20 to-cyan-500/20',
+    color: 'text-primary',
+    bgGradient: 'from-primary/20 to-accent/20',
     highlights: ['Analyse faciale IA', 'Détection en temps réel', 'Historique des scans'],
     available: true,
   },
@@ -49,8 +49,8 @@ const availableFeatures: Feature[] = [
     longDescription: 'Maîtrisez votre stress avec nos exercices de respiration validés : Cohérence cardiaque, 4-7-8, Box Breathing, et plus. Animations visuelles apaisantes et sons ambiants.',
     icon: Wind,
     href: '/dashboard/breathing',
-    color: 'text-teal-600',
-    bgGradient: 'from-teal-500/20 to-emerald-500/20',
+    color: 'text-primary',
+    bgGradient: 'from-primary/20 to-accent/20',
     highlights: ['6 protocoles', 'Animation visuelle', 'Suivi des sessions'],
     available: true,
   },
@@ -61,8 +61,8 @@ const availableFeatures: Feature[] = [
     longDescription: 'Enregistrez vos émotions quotidiennes avec notre journal intuitif. Sélectionnez votre émotion, son intensité, et ajoutez des notes personnelles. Visualisez votre évolution.',
     icon: BookOpen,
     href: '/dashboard/journal',
-    color: 'text-emerald-600',
-    bgGradient: 'from-emerald-500/20 to-green-500/20',
+    color: 'text-primary',
+    bgGradient: 'from-primary/20 to-accent/20',
     highlights: ['8 émotions', 'Tags personnalisés', 'Export RGPD'],
     available: true,
   },
@@ -73,8 +73,8 @@ const availableFeatures: Feature[] = [
     longDescription: 'Évaluez votre bien-être avec des outils cliniques reconnus internationalement. Suivez votre évolution avec des graphiques détaillés et des recommandations personnalisées.',
     icon: ClipboardCheck,
     href: '/dashboard/assessments',
-    color: 'text-violet-600',
-    bgGradient: 'from-violet-500/20 to-purple-500/20',
+    color: 'text-primary',
+    bgGradient: 'from-primary/20 to-accent/20',
     highlights: ['WHO-5 (OMS)', 'PHQ-9 (Dépression)', 'Graphiques évolution'],
     available: true,
   },
@@ -88,8 +88,8 @@ const comingSoonFeatures: Feature[] = [
     longDescription: 'Un coach conversationnel alimenté par l\'IA qui vous accompagne dans vos moments difficiles avec empathie et des techniques validées scientifiquement.',
     icon: Bot,
     href: '/app/coach',
-    color: 'text-orange-600',
-    bgGradient: 'from-orange-500/20 to-amber-500/20',
+    color: 'text-accent',
+    bgGradient: 'from-accent/20 to-primary/20',
     highlights: ['Conversations naturelles', 'Techniques CBT', 'Disponible 24/7'],
     available: false,
   },
@@ -100,8 +100,8 @@ const comingSoonFeatures: Feature[] = [
     longDescription: 'Bibliothèque de paysages sonores, musiques relaxantes et battements binauraux scientifiquement conçus pour réguler votre humeur et améliorer votre concentration.',
     icon: Music,
     href: '/app/music',
-    color: 'text-pink-600',
-    bgGradient: 'from-pink-500/20 to-rose-500/20',
+    color: 'text-accent',
+    bgGradient: 'from-accent/20 to-primary/20',
     highlights: ['Sons nature', 'Battements binauraux', 'Playlists personnalisées'],
     available: false,
   },
@@ -112,8 +112,8 @@ const comingSoonFeatures: Feature[] = [
     longDescription: 'Plongez dans des environnements virtuels apaisants grâce à la réalité virtuelle et augmentée. Méditations guidées et exercices de pleine conscience immersifs.',
     icon: Headphones,
     href: '/app/vr',
-    color: 'text-indigo-600',
-    bgGradient: 'from-indigo-500/20 to-blue-500/20',
+    color: 'text-accent',
+    bgGradient: 'from-accent/20 to-primary/20',
     highlights: ['Réalité virtuelle', 'Filtres AR', 'Environnements 3D'],
     available: false,
   },
@@ -198,7 +198,7 @@ const FeaturesPage: React.FC = () => {
               <Sparkles className="h-3 w-3 mr-1" />
               Plateforme complète
             </Badge>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight">
               Toutes les fonctionnalités pour votre{' '}
               <span className="text-primary">bien-être émotionnel</span>
             </h1>
@@ -213,18 +213,18 @@ const FeaturesPage: React.FC = () => {
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
-              <Link to="/demo">
+              <a href="#available">
                 <Button size="lg" variant="outline">
-                  Voir la démo
+                  Voir les fonctionnalités
                 </Button>
-              </Link>
+              </a>
             </div>
           </motion.div>
         </div>
       </section>
 
       {/* Available Features */}
-      <section className="py-16 bg-muted/30">
+      <section id="available" className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Fonctionnalités disponibles</h2>
@@ -270,7 +270,7 @@ const FeaturesPage: React.FC = () => {
             Prêt à commencer votre parcours ?
           </h2>
           <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-            Rejoignez des milliers d'utilisateurs qui améliorent leur bien-être 
+            Rejoignez les professionnels de santé qui améliorent leur bien-être 
             émotionnel avec EmotionsCare.
           </p>
           <div className="flex flex-wrap justify-center gap-4">

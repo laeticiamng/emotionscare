@@ -348,7 +348,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                 Prêt à transformer votre bien-être ?
               </h2>
             <p className="text-xl mb-8 opacity-90">
-              Rejoignez des milliers d'utilisateurs qui ont déjà amélioré leur qualité de vie
+              Rejoignez les professionnels de santé qui améliorent leur qualité de vie
             </p>
             <Link to="/signup">
               <Button size="lg" variant="secondary" className="px-8">

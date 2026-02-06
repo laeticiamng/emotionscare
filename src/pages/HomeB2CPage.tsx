@@ -516,7 +516,7 @@ const HomeB2CPage: React.FC = () => {
               Prêt à transformer votre bien-être ?
             </h2>
             <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-              Rejoignez des milliers d'utilisateurs qui ont déjà amélioré leur santé mentale avec EmotionsCare
+              Rejoignez les professionnels de santé qui améliorent leur bien-être avec EmotionsCare
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" variant="secondary" className="text-lg h-14 px-8 shadow-xl hover:shadow-2xl">

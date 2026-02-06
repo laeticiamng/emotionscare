@@ -802,12 +802,23 @@ const SuspenseWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) 
 // Import AppLayout for sidebar - uses Outlet instead of children
 const AppLayoutComponent = lazy(() => import('@/components/layout/AppLayout'));
 
+// Marketing layout for non-homepage marketing pages
+const MarketingLayout = lazy(() => import('@/components/layout/MarketingLayout'));
+
 const LayoutWrapper: React.FC<{ 
   children: React.ReactNode; 
   layout?: 'marketing' | 'app' | 'simple' | 'app-sidebar'
 }> = ({ children, layout = 'app' }) => {
-  if (layout === 'marketing' || layout === 'simple') {
+  if (layout === 'simple') {
     return <>{children}</>;
+  }
+  
+  if (layout === 'marketing') {
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-background" />}>
+        <MarketingLayout>{children}</MarketingLayout>
+      </Suspense>
+    );
   }
   
   // Note: app-sidebar layout cannot be used here because AppLayout uses <Outlet />

@@ -381,7 +381,7 @@ const DemoPage: React.FC = () => {
                   Convaincu ? Commencez Votre Transformation
                 </h2>
                 <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
-                  Rejoignez des milliers d'utilisateurs qui ont déjà amélioré leur bien-être émotionnel
+                  Rejoignez les professionnels de santé qui améliorent leur bien-être émotionnel
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -7,7 +7,7 @@ import React, { memo, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Heart, Download } from 'lucide-react';
+import { ArrowRight, Heart } from 'lucide-react';
 
 const AppleCTASection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -88,14 +88,14 @@ const AppleCTASection: React.FC = () => {
             </Link>
             
             {/* Lien installation PWA */}
-            <Link to="/install">
+            <Link to="/features">
               <Button 
                 variant="outline"
                 size="lg" 
                 className="group px-8 py-6 text-lg font-medium rounded-full border-2 border-muted-foreground/30 hover:border-primary hover:bg-primary/5 transition-all duration-300"
               >
-                <Download className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
-                Installer l'app
+                Découvrir les fonctionnalités
+                <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
           </motion.div>
@@ -108,7 +108,7 @@ const AppleCTASection: React.FC = () => {
             className="flex flex-wrap justify-center gap-6 mt-16 text-sm text-muted-foreground"
           >
             <span className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-emerald-500 rounded-full" />
+              <div className="w-2 h-2 bg-green-500 rounded-full" />
               100% confidentiel
             </span>
             <span className="flex items-center gap-2">

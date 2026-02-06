@@ -122,10 +122,10 @@ const CommunityEngagement: React.FC = () => {
               Rituels collectifs
             </Badge>
             <h2 className="text-3xl lg:text-4xl font-bold">
-              Tu n'es pas seul à lutter
+              Vous n'êtes pas seul à lutter
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Des milliers de personnes utilisent les mêmes protocoles que toi.
+              Des professionnels de santé utilisent les mêmes protocoles que vous.
               <span className="text-foreground font-medium"> Ensemble, on crée des rituels qui tiennent.</span>
             </p>
           </motion.div>
