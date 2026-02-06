@@ -1,9 +1,9 @@
 { 
-  "data-export": false, 
-  "data-delete": false, 
-  "scores-v2": false, 
+  "data-export": true, 
+  "data-delete": true, 
+  "scores-v2": true, 
   "telemetry-opt-in": false,
-  "new-audio-engine": false,
+  "new-audio-engine": true,
   "FF_FLASH": true,
   "FF_ASSESS_SUDS": true,
   "FF_ORCH_FLASHGLOW": true,

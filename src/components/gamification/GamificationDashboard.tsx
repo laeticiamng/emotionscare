@@ -81,7 +81,7 @@ const GamificationDashboard: React.FC = () => {
       .on('postgres_changes', { 
         event: '*', 
         schema: 'public', 
-        table: 'user_challenges' 
+        table: 'user_challenges_progress' 
       }, () => {
         loadData();
       })
