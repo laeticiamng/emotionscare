@@ -79,8 +79,9 @@ const ConsentBanner: React.FC = () => {
     <section
       aria-labelledby={titleId}
       aria-describedby={descriptionId}
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 shadow-lg backdrop-blur"
+      className="fixed inset-x-0 bottom-0 z-50 pointer-events-none"
     >
+      <div className="pointer-events-auto border-t border-border bg-background/95 shadow-lg backdrop-blur">
       <div className="mx-auto flex max-w-5xl flex-col gap-4 px-6 py-5 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex-1 space-y-3 text-sm">
           <div className="space-y-2 text-left">
@@ -160,6 +161,7 @@ const ConsentBanner: React.FC = () => {
             {showPreferences ? 'Masquer les préférences' : 'Personnaliser'}
           </Button>
         </div>
+      </div>
       </div>
     </section>
   );
