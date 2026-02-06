@@ -19,6 +19,7 @@ import { useStreakTracker } from '@/hooks/useStreakTracker';
 import { SessionFeedback, type FeedbackData } from '@/components/feedback/SessionFeedback';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 type SessionDuration = 2 | 5 | 10;
 
@@ -76,8 +77,7 @@ export default function B2CFlashGlowPage() {
   }, [saveSession, recordActivity]);
 
   const handleFeedbackSubmit = useCallback(async (feedback: FeedbackData) => {
-    // Could save feedback to DB here if needed
-    console.log('Feedback submitted:', feedback);
+    logger.debug('Feedback submitted', feedback, 'FLASH_GLOW');
     setShowFeedback(false);
     setLastSession(null);
   }, []);

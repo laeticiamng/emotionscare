@@ -26,6 +26,7 @@ import { useNyveeSessions } from '@/modules/nyvee/hooks/useNyveeSessions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { BreathingIntensity, BadgeType } from '@/modules/nyvee/types';
+import { logger } from '@/lib/logger';
 
 const groundingPrompts = [
   'Observe les nuances de lumière autour de toi.',
@@ -85,7 +86,7 @@ const B2CNyveeCoconPage: FC = () => {
       });
       setCurrentSessionId(result.id);
     } catch (error) {
-      console.error('Failed to create session:', error);
+      logger.error('Failed to create session', error, 'NYVEE');
     }
     
     setSessionPhase('breathing');
@@ -101,7 +102,7 @@ const B2CNyveeCoconPage: FC = () => {
       });
       setCurrentSessionId(result.id);
     } catch (error) {
-      console.error('Failed to create session:', error);
+      logger.error('Failed to create session', error, 'NYVEE');
     }
     
     setSessionPhase('breathing');
@@ -146,7 +147,7 @@ const B2CNyveeCoconPage: FC = () => {
           durationSeconds,
         });
       } catch (error) {
-        console.error('Failed to complete session:', error);
+        logger.error('Failed to complete session', error, 'NYVEE');
       }
     }
 
@@ -166,7 +167,7 @@ const B2CNyveeCoconPage: FC = () => {
           durationSeconds,
         });
       } catch (error) {
-        console.error('Failed to complete session:', error);
+        logger.error('Failed to complete session', error, 'NYVEE');
       }
     }
 
