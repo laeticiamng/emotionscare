@@ -31,10 +31,11 @@ global.IntersectionObserver = class IntersectionObserver {
   readonly root: Element | null = null;
   readonly rootMargin: string = '';
   readonly thresholds: ReadonlyArray<number> = [];
+  readonly scrollMargin: string = '';
   
-  constructor() {}
-  observe() {}
-  unobserve() {}
+  constructor(_callback: IntersectionObserverCallback, _options?: IntersectionObserverInit) {}
+  observe(_target: Element) {}
+  unobserve(_target: Element) {}
   disconnect() {}
   takeRecords(): IntersectionObserverEntry[] { return []; }
 };
