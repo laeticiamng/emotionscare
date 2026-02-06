@@ -3,19 +3,19 @@
  * Minimaliste, impactante, avec animations fluides et storytelling visuel
  */
 
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Building2, Menu, X } from 'lucide-react';
+import { ArrowRight, Menu, X, HelpCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppleHeroSection from '@/components/home/AppleHeroSection';
 import AppleFeatureSection from '@/components/home/AppleFeatureSection';
 import AppleShowcaseSection from '@/components/home/AppleShowcaseSection';
 import AppleStatsSection from '@/components/home/AppleStatsSection';
 import AppleCTASection from '@/components/home/AppleCTASection';
-import CookieConsent from '@/components/home/CookieConsent';
-import { useState } from 'react';
+import ConsentBanner from '@/components/consent/ConsentBanner';
+import { cn } from '@/lib/utils';
 
 // Lazy load non-critical sections
 const Footer = lazy(() => import('@/components/home/Footer'));
@@ -32,6 +32,9 @@ const SectionSkeleton = () => (
 const AppleHomePage: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -57,17 +60,51 @@ const AppleHomePage: React.FC = () => {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-8" aria-label="Navigation principale">
-              <Link to="/navigation" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link 
+                to="/features" 
+                className={cn(
+                  "text-sm transition-colors",
+                  isActive('/features') ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
                 Fonctionnalités
               </Link>
-              <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link 
+                to="/pricing" 
+                className={cn(
+                  "text-sm transition-colors",
+                  isActive('/pricing') ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
                 Tarifs
               </Link>
-              <Link to="/b2b" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link 
+                to="/b2b" 
+                className={cn(
+                  "text-sm transition-colors",
+                  isActive('/b2b') ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
                 Entreprise
               </Link>
-              <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link 
+                to="/about" 
+                className={cn(
+                  "text-sm transition-colors",
+                  isActive('/about') ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
                 À propos
+              </Link>
+              <Link 
+                to="/help" 
+                className={cn(
+                  "text-sm transition-colors flex items-center gap-1",
+                  isActive('/help') ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <HelpCircle className="h-3.5 w-3.5" aria-hidden="true" />
+                Aide
               </Link>
             </nav>
 
@@ -118,32 +155,55 @@ const AppleHomePage: React.FC = () => {
             >
               <nav className="container px-4 py-6 space-y-4">
                 <Link 
-                  to="/navigation" 
-                  className="block text-lg text-muted-foreground hover:text-foreground transition-colors"
+                  to="/features" 
+                  className={cn(
+                    "block text-lg transition-colors",
+                    isActive('/features') ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"
+                  )}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Fonctionnalités
                 </Link>
                 <Link 
                   to="/pricing" 
-                  className="block text-lg text-muted-foreground hover:text-foreground transition-colors"
+                  className={cn(
+                    "block text-lg transition-colors",
+                    isActive('/pricing') ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"
+                  )}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Tarifs
                 </Link>
                 <Link 
                   to="/b2b" 
-                  className="block text-lg text-muted-foreground hover:text-foreground transition-colors"
+                  className={cn(
+                    "block text-lg transition-colors",
+                    isActive('/b2b') ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"
+                  )}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Entreprise
                 </Link>
                 <Link 
                   to="/about" 
-                  className="block text-lg text-muted-foreground hover:text-foreground transition-colors"
+                  className={cn(
+                    "block text-lg transition-colors",
+                    isActive('/about') ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"
+                  )}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   À propos
+                </Link>
+                <Link 
+                  to="/help" 
+                  className={cn(
+                    "block text-lg transition-colors flex items-center gap-2",
+                    isActive('/help') ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"
+                  )}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <HelpCircle className="h-4 w-4" aria-hidden="true" />
+                  Aide & Support
                 </Link>
                 <div className="pt-4 border-t border-border space-y-3">
                   {isAuthenticated ? (
@@ -189,8 +249,8 @@ const AppleHomePage: React.FC = () => {
         <Footer />
       </Suspense>
 
-      {/* Cookie Consent */}
-      <CookieConsent />
+      {/* Cookie Consent - Unified CNIL-compliant banner */}
+      <ConsentBanner />
     </div>
   );
 };

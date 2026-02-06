@@ -328,32 +328,17 @@ const ContactPage: React.FC = () => {
                       </div>
 
                       <div className="flex items-start gap-4">
-                        <Phone className="w-6 h-6 text-primary mt-1 flex-shrink-0" aria-hidden="true" />
-                        <div>
-                          <h3 className="font-semibold mb-1">Téléphone</h3>
-                          <p className="text-muted-foreground">
-                            <a 
-                              href="tel:+33123456789"
-                              className="hover:text-primary focus:text-primary focus:underline focus:outline-none"
-                              aria-label="Appeler le +33 1 23 45 67 89"
-                            >
-                              +33 1 23 45 67 89
-                            </a>
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            Lundi au vendredi, 9h-18h
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-4">
                         <MapPin className="w-6 h-6 text-primary mt-1 flex-shrink-0" aria-hidden="true" />
                         <div>
-                          <h3 className="font-semibold mb-1">Adresse</h3>
+                          <h3 className="font-semibold mb-1">Siège social</h3>
                           <address className="text-muted-foreground not-italic">
-                            123 Avenue de l'Innovation<br />
-                            75001 Paris, France  
+                            EmotionsCare SASU<br />
+                            5 rue Caudron<br />
+                            80000 Amiens, France
                           </address>
+                          <p className="text-sm text-muted-foreground mt-2">
+                            Contact uniquement par email
+                          </p>
                         </div>
                       </div>
                     </CardContent>
