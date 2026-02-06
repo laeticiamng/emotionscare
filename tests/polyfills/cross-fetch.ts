@@ -1,8 +1,9 @@
-// @ts-nocheck
-import nodeFetch, { Headers, Request, Response } from 'node-fetch';
+/**
+ * Polyfill cross-fetch pour les tests Node.js
+ * Utilise le fetch natif disponible dans Node 18+
+ */
+const fetchFn = globalThis.fetch;
 
-const fetchFn = (globalThis.fetch ?? nodeFetch) as typeof nodeFetch;
-
-export const fetch = fetchFn as unknown as typeof globalThis.fetch;
-export { Headers, Request, Response };
+export const fetch = fetchFn;
+export const { Headers, Request, Response } = globalThis;
 export default fetch;
