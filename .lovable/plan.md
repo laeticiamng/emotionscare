@@ -1,144 +1,92 @@
 
+# Audit visuel marketing et branding premium -- Round 2
 
-# Audit visuel marketing et branding premium -- EmotionsCare
+## Bilan post-corrections precedentes
 
-## 1. Bilan global
+Les corrections P1-P7 du round precedent ont ete partiellement appliquees. Le hero, les stats, le CTA final et les feature cards utilisent desormais le vouvoiement. Cependant, **plusieurs problemes subsistent** et de nouveaux points ont ete identifies lors de cet audit visuel live.
 
-La plateforme projette une identite visuelle **premium, coherente et professionnelle** de type Apple. Le hero est lisible en 3 secondes, le positionnement healthcare est clair grace au badge "Pour ceux qui prennent soin des autres". Le design system (CSS custom properties, Tailwind tokens, glassmorphism) est solide et couvre light/dark mode.
-
-**Score global : 7.5/10** -- Tres bon niveau, mais plusieurs corrections ciblees permettraient de passer au niveau "premium irremprochable".
-
----
-
-## 2. Points forts (a conserver absolument)
-
-- **Hero Section** : Typographie massive, reveal mot-a-mot, gradient text sur "Revolutionnez" -- impact immediat
-- **Badge eyebrow** : "Pour ceux qui prennent soin des autres" -- positionne immediatement le produit
-- **Header fixe minimaliste** : Logo + nav + CTA "Essai gratuit" toujours visible, style Apple
-- **Feature cards** : Grandes typographies ("3 minutes.", "100% confidentiel.") avec stats chiffrees -- tres convaincant
-- **Section dark inversee** (Showcase) : Rupture visuelle forte, cercle de respiration anime -- differenciant
-- **Footer structure** : Badges RGPD/WCAG, liens legaux, reseaux sociaux -- credibilite
-- **Design tokens** : Systeme HSL complet avec variables CSS, gradients, glass effects
+**Score actuel : 8/10** -- En progression, mais 4 corrections restantes pour atteindre le niveau "premium irreprochable".
 
 ---
 
-## 3. Problemes identifies et corrections
+## Problemes identifies
 
-### P1 -- CRITIQUE : Showcase Section -- mockup placeholder "cheap"
+### P1 -- HAUTE : Showcase Section -- tutoiement residuel (incoherence de ton)
 
-**Probleme** : La section "Une experience immersive" montre 3 carres de couleur + un cercle anime "Respire". Ce placeholder donne une impression **prototype/inacheve** incompatible avec le positionnement premium. C'est la seule section qui casse la perception de qualite.
+La correction P3 du round precedent a harmonise le vouvoiement dans `AppleFeatureSection` et `AppleCTASection`, mais **`AppleShowcaseSection.tsx` contient encore du tutoiement** dans les 3 sous-features :
 
-**Correction** : Remplacer le placeholder par un vrai screenshot de l'application (ou un mockup statique elegant) dans un cadre device. A defaut, afficher un gradient anime plein ecran avec les 3 sous-features (Stop / Reset / Night) en overlay plutot que le grid de carres colores.
+- Ligne 141 : "Interromps une crise en cours" (imperatif familier)
+- Ligne 142 : "Recupere en 3 minutes" (imperatif familier)  
+- Ligne 143 : "Force **ton** cerveau a couper" (tutoiement explicite)
 
-**Fichier** : `src/components/home/AppleShowcaseSection.tsx` (lignes 66-103)
-- Supprimer le grid de 3 carres colores (lignes 70-84)
-- Agrandir le cercle de respiration pour qu'il occupe tout le viewport du mockup
-- Ou remplacer par une image statique de l'app dans `public/`
+Ces textes contrastent avec le vouvoiement utilise partout ailleurs et cassent la coherence du registre professionnel.
 
-### P2 -- HAUTE : Stats Section -- chiffres non credibles
+**Correction** : Reformuler en mode descriptif neutre ou imperatif formel :
+- "Interrompre une crise en cours" ou "Stoppez une crise en cours"
+- "Recuperez en 3 minutes"
+- "Coupez le mental instantanement"
 
-**Probleme** : "37 Modules bien-etre" et "50+ soignants consultes" sont des chiffres modestes qui nuisent a la credibilite. "37 modules" sonne arbitraire. "50+ soignants" n'est pas impressionnant.
+**Fichier** : `src/components/home/AppleShowcaseSection.tsx` (lignes 141-143)
 
-**Correction** :
-- Revoir les metriques pour choisir des angles plus impactants
-- Exemples : "4 protocoles valides" (credible et scientifique), "< 3 min par session" (deja present, c'est le meilleur), "100% confidentiel" (OK), "24/7 disponible" (OK)
-- Ou simplement retirer "37 modules" et "50+ soignants consultes" s'ils ne sont pas verifiables
+### P2 -- MOYENNE : Couleurs hardcodees massives dans les composants secondaires
 
-**Fichiers** :
-- `src/components/home/AppleStatsSection.tsx` (tableau `stats` lignes 16-21)
-- `src/components/home/AppleFeatureSection.tsx` (stat "50+" ligne 52)
+130 occurrences de couleurs Tailwind hardcodees (`from-amber-500`, `from-emerald-500`, `from-blue-500`, `from-indigo-500`, etc.) existent dans 15 fichiers du dossier `src/components/home/`. Les composants les plus touches :
+- `OnboardingGuide.tsx` (4 gradients hardcodes)
+- `QuickStartModules.tsx` (4 gradients hardcodes)
+- `ActionButtons.tsx` (5 gradients hardcodes)
+- `EnrichedHeroSection.tsx` (2 gradients hardcodes)
 
-### P3 -- HAUTE : CTA final "de toi" -- tutoiement incoherent
+Bien que ces composants ne soient pas sur la homepage Apple actuelle (ils appartiennent a l'ancienne homepage), ils restent dans le codebase et pourraient etre utilises ailleurs.
 
-**Probleme** : Le CTA final dit "Pret a prendre soin **de toi** ?" alors que le reste de la page utilise un ton plus professionnel. Ce tutoiement soudain cree une rupture de registre. De plus, les features utilisent aussi "tu/toi" ("Tes donnees t'appartiennent") alors que le hero est neutre.
+**Correction** : Non prioritaire pour la publication. A traiter dans un sprint de dette technique dedie. Les composants de la homepage Apple (`AppleFeatureSection`, `AppleShowcaseSection`, etc.) utilisent deja les tokens semantiques (`from-primary to-accent`).
 
-**Correction** : Harmoniser le ton sur l'ensemble de la page. Deux options :
-- Option A (recommandee) : Passer tout en vouvoiement professionnel ("Vos donnees vous appartiennent", "Pret a prendre soin de vous ?")
-- Option B : Assumer le tutoiement partout (y compris hero et header) pour un ton chaleureux et proche
+### P3 -- BASSE : Cookie banner couvre le scroll indicator du hero
 
-**Fichiers** :
-- `src/components/home/AppleCTASection.tsx` (ligne 50 : "de toi")
-- `src/components/home/AppleFeatureSection.tsx` (lignes 49-50 : "Tes donnees t'appartiennent", ligne 58 : "ton quotidien, tes contraintes, ta realite")
+Le cookie consent banner en bas de page masque l'indicateur de scroll anime du hero. L'utilisateur ne voit pas l'invitation a scroller tant qu'il n'a pas interagi avec la banniere.
 
-### P4 -- MOYENNE : Bouton "Decouvrir" -- CTA secondaire sans direction claire
+**Correction** : Ajouter un `mb-20` ou `bottom-24` au scroll indicator pour le placer au-dessus de la zone du cookie banner. Ou accepter ce compromis temporaire car le banner disparait apres interaction.
 
-**Probleme** : Le bouton secondaire "Decouvrir" dans le hero (avec icone Sparkles) est vague. L'utilisateur ne sait pas ce qui se passe au clic. Il redirige vers `/features`, mais l'intitule ne le communique pas.
+**Fichier** : `src/components/home/AppleHeroSection.tsx` (ligne 198, classe `bottom-8` -> `bottom-24`)
 
-**Correction** : Renommer en "Voir les fonctionnalites" ou "Comment ca marche" pour donner une direction claire.
+### P4 -- BASSE : Logo texte seul -- manque un symbole visuel
 
-**Fichier** : `src/components/home/AppleHeroSection.tsx` (ligne 161)
+Le header affiche "EmotionsCare" en texte brut sans icone ni symbole. Le footer utilise un coeur (Heart icon) a cote du nom. Cette incoherence reduit la reconnaissance de marque.
 
-### P5 -- MOYENNE : Double CTA "Essai gratuit" vs "Commencer gratuitement" -- confusion
+**Correction** : Ajouter l'icone Heart avant "EmotionsCare" dans le header, comme dans le footer.
 
-**Probleme** : Le header affiche "Essai gratuit" (ligne 125) tandis que le hero affiche "Commencer gratuitement" (ligne 142). Les deux menent a `/signup` mais utilisent un wording different, ce qui dilue le message.
-
-**Correction** : Unifier sur un seul wording. "Commencer gratuitement" est plus engageant et Apple-like. Modifier le header pour correspondre.
-
-**Fichier** : `src/components/home/AppleHomePage.tsx` (ligne 125 : changer "Essai gratuit" en "Commencer")
-
-### P6 -- MOYENNE : Social proof faible
-
-**Probleme** : La social proof se limite a 3 badges textuels ("Approche scientifique", "Donnees protegees", "Made in France"). Aucun logo, temoignage, ou chiffre d'utilisateurs. Pour une plateforme sante, des logos d'institutions partenaires ou des citations de soignants seraient beaucoup plus convaincants.
-
-**Correction** : Ajouter soit :
-- Une micro-citation d'un soignant ("Ce qui m'a manque pendant mes gardes." -- Dr. X, CHU)
-- Ou des logos partenaires/institutions (meme 2-3 suffisent)
-- A placer sous le hero ou dans la section stats
-
-**Fichier** : `src/components/home/AppleHeroSection.tsx` (lignes 166-186)
-
-### P7 -- BASSE : Couleurs hardcodees dans les feature cards
-
-**Probleme** : Les gradients des feature cards utilisent des classes Tailwind directes (`from-amber-500 to-orange-500`, `from-emerald-500 to-green-500`, `from-rose-500 to-pink-500`) au lieu des tokens semantiques du design system. Cela cree un risque d'incoherence en dark mode et contredit la dette technique identifiee (2700+ occurrences de couleurs non-tokenisees).
-
-**Correction** : Migrer vers les tokens semantiques (`from-primary to-accent`, ou definir des tokens `--feature-*` dedies).
-
-**Fichier** : `src/components/home/AppleFeatureSection.tsx` (lignes 33, 43, 48, 58)
+**Fichier** : `src/components/home/AppleHomePage.tsx` (ligne 57, ajouter `<Heart className="h-5 w-5 text-primary" />` avant le texte)
 
 ---
 
-## 4. Resume des corrections par priorite
+## Resume des corrections par priorite
 
-| Priorite | Correction | Impact conversion |
-|----------|-----------|-------------------|
-| P1 | Showcase mockup : remplacer placeholder par vrai visuel | +++ Credibilite |
-| P2 | Stats : revoir chiffres non credibles (37 modules, 50+) | ++ Confiance |
-| P3 | Ton : harmoniser tu/vous sur toute la page | ++ Coherence |
-| P4 | CTA "Decouvrir" : renommer en "Comment ca marche" | + Clarte |
-| P5 | Unifier wording CTA header/hero | + Coherence |
-| P6 | Ajouter temoignage ou logos partenaires | ++ Social proof |
-| P7 | Migrer couleurs hardcodees vers tokens | + Maintenabilite |
+| Priorite | Correction | Fichier | Impact |
+|----------|-----------|---------|--------|
+| P1 Haute | Showcase : corriger tutoiement residuel (3 textes) | `AppleShowcaseSection.tsx` L141-143 | Coherence de ton |
+| P2 Moyenne | Couleurs hardcodees (130 occurrences / 15 fichiers) | Multiple fichiers home/ | Dette technique (non bloquant) |
+| P3 Basse | Scroll indicator masque par cookie banner | `AppleHeroSection.tsx` L198 | UX mineure |
+| P4 Basse | Logo header sans icone Heart (incoherent avec footer) | `AppleHomePage.tsx` L57 | Branding |
 
 ---
 
-## 5. Details techniques d'implementation
+## Details techniques d'implementation
 
-### Correction P1 -- Showcase Section
-Remplacer le contenu placeholder (lignes 66-103 de `AppleShowcaseSection.tsx`) :
-- Supprimer le `grid grid-cols-3` avec les 3 carres de couleur
-- Conserver le cercle "Respire" mais l'agrandir (w-48 h-48) et le centrer
-- Ajouter un overlay gradient semi-transparent pour un effet premium
+### Correction P1 -- Tutoiement residuel Showcase
+Dans `src/components/home/AppleShowcaseSection.tsx`, lignes 141-143, remplacer :
+```text
+{ title: "Stop", desc: "Interromps une crise en cours" }
+{ title: "Reset", desc: "Récupère en 3 minutes" }
+{ title: "Night", desc: "Force ton cerveau à couper" }
+```
+Par :
+```text
+{ title: "Stop", desc: "Stoppez une crise en cours" }
+{ title: "Reset", desc: "Récupérez en 3 minutes" }
+{ title: "Night", desc: "Coupez le mental instantanément" }
+```
 
-### Correction P2 -- Stats
-Modifier le tableau `stats` dans `AppleStatsSection.tsx` :
-- Remplacer `{ value: 37, suffix: '', label: 'Modules bien-etre' }` par `{ value: 4, suffix: '', label: 'Protocoles valides' }`
-- Les 3 autres stats sont OK (3min, 100%, 24/7)
+### Correction P3 -- Scroll indicator
+Dans `src/components/home/AppleHeroSection.tsx`, ligne 198, changer `bottom-8` en `bottom-24`.
 
-### Correction P3 -- Harmonisation du ton
-Dans `AppleFeatureSection.tsx` :
-- Ligne 49 : "Vos donnees vous appartiennent."
-- Ligne 51 : "votre intimite"
-- Ligne 58 : "votre quotidien, vos contraintes, votre realite"
-
-Dans `AppleCTASection.tsx` :
-- Ligne 50 : "de vous ?"
-
-### Correction P4 -- CTA secondaire
-Dans `AppleHeroSection.tsx` ligne 161 : remplacer "Decouvrir" par "Comment ca marche"
-
-### Correction P5 -- Wording unifie
-Dans `AppleHomePage.tsx` ligne 125 : remplacer "Essai gratuit" par "Commencer"
-
-### Correction P7 -- Tokens de couleur
-Dans `AppleFeatureSection.tsx`, remplacer les gradients hardcodes par des classes semantiques ou des variables CSS custom dediees aux features.
-
+### Correction P4 -- Logo header
+Dans `src/components/home/AppleHomePage.tsx`, ligne 53-58, ajouter l'import `Heart` depuis lucide-react et inserer `<Heart className="h-5 w-5 text-primary" />` dans le Link du logo.
