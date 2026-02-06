@@ -100,17 +100,17 @@ const B2BSecurityPage: React.FC = () => {
   const complianceStatus = [
     {
       standard: 'ISO 27001',
-      status: 'certified',
-      expiry: '2024-12-31',
-      score: 98,
-      description: 'Système de management de la sécurité de l\'information'
+      status: 'in_progress',
+      expiry: 'Objectif 2026',
+      score: 45,
+      description: 'Système de management de la sécurité de l\'information (en cours)'
     },
     {
       standard: 'SOC 2 Type II',
-      status: 'certified',
-      expiry: '2024-10-15',
-      score: 96,
-      description: 'Contrôles de sécurité, disponibilité et confidentialité'
+      status: 'in_progress',
+      expiry: 'Objectif 2026',
+      score: 30,
+      description: 'Contrôles de sécurité, disponibilité et confidentialité (en cours)'
     },
     {
       standard: 'RGPD',

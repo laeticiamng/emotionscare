@@ -179,7 +179,7 @@ export default function Footer() {
               </Badge>
               <Badge variant="outline" className="text-xs">
                 <Globe className="w-3 h-3 mr-1" />
-                ISO 27001
+                Données protégées
               </Badge>
             </div>
           </div>
