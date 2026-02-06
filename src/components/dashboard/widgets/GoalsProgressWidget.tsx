@@ -44,7 +44,7 @@ async function fetchUserGoals(userId: string): Promise<Goal[]> {
     .limit(5);
 
   if (error) {
-    console.error('Error fetching goals:', error);
+    // Silent: goal fetch error handled by returning empty array
     return [];
   }
 
@@ -70,7 +70,7 @@ async function createUserGoal(userId: string, title: string, targetValue: number
     });
 
   if (error) {
-    console.error('Error creating goal:', error);
+    // Silent: goal creation error handled by returning false
     return false;
   }
   return true;

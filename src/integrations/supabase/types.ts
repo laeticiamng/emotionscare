@@ -1602,6 +1602,36 @@ export type Database = {
         }
         Relationships: []
       }
+      analytics_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          page_url: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          page_url?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          page_url?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       anatomical_landmarks: {
         Row: {
           confidence: number | null
@@ -7663,6 +7693,42 @@ export type Database = {
           item_code?: string
           multimedia_urls?: Json | null
           tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      edn_embeddings: {
+        Row: {
+          chunk_index: number
+          content_chunk: string
+          created_at: string
+          embedding: string | null
+          id: string
+          item_code: string
+          metadata: Json | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          chunk_index?: number
+          content_chunk: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          item_code: string
+          metadata?: Json | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          chunk_index?: number
+          content_chunk?: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          item_code?: string
+          metadata?: Json | null
           title?: string
           updated_at?: string
         }
@@ -31550,6 +31616,22 @@ export type Database = {
       mark_notifications_as_read: {
         Args: { notification_ids?: string[]; user_id_param: string }
         Returns: number
+      }
+      match_edn_embeddings: {
+        Args: {
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          chunk_index: number
+          content_chunk: string
+          id: string
+          item_code: string
+          metadata: Json
+          similarity: number
+          title: string
+        }[]
       }
       med_mng_add_song_to_playlist: {
         Args: { playlist_id: string; song_id: string }

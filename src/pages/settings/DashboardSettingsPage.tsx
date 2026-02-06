@@ -37,6 +37,7 @@ import { useTheme } from '@/providers/theme';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { usePageSEO } from '@/hooks/usePageSEO';
+import { logger } from '@/lib/logger';
 
 const DashboardSettingsPage: React.FC = () => {
   usePageSEO({
@@ -67,7 +68,7 @@ const DashboardSettingsPage: React.FC = () => {
       if (error) throw error;
       toast.success('Profil mis à jour avec succès');
     } catch (error) {
-      console.error('Error updating profile:', error);
+      logger.error('Error updating profile', error instanceof Error ? error : new Error(String(error)), 'UI');
       toast.error('Erreur lors de la mise à jour du profil');
     } finally {
       setIsSaving(false);
@@ -110,7 +111,7 @@ const DashboardSettingsPage: React.FC = () => {
 
       toast.success('Données exportées avec succès');
     } catch (error) {
-      console.error('Error exporting data:', error);
+      logger.error('Error exporting data', error instanceof Error ? error : new Error(String(error)), 'UI');
       toast.error('Erreur lors de l\'export des données');
     } finally {
       setIsExporting(false);
@@ -127,7 +128,7 @@ const DashboardSettingsPage: React.FC = () => {
       await supabase.auth.signOut();
       toast.success('Demande de suppression enregistrée. Votre compte sera supprimé sous 30 jours.');
     } catch (error) {
-      console.error('Error deleting account:', error);
+      logger.error('Error deleting account', error instanceof Error ? error : new Error(String(error)), 'UI');
       toast.error('Erreur lors de la suppression du compte');
     } finally {
       setIsDeleting(false);

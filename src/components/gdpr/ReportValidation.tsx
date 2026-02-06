@@ -52,8 +52,8 @@ export function ReportValidation({ reportData }: { reportData: any }) {
 
       setValidation(data.validation);
       toast.success('Validation IA complétée');
-    } catch (error: any) {
-      toast.error('Erreur: ' + error.message);
+    } catch (error: unknown) {
+      toast.error('Erreur: ' + (error instanceof Error ? error.message : 'Erreur inconnue'));
     } finally {
       setIsValidating(false);
     }

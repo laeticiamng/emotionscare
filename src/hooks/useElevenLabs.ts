@@ -14,6 +14,7 @@ import {
   type WellnessVoice,
 } from '@/services/elevenlabs';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface UseElevenLabsOptions {
   autoPlay?: boolean;
@@ -65,7 +66,7 @@ export function useElevenLabs(options: UseElevenLabsOptions = {}) {
     };
 
     audio.play().catch((error) => {
-      console.error('Audio play error:', error);
+      logger.error('Audio play error', error instanceof Error ? error : new Error(String(error)), 'MUSIC');
       setIsPlaying(false);
     });
   }, [onComplete]);

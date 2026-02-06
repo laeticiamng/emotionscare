@@ -143,7 +143,7 @@ function getStoredSet(key: string): Set<string> {
       }
     }
   } catch (e) {
-    console.warn('Error reading from localStorage:', e);
+    // Silent: localStorage read error
   }
   return new Set();
 }
@@ -152,7 +152,7 @@ function saveSet(key: string, set: Set<string>) {
   try {
     localStorage.setItem(key, JSON.stringify([...set]));
   } catch (e) {
-    console.warn('Error saving to localStorage:', e);
+    // Silent: localStorage save error
   }
 }
 

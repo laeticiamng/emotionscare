@@ -7,6 +7,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // TYPES
@@ -78,7 +79,7 @@ export function useVRGalaxyPersistence() {
       
       setSessions(history.slice(0, limit));
     } catch (err) {
-      console.error('Error fetching VR Galaxy sessions:', err);
+      logger.error('Error fetching VR Galaxy sessions', err instanceof Error ? err : new Error(String(err)), 'VR');
       setError('Erreur lors du chargement des sessions');
     } finally {
       setIsLoading(false);
@@ -110,7 +111,7 @@ export function useVRGalaxyPersistence() {
 
       return session;
     } catch (err) {
-      console.error('Error creating VR Galaxy session:', err);
+      logger.error('Error creating VR Galaxy session', err instanceof Error ? err : new Error(String(err)), 'VR');
       toast.error('Erreur lors de la création de la session');
       return null;
     }
@@ -157,7 +158,7 @@ export function useVRGalaxyPersistence() {
       toast.success('Session VR Galaxy enregistrée !');
       return completedSession;
     } catch (err) {
-      console.error('Error completing VR Galaxy session:', err);
+      logger.error('Error completing VR Galaxy session', err instanceof Error ? err : new Error(String(err)), 'VR');
       toast.error('Erreur lors de la sauvegarde');
       return null;
     }
@@ -216,7 +217,7 @@ export function useVRGalaxyPersistence() {
       setStats(stats);
       return stats;
     } catch (err) {
-      console.error('Error calculating VR Galaxy stats:', err);
+      logger.error('Error calculating VR Galaxy stats', err instanceof Error ? err : new Error(String(err)), 'VR');
       return getDefaultStats();
     }
   }, [user]);

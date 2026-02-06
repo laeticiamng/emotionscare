@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useMemo } from 'react';
 import { useRoleAuditLogs } from '@/hooks/useRoleAuditLogs';
 import { Badge } from '@/components/ui/badge';
@@ -112,8 +111,8 @@ export const RoleAuditLogsViewer = () => {
 
       await exportAuditLogsToCSV(filters);
       toast.success(`${filteredLogs.length} logs exportés en CSV`);
-    } catch (error: any) {
-      toast.error(error.message || 'Erreur lors de l\'export');
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : 'Erreur lors de l\'export');
     } finally {
       setIsExporting(false);
     }

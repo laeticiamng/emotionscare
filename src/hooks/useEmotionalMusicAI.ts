@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * useEmotionalMusicAI - Hook pour musique émotionnelle IA
  * Génération intelligente de musique basée sur l'état émotionnel
@@ -81,11 +80,11 @@ export const useEmotionalMusicAI = () => {
       setEmotionAnalysis(data);
       return data;
 
-    } catch (error: any) {
-      logger.error('❌ Emotion analysis failed', error as Error, 'MUSIC');
+    } catch (error: unknown) {
+      logger.error('❌ Emotion analysis failed', error instanceof Error ? error : new Error(String(error)), 'MUSIC');
       
       // Gestion des erreurs spécifiques
-      const errorMessage = error?.message || error?.error || 'Erreur lors de l\'analyse émotionnelle';
+      const errorMessage = error instanceof Error ? error.message : (error as any)?.error || 'Erreur lors de l\'analyse émotionnelle';
       
       if (errorMessage.includes('temporairement indisponible') || errorMessage.includes('503')) {
         toast.error('Service temporairement indisponible', {
@@ -159,7 +158,7 @@ export const useEmotionalMusicAI = () => {
               success: true,
               taskId: track.original_task_id,
               trackId: track.id,
-              sessionId: null,
+              sessionId: '',
               emotion: track.emotion,
               profile: { description: `Musique ${emotion} (morceaux déjà générés)` },
               status: 'complete',
@@ -206,11 +205,11 @@ export const useEmotionalMusicAI = () => {
 
       return data;
 
-    } catch (error: any) {
-      logger.error('❌ Music generation failed', error as Error, 'MUSIC');
+    } catch (error: unknown) {
+      logger.error('❌ Music generation failed', error instanceof Error ? error : new Error(String(error)), 'MUSIC');
       
       // Gestion des erreurs spécifiques
-      const errorMessage = error?.message || error?.error || '';
+      const errorMessage = error instanceof Error ? error.message : (error as any)?.error || '';
       
       if (errorMessage.includes('temporairement indisponible') || errorMessage.includes('503')) {
         toast.error('Service temporairement indisponible', {
@@ -262,10 +261,10 @@ export const useEmotionalMusicAI = () => {
 
       return data;
 
-    } catch (error: any) {
-      logger.error('❌ Status check failed', error as Error, 'MUSIC');
+    } catch (error: unknown) {
+      logger.error('❌ Status check failed', error instanceof Error ? error : new Error(String(error)), 'MUSIC');
       
-      const errorMessage = error?.message || error?.error || '';
+      const errorMessage = error instanceof Error ? error.message : (error as any)?.error || '';
       
       // Ne pas afficher de toast pour les erreurs de status check (polling silencieux)
       // mais logger pour le debug

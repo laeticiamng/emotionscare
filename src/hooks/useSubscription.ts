@@ -5,6 +5,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { logger } from '@/lib/logger';
 
 export type SubscriptionPlan = 'free' | 'pro' | 'business';
 
@@ -55,7 +56,7 @@ export function useSubscription(): UseSubscriptionReturn {
         error: null,
       });
     } catch (err) {
-      console.error('[useSubscription] Error checking subscription:', err);
+      logger.error('Error checking subscription', err instanceof Error ? err : new Error(String(err)), 'API');
       setState(prev => ({
         ...prev,
         isLoading: false,
@@ -80,7 +81,7 @@ export function useSubscription(): UseSubscriptionReturn {
       // Ouvrir Stripe Checkout dans un nouvel onglet
       window.open(data.url, '_blank');
     } catch (err) {
-      console.error('[useSubscription] Error creating checkout:', err);
+      logger.error('Error creating checkout', err instanceof Error ? err : new Error(String(err)), 'API');
       throw err;
     }
   }, [user]);
@@ -99,7 +100,7 @@ export function useSubscription(): UseSubscriptionReturn {
       // Ouvrir le portail Stripe dans un nouvel onglet
       window.open(data.url, '_blank');
     } catch (err) {
-      console.error('[useSubscription] Error opening customer portal:', err);
+      logger.error('Error opening customer portal', err instanceof Error ? err : new Error(String(err)), 'API');
       throw err;
     }
   }, [user]);

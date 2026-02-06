@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useARStore } from '@/store/ar.store';
 import { logger } from '@/lib/logger';
@@ -73,15 +72,16 @@ export const useCamera = () => {
       logger.info('Camera started successfully', {}, 'UI');
       return mediaStream;
 
-    } catch (error: any) {
-      logger.error('Error starting camera', error as Error, 'UI');
+    } catch (error: unknown) {
+      logger.error('Error starting camera', error instanceof Error ? error : new Error(String(error)), 'UI');
       
-      if (error.name === 'NotAllowedError') {
+      const errorName = error instanceof Error ? (error as any).name : '';
+      if (errorName === 'NotAllowedError') {
         store.setCameraPermission('denied');
         store.setError('Camera access denied');
-      } else if (error.name === 'NotFoundError') {
+      } else if (errorName === 'NotFoundError') {
         store.setError('No camera found');
-      } else if (error.name === 'NotReadableError') {
+      } else if (errorName === 'NotReadableError') {
         store.setError('Camera is being used by another application');
       } else {
         store.setError('Failed to access camera');
