@@ -231,21 +231,25 @@ const LoginPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <Button
                   variant="outline"
-                  onClick={() => handleSocialLogin('google')}
-                  className="h-11 hover:bg-muted/50"
-                  disabled={isLoading}
+                  disabled
+                  className="h-11 opacity-50 cursor-not-allowed relative"
                 >
                   <Chrome className="w-4 h-4 mr-2" />
                   Google
+                  <Badge variant="secondary" className="absolute -top-2 -right-2 text-[10px] px-1.5 py-0">
+                    Bientôt
+                  </Badge>
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => handleSocialLogin('github')}
-                  className="h-11 hover:bg-muted/50"
-                  disabled={isLoading}
+                  disabled
+                  className="h-11 opacity-50 cursor-not-allowed relative"
                 >
                   <Github className="w-4 h-4 mr-2" />
                   GitHub
+                  <Badge variant="secondary" className="absolute -top-2 -right-2 text-[10px] px-1.5 py-0">
+                    Bientôt
+                  </Badge>
                 </Button>
               </div>
 

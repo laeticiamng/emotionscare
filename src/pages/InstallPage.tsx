@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import PageRoot from '@/components/common/PageRoot';
+import { logger } from '@/lib/logger';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -71,7 +72,7 @@ const InstallPage: React.FC = () => {
         setIsInstalled(true);
       }
     } catch (error) {
-      console.error('Installation error:', error);
+      logger.error('Installation error', error, 'PWA');
     } finally {
       setIsInstalling(false);
       setDeferredPrompt(null);

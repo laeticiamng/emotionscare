@@ -26,6 +26,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { journalService, type JournalEntry } from '@/modules/journal/journalService';
 import { formatDistanceToNow, format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { logger } from '@/lib/logger';
 
 // ============= Types =============
 interface RecordingState {
@@ -397,7 +398,7 @@ const B2CVoiceJournalPage: React.FC = () => {
       setEntries(notes);
       computeStats(notes);
     } catch (error) {
-      console.error('Error loading entries:', error);
+      logger.error('Error loading entries', error, 'VOICE_JOURNAL');
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les entrées du journal',
@@ -468,7 +469,7 @@ const B2CVoiceJournalPage: React.FC = () => {
         });
       }, 1000);
     } catch (error) {
-      console.error('Error starting recording:', error);
+      logger.error('Error starting recording', error, 'VOICE_JOURNAL');
       toast({
         title: 'Erreur',
         description: 'Impossible d\'accéder au microphone',
@@ -536,7 +537,7 @@ const B2CVoiceJournalPage: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error('Error saving voice entry:', error);
+      logger.error('Error saving voice entry', error, 'VOICE_JOURNAL');
       toast({
         title: 'Erreur',
         description: 'Impossible de sauvegarder la note vocale',
@@ -569,7 +570,7 @@ const B2CVoiceJournalPage: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error('Error saving text entry:', error);
+      logger.error('Error saving text entry', error, 'VOICE_JOURNAL');
       toast({
         title: 'Erreur',
         description: 'Impossible de sauvegarder la note',

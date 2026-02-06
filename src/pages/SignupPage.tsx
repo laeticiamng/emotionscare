@@ -6,6 +6,7 @@ import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
@@ -305,28 +306,26 @@ const SignupPage: React.FC = () => {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => toast({
-                      title: "Bientôt disponible",
-                      description: "Connexion via Google sera disponible prochainement"
-                    })}
-                    disabled={isLoading}
-                    className="h-11 hover:bg-muted/50"
+                    disabled
+                    className="h-11 opacity-50 cursor-not-allowed relative"
                   >
                     <Chrome className="w-4 h-4 mr-2" />
                     Google
+                    <Badge variant="secondary" className="absolute -top-2 -right-2 text-[10px] px-1.5 py-0">
+                      Bientôt
+                    </Badge>
                   </Button>
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => toast({
-                      title: "Bientôt disponible",
-                      description: "Connexion via GitHub sera disponible prochainement"
-                    })}
-                    disabled={isLoading}
-                    className="h-11 hover:bg-muted/50"
+                    disabled
+                    className="h-11 opacity-50 cursor-not-allowed relative"
                   >
                     <Github className="w-4 h-4 mr-2" />
                     GitHub
+                    <Badge variant="secondary" className="absolute -top-2 -right-2 text-[10px] px-1.5 py-0">
+                      Bientôt
+                    </Badge>
                   </Button>
                 </div>
               </div>

@@ -97,10 +97,11 @@ const Footer: React.FC = () => {
                   <Link 
                     to={link.href} 
                     className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
+                    title={link.protected ? 'Connexion requise pour accéder à cette fonctionnalité' : undefined}
                   >
                     {link.label}
                     {link.protected && (
-                      <LockKeyhole className="h-3 w-3 opacity-60" aria-hidden="true" />
+                      <LockKeyhole className="h-3 w-3 opacity-60" aria-label="Connexion requise" />
                     )}
                   </Link>
                 </li>

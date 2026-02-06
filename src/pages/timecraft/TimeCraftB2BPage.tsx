@@ -29,6 +29,7 @@ import {
 import { motion } from 'framer-motion';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 // Hooks TIMECRAFT
 import { useOrgTimeAggregates } from '@/hooks/timecraft';
@@ -100,7 +101,7 @@ export default function TimeCraftB2BPage() {
         window.open(data.pdfUrl, '_blank');
       }
     } catch (error) {
-      console.error('Error generating report:', error);
+      logger.error('Error generating report', error, 'TIMECRAFT');
     }
   }, [selectedPeriod, selectedDepartment]);
 

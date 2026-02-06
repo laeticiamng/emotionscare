@@ -48,10 +48,11 @@ export default function UnifiedLoginPage() {
       // Rediriger vers la page initialement demandée ou vers /app par défaut
       const from = (location.state as LocationState)?.from || '/app';
       navigate(from, { replace: true });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Une erreur est survenue';
       toast({
         title: 'Erreur de connexion',
-        description: error.message,
+        description: message,
         variant: 'destructive',
       });
     }

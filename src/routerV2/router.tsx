@@ -892,50 +892,15 @@ logger.debug('Creating router', {
 }, 'SYSTEM');
 
 export const router = createBrowserRouter([
-  // Route de test directe HARDCODÉE pour Nyvée
-  {
+  // Route de test Nyvée - DEV uniquement
+  ...(import.meta.env.DEV ? [{
     path: '/test-nyvee',
     element: (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#f0f0f0',
-        padding: '2rem'
-      }}>
-        <div style={{
-          background: 'white',
-          padding: '3rem',
-          borderRadius: '1rem',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-          maxWidth: '600px',
-          textAlign: 'center'
-        }}>
-          <h1 style={{ fontSize: '2rem', marginBottom: '1rem', color: '#2563eb' }}>
-            ✅ ROUTE FONCTIONNE !
-          </h1>
-          <p style={{ marginBottom: '1.5rem', color: '#666' }}>
-            La route /test-nyvee est maintenant opérationnelle !
-          </p>
-          <Link 
-            to="/app/nyvee"
-            style={{
-              display: 'inline-block',
-              padding: '1rem 2rem',
-              background: 'linear-gradient(to right, #2563eb, #9333ea)',
-              color: 'white',
-              borderRadius: '0.5rem',
-              textDecoration: 'none',
-              fontWeight: '600'
-            }}
-          >
-            🌿 Aller vers Nyvée
-          </Link>
-        </div>
-      </div>
+      <SuspenseWrapper>
+        <NyveeTestPage />
+      </SuspenseWrapper>
     ),
-  },
+  }] : []),
 
   // Routes principales du registry (hors routes dépréciées et wildcard)
   ...canonicalRoutes.map(route => ({
@@ -967,7 +932,7 @@ export const router = createBrowserRouter([
     ),
   },
 ], {
-  basename: import.meta.env.BASE_URL ?? '/',
+  basename: import.meta.env.BASE_URL,
   future: {
     v7_fetcherPersist: true,
     v7_normalizeFormMethod: true,
