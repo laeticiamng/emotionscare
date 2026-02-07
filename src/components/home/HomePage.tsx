@@ -11,8 +11,8 @@ import { useOptimizedPage } from '@/hooks/useOptimizedPage';
 const HomePage: React.FC = () => {
   useOptimizedPage('HomePage');
   usePageSEO({
-    title: 'EmotionsCare - Bien-être émotionnel pour soignants',
-    description: 'Plateforme de régulation émotionnelle dédiée aux étudiants en santé et aux professionnels du soin. Gérer le stress, prévenir l\'épuisement.',
+    title: 'EmotionsCare - Gestion du stress pour soignants en 3 minutes',
+    description: 'Exercices de régulation émotionnelle en 3 minutes pour étudiants en santé et professionnels du soin. Gérer le stress, prévenir l\'épuisement.',
     keywords: 'soignants, étudiants santé, stress, burn-out, régulation émotionnelle, médecine, infirmier, bien-être santé',
     // Open Graph pour partage social
     ogType: 'website',
