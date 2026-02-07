@@ -277,6 +277,18 @@ const B2CMusicEnhanced: React.FC = () => {
     <div className="min-h-full bg-background p-8">
       {showReward && <RewardSystem type="crystal" message="Harmonie créée ♪" onComplete={() => setShowReward(false)} />}
 
+      {/* Bouton retour */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => navigate('/app/home')}
+        className="mb-4"
+        aria-label="Retour à l'accueil"
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Retour
+      </Button>
+
       <MusicPageHeaderEnhanced 
         hasPreferences={hasPreferences} 
         onOpenPreferences={() => setShowPreferencesModal(true)}
