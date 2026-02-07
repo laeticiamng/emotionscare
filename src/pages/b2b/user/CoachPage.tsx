@@ -410,7 +410,7 @@ const B2BCoachPage: React.FC = () => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button variant="ghost" size="icon" asChild className="text-slate-300 hover:text-slate-100">
-                      <Link to="/b2b/dashboard"><ArrowLeft className="h-4 w-4" /></Link>
+                      <Link to="/b2b/admin/dashboard"><ArrowLeft className="h-4 w-4" /></Link>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Retour au dashboard</TooltipContent>
@@ -442,7 +442,7 @@ const B2BCoachPage: React.FC = () => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button variant="ghost" size="icon" asChild className="text-slate-300 hover:text-slate-100">
-                      <Link to="/settings/general"><Settings className="h-4 w-4" /></Link>
+                      <Link to="/b2b/admin/settings"><Settings className="h-4 w-4" /></Link>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Paramètres</TooltipContent>

@@ -8,7 +8,7 @@ import { MedicalDisclaimerDialog, useMedicalDisclaimer } from '@/components/medi
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { useOptimizedPage } from '@/hooks/useOptimizedPage';
 import { Button } from '@/components/ui/button';
-import { Target, Calendar, BarChart3 } from 'lucide-react';
+import { ArrowLeft, Target } from 'lucide-react';
 
 const B2CAICoachPage = () => {
   useOptimizedPage('B2CAICoachPage');
@@ -35,7 +35,7 @@ const B2CAICoachPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950" data-testid="page-root">
+    <div className="min-h-screen bg-background" data-testid="page-root">
       <MedicalDisclaimerDialog
         open={showDisclaimer}
         onAccept={handleAccept}
@@ -48,24 +48,20 @@ const B2CAICoachPage = () => {
           <div className="bg-background/80 backdrop-blur-sm border-b sticky top-0 z-10">
             <div className="container mx-auto px-4 py-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-muted-foreground">Coach IA</span>
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" size="sm" asChild>
-                    <Link to="/app/goals">
+                    <Link to="/app/home">
+                      <ArrowLeft className="h-4 w-4 mr-1" />
+                      Retour
+                    </Link>
+                  </Button>
+                  <span className="text-sm font-medium text-muted-foreground">Coach IA</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/dashboard/settings">
                       <Target className="h-4 w-4 mr-1" />
-                      Mes Objectifs
-                    </Link>
-                  </Button>
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link to="/app/coach/sessions">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      Sessions
-                    </Link>
-                  </Button>
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link to="/app/coach/analytics">
-                      <BarChart3 className="h-4 w-4 mr-1" />
-                      Analytics
+                      Paramètres
                     </Link>
                   </Button>
                 </div>

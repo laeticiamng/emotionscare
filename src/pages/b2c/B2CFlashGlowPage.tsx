@@ -176,7 +176,7 @@ export default function B2CFlashGlowPage() {
                     <Share2 className="h-4 w-4" aria-hidden="true" />
                   </Button>
 
-                  <Link to="/settings">
+                  <Link to="/dashboard/settings">
                     <Button
                       variant="ghost"
                       size="icon"
@@ -430,7 +430,7 @@ export default function B2CFlashGlowPage() {
                   Continuez votre pratique
                 </h2>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <Link to="/breathwork">
+                  <Link to="/app/breath">
                     <Card className="p-4 hover:bg-muted/50 transition-colors cursor-pointer">
                       <h3 className="font-medium mb-1">🧘 Breathwork Avancé</h3>
                       <p className="text-sm text-muted-foreground">
@@ -438,19 +438,19 @@ export default function B2CFlashGlowPage() {
                       </p>
                     </Card>
                   </Link>
-                  <Link to="/vr-breath">
+                  <Link to="/app/vr">
                     <Card className="p-4 hover:bg-muted/50 transition-colors cursor-pointer">
-                      <h3 className="font-medium mb-1">🌌 VR Breath</h3>
+                      <h3 className="font-medium mb-1">🌌 VR Galaxy</h3>
                       <p className="text-sm text-muted-foreground">
                         Expérience immersive de respiration en VR
                       </p>
                     </Card>
                   </Link>
-                  <Link to="/challenges">
+                  <Link to="/app/scan">
                     <Card className="p-4 hover:bg-muted/50 transition-colors cursor-pointer">
-                      <h3 className="font-medium mb-1">🎯 Défis quotidiens</h3>
+                      <h3 className="font-medium mb-1">🎯 Scan Émotionnel</h3>
                       <p className="text-sm text-muted-foreground">
-                        Relevez des défis pour gagner des points bonus
+                        Analysez votre état émotionnel après la session
                       </p>
                     </Card>
                   </Link>
@@ -459,27 +459,6 @@ export default function B2CFlashGlowPage() {
             </motion.div>
           </main>
 
-          {/* Footer */}
-          <footer className="border-t mt-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-                <p>
-                  Flash Glow combine respiration et gamification pour une pratique quotidienne motivante.
-                </p>
-                <div className="flex gap-4">
-                  <Link to="/terms" className="hover:text-foreground">
-                    Conditions
-                  </Link>
-                  <Link to="/privacy" className="hover:text-foreground">
-                    Confidentialité
-                  </Link>
-                  <Link to="/help" className="hover:text-foreground">
-                    Aide
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </footer>
         </div>
       </>
     </ConsentGate>

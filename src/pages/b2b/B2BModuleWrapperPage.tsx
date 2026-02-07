@@ -21,6 +21,7 @@ const MoodMixerPage = lazy(() => import('@/pages/b2c/B2CMoodMixerPage'));
 const JournalPage = lazy(() => import('@/pages/b2c/B2CJournalPage'));
 const VRPage = lazy(() => import('@/pages/b2c/B2CVRGalaxyPage'));
 const QuickSessionPage = lazy(() => import('@/pages/b2c/B2CBreathworkPage'));
+const ClinicalAssessmentsPage = lazy(() => import('@/pages/assessments/ClinicalAssessmentsPage'));
 
 interface SessionInfo {
   org_id: string;
@@ -39,6 +40,7 @@ const moduleComponents: Record<string, React.LazyExoticComponent<React.Component
   'journal': JournalPage,
   'vr': VRPage,
   'quick-session': QuickSessionPage,
+  'assessments': ClinicalAssessmentsPage,
 };
 
 const moduleNames: Record<string, string> = {
@@ -51,6 +53,7 @@ const moduleNames: Record<string, string> = {
   'journal': 'Journal',
   'vr': 'Expériences VR',
   'quick-session': 'Session Rapide',
+  'assessments': 'Évaluations Cliniques',
 };
 
 export default function B2BModuleWrapperPage() {
