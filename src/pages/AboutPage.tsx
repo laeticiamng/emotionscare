@@ -1,446 +1,366 @@
 /**
  * ABOUT PAGE - EMOTIONSCARE
- * Page À propos accessible WCAG 2.1 AA
+ * Page À propos — style Apple, cohérente avec homepage
  */
 
-import React, { useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { 
-  Heart, 
-  Brain, 
-  Users, 
-  Shield, 
-  Award, 
-  Target,
-  Lightbulb,
-  Globe,
-  TrendingUp,
-  CheckCircle,
-  Star,
-  MessageSquare,
-  Zap,
-  Lock
-} from 'lucide-react';
-import { motion } from 'framer-motion';
+import React, { memo, useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { usePageSEO } from '@/hooks/usePageSEO';
+import {
+  Heart,
+  Shield,
+  Users,
+  Sparkles,
+  ArrowRight,
+  Stethoscope,
+  Clock,
+  Lock,
+  Brain,
+  Target,
+} from 'lucide-react';
+
+/** Scroll-reveal wrapper */
+const Reveal: React.FC<{
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}> = ({ children, delay = 0, className }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 50 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 const AboutPage: React.FC = () => {
   const navigate = useNavigate();
+  const heroRef = useRef<HTMLDivElement>(null);
+  const isHeroInView = useInView(heroRef, { once: true, amount: 0.3 });
 
-  // Focus management pour l'accessibilité
-  useEffect(() => {
-    document.title = "À Propos | EmotionsCare - Intelligence émotionnelle";
-  }, []);
-
-  const handleKeyDown = (event: React.KeyboardEvent, action: () => void) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      action();
-    }
-  };
-
-  const values = [
-    {
-      icon: Heart,
-      title: "Empathie",
-      description: "Nous comprenons l'importance du bien-être émotionnel et accompagnons chaque utilisateur avec bienveillance."
-    },
-    {
-      icon: Shield,
-      title: "Confidentialité",
-      description: "Vos données émotionnelles sont sacrées. Nous garantissons leur protection totale et leur confidentialité."
-    },
-    {
-      icon: Lightbulb,
-      title: "Innovation",
-      description: "Nous utilisons les dernières avancées en IA et neurosciences pour créer des solutions révolutionnaires."
-    },
-    {
-      icon: Users,
-      title: "Communauté",
-      description: "Nous croyons en la force du collectif pour créer un environnement de soutien et d'entraide."
-    }
-  ];
-
-  const features = [
-    {
-      icon: Brain,
-      title: "IA Émotionnelle Avancée",
-      description: "Analyse précise de vos émotions en temps réel"
-    },
-    {
-      icon: Target,
-      title: "Coaching Personnalisé",
-      description: "Accompagnement adapté à votre profil unique"
-    },
-    {
-      icon: TrendingUp,
-      title: "Suivi de Progression",
-      description: "Visualisation de votre évolution émotionnelle"
-    },
-    {
-      icon: Globe,
-      title: "Accessibilité Universelle",
-      description: "Disponible partout, pour tous"
-    }
-  ];
-
-  const stats = [
-    { number: "🚀", label: "Plateforme en lancement" },
-    { number: "✓", label: "Approche scientifique" },
-    { number: "🔒", label: "Données protégées" },
-    { number: "24/7", label: "Support disponible" }
-  ];
-
-  const founder = {
-    name: "Laeticia M.",
-    role: "Médecin-Fondatrice",
-    speciality: "Médecine d'Urgence",
-    description: "Médecin et fondatrice d'EmotionsCare. Passionnée par le bien-être émotionnel des soignants et étudiants en santé, elle a créé cette plateforme pour répondre aux besoins spécifiques de ceux qui prennent soin des autres."
-  };
-
-  const certifications = [
-    { name: "RGPD", description: "Protection des données" },
-    { name: "En cours", description: "Certifications sécurité" }
-  ];
+  usePageSEO({
+    title: 'À propos - EmotionsCare | Bien-être des soignants',
+    description:
+      'EmotionsCare est une plateforme créée par le Dr Laeticia Motongane, médecin urgentiste, pour accompagner les soignants vers un meilleur équilibre émotionnel.',
+    keywords:
+      'EmotionsCare, à propos, bien-être soignants, santé mentale, Dr Motongane',
+  });
 
   return (
     <>
-      {/* Skip Links pour l'accessibilité */}
-      <a 
-        href="#main-content" 
+      {/* Skip link */}
+      <a
+        href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded-md z-50"
-        tabIndex={0}
       >
         Aller au contenu principal
       </a>
 
-      <div className="container mx-auto px-4 py-8 max-w-7xl" data-testid="page-root">
-        <main id="main-content" role="main">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {/* Hero Section */}
-            <section className="text-center mb-16" aria-labelledby="hero-title">
-              <motion.div
-                initial={{ scale: 0.9 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                <h1 
-                id="hero-title"
-                className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"
-              >
-                  À Propos d'EmotionsCare
-                </h1>
-                <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-                  Nous révolutionnons le bien-être émotionnel grâce à l'intelligence artificielle, 
-                  en créant un monde où chacun peut comprendre, gérer et améliorer sa santé mentale.
-                </p>
-                <nav aria-label="Actions principales" className="flex flex-wrap justify-center gap-4">
-                  <Button 
-                    size="lg" 
-                    onClick={() => navigate('/register')}
-                    onKeyDown={(e) => handleKeyDown(e, () => navigate('/register'))}
-                    className="bg-gradient-to-r from-primary to-accent focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                    aria-label="Commencer gratuitement avec EmotionsCare"
-                    tabIndex={0}
+      <div className="min-h-screen bg-background">
+        <main id="main-content">
+          {/* ═══════════════════ HERO ═══════════════════ */}
+          <section className="relative py-24 md:py-36 overflow-hidden">
+            <div
+              className="absolute inset-0 pointer-events-none"
+              aria-hidden="true"
+            >
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-gradient-radial from-primary/8 via-primary/3 to-transparent rounded-full blur-3xl" />
+            </div>
+
+            <div
+              ref={heroRef}
+              className="container px-4 sm:px-6 lg:px-8 relative z-10"
+            >
+              <div className="max-w-4xl mx-auto text-center">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.6 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8"
+                >
+                  <Stethoscope className="h-4 w-4" />
+                  Créée par une médecin urgentiste
+                </motion.div>
+
+                <motion.h1
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                  className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 leading-[0.95]"
+                >
+                  Prendre soin de ceux qui{' '}
+                  <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    prennent soin.
+                  </span>
+                </motion.h1>
+
+                <motion.p
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                  className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10 font-light"
+                >
+                  EmotionsCare accompagne les soignants vers un meilleur
+                  équilibre émotionnel, avec des exercices courts et
+                  scientifiquement fondés.
+                </motion.p>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  className="flex flex-wrap justify-center gap-4"
+                >
+                  <Button
+                    size="lg"
+                    onClick={() => navigate('/signup')}
+                    className="rounded-full py-6 px-8 text-base font-semibold bg-foreground text-background hover:bg-foreground/90 shadow-lg hover:scale-[1.02] transition-all"
+                    aria-label="Créer un compte EmotionsCare gratuitement"
                   >
-                    Commencer Gratuitement
+                    Découvrir EmotionsCare
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
-                  <Button 
-                    size="lg" 
+                  <Button
+                    size="lg"
                     variant="outline"
                     onClick={() => navigate('/contact')}
-                    onKeyDown={(e) => handleKeyDown(e, () => navigate('/contact'))}
-                    className="focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    className="rounded-full py-6 px-8 text-base"
                     aria-label="Contacter l'équipe EmotionsCare"
-                    tabIndex={0}
                   >
-                    Nous Contacter
+                    Nous contacter
                   </Button>
-                </nav>
-              </motion.div>
-            </section>
+                </motion.div>
+              </div>
+            </div>
+          </section>
 
-            {/* Stats Section */}
-            <section 
-              className="mb-16"
-              aria-labelledby="stats-title"
-            >
-              <h2 id="stats-title" className="sr-only">Statistiques de performance</h2>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="grid grid-cols-2 md:grid-cols-4 gap-6"
-                role="group"
-                aria-label="Statistiques d'utilisation EmotionsCare"
-              >
-                {stats.map((stat, index) => (
-                  <article key={index}>
-                    <Card className="text-center">
-                      <CardContent className="pt-6">
-                        <div 
-                          className="text-3xl font-bold text-primary mb-2"
-                          aria-label={`${stat.number} ${stat.label}`}
-                        >
-                          {stat.number}
-                        </div>
-                        <div className="text-sm text-muted-foreground">{stat.label}</div>
-                      </CardContent>
-                    </Card>
-                  </article>
-                ))}
-              </motion.div>
-            </section>
-
-        {/* Mission Section */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mb-16"
-        >
-          <Card className="bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20">
-            <CardContent className="p-8">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                <div>
-                  <h2 className="text-3xl font-bold mb-4">Notre Mission</h2>
-                  <p className="text-lg text-muted-foreground mb-6">
-                    Démocratiser l'accès au bien-être émotionnel en rendant les outils de santé mentale 
-                    intelligents, accessibles et efficaces pour tous, partout dans le monde.
-                  </p>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3">
-                        <CheckCircle className="h-5 w-5 text-success" />
-                        <span>Technologie de pointe au service de la santé mentale</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <CheckCircle className="h-5 w-5 text-success" />
-                        <span>Approche scientifique et validation clinique</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <CheckCircle className="h-5 w-5 text-success" />
-                        <span>Respect absolu de la vie privée</span>
+          {/* ═══════════════════ FONDATRICE ═══════════════════ */}
+          <section className="py-24 md:py-32 bg-muted/30 border-y border-border/50">
+            <div className="container px-4 sm:px-6 lg:px-8">
+              <div className="max-w-4xl mx-auto">
+                <Reveal>
+                  <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-10 items-center">
+                    {/* Avatar */}
+                    <div className="flex justify-center">
+                      <div className="w-32 h-32 md:w-40 md:h-40 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground text-4xl md:text-5xl font-bold shadow-2xl shadow-primary/20">
+                        LM
                       </div>
                     </div>
-                </div>
-                <div className="relative">
-                  <div className="bg-gradient-to-br from-primary to-accent rounded-2xl p-8 text-primary-foreground">
-                    <h3 className="text-2xl font-bold mb-4">Vision 2030</h3>
-                    <p className="mb-4">
-                      Devenir la référence mondiale en matière de bien-être émotionnel numérique, 
-                      en aidant 100 millions de personnes à mieux comprendre et gérer leurs émotions.
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <Star className="h-5 w-5" />
-                      <span className="font-medium">Impact Global</span>
+
+                    {/* Bio */}
+                    <div>
+                      <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-2">
+                        Dr Laeticia Motongane
+                      </h2>
+                      <p className="text-lg text-primary font-medium mb-4">
+                        Médecin urgentiste · Fondatrice d'EmotionsCare
+                      </p>
+                      <p className="text-muted-foreground leading-relaxed text-lg">
+                        Confrontée au quotidien à l'épuisement des soignants,
+                        le Dr Motongane a créé EmotionsCare pour offrir des
+                        outils concrets et accessibles de gestion émotionnelle
+                        — parce que ceux qui soignent méritent aussi d'être
+                        accompagnés.
+                      </p>
                     </div>
                   </div>
-                </div>
+                </Reveal>
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+            </div>
+          </section>
 
-            {/* Values Section */}
-            <section 
-              className="mb-16"
-              aria-labelledby="values-title"
-            >
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-              >
-                <header className="text-center mb-12">
-                  <h2 id="values-title" className="text-3xl font-bold mb-4">Nos Valeurs</h2>
-                  <p className="text-lg text-muted-foreground">
-                    Les principes qui guident chacune de nos décisions et innovations
+          {/* ═══════════════════ MISSION ═══════════════════ */}
+          <section className="py-24 md:py-32">
+            <div className="container px-4 sm:px-6 lg:px-8">
+              <div className="max-w-4xl mx-auto">
+                <Reveal>
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-center mb-6">
+                    Notre{' '}
+                    <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                      mission
+                    </span>
+                  </h2>
+                  <p className="text-xl text-muted-foreground text-center max-w-2xl mx-auto mb-16 font-light">
+                    Rendre le bien-être émotionnel accessible à chaque soignant,
+                    avec des outils simples, scientifiques et respectueux de la
+                    vie privée.
                   </p>
-                </header>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {values.map((value, index) => (
-                    <motion.article
-                      key={index}
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Card className="h-full text-center hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                          <div 
-                            className="mx-auto p-3 bg-primary/10 rounded-full w-fit mb-4"
-                            role="img"
-                            aria-label={`Icône ${value.title}`}
-                          >
-                            <value.icon className="h-6 w-6 text-primary" aria-hidden="true" />
-                          </div>
-                          <h3 className="font-semibold text-lg mb-2">{value.title}</h3>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground">{value.description}</p>
-                        </CardContent>
-                      </Card>
-                    </motion.article>
+                </Reveal>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {[
+                    {
+                      icon: Clock,
+                      title: 'Exercices de 3 minutes',
+                      description:
+                        "Des micro-pauses conçues pour s'intégrer dans le rythme intense des soignants. Respiration, scan émotionnel, recentrage.",
+                    },
+                    {
+                      icon: Brain,
+                      title: 'Approche scientifique',
+                      description:
+                        'Chaque exercice est fondé sur les neurosciences et la psychologie positive. Pas de promesses vagues, des résultats mesurables.',
+                    },
+                    {
+                      icon: Shield,
+                      title: 'Confidentialité absolue',
+                      description:
+                        'Vos données émotionnelles restent les vôtres. Conforme RGPD, hébergé en France, aucune revente à des tiers.',
+                    },
+                    {
+                      icon: Target,
+                      title: 'Accompagnement personnalisé',
+                      description:
+                        "Un coach IA qui s'adapte à votre profil émotionnel et vous propose les bons exercices au bon moment.",
+                    },
+                  ].map((item, i) => (
+                    <Reveal key={i} delay={i * 0.1}>
+                      <div className="group rounded-3xl border border-border/50 p-8 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 h-full">
+                        <item.icon className="h-8 w-8 text-primary mb-4" />
+                        <h3 className="text-xl font-semibold mb-3">
+                          {item.title}
+                        </h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {item.description}
+                        </p>
+                      </div>
+                    </Reveal>
                   ))}
                 </div>
-              </motion.div>
-            </section>
-
-        {/* Features Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className="mb-16"
-        >
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Nos Innovations</h2>
-            <p className="text-lg text-muted-foreground">
-              Des technologies révolutionnaires pour votre bien-être
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {features.map((feature, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-center gap-4">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                      <feature.icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
-                      <CardDescription>{feature.description}</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Founder Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1 }}
-          className="mb-16"
-        >
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Fondatrice</h2>
-            <p className="text-lg text-muted-foreground">
-              Une médecin au service du bien-être des soignants
-            </p>
-          </div>
-          <div className="max-w-md mx-auto">
-            <Card className="text-center hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-full mx-auto mb-4 flex items-center justify-center text-primary-foreground text-2xl font-bold">
-                  {founder.name.split(' ').map((n: string) => n[0]).join('')}
-                </div>
-                <h3 className="font-semibold text-lg mb-2">{founder.name}</h3>
-                <CardDescription>{founder.role}</CardDescription>
-                <Badge variant="secondary">{founder.speciality}</Badge>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">{founder.description}</p>
-              </CardContent>
-            </Card>
-          </div>
-        </motion.div>
-
-        {/* Certifications Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2 }}
-          className="mb-16"
-        >
-          <Card>
-            <CardHeader>
-              <div className="text-center">
-                <h2 className="text-2xl font-bold mb-2 flex items-center justify-center gap-2">
-                  <Award className="h-6 w-6 text-primary" />
-                  Certifications & Conformité
-                </h2>
-                <CardDescription>
-                  Notre engagement envers la sécurité et la qualité
-                </CardDescription>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-6 max-w-md mx-auto">
-                {certifications.map((cert, index) => (
-                  <div key={index} className="text-center">
-                    <div className="p-4 border rounded-lg hover:border-primary/50 transition-colors">
-                      <Lock className="h-8 w-8 mx-auto mb-2 text-primary" />
-                      <div className="font-semibold">{cert.name}</div>
-                      <div className="text-xs text-muted-foreground">{cert.description}</div>
+            </div>
+          </section>
+
+          {/* ═══════════════════ VALEURS ═══════════════════ */}
+          <section className="py-24 md:py-32 bg-muted/30 border-y border-border/50">
+            <div className="container px-4 sm:px-6 lg:px-8">
+              <div className="max-w-4xl mx-auto">
+                <Reveal>
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-center mb-16">
+                    Nos{' '}
+                    <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                      valeurs
+                    </span>
+                  </h2>
+                </Reveal>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                  {[
+                    {
+                      icon: Heart,
+                      title: 'Empathie',
+                      text: "Chaque soignant mérite d'être écouté et accompagné avec bienveillance.",
+                    },
+                    {
+                      icon: Lock,
+                      title: 'Confidentialité',
+                      text: 'Vos émotions sont privées. Nous ne vendons ni ne partageons jamais vos données.',
+                    },
+                    {
+                      icon: Sparkles,
+                      title: 'Simplicité',
+                      text: "3 minutes suffisent. Pas de jargon, pas de complexité — juste l'essentiel.",
+                    },
+                    {
+                      icon: Users,
+                      title: 'Collectif',
+                      text: 'La force du groupe pour se soutenir, sans jugement, en toute sécurité.',
+                    },
+                  ].map((val, i) => (
+                    <Reveal key={i} delay={i * 0.1}>
+                      <div className="flex items-start gap-5">
+                        <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                          <val.icon className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold mb-1">
+                            {val.title}
+                          </h3>
+                          <p className="text-muted-foreground leading-relaxed">
+                            {val.text}
+                          </p>
+                        </div>
+                      </div>
+                    </Reveal>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ═══════════════════ CONFIANCE ═══════════════════ */}
+          <section className="py-16">
+            <div className="container px-4 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto text-center">
+                {[
+                  { icon: Shield, label: 'Conforme RGPD' },
+                  { icon: Lock, label: 'Hébergé en France' },
+                  { icon: Stethoscope, label: 'Créé par un médecin' },
+                  { icon: Heart, label: 'Made in France' },
+                ].map((badge, i) => (
+                  <Reveal key={i} delay={i * 0.1}>
+                    <div className="flex flex-col items-center gap-2">
+                      <badge.icon className="h-6 w-6 text-primary" />
+                      <span className="text-sm text-muted-foreground">
+                        {badge.label}
+                      </span>
                     </div>
-                  </div>
+                  </Reveal>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+            </div>
+          </section>
 
-            {/* CTA Section */}
-            <section aria-labelledby="cta-title">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.4 }}
-                className="text-center"
-              >
-                <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
-                  <CardContent className="py-12">
-                    <h2 id="cta-title" className="text-3xl font-bold mb-4">
-                      Prêt à Transformer Votre Bien-être ?
-                    </h2>
-                    <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-                      Découvrez une plateforme conçue pour accompagner les soignants
-                      vers un meilleur équilibre émotionnel.
-                    </p>
-                    <nav aria-label="Actions finales" className="flex flex-wrap justify-center gap-4">
-                      <Button 
-                        size="lg"
-                        onClick={() => navigate('/register')}
-                        onKeyDown={(e) => handleKeyDown(e, () => navigate('/register'))}
-                        className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                        aria-label="Commencer maintenant avec EmotionsCare"
-                        tabIndex={0}
-                      >
-                        <Zap className="h-4 w-4 mr-2" aria-hidden="true" />
-                        Commencer Maintenant
-                      </Button>
-                      <Button 
-                        size="lg"
-                        variant="outline"
-                        onClick={() => navigate('/help')}
-                        onKeyDown={(e) => handleKeyDown(e, () => navigate('/help'))}
-                        className="focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                        aria-label="Poser une question à l'équipe EmotionsCare"
-                        tabIndex={0}
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2" aria-hidden="true" />
-                        Poser une Question
-                      </Button>
-                    </nav>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </section>
-          </motion.div>
+          {/* ═══════════════════ CTA FINAL ═══════════════════ */}
+          <section className="py-28 md:py-36">
+            <div className="container px-4 sm:px-6 lg:px-8">
+              <Reveal>
+                <div className="max-w-3xl mx-auto text-center">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-6">
+                    Prêt à prendre soin de{' '}
+                    <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                      vous ?
+                    </span>
+                  </h2>
+                  <p className="text-xl text-muted-foreground mb-10 font-light">
+                    Rejoignez les soignants qui ont déjà adopté EmotionsCare
+                    pour retrouver un équilibre émotionnel au quotidien.
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-4">
+                    <Button
+                      size="lg"
+                      onClick={() => navigate('/signup')}
+                      className="rounded-full py-6 px-8 text-base font-semibold bg-foreground text-background hover:bg-foreground/90 shadow-lg hover:scale-[1.02] transition-all"
+                    >
+                      Essayer gratuitement
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      onClick={() => navigate('/pricing')}
+                      className="rounded-full py-6 px-8 text-base"
+                    >
+                      Voir les tarifs
+                    </Button>
+                  </div>
+                </div>
+              </Reveal>
+            </div>
+          </section>
         </main>
       </div>
     </>
   );
 };
 
-export default AboutPage;
+export default memo(AboutPage);
