@@ -36,6 +36,9 @@ import { ParkQuickActions } from '@/components/park/ParkQuickActions';
 import { ParkAchievementsPanel } from '@/components/park/ParkAchievementsPanel';
 import { ParkSettingsPanel } from '@/components/park/ParkSettingsPanel';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
+import { usePageSEO } from '@/hooks/usePageSEO';
+import { ArrowLeft } from 'lucide-react';
 import { parkAttractions } from '@/data/parkAttractions';
 import { parkZones } from '@/data/parkZones';
 import { useParkQuests } from '@/hooks/useParkQuests';
@@ -53,6 +56,13 @@ import type { WeatherType } from '@/components/park/ParkWeatherWidget';
 
 export default function EmotionalPark() {
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  usePageSEO({
+    title: 'Le Parc Émotionnel',
+    description: 'Explorez vos émotions à travers un parc d\'attractions interactif avec méditation, musique, journaling et bien plus.',
+    keywords: 'parc émotionnel, bien-être, gamification, émotions, méditation, thérapie',
+  });
   const [selectedZone, setSelectedZone] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -256,6 +266,11 @@ export default function EmotionalPark() {
   const handleAttractionClick = useCallback((attraction: Attraction) => {
     // Check energy
     if (!canAfford(10)) {
+      toast({
+        title: "⚡ Énergie insuffisante",
+        description: "Attends quelques instants que ton énergie se recharge pour visiter cette attraction.",
+        variant: "destructive",
+      });
       return;
     }
     
@@ -402,7 +417,14 @@ export default function EmotionalPark() {
           <div className="flex flex-col gap-4">
             {/* Title and Stats */}
           <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3">
+                <Link
+                  to="/app/consumer/home"
+                  className="p-2 rounded-full hover:bg-muted transition-colors"
+                  aria-label="Retour au tableau de bord"
+                >
+                  <ArrowLeft className="h-5 w-5 text-muted-foreground" />
+                </Link>
                 <motion.div
                   animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
                   transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
@@ -931,7 +953,7 @@ export default function EmotionalPark() {
 
       {/* Map Grid */}
       <div className="container mx-auto px-4 py-8">
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           {selectedZone === 'all' ? (
             Object.entries(zones).map(([zoneKey, zone]) => {
               const zoneAttractions = attractions.filter(a => a.zone === zoneKey);
@@ -1103,28 +1125,6 @@ export default function EmotionalPark() {
           </motion.div>
         )}
       </div>
-
-      {/* Footer */}
-      <footer role="contentinfo" className="bg-card border-t mt-12">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <p>© 2025 EmotionsCare - Le Parc Émotionnel</p>
-            <nav aria-label="Liens footer">
-              <div className="flex space-x-4">
-                <Link to="/legal/privacy" className="hover:text-foreground transition-colors">
-                  Confidentialité
-                </Link>
-                <Link to="/legal/terms" className="hover:text-foreground transition-colors">
-                  Conditions
-                </Link>
-                <Link to="/contact" className="hover:text-foreground transition-colors">
-                  Support
-                </Link>
-              </div>
-            </nav>
-          </div>
-        </div>
-      </footer>
 
       {/* Share Achievement Dialog */}
       <ShareAchievementDialog
