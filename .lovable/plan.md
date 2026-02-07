@@ -1,188 +1,259 @@
 
 
-# Audit complet de la page /help et de ses fonctionnalites liees
+# Audit complet des 7 modules -- Parcours B2C et B2B
 
 ---
 
-## 1) Test "3 secondes"
+## Synthese executive
 
-- **Je crois que c'est :** Un centre d'aide avec FAQ, categories et contact
-- **Public cible :** Utilisateurs EmotionsCare ayant besoin d'aide
-- **Clarte immediate : 7/10** -- Le titre "Comment pouvons-nous vous aider ?" est bon, la structure est claire, mais le design est **Shadcn basique** et ne correspond pas au style Apple-premium du reste du site (/, /features, /pricing, /about, /b2b)
-- **Directive `@ts-nocheck`** : drapeau rouge -- indique du code fragile sans verification de types
+| Module | B2C Route | B2C Etat | B2B Route | B2B Etat |
+|--------|-----------|----------|-----------|----------|
+| 1. Scanner | /app/scan | Fonctionnel, complexe | /b2b/module/scan | **404 - Route non enregistree** |
+| 2. Respiration | /app/breath | Fonctionnel, footer custom | /b2b/module/breath | **404 - Route non enregistree** |
+| 3. Journal | /app/journal | Fonctionnel, clean | /b2b/module/journal | **404 - Route non enregistree** |
+| 4. Evaluations | /dashboard/assessments | Fonctionnel, exemplaire | Absent | **Non prevu en B2B** |
+| 5. Coach IA | /app/coach | Ecran vide (disclaimer) | /b2b/coach | **Redirect login** |
+| 6. Musique | /app/music | Fonctionnel, riche | /b2b/module/music | **404 - Route non enregistree** |
+| 7. VR Galaxy | /app/vr | Fonctionnel, immersif | /b2b/module/vr | **404 - Route non enregistree** |
 
----
-
-## 2) Parcours utilisateur - Audit par etape
-
-| Etape | Ce que j'ai fait | Ce qui s'est passe | Probleme |
-|---|---|---|---|
-| Arrivee /help | Page chargee | **Double navigation** : header MarketingLayout + nav sticky interne | Navigation dupliquee, confus |
-| Recherche "scan" | Tape dans la barre | Filtrage fonctionne, 2 resultats affiches | OK, fonctionnel |
-| FAQ "Comment creer un compte ?" | Clic accordion | Reponse affichee correctement | OK |
-| Lien "Voir toutes les questions" → /faq | Clic | Page FAQ affichee | OK |
-| Carte "Premiers pas" → "Creer un compte" → /signup | Clic | Page signup OK | OK |
-| Carte "Premiers pas" → "Votre premier scan" → /app/scan | Clic | **Login wall** sans preview | Frustrant pour un visiteur non connecte |
-| Carte "Premiers pas" → "Comprendre vos emotions" → /app/insights | Clic | **Login wall** | Meme probleme |
-| Carte "Fonctionnalites" → tous les liens → /app/* | Clic | **Tous menent au login** | 5 liens brises pour les visiteurs |
-| Carte "Compte" → "Supprimer mon compte" → /account/delete | Clic | **404 - Route inexistante** | Lien brise |
-| Carte "Abonnement" → /billing (x4 liens) | Clic | **404 - Route inexistante** | 4 liens brises |
-| Carte "Securite" → "Exporter mes donnees" → /data-export | Clic | **404 - Route inexistante** | Lien brise |
-| Carte "Securite" → /legal/security | Clic | **404 probable** (route non verifiee dans registry) | Lien potentiellement brise |
-| Carte "B2B" → /b2b/dashboard | Clic | **404 - Route inexistante dans registry** | Lien brise |
-| Contact "Chat en Direct" → /support | Clic | **404 - Route inexistante** | Lien brise |
-| Contact "Telephone" → tel:+33123456789 | Clic | Ouverture telephone | **Numero fictif** |
-| Lien "Guide de demarrage" → /onboarding | Clic | OK (route existe) | OK |
-| Lien "Videos tutoriels" → /demo | Clic | Page chargee | OK |
-| Footer → /faq, /support, /contact, /legal/* | Clic | /support → 404, reste OK | Lien brise dans le footer |
+**Score global : 4/10** -- Le parcours B2C fonctionne correctement pour les utilisateurs authentifies. Le parcours B2B via codes d'acces est **completement casse** : les 8 modules du WellnessHub menent tous a des 404.
 
 ---
 
-## 3) Audit confiance : 4/10
+## Probleme critique : Routes B2B /b2b/module/* non enregistrees
 
-| Probleme | Gravite |
-|---|---|
-| **8+ liens brises** (404) : /billing, /support, /account/delete, /data-export, /b2b/dashboard, /legal/security | **Bloquant** |
-| 5+ liens vers /app/* qui menent au login wall | **Majeur** |
-| Numero de telephone fictif (+33123456789) | **Bloquant** (mensonger) |
-| Email fictif (support@emotionscare.com) -- non verifie | Majeur |
-| "Reponse sous 2h" / "Reponse immediate 24/7" -- promesses non tenues | **Bloquant** |
-| Double navigation (MarketingLayout header + nav sticky interne) | Majeur |
-| Design Shadcn basique ≠ style Apple du site | Majeur |
-| `@ts-nocheck` en haut du fichier | Moyen (dette technique) |
+Le `WellnessHubPage` (accessible apres code d'acces) genere 8 liens vers `/b2b/module/scan`, `/b2b/module/music`, etc. Le composant `B2BModuleWrapperPage` existe dans le code mais **n'est pas enregistre dans le routeur** (`src/routerV2/registry.ts`). Resultat : tous les boutons du hub wellness menent a une page 404.
 
 ---
 
-## 4) Audit des liens -- Detail complet
+## Audit detaille par module
 
-### Liens BRISES (404)
+### Module 1 : Scanner Emotionnel
 
-| Lien | Utilise dans | Route dans registry ? |
-|---|---|---|
-| `/support` | Nav sticky + Contact "Chat en Direct" + Footer | **NON** |
-| `/billing` | 4 liens dans categorie "Abonnement" | **NON** |
-| `/account/delete` | Categorie "Compte" | **NON** |
-| `/data-export` | Categorie "Securite" | **NON** |
-| `/b2b/dashboard` | Categorie "B2B" | **NON** (admin = /b2b/admin/dashboard) |
-| `/legal/security` | Categorie "Securite" | **NON verifiee** |
+**B2C (`/app/scan`)** -- Score : 7/10
+- Page chargee correctement avec 4 modes (curseurs, facial, vocal, texte)
+- 536 lignes de code, bien structure avec lazy loading
+- Onboarding, consentement medical et ConsentGate en place
+- 6 onglets (scanner, dashboard, comparaison, insights, weekly, export)
+- **Liens internes OK** : retour `/app/home`
+- **Probleme** : `@ts-nocheck` absent mais interface complexe, la page B2B user (`ScanPage.tsx`) utilise `@ts-nocheck`
 
-### Liens vers LOGIN WALL (fonctionnels mais frustrants)
-
-| Lien | Contexte |
-|---|---|
-| `/app/scan` | Premiers pas + Fonctionnalites |
-| `/app/insights` | Premiers pas |
-| `/app/journal` | Fonctionnalites |
-| `/app/music` | Fonctionnalites |
-| `/app/breathwork` | Fonctionnalites |
-| `/app/flash-glow` | Fonctionnalites |
-| `/settings/profile` | Premiers pas + Compte |
-| `/settings/notifications` | Compte |
-| `/settings/privacy` | Compte |
+**B2B (via WellnessHub)** -- Score : 0/10
+- `/b2b/module/scan` : **404** -- route non enregistree dans le router
+- `B2BModuleWrapperPage` charge `B2CScanPage` en lazy mais jamais atteint
 
 ---
 
-## 5) Audit visuel
+### Module 2 : Respiration Guidee
 
-- **Premium :** Rien. C'est du Shadcn Card standard sans personnalisation
-- **Double navigation :** Le header MarketingLayout est deja present, mais la page ajoute sa propre nav sticky avec Home, FAQ, Support, Contact -- redondant et confus
-- **Footer custom :** La page ajoute son propre footer avec liens FAQ/Support/Contact/etc, alors que MarketingLayout a deja un footer
-- **Monotone :** Toutes les icones sont `text-primary`, toutes les cartes identiques
-- **Manque :** Animations scroll-reveal, glassmorphism, typographie massive
-- **Mobile :** Fonctionnel mais nav sticky deborde
+**B2C (`/app/breath`)** -- Score : 6/10
+- Page chargee avec header custom, stats utilisateur, composant `AdvancedBreathwork`
+- Bonne accessibilite : skip link, aria-labels
+- **Problemes** :
+  - Footer custom avec ses propres liens (`/terms`, `/privacy`) qui **doublonnent** avec le layout global et pointent vers des routes potentiellement incorrectes (`/terms` au lieu de `/legal/terms`)
+  - Header sticky custom alors qu'un layout devrait s'en charger
+  - Lien `/settings` dans le header peut etre une 404
 
----
-
-## 6) Audit accessibilite
-
-- **Positif :** Skip link present, aria-labels sur les sections, aria-labelledby pour les categories
-- **Negatif :** Les cartes de categories utilisent `role="article"` au lieu de `role="region"` ou rien (un article n'est pas semantiquement correct ici)
-- **Negatif :** L'accessibilite audit (`useAccessibilityAudit`) tourne en dev -- inutile en production
+**B2B** -- Score : 0/10
+- `/b2b/module/breath` : **404**
 
 ---
 
-## 7) Duplications detectees
+### Module 3 : Journal Emotionnel
 
-Il existe **3 composants HelpPage/HelpCenter** differents :
+**B2C (`/app/journal`)** -- Score : 8/10
+- Page la plus propre : structure claire, 2 onglets (Ecrire / Dictee vocale)
+- Utilise `PageRoot`, pas de header/footer custom parasite
+- Feature flag `FF_JOURNAL` respecte avec message d'indisponibilite propre
+- Onboarding et disclaimer medical integres
+- Lazy loading du composant vocal
+- **Aucun lien brise detecte**
 
-1. `src/pages/HelpPage.tsx` -- Page principale (521 lignes, utilisee par le router)
-2. `src/components/pages/HelpPage.tsx` -- Composant export alternatif (377 lignes, avec framer-motion)
-3. `src/components/support/HelpCenter.tsx` -- Composant Card FAQ (168 lignes)
-
-Seul le premier est utilise par le router. Les deux autres sont du dead code ou des doublons.
-
----
-
-## 8) Top 15 ameliorations
-
-### P0 - Bloquants avant publication
-
-1. **Corriger les 6+ liens brises** : remplacer `/support` → `/contact`, `/billing` → `/pricing`, `/account/delete` → `/dashboard/settings`, `/data-export` → `/dashboard/settings`, `/b2b/dashboard` → `/b2b/admin/dashboard`, `/legal/security` → `/legal/privacy`
-2. **Retirer le numero de telephone fictif** (+33123456789) -- soit mettre le vrai numero, soit supprimer l'option telephone
-3. **Retirer les promesses non verifiees** ("Reponse sous 2h", "24/7") ou les reformuler ("Nous faisons notre maximum...")
-4. **Supprimer la nav sticky interne** : le MarketingLayout fournit deja header + footer
-5. **Supprimer le footer custom** en bas de la page (doublon avec MarketingLayout)
-
-### P1 - Ameliore fortement la confiance
-
-6. **Remplacer les liens /app/* dans les categories par des liens vers /features** ou vers les ancres de la page features (pas de login wall pour les visiteurs)
-7. **Refonte design Apple-style** : glassmorphism cards, scroll-reveal animations, typographie massive, couleurs differenciees par categorie
-8. **Retirer `@ts-nocheck`** et corriger les erreurs TypeScript
-9. **Supprimer les 2 composants dupliques** (`src/components/pages/HelpPage.tsx` et `src/components/support/HelpCenter.tsx`) -- dead code
-10. **Ajouter l'email reel de support** au lieu de `support@emotionscare.com` (ou confirmer que c'est le bon)
-
-### P2 - Polish premium
-
-11. **Ajouter des couleurs differenciees** par categorie (comme sur /features : rose, cyan, violet, emerald, amber, indigo)
-12. **Ajouter une section "Guides video"** avec des placeholders de tutoriels
-13. **Ajouter le hook `usePageSEO`** avec des keywords enrichis
-14. **Ajouter des animations scroll-reveal** avec framer-motion (pattern identique a /features, /about, /b2b refaits)
-15. **Integrer un formulaire de contact inline** au lieu de renvoyer vers /contact (reduction du nombre de clics)
+**B2B** -- Score : 0/10
+- `/b2b/module/journal` : **404**
 
 ---
 
-## 9) Verdict final
+### Module 4 : Evaluations Cliniques (WHO-5, PHQ-9)
 
-- **Publiable aujourd'hui ?** **NON**
-- **5 raisons bloquantes :**
-  1. 8+ liens brises (404) dont /billing, /support, /account/delete, /data-export
-  2. Numero de telephone fictif affiche en clair
-  3. Promesses de SLA non tenues ("Reponse sous 2h", "24/7 chat")
-  4. Double navigation (header MarketingLayout + nav sticky interne + footer custom)
-  5. Design completement deconnecte du style Apple du reste du site
+**B2C (`/dashboard/assessments`)** -- Score : 9/10
+- **Module exemplaire** : structure claire, disclaimer medical, historique
+- 2 questionnaires valides (WHO-5 et PHQ-9) avec scoring automatique
+- AnimatePresence pour les transitions entre vues
+- Retour via `/dashboard` correct
+- Hook `useClinicalAssessments` pour persistance
+- MedicalDisclaimer avec numero d'urgence (3114)
+- **Seul defaut** : le bouton retour pointe vers `/dashboard` qui peut rediriger selon le role
+
+**B2B** -- **Non prevu**
+- Pas de route B2B pour les evaluations cliniques
+- Devrait etre accessible aux collaborateurs B2B via le WellnessHub
+
+---
+
+### Module 5 : Coach IA
+
+**B2C (`/app/coach`)** -- Score : 5/10
+- Page chargee mais **contenu invisible** : le `MedicalDisclaimerDialog` doit etre accepte, mais si deja accepte, affiche `CoachView`
+- Header sticky avec 3 liens : `/app/goals`, `/app/coach/sessions`, `/app/coach/analytics` -- **non verifies** (potentiellement 404)
+- Background hardcode `bg-slate-100 dark:bg-slate-950` au lieu de tokens semantiques
+- **Pas de bouton retour** visible
+
+**B2B (`/b2b/coach` -- CoachPage.tsx)** -- Score : 7/10
+- Page tres riche (833 lignes) avec interface de coaching manager
+- Donnees fictives hardcodees (equipe, metriques) -- pas connecte a la vraie data
+- **`@ts-nocheck` present** -- dette technique
+- Design hardcode `bg-slate-950 text-slate-50` -- ne respecte pas le systeme de tokens
+- Retour pointe vers `/b2b/dashboard` qui est une **route inexistante** (correct = `/b2b/admin/dashboard`)
+- Lien parametres vers `/settings/general` -- potentiellement 404 en contexte B2B
+
+---
+
+### Module 6 : Musique Therapeutique
+
+**B2C (`/app/music`)** -- Score : 7/10
+- Page la plus riche (483 lignes) avec 12 vinyles, player audio, gamification
+- Integration Suno AI pour generation de musique
+- Lazy loading extensif (10+ composants)
+- Preferences musicales, historique, favoris
+- **Probleme** : erreur `useMusic()` peut lancer une exception non catchee si MusicProvider absent
+- Pas de bouton retour visible
+- Navigation vers `/app/music/analytics` -- **non verifiee**
+
+**B2B** -- Score : 0/10
+- `/b2b/module/music` : **404**
+
+---
+
+### Module 7 : VR Galaxy
+
+**B2C (`/app/vr`)** -- Score : 7/10
+- Composant immersif avec constellations, mantras, respiration
+- Modes adaptatifs (VR, VR_soft, 2D) selon les capacites
+- VRSafetyCheck, SSQ et POMS integres
+- Persistance des sessions via `createSession`
+- Design hardcode `from-slate-900 via-blue-900/30 to-slate-900` -- pas de tokens
+- **Pas de bouton retour** explicite
+
+**B2B** -- Score : 0/10
+- `/b2b/module/vr` : **404**
+
+---
+
+## Problemes transversaux
+
+### 1. Routes B2B Wellness non enregistrees (BLOQUANT)
+
+Le composant `B2BModuleWrapperPage` existe et charge correctement les modules B2C en lazy. Mais la route `/b2b/module/:moduleId` n'est **jamais declaree dans le routeur**. Les 8 liens du WellnessHub sont tous des 404.
+
+**Fix** : Enregistrer la route dynamique `/b2b/module/:moduleId` dans `src/routerV2/registry.ts` pointant vers `B2BModuleWrapperPage`.
+
+### 2. Liens brises recurrents
+
+| Lien | Depuis | Route valide |
+|------|--------|--------------|
+| `/b2b/dashboard` | B2B CoachPage, liens divers | `/b2b/admin/dashboard` |
+| `/settings` | Breathwork header | `/dashboard/settings` |
+| `/terms` | Breathwork footer | `/legal/terms` |
+| `/privacy` | Breathwork footer | `/legal/privacy` |
+| `/app/goals` | Coach B2C header | Non verifie |
+| `/app/coach/sessions` | Coach B2C header | Non verifie |
+| `/app/coach/analytics` | Coach B2C header | Non verifie |
+| `/settings/general` | B2B Coach nav | Non verifie |
+
+### 3. Headers/footers custom parasites
+
+Les modules Breathwork et FlashGlow embarquent leurs propres header sticky et footer. Ces elements **doublonnent** avec le layout global et contiennent des liens brises. Ils devraient etre supprimes au profit du layout parent.
+
+### 4. Couleurs hardcodees vs tokens
+
+Les modules VR Galaxy, Coach B2C et Coach B2B utilisent `bg-slate-900`, `text-slate-50`, etc. au lieu des tokens semantiques (`bg-background`, `text-foreground`). Cela casse le theming et le dark/light mode.
+
+### 5. `@ts-nocheck` present dans le code
+
+- `src/pages/b2b/user/ScanPage.tsx` : `@ts-nocheck`
+- `src/pages/b2b/user/CoachPage.tsx` : `@ts-nocheck`
+
+---
+
+## Tableau des problemes par priorite
+
+### P0 -- Bloquants
+
+| # | Probleme | Impact | Fichiers |
+|---|----------|--------|----------|
+| 1 | Routes `/b2b/module/*` non enregistrees | Tous les modules B2B wellness sont en 404 | `src/routerV2/registry.ts` |
+| 2 | Lien retour `/b2b/dashboard` dans B2B CoachPage | 404 pour les admins | `src/pages/b2b/user/CoachPage.tsx` |
+
+### P1 -- Majeurs
+
+| # | Probleme | Impact | Fichiers |
+|---|----------|--------|----------|
+| 3 | Footer custom Breathwork avec liens brises (`/terms`, `/privacy`) | 404 | `src/pages/b2c/B2CBreathworkPage.tsx` |
+| 4 | Header/footer custom dans Breathwork et FlashGlow doublonnent le layout | Double nav, confusion | `B2CBreathworkPage.tsx`, `B2CFlashGlowPage.tsx` |
+| 5 | Coach B2C : pas de bouton retour, liens `/app/goals`, `/app/coach/sessions` non verifies | Navigation bloquee | `src/pages/b2c/B2CAICoachPage.tsx` |
+| 6 | Evaluations cliniques absentes du parcours B2B | Module critique manquant pour les collaborateurs | WellnessHubPage + router |
+| 7 | Couleurs hardcodees dans VR, Coach B2C, Coach B2B | Theme casse | 3 fichiers |
+
+### P2 -- Moyens
+
+| # | Probleme | Impact | Fichiers |
+|---|----------|--------|----------|
+| 8 | `@ts-nocheck` dans ScanPage B2B et CoachPage B2B | Dette technique | 2 fichiers |
+| 9 | Pas de bouton retour dans Music et VR Galaxy | Navigation piege | 2 fichiers |
+| 10 | Donnees fictives hardcodees dans Coach B2B | Pas de data reelle | `CoachPage.tsx` |
 
 ---
 
 ## Plan d'implementation technique
 
-### Fichier principal : `src/pages/HelpPage.tsx` -- Refonte complete
+### Etape 1 : Enregistrer les routes B2B module (P0)
 
-1. **Retirer `@ts-nocheck`** et corriger les types
-2. **Supprimer la nav sticky interne** (lignes 222-280) -- le MarketingLayout s'en charge
-3. **Supprimer le footer custom** (lignes 505-516) -- doublon
-4. **Hero Apple-style** : typographie massive (text-5xl/6xl/7xl), gradient anime, badge "Centre d'aide"
-5. **Corriger tous les liens brises** :
-   - `/support` → `/contact`
-   - `/billing` → `/pricing`
-   - `/account/delete` → `/dashboard/settings`
-   - `/data-export` → `/dashboard/settings`
-   - `/b2b/dashboard` → `/b2b/admin/dashboard`
-   - `/legal/security` → `/legal/privacy`
-6. **Remplacer les liens /app/*** dans les categories par `/features` ou `/signup` (pas de login wall)
-7. **Retirer le telephone fictif** et le remplacer par un lien email seul + formulaire contact
-8. **Retirer "Reponse sous 2h"** et "24/7" -- reformuler en "Notre equipe vous repond dans les meilleurs delais"
-9. **Ajouter des couleurs differenciees** par categorie d'aide
-10. **Ajouter scroll-reveal animations** avec `useInView` + `motion.div`
-11. **Ajouter badges de confiance** (RGPD, Made in France) comme sur les autres pages
-12. **SEO** : enrichir les keywords
+**Fichier : `src/routerV2/registry.ts`**
+- Ajouter une route dynamique `/b2b/module/:moduleId` pointant vers `B2BModuleWrapperPage`
+- Marquer comme route publique (accessible via code d'acces, pas via auth)
+- Layout : `none` ou `simple` (le wrapper gere son propre header)
 
-### Fichiers a supprimer (dead code)
-- `src/components/pages/HelpPage.tsx` -- doublon non utilise par le router
-- `src/components/support/HelpCenter.tsx` -- composant orphelin
+### Etape 2 : Corriger les liens brises (P0/P1)
+
+**Fichier : `src/pages/b2b/user/CoachPage.tsx`**
+- Remplacer `/b2b/dashboard` par `/b2b/admin/dashboard`
+- Remplacer `/settings/general` par `/b2b/admin/dashboard`
+
+**Fichier : `src/pages/b2c/B2CBreathworkPage.tsx`**
+- Supprimer le footer custom (lignes 254-273)
+- Corriger les liens restants : `/terms` vers `/legal/terms`, `/privacy` vers `/legal/privacy`
+- Supprimer le header sticky custom et utiliser un simple bouton retour
+
+**Fichier : `src/pages/b2c/B2CAICoachPage.tsx`**
+- Ajouter un bouton retour vers `/app/home`
+- Verifier et corriger les liens `/app/goals`, `/app/coach/sessions`, `/app/coach/analytics`
+
+### Etape 3 : Ajouter evaluations au B2B (P1)
+
+**Fichier : `src/pages/b2b/WellnessHubPage.tsx`**
+- Ajouter un module "Evaluations cliniques" dans la liste `wellnessModules` avec path `/b2b/module/assessments`
+
+**Fichier : `src/pages/b2b/B2BModuleWrapperPage.tsx`**
+- Ajouter `'assessments': ClinicalAssessmentsPage` dans le mapping des modules
+
+### Etape 4 : Tokens semantiques (P1)
+
+- Remplacer les couleurs hardcodees (`bg-slate-950`, `text-slate-50`) par `bg-background`, `text-foreground` dans :
+  - `B2CAICoachPage.tsx`
+  - `B2CVRGalaxyPage.tsx`
+  - `B2BCoachPage.tsx` (src/pages/b2b/user/CoachPage.tsx)
+
+### Etape 5 : Nettoyage technique (P2)
+
+- Retirer `@ts-nocheck` de `ScanPage.tsx` et `CoachPage.tsx` B2B
+- Ajouter des boutons retour dans les pages Music et VR Galaxy
+- Supprimer le header/footer custom de FlashGlow
 
 ### Fichiers a ne PAS toucher
-- MarketingLayout (header/footer OK)
-- /faq (fonctionne correctement)
-- /contact (fonctionne correctement)
-- routerV2/registry.ts (route /help deja correcte)
+
+- `B2CScanPage.tsx` : complexe mais fonctionnel, pas de regression
+- `B2CJournalPage.tsx` : exemplaire, ne rien changer
+- `ClinicalAssessmentsPage.tsx` : exemplaire, ne rien changer
+- `WellnessHubPage.tsx` : design OK, juste ajouter le module evaluations
 
