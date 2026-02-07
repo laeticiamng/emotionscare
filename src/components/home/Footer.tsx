@@ -70,15 +70,19 @@ const Footer: React.FC = () => {
 
             {/* Réseaux sociaux */}
             <div className="flex items-center gap-3 pt-2">
-              {links.social.map((social) => (
-                <span
-                  key={social.label}
-                  className="p-2 rounded-lg bg-muted text-muted-foreground cursor-default"
-                  aria-label={`${social.label} (bientôt disponible)`}
-                >
-                  <social.icon className="h-4 w-4" aria-hidden="true" />
+            {links.social.map((social) => (
+              <span
+                key={social.label}
+                className="relative p-2 rounded-lg bg-muted text-muted-foreground/40 cursor-default group"
+                aria-label={`${social.label} (bientôt disponible)`}
+                title={`${social.label} — bientôt disponible`}
+              >
+                <social.icon className="h-4 w-4" aria-hidden="true" />
+                <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                  Bientôt
                 </span>
-              ))}
+              </span>
+            ))}
             </div>
           </div>
 

@@ -35,7 +35,7 @@ const AppleHeroSection: React.FC = () => {
   const scaleSpring = useSpring(scale, springConfig);
 
   // Text reveal animation
-  const words = ["Révolutionnez", "votre", "bien-être", "émotionnel."];
+  const words = ["Gérez", "votre", "stress", "en 3 minutes."];
   
   return (
     <section 
@@ -154,7 +154,10 @@ const AppleHeroSection: React.FC = () => {
             <Button 
               size="lg" 
               variant="ghost"
-              onClick={() => navigate('/features')}
+              onClick={() => {
+                const el = document.getElementById('features');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
               className="group px-8 py-7 text-lg font-medium text-muted-foreground hover:text-foreground rounded-full"
             >
               <Sparkles className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />

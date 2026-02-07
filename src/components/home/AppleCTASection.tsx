@@ -75,7 +75,7 @@ const AppleCTASection: React.FC = () => {
               >
                 <span className="relative z-10 flex items-center gap-3">
                   <Heart className="h-6 w-6 group-hover:scale-110 transition-transform" />
-                  Commencer maintenant
+                  Essayer gratuitement
                   <ArrowRight className="h-6 w-6 group-hover:translate-x-2 transition-transform" />
                 </span>
                 <motion.div
