@@ -174,12 +174,12 @@ const B2BEntreprisePage: React.FC = () => {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-              <Link to="/signup?segment=b2b">
+              <Link to="/contact">
                 <Button
                   size="lg"
                   className="group px-10 py-7 text-lg font-semibold bg-foreground text-background hover:bg-foreground/90 rounded-full shadow-xl transition-all duration-300 hover:scale-105"
                 >
-                  Nous contacter
+                  Échanger avec notre équipe
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
@@ -195,12 +195,25 @@ const B2BEntreprisePage: React.FC = () => {
               </Link>
             </motion.div>
 
+            {/* "Déjà inscrit?" link */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={isHeroInView ? { opacity: 1 } : {}}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="mt-6 text-sm text-muted-foreground"
+            >
+              Déjà inscrit ?{' '}
+              <Link to="/b2b/selection" className="text-primary hover:underline font-medium">
+                Se connecter
+              </Link>
+            </motion.p>
+
             {/* Trust badges */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={isHeroInView ? { opacity: 1 } : {}}
               transition={{ duration: 1, delay: 0.7 }}
-              className="flex flex-wrap justify-center gap-6 mt-12 text-sm text-muted-foreground"
+              className="flex flex-wrap justify-center gap-6 mt-8 text-sm text-muted-foreground"
             >
               {[
                 { label: 'Conforme RGPD', color: 'bg-green-500' },
@@ -475,13 +488,13 @@ const B2BEntreprisePage: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              <Link to="/signup?segment=b2b">
+              <Link to="/contact">
                 <Button
                   size="lg"
                   className="group px-12 py-8 text-xl font-semibold bg-foreground text-background hover:bg-foreground/90 rounded-full shadow-2xl shadow-foreground/20 transition-all duration-500 hover:scale-105"
                 >
                   <Users className="h-6 w-6 mr-3 group-hover:scale-110 transition-transform" />
-                  Nous contacter
+                  Échanger avec notre équipe
                   <ArrowRight className="h-6 w-6 ml-3 group-hover:translate-x-2 transition-transform" />
                 </Button>
               </Link>

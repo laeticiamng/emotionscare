@@ -1,210 +1,223 @@
-// @ts-nocheck
 /**
  * B2BSelectionPage - Sélection du type d'accès B2B
- * Page d'entrée pour les utilisateurs entreprise
+ * Style Apple premium avec framer-motion, glassmorphism
  */
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useRef } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { motion, useInView } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { 
-  Users, 
-  BarChart3, 
-  Shield, 
-  Heart, 
+import {
+  Users,
+  BarChart3,
+  Shield,
+  Heart,
   ArrowRight,
-  Building2,
   Sparkles,
   Activity,
   Target,
-  HelpCircle,
+  KeyRound,
+  CheckCircle,
 } from 'lucide-react';
 import { usePageSEO } from '@/hooks/usePageSEO';
-import { useAccessibilityAudit } from '@/lib/accessibility-checker';
 import { cn } from '@/lib/utils';
 
-const B2BSelectionPage: React.FC = () => {
-  const navigate = useNavigate();
-  
-  usePageSEO({
-    title: 'Espace Entreprise - EmotionsCare B2B',
-    description: 'Accédez aux outils de bien-être émotionnel pour votre organisation. Portail collaborateur et administrateur RH.',
-    keywords: ['B2B', 'entreprise', 'bien-être', 'RH', 'collaborateur', 'EmotionsCare'],
-  });
+const Reveal: React.FC<{ children: React.ReactNode; delay?: number }> = ({ children, delay = 0 }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 50 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
-  const { runAudit } = useAccessibilityAudit();
-
-  useEffect(() => {
-    if (import.meta.env.DEV) {
-      setTimeout(runAudit, 1000);
-    }
-  }, [runAudit]);
-
-  const features = {
-    collaborateur: [
+const personas = [
+  {
+    id: 'user',
+    title: 'Collaborateur',
+    subtitle: 'Espace personnel & confidentiel',
+    description: 'Accédez à vos outils de bien-être émotionnel. Aucune donnée partagée avec votre employeur.',
+    icon: Heart,
+    gradient: 'from-primary to-accent',
+    features: [
       { icon: Heart, label: 'Suivi émotionnel personnel' },
       { icon: Sparkles, label: 'Activités bien-être guidées' },
       { icon: Activity, label: 'Scan et journal vocal' },
       { icon: Target, label: 'Objectifs personnalisés' },
     ],
-    admin: [
+    cta: 'Accéder à mon espace',
+    loginUrl: '/login?segment=b2b&role=user',
+  },
+  {
+    id: 'admin',
+    title: 'Administrateur RH',
+    subtitle: 'Vue agrégée & anonymisée',
+    description: 'Tableau de bord avec indicateurs de tendances. Jamais de données nominatives.',
+    icon: BarChart3,
+    gradient: 'from-accent to-primary',
+    features: [
       { icon: BarChart3, label: 'Tableau de bord agrégé' },
       { icon: Users, label: 'Vue équipes anonymisée' },
       { icon: Shield, label: 'Rapports conformes RGPD' },
       { icon: Target, label: 'Indicateurs bien-être' },
     ],
-  };
+    cta: 'Accès Admin RH',
+    loginUrl: '/login?segment=b2b&role=admin',
+  },
+];
+
+const B2BSelectionPage: React.FC = () => {
+  const navigate = useNavigate();
+  const heroRef = useRef<HTMLDivElement>(null);
+  const isHeroInView = useInView(heroRef, { once: true, amount: 0.3 });
+
+  usePageSEO({
+    title: 'Connexion Entreprise — EmotionsCare B2B',
+    description: 'Choisissez votre type d\'accès : collaborateur ou administrateur RH. Données sécurisées & conformes RGPD.',
+    keywords: 'B2B, entreprise, bien-être, RH, collaborateur, EmotionsCare',
+  });
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+    <div data-testid="page-root" className="min-h-screen bg-background">
       {/* Skip Link */}
-      <a 
-        href="#main-content" 
+      <a
+        href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
       >
         Aller au contenu principal
       </a>
 
-      {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
-                <Building2 className="h-5 w-5 text-primary-foreground" aria-hidden="true" />
+      {/* Hero */}
+      <section className="relative py-24 md:py-36 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-gradient-radial from-primary/8 via-primary/3 to-transparent rounded-full blur-3xl" />
+        </div>
+
+        <div ref={heroRef} className="container px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 60 }}
+              animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-border/50 text-sm text-muted-foreground mb-8">
+                <Shield className="h-4 w-4 text-primary" />
+                Données sécurisées & conformes RGPD
               </div>
-              <div>
-                <h2 className="font-semibold">EmotionsCare</h2>
-                <span className="text-xs text-muted-foreground">Solutions Entreprise</span>
-              </div>
-            </div>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={() => navigate('/help')}>
-                    <HelpCircle className="h-5 w-5" aria-hidden="true" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Aide</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6 leading-[0.95]">
+                Espace{' '}
+                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  Entreprise.
+                </span>
+              </h1>
+            </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto font-light"
+            >
+              Choisissez votre type d'accès pour découvrir les outils adaptés à votre rôle.
+            </motion.p>
           </div>
         </div>
-      </header>
+      </section>
 
-      {/* Main Content */}
-      <main id="main-content" role="main" className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
-          {/* Hero Section */}
-          <div className="text-center mb-12">
-            <Badge variant="outline" className="mb-4 gap-1">
-              <Shield className="h-3 w-3" aria-hidden="true" />
-              Données sécurisées & conformes RGPD
-            </Badge>
-            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
-              Espace Entreprise
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Choisissez votre type d'accès pour découvrir les outils de bien-être émotionnel 
-              adaptés à votre rôle dans l'organisation.
-            </p>
-          </div>
-          
-          {/* Selection Cards */}
-          <div className="grid md:grid-cols-2 gap-8" role="list" aria-label="Options d'accès">
-            {/* Collaborateur Card */}
-            <Card 
-              className="group hover:shadow-xl transition-all duration-300 hover:border-primary/50 cursor-pointer overflow-hidden"
-              role="listitem"
-              onClick={() => navigate('/login?segment=b2b&role=user')}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <CardHeader className="relative">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <Users className="h-6 w-6 text-primary" aria-hidden="true" />
+      {/* Selection Cards */}
+      <main id="main-content" className="container px-4 sm:px-6 lg:px-8 pb-24">
+        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto" role="list" aria-label="Options d'accès">
+          {personas.map((persona, i) => (
+            <Reveal key={persona.id} delay={i * 0.15}>
+              <div
+                role="listitem"
+                onClick={() => navigate(persona.loginUrl)}
+                className="group relative cursor-pointer"
+              >
+                <div className="relative bg-card/50 backdrop-blur-xl rounded-3xl p-8 md:p-10 border border-border/50 hover:border-primary/40 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5">
+                  {/* Icon */}
+                  <div
+                    className={cn(
+                      'inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6',
+                      'bg-gradient-to-br text-white shadow-lg shadow-primary/20',
+                      persona.gradient,
+                    )}
+                  >
+                    <persona.icon className="h-8 w-8" />
                   </div>
-                  <Badge variant="secondary">Espace personnel</Badge>
-                </div>
-                <CardTitle className="text-2xl">Collaborateur</CardTitle>
-                <CardDescription className="text-base">
-                  Accédez à votre espace bien-être personnel avec des outils de suivi émotionnel confidentiels.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="relative space-y-4">
-                <ul className="space-y-3" aria-label="Fonctionnalités collaborateur">
-                  {features.collaborateur.map(({ icon: Icon, label }) => (
-                    <li key={label} className="flex items-center gap-3 text-sm text-muted-foreground">
-                      <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
-                        <Icon className="h-4 w-4" aria-hidden="true" />
-                      </div>
-                      {label}
-                    </li>
-                  ))}
-                </ul>
-                <Button className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors mt-4">
-                  Se connecter
-                  <ArrowRight className="h-4 w-4 ml-2" aria-hidden="true" />
-                </Button>
-              </CardContent>
-            </Card>
 
-            {/* Admin RH Card */}
-            <Card 
-              className="group hover:shadow-xl transition-all duration-300 hover:border-primary/50 cursor-pointer overflow-hidden"
-              role="listitem"
-              onClick={() => navigate('/login?segment=b2b&role=admin')}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-secondary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <CardHeader className="relative">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="h-12 w-12 rounded-xl bg-secondary/20 flex items-center justify-center group-hover:bg-secondary/30 transition-colors">
-                    <BarChart3 className="h-6 w-6 text-secondary-foreground" aria-hidden="true" />
-                  </div>
-                  <Badge variant="outline">Vue agrégée</Badge>
-                </div>
-                <CardTitle className="text-2xl">Administrateur RH</CardTitle>
-                <CardDescription className="text-base">
-                  Tableau de bord RH avec indicateurs agrégés et anonymisés pour le suivi d'équipe.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="relative space-y-4">
-                <ul className="space-y-3" aria-label="Fonctionnalités administrateur">
-                  {features.admin.map(({ icon: Icon, label }) => (
-                    <li key={label} className="flex items-center gap-3 text-sm text-muted-foreground">
-                      <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
-                        <Icon className="h-4 w-4" aria-hidden="true" />
-                      </div>
-                      {label}
-                    </li>
-                  ))}
-                </ul>
-                <Button variant="outline" className="w-full group-hover:bg-secondary group-hover:text-secondary-foreground transition-colors mt-4">
-                  Accès Admin
-                  <ArrowRight className="h-4 w-4 ml-2" aria-hidden="true" />
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+                  {/* Title */}
+                  <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-1">
+                    {persona.title}
+                  </h2>
+                  <p className="text-sm text-primary font-medium mb-3">{persona.subtitle}</p>
+                  <p className="text-muted-foreground mb-8 leading-relaxed">
+                    {persona.description}
+                  </p>
 
-          {/* Privacy Notice */}
-          <div className="mt-12 text-center">
-            <div className="inline-flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-4 py-2 rounded-full">
-              <Shield className="h-4 w-4 text-success" aria-hidden="true" />
-              <span>Vos données personnelles ne sont jamais partagées avec votre employeur</span>
+                  {/* Features */}
+                  <ul className="space-y-3 mb-8" aria-label={`Fonctionnalités ${persona.title}`}>
+                    {persona.features.map(({ icon: Icon, label }) => (
+                      <li key={label} className="flex items-center gap-3 text-sm text-muted-foreground">
+                        <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                        {label}
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* CTA */}
+                  <Button
+                    className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors rounded-full py-6 text-base"
+                    variant="outline"
+                  >
+                    {persona.cta}
+                    <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+
+                  {/* Hover glow */}
+                  <div
+                    className={cn(
+                      'absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-[0.06] transition-opacity duration-500',
+                      'bg-gradient-to-br pointer-events-none blur-3xl -z-10',
+                      persona.gradient,
+                    )}
+                  />
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+
+        {/* Access code link */}
+        <Reveal delay={0.3}>
+          <div className="max-w-5xl mx-auto mt-12 text-center">
+            <div className="inline-flex flex-col sm:flex-row items-center gap-4 px-6 py-4 rounded-2xl bg-muted/30 border border-border/50">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <KeyRound className="h-4 w-4" />
+                Vous avez un code d'accès employeur ?
+              </div>
+              <Link to="/b2b/access">
+                <Button variant="ghost" size="sm" className="text-primary hover:text-primary font-medium">
+                  Entrer le code
+                  <ArrowRight className="h-3 w-3 ml-1" />
+                </Button>
+              </Link>
             </div>
           </div>
+        </Reveal>
+
+        {/* Privacy notice */}
+        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mt-12">
+          <Shield className="h-4 w-4 text-primary" />
+          <span>Vos données personnelles ne sont jamais partagées avec votre employeur</span>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t py-6 mt-auto">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} EmotionsCare — Bien-être émotionnel au travail</p>
-        </div>
-      </footer>
     </div>
   );
 };
