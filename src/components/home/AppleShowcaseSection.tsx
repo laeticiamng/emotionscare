@@ -3,17 +3,14 @@
  * Grande image/vidéo centrée avec texte minimal
  */
 
-import React, { memo, useRef, useState } from 'react';
+import React, { memo, useRef } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Play, Pause } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const AppleShowcaseSection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(contentRef, { once: true, amount: 0.3 });
-  const [isPlaying, setIsPlaying] = useState(false);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -45,8 +42,8 @@ const AppleShowcaseSection: React.FC = () => {
               </span>
             </h2>
             <p className="text-xl md:text-2xl text-background/70 max-w-2xl mx-auto">
-              Des protocoles conçus pour vous absorber totalement. 
-              Quand le monde extérieur s'efface, la paix intérieure émerge.
+              Des exercices courts qui vous recentrent immédiatement.
+              Coupez le mental. Retrouvez le calme en quelques respirations.
             </p>
           </motion.div>
 
@@ -110,21 +107,7 @@ const AppleShowcaseSection: React.FC = () => {
                     </motion.div>
                   </div>
 
-                  {/* Play button overlay */}
-                  <motion.button
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                    transition={{ delay: 0.8, duration: 0.5 }}
-                    onClick={() => setIsPlaying(!isPlaying)}
-                    className="absolute bottom-6 right-6 w-14 h-14 bg-white/20 backdrop-blur-xl rounded-full flex items-center justify-center hover:bg-white/30 transition-colors"
-                    aria-label={isPlaying ? "Pause" : "Play demo"}
-                  >
-                    {isPlaying ? (
-                      <Pause className="h-6 w-6 text-white" />
-                    ) : (
-                      <Play className="h-6 w-6 text-white ml-1" />
-                    )}
-                  </motion.button>
+                  {/* Removed non-functional play button */}
                 </div>
               </div>
             </div>

@@ -138,6 +138,7 @@ const AppleFeatureSection: React.FC = () => {
 
   return (
     <section 
+      id="features"
       ref={sectionRef}
       className="relative py-32 md:py-40 bg-background overflow-hidden"
     >
