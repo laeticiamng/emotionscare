@@ -1,178 +1,200 @@
 
 
-# Audit complet -- /app/emotional-park (Parc Emotionnel)
+# Audit des 34 pages du Parc Emotionnel
 
 ---
 
-## 1) Test "3 secondes"
+## Synthese globale
 
-- **Je crois que c'est :** Un hub gamifie de navigation vers tous les modules EmotionsCare, habille en "parc d'attractions"
-- **Public cible :** Utilisateurs B2C connectes
-- **Clarte immediate : 7/10** -- Le concept est original et engageant, mais la page est **tres dense** (1167 lignes, 35 attractions, 8 zones, 15+ widgets)
-- **Premiere impression visuelle :** Header sticky riche (energie, notifications, recherche, filtres), widgets meteo/streak, puis grille d'attractions par zone
-
----
-
-## 2) Parcours utilisateur -- Audit par etape
-
-| Etape | Action | Resultat | Probleme |
-|-------|--------|----------|----------|
-| Arrivee | Page chargee | Tour guide propose si premiere visite | OK |
-| Recherche "scan" | Tape dans la barre | Filtrage fonctionne, suggestions apparaissent | OK |
-| Filtre zone "Serenite" | Clic sur bouton filtre | Attractions filtrees correctement | OK |
-| Mood selector "Heureux" | Clic | Meteo change en "magical", recommandations mises a jour | OK |
-| Clic attraction "Dashboard" | Clic | Route `/app/consumer/home` -- fonctionne (via alias `/app/home` -> `/app/consumer/home`) | OK |
-| Clic "La Bulle Respirante" | Clic | Route `/app/nyvee` -- enregistree dans le router | OK |
-| Clic "Galerie des Masques" | Clic | Route `/app/scan` -- fonctionne | OK |
-| Clic "Foret Sonore" | Clic | Route `/app/music` -- fonctionne | OK |
-| Widget "Voir la carte" | Clic | Carte SVG affichee avec zones cliquables | OK |
-| Widget "Voir la timeline" | Clic | Timeline vide si pas de visites | OK |
-| Bouton "Mes Succes" | Clic | Route `/app/achievements` -- enregistree | OK |
-| Bouton "Defis du jour" | Clic | Route `/app/daily-challenges` -- enregistree | OK |
-| Bouton "Tableau de bord" | Clic | Route `/app/home` -- fonctionne via alias | OK |
-| Export JSON | Clic Quick Action | Telecharge un fichier JSON | OK |
-| Favori coeur | Clic coeur sur attraction | Bascule favori (apparait/disparait) | OK |
-| Panel "Mes Succes" dialog | Clic Quick Action | Dialog avec achievements | OK |
-| Panel "Parametres" dialog | Clic Quick Action | Dialog avec parametres parc | OK |
-| **Footer custom** | Visible en bas | **Doublon** avec le layout global | **PROBLEME** |
+| Critere | Resultat |
+|---------|----------|
+| Pages auditees | 34 |
+| Routes toutes enregistrees | Oui (34/34) |
+| Pages avec bouton retour | 22/34 (65%) |
+| Pages avec `@ts-nocheck` | 3 (BubbleBeat, MoodMixer, CoachMicro) |
+| Pages sans `usePageSEO` | ~28/34 |
+| Score global | 7/10 |
 
 ---
 
-## 3) Audit des routes des 35 attractions
+## Audit individuel des 34 pages
 
-Toutes les routes d'attractions sont **enregistrees dans le router** ou resolues via alias. Aucune 404 detectee pour les attractions elles-memes.
+### ZONE HUB (8 pages)
 
-**Routes avec alias (redirection automatique) :**
+| # | Attraction | Route | Bouton retour | @ts-nocheck | Problemes |
+|---|-----------|-------|---------------|-------------|-----------|
+| 1 | Hall d'Accueil (Dashboard) | `/app/consumer/home` | N/A (c'est le home) | Non | OK |
+| 2 | Salle des Cartes (Home) | `/app/home` | N/A (alias home) | Non | OK |
+| 3 | Ciel des Auras (Leaderboard) | `/app/leaderboard` | Oui | Non | OK - bien structure |
+| 4 | Jardin des Saisons (Activity) | `/app/activity` | **NON** | Non | Pas de bouton retour, pas de navigate |
+| 5 | Carte des Humeurs (Scores) | `/app/scores` | Oui (HeatmapVibes) | Non | OK |
+| 6 | Observatoire (Insights) | `/app/insights` | Oui (via PageRoot) | Non | OK - WCAG conforme |
+| 7 | Pavillon Config (Settings) | `/app/settings/general` | Oui | Non | OK |
+| 8 | Tour des Messages (Notifications) | `/app/notifications` | Oui | Non | OK |
 
-| Route attraction | Alias vers | Statut |
-|-----------------|------------|--------|
-| `/app/home` | `/app/consumer/home` | OK via alias |
-| `/app/settings/general` | `/settings/general` | OK via alias |
-| `/app/settings/privacy` | `/settings/privacy` | OK via alias |
-| `/app/gamification` | `/gamification` | OK via alias |
+### ZONE CALM (5 pages)
 
-**Doublon d'attraction :** Les attractions `scan` (id: `scan`) et `emotion-scan` (id: `emotion-scan`) pointent toutes les deux vers `/app/scan`. C'est une duplication fonctionnelle dans la grille.
+| # | Attraction | Route | Bouton retour | @ts-nocheck | Problemes |
+|---|-----------|-------|---------------|-------------|-----------|
+| 9 | Bulle Respirante (Nyvee) | `/app/nyvee` | **NON** | Non | **Pas de bouton retour, pas de navigate import**. Navigation morte. Lien hardcode `window.location.href = '/app/meditation'` au lieu de `navigate()`. |
+| 10 | Temple de l'Air (VR Breath) | `/app/vr-breath-guide` | Oui | Non | OK |
+| 11 | Ocean Interieur (Breath) | `/app/breath` | Oui | Non | OK (corrige precedemment) |
+| 12 | Sanctuaire du Silence (Meditation) | `/app/meditation` | Oui (vers `/app`) | Non | Retour pointe vers `/app` au lieu de `/app/home` |
+| 13 | Zone Seuil | `/app/seuil` | Oui (vers `/app/emotional-park`) | Non | OK - exemplaire |
 
----
+### ZONE CREATIVE (4 pages)
 
-## 4) Problemes identifies
+| # | Attraction | Route | Bouton retour | @ts-nocheck | Problemes |
+|---|-----------|-------|---------------|-------------|-----------|
+| 14 | Galerie des Masques (Scan) | `/app/scan` | Oui | Non | OK (corrige precedemment) |
+| 15 | Foret Sonore (Music) | `/app/music` | Oui | Non | OK (corrige precedemment) |
+| 16 | Chambre des Reflets (AR) | `/app/face-ar` | **NON** | Non | Pas de bouton retour |
+| 17 | Studio DJ (Mood Mixer) | `/app/mood-mixer` | **NON** | **OUI** | `@ts-nocheck` + pas de bouton retour |
 
-### P0 -- Bloquants
+### ZONE WISDOM (4 pages)
 
-| # | Probleme | Detail |
-|---|----------|--------|
-| 1 | **AnimatePresence mode="wait" avec children multiples** | Ligne 934 : `<AnimatePresence mode="wait">` enveloppe un `.map()` qui genere **8 elements enfants** (un par zone). Le mode "wait" attend la sortie d'un enfant avant d'animer le suivant, ce qui ne fonctionne pas avec des listes. Cela cause le warning repete dans la console ("You're attempting to animate multiple children within AnimatePresence, but its mode is set to wait"). **Fix :** Supprimer `mode="wait"` ou le remplacer par `mode="popLayout"`. |
+| # | Attraction | Route | Bouton retour | @ts-nocheck | Problemes |
+|---|-----------|-------|---------------|-------------|-----------|
+| 18 | Jardin des Pensees (Coach) | `/app/coach` | Oui | Non | OK (corrige precedemment) |
+| 19 | Bibliotheque des Emotions (Journal) | `/app/journal` | Oui | Non | OK - exemplaire |
+| 20 | Echo des Paroles (Voice Journal) | `/app/voice-journal` | **NON** | Non | **841 lignes, pas de bouton retour, pas de navigate import** |
+| 21 | Theatre des Histoires (Story Synth) | `/app/story-synth` | Oui | Non | OK |
 
-### P1 -- Majeurs
+### ZONE ENERGY (3 pages)
 
-| # | Probleme | Detail |
-|---|----------|--------|
-| 2 | **Footer custom doublon** | Lignes 1108-1127 : Le parc affiche son propre footer avec liens Confidentialite/Conditions/Support. Le layout global fournit deja un footer. Ce doublon cree une incoherence visuelle et du code redondant. |
-| 3 | **Fichier `EmotionalPark.old.tsx` -- dead code** | 1076 lignes de dead code non utilise par le router. A supprimer. |
-| 4 | **Pas de bouton retour** | Aucun bouton retour vers `/app/home` ou `/app/consumer/home` dans le header. L'utilisateur doit utiliser le navigateur ou la sidebar pour quitter. |
-| 5 | **Doublon d'attraction "scan"** | Deux cartes pointent vers `/app/scan` : "La Galerie des Masques" (id: `scan`) et "L'Analyseur d'Emotions" (id: `emotion-scan`). Redondant et confus pour l'utilisateur. |
-| 6 | **Systeme d'energie bloquant sans feedback** | Si `canAfford(10)` retourne false, `handleAttractionClick` fait un `return` silencieux (ligne 258-260). L'utilisateur clique, rien ne se passe, aucun message d'erreur. |
+| # | Attraction | Route | Bouton retour | @ts-nocheck | Problemes |
+|---|-----------|-------|---------------|-------------|-----------|
+| 22 | Chambre des Lumieres (Flash Glow) | `/app/flash-glow` | Oui | Non | OK (corrige precedemment) |
+| 23 | Labo des Bulles (Bubble Beat) | `/app/bubble-beat` | **NON** | **OUI** | `@ts-nocheck` + pas de bouton retour |
+| 24 | Cocon Digital (Screen Silk) | `/app/screen-silk` | **NON** | Non | ArrowLeft importe mais jamais utilise dans le JSX |
 
-### P2 -- Moyens
+### ZONE CHALLENGE (3 pages)
 
-| # | Probleme | Detail |
-|---|----------|--------|
-| 7 | **Page trop longue (1167 lignes)** | Bien au-dela de la regle des 7 fichiers / composant. La logique metier (handlers, calculs) et le JSX sont melanges dans un seul fichier monolithique. |
-| 8 | **Copyright "2025"** | Ligne 1111 : devrait etre 2026 ou dynamique. |
-| 9 | **Sensibilite de performance** | 35 attractions x animations framer-motion par carte = potentiellement lourd sur mobile. Pas de virtualisation. |
-| 10 | **Aucun usePageSEO** | La page n'utilise pas le hook SEO contrairement aux autres pages auditees. |
+| # | Attraction | Route | Bouton retour | @ts-nocheck | Problemes |
+|---|-----------|-------|---------------|-------------|-----------|
+| 25 | Arene de la Perseverance (Boss Grit) | `/app/boss-grit` | **NON** | Non | Pas de bouton retour |
+| 26 | Trampoline Resilient (Bounce Back) | `/app/bounce-back` | Oui | Non | OK |
+| 27 | Salle des Defis (Ambition Arcade) | `/app/ambition-arcade` | Oui | Non | OK - exemplaire |
 
----
+### ZONE SOCIAL (4 pages)
 
-## 5) Audit accessibilite
+| # | Attraction | Route | Bouton retour | @ts-nocheck | Problemes |
+|---|-----------|-------|---------------|-------------|-----------|
+| 28 | Village Bienveillant (Community) | `/app/community` | Oui | Non | OK - PageSEO present, moderation |
+| 29 | Cercle des Allies (Buddies) | `/app/buddies` | A verifier | Non | A verifier |
+| 30 | Cocon Social | `/app/social-cocon` | Oui | Non | OK - `usePageSEO` present |
+| 31 | Arene des Champions (Gamification) | `/app/gamification` | Oui | Non | OK |
 
-| Element | Statut |
-|---------|--------|
-| Boutons de filtre zone | OK -- semantique correcte |
-| Mood selector | OK -- `role="radiogroup"`, `aria-pressed`, `aria-label` |
-| Cartes d'attractions | OK -- `role="button"`, `tabIndex={0}`, `onKeyDown` |
-| Bouton favori | OK -- `aria-label` conditionnel |
-| Badge "visite" | OK -- `aria-label="Attraction visitee"` |
-| Recherche clear button | OK -- `aria-label="Effacer la recherche"` |
-| Bouton toggle stats | OK -- `aria-expanded` |
-| **Footer** | OK -- `role="contentinfo"`, `aria-label` nav |
+### ZONE EXPLORE (3 pages)
 
-Score a11y : **8/10** -- Bon travail d'accessibilite sur cette page.
+| # | Attraction | Route | Bouton retour | @ts-nocheck | Problemes |
+|---|-----------|-------|---------------|-------------|-----------|
+| 32 | Constellation (VR Galaxy) | `/app/vr-galaxy` | Oui | Non | OK (corrige precedemment) |
+| 33 | Atlas des Emotions | `/app/emotion-atlas` | A verifier | Non | A verifier |
+| 34 | Sentier des Decouvertes | `/app/discovery` | A verifier | Non | A verifier |
 
----
+### HORS ZONE (3 pages supplementaires)
 
-## 6) Audit page associee : ParkJourney (`/app/park-journey`)
-
-Le `ParkJourney.tsx` (498 lignes) est un parcours narratif scrollable avec 19 "attractions" presentees comme des etapes d'un voyage.
-
-| Aspect | Statut |
-|--------|--------|
-| Design | Beau, scroll-reveal animations, gradients | OK |
-| Routes internes | Toutes les 19 routes sont enregistrees dans le router | OK |
-| Bouton "Voir la carte" | Redirige vers `/app/emotional-park` | OK |
-| **Pas de bouton retour** | Meme probleme que EmotionalPark | **PROBLEME** |
-| **Footer custom** | Lignes 430-498 : son propre footer avec liens | **Doublon** |
-| **Copyright "2025"** | Meme probleme | **PROBLEME** |
-| **20 particules animees en boucle infinie** | Performance : 20 `motion.div` avec `repeat: Infinity` dans le hero | **Moyen** |
-
----
-
-## 7) Top 12 ameliorations prioritaires
-
-### P0
-
-1. **Corriger `AnimatePresence mode="wait"`** : Retirer `mode="wait"` de la ligne 934 pour arreter le warning console. Remplacer par `<AnimatePresence>` tout court.
-
-### P1
-
-2. **Supprimer le footer custom** (lignes 1108-1127) -- le layout global s'en charge.
-3. **Supprimer `EmotionalPark.old.tsx`** -- 1076 lignes de dead code.
-4. **Ajouter un bouton retour** vers `/app/consumer/home` dans le header, comme fait pour les autres modules.
-5. **Supprimer l'attraction doublon `emotion-scan`** de `parkAttractions.ts` (pointe vers la meme route que `scan`).
-6. **Ajouter un feedback d'energie insuffisante** : toast ou animation quand `canAfford(10)` est false.
-
-### P1 (ParkJourney)
-
-7. **Supprimer le footer custom de ParkJourney** (meme probleme).
-8. **Ajouter un bouton retour dans ParkJourney**.
-
-### P2
-
-9. **Ajouter `usePageSEO`** avec keywords pertinents.
-10. **Corriger le copyright** : remplacer "2025" par `new Date().getFullYear()`.
-11. **Limiter les particules animees** dans ParkJourney (reduire de 20 a 8 ou utiliser CSS animations).
-12. **Considerer une refactorisation** : extraire les handlers et la logique metier dans un hook `useEmotionalPark`.
+| # | Page | Route | Bouton retour | Problemes |
+|---|------|-------|---------------|-----------|
+| - | Portail Immersif (VR) | `/app/vr` | **NON** | Pas de bouton retour, pas de navigate |
+| - | Profil | `/app/profile` | Oui | OK |
+| - | Confidentialite | `/app/settings/privacy` | Oui | OK |
 
 ---
 
-## Plan d'implementation technique
+## Problemes par priorite
 
-### Fichier 1 : `src/pages/EmotionalPark.tsx`
+### P1 -- 12 pages sans bouton retour
 
-1. **Ligne 934** : `<AnimatePresence mode="wait">` -> `<AnimatePresence>`
-2. **Lignes 1107-1127** : Supprimer le `<footer>` custom
-3. **Header (lignes 401-440)** : Ajouter un bouton retour `<Link to="/app/consumer/home">` avec `<ArrowLeft>` avant le titre
-4. **Ligne 258-260** : Ajouter un toast "Energie insuffisante" au lieu d'un return silencieux
-5. **Ajouter `usePageSEO`** apres les imports de hooks
-6. **Ligne 1111** : Supprimer (le footer entier est supprime)
+Les pages suivantes n'ont aucun moyen de revenir au parc ou au dashboard sans utiliser le bouton navigateur :
 
-### Fichier 2 : `src/data/parkAttractions.ts`
+1. **B2CNyveeCoconPage.tsx** (`/app/nyvee`) -- 411 lignes, utilise `window.location.href` au lieu de `navigate()`
+2. **B2CVoiceJournalPage.tsx** (`/app/voice-journal`) -- 841 lignes
+3. **B2CARFiltersPage.tsx** (`/app/face-ar`) -- 145 lignes
+4. **B2CMoodMixerPage.tsx** (`/app/mood-mixer`) -- 733 lignes
+5. **B2CBubbleBeatPage.tsx** (`/app/bubble-beat`) -- 648 lignes
+6. **B2CScreenSilkBreakPage.tsx** (`/app/screen-silk`) -- 924 lignes (ArrowLeft importe mais pas utilise)
+7. **B2CBossLevelGritPage.tsx** (`/app/boss-grit`) -- 445 lignes
+8. **B2CActivitePage.tsx** (`/app/activity`) -- 580 lignes
+9. **B2CImmersivePage.tsx** (`/app/vr`) -- 288 lignes
+10. **MeditationPage.tsx** -- retour vers `/app` (devrait etre `/app/home`)
 
-- **Lignes 203-213** : Supprimer l'attraction `emotion-scan` (doublon de `scan`, meme route `/app/scan`)
+### P2 -- 3 fichiers avec `@ts-nocheck`
 
-### Fichier 3 : `src/pages/ParkJourney.tsx`
+1. **B2CBubbleBeatPage.tsx** -- ligne 1
+2. **B2CMoodMixerPage.tsx** -- ligne 1
+3. **B2CAICoachMicroPage.tsx** -- ligne 1
 
-- Supprimer le footer custom en bas du fichier
-- Ajouter un bouton retour vers `/app/emotional-park` dans le hero
-- Reduire les particules de 20 a 8 : `[...Array(8)]` au lieu de `[...Array(20)]`
+### P2 -- 1 lien incorrect
 
-### Fichier a supprimer
+1. **B2CNyveeCoconPage.tsx** ligne 367 : `window.location.href = '/app/meditation'` au lieu de `navigate('/app/meditation')` -- provoque un rechargement complet de la page
 
-- `src/pages/EmotionalPark.old.tsx` -- 1076 lignes de dead code
+---
+
+## Plan d'implementation
+
+### Etape 1 : Ajouter boutons retour (9 pages)
+
+Pour chaque page, ajouter un bouton retour standardise au-dessus du titre principal. Le pattern est :
+
+```text
+<Link to="/app/home">
+  <Button variant="ghost" size="sm" aria-label="Retour a l'accueil">
+    <ArrowLeft /> Retour
+  </Button>
+</Link>
+```
+
+**Fichiers a modifier :**
+
+1. `src/pages/b2c/B2CNyveeCoconPage.tsx` -- ajouter bouton retour + remplacer `window.location.href` par `useNavigate`
+2. `src/pages/b2c/B2CVoiceJournalPage.tsx` -- ajouter bouton retour
+3. `src/pages/b2c/B2CARFiltersPage.tsx` -- ajouter bouton retour
+4. `src/pages/b2c/B2CMoodMixerPage.tsx` -- ajouter bouton retour
+5. `src/pages/b2c/B2CBubbleBeatPage.tsx` -- ajouter bouton retour
+6. `src/pages/b2c/B2CScreenSilkBreakPage.tsx` -- utiliser ArrowLeft deja importe, ajouter bouton retour
+7. `src/pages/b2c/B2CBossLevelGritPage.tsx` -- ajouter bouton retour
+8. `src/pages/b2c/B2CActivitePage.tsx` -- ajouter bouton retour
+9. `src/pages/b2c/B2CImmersivePage.tsx` -- ajouter bouton retour
+
+### Etape 2 : Corriger le lien Meditation (1 page)
+
+- `src/pages/MeditationPage.tsx` ligne 388 : changer `navigate('/app')` en `navigate('/app/home')`
+
+### Etape 3 : Corriger Nyvee navigation (1 page)
+
+- `src/pages/b2c/B2CNyveeCoconPage.tsx` ligne 367 : remplacer `window.location.href = '/app/meditation'` par `navigate('/app/meditation')` avec import de `useNavigate`
+
+### Etape 4 : Retirer `@ts-nocheck` (3 fichiers)
+
+- `src/pages/b2c/B2CBubbleBeatPage.tsx`
+- `src/pages/b2c/B2CMoodMixerPage.tsx`
+- `src/pages/b2c/B2CAICoachMicroPage.tsx`
+
+Note : la suppression de `@ts-nocheck` peut reveler des erreurs TypeScript. Les corrections seront adaptees au cas par cas (ajout de types, casts).
 
 ### Fichiers a ne PAS toucher
 
-- `src/data/parkZones.ts` -- structure correcte
-- `src/components/park/*` -- composants enfants fonctionnels
-- `src/hooks/usePark*` -- hooks fonctionnels
+Toutes les pages deja corrigees lors des audits precedents (Scan, Music, Breath, Coach, FlashGlow, VR Galaxy, Journal) ainsi que les pages exemplaires (Seuil, AmbitionArcade, BounceBack, Community, SocialCocon, Leaderboard, StorySynth).
+
+---
+
+## Resume des modifications
+
+| Fichier | Modification | Priorite |
+|---------|-------------|----------|
+| `B2CNyveeCoconPage.tsx` | Bouton retour + remplacer `window.location.href` par `navigate` | P1 |
+| `B2CVoiceJournalPage.tsx` | Bouton retour | P1 |
+| `B2CARFiltersPage.tsx` | Bouton retour | P1 |
+| `B2CMoodMixerPage.tsx` | Bouton retour + retirer `@ts-nocheck` | P1/P2 |
+| `B2CBubbleBeatPage.tsx` | Bouton retour + retirer `@ts-nocheck` | P1/P2 |
+| `B2CScreenSilkBreakPage.tsx` | Bouton retour (utiliser ArrowLeft deja importe) | P1 |
+| `B2CBossLevelGritPage.tsx` | Bouton retour | P1 |
+| `B2CActivitePage.tsx` | Bouton retour | P1 |
+| `B2CImmersivePage.tsx` | Bouton retour | P1 |
+| `MeditationPage.tsx` | Corriger retour `/app` -> `/app/home` | P2 |
+| `B2CAICoachMicroPage.tsx` | Retirer `@ts-nocheck` | P2 |
+
+Total : **11 fichiers a modifier**, aucun fichier a creer ou supprimer.
 
