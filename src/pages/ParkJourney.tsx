@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star,
   Lightbulb, Waves, Scan, Beaker, Sword, Sliders, Users,
-  Trophy, Theater, Sprout, ArrowRight, Map
+  Trophy, Theater, Sprout, ArrowRight, ArrowLeft, Map
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -326,7 +326,7 @@ export default function ParkJourney() {
       >
         {/* Animated background particles */}
         <div className="absolute inset-0 overflow-hidden">
-          {[...Array(20)].map((_, i) => (
+          {[...Array(8)].map((_, i) => (
             <motion.div
               key={i}
               className="absolute w-2 h-2 bg-primary/20 rounded-full"
@@ -349,6 +349,19 @@ export default function ParkJourney() {
         </div>
 
         <div className="container mx-auto relative z-10">
+          {/* Bouton retour */}
+          <div className="mb-6">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/app/emotional-park')}
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Retour au parc
+            </Button>
+          </div>
+
           <motion.div
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
