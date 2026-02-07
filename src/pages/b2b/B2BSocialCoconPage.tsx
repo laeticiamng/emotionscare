@@ -88,54 +88,7 @@ const B2BSocialCoconPage: React.FC = () => {
         Aller au contenu principal
       </a>
 
-      {/* Navigation sticky */}
-      <nav role="navigation" aria-label="Navigation cocon social" className="bg-card border-b sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link to="/b2b/dashboard" className="text-lg font-semibold hover:text-primary transition-colors">
-                EmotionsCare
-              </Link>
-              <Badge variant="secondary" className="gap-1">
-                <Heart className="h-3 w-3" aria-hidden="true" />
-                Cocon Social
-              </Badge>
-            </div>
-            <div className="flex items-center space-x-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link to="/notifications"><Bell className="h-4 w-4" /></Link>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Notifications</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link to="/settings/general"><Settings className="h-4 w-4" /></Link>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Paramètres</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link to="/help"><HelpCircle className="h-4 w-4" /></Link>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Aide</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          </div>
-        </div>
-      </nav>
+      {/* Navigation removed — uses B2BAdminLayout header */}
 
       {/* Main Content */}
       <main id="main-content" role="main" className="container mx-auto px-4 py-8 max-w-7xl">
@@ -352,21 +305,7 @@ const B2BSocialCoconPage: React.FC = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer role="contentinfo" className="bg-card border-t mt-12">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-            <p>© 2025 EmotionsCare B2B</p>
-            <nav aria-label="Liens footer">
-              <div className="flex gap-4">
-                <Link to="/legal/privacy" className="hover:text-foreground">Confidentialité</Link>
-                <Link to="/b2b/security" className="hover:text-foreground">Sécurité</Link>
-                <Link to="/help" className="hover:text-foreground">Support</Link>
-              </div>
-            </nav>
-          </div>
-        </div>
-      </footer>
+      {/* Footer removed — uses B2BAdminLayout footer */}
     </div>
   );
 };

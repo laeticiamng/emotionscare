@@ -201,18 +201,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'public',
     layout: 'marketing',
     component: 'B2BEntreprisePage',
-    aliases: ['/b2b', '/b2b/landing'],
+    aliases: ['/b2b', '/b2b/landing', '/b2b/institutional'],
     guard: false,
   },
   // Route /b2b/landing supprimée - alias dans b2b-landing
   {
     name: 'b2b-selection',
     path: '/b2b/selection',
-    segment: 'manager',
-    role: 'manager',
-    layout: 'app',
-    guard: true,
-    requireAuth: true,
+    segment: 'public',
+    layout: 'simple',
+    guard: false,
     component: 'B2BSelectionPage',
   },
   {
@@ -227,14 +225,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // ═══════════════════════════════════════════════════════════
   // B2B INSTITUTIONAL (nouvelles routes)
   // ═══════════════════════════════════════════════════════════
-  {
-    name: 'b2b-institutional-landing',
-    path: '/b2b/institutional',
-    segment: 'public',
-    layout: 'marketing',
-    component: 'InstitutionalLandingPage',
-    guard: false,
-  },
+  // /b2b/institutional supprimé — redondant avec /b2b. Alias dans b2b-landing.
   {
     name: 'b2b-institutional-access',
     path: '/b2b/access',
