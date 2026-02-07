@@ -383,7 +383,7 @@ export default function MeditationPage() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => navigate('/app')}
+                onClick={() => navigate('/app/home')}
                 aria-label="Retour"
               >
                 <ArrowLeft className="h-5 w-5" />

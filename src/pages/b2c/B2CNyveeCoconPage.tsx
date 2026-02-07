@@ -1,5 +1,7 @@
 import type { FC } from 'react';
 import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 import ZeroNumberBoundary from '@/components/common/ZeroNumberBoundary';
 import { Button } from '@/components/ui/button';
@@ -46,6 +48,7 @@ type SessionPhase = 'ready' | 'mood-before' | 'breathing' | 'mood-after' | 'comp
 
 const B2CNyveeCoconPage: FC = () => {
   const { has } = useFlags();
+  const navigate = useNavigate();
   const zeroNumbersActive = has('FF_ZERO_NUMBERS');
   const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const orchestration = useStai6Orchestration();
@@ -201,6 +204,12 @@ const B2CNyveeCoconPage: FC = () => {
         data-testid="page-root"
       >
         <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8">
+          {/* Back button */}
+          <Link to="/app/home" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors w-fit">
+            <ArrowLeft className="h-4 w-4" />
+            Retour
+          </Link>
+
           {/* Header */}
           <div className="text-center">
             <h1 className="text-4xl font-bold text-foreground">Nyvée</h1>
@@ -364,7 +373,7 @@ const B2CNyveeCoconPage: FC = () => {
                         Refaire une session
                       </Button>
                       <Button
-                        onClick={() => window.location.href = '/app/meditation'}
+                        onClick={() => navigate('/app/meditation')}
                         className="bg-primary text-primary-foreground hover:bg-primary/90"
                       >
                         {badgeType === 'calm' ? 'Silence & Ancrage' : 'Carte 5-4-3-2-1'}

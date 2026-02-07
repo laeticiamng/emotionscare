@@ -30,8 +30,10 @@ import {
   Play,
   Zap,
   Filter,
-  RefreshCw
+  RefreshCw,
+  ArrowLeft
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import PageRoot from '@/components/common/PageRoot';
 import { useAuth } from '@/contexts/AuthContext';
 import { ActivitySessionService, ActivityStreak } from '@/modules/activities/services/activitySessionService';
@@ -181,6 +183,12 @@ const B2CActivitePage: React.FC = () => {
     <PageRoot>
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
         <div className="container mx-auto px-4 py-6 max-w-7xl">
+          {/* Back button */}
+          <Link to="/app/home" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
+            <ArrowLeft className="h-4 w-4" />
+            Retour
+          </Link>
+
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}

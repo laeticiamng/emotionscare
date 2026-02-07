@@ -7,7 +7,8 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { immersiveService } from '@/services/b2c/immersiveService';
 import { useToast } from '@/hooks/use-toast';
-import { Sparkles, Loader2, Eye, History } from 'lucide-react';
+import { Sparkles, Loader2, Eye, History, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { VRViewer } from '@/components/b2c/VRViewer';
 
 type SessionType = 'vr' | 'ambilight' | 'audio';
@@ -100,6 +101,12 @@ const B2CImmersivePage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6 max-w-6xl space-y-8">
+      {/* Back button */}
+      <Link to="/app/home" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="h-4 w-4" />
+        Retour
+      </Link>
+
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Sparkles className="h-6 w-6 text-primary" />
