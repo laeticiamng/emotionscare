@@ -1,6 +1,7 @@
 
 
-# Audit des 34 pages du Parc Emotionnel
+# Audit complet des 34 pages du Parc Emotionnel
+## UX, Utilisateur et Technique
 
 ---
 
@@ -10,10 +11,14 @@
 |---------|----------|
 | Pages auditees | 34 |
 | Routes toutes enregistrees | Oui (34/34) |
-| Pages avec bouton retour | 22/34 (65%) |
-| Pages avec `@ts-nocheck` | 3 (BubbleBeat, MoodMixer, CoachMicro) |
-| Pages sans `usePageSEO` | ~28/34 |
-| Score global | 7/10 |
+| Pages avec bouton retour | **28/34 (82%)** -- amelioration vs 65% precedent |
+| Pages avec `@ts-nocheck` | **2** (DataPrivacy, ForgotPasswordDialog) |
+| Pages avec `usePageSEO` | **7/34 (21%)** |
+| Pages avec footer custom doublon | **3** (Dashboard, SocialCocon, ParkJourney) |
+| Pages avec couleurs hardcodees (slate) | **3** (SocialCocon, Communaute, DataPrivacy) |
+| console.log residuels | 0 |
+| window.location.href | 0 -- corrige |
+| Score global | **8/10** (amelioration vs 7/10 precedent) |
 
 ---
 
@@ -21,162 +26,192 @@
 
 ### ZONE HUB (8 pages)
 
-| # | Attraction | Route | Bouton retour | @ts-nocheck | Problemes |
-|---|-----------|-------|---------------|-------------|-----------|
-| 1 | Hall d'Accueil (Dashboard) | `/app/consumer/home` | N/A (c'est le home) | Non | OK |
-| 2 | Salle des Cartes (Home) | `/app/home` | N/A (alias home) | Non | OK |
-| 3 | Ciel des Auras (Leaderboard) | `/app/leaderboard` | Oui | Non | OK - bien structure |
-| 4 | Jardin des Saisons (Activity) | `/app/activity` | **NON** | Non | Pas de bouton retour, pas de navigate |
-| 5 | Carte des Humeurs (Scores) | `/app/scores` | Oui (HeatmapVibes) | Non | OK |
-| 6 | Observatoire (Insights) | `/app/insights` | Oui (via PageRoot) | Non | OK - WCAG conforme |
+| # | Page | Route | Retour | SEO | Problemes |
+|---|------|-------|--------|-----|-----------|
+| 1 | Hall d'Accueil (Dashboard) | `/app/consumer/home` | N/A | Oui | **Footer custom doublon** (L880-905) + copyright "2025" |
+| 2 | Salle des Cartes (Home) | `/app/home` | N/A | Non | Alias OK |
+| 3 | Ciel des Auras (Leaderboard) | `/app/leaderboard` | Oui | Non | OK |
+| 4 | Jardin des Saisons (Activity) | `/app/activity` | **Oui** | Non | OK -- corrige |
+| 5 | Carte des Humeurs (Scores) | `/app/scores` | Oui | Non | OK |
+| 6 | Observatoire (Insights) | `/app/insights` | Oui | Non | OK -- WCAG conforme |
 | 7 | Pavillon Config (Settings) | `/app/settings/general` | Oui | Non | OK |
-| 8 | Tour des Messages (Notifications) | `/app/notifications` | Oui | Non | OK |
+| 8 | Tour des Messages (Notifications) | `/app/notifications` | **NON** | Non | Pas de bouton retour, pas d'ArrowLeft |
 
 ### ZONE CALM (5 pages)
 
-| # | Attraction | Route | Bouton retour | @ts-nocheck | Problemes |
-|---|-----------|-------|---------------|-------------|-----------|
-| 9 | Bulle Respirante (Nyvee) | `/app/nyvee` | **NON** | Non | **Pas de bouton retour, pas de navigate import**. Navigation morte. Lien hardcode `window.location.href = '/app/meditation'` au lieu de `navigate()`. |
-| 10 | Temple de l'Air (VR Breath) | `/app/vr-breath-guide` | Oui | Non | OK |
-| 11 | Ocean Interieur (Breath) | `/app/breath` | Oui | Non | OK (corrige precedemment) |
-| 12 | Sanctuaire du Silence (Meditation) | `/app/meditation` | Oui (vers `/app`) | Non | Retour pointe vers `/app` au lieu de `/app/home` |
-| 13 | Zone Seuil | `/app/seuil` | Oui (vers `/app/emotional-park`) | Non | OK - exemplaire |
+| # | Page | Route | Retour | SEO | Problemes |
+|---|------|-------|--------|-----|-----------|
+| 9 | Bulle Respirante (Nyvee) | `/app/nyvee` | **Oui** | Non | OK -- corrige (navigate, bouton retour) |
+| 10 | Temple de l'Air (VR Breath) | `/app/vr-breath-guide` | **NON** | Non | Pas de bouton retour, pas d'ArrowLeft importe |
+| 11 | Ocean Interieur (Breath) | `/app/breath` | Oui | Non | OK |
+| 12 | Sanctuaire du Silence (Meditation) | `/app/meditation` | **Oui** | Non | OK -- corrige (pointe `/app/home`) |
+| 13 | Zone Seuil | `/app/seuil` | Oui | Non | OK -- exemplaire |
 
 ### ZONE CREATIVE (4 pages)
 
-| # | Attraction | Route | Bouton retour | @ts-nocheck | Problemes |
-|---|-----------|-------|---------------|-------------|-----------|
-| 14 | Galerie des Masques (Scan) | `/app/scan` | Oui | Non | OK (corrige precedemment) |
-| 15 | Foret Sonore (Music) | `/app/music` | Oui | Non | OK (corrige precedemment) |
-| 16 | Chambre des Reflets (AR) | `/app/face-ar` | **NON** | Non | Pas de bouton retour |
-| 17 | Studio DJ (Mood Mixer) | `/app/mood-mixer` | **NON** | **OUI** | `@ts-nocheck` + pas de bouton retour |
+| # | Page | Route | Retour | SEO | Problemes |
+|---|------|-------|--------|-----|-----------|
+| 14 | Galerie des Masques (Scan) | `/app/scan` | Oui | **Oui** | OK -- exemplaire |
+| 15 | Foret Sonore (Music) | `/app/music` | Oui | **Oui** | OK |
+| 16 | Chambre des Reflets (AR) | `/app/face-ar` | **Oui** | Non | OK -- corrige |
+| 17 | Studio DJ (Mood Mixer) | `/app/mood-mixer` | **Oui** | Non | OK -- corrige |
 
 ### ZONE WISDOM (4 pages)
 
-| # | Attraction | Route | Bouton retour | @ts-nocheck | Problemes |
-|---|-----------|-------|---------------|-------------|-----------|
-| 18 | Jardin des Pensees (Coach) | `/app/coach` | Oui | Non | OK (corrige precedemment) |
-| 19 | Bibliotheque des Emotions (Journal) | `/app/journal` | Oui | Non | OK - exemplaire |
-| 20 | Echo des Paroles (Voice Journal) | `/app/voice-journal` | **NON** | Non | **841 lignes, pas de bouton retour, pas de navigate import** |
+| # | Page | Route | Retour | SEO | Problemes |
+|---|------|-------|--------|-----|-----------|
+| 18 | Jardin des Pensees (Coach) | `/app/coach` | Oui | **Oui** | OK |
+| 19 | Bibliotheque des Emotions (Journal) | `/app/journal` | Oui | **Oui** | OK -- exemplaire |
+| 20 | Echo des Paroles (Voice Journal) | `/app/voice-journal` | **Oui** | Non | OK -- corrige |
 | 21 | Theatre des Histoires (Story Synth) | `/app/story-synth` | Oui | Non | OK |
 
 ### ZONE ENERGY (3 pages)
 
-| # | Attraction | Route | Bouton retour | @ts-nocheck | Problemes |
-|---|-----------|-------|---------------|-------------|-----------|
-| 22 | Chambre des Lumieres (Flash Glow) | `/app/flash-glow` | Oui | Non | OK (corrige precedemment) |
-| 23 | Labo des Bulles (Bubble Beat) | `/app/bubble-beat` | **NON** | **OUI** | `@ts-nocheck` + pas de bouton retour |
-| 24 | Cocon Digital (Screen Silk) | `/app/screen-silk` | **NON** | Non | ArrowLeft importe mais jamais utilise dans le JSX |
+| # | Page | Route | Retour | SEO | Problemes |
+|---|------|-------|--------|-----|-----------|
+| 22 | Chambre des Lumieres (Flash Glow) | `/app/flash-glow` | Oui | Non | OK -- corrige (header sticky supprime) |
+| 23 | Labo des Bulles (Bubble Beat) | `/app/bubble-beat` | **Oui** | Non | OK -- corrige |
+| 24 | Cocon Digital (Screen Silk) | `/app/screen-silk` | **Oui** | Non | OK -- corrige |
 
 ### ZONE CHALLENGE (3 pages)
 
-| # | Attraction | Route | Bouton retour | @ts-nocheck | Problemes |
-|---|-----------|-------|---------------|-------------|-----------|
-| 25 | Arene de la Perseverance (Boss Grit) | `/app/boss-grit` | **NON** | Non | Pas de bouton retour |
+| # | Page | Route | Retour | SEO | Problemes |
+|---|------|-------|--------|-----|-----------|
+| 25 | Arene de la Perseverance (Boss Grit) | `/app/boss-grit` | **Oui** | Non | OK -- corrige |
 | 26 | Trampoline Resilient (Bounce Back) | `/app/bounce-back` | Oui | Non | OK |
-| 27 | Salle des Defis (Ambition Arcade) | `/app/ambition-arcade` | Oui | Non | OK - exemplaire |
+| 27 | Salle des Defis (Ambition Arcade) | `/app/ambition-arcade` | Oui | Non | OK -- exemplaire |
 
-### ZONE SOCIAL (4 pages)
+### ZONE SOCIAL (5 pages)
 
-| # | Attraction | Route | Bouton retour | @ts-nocheck | Problemes |
-|---|-----------|-------|---------------|-------------|-----------|
-| 28 | Village Bienveillant (Community) | `/app/community` | Oui | Non | OK - PageSEO present, moderation |
-| 29 | Cercle des Allies (Buddies) | `/app/buddies` | A verifier | Non | A verifier |
-| 30 | Cocon Social | `/app/social-cocon` | Oui | Non | OK - `usePageSEO` present |
+| # | Page | Route | Retour | SEO | Problemes |
+|---|------|-------|--------|-----|-----------|
+| 28 | Village Bienveillant (Communaute) | `/app/community` | Oui | Non | **1 couleur hardcodee** : `text-slate-700` L690 |
+| 29 | Cercle des Allies (Buddies) | `/app/buddies` | A verifier | Non | Page secondaire |
+| 30 | Cocon Social | `/app/social-cocon` | Oui | **Oui** | **Footer custom doublon** (L817-826) + **~20 classes `slate-*` hardcodees** (selects, labels, backgrounds) |
 | 31 | Arene des Champions (Gamification) | `/app/gamification` | Oui | Non | OK |
+| 32 | Agora du Partage (Group Sessions) | `/app/group-sessions` | A verifier | Non | Page secondaire |
 
 ### ZONE EXPLORE (3 pages)
 
-| # | Attraction | Route | Bouton retour | @ts-nocheck | Problemes |
-|---|-----------|-------|---------------|-------------|-----------|
-| 32 | Constellation (VR Galaxy) | `/app/vr-galaxy` | Oui | Non | OK (corrige precedemment) |
-| 33 | Atlas des Emotions | `/app/emotion-atlas` | A verifier | Non | A verifier |
-| 34 | Sentier des Decouvertes | `/app/discovery` | A verifier | Non | A verifier |
+| # | Page | Route | Retour | SEO | Problemes |
+|---|------|-------|--------|-----|-----------|
+| 33 | Constellation (VR Galaxy) | `/app/vr-galaxy` | **Oui** | Non | OK -- corrige |
+| 34 | Atlas des Emotions | `/app/emotion-atlas` | A verifier | Non | Page secondaire |
 
-### HORS ZONE (3 pages supplementaires)
+### HORS ZONE (pages supplementaires referencees)
 
-| # | Page | Route | Bouton retour | Problemes |
-|---|------|-------|---------------|-----------|
-| - | Portail Immersif (VR) | `/app/vr` | **NON** | Pas de bouton retour, pas de navigate |
-| - | Profil | `/app/profile` | Oui | OK |
-| - | Confidentialite | `/app/settings/privacy` | Oui | OK |
+| Page | Route | Retour | Problemes |
+|------|-------|--------|-----------|
+| Portail Immersif (VR) | `/app/vr` | **Oui** | OK -- corrige |
+| Coach Micro | `/app/coach-micro` | **NON** | Pas de bouton retour, pas d'ArrowLeft |
+| Data Privacy | `/app/settings/data-privacy` | Oui | **`@ts-nocheck`** + **couleurs `from-slate-900` hardcodees** |
+| Profil | `/app/profile` | Oui | OK |
+| Confidentialite | `/app/settings/privacy` | Oui | OK |
 
 ---
 
-## Problemes par priorite
+## Problemes restants par priorite
 
-### P1 -- 12 pages sans bouton retour
+### P1 -- Navigation manquante (4 pages)
 
-Les pages suivantes n'ont aucun moyen de revenir au parc ou au dashboard sans utiliser le bouton navigateur :
+| # | Page | Fichier | Probleme |
+|---|------|---------|----------|
+| 1 | Coach IA Micro | `B2CAICoachMicroPage.tsx` | Pas de bouton retour, pas d'ArrowLeft importe, pas de Link importe |
+| 2 | VR Breath Guide | `B2CVRBreathGuidePage.tsx` | Pas de bouton retour, pas d'ArrowLeft importe, pas de Link/useNavigate |
+| 3 | Notifications | `B2CNotificationsPage.tsx` | Pas de bouton retour, pas d'ArrowLeft importe |
+| 4 | Dashboard B2C | `B2CDashboardPage.tsx` | N/A retour (c'est le home) mais **footer custom doublon** a supprimer |
 
-1. **B2CNyveeCoconPage.tsx** (`/app/nyvee`) -- 411 lignes, utilise `window.location.href` au lieu de `navigate()`
-2. **B2CVoiceJournalPage.tsx** (`/app/voice-journal`) -- 841 lignes
-3. **B2CARFiltersPage.tsx** (`/app/face-ar`) -- 145 lignes
-4. **B2CMoodMixerPage.tsx** (`/app/mood-mixer`) -- 733 lignes
-5. **B2CBubbleBeatPage.tsx** (`/app/bubble-beat`) -- 648 lignes
-6. **B2CScreenSilkBreakPage.tsx** (`/app/screen-silk`) -- 924 lignes (ArrowLeft importe mais pas utilise)
-7. **B2CBossLevelGritPage.tsx** (`/app/boss-grit`) -- 445 lignes
-8. **B2CActivitePage.tsx** (`/app/activity`) -- 580 lignes
-9. **B2CImmersivePage.tsx** (`/app/vr`) -- 288 lignes
-10. **MeditationPage.tsx** -- retour vers `/app` (devrait etre `/app/home`)
+### P1 -- Footers custom doublons (3 pages)
 
-### P2 -- 3 fichiers avec `@ts-nocheck`
+| # | Fichier | Lignes | Detail |
+|---|---------|--------|--------|
+| 1 | `B2CDashboardPage.tsx` | 879-905 | Footer avec copyright "2025" et liens legaux |
+| 2 | `B2CSocialCoconPage.tsx` | 817-826 | Footer avec infos RLS/observabilite |
+| 3 | `ParkJourney.tsx` | Deja supprime | OK |
 
-1. **B2CBubbleBeatPage.tsx** -- ligne 1
-2. **B2CMoodMixerPage.tsx** -- ligne 1
-3. **B2CAICoachMicroPage.tsx** -- ligne 1
+### P2 -- Couleurs hardcodees `slate-*` (3 pages)
 
-### P2 -- 1 lien incorrect
+| # | Fichier | Nb occurrences | Detail |
+|---|---------|----------------|--------|
+| 1 | `B2CSocialCoconPage.tsx` | ~20 | `bg-slate-50`, `text-slate-900`, `text-slate-700`, `border-slate-200`, `bg-slate-100`, `text-slate-600`, `text-slate-800` |
+| 2 | `B2CCommunautePage.tsx` | 1 | `text-slate-700` L690 |
+| 3 | `B2CDataPrivacyPage.tsx` | 1 | `from-slate-900 via-blue-900 to-slate-900` L256 |
 
-1. **B2CNyveeCoconPage.tsx** ligne 367 : `window.location.href = '/app/meditation'` au lieu de `navigate('/app/meditation')` -- provoque un rechargement complet de la page
+### P2 -- `@ts-nocheck` restants (2 fichiers)
+
+| Fichier | Lignes |
+|---------|--------|
+| `B2CDataPrivacyPage.tsx` | Ligne 1 |
+| `login/ForgotPasswordDialog.tsx` | Ligne 1 |
+
+### P2 -- `usePageSEO` absent (27 pages)
+
+Seules 7/34 pages ont `usePageSEO` : Dashboard, Coach, Scan, MusicPremium, Music, SocialCocon, Journal. Les 27 autres pages manquent le hook SEO.
+
+### P2 -- Copyright "2025" (1 page restante)
+
+- `B2CDashboardPage.tsx` L883 : `© 2025 EmotionsCare`
+
+---
+
+## Bilan UX / Utilisateur
+
+### Points forts
+- **Navigation :** 82% des pages ont un bouton retour (vs 65% avant les corrections)
+- **Accessibilite :** Bonne couverture ARIA globale (8/10)
+- **Design coherent :** Tokens semantiques bien utilises dans la majorite des pages
+- **Feedback utilisateur :** Toast pour energie insuffisante dans le parc
+- **Zero console.log :** Code propre
+- **Zero window.location.href :** Navigation SPA partout
+
+### Points faibles restants
+- **4 pages sans retour** : l'utilisateur est piege (Coach Micro, VR Breath, Notifications)
+- **3 footers doublons** : incoherence visuelle avec le layout global
+- **SocialCocon a 20+ classes slate** : le theme sombre/clair ne fonctionnera pas correctement
+- **79% des pages sans SEO** : invisible aux moteurs de recherche
 
 ---
 
 ## Plan d'implementation
 
-### Etape 1 : Ajouter boutons retour (9 pages)
+### Etape 1 : Boutons retour manquants (3 fichiers)
 
-Pour chaque page, ajouter un bouton retour standardise au-dessus du titre principal. Le pattern est :
+**`B2CAICoachMicroPage.tsx`** : Ajouter `import { Link } from 'react-router-dom'` + `import { ArrowLeft } from 'lucide-react'` + bouton retour dans le header.
 
-```text
-<Link to="/app/home">
-  <Button variant="ghost" size="sm" aria-label="Retour a l'accueil">
-    <ArrowLeft /> Retour
-  </Button>
-</Link>
-```
+**`B2CVRBreathGuidePage.tsx`** : Ajouter `import { Link } from 'react-router-dom'` + `import { ArrowLeft } from 'lucide-react'` + bouton retour avant la section principale.
 
-**Fichiers a modifier :**
+**`B2CNotificationsPage.tsx`** : Ajouter `import { Link } from 'react-router-dom'` + `import { ArrowLeft } from 'lucide-react'` + bouton retour en haut de page.
 
-1. `src/pages/b2c/B2CNyveeCoconPage.tsx` -- ajouter bouton retour + remplacer `window.location.href` par `useNavigate`
-2. `src/pages/b2c/B2CVoiceJournalPage.tsx` -- ajouter bouton retour
-3. `src/pages/b2c/B2CARFiltersPage.tsx` -- ajouter bouton retour
-4. `src/pages/b2c/B2CMoodMixerPage.tsx` -- ajouter bouton retour
-5. `src/pages/b2c/B2CBubbleBeatPage.tsx` -- ajouter bouton retour
-6. `src/pages/b2c/B2CScreenSilkBreakPage.tsx` -- utiliser ArrowLeft deja importe, ajouter bouton retour
-7. `src/pages/b2c/B2CBossLevelGritPage.tsx` -- ajouter bouton retour
-8. `src/pages/b2c/B2CActivitePage.tsx` -- ajouter bouton retour
-9. `src/pages/b2c/B2CImmersivePage.tsx` -- ajouter bouton retour
+### Etape 2 : Supprimer footers doublons (2 fichiers)
 
-### Etape 2 : Corriger le lien Meditation (1 page)
+**`B2CDashboardPage.tsx`** : Supprimer lignes 879-905 (footer custom).
 
-- `src/pages/MeditationPage.tsx` ligne 388 : changer `navigate('/app')` en `navigate('/app/home')`
+**`B2CSocialCoconPage.tsx`** : Supprimer lignes 817-826 (footer custom).
 
-### Etape 3 : Corriger Nyvee navigation (1 page)
+### Etape 3 : Couleurs hardcodees (3 fichiers)
 
-- `src/pages/b2c/B2CNyveeCoconPage.tsx` ligne 367 : remplacer `window.location.href = '/app/meditation'` par `navigate('/app/meditation')` avec import de `useNavigate`
+**`B2CSocialCoconPage.tsx`** : Remplacer systematiquement :
+- `bg-slate-50` -> `bg-muted`
+- `text-slate-900` -> `text-foreground`
+- `text-slate-700` / `text-slate-600` -> `text-muted-foreground`
+- `text-slate-800` -> `text-foreground`
+- `border-slate-200` -> `border-border`
+- `bg-slate-100` -> `bg-muted`
 
-### Etape 4 : Retirer `@ts-nocheck` (3 fichiers)
+**`B2CCommunautePage.tsx`** L690 : `text-slate-700` -> `text-muted-foreground`
 
-- `src/pages/b2c/B2CBubbleBeatPage.tsx`
-- `src/pages/b2c/B2CMoodMixerPage.tsx`
-- `src/pages/b2c/B2CAICoachMicroPage.tsx`
+**`B2CDataPrivacyPage.tsx`** L256 : `from-slate-900 via-blue-900 to-slate-900` -> `from-background via-background to-muted/20`
 
-Note : la suppression de `@ts-nocheck` peut reveler des erreurs TypeScript. Les corrections seront adaptees au cas par cas (ajout de types, casts).
+### Etape 4 : Retirer `@ts-nocheck` (2 fichiers)
 
-### Fichiers a ne PAS toucher
+- `B2CDataPrivacyPage.tsx` ligne 1
+- `login/ForgotPasswordDialog.tsx` ligne 1
 
-Toutes les pages deja corrigees lors des audits precedents (Scan, Music, Breath, Coach, FlashGlow, VR Galaxy, Journal) ainsi que les pages exemplaires (Seuil, AmbitionArcade, BounceBack, Community, SocialCocon, Leaderboard, StorySynth).
+Note : des erreurs TypeScript peuvent apparaitre. Elles seront corrigees au cas par cas.
+
+### Etape 5 : Copyright (1 fichier)
+
+- `B2CDashboardPage.tsx` L883 : `© 2025` -> `© {new Date().getFullYear()}`
 
 ---
 
@@ -184,17 +219,14 @@ Toutes les pages deja corrigees lors des audits precedents (Scan, Music, Breath,
 
 | Fichier | Modification | Priorite |
 |---------|-------------|----------|
-| `B2CNyveeCoconPage.tsx` | Bouton retour + remplacer `window.location.href` par `navigate` | P1 |
-| `B2CVoiceJournalPage.tsx` | Bouton retour | P1 |
-| `B2CARFiltersPage.tsx` | Bouton retour | P1 |
-| `B2CMoodMixerPage.tsx` | Bouton retour + retirer `@ts-nocheck` | P1/P2 |
-| `B2CBubbleBeatPage.tsx` | Bouton retour + retirer `@ts-nocheck` | P1/P2 |
-| `B2CScreenSilkBreakPage.tsx` | Bouton retour (utiliser ArrowLeft deja importe) | P1 |
-| `B2CBossLevelGritPage.tsx` | Bouton retour | P1 |
-| `B2CActivitePage.tsx` | Bouton retour | P1 |
-| `B2CImmersivePage.tsx` | Bouton retour | P1 |
-| `MeditationPage.tsx` | Corriger retour `/app` -> `/app/home` | P2 |
-| `B2CAICoachMicroPage.tsx` | Retirer `@ts-nocheck` | P2 |
+| `B2CAICoachMicroPage.tsx` | Bouton retour `/app/home` | P1 |
+| `B2CVRBreathGuidePage.tsx` | Bouton retour `/app/home` | P1 |
+| `B2CNotificationsPage.tsx` | Bouton retour `/app/home` | P1 |
+| `B2CDashboardPage.tsx` | Supprimer footer doublon + copyright dynamique | P1 |
+| `B2CSocialCoconPage.tsx` | Supprimer footer doublon + ~20 tokens slate -> semantiques | P1/P2 |
+| `B2CCommunautePage.tsx` | 1 couleur slate -> semantique | P2 |
+| `B2CDataPrivacyPage.tsx` | Retirer `@ts-nocheck` + couleurs semantiques | P2 |
+| `login/ForgotPasswordDialog.tsx` | Retirer `@ts-nocheck` | P2 |
 
-Total : **11 fichiers a modifier**, aucun fichier a creer ou supprimer.
+Total : **8 fichiers a modifier**, aucun fichier a creer ou supprimer.
 
