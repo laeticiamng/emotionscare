@@ -103,7 +103,7 @@ export default function B2CBreathworkPage() {
                     <Share2 className="h-4 w-4" aria-hidden="true" />
                   </Button>
 
-                  <Link to="/settings">
+                  <Link to="/dashboard/settings">
                     <Button
                       variant="ghost"
                       size="icon"
@@ -250,27 +250,6 @@ export default function B2CBreathworkPage() {
             </motion.div>
           </main>
 
-          {/* Footer */}
-          <footer className="border-t mt-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-                <p>
-                  Les techniques de respiration présentées sont basées sur des études scientifiques.
-                </p>
-                <div className="flex gap-4">
-                  <Link to="/terms" className="hover:text-foreground">
-                    Conditions
-                  </Link>
-                  <Link to="/privacy" className="hover:text-foreground">
-                    Confidentialité
-                  </Link>
-                  <Link to="/help" className="hover:text-foreground">
-                    Aide
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </footer>
         </div>
       </>
     </ConsentGate>

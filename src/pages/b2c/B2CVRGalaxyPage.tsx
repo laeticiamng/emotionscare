@@ -319,7 +319,7 @@ export default function B2CVRGalaxyPage() {
 
   return (
     <ConsentGate>
-      <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900/30 to-slate-900 p-4 relative overflow-hidden">
+      <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-background via-info/10 to-background p-4 relative overflow-hidden">
       {/* Background Stars */}
       <div className="absolute inset-0 pointer-events-none">
         {backgroundStars.map((star) => (

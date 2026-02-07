@@ -243,6 +243,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: false,
   },
   {
+    name: 'b2b-module-wrapper',
+    path: '/b2b/module/:moduleId',
+    segment: 'public',
+    layout: 'simple',
+    component: 'B2BModuleWrapperPage',
+    guard: false,
+  },
+  {
     name: 'b2b-org-dashboard',
     path: '/b2b/admin/dashboard',
     segment: 'manager',

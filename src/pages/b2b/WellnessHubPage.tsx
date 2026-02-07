@@ -137,6 +137,17 @@ const wellnessModules: WellnessModule[] = [
     duration: '5-15 min',
     category: 'explore',
   },
+  {
+    id: 'assessments',
+    title: 'Évaluations Cliniques',
+    description: 'WHO-5 et PHQ-9 pour suivre votre bien-être',
+    icon: Activity,
+    color: 'text-rose-600',
+    bgColor: 'bg-rose-500/10',
+    path: '/b2b/module/assessments',
+    duration: '5-10 min',
+    category: 'scan',
+  },
 ];
 
 const quickSessions = [
