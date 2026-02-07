@@ -4,11 +4,12 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Mic, MicOff, FileText, History, BarChart3, Search, 
   Tag, Calendar, Play, Pause, Trash2, Archive, 
-  Sparkles, Clock, Volume2, X, Plus, Filter
+  Sparkles, Clock, Volume2, X, Plus, Filter, ArrowLeft
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -618,6 +619,12 @@ const B2CVoiceJournalPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4 md:p-6" data-testid="page-root">
       <div className="max-w-6xl mx-auto">
+        {/* Back button */}
+        <Link to="/app/home" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
+          <ArrowLeft className="h-4 w-4" />
+          Retour
+        </Link>
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

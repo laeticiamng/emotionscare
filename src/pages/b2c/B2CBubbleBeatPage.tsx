@@ -1,10 +1,10 @@
-// @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
-import { Heart, Play, Pause, Square, Waves, Zap, Target, Trophy, Music } from 'lucide-react';
+import { Heart, Play, Pause, Square, Waves, Zap, Target, Trophy, Music, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from '@/hooks/use-toast';
 import PageRoot from '@/components/common/PageRoot';
@@ -257,8 +257,10 @@ const B2CBubbleBeatPage: React.FC = () => {
       average_heart_rate: heartRate,
       target_heart_rate: targetHeartRate[0],
       difficulty: difficulty[0],
-      biometrics: biometricData
-    });
+      biometrics: biometricData,
+      bubbles_popped: currentScore / 50,
+      rhythm_accuracy: biometricData.coherenceLevel,
+    } as any);
 
     toast({
       title: "🎉 Session terminée !",
@@ -310,6 +312,12 @@ const B2CBubbleBeatPage: React.FC = () => {
     <PageRoot>
       <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
         <div className="container mx-auto px-4 py-8 space-y-6">
+
+      {/* Back button */}
+      <Link to="/app/home" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="h-4 w-4" />
+        Retour
+      </Link>
       
       <motion.div 
         initial={{ opacity: 0, y: 20 }}

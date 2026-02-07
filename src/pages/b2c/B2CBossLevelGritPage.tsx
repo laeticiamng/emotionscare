@@ -3,8 +3,9 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Crown, BarChart2, Sword, RefreshCw, Clock } from 'lucide-react';
+import { Crown, BarChart2, Sword, RefreshCw, Clock, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGritQuest } from '@/hooks/useGritQuest';
@@ -273,6 +274,12 @@ const B2CBossLevelGritPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-muted/20 p-6" data-testid="page-root">
       <div className="max-w-6xl mx-auto">
+        {/* Back button */}
+        <Link to="/app/home" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
+          <ArrowLeft className="h-4 w-4" />
+          Retour
+        </Link>
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

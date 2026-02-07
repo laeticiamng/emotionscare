@@ -19,6 +19,7 @@ import {
   Target, Sparkles, ArrowLeft, Volume2, VolumeX, X, Trophy,
   Calendar, BarChart3, Zap
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import PageRoot from '@/components/common/PageRoot';
 import { useAuth } from '@/contexts/AuthContext';
@@ -517,6 +518,12 @@ const B2CScreenSilkBreakPage: React.FC = () => {
     <PageRoot>
       <div className="min-h-screen bg-gradient-to-br from-background via-emerald-50/10 to-muted/20 p-4 md:p-6">
         <div className="max-w-6xl mx-auto space-y-6">
+
+          {/* Back button */}
+          <Link to="/app/home" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="h-4 w-4" />
+            Retour
+          </Link>
           
           {/* Active Session Overlay */}
           <AnimatePresence>

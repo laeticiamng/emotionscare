@@ -1,5 +1,5 @@
-// @ts-nocheck
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,10 +16,10 @@ import { useMoodMixerEnriched, type MoodComponent, type MoodPreset } from '@/mod
 import { 
   Palette, Heart, Zap, Smile, CloudRain, Sun, Moon, Sparkles, 
   Play, Pause, RotateCcw, Save, Star, Clock, TrendingUp, 
-  History, BarChart3, ThumbsUp, ThumbsDown, Minus, Award
+  History, BarChart3, ThumbsUp, ThumbsDown, Minus, Award, ArrowLeft
 } from 'lucide-react';
 
-const ICON_MAP: Record<string, React.ElementType> = {
+const ICON_MAP: Record<string, React.FC<{ className?: string }>> = {
   Zap, CloudRain, Sun, Sparkles, Heart, Moon
 };
 
@@ -85,6 +85,12 @@ const B2CMoodMixerPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/10 to-muted/20 p-4 md:p-6" data-testid="page-root">
       <div className="max-w-7xl mx-auto">
+        {/* Back button */}
+        <Link to="/app/home" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
+          <ArrowLeft className="h-4 w-4" />
+          Retour
+        </Link>
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -194,7 +200,7 @@ const B2CMoodMixerPage: React.FC = () => {
                     {/* Curseurs de composants */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {moodComponents.map((component, index) => {
-                        const Icon = ICON_MAP[component.icon] || Sparkles;
+                        const IconComp = ICON_MAP[component.icon] || Sparkles;
                         return (
                           <motion.div
                             key={component.id}
@@ -205,7 +211,7 @@ const B2CMoodMixerPage: React.FC = () => {
                           >
                             <div className="flex items-center gap-2">
                               <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${component.color}`} />
-                              <Icon className="w-4 h-4" />
+                              <IconComp className="w-4 h-4" />
                               <span className="font-medium">{component.name}</span>
                               <Badge variant="outline" className="ml-auto">
                                 {component.value}%

@@ -1,6 +1,7 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Camera, Sparkles, Image, History, BarChart3 } from 'lucide-react';
+import { Camera, Sparkles, Image, History, BarChart3, ArrowLeft } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useARFilters } from '@/modules/ar-filters/hooks/useARFilters';
@@ -42,6 +43,12 @@ const B2CARFiltersPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4 md:p-6" data-testid="page-root">
       <div className="max-w-7xl mx-auto">
+        {/* Back button */}
+        <Link to="/app/home" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
+          <ArrowLeft className="h-4 w-4" />
+          Retour
+        </Link>
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
