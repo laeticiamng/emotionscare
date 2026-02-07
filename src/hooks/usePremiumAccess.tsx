@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
+import { Sparkles } from 'lucide-react';
 
 interface SubscriptionStatus {
   subscribed: boolean;
@@ -118,14 +119,15 @@ export const PremiumGate: React.FC<PremiumGateProps> = ({
 
   if (!hasAccess(feature)) {
     return fallback || (
-      <div className="text-center p-8 bg-muted/50 rounded-lg border-2 border-dashed">
+      <div className="text-center p-8 bg-muted/50 rounded-2xl border-2 border-dashed border-border">
+        <Sparkles className="h-8 w-8 text-primary mx-auto mb-3" />
         <h3 className="text-lg font-semibold mb-2">Fonctionnalité Premium</h3>
         <p className="text-muted-foreground mb-4">
-          Cette fonctionnalité nécessite un abonnement actif.
+          Cette fonctionnalité nécessite un abonnement Pro actif.
         </p>
-        <button className="btn btn-primary">
-          Découvrir Premium
-        </button>
+        <a href="/pricing" className="inline-flex items-center justify-center rounded-full bg-foreground text-background px-6 py-3 text-sm font-semibold hover:bg-foreground/90 transition-colors">
+          Découvrir les plans
+        </a>
       </div>
     );
   }
