@@ -1,148 +1,178 @@
 
 
-# Audit Beta Testeur -- EmotionsCare Homepage
+# Audit complet du parcours B2B EmotionsCare
+
+## 1) Test "3 secondes" - Page d'entree /b2b
+
+- **Je crois que c'est :** Une solution de bien-etre pour equipes soignantes en entreprise
+- **Public cible :** DRH / responsables QVT en etablissements de sante
+- **Clarté immediate : 8/10** -- la page /b2b refaite recemment est bien positionnee
+- **Confusion possible :** La coexistence de DEUX parcours paralleles (landing /b2b + selection /b2b/selection + acces institutionnel /b2b/access + institutionnel /b2b/institutional) cree une architecture confuse
 
 ---
 
-## 1) Test "3 secondes"
+## 2) Parcours utilisateur - Audit par etape
 
-- **En 3 secondes, je crois que cette plateforme sert a :** Une appli de bien-etre/meditation pour des soignants. Le mot "emotionnel" + l'animation de respiration donnent une impression de Calm/Headspace version sante.
-- **Public cible imagine :** Des professionnels de sante (infirmiers, medecins). C'est clair grace au badge "Pour ceux qui prennent soin des autres".
-- **2 confusions possibles :**
-  1. "Revolutionnez votre bien-etre emotionnel" -- on peut croire a une appli grand public de meditation type Calm
-  2. Le mot "Revolutionnez" est tres startup/tech, pas tres rassurant pour un soignant fatigue qui cherche du concret
-- **Note clarte immediate : 7/10** -- Le positionnement soignant est present mais le hero titre est generique. On comprend "bien-etre" mais pas "quoi concretement" en 3 secondes.
+### Parcours A : Decouverte B2B (DRH)
 
----
+| Etape | Ce qui se passe | Probleme |
+|---|---|---|
+| /b2b (landing) | Page Apple-style, bien faite | OK |
+| CTA "Nous contacter" | Redirige vers `/signup?segment=b2b` | **Incohérent** : le texte dit "Nous contacter" mais mene a l'inscription. Pas de page contact B2B |
+| Scroll bas → "Entrer le code" | Mene a `/b2b/access` | OK, fonctionnel |
+| /b2b/selection | Page de selection Collab/Admin | **Design incoherent** : style shadcn basique ≠ landing Apple-style |
+| Selection Collaborateur | Mene a `/login?segment=b2b&role=user` → redirige vers `/login` | OK |
+| Selection Admin | Mene a `/login?segment=b2b&role=admin` → redirige vers `/login` | Les params `segment` et `role` sont **perdus** lors du redirect |
 
-## 2) Parcours utilisateur
+### Parcours B : Collaborateur avec code d'acces
 
-| Etape | Ce que j'ai essaye | Ce qui s'est passe | Ressenti | Bloquant | Attendu |
-|---|---|---|---|---|---|
-| **Decouverte** | J'arrive, je lis le titre | "Revolutionnez votre bien-etre emotionnel" -- OK mais vague | Interesse mais pas convaincu | Le mot "Revolutionnez" ne dit pas CE QUE ca fait | "Gerez votre stress en 3 min" serait plus concret |
-| **Premier clic** | Je clique "Commencer gratuitement" | Redirige vers /signup -- OK, page d'inscription fonctionnelle | Fluide | Rien de bloquant | OK |
-| **Comprehension** | Je scrolle pour comprendre | Les sections features sont claires : "3 minutes", "Base sur la science" | Le scrolling est agreable, contenu bien dose | RAS | OK |
-| **Section Showcase** | Je vois la section noire "Respirez" | Animation de respiration sympathique mais le bouton Play ne fait rien de visible | Decu -- je clique Play et rien ne se passe | **Bouton Play non fonctionnel** | Que ca lance une vraie demo ou une video |
-| **Stats** | Je lis les chiffres | "4 protocoles", "3 min", "100%", "24/7" | Honnete et credible (pas de faux chiffres) | RAS | OK |
-| **CTA final** | "Pret a prendre soin de vous ?" | Bouton "Commencer maintenant" fonctionne | Correct | RAS | OK |
-| **Navigation retour** | Je clique les liens navbar | Fonctionnalites, Tarifs, Entreprise, A propos -- tous fonctionnent | Fluide | RAS | OK |
+| Etape | Ce qui se passe | Probleme |
+|---|---|---|
+| /b2b/access | Page code d'acces, bien faite | OK |
+| Validation code | Requete Supabase `org_access_codes` | OK |
+| Charte ethique | Affichee, checkbox + acceptation | OK |
+| CTA "Commencer" | Redirige vers `/b2b/wellness` | **Page vide / login required** sans feedback clair |
 
----
+### Parcours C : Dashboard Admin RH (authentifie)
 
-## 3) Audit Confiance
+| Etape | Ce qui se passe | Probleme |
+|---|---|---|
+| /b2b/admin/dashboard | Route alias de /app/rh | Requiert auth, OK |
+| /b2b/dashboard | **Route inexistante dans le registry !** | **404 potentiel** |
+| /b2b/teams | Page equipes B2B | Requiert auth, pas de guard visible |
+| /b2b/reports | Heatmap RH | OK |
+| /b2b/events | Page evenements | OK |
+| /b2b/analytics | Page analytics | OK |
+| /b2b/social-cocon | Cocon Social | **Design autonome** avec son propre header/footer ≠ layout commun |
 
-- **Liens morts / 404 :** Aucun detecte sur les pages principales (features, pricing, about, legal, signup, login)
-- **Boutons qui ne font rien :** Le bouton **Play/Pause** de la section Showcase ne declenche aucune action visible (il toggle un state mais rien ne change visuellement)
-- **Textes coupes / chevauchements :** Aucun detecte desktop. Mobile OK aussi.
-- **Lenteurs :** Aucune lenteur perceptible (lazy loading bien implemente)
-- **Erreurs visibles :** 0 erreur console
-- **Design "pas pro" :** Non -- le design est premium, style Apple, tres propre
-- **Preuves de credibilite :** Footer avec badges RGPD/WCAG, email de contact, mentions legales completes. Manque : une page equipe, des partenariats visibles, un logo d'universite ou hopital partenaire.
-- **Reseaux sociaux :** Les icones Twitter/LinkedIn/Instagram/YouTube pointent vers **"#"** -- pas de vrais liens. C'est un red flag confiance.
+### Parcours D : Routes "fantomes"
 
-**Note confiance : 7.5/10** -- Design premium et legal OK, mais les reseaux sociaux factices et le bouton Play cassent la credibilite.
-
----
-
-## 4) Audit Comprehension & Guidance
-
-- **Premier clic evident ?** **OUI** -- Le bouton "Commencer gratuitement" est bien visible et contraste.
-- **Je sais quoi faire apres ?** **OUI** -- Le flow hero -> features -> showcase -> stats -> CTA est logique.
-- **Ou je me sens perdu(e) :**
-  - La section Showcase : le bouton Play ne fait rien, je ne sais pas a quoi sert cette section
-  - "Comment ca marche" (bouton secondaire hero) redirige vers /features -- c'est une page, pas une explication rapide inline
-- **Phrases floues/inutiles :**
-  - "Revolutionnez" -- trop marketing, pas concret
-  - "Des protocoles concus pour vous absorber totalement" -- bizarre, "absorber" fait peur
-  - "Quand le monde exterieur s'efface, la paix interieure emerge" -- joli mais ne dit rien de concret
+| Route | Statut |
+|---|---|
+| `/b2b/institutional` | Page landing institutionnelle **redondante** avec /b2b |
+| `/b2b/selection` | Page selection **pas liee** depuis /b2b (pas de lien visible) |
+| `/b2b/user/login` | Redirect vers /login (OK mais pourquoi cette route existe ?) |
+| `/b2b/admin/login` | Idem |
+| `/b2b/user/dashboard` | Alias de /app/collab |
+| `/b2b/security` | Non verifiee |
+| `/b2b/audit` | Non verifiee |
 
 ---
 
-## 5) Audit Visuel Non Technique
+## 3) Audit confiance : 6/10
 
-- **Ce qui fait premium :** Typographie massive, animations de scroll fluides, gradient subtils, spacing genereux, dark section showcase, badges de confiance
-- **Ce qui fait cheap :** Le bouton Play qui ne fait rien, les icones reseaux sociaux sans liens reels
-- **Ce qui est trop charge :** RAS -- la page est bien equilibree
-- **Ce qui manque :** Un screenshot ou mockup reel de l'app (la section Showcase montre une animation de respiration mais pas l'interface reelle), une video de demo
-- **Lisibilite mobile :** OK -- hierarchie typographique correcte, boutons accessibles, menu hamburger fonctionnel
+| Probleme | Gravite |
+|---|---|
+| CTA "Nous contacter" → /signup (mensonger) | **Bloquant** |
+| Routes paralleles/redondantes creent de la confusion | Majeur |
+| /b2b/selection non liee depuis /b2b | Majeur |
+| /b2b/social-cocon a son propre layout different | Moyen |
+| /b2b/wellness potentiellement vide apres acces code | Majeur |
+| Pas de page contact B2B dediee | Majeur |
 
 ---
 
-## 6) Liste des Problemes
+## 4) Audit comprehension & guidance
 
-| Probleme | Ou | Gravite | Impact utilisateur | Suggestion |
+- **Premier CTA clair ?** Oui sur /b2b, mais il ment ("Nous contacter" = inscription)
+- **Je sais quoi faire apres ?** Non -- trop de chemins possibles et aucun flowchart clair
+- **Ou je me perds :** La relation entre /b2b, /b2b/selection, /b2b/access, /b2b/institutional n'est pas claire
+- **Copies floues :** Aucune sur /b2b (bien refaite), mais /b2b/selection garde du jargon ancien
+
+---
+
+## 5) Audit visuel
+
+- **Premium :** /b2b landing (Apple-style), /b2b/access (clean)
+- **Cheap :** /b2b/selection (shadcn basique, deconnecte visuellement)
+- **Incoherent :** /b2b/social-cocon (propre header/footer, copyright "2025")
+- **Mobile :** /b2b OK, texte lisible
+
+---
+
+## 6) Tableau des problemes
+
+| Probleme | Ou | Gravite | Impact | Suggestion |
 |---|---|---|---|---|
-| Bouton Play/Pause ne fait rien | Showcase section | **Majeur** | L'utilisateur clique, rien ne se passe -- perte de confiance | Soit retirer le bouton, soit ajouter une video/demo |
-| Reseaux sociaux pointent vers "#" | Footer | **Majeur** | L'utilisateur voit des faux liens -- perte de confiance | Retirer les icones ou mettre "bientot disponible" visible |
-| "Revolutionnez" trop generique | Hero H1 | **Moyen** | Ne communique pas la valeur en 3 secondes | Remplacer par action concrete ("Gerez votre stress en 3 min") |
-| "Absorber totalement" est confus | Showcase section | **Moyen** | Le wording fait peur au lieu de rassurer | Reformuler : "Des exercices courts qui recentrent immediatement" |
-| Bouton "Comment ca marche" navigue vers /features | Hero | **Moyen** | L'utilisateur s'attend a une explication rapide, pas une page entiere | Envisager un scroll vers la section features de la homepage |
+| CTA "Nous contacter" mene a /signup | /b2b hero + CTA final | **Bloquant** | Perte de confiance | Lier a /contact ou formulaire B2B dedie |
+| /b2b/selection non accessible depuis /b2b | Navigation | Majeur | Page orpheline | Ajouter un lien "Deja inscrit ?" sur /b2b |
+| /b2b/selection design incoherent | /b2b/selection | Majeur | Cassure visuelle | Refondre style Apple |
+| /b2b/institutional redondant avec /b2b | Architecture | Majeur | Confusion | Supprimer ou fusionner |
+| /b2b/social-cocon layout autonome | /b2b/social-cocon | Moyen | Incoherence | Utiliser le layout B2B commun |
+| /b2b/social-cocon copyright "2025" | Footer | Moyen | Date perimee | Corriger a 2026 |
+| Params segment/role perdus dans redirect login | /b2b/selection | Moyen | Pas de pre-fill | Propager les query params |
+| /b2b/wellness peut etre vide sans auth | Post-code acces | Majeur | Frustration | Verifier le guard |
 
 ---
 
-## 7) Top 15 Ameliorations
+## 7) Top 15 ameliorations
 
-### P0 -- Bloquants avant publication
+### P0 - Bloquants avant publication
 
-1. **Retirer ou rendre fonctionnel le bouton Play** de la section Showcase -- un bouton cassee est inacceptable
-2. **Corriger les icones reseaux sociaux** dans le footer -- soit retirer, soit afficher clairement "Bientot" avec tooltip (deja en `cursor-default` et `aria-label` "bientot disponible" mais visuellement pas clair)
-3. **Reformuler le hero H1** -- remplacer "Revolutionnez votre bien-etre emotionnel" par quelque chose de concret et d'immediat
-4. **Reformuler le texte Showcase** -- remplacer "absorber totalement" et "la paix interieure emerge" par du concret soignant
-5. **Faire pointer "Comment ca marche"** vers un smooth scroll vers la section features sur la meme page
+1. **Fixer le CTA "Nous contacter"** : rediriger vers `/contact` au lieu de `/signup?segment=b2b`, ou creer un formulaire B2B dedie
+2. **Lier /b2b/selection depuis /b2b** : ajouter un lien "Vous avez deja un compte ? Connectez-vous" sur la landing B2B
+3. **Verifier /b2b/wellness** : s'assurer que la page apres validation du code d'acces fonctionne correctement sans authentification
+4. **Supprimer ou fusionner /b2b/institutional** : c'est une landing redondante avec /b2b, source de confusion
+5. **Refondre /b2b/selection** : passer au style Apple avec scroll-reveal, glassmorphism, typographie massive
 
-### P1 -- Ameliore fortement la conversion
+### P1 - Ameliore fortement la conversion
 
-6. Ajouter un sous-titre concret sous le H1 qui dit exactement ce que la plateforme FAIT (ex: "Exercices de 3 min contre le stress. Sans rdv. Sans jugement.")
-7. Ajouter un vrai screenshot/mockup de l'interface dans la section Showcase plutot qu'une animation abstraite
-8. Ajouter une section "A qui c'est destine" avec des personas (etudiant en medecine, infirmiere, aide-soignant)
-9. Rendre les badges de confiance hero ("Approche scientifique", "Donnees protegees", "Made in France") plus visibles avec des icones
-10. Ajouter un indicateur de gratuite plus fort (ex: "Gratuit, sans carte bancaire" pres du CTA principal)
+6. **Propager les query params** dans les redirects login B2B pour pre-remplir le segment
+7. **Unifier le layout** de /b2b/social-cocon (retirer header/footer custom, utiliser B2BAdminLayout)
+8. **Corriger le copyright** "2025" → "2026" dans /b2b/social-cocon footer
+9. **Ajouter un vrai formulaire de contact B2B** (nom societe, nombre de salaries, email) au lieu de rediriger vers /signup
+10. **Ajouter un breadcrumb** sur les pages internes B2B (/teams, /events, /reports) pour faciliter la navigation retour
 
-### P2 -- Polish premium
+### P2 - Polish premium
 
-11. Ajouter un favicon et un OG image reels (actuellement /og-image.svg et /twitter-card.svg -- verifier qu'ils existent)
-12. Ajouter une micro-animation hover sur les cartes features pour renforcer l'interactivite
-13. Ajouter un temoignage ou citation anonyme d'un soignant beta-testeur (si disponible et verifiable)
-14. Ajouter un lien "Accessibilite" dans le footer pour montrer l'engagement WCAG
-15. Optimiser le titre SEO : remplacer le titre generique par "EmotionsCare - Gestion du stress pour soignants en 3 minutes"
-
----
-
-## 8) Verdict Final
-
-- **Publiable aujourd'hui ?** **OUI, avec reserves** -- Le design est premium, la navigation fonctionne, le legal est en place. Mais 2 corrections sont urgentes avant d'envoyer du trafic reel.
-
-- **Les 2 problemes les plus bloquants :**
-  1. Le bouton Play qui ne fait rien (impression de site pas fini)
-  2. Le wording hero trop generique (l'utilisateur ne comprend pas en 3 secondes ce que fait concretement la plateforme)
-
-- **La phrase HERO parfaite :**
-  > **Gerez votre stress en 3 minutes. Concretement.**
-
-- **Le CTA ideal :**
-  > **Essayer gratuitement**
+11. **Ajouter une page /b2b/demo** avec video ou walkthrough interactif du dashboard RH
+12. **Nettoyer les routes fantomes** : supprimer /b2b/user/login, /b2b/admin/login (simples redirects inutiles)
+13. **Ajouter des transitions page-a-page** dans le parcours B2B (AnimatePresence)
+14. **Harmoniser les textes vides** (empty states) sur teams/events/reports avec un ton humain
+15. **Ajouter un badge "Nouveau"** sur les fonctionnalites cles du dashboard B2B
 
 ---
 
-## Plan de Corrections a Implementer
+## 8) Verdict final
 
-### Fichiers concernes et modifications :
+- **Publiable aujourd'hui ?** **NON**
+- **5 raisons bloquantes :**
+  1. CTA "Nous contacter" ment (mene a /signup)
+  2. /b2b/selection orpheline et visuellement incoherente
+  3. /b2b/institutional redondant et confus
+  4. Parcours post-code d'acces (/b2b/wellness) potentiellement casse
+  5. Pas de formulaire de contact B2B dedie pour les prospects DRH
 
-**1. `src/components/home/AppleHeroSection.tsx`**
-- Changer le H1 de "Revolutionnez votre bien-etre emotionnel." a **"Gerez votre stress en 3 minutes. Concretement."**
-- Changer le bouton "Comment ca marche" pour qu'il scroll vers la section features (ancre `#features`) au lieu de naviguer vers `/features`
+- **HERO parfait :** "Prenez soin de vos equipes soignantes." (deja en place, OK)
+- **CTA ideal :** "Echanger avec notre equipe" (au lieu de "Nous contacter" qui mene a /signup)
 
-**2. `src/components/home/AppleShowcaseSection.tsx`**
-- Retirer le bouton Play/Pause qui ne fait rien
-- Reformuler le texte : "Des protocoles concus pour vous absorber totalement" -> "Des exercices courts qui vous recentrent immediatement"
-- Reformuler : "Quand le monde exterieur s'efface, la paix interieure emerge" -> "Coupez le mental. Retrouvez le calme en quelques respirations."
+---
 
-**3. `src/components/home/Footer.tsx`**
-- Ajouter une indication visuelle "Bientot" sur les icones reseaux sociaux (actuellement en `cursor-default` mais pas clair visuellement -- ajouter une opacite reduite et un tooltip visible)
+## Plan d'implementation technique
 
-**4. `src/components/home/AppleFeatureSection.tsx`**
-- Ajouter un `id="features"` sur la section pour permettre le smooth scroll depuis le hero
+### Fichiers a modifier
 
-**5. `src/components/home/AppleCTASection.tsx`**
-- Reformuler le CTA button de "Commencer maintenant" a **"Essayer gratuitement"**
+1. **`src/pages/b2b/B2BEntreprisePage.tsx`**
+   - Remplacer les 2 CTA "Nous contacter" (`Link to="/signup?segment=b2b"`) par `Link to="/contact"` 
+   - Ajouter un lien "Deja inscrit ? Se connecter" vers `/b2b/selection` en bas de la section hero
+   - Ajouter une section "Demander un echange" avec formulaire inline (nom, email, etablissement)
+
+2. **`src/pages/b2b/B2BSelectionPage.tsx`**
+   - Refonte complete en style Apple : retirer le header custom, utiliser framer-motion scroll-reveal, typographie massive, glassmorphism cards
+   - Conserver la logique de navigation vers `/login?segment=b2b&role=user|admin`
+
+3. **`src/pages/b2b/B2BSocialCoconPage.tsx`**
+   - Retirer le header et footer custom embarques
+   - Corriger copyright "2025" → utiliser `new Date().getFullYear()`
+
+4. **`src/routerV2/registry.ts`**
+   - Supprimer ou rediriger `/b2b/institutional` vers `/b2b`
+   - Verifier que `/b2b/wellness` est bien accessible apres validation du code
+
+5. **`src/pages/b2b/user/LoginPage.tsx` et `admin/LoginPage.tsx`**
+   - Propager les query params (`segment`, `role`) dans le redirect vers `/login`
+
+### Fichiers a ne PAS toucher
+- `/b2b/access` (InstitutionalAccessPage) : bien concu, fonctionnel
+- `/b2b/reports`, `/b2b/teams`, `/b2b/events` : pages internes OK derriere auth
 
