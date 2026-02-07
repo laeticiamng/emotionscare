@@ -876,33 +876,6 @@ export default function B2CDashboardPage() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer role="contentinfo" className="bg-card border-t mt-12">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-            <p>© 2025 EmotionsCare - Votre bien-être, notre priorité</p>
-            <nav aria-label="Liens footer">
-              <div className="flex flex-wrap justify-center gap-4">
-                <Link to="/settings/privacy" className="hover:text-foreground">
-                  Confidentialité
-                </Link>
-                <Link to="/legal/privacy" className="hover:text-foreground">
-                  Politique vie privée
-                </Link>
-                <Link to="/legal/terms" className="hover:text-foreground">
-                  Conditions
-                </Link>
-                <Link to="/accessibility" className="hover:text-foreground">
-                  Accessibilité
-                </Link>
-                <Link to="/contact" className="hover:text-foreground">
-                  Support
-                </Link>
-              </div>
-            </nav>
-          </div>
-        </div>
-      </footer>
     </div>
     </>
   );

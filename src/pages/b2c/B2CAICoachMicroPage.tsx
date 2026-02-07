@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Send, Mic, Zap, Target, Clock, TrendingUp, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Send, Mic, Zap, Target, Clock, TrendingUp, Sparkles, ArrowLeft } from 'lucide-react';
 import PageRoot from '@/components/common/PageRoot';
 import { logger } from '@/lib/logger';
 
@@ -52,6 +53,12 @@ const B2CAICoachMicroPage: React.FC = () => {
     <PageRoot>
       <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
         <div className="container mx-auto px-4 py-8">
+          <div className="mb-4">
+            <Link to="/app/home" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Retour à l'accueil">
+              <ArrowLeft className="h-4 w-4" />
+              Retour
+            </Link>
+          </div>
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Zap className="h-8 w-8 text-warning" />
