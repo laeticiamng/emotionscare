@@ -4,8 +4,9 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, RotateCcw, Eye, EyeOff, Settings } from 'lucide-react';
+import { Play, Pause, RotateCcw, Eye, EyeOff, Settings, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -181,6 +182,13 @@ export default function B2CVRBreathGuidePage() {
 
       <div className="min-h-screen bg-gradient-to-br from-background via-blue/5 to-background p-4" data-testid="page-root">
         <main id="main-content" role="main" className="max-w-md mx-auto pt-8">
+          {/* Back button */}
+          <div className="mb-4">
+            <Link to="/app/home" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Retour à l'accueil">
+              <ArrowLeft className="h-4 w-4" />
+              Retour
+            </Link>
+          </div>
           {/* Header */}
           <motion.header
             initial={{ opacity: 0, y: -20 }}

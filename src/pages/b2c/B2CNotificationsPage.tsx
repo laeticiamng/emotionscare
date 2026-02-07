@@ -8,8 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 
   Bell, Settings, Clock, Mail, Smartphone, Volume2, 
-  Trash2, Check, Pin, Filter, RefreshCw, BellOff
+  Trash2, Check, Pin, Filter, RefreshCw, BellOff, ArrowLeft
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import { useNotifications } from '@/modules/notifications';
 import { formatDistanceToNow } from 'date-fns';
@@ -97,6 +98,13 @@ const B2CNotificationsPage: React.FC = () => {
     <div data-testid="page-root" className="space-y-6">
       <Breadcrumbs />
       
+      <div className="mb-2">
+        <Link to="/app/home" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Retour à l'accueil">
+          <ArrowLeft className="h-4 w-4" />
+          Retour
+        </Link>
+      </div>
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Bell className="h-8 w-8 text-primary" />

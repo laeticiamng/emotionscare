@@ -687,7 +687,7 @@ const B2CCommunautePage: React.FC = () => {
                         </Badge>
                         <span className="text-xs text-muted-foreground">{post.timestamp}</span>
                       </div>
-                      <p className="mt-2 text-sm leading-relaxed text-slate-700">{post.content}</p>
+                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{post.content}</p>
                       {post.autoFlagged && (
                         <p className="mt-2 text-xs text-amber-600">Notre équipe a reçu un signal discret pour accompagner ce message.</p>
                       )}
