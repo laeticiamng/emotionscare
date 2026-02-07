@@ -5,11 +5,12 @@
  */
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
 import { captureException } from '@/lib/ai-monitoring';
 import { logger } from '@/lib/logger';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, Play, Pause, RotateCcw, Sparkles } from 'lucide-react';
+import { Star, Play, Pause, RotateCcw, Sparkles, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -83,6 +84,7 @@ const describeGalaxyOutcome = (durationSeconds: number, breaths: number) => {
 };
 
 export default function B2CVRGalaxyPage() {
+  const navigate = useNavigate();
   const particleMode = useVRSafetyStore((state) => state.particleMode);
   const fallbackEnabled = useVRSafetyStore((state) => state.fallbackEnabled);
   const prefersReducedMotion = useVRSafetyStore((state) => state.prefersReducedMotion);
@@ -365,6 +367,18 @@ export default function B2CVRGalaxyPage() {
           animate={allowMotion ? { opacity: 1, y: 0 } : { opacity: 1 }}
           className="mb-8 text-center"
         >
+          {/* Back button */}
+          <div className="flex justify-start mb-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/app/home')}
+              aria-label="Retour à l'accueil"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour
+            </Button>
+          </div>
           <div className="flex flex-col items-center gap-3 text-foreground">
             <div className="flex items-center gap-2">
               <Star className="h-6 w-6" />
@@ -433,7 +447,7 @@ export default function B2CVRGalaxyPage() {
               className="space-y-6"
             >
               {/* Galaxy Dome */}
-              <div className="relative h-80 bg-gradient-to-b from-slate-800/30 to-slate-900/50 rounded-3xl border border-slate-600/30 overflow-hidden">
+              <div className="relative h-80 bg-gradient-to-b from-muted/30 to-muted/50 rounded-3xl border border-border/30 overflow-hidden">
                 {/* Constellations */}
                 {constellations.map((constellation) => (
                   <div key={constellation.id} className="absolute inset-0">
@@ -650,7 +664,7 @@ export default function B2CVRGalaxyPage() {
                   {allowExtensionCTA && (
                     <Button
                       variant="outline"
-                      className="w-full border-slate-600 text-slate-300"
+                      className="w-full border-border text-muted-foreground"
                       onClick={() => handleStart('extension')}
                     >
                       Encore 1 min

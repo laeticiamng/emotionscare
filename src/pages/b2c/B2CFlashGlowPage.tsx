@@ -119,76 +119,15 @@ export default function B2CFlashGlowPage() {
         </a>
 
         <div className="min-h-screen bg-gradient-to-br from-background via-secondary/5 to-background" data-testid="page-root">
-          {/* Header */}
-          <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm border-b">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex items-center justify-between h-16">
-                <div className="flex items-center gap-4">
-                  <Link to="/dashboard">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      aria-label="Retour au tableau de bord"
-                    >
-                      <ArrowLeft className="h-4 w-4 mr-2" aria-hidden="true" />
-                      Retour
-                    </Button>
-                  </Link>
-
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h1 className="text-xl font-semibold text-foreground">
-                        Flash Glow
-                      </h1>
-                      <Badge variant="secondary" className="hidden sm:inline-flex">
-                        ✨ Pro
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground hidden sm:block">
-                      Respiration gamifiée en 2 minutes
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {user && (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-full">
-                            <Trophy className="h-4 w-4 text-yellow-500" aria-hidden="true" />
-                            <span className="font-bold text-sm">{stats.totalScore}</span>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Score total accumulé</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
-
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleShare}
-                    aria-label="Partager votre progression"
-                  >
-                    <Share2 className="h-4 w-4" aria-hidden="true" />
-                  </Button>
-
-                  <Link to="/dashboard/settings">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Paramètres"
-                    >
-                      <Settings className="h-4 w-4" aria-hidden="true" />
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </header>
+          {/* Simple back button */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+            <Link to="/app/home">
+              <Button variant="ghost" size="sm" aria-label="Retour à l'accueil">
+                <ArrowLeft className="h-4 w-4 mr-2" aria-hidden="true" />
+                Retour
+              </Button>
+            </Link>
+          </div>
 
           {/* Main Content */}
           <main id="main-content" role="main" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

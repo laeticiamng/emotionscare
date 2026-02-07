@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * B2BCoachPage - Coach IA d'équipe pour managers
  * Interface conversationnelle avec suggestions et métriques
@@ -350,11 +349,19 @@ const B2BCoachPage: React.FC = () => {
     [selectedFocusId]
   );
 
+  const selectedMember = useMemo(
+    () => teamMembers.find((m) => m.id === selectedMemberId) ?? teamMembers[0],
+    [selectedMemberId]
+  );
+
+  const getTargetLabel = () =>
+    selectedMemberId === 'team' ? "l'équipe produit" : selectedMember.name;
+
   // SEO & Accessibility
   usePageSEO({
     title: 'Coach IA d\'équipe - EmotionsCare B2B',
     description: 'Interface de coaching IA pour managers. Accompagnez vos équipes avec des recommandations personnalisées basées sur les données émotionnelles.',
-    keywords: ['coach IA', 'manager', 'équipe', 'bien-être', 'B2B', 'EmotionsCare'],
+    keywords: 'coach IA, manager, équipe, bien-être, B2B, EmotionsCare',
   });
 
   const { runAudit } = useAccessibilityAudit();
@@ -366,7 +373,43 @@ const B2BCoachPage: React.FC = () => {
     }
   }, [runAudit]);
 
-  // Mise à jour des pulseMetrics avec données réelles si disponibles
+  useEffect(() => {
+    setMessages(buildConversation(selectedFocus));
+  }, [selectedFocus]);
+
+  const handleSendMessage = (prompt?: string) => {
+    const content = prompt || managerMessage.trim();
+    if (!content) return;
+
+    const newMessage: ConversationMessage = {
+      author: 'manager',
+      content,
+      timestamp: new Date().toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    };
+
+    setMessages((prev) => [...prev, newMessage]);
+    setManagerMessage('');
+
+    // Simulate coach response
+    setTimeout(() => {
+      const coachResponse: ConversationMessage = {
+        author: 'coach',
+        content: selectedFocus.followUp.template.replace('{target}', getTargetLabel()),
+        timestamp: new Date().toLocaleTimeString('fr-FR', {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+        actions: selectedFocus.followUp.actions,
+        tone: 'positive',
+      };
+      setMessages((prev) => [...prev, coachResponse]);
+    }, 1500);
+  };
+
+  // Dynamic pulse metrics with real data
   const dynamicPulseMetrics = useMemo(() => {
     if (statsLoading) return pulseMetrics;
     return [
@@ -395,21 +438,21 @@ const B2BCoachPage: React.FC = () => {
   }, [stats, statsLoading]);
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-slate-950 text-slate-50">
+    <div data-testid="page-root" className="min-h-screen bg-background text-foreground">
       {/* Skip Links */}
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md">
         Aller au contenu principal
       </a>
 
       {/* Navigation sticky */}
-      <nav role="navigation" aria-label="Navigation Coach IA" className="bg-slate-900/80 border-b border-white/5 sticky top-0 z-40 backdrop-blur-sm">
+      <nav role="navigation" aria-label="Navigation Coach IA" className="bg-background/80 border-b border-border sticky top-0 z-40 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-6 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" asChild className="text-slate-300 hover:text-slate-100">
+                    <Button variant="ghost" size="icon" asChild className="text-muted-foreground hover:text-foreground">
                       <Link to="/b2b/admin/dashboard"><ArrowLeft className="h-4 w-4" /></Link>
                     </Button>
                   </TooltipTrigger>
@@ -420,7 +463,7 @@ const B2BCoachPage: React.FC = () => {
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center">
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
-                <span className="font-semibold text-slate-100">Coach IA</span>
+                <span className="font-semibold text-foreground">Coach IA</span>
               </div>
               <Badge variant="outline" className="border-emerald-400/40 text-emerald-200 hidden md:inline-flex gap-1">
                 <Shield className="h-3 w-3" />
@@ -431,7 +474,7 @@ const B2BCoachPage: React.FC = () => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" onClick={() => refetch()} className="text-slate-300 hover:text-slate-100">
+                    <Button variant="ghost" size="icon" onClick={() => refetch()} className="text-muted-foreground hover:text-foreground">
                       <RefreshCw className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
@@ -441,7 +484,7 @@ const B2BCoachPage: React.FC = () => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" asChild className="text-slate-300 hover:text-slate-100">
+                    <Button variant="ghost" size="icon" asChild className="text-muted-foreground hover:text-foreground">
                       <Link to="/b2b/admin/settings"><Settings className="h-4 w-4" /></Link>
                     </Button>
                   </TooltipTrigger>
@@ -451,7 +494,7 @@ const B2BCoachPage: React.FC = () => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" asChild className="text-slate-300 hover:text-slate-100">
+                    <Button variant="ghost" size="icon" asChild className="text-muted-foreground hover:text-foreground">
                       <Link to="/help"><HelpCircle className="h-4 w-4" /></Link>
                     </Button>
                   </TooltipTrigger>
@@ -471,14 +514,14 @@ const B2BCoachPage: React.FC = () => {
             </div>
             <div>
               <h1 className="text-3xl font-semibold tracking-tight">Coach IA d'équipe</h1>
-              <p className="text-sm text-slate-300">
+              <p className="text-sm text-muted-foreground">
                 Priorisez les actions à fort impact émotionnel pour vos collaborateurs.
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Badge className="bg-emerald-500/15 text-emerald-200 border-emerald-400/40">Mode B2B</Badge>
-            <Badge variant="outline" className="border-white/10 text-slate-200">
+            <Badge variant="outline" className="border-border text-muted-foreground">
               Focus actuel : {selectedFocus.title}
             </Badge>
           </div>
@@ -486,9 +529,9 @@ const B2BCoachPage: React.FC = () => {
 
         <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)_320px]">
           <aside className="space-y-4">
-            <Card className="bg-slate-900/70 border-white/5">
+            <Card className="bg-card/70 border-border">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base text-slate-200 flex items-center gap-2">
+                <CardTitle className="text-base text-foreground flex items-center gap-2">
                   <Target className="w-4 h-4 text-emerald-300" />
                   Focales d'accompagnement
                 </CardTitle>
@@ -502,15 +545,15 @@ const B2BCoachPage: React.FC = () => {
                       onClick={() => setSelectedFocusId(focus.id)}
                       className={`w-full rounded-xl border px-4 py-3 text-left transition ${
                         isSelected
-                          ? 'border-emerald-400/60 bg-emerald-500/10 text-emerald-100 shadow-lg shadow-emerald-900/30'
-                          : 'border-white/10 bg-slate-950/40 text-slate-300 hover:border-emerald-400/30 hover:text-emerald-100'
+                          ? 'border-emerald-400/60 bg-emerald-500/10 text-foreground shadow-lg shadow-emerald-900/30'
+                          : 'border-border bg-background/40 text-muted-foreground hover:border-emerald-400/30 hover:text-foreground'
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-medium">{focus.title}</span>
-                        <Badge className="bg-white/10 text-xs text-emerald-100 border-white/10">{focus.trend}</Badge>
+                        <Badge className="bg-muted/30 text-xs text-foreground border-border">{focus.trend}</Badge>
                       </div>
-                      <p className="mt-2 text-xs leading-relaxed text-slate-300">
+                      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
                         {focus.description}
                       </p>
                     </button>
@@ -519,9 +562,9 @@ const B2BCoachPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-900/70 border-white/5">
+            <Card className="bg-card/70 border-border">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base text-slate-200 flex items-center gap-2">
+                <CardTitle className="text-base text-foreground flex items-center gap-2">
                   <Users className="w-4 h-4 text-cyan-300" />
                   Collaborateurs suivis
                 </CardTitle>
@@ -535,26 +578,26 @@ const B2BCoachPage: React.FC = () => {
                       onClick={() => setSelectedMemberId(member.id)}
                       className={`w-full rounded-xl border px-4 py-3 text-left transition ${
                         isActive
-                          ? 'border-cyan-400/70 bg-cyan-500/10 text-cyan-50 shadow-lg shadow-cyan-900/30'
-                          : 'border-white/10 bg-slate-950/40 text-slate-300 hover:border-cyan-400/30 hover:text-cyan-100'
+                          ? 'border-cyan-400/70 bg-cyan-500/10 text-foreground shadow-lg shadow-cyan-900/30'
+                          : 'border-border bg-background/40 text-muted-foreground hover:border-cyan-400/30 hover:text-foreground'
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="font-medium">{member.name}</div>
-                          <div className="text-xs text-slate-400">{member.role}</div>
+                          <div className="text-xs text-muted-foreground">{member.role}</div>
                         </div>
-                        <Badge variant="outline" className="border-white/15 text-xs text-slate-200">
+                        <Badge variant="outline" className="border-border text-xs text-foreground">
                           {member.mood} %
                         </Badge>
                       </div>
-                      <div className="mt-2 text-xs text-slate-300">{member.focus}</div>
+                      <div className="mt-2 text-xs text-muted-foreground">{member.focus}</div>
                       <div className="mt-2 flex items-center gap-2 text-xs">
                         <TrendingUp className="w-3 h-3 text-emerald-300" />
                         <span className={member.trend.includes('-') ? 'text-rose-300' : 'text-emerald-300'}>
                           {member.trend}
                         </span>
-                        <span className="text-slate-400">• {member.status}</span>
+                        <span className="text-muted-foreground">• {member.status}</span>
                       </div>
                     </button>
                   );
@@ -562,23 +605,23 @@ const B2BCoachPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-900/70 border-white/5">
+            <Card className="bg-card/70 border-border">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base text-slate-200 flex items-center gap-2">
+                <CardTitle className="text-base text-foreground flex items-center gap-2">
                   <ClipboardList className="w-4 h-4 text-violet-300" />
                   Rituels conseillés
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {selectedFocus.rituals.map((ritual) => (
-                  <div key={ritual.title} className="rounded-lg border border-white/10 bg-white/5 p-3">
-                    <div className="flex items-center justify-between text-sm text-slate-200">
+                  <div key={ritual.title} className="rounded-lg border border-border bg-muted/10 p-3">
+                    <div className="flex items-center justify-between text-sm text-foreground">
                       <span className="font-medium">{ritual.title}</span>
-                      <Badge variant="outline" className="border-white/10 text-xs text-slate-200">
+                      <Badge variant="outline" className="border-border text-xs text-muted-foreground">
                         {ritual.duration}
                       </Badge>
                     </div>
-                    <p className="mt-2 text-xs text-slate-300">{ritual.impact}</p>
+                    <p className="mt-2 text-xs text-muted-foreground">{ritual.impact}</p>
                   </div>
                 ))}
               </CardContent>
@@ -586,15 +629,15 @@ const B2BCoachPage: React.FC = () => {
           </aside>
 
           <main className="space-y-4">
-            <Card className="bg-slate-900/80 border-white/5 backdrop-blur">
-              <CardHeader className="border-b border-white/5">
+            <Card className="bg-card/80 border-border backdrop-blur">
+              <CardHeader className="border-b border-border">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
-                    <CardTitle className="flex items-center gap-2 text-slate-100 text-xl">
+                    <CardTitle className="flex items-center gap-2 text-foreground text-xl">
                       <Sparkles className="w-5 h-5 text-emerald-300" />
                       Session coach IA
                     </CardTitle>
-                    <p className="mt-1 text-sm text-slate-300">
+                    <p className="mt-1 text-sm text-muted-foreground">
                       {selectedFocus.description}
                     </p>
                   </div>
@@ -602,7 +645,7 @@ const B2BCoachPage: React.FC = () => {
                     <Badge className="bg-emerald-500/15 text-emerald-200 border-emerald-400/30">
                       Cible : {selectedMember.name}
                     </Badge>
-                    <Badge variant="outline" className="border-white/10 text-xs text-slate-300">
+                    <Badge variant="outline" className="border-border text-xs text-muted-foreground">
                       {getTargetLabel() === "l'équipe produit" ? 'Approche collective' : 'Coaching individuel'}
                     </Badge>
                   </div>
@@ -610,10 +653,10 @@ const B2BCoachPage: React.FC = () => {
               </CardHeader>
 
               <CardContent className="p-0">
-                <div className="border-b border-white/5 bg-white/5 px-6 py-4">
+                <div className="border-b border-border bg-muted/10 px-6 py-4">
                   <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                     {selectedFocus.metricHighlights.map((highlight) => (
-                      <div key={highlight} className="flex items-start gap-2 text-xs text-slate-200">
+                      <div key={highlight} className="flex items-start gap-2 text-xs text-foreground">
                         <CheckCircle2 className="mt-0.5 w-4 h-4 text-emerald-300" />
                         <span>{highlight}</span>
                       </div>
@@ -632,11 +675,11 @@ const B2BCoachPage: React.FC = () => {
                           <div
                             className={`max-w-[75%] rounded-2xl border p-4 shadow transition ${
                               isCoach
-                                ? 'border-emerald-400/30 bg-emerald-500/10 text-emerald-50'
-                                : 'border-cyan-400/30 bg-cyan-500/10 text-cyan-50'
+                                ? 'border-emerald-400/30 bg-emerald-500/10 text-foreground'
+                                : 'border-cyan-400/30 bg-cyan-500/10 text-foreground'
                             }`}
                           >
-                            <div className="flex items-center justify-between text-xs text-slate-200">
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
                               <div className="flex items-center gap-2">
                                 {isCoach ? (
                                   <Sparkles className="w-4 h-4" />
@@ -647,16 +690,16 @@ const B2BCoachPage: React.FC = () => {
                                   {isCoach ? 'Coach IA EmotionsCare' : 'Manager'}
                                 </span>
                               </div>
-                              <span className="text-slate-300">{message.timestamp}</span>
+                              <span className="text-muted-foreground">{message.timestamp}</span>
                             </div>
-                            <p className="mt-3 text-sm leading-relaxed text-slate-100">{message.content}</p>
+                            <p className="mt-3 text-sm leading-relaxed text-foreground">{message.content}</p>
 
                             {message.highlights && message.highlights.length > 0 && (
-                              <div className="mt-4 space-y-2 rounded-lg border border-white/10 bg-white/5 p-3">
-                                <div className="text-xs font-semibold uppercase tracking-wide text-slate-200">
+                              <div className="mt-4 space-y-2 rounded-lg border border-border bg-muted/10 p-3">
+                                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                                   Points clés
                                 </div>
-                                <ul className="space-y-1 text-sm text-slate-100">
+                                <ul className="space-y-1 text-sm text-foreground">
                                   {message.highlights.map((highlight) => (
                                     <li key={highlight} className="flex gap-2">
                                       <BarChart3 className="w-3.5 h-3.5 text-emerald-300" />
@@ -668,11 +711,11 @@ const B2BCoachPage: React.FC = () => {
                             )}
 
                             {message.actions && message.actions.length > 0 && (
-                              <div className="mt-4 space-y-2 rounded-lg border border-white/10 bg-white/5 p-3">
-                                <div className="text-xs font-semibold uppercase tracking-wide text-slate-200">
+                              <div className="mt-4 space-y-2 rounded-lg border border-border bg-muted/10 p-3">
+                                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                                   Actions proposées
                                 </div>
-                                <ul className="space-y-2 text-sm text-slate-100">
+                                <ul className="space-y-2 text-sm text-foreground">
                                   {message.actions.map((action) => (
                                     <li key={action} className="flex items-start gap-2">
                                       <CheckCircle2 className="mt-0.5 w-4 h-4 text-emerald-300" />
@@ -689,14 +732,14 @@ const B2BCoachPage: React.FC = () => {
                   </div>
                 </ScrollArea>
 
-                <div className="border-t border-white/5 px-6 py-4 space-y-4">
+                <div className="border-t border-border px-6 py-4 space-y-4">
                   <div className="flex flex-wrap gap-2">
                     {selectedFocus.quickPrompts.map((prompt) => (
                       <Button
                         key={prompt}
                         variant="outline"
                         onClick={() => handleSendMessage(prompt)}
-                        className="border-white/10 bg-white/5 text-xs text-slate-200 hover:border-emerald-400/40 hover:text-emerald-100"
+                        className="border-border bg-muted/10 text-xs text-muted-foreground hover:border-emerald-400/40 hover:text-foreground"
                       >
                         {prompt}
                       </Button>
@@ -708,15 +751,15 @@ const B2BCoachPage: React.FC = () => {
                       value={managerMessage}
                       onChange={(event) => setManagerMessage(event.target.value)}
                       placeholder="Partagez une intention, une consigne ou une attention pour l'équipe..."
-                      className="min-h-[90px] resize-none border-white/10 bg-slate-950/60 text-slate-100 placeholder:text-slate-400"
+                      className="min-h-[90px] resize-none border-border bg-background/60 text-foreground placeholder:text-muted-foreground"
                     />
-                    <div className="flex items-center justify-between text-xs text-slate-400">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>Réponse coach en moins de 30 secondes</span>
                       <Button
                         size="sm"
                         onClick={() => handleSendMessage()}
                         disabled={!managerMessage.trim()}
-                        className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 hover:from-emerald-400 hover:to-cyan-400"
+                        className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-white hover:from-emerald-400 hover:to-cyan-400"
                       >
                         Envoyer au coach
                       </Button>
@@ -728,9 +771,9 @@ const B2BCoachPage: React.FC = () => {
           </main>
 
           <aside className="space-y-4">
-            <Card className="bg-slate-900/70 border-white/5">
+            <Card className="bg-card/70 border-border">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base text-slate-200 flex items-center gap-2">
+                <CardTitle className="text-base text-foreground flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-emerald-300" />
                   Pulse émotionnel
                 </CardTitle>
@@ -753,12 +796,12 @@ const B2BCoachPage: React.FC = () => {
 
                     return (
                       <div key={metric.label} className="space-y-2">
-                        <div className="flex items-center justify-between text-xs text-slate-300">
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
                           <span>{metric.label}</span>
                           <span className={deltaClass}>{metric.delta}</span>
                         </div>
-                        <Progress value={metric.value} className="h-2 bg-white/10" aria-label={`${metric.label}: ${metric.value}%`} />
-                        <p className="text-xs text-slate-400">{metric.description}</p>
+                        <Progress value={metric.value} className="h-2 bg-muted/30" aria-label={`${metric.label}: ${metric.value}%`} />
+                        <p className="text-xs text-muted-foreground">{metric.description}</p>
                       </div>
                     );
                   })
@@ -766,9 +809,9 @@ const B2BCoachPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-900/70 border-white/5">
+            <Card className="bg-card/70 border-border">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base text-slate-200 flex items-center gap-2">
+                <CardTitle className="text-base text-foreground flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-amber-300" />
                   Alertes & signaux faibles
                 </CardTitle>
@@ -782,9 +825,9 @@ const B2BCoachPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-900/70 border-white/5">
+            <Card className="bg-card/70 border-border">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base text-slate-200 flex items-center gap-2">
+                <CardTitle className="text-base text-foreground flex items-center gap-2">
                   <Target className="w-4 h-4 text-cyan-300" />
                   Actions prioritaires 48 h
                 </CardTitle>
@@ -793,10 +836,10 @@ const B2BCoachPage: React.FC = () => {
                 {selectedFocus.recommendations.map((recommendation) => (
                   <div
                     key={recommendation}
-                    className="flex items-start justify-between gap-3 rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-slate-200"
+                    className="flex items-start justify-between gap-3 rounded-lg border border-border bg-muted/10 p-3 text-sm text-foreground"
                   >
                     <span>{recommendation}</span>
-                    <Button variant="ghost" size="sm" className="text-emerald-200 hover:text-emerald-100">
+                    <Button variant="ghost" size="sm" className="text-emerald-200 hover:text-foreground">
                       <ChevronRight className="w-4 h-4" />
                     </Button>
                   </div>
@@ -804,14 +847,14 @@ const B2BCoachPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-900/70 border-white/5">
+            <Card className="bg-card/70 border-border">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base text-slate-200 flex items-center gap-2">
+                <CardTitle className="text-base text-foreground flex items-center gap-2">
                   <Timer className="w-4 h-4 text-violet-300" />
                   Prochaines étapes coach
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm text-slate-300">
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
                 <p>
                   • Synthèse personnalisée envoyée à {getTargetLabel()} après validation
                 </p>
@@ -819,7 +862,7 @@ const B2BCoachPage: React.FC = () => {
                   • Tracking des signaux faibles renforcé sur 72 heures
                 </p>
                 <p>
-                  • Point d\'étape automatique proposé si la charge mentale remonte
+                  • Point d'étape automatique proposé si la charge mentale remonte
                 </p>
               </CardContent>
             </Card>
