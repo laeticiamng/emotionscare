@@ -35,7 +35,7 @@ const AppleHeroSection: React.FC = () => {
   const scaleSpring = useSpring(scale, springConfig);
 
   // Text reveal animation
-  const words = ["Gérez", "votre", "stress", "en 3 minutes."];
+  const words = ["Gérez", "votre", "stress", "en 3 minutes.", "Concrètement."];
   
   return (
     <section 
@@ -107,7 +107,8 @@ const AppleHeroSection: React.FC = () => {
                 }}
                 className={cn(
                   "inline-block mr-[0.25em]",
-                  i === 0 && "bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient-shift"
+                  i === 0 && "bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient-shift",
+                  i === words.length - 1 && "bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent block mt-2"
                 )}
               >
                 {word}
@@ -120,10 +121,20 @@ const AppleHeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.8 }}
-            className="text-xl sm:text-2xl md:text-3xl text-muted-foreground max-w-3xl mx-auto mb-12 font-light leading-relaxed"
+            className="text-xl sm:text-2xl md:text-3xl text-muted-foreground max-w-3xl mx-auto mb-4 font-light leading-relaxed"
           >
             La première plateforme de régulation émotionnelle
             <span className="text-foreground font-medium"> conçue par et pour les soignants.</span>
+          </motion.p>
+
+          {/* Concrete value prop */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.9 }}
+            className="text-base sm:text-lg text-muted-foreground/80 max-w-xl mx-auto mb-12"
+          >
+            Exercices guidés contre le stress. Sans rendez-vous. Sans jugement. <span className="text-primary font-medium">100% gratuit pour commencer.</span>
           </motion.p>
 
           {/* CTAs */}
