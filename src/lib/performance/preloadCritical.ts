@@ -25,14 +25,14 @@ const CRITICAL_ASSETS = [
 export function preloadCriticalResources(): void {
   if (typeof window === 'undefined') return;
 
-  // Précharger les fonts critiques
-  const fontLink = document.createElement('link');
-  fontLink.rel = 'preload';
-  fontLink.as = 'font';
-  fontLink.type = 'font/woff2';
-  fontLink.crossOrigin = 'anonymous';
-  fontLink.href = CRITICAL_ASSETS[0];
-  document.head.appendChild(fontLink);
+  // Précharger l'audio ambient (non-bloquant)
+  if (CRITICAL_ASSETS.length > 0) {
+    const audioLink = document.createElement('link');
+    audioLink.rel = 'prefetch';
+    audioLink.href = CRITICAL_ASSETS[0];
+    audioLink.as = 'fetch';
+    document.head.appendChild(audioLink);
+  }
 
   logger.debug('[Perf] Critical resources preloaded', {}, 'SYSTEM');
 }

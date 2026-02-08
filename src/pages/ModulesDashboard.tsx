@@ -32,6 +32,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { routes } from '@/lib/routes';
+import { cn } from '@/lib/utils';
 import {
   Select,
   SelectContent,
@@ -741,6 +742,3 @@ export default function ModulesDashboard() {
   );
 }
 
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(' ');
-}
