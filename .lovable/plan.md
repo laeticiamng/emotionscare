@@ -1,81 +1,80 @@
 
 
-# Audit beta-testeur complet - Resultats et plan d'action
+# Audit final des modules et mise a jour du README
 
-## Resume de l'audit
+## Constats de l'audit
 
-J'ai cree un compte, parcouru le signup, le dashboard, et teste 15+ modules en conditions reelles. Voici les constats :
+Apres analyse exhaustive du registry (2744 lignes, 200+ routes), du router, du catalogue ModulesDashboard et de chaque page "coming-soon", voici l'etat reel :
 
----
+### Modules marques "coming-soon" mais totalement implementes
 
-## Ce qui fonctionne bien
+| Module | Fichier | Lignes | Etat reel |
+|--------|---------|--------|-----------|
+| **Wearables** | `WearablesPage.tsx` | 551 lignes | Implementation complete (providers, sync, charts) |
+| **Brain Viewer** | `BrainViewerPage.tsx` | 379 lignes | Implementation complete (3D, DICOM, overlays) |
+| **Context Lens** | `ContextLensPage.tsx` | 28 lignes mais charge `ContextLensDashboard` du feature | Implementation complete |
+| **Suno Music Generator** | `SunoMusicGeneratorPage.tsx` | 225 lignes | Implementation complete, deja badge "Beta" dans la page |
 
-| Element | Verdict |
-|---------|---------|
-| Inscription (signup) | Fonctionnel, redirection vers /app/home OK |
-| Redirections deprecated (/app/social-cocon -> /app/entraide) | OK |
-| Dashboard /app/home | Clair, 5 actions prioritaires visibles |
-| Scanner /app/scan | Fonctionnel, interface propre |
-| Respiration /app/breath | Fonctionnel, exercices accessibles |
-| Musique /app/music | Interface riche, visualiseur present |
-| Journal /app/journal | Fonctionnel, templates disponibles |
-| Coach IA /app/coach | Interface chat fonctionnelle |
-| Entraide /app/entraide | Hub unifie avec onglets |
-| Boss Grit /app/boss-grit | Defis de resilience fonctionnels |
-| Bubble Beat /app/bubble-beat | Jeu rythmique fonctionnel |
-| VR Galaxy /app/vr-galaxy | Experience immersive presente |
-| Meditation /app/meditation | Sessions guidees disponibles |
-| Mood Mixer /app/mood-mixer | Mixeur interactif fonctionnel |
-| Flash Glow /app/flash-glow | Micro-sessions energetiques OK |
-| Catalogue /app/modules | Liste filtrable avec badges |
+Ces 4 modules doivent passer de `coming-soon` a `beta` dans le registry ET dans le catalogue ModulesDashboard.
 
----
+### Seul vrai "coming-soon" restant
 
-## Problemes identifies
+**Hume AI** (`HumeAIRealtimePage.tsx`) — utilise le composant `ComingSoon`, pas d'interface fonctionnelle. Correctement gere.
 
-### P0 - Critique
+### Routes du README incorrectes
 
-**1. Signup : champ "Confirmer le mot de passe" invisible sans scroll**
-Le formulaire a 5 champs (nom, email, mot de passe, confirmer mot de passe, checkboxes). Sur un ecran 768px, le champ "Confirmer le mot de passe" est hors ecran. L'utilisateur peut remplir les 3 premiers champs, cocher les cases, cliquer "Creer" et ne rien comprendre quand ca ne marche pas (le mot de passe ne match pas car le champ confirm est vide).
-
-**Correction** : Ajouter une validation visible qui scrolle vers le champ confirm vide, ou fusionner la validation en un seul message clair.
-
-### P1 - Important
-
-**2. Hume AI (/app/hume-ai) - Page "coming-soon" mais affiche une interface complete**
-La page montre une interface Hume AI complete avec boutons d'interaction, mais le status est `coming-soon`. L'utilisateur va essayer de l'utiliser et etre frustre. Il faut soit afficher un badge "Bientot disponible" bien visible, soit rendre le module fonctionnel.
-
-**3. Erreur 400 silencieuse au login avec mauvais identifiants**
-Le login retourne un 400 "Invalid login credentials" mais le message d'erreur cote UI est potentiellement peu visible ou absent (l'utilisateur reste sur la page sans feedback clair).
-
-### P2 - Amelioration
-
-**4. Catalogue /app/modules : trop dense**
-Le catalogue affiche tous les modules en grille. Meme avec les filtres, la densite reste elevee. Recommandation : ajouter une vue "Recommandes pour vous" en haut basee sur l'activite recente, avant la grille complete.
-
-**5. Navigation sidebar : absente sur certaines pages**
-Certains modules (Hume AI, VR Galaxy) n'affichent pas la sidebar de navigation, ce qui empeche de revenir facilement au dashboard sans utiliser le bouton retour du navigateur.
+Le README affiche des routes obsoletes :
+- `/app/vr/galaxy` et `/app/vr/breath` → les vraies routes sont `/app/vr-galaxy` et `/app/vr-breath-guide`
+- `/app/ar-filters` → la vraie route est `/app/face-ar`
+- `/b2b/rh/dashboard` → la vraie route est `/app/rh`
+- `/b2b/heatmap` → la vraie route est `/app/scores`
+- `/b2b/teams` → la vraie route est `/app/teams`
+- Section "Limitations Connues" (lignes 496-522) mentionne "Boss Level Grit: interface utilisateur incomplete", "Mood Mixer: UI a enrichir" etc. — tous ces modules sont en fait fonctionnels
 
 ---
 
 ## Plan de corrections
 
-### Fichier 1 : `src/pages/SignupPage.tsx`
-- Ajouter une validation qui detecte le champ "Confirmer le mot de passe" vide et scrolle vers ce champ avec un message d'erreur visible
-- Rendre le message d'erreur de confirmation de mot de passe plus explicite
+### 1. Registry : Changer le statut des 4 modules implementes
 
-### Fichier 2 : `src/pages/HumeAIRealtimePage.tsx`
-- Ajouter un bandeau "Coming Soon" bien visible en haut de la page
-- Desactiver les boutons d'interaction (opacity reduite + tooltip explicatif)
-- Ajouter un bouton de retour au dashboard
+**Fichier : `src/routerV2/registry.ts`**
 
-### Fichier 3 : `src/pages/LoginPage.tsx`
-- Verifier que l'erreur 400 "Invalid credentials" affiche un message visible et clair pour l'utilisateur
-- S'assurer que le message d'erreur est place au-dessus du bouton submit, pas en dessous
+| Route | Changement |
+|-------|-----------|
+| `/app/wearables` (ligne ~1008) | `status: 'coming-soon'` → `status: 'beta'` |
+| `/app/brain-viewer` (ligne ~507) | `status: 'coming-soon'` → `status: 'beta'` |
+| `/app/context-lens` (ligne ~1020) | `status: 'coming-soon'` → `status: 'beta'` |
+| `/app/suno` (ligne ~2690) | `status: 'coming-soon'` → `status: 'beta'` |
 
-### Fichier 4 : `src/pages/ModulesDashboard.tsx`
-- Ajouter une section "Recommandes" en haut du catalogue avec 3-4 modules suggeres
-- Filtrer automatiquement les modules `coming-soon` dans un onglet separe plutot que melange avec les modules stables
+### 2. Catalogue : Mettre a jour ModulesDashboard
 
-Total : 4 fichiers a modifier pour resoudre les problemes identifies lors de cet audit.
+**Fichier : `src/pages/ModulesDashboard.tsx`**
+
+- Passer Wearables, Brain Viewer et Hume AI de `coming-soon` a `beta` (sauf Hume AI qui reste `coming-soon`)
+- Leur donner des couleurs actives au lieu de `from-muted to-muted`
+- Ajouter Suno Music Generator et Context Lens au catalogue (actuellement absents)
+- Le seul module restant en "coming-soon" sera Hume AI
+
+### 3. README : Mettre a jour les routes, statuts et limitations
+
+**Fichier : `README.md`**
+
+Corrections principales :
+- Corriger toutes les routes dans le tableau des modules (lignes 72-94) pour correspondre aux vraies routes du registry
+- Corriger les routes B2B (lignes 97-106)
+- Mettre a jour la section "Limitations Connues" (lignes 496-522) : supprimer les modules qui sont maintenant fonctionnels, ne garder que les vraies limitations
+- Mettre a jour la date et la version
+- Corriger le comptage des routes (225+ → verifier le nombre reel)
+
+---
+
+## Fichiers a modifier
+
+| Fichier | Type de modification |
+|---------|---------------------|
+| `src/routerV2/registry.ts` | 4 changements de statut (`coming-soon` → `beta`) |
+| `src/pages/ModulesDashboard.tsx` | Mise a jour des statuts et couleurs de 3 modules, ajout de 2 modules manquants |
+| `README.md` | Correction des routes, statuts, limitations, date |
+
+Total : 3 fichiers a modifier. Impact : les utilisateurs verront 4 modules supplementaires disponibles au lieu de les croire "bientot disponibles", et le README refleteera l'etat reel de la plateforme.
 
