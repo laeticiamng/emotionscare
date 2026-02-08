@@ -1,113 +1,109 @@
 
-# Plan d'optimisation ergonomique finale : Registre, doublons et modules
+# Audit complet et remediation finale - Routes, redirections et modules
 
 ---
 
-## Constat
+## Problemes critiques identifies
 
-Les interventions precedentes ont ameliore :
-- Le **menu de navigation** (reduit a ~25 liens, bien organise)
-- Le **dashboard** (5 actions prioritaires)
-- Les **pages experimentales** (boutons retour, badges "Bientot")
-- Le **catalogue ModulesDashboard** (filtres, badges statut)
+Apres analyse approfondie du code et verification visuelle en navigateur :
 
-**Ce qui reste non traite** : le registre de routes (`registry.ts`, 2709 lignes) contient encore ~200 routes sans aucun marquage `hidden`, `status` ou `deprecated` (sauf 1 route). Cela signifie que :
+### 1. Routes deprecated = 404 (BUG CRITIQUE)
+Le router (ligne 899 de `router.tsx`) filtre les routes `deprecated: true` avec :
+```text
+const canonicalRoutes = ROUTES_REGISTRY.filter(route => !route.deprecated && route.path !== '*');
+```
+Resultat : les routes `/app/social-cocon`, `/app/communaute`, `/app/feed`, `/app/friends`, `/app/groups`, `/app/voice-analysis`, `/app/auras`, `/app/particulier`, `/app/particulier/mood`, `/mode-selection` retournent une **erreur 404** au lieu de rediriger vers la route canonique.
 
-1. Les **routes en doublon** (`/app/social-cocon`, `/app/communaute`, `/app/feed`, `/app/friends`, `/app/groups`, `/app/auras`, `/app/voice-analysis`, `/app/particulier`, `/app/particulier/mood`) sont toujours accessibles et creent de la confusion
-2. Les **routes dev-only** (`/app/api-keys`, `/app/webhooks`, `/app/api-docs`, `/system-health`, `/k6-analytics`) restent visibles en production
-3. Les **modules experimentaux** (`/app/hume-ai`, `/app/suno`, `/app/brain-viewer`, `/app/wearables`, `/app/context-lens`) n'ont pas de marquage `status` dans le registre
+### 2. Routes hidden toujours accessibles
+Les routes marquees `hidden: true` (`/app/api-keys`, `/app/webhooks`, `/app/api-docs`, `/system-health`, `/k6-analytics`, `/test`, `/dev/test-accounts`) ne sont pas filtrees par le router. Le champ `hidden` est annote mais jamais consomme.
+
+### 3. Chaines de redirections cassees dans aliases.tsx
+Exemples :
+- `/community` redirige vers `/app/social-cocon` (qui est deprecated et 404)
+- `/feed` redirige vers `/app/communaute` (deprecated, 404)
+- `/app/social-b2c` redirige vers `/app/social-cocon` (deprecated, 404)
+
+### 4. Duplications dans le registry
+- `/app/context-lens` apparait **2 fois** (lignes 1007 et 2729)
+- `/app/faq` apparait alors que `/faq` existe deja (doublon public)
+- `/app/accessibility-settings` doublon de `/settings/accessibility`
+- B2B teams : `/app/teams` et `/b2b/teams` pointent vers le meme composant
 
 ---
 
-## Plan en 2 phases
+## Plan en 3 phases
 
-### Phase 1 : Marquage systematique dans `registry.ts`
+### Phase 1 : Corriger les redirections cassees
 
-Ajouter les champs `hidden`, `deprecated` et `status` aux routes appropriees :
+**Fichier : `src/routerV2/router.tsx`**
+- Modifier la logique de filtrage pour que les routes `deprecated` generent des redirections `<Navigate>` vers la route canonique au lieu d'etre supprimees
+- Filtrer les routes `hidden: true` pour les exclure du router en production
 
-**Routes a marquer `hidden: true` (dev-only, retirer de tout listing)** :
-- `/app/api-keys` -- outil developpeur
-- `/app/webhooks` -- outil developpeur
-- `/app/api-docs` -- documentation technique
-- `/system-health` -- monitoring interne
-- `/k6-analytics` -- tests de charge
-- `/test` -- page de test
-- `/validation` -- page de validation
-- `/dev/test-accounts` -- comptes de test
+**Fichier : `src/routerV2/aliases.tsx`**
+- Corriger les alias qui pointent vers des routes deprecated :
+  - `/community` : `/app/social-cocon` -> `/app/entraide`
+  - `/feed` : `/app/communaute` -> `/app/entraide`  
+  - `/app/social-b2c` : `/app/social-cocon` -> `/app/entraide`
 
-**Routes a marquer `deprecated: true` (doublons vers une route canonique)** :
-- `/app/social-cocon` -- doublon de `/app/entraide`
-- `/app/communaute` -- doublon de `/app/entraide`
-- `/app/feed` -- doublon de `/app/entraide` (deja pointe vers `B2CCommunautePage`)
-- `/app/friends` -- doublon de `/app/buddies`
-- `/app/groups` -- doublon de `/app/entraide`
-- `/app/voice-analysis` -- doublon du scan vocal (`/app/scan/voice`)
-- `/app/auras` -- doublon de `/app/leaderboard`
-- `/app/particulier` -- doublon de `/app/home`
-- `/app/particulier/mood` -- doublon de `/app/scan`
-- `/mode-selection` -- redondant avec homepage
+### Phase 2 : Nettoyer le registry des doublons
 
-**Routes a marquer `status: 'coming-soon'`** :
-- `/app/hume-ai` -- API pas completement connectee
-- `/app/suno` -- generateur musical IA non connecte
-- `/app/brain-viewer` -- visualisation 3D sans donnees reelles
-- `/app/wearables` -- donnees tendances generees aleatoirement (mock)
-- `/app/context-lens` -- experimental
+**Fichier : `src/routerV2/registry.ts`**
+- Supprimer le doublon `context-lens-duplicate` (ligne 2729)
+- Marquer `/app/faq` comme `deprecated: true` (doublon de `/faq`)
+- Marquer `/app/accessibility-settings` comme `deprecated: true` (doublon de `/settings/accessibility`)
+- Ajouter `status: 'stable'` aux modules fonctionnels principaux qui n'ont pas encore de statut (scan, music, coach, journal, breath, etc.)
+- Marquer les routes admin/monitoring internes comme `hidden: true` quand elles ne sont pas utiles aux beta-testeurs
 
-**Routes a marquer `status: 'beta'`** :
-- `/app/exchange` -- Exchange Hub
-- `/app/workshops` -- donnees localStorage
-- `/app/webinars` -- donnees localStorage
-- `/app/integrations` -- aucune integration reelle
-- `/app/themes` -- fonctionnel en localStorage uniquement
-- `/app/customization` -- sans persistance
-- `/app/widgets` -- fonctionnel en localStorage
-- `/app/timecraft` -- module recemment ajoute
+### Phase 3 : Implementer le filtrage dans le router
 
-### Phase 2 : Redirection des doublons vers routes canoniques
+**Fichier : `src/routerV2/router.tsx`**
+Remplacer le filtrage actuel par une logique qui :
+1. Exclut les routes `hidden: true` en production
+2. Genere des `<Navigate>` automatiques pour les routes `deprecated: true` vers leur route canonique (en utilisant un mapping `deprecatedRedirects`)
 
-Modifier les composants des routes dupliquees pour qu'ils redirigent automatiquement vers la route canonique, au lieu de rendre un composant distinct. Cela se fait en remplacant le composant par un `Navigate` dans le registre ou dans les pages elles-memes.
+La logique cible :
+```text
+// Routes normales (ni deprecated, ni hidden en prod)
+const activeRoutes = ROUTES_REGISTRY.filter(route => 
+  !route.deprecated && 
+  !(route.hidden && !import.meta.env.DEV)
+);
 
-Pour les routes deja marquees `deprecated: true` dans le registre, ajouter la redirection dans le router (via `aliases.tsx` ou directement dans le composant mappe).
+// Routes deprecated avec redirection
+const deprecatedRoutes = ROUTES_REGISTRY.filter(route => route.deprecated);
+// -> Generer <Navigate to={canonicalTarget} replace /> pour chacune
+```
+
+Pour determiner la cible de redirection des routes deprecated, on ajoutera un champ `redirectTo` dans le schema ou on utilisera un mapping explicite dans `router.tsx`.
 
 ---
 
 ## Fichiers a modifier
 
-| Fichier | Modification |
-|---------|-------------|
-| `src/routerV2/registry.ts` | Ajouter `hidden`, `deprecated`, `status` a ~30 routes |
+| Fichier | Modifications |
+|---------|--------------|
+| `src/routerV2/schema.ts` | Ajouter `redirectTo?: string` au type `RouteMeta` |
+| `src/routerV2/registry.ts` | Ajouter `redirectTo` aux routes deprecated, supprimer doublons, completer les `status` manquants |
+| `src/routerV2/router.tsx` | Filtrer `hidden` en prod, generer des `<Navigate>` pour `deprecated` avec `redirectTo` |
+| `src/routerV2/aliases.tsx` | Corriger 3 alias casses (`/community`, `/feed`, `/app/social-b2c`) |
 
-C'est le seul fichier a modifier. L'impact est architectural : toute logique de filtrage dans le menu, le catalogue ou le router peut ensuite s'appuyer sur ces champs pour masquer/rediriger automatiquement.
+Total : **4 fichiers a modifier**. Impact : aucune route ne produira plus de 404 involontaire, les outils dev seront invisibles en production, et les beta-testeurs ne tomberont plus sur des pages mortes.
 
 ---
 
-## Detail technique
+## Detail des redirections deprecated
 
-Chaque route modifiee recevra un ou plusieurs de ces champs :
-
-```text
-{
-  name: 'api-keys',
-  path: '/app/api-keys',
-  ...
-  hidden: true,        // <-- AJOUTE
-  status: 'dev-only',  // <-- AJOUTE
-}
-
-{
-  name: 'communaute-b2c',
-  path: '/app/communaute',
-  ...
-  deprecated: true,    // <-- AJOUTE (redirection vers /app/entraide)
-}
-
-{
-  name: 'hume-ai-realtime',
-  path: '/app/hume-ai',
-  ...
-  status: 'coming-soon', // <-- AJOUTE
-}
-```
-
-Cela permettra ensuite a tout composant de filtrage (menu, catalogue, router) de respecter ces metadonnees sans modifier chaque composant individuellement.
+| Route deprecated | Redirige vers |
+|-----------------|---------------|
+| `/app/social-cocon` | `/app/entraide` |
+| `/app/communaute` | `/app/entraide` |
+| `/app/feed` | `/app/entraide` |
+| `/app/friends` | `/app/buddies` |
+| `/app/groups` | `/app/entraide` |
+| `/app/voice-analysis` | `/app/scan` |
+| `/app/auras` | `/app/leaderboard` |
+| `/app/particulier` | `/app/consumer/home` |
+| `/app/particulier/mood` | `/app/scan` |
+| `/mode-selection` | `/` |
+| `/app/community` (legacy) | `/app/entraide` |
+| `/app/context-lens` (doublon) | Supprime (garder l'original) |
