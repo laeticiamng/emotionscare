@@ -78,15 +78,15 @@
 | **🎵 Musicothérapie** | Génération musicale IA adaptative (Suno) | `/app/music` |
 | **⚡ Flash Glow** | Apaisement instantané en 2 min | `/app/flash-glow` |
 | **🎛️ Mood Mixer** | DJ des émotions - mixage sonore | `/app/mood-mixer` |
-| **🥽 VR Galaxy** | Exploration immersive 3D | `/app/vr/galaxy` |
-| **🌬️ VR Breath** | Respiration guidée en VR | `/app/vr/breath` |
+| **🥽 VR Galaxy** | Exploration immersive 3D | `/app/vr-galaxy` |
+| **🌬️ VR Breath** | Respiration guidée en VR | `/app/vr-breath-guide` |
 | **🏆 Boss Grit** | Forge de persévérance gamifiée | `/app/boss-grit` |
 | **🫧 Bubble Beat** | Défouloir rythmé (bulles) | `/app/bubble-beat` |
 | **📖 Story Synth** | Contes thérapeutiques IA | `/app/story-synth` |
 | **🖼️ Screen Silk** | Wallpapers apaisants animés | `/app/screen-silk` |
 | **🏞️ Parc Émotionnel** | Visualisation spatiale des émotions | `/app/emotional-park` |
 | **🔄 Exchange Hub** | Échanges émotionnels communautaires | `/app/exchange` |
-| **📸 AR Filters** | Filtres de réalité augmentée | `/app/ar-filters` |
+| **📸 Face AR** | Filtres de réalité augmentée | `/app/face-ar` |
 | **🎯 Ambition Arcade** | Objectifs gamifiés roguelike | `/app/ambition-arcade` |
 | **💪 Bounce Back** | Résilience et rebond | `/app/bounce-back` |
 | **🧠 AI Recommendations** | Suggestions proactives contextuelles | Dashboard |
@@ -96,13 +96,13 @@
 
 | Module | Description | Route |
 |--------|-------------|-------|
-| **📈 Dashboard RH** | Analytics bien-être équipe | `/b2b/rh/dashboard` |
-| **🗺️ Heatmap Vibes** | Cartographie émotionnelle temps réel | `/b2b/heatmap` |
-| **📊 Rapports** | Export PDF/Excel automatisé | `/b2b/reports` |
-| **👥 Gestion Équipes** | Invitation, rôles, permissions | `/b2b/teams` |
-| **📅 Événements** | Ateliers bien-être, webinaires | `/b2b/events` |
-| **🔒 Sécurité** | Audit RGPD, sessions, logs | `/b2b/security` |
-| **🏢 Enterprise** | SSO, SCIM, multi-tenant | `/b2b/enterprise` |
+| **📈 Dashboard RH** | Analytics bien-être équipe | `/app/rh` |
+| **🗺️ Heatmap Vibes** | Cartographie émotionnelle temps réel | `/app/scores` |
+| **📊 Rapports** | Export PDF/Excel automatisé | `/app/reports` |
+| **👥 Gestion Équipes** | Invitation, rôles, permissions | `/app/teams` |
+| **📅 Événements** | Ateliers bien-être, webinaires | `/app/events` |
+| **🔒 Sécurité** | Audit RGPD, sessions, logs | `/app/security` |
+| **🏢 Enterprise** | SSO, SCIM, multi-tenant | `/app/enterprise` |
 
 ### 🎮 Gamification Complète
 
@@ -495,30 +495,19 @@ npm run test:e2e          # Tests Playwright
 
 ## ⚠️ Limitations Connues
 
-### Modules Partiels
+### Module Non Finalisé
 
-1. **VR Galaxy/Breath** : Orchestrateurs backend fonctionnels, UI 3D basique
-2. **AR Filters** : Infrastructure MediaPipe prête, filtres non finalisés
-3. **Boss Level Grit** : Edge function existe, interface utilisateur incomplète
-4. **Mood Mixer** : Backend OK avec simulation, UI à enrichir
-5. **Guildes/Tournois** : Backend OK, composants UI en maquette
+1. **Hume AI** : Interface coming-soon, en attente d'intégration complète de l'API Hume
 
 ### Tests
 
-- Couverture inférieure aux objectifs sur certains modules
-- Tests d'accessibilité automatisés à développer
-- Tests de performance (Lighthouse) non automatisés
+- Tests d'accessibilité automatisés (axe-core) à généraliser
+- Tests de performance (Lighthouse) non automatisés en CI
 
 ### Documentation
 
 - Certains guides API référencés sont à compléter
 - Documentation des Edge Functions à enrichir
-
-### B2B
-
-- Dashboard RH avec métriques basiques
-- Heatmaps émotionnels en cours de développement
-- SSO/SCIM non finalisé
 
 ---
 
@@ -603,6 +592,6 @@ Propriétaire — © 2024-2026 EmotionsCare. Tous droits réservés.
 
 **Fait avec ❤️ pour les soignants**
 
-*Dernière mise à jour : 4 février 2026 - v2.7*
+*Dernière mise à jour : 8 février 2026 - v2.8*
 
 </div>
