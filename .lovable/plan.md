@@ -1,128 +1,70 @@
 
+# Audit multi-roles pre-publication - Corrections prioritaires
 
-# Audit complet des modules et mise a jour de la plateforme
+## Resultats de l'audit
 
-## Resultats de l'audit en conditions reelles
+### Ce qui fonctionne
+- Homepage : design premium Apple-style, message clair en 3 secondes
+- Signup/Login : formulaires fonctionnels, validation visible
+- Dashboard /app/home : 5 actions prioritaires, comprehension immediate
+- 30+ modules fonctionnels (Scan, Breath, Journal, Coach, Music, VR, Jeux, etc.)
+- Catalogue /app/modules : filtres, recherche, categories, section "Recommandes"
+- Pages legales : presentes et accessibles
+- Pricing : page structuree
 
-J'ai cree un compte, parcouru le signup, le dashboard, le catalogue des modules, et teste 20+ pages individuellement. Voici le bilan complet.
-
----
-
-## Ce qui fonctionne bien
-
-| Page/Module | Route | Verdict |
-|-------------|-------|---------|
-| Homepage | `/` | OK - Design premium, navigation claire |
-| Inscription | `/signup` | OK - Checkboxes visibles, scroll auto sur erreur |
-| Dashboard B2C | `/app/home` | OK - 5 actions prioritaires visibles |
-| Catalogue modules | `/app/modules` | OK - Filtres, recherche, categories |
-| Scanner | `/app/scan` | OK - Interface propre avec modes |
-| Respiration | `/app/breath` | OK - Exercices accessibles |
-| Musique | `/app/music` | OK - Interface riche |
-| Journal | `/app/journal` | OK - Templates et entrees |
-| Coach IA | `/app/coach` | OK - Chat fonctionnel |
-| Entraide | `/app/entraide` | OK - Hub unifie |
-| Boss Grit | `/app/boss-grit` | OK - Defis gamifies |
-| Bubble Beat | `/app/bubble-beat` | OK - Jeu rythmique |
-| Mood Mixer | `/app/mood-mixer` | OK - Mixeur interactif |
-| Flash Glow | `/app/flash-glow` | OK - Micro-sessions |
-| VR Galaxy | `/app/vr-galaxy` | OK - Experience immersive |
-| Exchange Hub | `/app/exchange` | OK - 4 marches |
-| Seuil | `/app/seuil` | OK - Exercices de gestion |
-| Nyvee Cocon | `/app/nyvee` | OK - Espace personnel |
-| Screen Silk | `/app/screen-silk` | OK - Pauses ecran |
-| Ambition Arcade | `/app/ambition-arcade` | OK - Objectifs gamifies |
-| Voice Journal | `/app/voice-journal` | OK - Journal vocal |
-| Buddies | `/app/buddies` | OK - Systeme de binomes |
-| Sessions Groupe | `/app/group-sessions` | OK - Sessions collectives |
-| Parc Emotionnel | `/app/emotional-park` | OK - Visualisation spatiale |
-| Bilan Hebdomadaire | `/app/weekly-bars` | OK - Barres de progression |
-| Page Fonctionnalites | `/features` | OK - Presentation marketing |
+### Corrections identifiees (classees par priorite)
 
 ---
 
-## Problemes identifies
+## P0 - Bugs techniques bloquants
 
-### P1 - Font preload warning persistant
+### 1. preloadCritical.ts : MP3 charge comme font
+Lignes 29-35 : le code charge `CRITICAL_ASSETS[0]` (qui est `/audio/default-ambient.mp3`) avec `as = 'font'` et `type = 'font/woff2'`. Cela cause le warning console "preloaded but not used". La logique de preload font est residuelle apres la suppression de inter-var.woff2.
 
-**3 fichiers referent encore `inter-var.woff2`** qui n'existe pas, causant un warning console sur chaque page :
-- `src/utils/buildOptimization.ts` (ligne 44)
-- `src/lib/performance/preloadCritical.ts` (ligne 19)
-- `src/lib/performance/pageOptimizer.ts` (ligne 20)
+**Correction** : Supprimer le bloc de preload font dans `preloadCriticalResources()`, ou le remplacer par un preload audio correct.
 
-**Correction** : Retirer `inter-var.woff2` de ces 3 fichiers.
+### 2. ModulesDashboard.tsx : double definition de `cn`
+Ligne 744 definit `function cn(...)` localement alors que `cn` de `@/lib/utils` est deja importe (ligne 34 `import { routes } from '@/lib/routes'` — mais en fait `cn` n'est PAS importe). La fonction locale est une version simplifiee qui ne gere pas `tailwind-merge`. Cela peut causer des conflits de classes CSS.
 
-### P2 - Catalogue /app/modules incomplet
-
-Le catalogue (`ModulesDashboard.tsx`) liste 32 modules mais il manque plusieurs modules fonctionnels qui existent dans le registry et sont accessibles :
-
-| Module manquant | Route | Statut reel |
-|-----------------|-------|-------------|
-| Meditation | `/app/meditation` | actif |
-| Parc Emotionnel | `/app/emotional-park` | actif |
-| Voice Journal | `/app/voice-journal` | actif (deja liste - OK) |
-| Timecraft | `/app/timecraft` | beta |
-| Discovery | `/app/discovery` | actif |
-| Emotion Atlas | `/app/emotion-atlas` | actif |
-| Parcours XL | `/app/parcours-xl` | actif |
-| Grounding | lien dans breath | actif |
-
-**Correction** : Ajouter Parc Emotionnel, Timecraft, Discovery, et Emotion Atlas au catalogue ModulesDashboard (les plus pertinents pour les utilisateurs). Ne pas surcharger la grille avec des sous-pages de navigation.
-
-### P3 - README : roadmap incoherente
-
-La section Roadmap (lignes 527-544) mentionne encore :
-- "Finalisation modules partiels (VR, Guildes, Tournois)" - deja fait
-- "Wearables avances (Apple Watch, Garmin)" en Q3-Q4 - deja en beta
-- "Dashboard B2B complet" en Q2 - deja fonctionnel
-
-**Correction** : Mettre a jour la roadmap pour refleter l'etat reel.
-
-### P4 - README : comptage incoherent dans l'architecture
-
-Ligne 218 dit "33 modules metier" mais ligne 24 dit "37 features". Le nombre reel de dossiers dans src/features/ devrait etre verifie et un seul chiffre utilise.
-
-**Correction** : Uniformiser a "37 modules metier" partout.
+**Correction** : Remplacer la definition locale par l'import de `cn` depuis `@/lib/utils`.
 
 ---
 
-## Plan de corrections
+## P1 - Securite (CISO/DPO)
 
-### Fichier 1 : `src/utils/buildOptimization.ts`
-Retirer `/fonts/inter-var.woff2` du tableau `criticalFonts`.
+### 3. RLS policies "always true"
+Le linter Supabase detecte 2 policies avec `USING (true)` ou `WITH CHECK (true)` sur des operations INSERT/UPDATE/DELETE. Cela permet potentiellement a tout utilisateur authentifie de modifier des donnees.
 
-### Fichier 2 : `src/lib/performance/preloadCritical.ts`
-Retirer `/fonts/inter-var.woff2` du tableau `CRITICAL_ASSETS`.
+**Correction** : Identifier et corriger ces policies via Cloud > Run SQL. (Hors scope code front — signaler uniquement.)
 
-### Fichier 3 : `src/lib/performance/pageOptimizer.ts`
-Retirer `/fonts/inter-var.woff2` du tableau `CRITICAL_ASSETS`.
+### 4. 52 fichiers avec `@ts-nocheck` dans src/pages/
+Le standard release-grade exige zero `@ts-nocheck`. 52 fichiers dans les pages desactivent le typage TypeScript. Le risque est la regression silencieuse.
 
-### Fichier 4 : `src/pages/ModulesDashboard.tsx`
-Ajouter 4 modules manquants au catalogue :
-- **Parc Emotionnel** (categorie Wellness, actif, icone de carte/globe)
-- **Timecraft** (categorie Wellness, beta, icone horloge)
-- **Discovery** (categorie Wellness, actif, icone boussole)
-- **Emotion Atlas** (categorie Analytics, actif, icone carte)
-
-### Fichier 5 : `README.md`
-- Corriger le comptage "33 modules" en "37 modules" (ligne 218)
-- Mettre a jour la Roadmap Q1/Q2/Q3 2026 (lignes 527-544) :
-  - Q1 : marquer comme termine les modules VR, Guildes, Tournois
-  - Q2 : marquer comme termine le Dashboard B2B complet
-  - Q3-Q4 : retirer "Wearables avances" (deja beta), ajouter les vrais objectifs restants (Hume AI, app mobile)
-- Mettre a jour la date en bas du fichier
+**Correction** : Documenter dans le README comme dette technique connue. La correction complete de 52 fichiers depasse le scope d'un seul commit.
 
 ---
 
-## Fichiers a modifier
+## P2 - Marketing / Conversion (CMO)
 
-| Fichier | Modification |
-|---------|-------------|
-| `src/utils/buildOptimization.ts` | Retirer reference font |
-| `src/lib/performance/preloadCritical.ts` | Retirer reference font |
-| `src/lib/performance/pageOptimizer.ts` | Retirer reference font |
-| `src/pages/ModulesDashboard.tsx` | Ajouter 4 modules manquants |
-| `README.md` | Corriger comptage, roadmap, date |
+### 5. Aucun probleme majeur identifie
+- Homepage : H1 clair ("Gerez votre stress en 3 minutes"), CTA "Essayer gratuitement" visible
+- Features page : modules presentes avec categories
+- Pricing : structure lisible
 
-Total : 5 fichiers. Impact : zero warning console, catalogue complet, documentation synchronisee.
+---
 
+## Plan de corrections (3 fichiers)
+
+### Fichier 1 : `src/lib/performance/preloadCritical.ts`
+- Supprimer le bloc de preload font residuel (lignes 28-35) qui charge un MP3 comme font
+- Le remplacer par un commentaire ou un vrai preload audio
+
+### Fichier 2 : `src/pages/ModulesDashboard.tsx`
+- Supprimer la definition locale de `cn` (ligne 744-746)
+- Ajouter l'import de `cn` depuis `@/lib/utils` en haut du fichier
+
+### Fichier 3 : `README.md`
+- Ajouter une section "Dette technique connue" mentionnant les 52 fichiers `@ts-nocheck` et les 2 RLS policies a corriger
+- Mettre a jour la version en v2.9
+
+Total : 3 fichiers a modifier. Corrections ciblees sur les bugs techniques reels detectes lors de l'audit.
