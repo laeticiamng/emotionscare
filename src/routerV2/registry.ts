@@ -504,7 +504,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'BrainViewerPage',
     guard: true,
     requireAuth: true,
-    status: 'coming-soon',
+    status: 'beta',
   },
   {
     name: 'music',
@@ -1005,7 +1005,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
     aliases: ['/health-sync', '/devices'],
-    status: 'coming-soon',
+    status: 'beta',
   },
   {
     name: 'context-lens',
@@ -1017,7 +1017,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
     aliases: ['/insights', '/patterns'],
-    status: 'coming-soon',
+    status: 'beta',
   },
   {
     name: 'data-export',
@@ -2687,7 +2687,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
     aliases: ['/suno', '/ai-music-generator'],
-    status: 'coming-soon',
+    status: 'beta',
   },
   {
     name: 'auras-leaderboard',

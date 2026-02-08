@@ -309,29 +309,49 @@ const modules: Module[] = [
     color: 'from-warning/70 to-warning',
   },
 
-  // Coming Soon
-  {
-    title: 'Hume AI',
-    description: 'Analyse émotionnelle avancée par IA multimodale',
-    url: '/app/hume-ai',
-    icon: Brain,
-    category: 'Core',
-    status: 'coming-soon',
-    color: 'from-muted to-muted',
-  },
+  // Beta Modules
   {
     title: 'Wearables',
     description: 'Synchronisez vos montres et capteurs connectés',
     url: '/app/wearables',
     icon: Activity,
     category: 'Wellness',
-    status: 'coming-soon',
-    color: 'from-muted to-muted',
+    status: 'beta',
+    color: 'from-success/70 to-success',
   },
   {
     title: 'Brain Viewer',
     description: 'Visualisation cérébrale 3D interactive',
     url: '/app/brain-viewer',
+    icon: Brain,
+    category: 'Core',
+    status: 'beta',
+    color: 'from-primary to-accent',
+  },
+  {
+    title: 'Suno Music Generator',
+    description: 'Créez de la musique thérapeutique avec l\'IA Suno',
+    url: '/app/suno',
+    icon: Music,
+    category: 'Core',
+    status: 'beta',
+    color: 'from-accent/80 to-primary',
+  },
+  {
+    title: 'Context Lens',
+    description: 'Analyse contextuelle de vos patterns émotionnels',
+    url: '/app/context-lens',
+    icon: TrendingUp,
+    category: 'Analytics',
+    status: 'beta',
+    color: 'from-info/70 to-info',
+  },
+
+  // Coming Soon
+  {
+    title: 'Hume AI',
+    description: 'Analyse émotionnelle avancée par IA multimodale',
+    url: '/app/hume-ai',
     icon: Brain,
     category: 'Core',
     status: 'coming-soon',
