@@ -16,9 +16,7 @@ const CRITICAL_ROUTES = [
 ];
 
 // Assets critiques à précharger
-const CRITICAL_ASSETS = [
-  '/fonts/inter-var.woff2',
-];
+const CRITICAL_ASSETS: string[] = [];
 
 /**
  * Précharge les routes critiques pour navigation instantanée

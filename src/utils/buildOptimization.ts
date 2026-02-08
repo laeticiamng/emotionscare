@@ -40,19 +40,7 @@ export const CHUNK_OPTIMIZATION = {
  */
 export function preloadCriticalResources(): void {
   // Précharger les fonts critiques
-  const criticalFonts = [
-    '/fonts/inter-var.woff2'
-  ];
-  
-  criticalFonts.forEach(font => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.href = font;
-    link.as = 'font';
-    link.type = 'font/woff2';
-    link.crossOrigin = 'anonymous';
-    document.head.appendChild(link);
-  });
+  // Fonts are loaded via CSS (rsms.me/inter), no local preload needed
   
   // Précharger les images critiques
   const criticalImages = [
