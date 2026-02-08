@@ -31,11 +31,11 @@ const sections: Section[] = [
       <>
         <p>
           Le site et les applications EmotionsCare sont édités par la société EmotionsCare SASU, société par actions
-          simplifiée unipersonnelle immatriculée au Registre du Commerce et des Sociétés sous le numéro [RCS à compléter].
+          simplifiée unipersonnelle immatriculée au Registre du Commerce et des Sociétés sous le numéro 944 505 445 R.C.S. Amiens.
         </p>
         <ul className="mt-3 list-disc list-inside space-y-1">
-          <li>Siège social : [Adresse à compléter]</li>
-          <li>Numéro de TVA intracommunautaire : [À compléter]</li>
+          <li>Siège social : 5 rue Caudron, 80000 Amiens</li>
+          <li>SIRET : 944 505 445 00014</li>
           <li>Adresse électronique : contact@emotionscare.com</li>
         </ul>
       </>
@@ -48,8 +48,8 @@ const sections: Section[] = [
     content: (
       <>
         <p>
-          La directrice de la publication est Laeticia M., en sa qualité de Présidente de EmotionsCare SASU. Elle est
-          joignable à l'adresse legal@emotionscare.com pour toute question relative au contenu éditorial.
+          La directrice de la publication est Dr Laeticia Motongane, en sa qualité de Présidente de EmotionsCare SASU. Elle est
+          joignable à l'adresse contact@emotionscare.com pour toute question relative au contenu éditorial.
         </p>
       </>
     ),
@@ -84,9 +84,7 @@ const sections: Section[] = [
           Notre équipe reste disponible pour répondre à vos questions techniques, commerciales ou légales :
         </p>
         <ul className="mt-3 list-disc list-inside space-y-1">
-          <li>Email support : support@emotionscare.com</li>
-          <li>Email juridique : legal@emotionscare.com</li>
-          <li>Téléphone : +33 (0)1 86 95 12 34 (du lundi au vendredi, 9h-18h CET)</li>
+          <li>Email : contact@emotionscare.com</li>
         </ul>
       </>
     ),
@@ -131,7 +129,7 @@ const sections: Section[] = [
       <>
         <p>
           Si vous identifiez un contenu susceptible de contrevenir à la loi ou aux bonnes mœurs, vous pouvez adresser un
-          signalement motivé à legal@emotionscare.com. Merci d'y joindre l'URL concernée, une description précise des faits
+          signalement motivé à contact@emotionscare.com. Merci d'y joindre l'URL concernée, une description précise des faits
           et vos coordonnées pour faciliter notre traitement.
         </p>
       </>

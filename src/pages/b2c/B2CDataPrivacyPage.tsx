@@ -616,9 +616,8 @@ const B2CDataPrivacyPage: React.FC = () => {
                     Pour toute question relative à vos données personnelles ou à l'exercice de vos droits :
                   </p>
                   <div className="text-sm text-blue-300">
-                    📧 dpo@emotionscare.com<br />
-                    📞 +33 1 23 45 67 89<br />
-                    📍 123 Avenue de la Protection des Données, 75001 Paris
+                    📧 contact@emotionscare.com<br />
+                    📍 5 rue Caudron, 80000 Amiens
                   </div>
                 </div>
               </CardContent>

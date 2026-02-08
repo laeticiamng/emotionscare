@@ -156,7 +156,7 @@ serve(async (req: Request) => {
 
     // Format email pour l'équipe support
     const emailContent = {
-      to: 'support@emotionscare.ai',
+      to: 'contact@emotionscare.com',
       subject: `[EmotionsCare] ${safeSubject}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -219,7 +219,7 @@ serve(async (req: Request) => {
           
           <div style="padding: 20px; text-align: center; background: #667eea; color: white;">
             <p><strong>Besoin d'aide immédiate ?</strong></p>
-            <p>Consultez notre <a href="https://emotionscare.ai/help" style="color: white;">Centre d'Aide</a> ou rejoignez notre <a href="https://emotionscare.ai/social-cocon" style="color: white;">Communauté</a></p>
+            <p>Consultez notre <a href="https://emotionscare.com/help" style="color: white;">Centre d'Aide</a> ou rejoignez notre <a href="https://emotionscare.com/social-cocon" style="color: white;">Communauté</a></p>
           </div>
         </div>
       `
