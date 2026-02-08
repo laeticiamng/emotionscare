@@ -1,179 +1,169 @@
 
 
-# Audit Beta-Testeur Complet : Routes, Modules et Ergonomie
+# Audit complet et plan de remediation des modules non fonctionnels
 
 ---
 
-## Diagnostic principal
+## Etat des lieux
 
-**Le probleme central est clair : la plateforme declare ~200 routes dans le registre pour un utilisateur qui devrait en voir maximum 20-30.**
+Le registre contient **~200 routes** pour **~150 composants**. Apres analyse du code source, voici la classification des modules par fonctionnalite reelle :
 
-Un beta-testeur qui arrive sur la plateforme est confronte a :
-- **13 categories** dans le menu de navigation (Analyse, Bien-etre, Musique, Journal, Coaching, Immersif, Creatif, Gamification, Analytics, Social, Outils, Parametres, Support)
-- **~90 liens** dans le menu hamburger MainNavigationMenu
-- **4 points d'entree concurrents** vers les modules : la page Features (/features), le Dashboard (/app/home), le Parc Emotionnel (/app/emotional-park), le Modules Dashboard (/app/modules)
-- **Des doublons fonctionnels** : meme module accessible via 3-4 chemins differents (ex: communaute = /app/community + /app/social-cocon + /app/communaute + /app/entraide + /app/feed)
+### Modules fonctionnels (aucune action requise) : ~25
 
-**Resultat : les beta-testeurs sont perdus.** Ils ne savent pas ou aller ni par ou commencer.
+Scanner, Musique, Coach IA, Journal, Respiration, Meditation, Flash Glow, Bubble Beat, Boss Grit, Ambition Arcade, Bounce Back, Story Synth, Mood Mixer, Screen Silk, VR Galaxy, VR Breath, Nyvee, Leaderboard, Weekly Bars, Entraide, Buddies, Dashboard, Profil, Parametres, Premium.
 
----
+### Modules partiellement fonctionnels (UI OK, backend simule) : ~12
 
-## Inventaire complet des routes par segment
+| Module | Route | Probleme |
+|--------|-------|----------|
+| Hume AI Realtime | `/app/hume-ai` | Edge function existe mais retourne des mocks si cle API absente. 2 tabs sur 3 desactives (Face, Prosody). UI fonctionnelle pour le texte. |
+| Wearables | `/app/wearables` | Edge function `wearables-sync` existe. UI complete avec graphiques. Donnees mock pour tendances. Fonctionnel en mode demo. |
+| Brain Viewer | `/app/brain-viewer` | Composants 3D complets (BrainViewer3D, BrainControls, EmotionOverlayPanel). Depend de hooks `useBrainData` et `useEmotionOverlay`. Visuellement impressionnant mais sans donnees reelles. |
+| Context Lens | `/app/context-lens` | Delegue a `ContextLensDashboard` dans `src/features/context-lens`. Fonctionne si le feature existe. |
+| Voice Analysis | `/app/voice-analysis` | Utilise `useHumeWebSocket`. Doublon fonctionnel du scan vocal dans `/app/scan`. |
+| Workshops | `/app/workshops` | UI complete avec inscription, donnees mock localStorage. |
+| Webinars | `/app/webinars` | UI complete avec inscription, donnees mock localStorage. |
+| Integrations | `/app/integrations` | UI avec toggles, aucune integration reelle (Google Cal, Spotify, Slack, Notion). |
+| Themes | `/app/themes` | Fonctionnel en local (localStorage) mais ne s'applique pas globalement. |
+| Customization | `/app/customization` | UI avec switches, aucune persistance reelle. |
+| Widgets | `/app/widgets` | Fonctionnel en localStorage. |
+| Export PDF/CSV | `/app/export/pdf`, `/app/export/csv` | UI presente, aucun export reel. |
 
-### Routes Publiques (Marketing) : 22 routes
-| Route | Page | Verdict |
-|-------|------|---------|
-| `/` | Homepage Apple-style | OK -- point d'entree clair |
-| `/features` | Page fonctionnalites | OK mais CTA pointent vers /signup |
-| `/pricing` | Tarification | OK |
-| `/about` | A propos | OK |
-| `/contact` | Contact | OK |
-| `/help` | Aide | OK |
-| `/faq` | FAQ | OK -- DOUBLON avec /app/faq |
-| `/store` | Boutique Shopify | OK |
-| `/demo` | Demo | A verifier contenu |
-| `/onboarding` | Onboarding | OK |
-| `/install` | Installation PWA | OK |
-| `/marketplace` | Marketplace | A verifier contenu |
-| `/b2c` | Landing B2C | OK |
-| `/entreprise` | Landing B2B | OK |
-| `/login` | Connexion unifiee | OK |
-| `/signup` | Inscription | OK (corrige recemment) |
-| `/privacy` | Confidentialite | OK |
-| `/legal/*` | Pages legales (6) | OK |
-| `/exam-mode` | Mode examen | Niche -- cache pour beta |
-| `/mode-selection` | Selection de mode | Redondant avec homepage |
+### Modules dev-only (a masquer pour les beta-testeurs) : ~6
 
-### Routes App Consumer : ~80 routes (PROBLEME MAJEUR)
+| Module | Route | Raison |
+|--------|-------|--------|
+| API Keys | `/app/api-keys` | Outil developpeur, pas un module utilisateur |
+| Webhooks | `/app/webhooks` | Outil developpeur |
+| K6 Analytics | `/k6-analytics` | Monitoring interne |
+| System Health | `/system-health` | Monitoring interne |
+| Public API | `/app/api-docs` | Documentation technique |
+| Test Accounts | `/dev/test-accounts` | Dev uniquement |
 
-**C'est ici que se concentre le probleme d'ergonomie.** Un utilisateur B2C a acces a ~80 routes dont beaucoup sont :
+### Routes dupliquees a consolider : ~15
 
-1. **Des doublons fonctionnels** (meme page, chemins differents)
-2. **Des sous-pages non necessaires** (journal a 8 sous-routes)
-3. **Des modules experimentaux non finalises** (Hume AI, Suno, Brain Viewer)
-4. **Des pages utilitaires deguisees en modules** (Export PDF, Export CSV, API Keys)
-
-#### Doublons identifies :
-
-| Fonctionnalite | Routes en doublon | Route canonique recommandee |
-|----------------|-------------------|-----------------------------|
-| Dashboard | `/app/consumer/home`, `/app/home`, `/app/particulier`, `/dashboard` | `/app/home` |
-| Communaute | `/app/community`, `/app/communaute`, `/app/social-cocon`, `/app/entraide`, `/app/feed` | `/app/entraide` |
-| Scan | `/app/scan`, `/app/particulier/mood`, `/app/emotions` | `/app/scan` |
-| FAQ | `/faq`, `/app/faq` | `/faq` |
-| Profil | `/app/profile`, `/settings/profile` | `/settings/profile` |
-| Leaderboard | `/app/leaderboard`, `/app/auras` | `/app/leaderboard` |
-| Notifications | `/app/notifications`, `/settings/notifications` | `/app/notifications` (centre) + `/settings/notifications` (config) |
-
-#### Modules sans contenu reel ou experimentaux :
-
-| Route | Module | Probleme |
-|-------|--------|----------|
-| `/app/brain-viewer` | Brain Viewer | Experimental, pas de contenu backend |
-| `/app/hume-ai` | Hume AI Realtime | API non connectee |
-| `/app/suno` | Suno Music Generator | API non connectee |
-| `/app/context-lens` | Context Lens | Experimental |
-| `/app/voice-analysis` | Voice Analysis | Doublon avec scan vocal |
-| `/app/wearables` | Wearables | Pas d'integration reelle |
-| `/app/api-keys` | API Keys | Dev-only, pas pour beta |
-| `/app/webhooks` | Webhooks | Dev-only, pas pour beta |
-| `/app/integrations` | Integrations | Pas d'integration reelle |
-| `/app/widgets` | Widgets | Pas de contenu |
-| `/app/themes` | Themes | Pas de contenu |
-| `/app/customization` | Customization | Pas de contenu |
-| `/app/workshops` | Workshops | Pas de contenu |
-| `/app/webinars` | Webinars | Pas de contenu |
-| `/app/export/pdf` | Export PDF | Utilitaire, pas un module |
-| `/app/export/csv` | Export CSV | Utilitaire, pas un module |
-
-### Routes B2B Employee/Manager : ~40 routes
-
-Correctement separees par segment mais beaucoup de pages admin tres techniques (alert-config, ab-tests, ml-assignment-rules, cron-monitoring...) qui ne devraient pas etre visibles pour un beta-testeur.
-
-### Routes Systeme/Dev : ~15 routes
-
-OK -- correctement masquees en production.
+| Doublon | Route canonique |
+|---------|----------------|
+| `/app/communaute` | `/app/entraide` |
+| `/app/social-cocon` | `/app/entraide` |
+| `/app/feed` | `/app/entraide` |
+| `/app/community` | `/app/entraide` |
+| `/app/friends` | `/app/buddies` |
+| `/app/groups` | `/app/entraide` |
+| `/app/voice-analysis` | `/app/scan` (vocal) |
+| `/app/auras` | `/app/leaderboard` |
+| `/app/particulier` | `/app/home` |
+| `/app/particulier/mood` | `/app/scan` |
 
 ---
 
-## Problemes UX critiques pour un beta-testeur
+## Probleme de fond
 
-### 1. SURCHARGE COGNITIVE (Critique)
+Le vrai probleme n'est pas que les modules sont "non fonctionnels" -- la plupart ont une UI complete. Le probleme est :
 
-Le menu de navigation propose **~90 liens** repartis en 13 categories. Un utilisateur moyen utilise 5-8 fonctionnalites regulierement.
-
-**Recommandation** : Reduire le menu a **5 categories principales** avec les modules les plus pertinents. Les modules avances doivent etre accessibles depuis une page "Explorer" mais pas depuis le menu principal.
-
-### 2. QUATRE HUBS CONCURRENTS (Critique)
-
-L'utilisateur peut decouvrir les modules depuis :
-- Le **Dashboard** (`/app/home`) -- cartes d'acces rapide
-- Le **Parc Emotionnel** (`/app/emotional-park`) -- metaphore gamifiee
-- Le **Modules Dashboard** (`/app/modules`) -- liste complete
-- Le **Menu hamburger** -- navigation laterale
-
-Il n'y a aucune coherence entre ces 4 points d'entree : certains modules apparaissent dans l'un mais pas dans l'autre.
-
-**Recommandation** : Definir UN hub principal (le Dashboard) et rendre les autres optionnels/secondaires.
-
-### 3. MODULES FANTOMES (Important)
-
-16+ routes pointent vers des pages vides ou avec des donnees fictives. Un beta-testeur qui clique sur "Wearables", "Brain Viewer" ou "Suno AI" tombe sur une page vide ou non fonctionnelle -- impression tres negative.
-
-**Recommandation** : Masquer les modules non finalises du menu et des hubs. Ajouter un badge "Prochainement" au lieu de rendre la page accessible.
-
-### 4. NOMENCLATURE CONFUSE (Important)
-
-Des noms comme "Screen Silk", "Boss Grit", "Bounce Back Battle", "Context Lens", "Flash Glow Ultra" ne sont pas immediatement comprehensibles. Un beta-testeur ne sait pas ce que fait chaque module avant de cliquer.
-
-**Recommandation** : Ajouter un sous-titre descriptif clair sur chaque carte/lien (deja fait dans certains cas via `description` dans le menu).
+1. **Les modules experimentaux sont accessibles** sans avertissement clair
+2. **Les doublons creent de la confusion** (5 chemins vers la communaute)
+3. **Les outils dev sont melanges** avec les modules utilisateur
+4. **Aucune hierarchie** : tout est au meme niveau dans le registre
 
 ---
 
-## Plan d'action propose (par priorite)
+## Plan d'action en 3 phases
 
-### Phase 1 : Nettoyer le menu de navigation (MainNavigationMenu)
+### Phase 1 : Masquer les modules non pertinents pour les beta-testeurs
 
-Reduire les ~90 liens a ~30 liens organises en 5 categories :
+**Fichier : `src/routerV2/registry.ts`**
 
-```text
-CATEGORIES SIMPLIFIEES :
-1. Comprendre (Scanner, Evaluations, Insights)
-2. Agir (Respiration, Coach IA, Journal, Meditation)
-3. S'evader (Musique, VR, Parc Emotionnel)
-4. Progresser (Gamification, Defis, Classement)
-5. Communaute (Entraide, Buddies, Sessions Groupe)
-+ Parametres (Profil, Confidentialite, Premium)
-```
+Ajouter un champ `status` aux routes non fonctionnelles ou dev-only :
 
-Supprimer du menu : Brain Viewer, Hume AI, Suno AI, Wearables, API Keys, Webhooks, Widgets, Themes, Customization, Workshops, Webinars, Export PDF/CSV, Voice Analysis, Context Lens, Parcours XL, TimeCraft.
+Routes a marquer `hidden: true` (retirer du registre utilisateur) :
+- `/app/api-keys` (dev-only)
+- `/app/webhooks` (dev-only)  
+- `/k6-analytics` (monitoring)
+- `/system-health` (monitoring)
+- `/app/api-docs` (dev-only)
+- `/dev/test-accounts` (dev-only)
+- `/app/voice-analysis` (doublon de scan vocal)
+- `/app/auras` (doublon de leaderboard)
 
-### Phase 2 : Consolider les doublons de routes
+Routes a marquer comme `deprecated: true` et rediriger :
+- `/app/communaute` -> `/app/entraide`
+- `/app/social-cocon` -> `/app/entraide`
+- `/app/feed` -> `/app/entraide`
+- `/app/friends` -> `/app/buddies`
+- `/app/groups` -> `/app/entraide`
+- `/app/particulier` -> `/app/home`
+- `/app/particulier/mood` -> `/app/scan`
 
-Pour chaque doublon identifie, garder la route canonique et s'assurer que les alias redirigent correctement (deja fait dans `aliases.tsx` mais le menu pointe encore vers des doublons).
+### Phase 2 : Rendre fonctionnels les modules partiels (priorite haute)
 
-### Phase 3 : Masquer les modules non prets
+**2a. Hume AI (`HumeAIRealtimePage.tsx`)** -- Ameliorations :
+- Ajouter un bouton retour vers `/app/home`
+- Remplacer les tabs desactives (Face, Prosody) par un message "Mode textuel uniquement" au lieu de tabs grises
+- L'edge function `hume-analysis` existe et fonctionne deja en mode mock -- c'est acceptable
 
-Pour les 16 modules non fonctionnels, 2 options :
-- **Option A** : Les retirer completement du registre de navigation
-- **Option B** : Les garder avec un badge "Bientot" et un ecran placeholder unifie ("Ce module arrive bientot. Restez connecte !")
+**2b. Wearables (`WearablesPage.tsx`)** -- Ameliorations :
+- Ajouter un bouton retour vers `/app/home`
+- Remplacer `loadTrends()` qui genere des mocks aleatoires par un etat vide propre ("Connectez un appareil")
+- La page est deja bien construite avec tabs et graphiques
 
-### Phase 4 : Simplifier le parcours post-inscription
+**2c. Brain Viewer (`BrainViewerPage.tsx`)** -- Ameliorations :
+- Le lien retour pointe vers `/app` au lieu de `/app/home` -- corriger
+- Ce module est fonctionnel visuellement (3D, shortcuts clavier) -- le laisser tel quel
 
-Apres l'inscription (corrigee recemment), l'utilisateur arrive sur `/app/home`. Le dashboard doit presenter **5 actions principales** maximum au lieu de la grille actuelle de 20+ cartes.
+**2d. Workshops / Webinars** -- Ameliorations :
+- Ajouter un bouton retour vers `/app/home`
+- Les pages sont fonctionnelles en localStorage -- acceptable pour une beta
+
+**2e. Integrations (`IntegrationsPage.tsx`)** -- Ameliorations :
+- Ajouter un bouton retour
+- Ajouter un message "Integrations disponibles prochainement" sous le titre
+- Desactiver les toggles (actuellement ils ne font rien, ce qui est trompeur)
+
+**2f. Themes / Customization / Widgets** -- Ameliorations :
+- Ajouter boutons retour
+- Themes fonctionne en localStorage -- acceptable
+- Customization/Widgets : ajouter persistance localStorage (deja fait pour Widgets)
+
+**2g. Export PDF/CSV** -- Ameliorations :
+- Ajouter boutons retour
+- Connecter le bouton "Exporter" a un vrai telechargement (generer un PDF/CSV basique avec les donnees utilisateur disponibles)
+
+### Phase 3 : Ajouter les modules au catalogue ModulesDashboard
+
+**Fichier : `src/pages/ModulesDashboard.tsx`**
+
+Ajouter les modules manquants du catalogue :
+- Meditation (absent du catalogue mais fonctionnel)
+- Screen Silk (absent)
+- Nyvee (absent)
+- VR Breath (absent)
+- Voice Journal (absent)
+- Seuil (absent)
+- Face AR (absent)
 
 ---
 
 ## Resume des fichiers a modifier
 
-| Fichier | Modification | Impact |
-|---------|-------------|--------|
-| `MainNavigationMenu.tsx` | Reduire de ~90 a ~30 liens, reorganiser en 5 categories | UX critique |
-| `B2CDashboardPage.tsx` | Simplifier les cartes d'acces rapide (5 principales + "Voir plus") | UX critique |
-| `ModulesDashboard.tsx` | Ajouter filtres et badges "Bientot" pour modules non prets | UX important |
-| `registry.ts` | Ajouter un champ `status: 'stable' | 'beta' | 'coming-soon'` aux routes non pretes | Architecture |
+| Fichier | Modifications |
+|---------|--------------|
+| `src/routerV2/registry.ts` | Marquer ~8 routes `hidden`, ~7 routes `deprecated` |
+| `src/pages/HumeAIRealtimePage.tsx` | Bouton retour + simplifier tabs + message clair |
+| `src/pages/WearablesPage.tsx` | Bouton retour + supprimer mocks trends |
+| `src/pages/BrainViewerPage.tsx` | Corriger lien retour `/app` -> `/app/home` |
+| `src/pages/WorkshopsPage.tsx` | Bouton retour |
+| `src/pages/WebinarsPage.tsx` | Bouton retour |
+| `src/pages/IntegrationsPage.tsx` | Bouton retour + desactiver toggles + message "prochainement" |
+| `src/pages/ThemesPage.tsx` | Bouton retour |
+| `src/pages/CustomizationPage.tsx` | Bouton retour + persistance localStorage |
+| `src/pages/WidgetsPage.tsx` | Bouton retour |
+| `src/pages/ExportPDFPage.tsx` | Bouton retour |
+| `src/pages/ExportCSVPage.tsx` | Bouton retour |
+| `src/pages/ModulesDashboard.tsx` | Ajouter ~7 modules manquants au catalogue |
+| `src/routerV2/schema.ts` | Ajouter `hidden?: boolean` au type `RouteMeta` |
 
-**4 fichiers principaux a modifier** pour un impact maximal sur l'experience beta-testeur.
+Total : **14 fichiers a modifier**. Aucun fichier a creer, aucune migration DB.
 
-Le travail le plus impactant est la simplification du `MainNavigationMenu.tsx` : passer de 90 liens a 30 liens bien organises transformera immediatement l'experience utilisateur.
+La priorite absolue est la Phase 1 (masquer les modules dev/doublons) car c'est ce qui genere le plus de confusion pour les beta-testeurs.
 
