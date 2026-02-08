@@ -28,10 +28,10 @@ const ERROR_MESSAGES: Record<string, FriendlyError> = {
     action: 'Essayez de vous connecter ou utilisez une autre adresse.'
   },
   'weak_password': {
-    message: 'Le mot de passe doit contenir au moins 8 caractères, incluant majuscules, minuscules et chiffres.',
+    message: 'Ce mot de passe est trop courant et a été trouvé dans des fuites de données. Choisissez un mot de passe unique.',
     code: 'WEAK_PASSWORD',
     severity: 'error',
-    action: 'Choisissez un mot de passe plus robuste.'
+    action: 'Utilisez un mot de passe unique que vous n\'avez jamais utilisé ailleurs (ex: une phrase mémorable avec chiffres et symboles).'
   },
   'invalid_email': {
     message: 'L\'adresse email n\'est pas valide.',
@@ -147,6 +147,16 @@ export function getFriendlyAuthError(error: unknown): FriendlyError {
     const code = typeof errorObj.code === 'string' ? errorObj.code : '';
     
     if (code === 'weak_password') {
+      // Detect "pwned" specifically for a more precise message
+      const msg = typeof errorObj.message === 'string' ? errorObj.message.toLowerCase() : '';
+      if (msg.includes('pwned') || msg.includes('known to be weak')) {
+        return {
+          message: 'Ce mot de passe est trop courant et figure dans des bases de données piratées. Choisissez un mot de passe unique.',
+          code: 'WEAK_PASSWORD',
+          severity: 'error',
+          action: 'Inventez une phrase personnelle avec des chiffres et symboles (ex: MonChat*Adore7Poissons!).'
+        };
+      }
       return ERROR_MESSAGES['weak_password'];
     }
     if (code === 'email_not_confirmed') {
