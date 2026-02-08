@@ -5,55 +5,27 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
-  Menu, 
   X, 
   Home, 
   Brain, 
   Music, 
   BookOpen, 
   Wind, 
-  Eye, 
-  Palette, 
-  Wand2,
-  Zap,
+  Eye,
+  Sparkles,
   Target,
   Heart,
   Users,
   Settings,
-  BarChart3,
-  Shield,
   HelpCircle,
-  FileDown,
-  Bell,
   User,
   ChevronDown,
-  Sparkles,
   Gamepad2,
-  Star,
-  Calendar,
-  MessageCircle,
   Trophy,
-  Compass,
   Map,
-  Film,
-  Volume2,
-  Activity,
+  MessageCircle,
   Crown,
-  Clock,
-  Rocket,
-  Globe,
-  Smile,
-  TrendingUp,
-  Gift,
   Lock,
-  Database,
-  Smartphone,
-  RefreshCw,
-  LayoutDashboard,
-  Camera,
-  Mic,
-  FileText,
-  Waves
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -69,133 +41,55 @@ interface NavigationItem {
   isPremium?: boolean;
 }
 
+/**
+ * Navigation simplifiée : ~30 liens essentiels organisés en 5 catégories
+ * (réduit depuis ~90 liens / 15 catégories)
+ */
 const navigationItems: NavigationItem[] = [
   // ═══════════════════════════════════════════════════════════
-  // ACCUEIL & DASHBOARDS
+  // ACCUEIL
   // ═══════════════════════════════════════════════════════════
-  { id: 'home', label: 'Accueil', icon: Home, href: '/', category: 'Accueil', description: 'Page d\'accueil' },
-  { id: 'dashboard', label: 'Mon Espace', icon: LayoutDashboard, href: '/app/home', category: 'Accueil', description: 'Tableau de bord' },
-  { id: 'modules', label: 'Tous les Modules', icon: Compass, href: '/app/modules', category: 'Accueil', description: 'Explorer les modules' },
-  { id: 'navigation', label: 'Plan du site', icon: Map, href: '/navigation', category: 'Accueil', description: 'Toutes les pages' },
-  
+  { id: 'dashboard', label: 'Mon Espace', icon: Home, href: '/app/home', category: 'Accueil', description: 'Tableau de bord' },
+  { id: 'emotional-park', label: 'Parc Émotionnel', icon: Map, href: '/app/emotional-park', category: 'Accueil', description: 'Monde immersif' },
+  { id: 'modules', label: 'Explorer les modules', icon: Sparkles, href: '/app/modules', category: 'Accueil', description: 'Catalogue complet' },
+
   // ═══════════════════════════════════════════════════════════
-  // ANALYSE ÉMOTIONNELLE
+  // COMPRENDRE — Scanner, Évaluations, Insights
   // ═══════════════════════════════════════════════════════════
-  { id: 'scan', label: 'Scanner Émotionnel', icon: Brain, href: '/app/scan', category: 'Analyse', description: 'Analyse IA temps réel', badge: 'IA' },
-  { id: 'scan-facial', label: 'Scan Facial', icon: Camera, href: '/app/scan/facial', category: 'Analyse', description: 'Détection visage' },
-  { id: 'scan-voice', label: 'Scan Vocal', icon: Mic, href: '/app/scan/voice', category: 'Analyse', description: 'Analyse vocale' },
-  { id: 'scan-text', label: 'Scan Texte', icon: FileText, href: '/app/scan/text', category: 'Analyse', description: 'Analyse textuelle' },
-  { id: 'hume-ai', label: 'Hume AI', icon: Activity, href: '/app/hume-ai', category: 'Analyse', description: 'IA émotionnelle avancée', isNew: true },
-  { id: 'brain-viewer', label: 'Brain Viewer', icon: Brain, href: '/app/brain-viewer', category: 'Analyse', description: 'Visualisation cérébrale', isPremium: true },
-  { id: 'context-lens', label: 'Context Lens', icon: Eye, href: '/app/context-lens', category: 'Analyse', description: 'Analyse contextuelle', isNew: true },
-  
+  { id: 'scan', label: 'Scanner Émotionnel', icon: Brain, href: '/app/scan', category: 'Comprendre', description: 'Analyse IA temps réel', badge: 'IA' },
+  { id: 'journal', label: 'Journal', icon: BookOpen, href: '/app/journal', category: 'Comprendre', description: 'Journal émotionnel' },
+  { id: 'weekly-bars', label: 'Bilan Hebdo', icon: Target, href: '/app/weekly-bars', category: 'Comprendre', description: 'Visualisation semaine' },
+
   // ═══════════════════════════════════════════════════════════
-  // ÉVALUATIONS CLINIQUES
+  // AGIR — Respiration, Coach, Méditation
   // ═══════════════════════════════════════════════════════════
-  { id: 'assess', label: 'Évaluations', icon: FileText, href: '/app/assess', category: 'Évaluations', description: 'Tests psychométriques', isNew: true },
-  { id: 'assess-who5', label: 'WHO-5', icon: Smile, href: '/app/assess?instrument=WHO5', category: 'Évaluations', description: 'Bien-être OMS' },
-  { id: 'assess-phq9', label: 'PHQ-9', icon: Heart, href: '/app/assess?instrument=PHQ9', category: 'Évaluations', description: 'Dépression' },
-  { id: 'assess-gad7', label: 'GAD-7', icon: Activity, href: '/app/assess?instrument=GAD7', category: 'Évaluations', description: 'Anxiété' },
-  
+  { id: 'breath', label: 'Respiration', icon: Wind, href: '/app/breath', category: 'Agir', description: 'Exercices guidés' },
+  { id: 'coach', label: 'Coach IA', icon: MessageCircle, href: '/app/coach', category: 'Agir', description: 'Assistant personnel', badge: 'IA' },
+  { id: 'meditation', label: 'Méditation', icon: Heart, href: '/app/meditation', category: 'Agir', description: 'Sessions guidées' },
+  { id: 'flash-glow', label: 'Flash Glow', icon: Sparkles, href: '/app/flash-glow', category: 'Agir', description: 'Boost rapide 2min' },
+
   // ═══════════════════════════════════════════════════════════
-  // BIEN-ÊTRE & RELAXATION
+  // S'ÉVADER — Musique, VR, Parc Émotionnel
   // ═══════════════════════════════════════════════════════════
-  { id: 'flash-glow', label: 'Flash Glow', icon: Sparkles, href: '/app/flash-glow', category: 'Bien-être', description: 'Boost rapide 2min', isNew: true },
-  { id: 'breath', label: 'Respiration', icon: Wind, href: '/app/breath', category: 'Bien-être', description: 'Exercices guidés' },
-  { id: 'meditation', label: 'Méditation', icon: Heart, href: '/app/meditation', category: 'Bien-être', description: 'Sessions guidées' },
-  { id: 'screen-silk', label: 'Screen Silk', icon: RefreshCw, href: '/app/screen-silk', category: 'Bien-être', description: 'Micro-pauses' },
-  { id: 'bubble-beat', label: 'Bubble Beat', icon: Waves, href: '/app/bubble-beat', category: 'Bien-être', description: 'Défouloir ludique', isNew: true },
-  
+  { id: 'music', label: 'Musicothérapie', icon: Music, href: '/app/music', category: "S'évader", description: 'Vinyls adaptatifs' },
+  { id: 'vr', label: 'Espace VR', icon: Eye, href: '/app/vr', category: "S'évader", description: 'Réalité virtuelle', isPremium: true },
+  { id: 'bubble-beat', label: 'Bubble Beat', icon: Gamepad2, href: '/app/bubble-beat', category: "S'évader", description: 'Jeu anti-stress' },
+  { id: 'story-synth', label: 'Story Synth', icon: Sparkles, href: '/app/story-synth', category: "S'évader", description: 'Histoires IA' },
+
   // ═══════════════════════════════════════════════════════════
-  // MUSIQUE & AUDIO
+  // PROGRESSER — Gamification, Défis, Classement
   // ═══════════════════════════════════════════════════════════
-  { id: 'music', label: 'Musicothérapie', icon: Music, href: '/app/music', category: 'Musique', description: 'Vinyls adaptatifs' },
-  { id: 'music-premium', label: 'Music Premium', icon: Crown, href: '/app/music-premium', category: 'Musique', description: 'Génération IA', isPremium: true },
-  { id: 'mood-mixer', label: 'Mood Mixer', icon: Palette, href: '/app/mood-mixer', category: 'Musique', description: 'Mix personnalisé' },
-  { id: 'suno-ai', label: 'Suno AI', icon: Music, href: '/app/suno', category: 'Musique', description: 'Génération musicale', isNew: true },
-  { id: 'voice-journal', label: 'Journal Vocal', icon: Volume2, href: '/app/voice-journal', category: 'Musique', description: 'Dictée vocale' },
-  
+  { id: 'boss-grit', label: 'Boss Grit', icon: Target, href: '/app/boss-grit', category: 'Progresser', description: 'Défis résilience' },
+  { id: 'ambition-arcade', label: 'Ambition Arcade', icon: Gamepad2, href: '/app/ambition-arcade', category: 'Progresser', description: 'Objectifs gamifiés' },
+  { id: 'leaderboard', label: 'Classements', icon: Trophy, href: '/app/leaderboard', category: 'Progresser', description: 'Top joueurs' },
+
   // ═══════════════════════════════════════════════════════════
-  // JOURNAL & RÉFLEXION
+  // COMMUNAUTÉ — Entraide, Buddies
   // ═══════════════════════════════════════════════════════════
-  { id: 'journal', label: 'Journal', icon: BookOpen, href: '/app/journal', category: 'Journal', description: 'Journal émotionnel' },
-  { id: 'journal-new', label: 'Nouvelle Entrée', icon: FileText, href: '/app/journal-new', category: 'Journal', description: 'Créer entrée' },
-  { id: 'emotion-sessions', label: 'Historique Sessions', icon: Clock, href: '/app/emotion-sessions', category: 'Journal', description: 'Toutes vos sessions' },
-  { id: 'insights', label: 'Insights', icon: TrendingUp, href: '/app/insights', category: 'Journal', description: 'Analyses personnelles' },
-  
-  // ═══════════════════════════════════════════════════════════
-  // COACHING & ACCOMPAGNEMENT
-  // ═══════════════════════════════════════════════════════════
-  { id: 'coach', label: 'Coach IA', icon: Sparkles, href: '/app/coach', category: 'Coaching', description: 'Assistant personnel', badge: 'IA' },
-  { id: 'coach-programs', label: 'Programmes', icon: Target, href: '/app/coach/programs', category: 'Coaching', description: 'Parcours guidés' },
-  { id: 'coach-sessions', label: 'Sessions Coach', icon: MessageCircle, href: '/app/coach/sessions', category: 'Coaching', description: 'Historique coaching' },
-  { id: 'nyvee', label: 'Nyvee Cocon', icon: Heart, href: '/app/nyvee', category: 'Coaching', description: 'Compagnon virtuel' },
-  
-  // ═══════════════════════════════════════════════════════════
-  // IMMERSIF & VR
-  // ═══════════════════════════════════════════════════════════
-  { id: 'vr', label: 'Espace VR', icon: Eye, href: '/app/vr', category: 'Immersif', description: 'Réalité virtuelle', isPremium: true },
-  { id: 'vr-galaxy', label: 'VR Galaxy', icon: Globe, href: '/app/vr-galaxy', category: 'Immersif', description: 'Exploration spatiale' },
-  { id: 'vr-breath', label: 'VR Respiration', icon: Wind, href: '/app/vr-breath-guide', category: 'Immersif', description: 'Guidage immersif' },
-  { id: 'ar-filters', label: 'AR Filters', icon: Camera, href: '/app/face-ar', category: 'Immersif', description: 'Filtres AR' },
-  { id: 'emotional-park', label: 'Parc Émotionnel', icon: Map, href: '/app/emotional-park', category: 'Immersif', description: 'Monde 3D' },
-  
-  // ═══════════════════════════════════════════════════════════
-  // CRÉATIF & HISTOIRES
-  // ═══════════════════════════════════════════════════════════
-  { id: 'story-synth', label: 'Story Synth Lab', icon: Wand2, href: '/app/story-synth', category: 'Créatif', description: 'Histoires IA' },
-  { id: 'emotion-atlas', label: 'Atlas Émotions', icon: Compass, href: '/app/emotion-atlas', category: 'Créatif', description: 'Cartographie' },
-  { id: 'discovery', label: 'Découverte', icon: Rocket, href: '/app/discovery', category: 'Créatif', description: 'Exploration' },
-  { id: 'parcours-xl', label: 'Parcours XL', icon: Film, href: '/app/parcours-xl', category: 'Créatif', description: 'Immersion longue' },
-  
-  // ═══════════════════════════════════════════════════════════
-  // GAMIFICATION & DÉFIS
-  // ═══════════════════════════════════════════════════════════
-  { id: 'boss-grit', label: 'Boss Level Grit', icon: Target, href: '/app/boss-grit', category: 'Gamification', description: 'Défis persévérance' },
-  { id: 'ambition-arcade', label: 'Ambition Arcade', icon: Gamepad2, href: '/app/ambition-arcade', category: 'Gamification', description: 'Jeux motivationnels' },
-  { id: 'bounce-back', label: 'Bounce Back', icon: Shield, href: '/app/bounce-back', category: 'Gamification', description: 'Résilience' },
-  { id: 'daily-challenges', label: 'Défis Quotidiens', icon: Zap, href: '/app/daily-challenges', category: 'Gamification', description: 'Challenges du jour' },
-  { id: 'challenges', label: 'Tous les Défis', icon: Trophy, href: '/app/challenges', category: 'Gamification', description: 'Liste des défis' },
-  { id: 'gamification', label: 'Centre Gamification', icon: Star, href: '/gamification', category: 'Gamification', description: 'XP et niveaux' },
-  { id: 'badges', label: 'Badges', icon: Star, href: '/app/badges', category: 'Gamification', description: 'Vos récompenses' },
-  { id: 'rewards', label: 'Récompenses', icon: Gift, href: '/app/rewards', category: 'Gamification', description: 'Débloquer bonus' },
-  { id: 'leaderboard', label: 'Classements', icon: Trophy, href: '/app/leaderboard', category: 'Gamification', description: 'Top joueurs' },
-  { id: 'tournaments', label: 'Tournois', icon: Trophy, href: '/app/tournaments', category: 'Gamification', description: 'Compétitions' },
-  { id: 'guilds', label: 'Guildes', icon: Users, href: '/app/guilds', category: 'Gamification', description: 'Équipes' },
-  
-  // ═══════════════════════════════════════════════════════════
-  // ANALYTICS & STATISTIQUES
-  // ═══════════════════════════════════════════════════════════
-  { id: 'analytics', label: 'Analytics', icon: BarChart3, href: '/app/analytics', category: 'Analytics', description: 'Statistiques globales' },
-  { id: 'weekly-bars', label: 'Weekly Bars', icon: BarChart3, href: '/app/weekly-bars', category: 'Analytics', description: 'Graphiques hebdo' },
-  { id: 'scores', label: 'Scores & Vibes', icon: Activity, href: '/app/scores', category: 'Analytics', description: 'Heatmap quotidienne' },
-  { id: 'activity', label: 'Activité', icon: Activity, href: '/app/activity', category: 'Analytics', description: 'Historique activité' },
-  { id: 'trends', label: 'Tendances', icon: TrendingUp, href: '/app/trends', category: 'Analytics', description: 'Évolution' },
-  { id: 'sessions', label: 'Sessions', icon: Clock, href: '/app/sessions', category: 'Analytics', description: 'Historique complet' },
-  { id: 'goals', label: 'Objectifs', icon: Target, href: '/app/goals', category: 'Analytics', description: 'Suivi objectifs' },
-  { id: 'auras', label: 'Auras', icon: Sparkles, href: '/app/auras', category: 'Analytics', description: 'Classement aura', isNew: true },
-  
-  // ═══════════════════════════════════════════════════════════
-  // SOCIAL & COMMUNAUTÉ
-  // ═══════════════════════════════════════════════════════════
-  { id: 'community', label: 'Communauté', icon: Users, href: '/app/community', category: 'Social', description: 'Groupes' },
-  { id: 'social-cocon', label: 'Social Cocon', icon: Heart, href: '/app/social-cocon', category: 'Social', description: 'Espace bienveillant' },
-  { id: 'buddies', label: 'Buddies', icon: Users, href: '/app/buddies', category: 'Social', description: 'Trouver un binôme' },
-  { id: 'group-sessions', label: 'Sessions Groupe', icon: Users, href: '/app/group-sessions', category: 'Social', description: 'Pratique collective' },
-  { id: 'exchange', label: 'Exchange Hub', icon: RefreshCw, href: '/app/exchange', category: 'Social', description: 'Partage ressources' },
-  { id: 'messages', label: 'Messages', icon: MessageCircle, href: '/messages', category: 'Social', description: 'Messagerie' },
-  { id: 'friends', label: 'Amis', icon: Users, href: '/app/friends', category: 'Social', description: 'Liste d\'amis' },
-  
-  // ═══════════════════════════════════════════════════════════
-  // OUTILS & INTÉGRATIONS
-  // ═══════════════════════════════════════════════════════════
-  { id: 'wearables', label: 'Wearables', icon: Smartphone, href: '/app/wearables', category: 'Outils', description: 'Montres connectées' },
-  { id: 'data-export', label: 'Export Données', icon: FileDown, href: '/app/data-export', category: 'Outils', description: 'RGPD Export' },
-  { id: 'calendar', label: 'Calendrier', icon: Calendar, href: '/calendar', category: 'Outils', description: 'Planning' },
-  { id: 'notifications', label: 'Notifications', icon: Bell, href: '/app/notifications', category: 'Outils', description: 'Centre notifs' },
-  { id: 'timecraft', label: 'TimeCraft', icon: Clock, href: '/app/timecraft', category: 'Outils', description: 'Gestion du temps' },
-  { id: 'integrations', label: 'Intégrations', icon: Database, href: '/app/integrations', category: 'Outils', description: 'Apps tierces' },
-  
+  { id: 'entraide', label: 'Entraide', icon: Users, href: '/app/entraide', category: 'Communauté', description: 'Espace bienveillant' },
+  { id: 'buddies', label: 'Buddies', icon: Heart, href: '/app/buddies', category: 'Communauté', description: 'Trouver un binôme' },
+  { id: 'exchange', label: 'Exchange Hub', icon: Sparkles, href: '/app/exchange', category: 'Communauté', description: 'Marchés émotions' },
+
   // ═══════════════════════════════════════════════════════════
   // PARAMÈTRES
   // ═══════════════════════════════════════════════════════════
@@ -203,35 +97,17 @@ const navigationItems: NavigationItem[] = [
   { id: 'settings', label: 'Paramètres', icon: Settings, href: '/settings/general', category: 'Paramètres', description: 'Configuration' },
   { id: 'privacy', label: 'Confidentialité', icon: Lock, href: '/settings/privacy', category: 'Paramètres', description: 'Données privées' },
   { id: 'premium', label: 'Premium', icon: Crown, href: '/app/premium', category: 'Paramètres', description: 'Abonnement', isPremium: true },
-  { id: 'billing', label: 'Facturation', icon: FileText, href: '/app/billing', category: 'Paramètres', description: 'Paiements' },
-  { id: 'consent', label: 'Consentements', icon: Shield, href: '/app/consent', category: 'Paramètres', description: 'Gérer consentements', isNew: true },
-  { id: 'delete-account', label: 'Suppression', icon: Shield, href: '/app/delete-account', category: 'Paramètres', description: 'Supprimer compte' },
-  
-  // ═══════════════════════════════════════════════════════════
-  // SUPPORT
-  // ═══════════════════════════════════════════════════════════
-  { id: 'help', label: 'Centre d\'Aide', icon: HelpCircle, href: '/help', category: 'Support', description: 'Documentation' },
-  { id: 'faq', label: 'FAQ', icon: HelpCircle, href: '/faq', category: 'Support', description: 'Questions fréquentes' },
-  { id: 'support', label: 'Support', icon: MessageCircle, href: '/app/support', category: 'Support', description: 'Contacter support' },
-  { id: 'tickets', label: 'Mes Tickets', icon: FileText, href: '/app/tickets', category: 'Support', description: 'Suivi demandes' },
+  { id: 'help', label: 'Aide', icon: HelpCircle, href: '/help', category: 'Paramètres', description: 'Documentation' },
 ];
 
 const categories = [
   'Accueil',
-  'Analyse',
-  'Évaluations',
-  'Bien-être',
-  'Musique',
-  'Journal',
-  'Coaching',
-  'Immersif',
-  'Créatif',
-  'Gamification',
-  'Analytics',
-  'Social',
-  'Outils',
+  'Comprendre',
+  'Agir',
+  "S'évader",
+  'Progresser',
+  'Communauté',
   'Paramètres',
-  'Support'
 ];
 
 interface MainNavigationMenuProps {
@@ -241,7 +117,7 @@ interface MainNavigationMenuProps {
 
 const MainNavigationMenu: React.FC<MainNavigationMenuProps> = ({ isOpen, onToggle }) => {
   const location = useLocation();
-  const [expandedCategories, setExpandedCategories] = useState<string[]>(['Accueil']);
+  const [expandedCategories, setExpandedCategories] = useState<string[]>(['Accueil', 'Agir']);
 
   const getItemsByCategory = (category: string) => {
     return navigationItems.filter(item => item.category === category);
@@ -320,15 +196,10 @@ const MainNavigationMenu: React.FC<MainNavigationMenuProps> = ({ isOpen, onToggl
                     )}
                   >
                     <span>{category}</span>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="text-xs h-5 px-1.5">
-                        {items.length}
-                      </Badge>
-                      <ChevronDown className={cn(
-                        "h-4 w-4 transition-transform duration-200",
-                        isExpanded && "rotate-180"
-                      )} />
-                    </div>
+                    <ChevronDown className={cn(
+                      "h-4 w-4 transition-transform duration-200",
+                      isExpanded && "rotate-180"
+                    )} />
                   </Button>
 
                   <AnimatePresence>
@@ -372,11 +243,6 @@ const MainNavigationMenu: React.FC<MainNavigationMenuProps> = ({ isOpen, onToggl
                                         {item.badge}
                                       </Badge>
                                     )}
-                                    {item.isNew && (
-                                      <Badge className="text-[10px] h-4 px-1 bg-green-500 hover:bg-green-600">
-                                        New
-                                      </Badge>
-                                    )}
                                     {item.isPremium && (
                                       <Crown className="h-3 w-3 text-amber-500" />
                                     )}
@@ -401,14 +267,9 @@ const MainNavigationMenu: React.FC<MainNavigationMenuProps> = ({ isOpen, onToggl
             <p className="text-xs text-muted-foreground">
               Intelligence Émotionnelle
             </p>
-            <div className="flex justify-center gap-3 text-xs">
-              <span className="text-primary font-medium">
-                {navigationItems.length} modules
-              </span>
-              <span className="text-green-600 font-medium">
-                {navigationItems.filter(i => i.isNew).length} nouveaux
-              </span>
-            </div>
+            <p className="text-xs text-primary font-medium">
+              {navigationItems.length} modules disponibles
+            </p>
           </div>
         </div>
       </motion.aside>

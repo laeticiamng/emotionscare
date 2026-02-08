@@ -20,7 +20,6 @@ import {
   HelpCircle,
   ChevronRight,
   Wind,
-  TreePalm,
   Flame,
   RefreshCw,
   Award,
@@ -30,7 +29,6 @@ import {
   User,
   Bell,
   Activity,
-  Calendar,
   Compass,
 } from 'lucide-react';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
@@ -75,70 +73,50 @@ type QuickAction = {
   accent: string;
 };
 
+/**
+ * 5 actions prioritaires pour le dashboard simplifié.
+ * Les modules secondaires sont accessibles via "Explorer tous les modules".
+ */
 const QUICK_ACTIONS: QuickAction[] = [
   {
+    id: 'scan',
+    title: 'Scanner mes émotions',
+    description: 'Analyse IA en temps réel',
+    to: '/app/scan',
+    icon: Brain,
+    accent: 'bg-primary/10 text-primary',
+  },
+  {
     id: 'breath',
-    title: 'Respiration douce',
-    description: 'Un instant pour revenir au calme',
+    title: 'Respiration guidée',
+    description: 'Retrouver le calme en 2 min',
     to: '/app/breath',
     icon: Wind,
     accent: 'bg-sky-500/10 text-sky-600',
   },
   {
-    id: 'nyvee',
-    title: 'Parler à Nyvée',
-    description: 'Support immédiat et bienveillant',
+    id: 'coach',
+    title: 'Parler au Coach IA',
+    description: 'Soutien personnalisé immédiat',
     to: '/app/coach',
     icon: MessageCircle,
     accent: 'bg-accent/10 text-accent',
   },
   {
     id: 'music',
-    title: 'Musique thérapeutique',
-    description: 'Sons adaptatifs personnalisés',
+    title: 'Musicothérapie',
+    description: 'Sons adaptatifs à votre humeur',
     to: '/app/music',
     icon: Music,
     accent: 'bg-info/10 text-info',
   },
   {
-    id: 'ambition',
-    title: 'Ambition Arcade',
-    description: 'Gamifier vos objectifs positifs',
-    to: '/app/ambition-arcade',
-    icon: Sparkles,
-    accent: 'bg-warning/10 text-warning',
-  },
-  {
-    id: 'scan',
-    title: 'Scanner mes émotions',
-    description: 'Analyse faciale temps réel',
-    to: '/app/scan',
-    icon: Brain,
-    accent: 'bg-primary/10 text-primary',
-  },
-  {
     id: 'journal',
-    title: 'Journal émotionnel',
-    description: 'Consignez vos ressentis',
+    title: 'Mon journal',
+    description: 'Consigner mes ressentis',
     to: '/app/journal',
     icon: BookOpen,
     accent: 'bg-success/10 text-success',
-  },
-  {
-    id: 'exchange',
-    title: 'Exchange Hub',
-    description: 'Marchés émotions, temps et confiance',
-    to: routes.b2c.exchange(),
-    icon: TrendingUp,
-    accent: 'bg-emerald-500/10 text-emerald-600',
-  },
-  {
-    id: 'emotional-park',
-    title: 'Parc Émotionnel',
-    description: 'Voyage immersif dans vos émotions',
-    to: '/app/emotional-park',
-    icon: TreePalm,
-    accent: 'bg-violet-500/10 text-violet-600',
   },
 ];
 
@@ -247,7 +225,7 @@ export default function B2CDashboardPage() {
   }, [activeTone, clinicalTone]);
 
   const orderedQuickActions = useMemo(
-    () => orderQuickActions(QUICK_ACTIONS, activeTone ?? undefined).slice(0, 8),
+    () => orderQuickActions(QUICK_ACTIONS, activeTone ?? undefined).slice(0, 5),
     [activeTone],
   );
 
