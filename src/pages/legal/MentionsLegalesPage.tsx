@@ -83,7 +83,7 @@ export const MentionsLegalesPage: React.FC = () => {
               </p>
               <p>
                 <strong>Délégué à la Protection des Données (DPO) :</strong><br />
-                Email : <a href="mailto:dpo@emotionscare.com" className="text-primary hover:underline">dpo@emotionscare.com</a><br />
+                Email : <a href="mailto:contact@emotionscare.com" className="text-primary hover:underline">contact@emotionscare.com</a><br />
                 Adresse : EmotionsCare SASU – DPO, 5 rue Caudron, 80000 Amiens
               </p>
               <p>
@@ -177,7 +177,7 @@ export const MentionsLegalesPage: React.FC = () => {
               </h2>
               <p>Pour toute question concernant ces mentions légales :</p>
               <ul>
-                <li><strong>Email :</strong> <a href="mailto:legal@emotionscare.com" className="text-primary hover:underline">legal@emotionscare.com</a></li>
+                <li><strong>Email :</strong> <a href="mailto:contact@emotionscare.com" className="text-primary hover:underline">contact@emotionscare.com</a></li>
                 <li><strong>Courrier :</strong> EmotionsCare SASU - Service Juridique - 5 rue Caudron, 80000 Amiens</li>
               </ul>
             </section>

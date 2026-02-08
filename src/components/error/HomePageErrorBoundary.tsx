@@ -134,10 +134,10 @@ class HomePageErrorBoundary extends Component<Props, State> {
               <div className="text-center text-sm text-muted-foreground pt-4 border-t">
                 <p>Si le problème persiste, contactez-nous à</p>
                 <a
-                  href="mailto:support@emotionscare.com"
+                  href="mailto:contact@emotionscare.com"
                   className="text-primary hover:underline font-medium"
                 >
-                  support@emotionscare.com
+                  contact@emotionscare.com
                 </a>
               </div>
             </CardContent>

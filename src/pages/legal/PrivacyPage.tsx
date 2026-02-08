@@ -114,7 +114,7 @@ export const PrivacyPage: React.FC = () => {
               </li>
             </ul>
             <p>
-              Pour exercer ces droits : <strong>privacy@emotionscare.com</strong>
+              Pour exercer ces droits : <strong>contact@emotionscare.com</strong>
             </p>
 
             <h2>6. Cookies et traceurs</h2>
@@ -169,9 +169,9 @@ export const PrivacyPage: React.FC = () => {
             <p>
               <strong>Délégué à la Protection des Données (DPO)</strong>
               <br />
-              Email : dpo@emotionscare.com
+              Email : contact@emotionscare.com
               <br />
-              Adresse : EmotionsCare, France
+              Adresse : EmotionsCare SASU, 5 rue Caudron, 80000 Amiens
             </p>
             <p>
               Vous pouvez également introduire une réclamation auprès de la CNIL (

@@ -182,7 +182,7 @@ serve(async (req) => {
 
     const vapidPrivateKey = Deno.env.get('VAPID_PRIVATE_KEY');
     const vapidPublicKey = Deno.env.get('VITE_VAPID_PUBLIC_KEY') || Deno.env.get('VAPID_PUBLIC_KEY');
-    const vapidSubject = Deno.env.get('VAPID_SUBJECT') || 'mailto:support@emotionscare.com';
+    const vapidSubject = Deno.env.get('VAPID_SUBJECT') || 'mailto:contact@emotionscare.com';
 
     if (!vapidPrivateKey || !vapidPublicKey) {
       console.error('VAPID keys not configured');

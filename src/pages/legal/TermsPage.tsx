@@ -107,8 +107,8 @@ export const TermsPage: React.FC = () => {
             <h2>10. Contact</h2>
             <p>
               Pour toute question concernant ces CGU :<br />
-              Email : legal@emotionscare.com<br />
-              Adresse : EmotionsCare, France
+              Email : contact@emotionscare.com<br />
+              Adresse : EmotionsCare SASU, 5 rue Caudron, 80000 Amiens
             </p>
           </CardContent>
         </Card>

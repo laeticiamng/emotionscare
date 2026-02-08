@@ -8,7 +8,7 @@ export const APP_CONFIG = {
   description: 'Plateforme de régulation émotionnelle dédiée aux étudiants en santé et aux professionnels du soin',
   tagline: 'Prendre soin de celles et ceux qui prennent soin.',
   subtitle: 'Une plateforme de régulation émotionnelle dédiée aux étudiants en santé et aux professionnels du soin.',
-  url: 'https://emotionscare.app',
+  url: 'https://emotionscare.com',
   target: {
     primary: 'Étudiants en santé et professionnels du soin',
     b2c: ['Étudiants en santé', 'Infirmiers', 'Médecins', 'Aides-soignants', 'Psychologues'],

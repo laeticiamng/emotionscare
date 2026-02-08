@@ -118,11 +118,7 @@ export const LegalPage: React.FC = () => {
               <div>
                 <h3 className="font-semibold mb-2">Contact</h3>
                 <p className="text-sm text-muted-foreground">
-                  Email : contact@emotionscare.com
-                  <br />
-                  Support : support@emotionscare.com
-                  <br />
-                  DPO : dpo@emotionscare.com
+              Email : contact@emotionscare.com
                 </p>
               </div>
 

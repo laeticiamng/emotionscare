@@ -173,24 +173,20 @@ function updateOrCreateLink(rel: string, href: string) {
 function getOrganizationSchema() {
   return {
     '@type': 'Organization',
-    '@id': 'https://emotionscare.app/#organization',
+    '@id': 'https://emotionscare.com/#organization',
     name: 'EmotionsCare',
-    url: 'https://emotionscare.app',
+    url: 'https://emotionscare.com',
     logo: {
       '@type': 'ImageObject',
-      url: 'https://emotionscare.app/logo.svg',
+      url: 'https://emotionscare.com/logo.svg',
       width: 512,
       height: 512
     },
-    sameAs: [
-      'https://www.linkedin.com/company/emotionscare',
-      'https://twitter.com/emotionscare',
-      'https://www.facebook.com/emotionscare'
-    ],
+    sameAs: [],
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer support',
-      email: 'support@emotionscare.app',
+      email: 'contact@emotionscare.com',
       availableLanguage: ['fr', 'en']
     },
     description: 'Plateforme d\'intelligence émotionnelle pour le bien-être personnel et professionnel. Analysez et améliorez vos émotions avec nos outils innovants.',

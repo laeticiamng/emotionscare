@@ -225,9 +225,9 @@ const GdprActionsSection: React.FC = () => {
           </div>
           <div className="mt-4 pt-4 border-t">
             <p className="text-xs text-muted-foreground">
-              Pour toute question relative à vos données personnelles, contactez notre DPO : 
-              <a href="mailto:dpo@emotionscare.com" className="text-primary hover:underline ml-1">
-                dpo@emotionscare.com
+              Pour toute question relative à vos données personnelles, contactez-nous : 
+              <a href="mailto:contact@emotionscare.com" className="text-primary hover:underline ml-1">
+                contact@emotionscare.com
               </a>
             </p>
           </div>

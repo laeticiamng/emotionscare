@@ -101,7 +101,7 @@ async function sendNotificationEmail(schedule: any, hoursUntilRun: number, resen
   const timeText = hoursUntilRun > 24 ? '48 heures' : '24 heures';
   
   await resend.emails.send({
-    from: "EmotionsCare RGPD <notifications@emotionscare.app>",
+    from: "EmotionsCare RGPD <noreply@emotionscare.com>",
     to: schedule.recipient_emails,
     subject: `🔔 Rapport RGPD planifié dans ${timeText}`,
     html: `

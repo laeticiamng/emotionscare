@@ -359,8 +359,8 @@ export default function ConsentManagementPage() {
           </p>
           <p className="pt-2 border-t">
             Pour toute question concernant vos consentements, contactez-nous à{' '}
-            <a href="mailto:privacy@emotionscare.com" className="text-primary hover:underline">
-              privacy@emotionscare.com
+            <a href="mailto:contact@emotionscare.com" className="text-primary hover:underline">
+              contact@emotionscare.com
             </a>
           </p>
         </CardContent>

@@ -209,7 +209,7 @@ const GdprRightsSection: React.FC = () => {
                   <p>• Les demandes sont traitées dans un délai maximum de 30 jours</p>
                   <p>• Certaines demandes peuvent nécessiter une vérification d'identité</p>
                   <p>• Vous recevrez une confirmation par email pour chaque demande</p>
-                  <p>• En cas de question, contactez notre DPO : privacy@emotionscare.com</p>
+                  <p>• En cas de question, contactez-nous : contact@emotionscare.com</p>
                 </div>
               </div>
             </div>

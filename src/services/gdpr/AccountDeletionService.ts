@@ -23,7 +23,7 @@ interface EmailTemplate {
 }
 
 const EMAIL_FROM = 'EmotionsCare <noreply@emotionscare.com>';
-const SUPPORT_EMAIL = 'support@emotionscare.com';
+const SUPPORT_EMAIL = 'contact@emotionscare.com';
 const APP_URL = import.meta.env.VITE_APP_URL || 'https://emotionscare.com';
 
 /**

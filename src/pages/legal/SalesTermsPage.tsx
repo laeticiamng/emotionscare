@@ -358,7 +358,7 @@ export const SalesTermsPage: React.FC = () => {
               </p>
               <p>
                 <strong>Responsable du traitement :</strong> EmotionsCare SASU<br />
-                <strong>DPO :</strong> <a href="mailto:dpo@emotionscare.com" className="text-primary hover:underline">dpo@emotionscare.com</a>
+                <strong>Contact :</strong> <a href="mailto:contact@emotionscare.com" className="text-primary hover:underline">contact@emotionscare.com</a>
               </p>
               <p>
                 Vous disposez d'un droit d'accès, de rectification, d'effacement, de portabilité et d'opposition sur vos données. 

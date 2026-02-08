@@ -218,7 +218,7 @@ export const NAV_SCHEMA: NavNode[] = [
       {
         id: "contact",
         labelKey: "nav.help.contact",
-        action: { type: "external", href: "mailto:support@emotionscare.com" },
+        action: { type: "external", href: "mailto:contact@emotionscare.com" },
       },
     ],
   },

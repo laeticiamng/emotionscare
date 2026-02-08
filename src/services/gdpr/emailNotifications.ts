@@ -37,7 +37,7 @@ export async function sendDeletionConfirmationEmail(
           }),
           gracePeriodDays: 30,
           cancelUrl: `${window.location.origin}/settings/account`,
-          supportEmail: 'dpo@emotionscare.com'
+          supportEmail: 'contact@emotionscare.com'
         },
         subject: '⚠️ Confirmation de la demande de suppression de compte - EmotionsCare'
       }
@@ -111,7 +111,7 @@ export async function sendFinalDeletionNotice(
         template: 'account_deleted',
         data: {
           userName: userName || 'Utilisateur',
-          supportEmail: 'dpo@emotionscare.com'
+          supportEmail: 'contact@emotionscare.com'
         },
         subject: '👋 Votre compte EmotionsCare a été supprimé'
       }
@@ -139,7 +139,7 @@ export async function notifyGDPRAdmin(
   context: Record<string, unknown> = {}
 ): Promise<boolean> {
   try {
-    const adminEmail = import.meta.env.VITE_GDPR_ADMIN_EMAIL || 'dpo@emotionscare.com';
+    const adminEmail = import.meta.env.VITE_GDPR_ADMIN_EMAIL || 'contact@emotionscare.com';
 
     const { error: sendError } = await supabase.functions.invoke('send-notification-email', {
       body: {

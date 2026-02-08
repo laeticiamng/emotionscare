@@ -21,7 +21,7 @@ export const SEO: React.FC<SEOProps> = ({
   title = 'EmotionsCare',
   description = 'Plateforme de bien-être émotionnel avec IA - Scan émotionnel, musique adaptative, coach IA et plus',
   image = '/og-image.jpg',
-  url = 'https://emotionscare.app',
+  url = 'https://emotionscare.com',
   type = 'website',
   keywords = ['bien-être', 'émotions', 'IA', 'santé mentale', 'musique thérapeutique'],
   author = 'EmotionsCare',
@@ -29,8 +29,8 @@ export const SEO: React.FC<SEOProps> = ({
   modifiedTime,
 }) => {
   const fullTitle = title === 'EmotionsCare' ? title : `${title} | EmotionsCare`;
-  const fullUrl = url.startsWith('http') ? url : `https://emotionscare.app${url}`;
-  const fullImage = image.startsWith('http') ? image : `https://emotionscare.app${image}`;
+  const fullUrl = url.startsWith('http') ? url : `https://emotionscare.com${url}`;
+  const fullImage = image.startsWith('http') ? image : `https://emotionscare.com${image}`;
 
   return (
     <Helmet>
