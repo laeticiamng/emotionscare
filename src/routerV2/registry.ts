@@ -794,6 +794,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: false,
     aliases: ['/choose-mode'],
     deprecated: true,
+    redirectTo: '/',
   },
   {
     name: 'b2c-dashboard',
@@ -805,6 +806,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
     deprecated: true,
+    redirectTo: '/app/consumer/home',
   },
   {
     name: 'b2c-mood',
@@ -816,6 +818,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
     deprecated: true,
+    redirectTo: '/app/scan',
   },
   {
     name: 'advanced-analytics',
@@ -964,6 +967,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
     deprecated: true,
+    redirectTo: '/app/entraide',
   },
   // ═══════════════════════════════════════════════════════════
   // EXCHANGE HUB V2.0 - 4 Marchés
@@ -1118,6 +1122,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/social-cocon'],
     deprecated: true,
+    redirectTo: '/app/entraide',
   },
   {
     name: 'communaute-b2c',
@@ -1129,6 +1134,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/communaute'],
     deprecated: true,
+    redirectTo: '/app/entraide',
   },
 
   // ═══════════════════════════════════════════════════════════
@@ -2077,6 +2083,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'VoiceAnalysisPage',
     guard: true,
     deprecated: true,
+    redirectTo: '/app/scan',
   },
   
   // Social
@@ -2089,6 +2096,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'FriendsPage',
     guard: true,
     deprecated: true,
+    redirectTo: '/app/buddies',
   },
   {
     name: 'groups',
@@ -2099,6 +2107,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'GroupsPage',
     guard: true,
     deprecated: true,
+    redirectTo: '/app/entraide',
   },
   {
     name: 'feed',
@@ -2109,6 +2118,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'B2CCommunautePage',
     guard: true,
     deprecated: true,
+    redirectTo: '/app/entraide',
   },
   
   // Personnalisation
@@ -2690,6 +2700,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
     aliases: ['/auras', '/aura-ranking'],
     deprecated: true,
+    redirectTo: '/app/leaderboard',
   },
   {
     name: 'consent-management',
@@ -2725,22 +2736,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       description: 'Rapport de santé et audit complet de la plateforme',
     },
   },
-  {
-    name: 'context-lens-duplicate',
-    path: '/app/context-lens',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'ContextLensPage',
-    guard: true,
-    requireAuth: true,
-    status: 'coming-soon',
-    deprecated: true,
-    meta: {
-      title: 'Context Lens - EmotionsCare',
-      description: 'Analyse contextuelle et insights émotionnels',
-    },
-  },
+  // context-lens-duplicate supprimé — doublon de context-lens (ligne ~1007)
 
   // 404 FALLBACK ROUTE - Le fallback '*' est géré directement dans router.tsx
   // Cette entrée est gardée pour documentation mais n'est pas utilisée
