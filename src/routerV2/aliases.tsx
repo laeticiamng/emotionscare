@@ -25,7 +25,7 @@ export const ROUTE_ALIASES = {
   // LANDING PAGES
   // ═══════════════════════════════════════════════════════════
   '/choose-mode': '/mode-selection',
-  '/feed': '/app/communaute',
+  '/feed': '/app/entraide',
   '/b2b': '/entreprise',
   '/b2b/selection': '/entreprise',
   '/help-center': '/help',
@@ -70,7 +70,7 @@ export const ROUTE_ALIASES = {
   '/breath': '/app/breath',
   '/voice-journal': '/app/journal',
   '/vr': '/app/vr',
-  '/community': '/app/social-cocon',
+  '/community': '/app/entraide',
 
   // ═══════════════════════════════════════════════════════════
   // MODULES FUN-FIRST
@@ -134,7 +134,7 @@ export const ROUTE_ALIASES = {
   '/contact': '/contact',
   '/app/park': '/app/emotional-park',
   '/park': '/app/emotional-park',
-  '/app/social-b2c': '/app/social-cocon',
+  '/app/social-b2c': '/app/entraide',
 } as const;
 
 export type LegacyPath = keyof typeof ROUTE_ALIASES;

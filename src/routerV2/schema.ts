@@ -22,6 +22,7 @@ export interface RouteMeta {
   status?: 'stable' | 'beta' | 'coming-soon' | 'dev-only'; // visibilité
   guard?: boolean;           // nécessite une protection
   requireAuth?: boolean;     // nécessite authentification
+  redirectTo?: string;       // cible de redirection pour routes deprecated
 }
 
 export interface RouteRegistry {

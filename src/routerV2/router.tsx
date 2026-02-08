@@ -896,7 +896,15 @@ function createRouteElement(routeMeta: RouteMeta) {
 // CRÉATION DU ROUTER
 // ═══════════════════════════════════════════════════════════
 
-const canonicalRoutes = ROUTES_REGISTRY.filter(route => !route.deprecated && route.path !== '*');
+// Routes actives : ni deprecated, ni hidden en production
+const canonicalRoutes = ROUTES_REGISTRY.filter(route => 
+  !route.deprecated && 
+  route.path !== '*' &&
+  !(route.hidden && !import.meta.env.DEV)
+);
+
+// Routes deprecated avec redirectTo → génèrent des <Navigate>
+const deprecatedRoutes = ROUTES_REGISTRY.filter(route => route.deprecated && route.redirectTo);
 
 logger.debug('Creating router', { 
   canonicalRoutes: canonicalRoutes.length,
@@ -926,6 +934,20 @@ export const router = createBrowserRouter([
     (route.aliases || []).map(alias => ({
       path: alias,
       element: createRouteElement(route),
+    }))
+  ),
+
+  // Redirections automatiques des routes deprecated
+  ...deprecatedRoutes.map(route => ({
+    path: route.path,
+    element: <Navigate to={route.redirectTo!} replace />,
+  })),
+
+  // Aliases des routes deprecated (aussi rediriger)
+  ...deprecatedRoutes.flatMap(route =>
+    (route.aliases || []).map(alias => ({
+      path: alias,
+      element: <Navigate to={route.redirectTo!} replace />,
     }))
   ),
 
