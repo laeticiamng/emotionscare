@@ -66,7 +66,7 @@ const MicroGestes: React.FC<MicroGestesProps> = ({
   };
 
   return (
-    <section className="rounded-3xl border border-transparent bg-white/5 p-6 shadow-lg backdrop-blur mood-surface dark:bg-slate-800/40">
+    <section id="micro-gestes-section" data-section="micro-gestes" className="rounded-3xl border border-transparent bg-white/5 p-6 shadow-lg backdrop-blur mood-surface dark:bg-slate-800/40">
       <header className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
