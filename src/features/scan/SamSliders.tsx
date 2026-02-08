@@ -2,9 +2,11 @@ import React from 'react';
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 
 import { Slider } from '@/components/ui/slider';
-import { toLevel, useMoodPublisher } from '@/features/mood/useMoodPublisher';
+import { Button } from '@/components/ui/button';
+import { toLevel, summary as computeSummary, useMoodPublisher } from '@/features/mood/useMoodPublisher';
 import type { MoodEventDetail } from '@/features/mood/mood-bus';
 import { scanAnalytics } from '@/lib/analytics/scanEvents';
+import { ArrowDown, Sparkles } from 'lucide-react';
 
 interface SamSlidersProps {
   detail?: MoodEventDetail | null;
@@ -36,12 +38,22 @@ const AROUSAL_WORDS: Record<0 | 1 | 2 | 3 | 4, { label: string; description: str
   4: { label: 'Très énergique', description: 'Excité, très stimulé' },
 };
 
+/** Scroll to the MicroGestes recommendations section */
+const scrollToRecommendations = () => {
+  const target =
+    document.getElementById('micro-gestes-section') ??
+    document.querySelector('[data-section="micro-gestes"]');
+  if (target) {
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+};
+
 const SamSliders: React.FC<SamSlidersProps> = ({ detail, summary }) => {
   const publishMood = useMoodPublisher();
   const [valence, setValence] = useState(0.5);
   const [arousal, setArousal] = useState(0.5);
   const [liveMessage, setLiveMessage] = useState('');
-  const [showFeedback, setShowFeedback] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
   const feedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -57,34 +69,33 @@ const SamSliders: React.FC<SamSlidersProps> = ({ detail, summary }) => {
     }
   }, [summary]);
 
-  const valenceDescriptor = useMemo(() => VALENCE_WORDS[toLevel(Math.round(valence * 100))], [valence]);
-  const arousalDescriptor = useMemo(() => AROUSAL_WORDS[toLevel(Math.round(arousal * 100))], [arousal]);
-  
+  const valenceLevel = useMemo(() => toLevel(Math.round(valence * 100)), [valence]);
+  const arousalLevel = useMemo(() => toLevel(Math.round(arousal * 100)), [arousal]);
+
+  const valenceDescriptor = useMemo(() => VALENCE_WORDS[valenceLevel], [valenceLevel]);
+  const arousalDescriptor = useMemo(() => AROUSAL_WORDS[arousalLevel], [arousalLevel]);
+
   const valencePercent = useMemo(() => Math.round(valence * 100), [valence]);
   const arousalPercent = useMemo(() => Math.round(arousal * 100), [arousal]);
+
+  /** Dynamic human-readable summary of detected state */
+  const detectedSummary = useMemo(
+    () => computeSummary(valenceLevel, arousalLevel),
+    [valenceLevel, arousalLevel],
+  );
 
   const handleValence = useCallback(
     (values: number[]) => {
       const next = clampNormalized((values[0] ?? 50) / 100);
       setValence(next);
+      setHasInteracted(true);
       publishMood('scan_sliders', next, arousal);
-      
-      // Clear existing timeout
-      if (feedbackTimeoutRef.current) {
-        clearTimeout(feedbackTimeoutRef.current);
-      }
-      
-      setShowFeedback(true);
-      
-      // Haptic feedback on mobile
+
       if ('vibrate' in navigator) {
-        navigator.vibrate(10); // 10ms subtle vibration
+        navigator.vibrate(10);
       }
-      
+
       scanAnalytics.sliderAdjusted('valence', Math.round(next * 100));
-      scanAnalytics.feedbackShown('badge', 1000);
-      
-      feedbackTimeoutRef.current = setTimeout(() => setShowFeedback(false), 1000);
     },
     [arousal, publishMood],
   );
@@ -93,35 +104,27 @@ const SamSliders: React.FC<SamSlidersProps> = ({ detail, summary }) => {
     (values: number[]) => {
       const next = clampNormalized((values[0] ?? 50) / 100);
       setArousal(next);
+      setHasInteracted(true);
       publishMood('scan_sliders', valence, next);
-      
-      // Clear existing timeout
-      if (feedbackTimeoutRef.current) {
-        clearTimeout(feedbackTimeoutRef.current);
-      }
-      
-      setShowFeedback(true);
-      
-      // Haptic feedback on mobile
+
       if ('vibrate' in navigator) {
-        navigator.vibrate(10); // 10ms subtle vibration
+        navigator.vibrate(10);
       }
-      
+
       scanAnalytics.sliderAdjusted('arousal', Math.round(next * 100));
-      scanAnalytics.feedbackShown('badge', 1000);
-      
-      feedbackTimeoutRef.current = setTimeout(() => setShowFeedback(false), 1000);
     },
     [publishMood, valence],
   );
 
   return (
     <section className="relative rounded-3xl border border-transparent bg-white/5 p-6 shadow-lg backdrop-blur mood-surface dark:bg-slate-800/40">
-      {showFeedback && (
-        <div className="absolute top-4 right-4 rounded-lg bg-primary/10 px-3 py-1 text-xs font-medium text-primary animate-in fade-in slide-in-from-top-2 duration-300">
-          Mis à jour ✓
-        </div>
-      )}
+      {/* 1. Microcopy guidage */}
+      <div className="mb-4 rounded-xl bg-primary/5 px-4 py-3">
+        <p className="text-sm font-medium text-primary">
+          Étape 1 : indiquez votre ressenti, puis découvrez vos recommandations
+        </p>
+      </div>
+
       <div className="space-y-2">
         <h2 className="text-lg font-semibold text-foreground">Réglage émotionnel</h2>
         <p className="text-sm text-muted-foreground">
@@ -130,6 +133,7 @@ const SamSliders: React.FC<SamSlidersProps> = ({ detail, summary }) => {
       </div>
 
       <div className="mt-6 space-y-8">
+        {/* Valence slider */}
         <div>
           <div className="mb-3">
             <div className="flex items-center justify-between mb-1">
@@ -156,6 +160,7 @@ const SamSliders: React.FC<SamSlidersProps> = ({ detail, summary }) => {
           </div>
         </div>
 
+        {/* Arousal slider */}
         <div>
           <div className="mb-3">
             <div className="flex items-center justify-between mb-1">
@@ -181,6 +186,37 @@ const SamSliders: React.FC<SamSlidersProps> = ({ detail, summary }) => {
             <span>⚡ Énergique</span>
           </div>
         </div>
+      </div>
+
+      {/* 2. Résumé dynamique permanent */}
+      <div
+        className="mt-6 rounded-2xl bg-accent/10 px-4 py-3 text-center transition-all duration-300"
+        aria-live="polite"
+      >
+        <p className="text-sm font-medium text-foreground">
+          Vous semblez en état de{' '}
+          <span className="font-bold text-primary">{detectedSummary}</span>
+        </p>
+      </div>
+
+      {/* 3. CTA "Voir mes recommandations" */}
+      <div className="mt-5 flex flex-col items-center gap-2">
+        <Button
+          variant="premium"
+          size="lg"
+          onClick={scrollToRecommendations}
+          className="w-full sm:w-auto gap-2"
+          aria-label="Voir mes recommandations personnalisées"
+        >
+          <Sparkles className="h-4 w-4" />
+          Voir mes recommandations
+          <ArrowDown className="h-4 w-4" />
+        </Button>
+
+        {/* 4. Teaser */}
+        <p className="text-xs text-muted-foreground text-center max-w-xs">
+          Musique, respiration et micro-gestes adaptés à votre état
+        </p>
       </div>
 
       <p aria-live="polite" className="sr-only">
