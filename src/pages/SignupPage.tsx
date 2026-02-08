@@ -282,14 +282,16 @@ const SignupPage: React.FC = () => {
               )}
 
               {/* Checkboxes CGU/Privacy - RGPD */}
-              <div className="space-y-3 pt-2">
+              <div className="border rounded-lg p-4 bg-muted/30 space-y-3">
+                <p className="text-sm font-semibold text-foreground">Consentements obligatoires</p>
                 <div className="flex items-start space-x-3">
                   <Checkbox
                     id="terms"
                     checked={acceptTerms}
                     onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
                     disabled={isLoading}
-                    className="mt-0.5"
+                    aria-required="true"
+                    className={!acceptTerms && error ? 'border-destructive' : ''}
                   />
                   <Label
                     htmlFor="terms"
@@ -309,7 +311,8 @@ const SignupPage: React.FC = () => {
                     checked={acceptPrivacy}
                     onCheckedChange={(checked) => setAcceptPrivacy(checked as boolean)}
                     disabled={isLoading}
-                    className="mt-0.5"
+                    aria-required="true"
+                    className={!acceptPrivacy && error ? 'border-destructive' : ''}
                   />
                   <Label
                     htmlFor="privacy"
