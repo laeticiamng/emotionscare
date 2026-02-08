@@ -215,7 +215,7 @@ const content = await scrapeWebsite({
 ```
 emotionscare/
 ├── 📁 src/
-│   ├── 📁 features/              # 33 modules métier (feature-first)
+│   ├── 📁 features/              # 37 modules métier (feature-first)
 │   │   ├── scan/                 # Analyse émotionnelle
 │   │   ├── journal/              # Journaling
 │   │   ├── breath/               # Respiration
@@ -526,20 +526,21 @@ npm run test:e2e          # Tests Playwright
 
 ## 🗺️ Roadmap 2026
 
-### Q1 2026 (En cours)
+### Q1 2026 (Terminé ✅)
 - [x] ✅ Modules core opérationnels (Scan, Breath, Journal, Coach, Music)
 - [x] ✅ Gamification de base (XP, badges, streaks)
 - [x] ✅ 261 Edge Functions déployées
-- [ ] 🔄 Finalisation modules partiels (VR, Guildes, Tournois)
-- [ ] 🔄 Amélioration couverture tests
+- [x] ✅ Modules VR, Guildes, Tournois finalisés
+- [x] ✅ Dashboard B2B complet
+- [x] ✅ Wearables en beta (Apple Watch, Garmin)
 
-### Q2 2026
-- [ ] Application mobile React Native
-- [ ] VR standalone (Meta Quest 3)
-- [ ] Dashboard B2B complet
+### Q2 2026 (En cours)
+- [ ] 🔄 Application mobile React Native
+- [ ] 🔄 Intégration Hume AI (analyse émotionnelle multimodale)
+- [ ] 🔄 Amélioration couverture tests > 80%
 
 ### Q3-Q4 2026
-- [ ] Wearables avancés (Apple Watch, Garmin)
+- [ ] VR standalone (Meta Quest 3)
 - [ ] IA prédictive burnout
 - [ ] Certification HDS
 

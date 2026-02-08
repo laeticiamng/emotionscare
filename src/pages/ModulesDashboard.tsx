@@ -347,6 +347,44 @@ const modules: Module[] = [
     color: 'from-info/70 to-info',
   },
 
+  // Additional Wellness & Analytics
+  {
+    title: 'Parc Émotionnel',
+    description: 'Explorez vos émotions dans un espace spatial interactif',
+    url: '/app/emotional-park',
+    icon: Sparkles,
+    category: 'Wellness',
+    status: 'active',
+    color: 'from-primary/70 to-accent',
+  },
+  {
+    title: 'Timecraft',
+    description: 'Gestion créative du temps et des priorités',
+    url: '/app/timecraft',
+    icon: Clock,
+    category: 'Wellness',
+    status: 'beta',
+    color: 'from-warning/70 to-warning',
+  },
+  {
+    title: 'Discovery',
+    description: 'Découvrez de nouvelles pratiques de bien-être',
+    url: '/app/discovery',
+    icon: Star,
+    category: 'Wellness',
+    status: 'active',
+    color: 'from-success/60 to-success',
+  },
+  {
+    title: 'Emotion Atlas',
+    description: 'Cartographiez et comprenez vos patterns émotionnels',
+    url: '/app/emotion-atlas',
+    icon: Activity,
+    category: 'Analytics',
+    status: 'active',
+    color: 'from-info to-primary/70',
+  },
+
   // Coming Soon
   {
     title: 'Hume AI',

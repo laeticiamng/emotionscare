@@ -16,7 +16,6 @@ const CRITICAL_ROUTES = [
 
 // Ressources statiques critiques
 const CRITICAL_ASSETS = [
-  '/fonts/inter-var.woff2',
   '/audio/default-ambient.mp3',
 ] as const;
 
