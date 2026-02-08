@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Check } from 'lucide-react';
+import { Check, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Theme {
@@ -74,6 +75,10 @@ export default function ThemesPage() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      <Link to="/app/home" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="h-4 w-4" />
+        Retour au dashboard
+      </Link>
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Thèmes</h1>
         <p className="text-muted-foreground">

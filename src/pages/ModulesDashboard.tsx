@@ -130,6 +130,42 @@ const modules: Module[] = [
     status: 'beta',
     color: 'from-primary to-accent',
   },
+  {
+    title: 'VR Breath',
+    description: 'Respiration guidée en immersion VR',
+    url: '/app/vr-breath-guide',
+    icon: Wind,
+    category: 'Wellness',
+    status: 'beta',
+    color: 'from-info to-primary',
+  },
+  {
+    title: 'Screen Silk',
+    description: 'Pauses écran intelligentes anti-fatigue',
+    url: '/app/screen-silk',
+    icon: Activity,
+    category: 'Wellness',
+    status: 'active',
+    color: 'from-accent/60 to-accent',
+  },
+  {
+    title: 'Nyvee Cocon',
+    description: 'Votre espace émotionnel personnel',
+    url: '/app/nyvee',
+    icon: Heart,
+    category: 'Wellness',
+    status: 'active',
+    color: 'from-primary/60 to-primary',
+  },
+  {
+    title: 'Seuil',
+    description: 'Exercices de gestion du seuil émotionnel',
+    url: '/app/seuil',
+    icon: Target,
+    category: 'Wellness',
+    status: 'active',
+    color: 'from-warning/60 to-warning',
+  },
 
   // Fun-First Games
   {
@@ -186,6 +222,15 @@ const modules: Module[] = [
     status: 'active',
     color: 'from-warning/80 to-warning',
   },
+  {
+    title: 'Face AR',
+    description: 'Filtres AR émotionnels en réalité augmentée',
+    url: '/app/face-ar',
+    icon: Scan,
+    category: 'Games',
+    status: 'beta',
+    color: 'from-primary/70 to-primary',
+  },
 
   // Social — consolidated
   {
@@ -213,7 +258,7 @@ const modules: Module[] = [
     icon: TrendingUp,
     category: 'Exchange',
     status: 'active',
-    color: 'from-emerald-500 to-teal-600',
+    color: 'from-success to-success/70',
     featured: true,
   },
   {
@@ -224,6 +269,15 @@ const modules: Module[] = [
     category: 'Social',
     status: 'active',
     color: 'from-warning to-warning/70',
+  },
+  {
+    title: 'Sessions Groupe',
+    description: 'Rejoignez des sessions de bien-être collectives',
+    url: '/app/group-sessions',
+    icon: Users,
+    category: 'Social',
+    status: 'active',
+    color: 'from-primary/70 to-accent',
   },
 
   // Analytics
@@ -245,12 +299,21 @@ const modules: Module[] = [
     status: 'active',
     color: 'from-success to-success/70',
   },
+  {
+    title: 'Voice Journal',
+    description: 'Journal vocal avec transcription IA',
+    url: '/app/voice-journal',
+    icon: BookOpen,
+    category: 'Core',
+    status: 'active',
+    color: 'from-warning/70 to-warning',
+  },
 
-  // Coming Soon — masqué comme "bientôt"
+  // Coming Soon
   {
     title: 'Hume AI',
     description: 'Analyse émotionnelle avancée par IA multimodale',
-    url: '#',
+    url: '/app/hume-ai',
     icon: Brain,
     category: 'Core',
     status: 'coming-soon',
@@ -259,7 +322,7 @@ const modules: Module[] = [
   {
     title: 'Wearables',
     description: 'Synchronisez vos montres et capteurs connectés',
-    url: '#',
+    url: '/app/wearables',
     icon: Activity,
     category: 'Wellness',
     status: 'coming-soon',
@@ -268,7 +331,7 @@ const modules: Module[] = [
   {
     title: 'Brain Viewer',
     description: 'Visualisation cérébrale 3D interactive',
-    url: '#',
+    url: '/app/brain-viewer',
     icon: Brain,
     category: 'Core',
     status: 'coming-soon',

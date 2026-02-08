@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { logger } from '@/lib/logger';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Users, Clock, CheckCircle2 } from 'lucide-react';
+import { Users, Clock, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 interface Workshop {
@@ -184,6 +185,10 @@ export default function WorkshopsPage() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      <Link to="/app/home" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="h-4 w-4" />
+        Retour au dashboard
+      </Link>
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Ateliers</h1>
         <p className="text-muted-foreground">

@@ -196,7 +196,7 @@ const BrainViewerPage: React.FC = () => {
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" asChild>
-              <Link to="/app">
+              <Link to="/app/home">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
