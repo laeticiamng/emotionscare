@@ -12,13 +12,6 @@ interface PreloadResource {
 }
 
 const CRITICAL_RESOURCES: PreloadResource[] = [
-  // Fonts critiques
-  {
-    href: '/fonts/inter-var.woff2',
-    as: 'font',
-    type: 'font/woff2',
-    crossOrigin: 'anonymous',
-  },
   // Images hero critiques
   {
     href: '/og-image.jpg',
