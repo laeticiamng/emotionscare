@@ -546,6 +546,15 @@ npm run test:e2e          # Tests Playwright
 
 ---
 
+## ⚠️ Dette Technique Connue
+
+| Élément | Impact | Plan |
+|---------|--------|------|
+| **52 fichiers `@ts-nocheck`** dans `src/pages/` | Régression silencieuse possible | Retrait progressif par lot de 10 fichiers/sprint |
+| **2 RLS policies `USING (true)`** | Risque d'accès non autorisé en écriture | Correction via Cloud > Run SQL avant publication |
+
+---
+
 ## 📚 Documentation Technique
 
 | Document | Description |
@@ -593,6 +602,6 @@ Propriétaire — © 2024-2026 EmotionsCare. Tous droits réservés.
 
 **Fait avec ❤️ pour les soignants**
 
-*Dernière mise à jour : 8 février 2026 - v2.8*
+*Dernière mise à jour : 8 février 2026 - v2.9*
 
 </div>
