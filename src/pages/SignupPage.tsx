@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
@@ -36,6 +36,7 @@ const SignupPage: React.FC = () => {
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const errorRef = useRef<HTMLDivElement>(null);
 
   const { signUp, isLoading, isAuthenticated } = useAuth();
 
@@ -56,11 +57,13 @@ const SignupPage: React.FC = () => {
     // Validation CGU/Privacy (RGPD obligatoire)
     if (!acceptTerms) {
       setError('Vous devez accepter les Conditions Générales d\'Utilisation');
+      setTimeout(() => errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
       return;
     }
 
     if (!acceptPrivacy) {
       setError('Vous devez accepter la Politique de Confidentialité');
+      setTimeout(() => errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
       return;
     }
 
@@ -246,6 +249,7 @@ const SignupPage: React.FC = () => {
               {/* Messages d'erreur/succès */}
               {error && (
                 <motion.div
+                  ref={errorRef}
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="flex items-center gap-2 p-3 bg-destructive/10 text-destructive rounded-lg border border-destructive/20"
@@ -315,6 +319,25 @@ const SignupPage: React.FC = () => {
                 </p>
               </div>
 
+              {/* Submit Button */}
+              <Button 
+                type="submit" 
+                className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                    Création du compte...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <UserPlus className="w-5 h-5" />
+                    Créer mon compte
+                  </div>
+                )}
+              </Button>
+
               {/* Social Login Options */}
               <div className="space-y-3">
                 <div className="relative">
@@ -355,25 +378,6 @@ const SignupPage: React.FC = () => {
                   </Button>
                 </div>
               </div>
-
-              {/* Submit Button */}
-              <Button 
-                type="submit" 
-                className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-                    Création du compte...
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <UserPlus className="w-5 h-5" />
-                    Créer mon compte
-                  </div>
-                )}
-              </Button>
 
               {/* Lien vers connexion */}
               <div className="text-center pt-4">
