@@ -1,85 +1,101 @@
 
 
-# Correction des informations de contact - Audit complet
+# Standardisation complete des emails et domaines - Phase 2
 
-## Probleme
+## Contexte
 
-Le seul contact valide est **contact@emotionscare.com**. Or la plateforme contient :
-- Des numeros de telephone fictifs (+33 1 23 45 67 89, +33 (0)1 86 95 12 34)
-- Un domaine incorrect : **emotions-care.com** (avec tiret) au lieu de **emotionscare.com**
-- Un domaine inexistant : **emotionscare.ai**
-- Des adresses postales fictives (123 Avenue..., 75001 Paris)
-- Des emails non verifies (support@, legal@, dpo@, privacy@, enterprise@)
+Apres la Phase 1 (12 fichiers corriges), il reste **~30 fichiers** contenant des emails non valides ou des domaines incorrects. Les seuls contacts valides sont :
+- **contact@emotionscare.com** (contact general)
+- **m.laeticia@emotionscare.com** (fondatrice)
 
-L'adresse reelle est : **5 rue Caudron, 80000 Amiens** (source Pappers / RCS).
+Les emails `noreply@emotionscare.com` dans les edge functions d'envoi d'emails sont acceptables car ils representent l'adresse d'expedition configuree via Resend (pas un contact public).
 
 ---
 
-## Inventaire des corrections (11 fichiers)
+## Fichiers a corriger (classes par categorie)
 
-### Fichier 1 : `src/components/navigation/MainFooter.tsx`
-- Ligne 77-79 : `contact@emotions-care.com` -> `contact@emotionscare.com`
-- Lignes 81-86 : Supprimer le bloc telephone fictif (+33 1 23 45 67 89)
+### A. Pages legales visibles par les utilisateurs (priorite haute)
 
-### Fichier 2 : `src/components/layout/PremiumFooter.tsx`
-- Ligne 141-143 : `contact@emotions-care.com` -> `contact@emotionscare.com`
-- Lignes 145-150 : Supprimer le bloc telephone fictif
-- Lignes 158-174 : Remplacer les liens sociaux actifs (twitter.com, facebook.com, instagram.com) par des spans desactives avec label "bientot disponible" (conformement a la politique de credibilite)
+| # | Fichier | Email actuel | Correction |
+|---|---------|-------------|------------|
+| 1 | `src/pages/legal/LegalPage.tsx` (l.123-125) | `support@emotionscare.com` + `dpo@emotionscare.com` | Remplacer les 2 par `contact@emotionscare.com` |
+| 2 | `src/pages/legal/CookiesPage.tsx` (l.226) | `dpo@emotionscare.com` | -> `contact@emotionscare.com` |
+| 3 | `src/pages/legal/TermsPage.tsx` (l.110) | `legal@emotionscare.com` | -> `contact@emotionscare.com` |
+| 4 | `src/pages/legal/SalesTermsPage.tsx` (l.361) | `dpo@emotionscare.com` | -> `contact@emotionscare.com` |
+| 5 | `src/pages/legal/PrivacyPage.tsx` (l.117, 172) | `privacy@emotionscare.com` + `dpo@emotionscare.com` | -> `contact@emotionscare.com` |
+| 6 | `src/pages/legal/LicensesPage.tsx` (l.255) | `legal@emotionscare.com` | -> `contact@emotionscare.com` |
+| 7 | `src/pages/legal/MentionsLegalesPage.tsx` (l.86, 180) | `dpo@emotionscare.com` + `legal@emotionscare.com` | -> `contact@emotionscare.com` |
+| 8 | `src/components/pages/TermsPage.tsx` (l.62) | `legal@emotionscare.com` | -> `contact@emotionscare.com` |
+| 9 | `src/components/pages/PrivacyPage.tsx` (l.85-88) | `dpo@emotionscare.com` + `privacy@emotionscare.com` | -> `contact@emotionscare.com` |
 
-### Fichier 3 : `src/components/marketing/Footer.tsx`
-- Ligne 67 : email deja correct (contact@emotionscare.com)
-- Lignes 69-72 : Supprimer le bloc telephone fictif
-- Lignes 73-76 : Remplacer "Paris, France" par "Amiens, France"
+### B. Pages utilisateur visibles (priorite haute)
 
-### Fichier 4 : `src/pages/legal/MentionsPage.tsx`
-- Ligne 87 : `support@emotionscare.com` -> `contact@emotionscare.com`
-- Ligne 88 : Supprimer `legal@emotionscare.com` (non verifie)
-- Ligne 89 : Supprimer la ligne telephone fictif
+| # | Fichier | Email actuel | Correction |
+|---|---------|-------------|------------|
+| 10 | `src/pages/ConsentManagementPage.tsx` (l.362-363) | `privacy@emotionscare.com` | -> `contact@emotionscare.com` |
+| 11 | `src/pages/FAQPage.tsx` (l.119) | `support@emotionscare.com` | -> `contact@emotionscare.com` |
+| 12 | `src/pages/b2c/B2CPrivacyTogglesPage.tsx` (l.700-702) | `dpo@emotionscare.com` | -> `contact@emotionscare.com` |
+| 13 | `src/components/privacy/GdprActionsSection.tsx` (l.229-230) | `dpo@emotionscare.com` | -> `contact@emotionscare.com` |
+| 14 | `src/components/privacy/GdprRightsSection.tsx` (l.212) | `privacy@emotionscare.com` | -> `contact@emotionscare.com` |
+| 15 | `src/components/error/HomePageErrorBoundary.tsx` (l.137-140) | `support@emotionscare.com` | -> `contact@emotionscare.com` |
+| 16 | `src/components/error/Enhanced500Page.tsx` (l.179-182) | `support@emotionscare.com` | -> `contact@emotionscare.com` |
 
-### Fichier 5 : `src/pages/legal/PrivacyPolicyPage.tsx`
-- Ligne 431 : `privacy@emotionscare.com` -> `contact@emotionscare.com`
-- Ligne 432 : `dpo@emotionscare.com` -> `contact@emotionscare.com`
-- Ligne 433 : Supprimer telephone fictif
-- Ligne 434 : Remplacer adresse fictive par "5 rue Caudron, 80000 Amiens"
+### C. Configuration et navigation (priorite moyenne)
 
-### Fichier 6 : `src/pages/b2c/B2CDataPrivacyPage.tsx`
-- Ligne 619 : `dpo@emotionscare.com` -> `contact@emotionscare.com`
-- Ligne 620 : Supprimer telephone fictif
-- Ligne 621 : Remplacer adresse fictive par "5 rue Caudron, 80000 Amiens"
+| # | Fichier | Email actuel | Correction |
+|---|---------|-------------|------------|
+| 17 | `src/lib/nav-schema.ts` (l.221) | `mailto:support@emotionscare.com` | -> `mailto:contact@emotionscare.com` |
+| 18 | `src/components/admin/GlobalConfigurationCenter.tsx` (l.69) | `support@emotionscare.com` | -> `contact@emotionscare.com` |
+| 19 | `src/components/admin/GlobalConfigurationCenter.old.tsx` (l.131) | `support@emotionscare.com` | -> `contact@emotionscare.com` |
+| 20 | `src/pages/manager/AuditPageEnhanced.tsx` (l.104) | `security@emotionscare.com` | -> `contact@emotionscare.com` |
+| 21 | `src/pages/manager/SecurityPageEnhanced.tsx` (l.335) | `security@emotionscare.com` | -> `contact@emotionscare.com` |
 
-### Fichier 7 : `src/pages/EntreprisePage.tsx`
-- Lignes 440-447 : Remplacer bouton "Nous Appeler" par bouton "Nous Contacter" avec mailto
-- Ligne 453 : `enterprise@emotionscare.com` -> `contact@emotionscare.com`
-- Lignes 455-458 : Supprimer le bloc telephone
+### D. Services GDPR et backend (priorite moyenne)
 
-### Fichier 8 : `src/pages/SupportChatbotPage.tsx`
-- Ligne 335 : `support@emotionscare.com` -> `contact@emotionscare.com`
-- Lignes 337-340 : Supprimer le bouton telephone
+| # | Fichier | Email actuel | Correction |
+|---|---------|-------------|------------|
+| 22 | `src/services/gdpr/emailNotifications.ts` (l.40, 114, 142) | `dpo@emotionscare.com` | -> `contact@emotionscare.com` |
+| 23 | `src/services/gdpr/AccountDeletionService.ts` (l.26) | `support@emotionscare.com` | -> `contact@emotionscare.com` |
 
-### Fichier 9 : `src/pages/SupportPage.tsx`
-- Ligne 124 : `support@emotionscare.com` -> `contact@emotionscare.com`
+### E. SEO et domaines (priorite moyenne)
 
-### Fichier 10 : `src/components/layout/CommandMenu.tsx`
-- Ligne 117 : `docs.emotions-care.com` -> `emotionscare.com` (ou supprimer le lien externe)
+| # | Fichier | Valeur actuelle | Correction |
+|---|---------|----------------|------------|
+| 24 | `src/hooks/usePageSEO.ts` (l.176-193) | `emotionscare.app` partout + `support@emotionscare.app` | -> `emotionscare.com` + `contact@emotionscare.com` |
+| 25 | `src/components/seo/SEO.tsx` (l.24, 32-33) | `emotionscare.app` | -> `emotionscare.com` |
+| 26 | `src/lib/constants.ts` (l.11) | `emotionscare.app` | -> `emotionscare.com` |
+| 27 | `src/pages/b2c/B2CSocialCoconPage.tsx` (l.116) | `emotionscare.app` | -> `emotionscare.com` |
+| 28 | `src/components/b2b/admin/B2BSettingsPanel.tsx` (l.54) | `mon-org.emotionscare.app` | -> `mon-org.emotionscare.com` |
 
-### Fichier 11 : `src/components/help/FAQAccordion.tsx`
-- Ligne 55 : `support@emotionscare.com` -> `contact@emotionscare.com`
+### F. Edge Functions (priorite moyenne)
 
-### Fichier 12 : `supabase/functions/contact-form/index.ts`
-- Ligne 159 : `support@emotionscare.ai` -> `contact@emotionscare.com`
-- Ligne 222 : `emotionscare.ai/help` -> `emotionscare.com/help`
-- Ligne 222 : `emotionscare.ai/social-cocon` -> `emotionscare.com/social-cocon`
+| # | Fichier | Email actuel | Correction |
+|---|---------|-------------|------------|
+| 29 | `supabase/functions/push-notification/index.ts` (l.302) | `mailto:support@emotionscare.com` | -> `mailto:contact@emotionscare.com` |
+| 30 | `supabase/functions/send-push-notification/index.ts` (l.185) | `mailto:support@emotionscare.com` | -> `mailto:contact@emotionscare.com` |
+| 31 | `supabase/functions/dsar-handler/index.ts` (l.226, 419) | `dpo@emotionscare.com` | -> `contact@emotionscare.com` |
+| 32 | `supabase/functions/gdpr-scheduled-export/index.ts` (l.100) | `rgpd@emotionscare.app` | -> `noreply@emotionscare.com` |
+| 33 | `supabase/functions/pdf-notifications/index.ts` (l.104) | `notifications@emotionscare.app` | -> `noreply@emotionscare.com` |
+| 34 | `supabase/functions/scheduled-pdf-reports/index.ts` (l.65) | `reports@emotionscare.app` | -> `noreply@emotionscare.com` |
+| 35 | `supabase/functions/send-cron-alert/index.ts` (l.138) | `alerts@emotionscare.app` | -> `noreply@emotionscare.com` |
+| 36 | `supabase/functions/check-suspicious-role-changes/index.ts` (l.8) | `noreply@emotionscare.com` | OK (inchange) |
+
+### G. Fichiers NON modifies (acceptables)
+
+Les fichiers suivants ne seront **pas** modifies :
+- **Edge functions avec `noreply@emotionscare.com`** : c'est l'adresse d'expedition systeme, pas un contact public. OK.
+- **Fichiers de tests (`tests/e2e/`)** : `test@emotionscare.app` est un email de test fictif, acceptable dans le contexte des tests.
+- **Fichiers de documentation (`reports/`, `docs/`, `scripts/`)** : documents internes, pas visibles par les utilisateurs.
 
 ---
 
-## Resume des regles appliquees
+## Resume des regles
 
-| Element | Avant | Apres |
-|---------|-------|-------|
-| Email de contact | contact@emotions-care.com, support@, legal@, dpo@, privacy@, enterprise@ | **contact@emotionscare.com** partout |
-| Telephone | +33 1 23 45 67 89 / +33 (0)1 86 95 12 34 | **Supprime** (fictif) |
-| Adresse postale | 123 Avenue..., 75001 Paris | **5 rue Caudron, 80000 Amiens** |
-| Domaine | emotions-care.com / emotionscare.ai | **emotionscare.com** |
-| Reseaux sociaux | Liens actifs vers twitter.com/facebook.com | **Desactives** ("bientot disponible") |
+| Type | Avant | Apres |
+|------|-------|-------|
+| Contact general visible | support@, legal@, privacy@, dpo@, security@, enterprise@ | **contact@emotionscare.com** |
+| Fondatrice (si mentionne) | - | **m.laeticia@emotionscare.com** |
+| Email d'expedition systeme | rgpd@, reports@, alerts@, notifications@ (emotionscare.app) | **noreply@emotionscare.com** |
+| Domaine SEO/canonical | emotionscare.app | **emotionscare.com** |
 
-Total : 12 fichiers a modifier. Zero donnee fictive restante apres correction.
+Total : **36 fichiers** a modifier, couvrant 100% des emails non valides restants dans le code source et les edge functions.
