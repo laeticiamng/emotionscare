@@ -128,7 +128,7 @@ export const GlobalConfigurationCenter: React.FC = () => {
         general: {
           appName: 'EmotionsCare',
           appDescription: 'Plateforme de bien-être émotionnel alimentée par l\'IA',
-          supportEmail: 'support@emotionscare.com',
+          supportEmail: 'contact@emotionscare.com',
           maintenanceMode: false,
           debugMode: false,
           analyticsEnabled: true

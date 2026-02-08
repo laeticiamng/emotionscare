@@ -113,7 +113,7 @@ const B2CSocialCoconPage: React.FC = () => {
     title: 'Social Cocon - Espaces d\'écoute privés | EmotionsCare',
     description: 'Créez des rooms privées pour des moments de pause partagée en toute confidentialité. Audio/texte, mode très doux, sans jugement.',
     keywords: 'room privée, écoute, soutien, pause partagée, confidentialité, soignants, bien-être',
-    canonical: 'https://emotionscare.app/app/social-cocon',
+    canonical: 'https://emotionscare.com/app/social-cocon',
   });
 
   const {

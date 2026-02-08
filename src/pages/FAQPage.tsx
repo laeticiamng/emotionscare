@@ -116,7 +116,7 @@ const FAQS: FAQCategory[] = [
       { q: 'L\'application fonctionne-t-elle hors ligne ?', a: 'Partiellement. Certaines fonctionnalités comme la respiration guidée sont disponibles hors ligne grâce au cache.' },
       { q: 'Comment autoriser l\'accès à la caméra ?', a: 'Lors du premier scan, votre navigateur demandera l\'autorisation. Vous pouvez aussi l\'activer manuellement dans les paramètres du navigateur.' },
       { q: 'Le scan ne fonctionne pas, que faire ?', a: 'Vérifiez que votre caméra est bien connectée, que l\'éclairage est suffisant, et que vous avez autorisé l\'accès. Essayez aussi un autre navigateur.' },
-      { q: 'Comment signaler un bug ?', a: 'Utilisez le formulaire de support ou envoyez un email à support@emotionscare.com avec les détails du problème et des captures d\'écran.' },
+      { q: 'Comment signaler un bug ?', a: 'Utilisez le formulaire de support ou envoyez un email à contact@emotionscare.com avec les détails du problème et des captures d\'écran.' },
     ],
   },
 ];

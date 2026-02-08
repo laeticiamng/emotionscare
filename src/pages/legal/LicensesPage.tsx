@@ -252,7 +252,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.`}
               </p>
               <p className="text-sm text-muted-foreground mt-2">
                 Si vous constatez une omission ou une erreur concernant une attribution de licence, merci de nous contacter à : 
-                <a href="mailto:legal@emotionscare.com" className="text-primary hover:underline ml-1">legal@emotionscare.com</a>
+                <a href="mailto:contact@emotionscare.com" className="text-primary hover:underline ml-1">contact@emotionscare.com</a>
               </p>
             </section>
 

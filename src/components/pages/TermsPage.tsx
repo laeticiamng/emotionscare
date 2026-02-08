@@ -59,7 +59,7 @@ export const TermsPage: React.FC<{ 'data-testid'?: string }> = ({ 'data-testid':
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">7. Contact</h2>
             <p className="mb-4">
-              Pour toute question concernant ces conditions, contactez-nous à : legal@emotionscare.com
+              Pour toute question concernant ces conditions, contactez-nous à : contact@emotionscare.com
             </p>
           </section>
         </div>

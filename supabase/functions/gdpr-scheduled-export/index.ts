@@ -97,7 +97,7 @@ async function sendReportEmail(emails: string[], content: string, format: string
 
   try {
     const emailResponse = await resend.emails.send({
-      from: "EmotionsCare RGPD <rgpd@emotionscare.app>",
+      from: "EmotionsCare RGPD <noreply@emotionscare.com>",
       to: emails,
       subject: `📊 Rapport RGPD ${frequencyLabel} - ${now.toLocaleDateString('fr-FR')}`,
       html: `

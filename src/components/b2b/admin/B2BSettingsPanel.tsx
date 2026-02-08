@@ -51,7 +51,7 @@ export const B2BSettingsPanel: React.FC = () => {
 
   const [orgSettings, setOrgSettings] = useState<OrganizationSettings>({
     name: 'Mon Organisation',
-    domain: 'mon-org.emotionscare.app',
+    domain: 'mon-org.emotionscare.com',
     timezone: 'Europe/Paris',
     language: 'fr',
   });

@@ -62,7 +62,7 @@ serve(async (req) => {
 
         // Envoyer l'email avec le rapport
         const emailResponse = await resend.emails.send({
-          from: "EmotionsCare RGPD <reports@emotionscare.app>",
+          from: "EmotionsCare RGPD <noreply@emotionscare.com>",
           to: schedule.recipient_emails,
           subject: `📊 Rapport RGPD automatique - ${schedule.report_type}`,
           html: `

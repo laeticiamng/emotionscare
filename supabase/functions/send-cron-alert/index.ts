@@ -135,7 +135,7 @@ Deno.serve(async (req: Request) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'EmotionsCare Alerts <alerts@emotionscare.app>',
+          from: 'EmotionsCare Alerts <noreply@emotionscare.com>',
           to: [adminEmail],
           subject: `🚨 Cron Alert: ${jobName} - 3 échecs consécutifs`,
           html: htmlContent,

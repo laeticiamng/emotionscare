@@ -176,10 +176,10 @@ const Enhanced500Page: React.FC<Enhanced500PageProps> = ({
             <p>
               En cas d'urgence: 
               <a 
-                href="mailto:support@emotionscare.com" 
+                href="mailto:contact@emotionscare.com" 
                 className="text-primary hover:underline ml-1"
               >
-                support@emotionscare.com
+                contact@emotionscare.com
               </a>
             </p>
           </div>

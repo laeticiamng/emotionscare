@@ -81,11 +81,8 @@ export const PrivacyPage: React.FC<{ 'data-testid'?: string }> = ({ 'data-testid
             <p className="mb-4">
               Pour exercer vos droits ou toute question sur la confidentialité :
             </p>
-            <p className="mb-2">
-              <strong>Délégué à la Protection des Données :</strong> dpo@emotionscare.com
-            </p>
             <p className="mb-4">
-              <strong>Support :</strong> privacy@emotionscare.com
+              <strong>Contact :</strong> contact@emotionscare.com
             </p>
           </section>
         </div>

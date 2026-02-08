@@ -101,7 +101,7 @@ const AuditPageEnhanced: React.FC = () => {
     {
       id: '5',
       timestamp: new Date(Date.now() - 18000000),
-      user: 'security@emotionscare.com',
+      user: 'contact@emotionscare.com',
       action: 'POLICY_UPDATE',
       resource: 'Security Policies',
       ip: '192.168.1.102',

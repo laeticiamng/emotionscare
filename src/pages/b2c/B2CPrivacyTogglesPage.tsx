@@ -697,9 +697,9 @@ const B2CPrivacyTogglesPage = memo(() => {
                     </p>
                   </div>
                   <Button variant="outline" asChild>
-                    <a href="mailto:dpo@emotionscare.com" className="flex items-center gap-2">
+                    <a href="mailto:contact@emotionscare.com" className="flex items-center gap-2">
                       <ExternalLink className="w-4 h-4" aria-hidden="true" />
-                      dpo@emotionscare.com
+                      contact@emotionscare.com
                     </a>
                   </Button>
                 </div>

@@ -332,7 +332,7 @@ const SecurityPageEnhanced: React.FC = () => {
               <div className="space-y-3">
                 {[
                   { action: 'Connexion administrateur', user: 'admin@emotionscare.com', time: '10:45', status: 'success' },
-                  { action: 'Modification politique sécurité', user: 'security@emotionscare.com', time: '09:32', status: 'warning' },
+                  { action: 'Modification politique sécurité', user: 'contact@emotionscare.com', time: '09:32', status: 'warning' },
                   { action: 'Tentative accès non autorisé', user: 'unknown', time: '08:15', status: 'error' },
                   { action: 'Sauvegarde système', user: 'system', time: '06:00', status: 'success' }
                 ].map((entry, index) => (

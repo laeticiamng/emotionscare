@@ -223,7 +223,7 @@ function generateSummaryText(dataPackage: UserDataPackage): string {
     '-'.repeat(60),
     '',
     'Pour toute question concernant vos données personnelles:',
-    'Email: dpo@emotionscare.com',
+    'Email: contact@emotionscare.com',
     'Site: https://emotionscare.com/legal/privacy',
     '',
     '='.repeat(60),
@@ -416,7 +416,7 @@ serve(async (req) => {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                from: 'EmotionsCare <dpo@emotionscare.com>',
+                from: 'EmotionsCare <noreply@emotionscare.com>',
                 to: [profile.email],
                 subject: '📦 Vos données personnelles sont prêtes - EmotionsCare',
                 html: `
