@@ -293,6 +293,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
     aliases: ['/timecraft'],
+    status: 'beta',
   },
   {
     name: 'timecraft-b2b',
@@ -503,6 +504,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'BrainViewerPage',
     guard: true,
     requireAuth: true,
+    status: 'coming-soon',
   },
   {
     name: 'music',
@@ -791,6 +793,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'ModeSelectionPage',
     guard: false,
     aliases: ['/choose-mode'],
+    deprecated: true,
   },
   {
     name: 'b2c-dashboard',
@@ -801,6 +804,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'B2CDashboardPage',
     guard: true,
     requireAuth: true,
+    deprecated: true,
   },
   {
     name: 'b2c-mood',
@@ -811,6 +815,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'B2CScanPage',
     guard: true,
     requireAuth: true,
+    deprecated: true,
   },
   {
     name: 'advanced-analytics',
@@ -871,6 +876,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'marketing',
     component: 'TestAccountsPage',
     guard: false,
+    hidden: true,
+    status: 'dev-only',
   },
   {
     name: 'navigation-hub',
@@ -971,6 +978,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
     aliases: ['/exchange'],
+    status: 'beta',
   },
   {
     name: 'buddies',
@@ -993,6 +1001,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
     aliases: ['/health-sync', '/devices'],
+    status: 'coming-soon',
   },
   {
     name: 'context-lens',
@@ -1004,6 +1013,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
     aliases: ['/insights', '/patterns'],
+    status: 'coming-soon',
   },
   {
     name: 'data-export',
@@ -1107,6 +1117,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'B2CSocialCoconPage',
     guard: true,
     aliases: ['/social-cocon'],
+    deprecated: true,
   },
   {
     name: 'communaute-b2c',
@@ -1117,6 +1128,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'B2CCommunautePage',
     guard: true,
     aliases: ['/communaute'],
+    deprecated: true,
   },
 
   // ═══════════════════════════════════════════════════════════
@@ -1460,6 +1472,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'simple',
     component: 'TestPage',
     guard: false,
+    hidden: true,
+    status: 'dev-only',
   },
   // Routes legacy supprimées - redirection automatique via aliases dans les routes principales
   // emotions-legacy supprimé - utiliser /app/scan directement
@@ -2062,6 +2076,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'VoiceAnalysisPage',
     guard: true,
+    deprecated: true,
   },
   
   // Social
@@ -2073,6 +2088,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'FriendsPage',
     guard: true,
+    deprecated: true,
   },
   {
     name: 'groups',
@@ -2082,6 +2098,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'GroupsPage',
     guard: true,
+    deprecated: true,
   },
   {
     name: 'feed',
@@ -2091,6 +2108,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'B2CCommunautePage',
     guard: true,
+    deprecated: true,
   },
   
   // Personnalisation
@@ -2102,6 +2120,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'ThemesPage',
     guard: true,
+    status: 'beta',
   },
   {
     name: 'customization',
@@ -2111,6 +2130,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'CustomizationPage',
     guard: true,
+    status: 'beta',
   },
   {
     name: 'widgets',
@@ -2120,6 +2140,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'WidgetsPage',
     guard: true,
+    status: 'beta',
   },
   
   // Événements & Ateliers
@@ -2140,6 +2161,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'WorkshopsPage',
     guard: true,
+    status: 'beta',
   },
   {
     name: 'webinars',
@@ -2149,6 +2171,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'WebinarsPage',
     guard: true,
+    status: 'beta',
   },
   
   // Export & Partage
@@ -2189,6 +2212,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'IntegrationsPage',
     guard: true,
+    status: 'beta',
   },
   {
     name: 'api-keys',
@@ -2198,6 +2222,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'APIKeysPage',
     guard: true,
+    hidden: true,
+    status: 'dev-only',
   },
   {
     name: 'webhooks',
@@ -2207,6 +2233,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'WebhooksPage',
     guard: true,
+    hidden: true,
+    status: 'dev-only',
   },
   
   // Accessibilité
@@ -2469,6 +2497,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app',
     component: 'PublicAPIPage',
     guard: false,
+    hidden: true,
+    status: 'dev-only',
     meta: {
       title: 'API Documentation - EmotionsCare',
       description: 'Documentation des APIs publiques',
@@ -2600,6 +2630,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'marketing',
     component: 'SystemHealthPage',
     guard: false,
+    hidden: true,
+    status: 'dev-only',
     meta: {
       title: 'Santé Système - EmotionsCare',
       description: 'Monitoring et santé du système',
@@ -2612,6 +2644,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'marketing',
     component: 'K6AnalyticsDashboardPage',
     guard: false,
+    hidden: true,
+    status: 'dev-only',
     meta: {
       title: 'K6 Analytics - EmotionsCare',
       description: 'Dashboard analytics des tests de charge K6',
@@ -2631,6 +2665,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
     aliases: ['/hume-ai', '/emotion-ai'],
+    status: 'coming-soon',
   },
   {
     name: 'suno-music-generator',
@@ -2642,6 +2677,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
     aliases: ['/suno', '/ai-music-generator'],
+    status: 'coming-soon',
   },
   {
     name: 'auras-leaderboard',
@@ -2653,6 +2689,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
     aliases: ['/auras', '/aura-ranking'],
+    deprecated: true,
   },
   {
     name: 'consent-management',
@@ -2689,7 +2726,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     },
   },
   {
-    name: 'context-lens',
+    name: 'context-lens-duplicate',
     path: '/app/context-lens',
     segment: 'consumer',
     role: 'consumer',
@@ -2697,6 +2734,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'ContextLensPage',
     guard: true,
     requireAuth: true,
+    status: 'coming-soon',
+    deprecated: true,
     meta: {
       title: 'Context Lens - EmotionsCare',
       description: 'Analyse contextuelle et insights émotionnels',
