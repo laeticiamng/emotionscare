@@ -84,10 +84,14 @@ const SignupPage: React.FC = () => {
       await signUp(email.trim(), password, {
         full_name: fullName.trim()
       });
-      setSuccess('Compte créé avec succès ! Vérifiez votre email pour confirmer votre compte.');
-    } catch (error: unknown) {
-      logger.error('Erreur d\'inscription', error as Error, 'AUTH');
-      setError(error instanceof Error ? error.message : 'Erreur lors de la création du compte');
+      toast({ title: 'Bienvenue !', description: 'Votre compte a été créé avec succès.' });
+      navigate('/app/home', { replace: true });
+    } catch (err: unknown) {
+      logger.error('Erreur d\'inscription', err as Error, 'AUTH');
+      // Use authErrorService for user-friendly messages
+      const { getFriendlyAuthError } = await import('@/lib/auth/authErrorService');
+      const friendly = getFriendlyAuthError(err);
+      setError(friendly.action ? `${friendly.message} ${friendly.action}` : friendly.message);
     }
   };
 
