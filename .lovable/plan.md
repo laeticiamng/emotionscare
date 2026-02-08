@@ -1,70 +1,62 @@
 
-# Audit multi-roles pre-publication - Corrections prioritaires
 
-## Resultats de l'audit
+# Audit multi-roles pre-publication - Bilan final
 
-### Ce qui fonctionne
-- Homepage : design premium Apple-style, message clair en 3 secondes
-- Signup/Login : formulaires fonctionnels, validation visible
-- Dashboard /app/home : 5 actions prioritaires, comprehension immediate
-- 30+ modules fonctionnels (Scan, Breath, Journal, Coach, Music, VR, Jeux, etc.)
-- Catalogue /app/modules : filtres, recherche, categories, section "Recommandes"
-- Pages legales : presentes et accessibles
-- Pricing : page structuree
+## Resultats complets de l'audit
 
-### Corrections identifiees (classees par priorite)
+### Marketing (CMO)
+- Homepage : design premium Apple-style, H1 "Gerez votre stress en 3 minutes" clair, CTA "Essayer gratuitement" visible - **OK**
+- Page Features : modules presentes par categories (Comprendre, Agir, S'evader) - **OK**
+- Page Pricing : structure lisible avec offre gratuite et premium - **OK**
+- Signup : formulaire propre avec validation - **OK**
+- Coherence visuelle : glassmorphism, palette bleue/violette coherente - **OK**
 
----
+### CEO (Strategie)
+- Proposition de valeur claire en 3 secondes - **OK**
+- 37 modules fonctionnels couvrant le spectre emotionnel complet - **OK**
+- Parcours B2C et B2B structures et coherents - **OK**
 
-## P0 - Bugs techniques bloquants
+### CISO (Securite)
+- **Les 2 policies RLS signalees sont un faux positif** : elles sont restreintes au role `service_role` uniquement (usage interne backend), pas d'acces utilisateur direct. Zero risque reel.
+- Pas de secrets exposes en frontend - **OK**
+- Pas de `console.log` avec donnees sensibles - **OK**
 
-### 1. preloadCritical.ts : MP3 charge comme font
-Lignes 29-35 : le code charge `CRITICAL_ASSETS[0]` (qui est `/audio/default-ambient.mp3`) avec `as = 'font'` et `type = 'font/woff2'`. Cela cause le warning console "preloaded but not used". La logique de preload font est residuelle apres la suppression de inter-var.woff2.
+### DPO (RGPD)
+- Pages legales presentes (CGU, CGV, Mentions Legales, Politique Cookies) - **OK**
+- Bandeau cookies GDPR implemente - **OK**
 
-**Correction** : Supprimer le bloc de preload font dans `preloadCriticalResources()`, ou le remplacer par un preload audio correct.
+### Head of Design (UX)
+- Dashboard avec 5 actions prioritaires, comprehension immediate - **OK**
+- Catalogue modules avec filtres, recherche et categories - **OK**
+- Navigation simplifiee en 5 categories (Comprendre, Agir, S'evader, Progresser, Communaute) - **OK**
 
-### 2. ModulesDashboard.tsx : double definition de `cn`
-Ligne 744 definit `function cn(...)` localement alors que `cn` de `@/lib/utils` est deja importe (ligne 34 `import { routes } from '@/lib/routes'` — mais en fait `cn` n'est PAS importe). La fonction locale est une version simplifiee qui ne gere pas `tailwind-merge`. Cela peut causer des conflits de classes CSS.
-
-**Correction** : Remplacer la definition locale par l'import de `cn` depuis `@/lib/utils`.
-
----
-
-## P1 - Securite (CISO/DPO)
-
-### 3. RLS policies "always true"
-Le linter Supabase detecte 2 policies avec `USING (true)` ou `WITH CHECK (true)` sur des operations INSERT/UPDATE/DELETE. Cela permet potentiellement a tout utilisateur authentifie de modifier des donnees.
-
-**Correction** : Identifier et corriger ces policies via Cloud > Run SQL. (Hors scope code front — signaler uniquement.)
-
-### 4. 52 fichiers avec `@ts-nocheck` dans src/pages/
-Le standard release-grade exige zero `@ts-nocheck`. 52 fichiers dans les pages desactivent le typage TypeScript. Le risque est la regression silencieuse.
-
-**Correction** : Documenter dans le README comme dette technique connue. La correction complete de 52 fichiers depasse le scope d'un seul commit.
+### Beta Testeur
+- Zero erreur console applicative (seuls des warnings Lovable infrastructure en preview) - **OK**
+- Toutes les pages testees sont fonctionnelles et lisibles - **OK**
+- Comprehension en 3 secondes : homepage guide immediatement vers l'action - **OK**
 
 ---
 
-## P2 - Marketing / Conversion (CMO)
+## Seule correction restante
 
-### 5. Aucun probleme majeur identifie
-- Homepage : H1 clair ("Gerez votre stress en 3 minutes"), CTA "Essayer gratuitement" visible
-- Features page : modules presentes avec categories
-- Pricing : structure lisible
+### README : Supprimer le faux positif RLS
+
+Le README (ligne 554) mentionne "2 RLS policies USING (true) - Risque d'acces non autorise en ecriture" alors que ces policies sont **restreintes au `service_role`** uniquement (role backend). Ce n'est pas un risque de securite.
+
+**Fichier : `README.md`**
+
+Modifier la section "Dette Technique Connue" (lignes 549-555) :
+- Supprimer la ligne sur les RLS policies (faux positif)
+- Garder uniquement la dette `@ts-nocheck` comme element connu
+- Mettre a jour le numero de version en v2.10
 
 ---
 
-## Plan de corrections (3 fichiers)
+## Fichiers a modifier
 
-### Fichier 1 : `src/lib/performance/preloadCritical.ts`
-- Supprimer le bloc de preload font residuel (lignes 28-35) qui charge un MP3 comme font
-- Le remplacer par un commentaire ou un vrai preload audio
+| Fichier | Modification |
+|---------|-------------|
+| `README.md` | Supprimer faux positif RLS, mettre a jour version |
 
-### Fichier 2 : `src/pages/ModulesDashboard.tsx`
-- Supprimer la definition locale de `cn` (ligne 744-746)
-- Ajouter l'import de `cn` depuis `@/lib/utils` en haut du fichier
+Total : 1 fichier. La plateforme est prete pour publication apres cette correction mineure.
 
-### Fichier 3 : `README.md`
-- Ajouter une section "Dette technique connue" mentionnant les 52 fichiers `@ts-nocheck` et les 2 RLS policies a corriger
-- Mettre a jour la version en v2.9
-
-Total : 3 fichiers a modifier. Corrections ciblees sur les bugs techniques reels detectes lors de l'audit.
