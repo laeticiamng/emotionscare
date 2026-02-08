@@ -159,14 +159,14 @@ const AboutPage: React.FC = () => {
                     {/* Bio */}
                     <div>
                       <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-2">
-                        Dr Laeticia Motongane
+                        Laeticia Motongane
                       </h2>
                       <p className="text-lg text-primary font-medium mb-4">
-                        Médecin urgentiste · Fondatrice d'EmotionsCare
+                        Médecin · Fondatrice d'EmotionsCare
                       </p>
                       <p className="text-muted-foreground leading-relaxed text-lg">
                         Confrontée au quotidien à l'épuisement des soignants,
-                        le Dr Motongane a créé EmotionsCare pour offrir des
+                        Laeticia Motongane a créé EmotionsCare pour offrir des
                         outils concrets et accessibles de gestion émotionnelle
                         — parce que ceux qui soignent méritent aussi d'être
                         accompagnés.
