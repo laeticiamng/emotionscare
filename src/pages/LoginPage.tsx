@@ -52,6 +52,7 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
   
   const { signIn, isLoading, isAuthenticated, user } = useAuth();
 
@@ -74,6 +75,7 @@ const LoginPage: React.FC = () => {
     if (submitted || isLoading) return;
     
     setSubmitted(true);
+    setLoginError(null);
     
     try {
       await signIn(formData.email.trim(), formData.password);
@@ -95,6 +97,8 @@ const LoginPage: React.FC = () => {
       
       const errMsg = error instanceof Error ? error.message : 'Une erreur est survenue';
       const message = errorMessages[errMsg] || errMsg;
+      
+      setLoginError(message);
       
       toast({
         title: "Erreur de connexion",
@@ -321,6 +325,19 @@ const LoginPage: React.FC = () => {
                     </button>
                   </div>
                 </div>
+
+                {/* Inline error message */}
+                {loginError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 p-3 bg-destructive/10 text-destructive rounded-lg border border-destructive/20"
+                    role="alert"
+                  >
+                    <Shield className="w-4 h-4 flex-shrink-0" />
+                    <p className="text-sm font-medium">{loginError}</p>
+                  </motion.div>
+                )}
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
