@@ -28,6 +28,8 @@ import {
   Search,
   Filter,
   Star,
+  Clock,
+  Lock,
 } from 'lucide-react';
 import { routes } from '@/lib/routes';
 import {
@@ -102,6 +104,24 @@ const modules: Module[] = [
     color: 'from-info/80 to-info',
   },
   {
+    title: 'Méditation',
+    description: 'Sessions de méditation guidée',
+    url: '/app/meditation',
+    icon: Heart,
+    category: 'Wellness',
+    status: 'active',
+    color: 'from-primary/80 to-primary',
+  },
+  {
+    title: 'Flash Glow',
+    description: 'Micro-sessions de 2 minutes pour un boost immédiat',
+    url: routes.b2c.flashGlow(),
+    icon: Zap,
+    category: 'Wellness',
+    status: 'active',
+    color: 'from-warning to-warning/70',
+  },
+  {
     title: 'VR Galaxy',
     description: 'Expérience immersive de méditation en VR',
     url: routes.b2c.vrGalaxy(),
@@ -109,15 +129,6 @@ const modules: Module[] = [
     category: 'Wellness',
     status: 'beta',
     color: 'from-primary to-accent',
-  },
-  {
-    title: 'Flash Glow',
-    description: 'Stimulation visuelle pour l\'apaisement',
-    url: routes.b2c.flashGlow(),
-    icon: Zap,
-    category: 'Wellness',
-    status: 'active',
-    color: 'from-warning to-warning/70',
   },
 
   // Fun-First Games
@@ -166,37 +177,35 @@ const modules: Module[] = [
     status: 'beta',
     color: 'from-accent to-primary',
   },
-
-  // Social
   {
-    title: 'Communauté',
-    description: 'Connectez-vous avec d\'autres utilisateurs',
-    url: routes.b2c.community(),
+    title: 'Ambition Arcade',
+    description: 'Gamifiez vos objectifs de vie',
+    url: '/app/ambition-arcade',
+    icon: Gamepad2,
+    category: 'Games',
+    status: 'active',
+    color: 'from-warning/80 to-warning',
+  },
+
+  // Social — consolidated
+  {
+    title: 'Entraide',
+    description: 'Espace de soutien et d\'entraide entre pairs',
+    url: '/app/entraide',
     icon: Users,
     category: 'Social',
     status: 'active',
     color: 'from-info to-primary',
   },
   {
-    title: 'Social Cocon',
-    description: 'Espace de soutien et d\'entraide',
-    url: routes.b2c.socialCocon(),
+    title: 'Buddies',
+    description: 'Trouvez un binôme de soutien',
+    url: '/app/buddies',
     icon: Heart,
     category: 'Social',
     status: 'active',
     color: 'from-destructive/70 to-accent',
   },
-  {
-    title: 'Leaderboard',
-    description: 'Classement et défis communautaires',
-    url: routes.b2c.leaderboard(),
-    icon: Trophy,
-    category: 'Social',
-    status: 'active',
-    color: 'from-warning to-warning/70',
-  },
-
-  // Exchange Hub V2.0
   {
     title: 'Exchange Hub',
     description: 'Marchés d\'émotions, temps, confiance et progression',
@@ -207,34 +216,63 @@ const modules: Module[] = [
     color: 'from-emerald-500 to-teal-600',
     featured: true,
   },
+  {
+    title: 'Classements',
+    description: 'Classement et défis communautaires',
+    url: routes.b2c.leaderboard(),
+    icon: Trophy,
+    category: 'Social',
+    status: 'active',
+    color: 'from-warning to-warning/70',
+  },
 
   // Analytics
   {
-    title: 'Analytics',
-    description: 'Visualisez vos statistiques émotionnelles',
-    url: routes.b2c.activity(),
-    icon: Activity,
-    category: 'Analytics',
-    status: 'active',
-    color: 'from-success to-success/70',
-  },
-  {
-    title: 'Heatmap Émotionnelle',
-    description: 'Cartographie de vos émotions dans le temps',
-    url: routes.b2c.heatmap(),
+    title: 'Bilan Hebdomadaire',
+    description: 'Visualisez vos barres de progression',
+    url: '/app/weekly-bars',
     icon: BarChart3,
     category: 'Analytics',
     status: 'active',
     color: 'from-info to-info/70',
   },
   {
-    title: 'Gamification',
-    description: 'Badges, achievements et progression',
-    url: routes.b2c.gamification(),
-    icon: TrendingUp,
+    title: 'Heatmap Émotionnelle',
+    description: 'Cartographie de vos émotions dans le temps',
+    url: routes.b2c.heatmap(),
+    icon: Activity,
     category: 'Analytics',
     status: 'active',
-    color: 'from-accent to-accent/70',
+    color: 'from-success to-success/70',
+  },
+
+  // Coming Soon — masqué comme "bientôt"
+  {
+    title: 'Hume AI',
+    description: 'Analyse émotionnelle avancée par IA multimodale',
+    url: '#',
+    icon: Brain,
+    category: 'Core',
+    status: 'coming-soon',
+    color: 'from-muted to-muted',
+  },
+  {
+    title: 'Wearables',
+    description: 'Synchronisez vos montres et capteurs connectés',
+    url: '#',
+    icon: Activity,
+    category: 'Wellness',
+    status: 'coming-soon',
+    color: 'from-muted to-muted',
+  },
+  {
+    title: 'Brain Viewer',
+    description: 'Visualisation cérébrale 3D interactive',
+    url: '#',
+    icon: Brain,
+    category: 'Core',
+    status: 'coming-soon',
+    color: 'from-muted to-muted',
   },
 ];
 
@@ -243,6 +281,7 @@ const categories = [
   { name: 'Wellness', description: 'Bien-être et relaxation', color: 'bg-success' },
   { name: 'Games', description: 'Jeux Fun-First', color: 'bg-accent' },
   { name: 'Social', description: 'Connexion et communauté', color: 'bg-destructive/70' },
+  { name: 'Exchange', description: 'Marchés et échanges', color: 'bg-emerald-500' },
   { name: 'Analytics', description: 'Suivi et progression', color: 'bg-warning' },
 ];
 
@@ -257,7 +296,6 @@ export default function ModulesDashboard() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
 
-  // Filtrer les modules
   const filteredModules = useMemo(() => {
     return modules.filter(module => {
       const matchesSearch = module.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -269,7 +307,6 @@ export default function ModulesDashboard() {
     });
   }, [searchQuery, selectedCategory, selectedStatus]);
 
-  // Grouper par catégorie
   const modulesByCategory = useMemo(() => {
     const grouped: Record<string, Module[]> = {};
     filteredModules.forEach(module => {
@@ -286,13 +323,20 @@ export default function ModulesDashboard() {
       case 'active':
         return <Badge variant="default" className="bg-success">Actif</Badge>;
       case 'beta':
-        return <Badge variant="secondary">Beta</Badge>;
+        return <Badge variant="secondary">Bêta</Badge>;
       case 'coming-soon':
-        return <Badge variant="outline">Bientôt</Badge>;
+        return (
+          <Badge variant="outline" className="border-muted-foreground/30 text-muted-foreground">
+            <Clock className="h-3 w-3 mr-1" />
+            Bientôt
+          </Badge>
+        );
       default:
         return null;
     }
   };
+
+  const isComingSoon = (module: Module) => module.status === 'coming-soon';
 
   return (
     <div className="space-y-8 pb-20">
@@ -304,13 +348,13 @@ export default function ModulesDashboard() {
               Tous les Modules
             </h1>
             <p className="text-muted-foreground text-lg">
-              Explorez tous les modules de la plateforme EmotionsCare
+              Explorez les outils de bien-être EmotionsCare
             </p>
           </div>
           
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-sm">
-              {filteredModules.length} modules
+              {modules.filter(m => m.status !== 'coming-soon').length} actifs
             </Badge>
           </div>
         </div>
@@ -348,7 +392,7 @@ export default function ModulesDashboard() {
             <SelectContent>
               <SelectItem value="all">Tous les statuts</SelectItem>
               <SelectItem value="active">Actif</SelectItem>
-              <SelectItem value="beta">Beta</SelectItem>
+              <SelectItem value="beta">Bêta</SelectItem>
               <SelectItem value="coming-soon">Bientôt</SelectItem>
             </SelectContent>
           </Select>
@@ -363,7 +407,7 @@ export default function ModulesDashboard() {
             Modules mis en avant
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {modules.filter(m => m.featured).map((module) => {
+            {modules.filter(m => m.featured && m.status !== 'coming-soon').map((module) => {
               const Icon = module.icon;
               return (
                 <Card 
@@ -399,13 +443,13 @@ export default function ModulesDashboard() {
 
       {/* Categories Overview */}
       {selectedCategory === 'all' && selectedStatus === 'all' && !searchQuery && (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {categories.map((cat) => (
             <button
               key={cat.name}
               onClick={() => setSelectedCategory(cat.name)}
               className="text-left w-full"
-              aria-label={`Sélectionner la catégorie ${cat.name} - ${cat.description}`}
+              aria-label={`Filtrer par ${cat.name}`}
             >
               <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer h-full">
                 <CardHeader className="pb-3">
@@ -428,7 +472,7 @@ export default function ModulesDashboard() {
       {Object.keys(modulesByCategory).length === 0 ? (
         <Card className="p-12 text-center">
           <p className="text-muted-foreground text-lg">
-            Aucun module ne correspond à vos critères de recherche
+            Aucun module ne correspond à vos critères
           </p>
           <Button
             variant="outline"
@@ -461,15 +505,25 @@ export default function ModulesDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {categoryModules.map((module) => {
                     const Icon = module.icon;
+                    const comingSoon = isComingSoon(module);
                     
                     return (
                       <Card 
                         key={module.title} 
-                        className="group hover:shadow-lg transition-all duration-300 border-2 hover:border-primary/50"
+                        className={cn(
+                          "group transition-all duration-300 border-2",
+                          comingSoon 
+                            ? "opacity-60 border-dashed border-muted-foreground/20"
+                            : "hover:shadow-lg hover:border-primary/50"
+                        )}
                       >
                         <CardHeader>
                           <div className="flex items-start justify-between">
-                            <div className={`p-3 rounded-lg bg-gradient-to-br ${module.color} text-white group-hover:scale-110 transition-transform`}>
+                            <div className={cn(
+                              "p-3 rounded-lg bg-gradient-to-br text-white transition-transform",
+                              module.color,
+                              !comingSoon && "group-hover:scale-110"
+                            )} aria-hidden="true">
                               <Icon className="h-6 w-6" />
                             </div>
                             {getStatusBadge(module.status)}
@@ -478,14 +532,25 @@ export default function ModulesDashboard() {
                           <CardDescription>{module.description}</CardDescription>
                         </CardHeader>
                         <CardContent>
-                          <Link to={module.url}>
+                          {comingSoon ? (
                             <Button 
-                              className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+                              className="w-full"
                               variant="outline"
+                              disabled
                             >
-                              Accéder au module
+                              <Lock className="h-4 w-4 mr-2" />
+                              Bientôt disponible
                             </Button>
-                          </Link>
+                          ) : (
+                            <Link to={module.url}>
+                              <Button 
+                                className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+                                variant="outline"
+                              >
+                                Accéder au module
+                              </Button>
+                            </Link>
+                          )}
                         </CardContent>
                       </Card>
                     );
@@ -498,35 +563,31 @@ export default function ModulesDashboard() {
 
       {/* Stats Summary */}
       <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
-            Statistiques Globales
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center">
-            <p className="text-3xl font-bold text-primary">{modules.length}</p>
-            <p className="text-sm text-muted-foreground">Modules totaux</p>
-          </div>
-          <div className="text-center">
-            <p className="text-3xl font-bold text-success">
-              {modules.filter(m => m.status === 'active').length}
-            </p>
-            <p className="text-sm text-muted-foreground">Modules actifs</p>
-          </div>
-          <div className="text-center">
-            <p className="text-3xl font-bold text-warning">
-              {modules.filter(m => m.status === 'beta').length}
-            </p>
-            <p className="text-sm text-muted-foreground">En beta</p>
-          </div>
-          <div className="text-center">
-            <p className="text-3xl font-bold text-accent">{categories.length}</p>
-            <p className="text-sm text-muted-foreground">Catégories</p>
+        <CardContent className="py-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div>
+              <p className="text-3xl font-bold text-primary">{modules.filter(m => m.status === 'active').length}</p>
+              <p className="text-sm text-muted-foreground">Modules actifs</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-accent">{modules.filter(m => m.status === 'beta').length}</p>
+              <p className="text-sm text-muted-foreground">En bêta</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-muted-foreground">{modules.filter(m => m.status === 'coming-soon').length}</p>
+              <p className="text-sm text-muted-foreground">Bientôt</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-success">{categories.length}</p>
+              <p className="text-sm text-muted-foreground">Catégories</p>
+            </div>
           </div>
         </CardContent>
       </Card>
     </div>
   );
+}
+
+function cn(...classes: (string | boolean | undefined)[]) {
+  return classes.filter(Boolean).join(' ');
 }
