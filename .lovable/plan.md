@@ -1,101 +1,41 @@
 
+# Correction des checkboxes invisibles sur la page d'inscription
 
-# Standardisation complete des emails et domaines - Phase 2
+## Probleme constate
 
-## Contexte
+Les cases a cocher CGU et Politique de Confidentialite sur `/signup` sont quasiment invisibles :
+- **Taille trop petite** : 16x16px (`h-4 w-4`), a peine visible sur mobile
+- **Contraste insuffisant** : bordure fine `border-primary` qui se confond avec le fond, surtout en mode sombre
+- **Pas de fond distinctif** : la case non cochee n'a aucun remplissage, elle "disparait" visuellement
 
-Apres la Phase 1 (12 fichiers corriges), il reste **~30 fichiers** contenant des emails non valides ou des domaines incorrects. Les seuls contacts valides sont :
-- **contact@emotionscare.com** (contact general)
-- **m.laeticia@emotionscare.com** (fondatrice)
+L'utilisateur voit le texte "J'accepte les CGU" mais ne voit pas la case a cocher a cote. Il clique sur "Creer mon compte" et rien ne se passe (erreur de validation non visible sans scroll).
 
-Les emails `noreply@emotionscare.com` dans les edge functions d'envoi d'emails sont acceptables car ils representent l'adresse d'expedition configuree via Resend (pas un contact public).
+## Corrections (2 fichiers)
 
----
+### Fichier 1 : `src/components/ui/checkbox.tsx`
 
-## Fichiers a corriger (classes par categorie)
+Ameliorer la visibilite globale du composant Checkbox :
+- Taille augmentee de `h-4 w-4` a **`h-5 w-5`** (20x20px)
+- Bordure renforcee : `border` -> **`border-2`**
+- Ajout d'un fond pour la case non cochee : **`bg-background`** (contraste garanti en light ET dark mode)
+- Icone Check agrandie pour correspondre : `h-4 w-4` -> **`h-3.5 w-3.5`**
 
-### A. Pages legales visibles par les utilisateurs (priorite haute)
+### Fichier 2 : `src/pages/SignupPage.tsx`
 
-| # | Fichier | Email actuel | Correction |
-|---|---------|-------------|------------|
-| 1 | `src/pages/legal/LegalPage.tsx` (l.123-125) | `support@emotionscare.com` + `dpo@emotionscare.com` | Remplacer les 2 par `contact@emotionscare.com` |
-| 2 | `src/pages/legal/CookiesPage.tsx` (l.226) | `dpo@emotionscare.com` | -> `contact@emotionscare.com` |
-| 3 | `src/pages/legal/TermsPage.tsx` (l.110) | `legal@emotionscare.com` | -> `contact@emotionscare.com` |
-| 4 | `src/pages/legal/SalesTermsPage.tsx` (l.361) | `dpo@emotionscare.com` | -> `contact@emotionscare.com` |
-| 5 | `src/pages/legal/PrivacyPage.tsx` (l.117, 172) | `privacy@emotionscare.com` + `dpo@emotionscare.com` | -> `contact@emotionscare.com` |
-| 6 | `src/pages/legal/LicensesPage.tsx` (l.255) | `legal@emotionscare.com` | -> `contact@emotionscare.com` |
-| 7 | `src/pages/legal/MentionsLegalesPage.tsx` (l.86, 180) | `dpo@emotionscare.com` + `legal@emotionscare.com` | -> `contact@emotionscare.com` |
-| 8 | `src/components/pages/TermsPage.tsx` (l.62) | `legal@emotionscare.com` | -> `contact@emotionscare.com` |
-| 9 | `src/components/pages/PrivacyPage.tsx` (l.85-88) | `dpo@emotionscare.com` + `privacy@emotionscare.com` | -> `contact@emotionscare.com` |
+Ameliorations UX specifiques au formulaire d'inscription :
+- Supprimer `className="mt-0.5"` sur les checkboxes (l'alignement sera meilleur avec la taille 20px)
+- Ajouter **`aria-required="true"`** sur les deux checkboxes
+- Ajouter une **bordure visuelle** autour du bloc checkboxes : un encadre leger (`border rounded-lg p-4 bg-muted/30`) pour attirer l'attention
+- Ajouter un titre "Consentements obligatoires" au-dessus du bloc pour que l'utilisateur comprenne immediatement qu'il doit cocher
+- En cas d'erreur sur les checkboxes, ajouter **`border-destructive`** sur les checkboxes non cochees pour un feedback visuel immediat
 
-### B. Pages utilisateur visibles (priorite haute)
+## Resultat attendu
 
-| # | Fichier | Email actuel | Correction |
-|---|---------|-------------|------------|
-| 10 | `src/pages/ConsentManagementPage.tsx` (l.362-363) | `privacy@emotionscare.com` | -> `contact@emotionscare.com` |
-| 11 | `src/pages/FAQPage.tsx` (l.119) | `support@emotionscare.com` | -> `contact@emotionscare.com` |
-| 12 | `src/pages/b2c/B2CPrivacyTogglesPage.tsx` (l.700-702) | `dpo@emotionscare.com` | -> `contact@emotionscare.com` |
-| 13 | `src/components/privacy/GdprActionsSection.tsx` (l.229-230) | `dpo@emotionscare.com` | -> `contact@emotionscare.com` |
-| 14 | `src/components/privacy/GdprRightsSection.tsx` (l.212) | `privacy@emotionscare.com` | -> `contact@emotionscare.com` |
-| 15 | `src/components/error/HomePageErrorBoundary.tsx` (l.137-140) | `support@emotionscare.com` | -> `contact@emotionscare.com` |
-| 16 | `src/components/error/Enhanced500Page.tsx` (l.179-182) | `support@emotionscare.com` | -> `contact@emotionscare.com` |
+| Avant | Apres |
+|-------|-------|
+| Case invisible, 16px, pas de fond | Case visible, 20px, fond blanc/sombre, bordure epaisse |
+| Texte CGU sans contexte | Bloc encadre "Consentements obligatoires" |
+| Erreur seulement en haut du formulaire | Bordure rouge sur la case non cochee |
+| Utilisateur bloque sans comprendre pourquoi | Action evidente en moins de 3 secondes |
 
-### C. Configuration et navigation (priorite moyenne)
-
-| # | Fichier | Email actuel | Correction |
-|---|---------|-------------|------------|
-| 17 | `src/lib/nav-schema.ts` (l.221) | `mailto:support@emotionscare.com` | -> `mailto:contact@emotionscare.com` |
-| 18 | `src/components/admin/GlobalConfigurationCenter.tsx` (l.69) | `support@emotionscare.com` | -> `contact@emotionscare.com` |
-| 19 | `src/components/admin/GlobalConfigurationCenter.old.tsx` (l.131) | `support@emotionscare.com` | -> `contact@emotionscare.com` |
-| 20 | `src/pages/manager/AuditPageEnhanced.tsx` (l.104) | `security@emotionscare.com` | -> `contact@emotionscare.com` |
-| 21 | `src/pages/manager/SecurityPageEnhanced.tsx` (l.335) | `security@emotionscare.com` | -> `contact@emotionscare.com` |
-
-### D. Services GDPR et backend (priorite moyenne)
-
-| # | Fichier | Email actuel | Correction |
-|---|---------|-------------|------------|
-| 22 | `src/services/gdpr/emailNotifications.ts` (l.40, 114, 142) | `dpo@emotionscare.com` | -> `contact@emotionscare.com` |
-| 23 | `src/services/gdpr/AccountDeletionService.ts` (l.26) | `support@emotionscare.com` | -> `contact@emotionscare.com` |
-
-### E. SEO et domaines (priorite moyenne)
-
-| # | Fichier | Valeur actuelle | Correction |
-|---|---------|----------------|------------|
-| 24 | `src/hooks/usePageSEO.ts` (l.176-193) | `emotionscare.app` partout + `support@emotionscare.app` | -> `emotionscare.com` + `contact@emotionscare.com` |
-| 25 | `src/components/seo/SEO.tsx` (l.24, 32-33) | `emotionscare.app` | -> `emotionscare.com` |
-| 26 | `src/lib/constants.ts` (l.11) | `emotionscare.app` | -> `emotionscare.com` |
-| 27 | `src/pages/b2c/B2CSocialCoconPage.tsx` (l.116) | `emotionscare.app` | -> `emotionscare.com` |
-| 28 | `src/components/b2b/admin/B2BSettingsPanel.tsx` (l.54) | `mon-org.emotionscare.app` | -> `mon-org.emotionscare.com` |
-
-### F. Edge Functions (priorite moyenne)
-
-| # | Fichier | Email actuel | Correction |
-|---|---------|-------------|------------|
-| 29 | `supabase/functions/push-notification/index.ts` (l.302) | `mailto:support@emotionscare.com` | -> `mailto:contact@emotionscare.com` |
-| 30 | `supabase/functions/send-push-notification/index.ts` (l.185) | `mailto:support@emotionscare.com` | -> `mailto:contact@emotionscare.com` |
-| 31 | `supabase/functions/dsar-handler/index.ts` (l.226, 419) | `dpo@emotionscare.com` | -> `contact@emotionscare.com` |
-| 32 | `supabase/functions/gdpr-scheduled-export/index.ts` (l.100) | `rgpd@emotionscare.app` | -> `noreply@emotionscare.com` |
-| 33 | `supabase/functions/pdf-notifications/index.ts` (l.104) | `notifications@emotionscare.app` | -> `noreply@emotionscare.com` |
-| 34 | `supabase/functions/scheduled-pdf-reports/index.ts` (l.65) | `reports@emotionscare.app` | -> `noreply@emotionscare.com` |
-| 35 | `supabase/functions/send-cron-alert/index.ts` (l.138) | `alerts@emotionscare.app` | -> `noreply@emotionscare.com` |
-| 36 | `supabase/functions/check-suspicious-role-changes/index.ts` (l.8) | `noreply@emotionscare.com` | OK (inchange) |
-
-### G. Fichiers NON modifies (acceptables)
-
-Les fichiers suivants ne seront **pas** modifies :
-- **Edge functions avec `noreply@emotionscare.com`** : c'est l'adresse d'expedition systeme, pas un contact public. OK.
-- **Fichiers de tests (`tests/e2e/`)** : `test@emotionscare.app` est un email de test fictif, acceptable dans le contexte des tests.
-- **Fichiers de documentation (`reports/`, `docs/`, `scripts/`)** : documents internes, pas visibles par les utilisateurs.
-
----
-
-## Resume des regles
-
-| Type | Avant | Apres |
-|------|-------|-------|
-| Contact general visible | support@, legal@, privacy@, dpo@, security@, enterprise@ | **contact@emotionscare.com** |
-| Fondatrice (si mentionne) | - | **m.laeticia@emotionscare.com** |
-| Email d'expedition systeme | rgpd@, reports@, alerts@, notifications@ (emotionscare.app) | **noreply@emotionscare.com** |
-| Domaine SEO/canonical | emotionscare.app | **emotionscare.com** |
-
-Total : **36 fichiers** a modifier, couvrant 100% des emails non valides restants dans le code source et les edge functions.
+2 fichiers modifies. Zero changement de logique metier.
