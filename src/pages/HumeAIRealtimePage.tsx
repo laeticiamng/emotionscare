@@ -9,9 +9,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Camera, Mic, Type, Info, Sparkles } from 'lucide-react';
+import { Camera, Mic, Type, Info, Sparkles, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { Link } from 'react-router-dom';
 
 interface EmotionResult {
   topEmotion: {
@@ -94,6 +95,12 @@ export default function HumeAIRealtimePage() {
 
   return (
     <div className="container max-w-6xl mx-auto p-6 space-y-6">
+      {/* Back button */}
+      <Link to="/app/home" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="h-4 w-4" />
+        Retour au dashboard
+      </Link>
+
       {/* Header */}
       <div className="flex items-start gap-4">
         <div className="p-3 bg-primary/10 rounded-lg">

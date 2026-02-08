@@ -1,8 +1,9 @@
+import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { FileText, Download } from 'lucide-react';
+import { FileText, Download, ArrowLeft } from 'lucide-react';
 
 export default function ExportPDFPage() {
   const sections = [
@@ -16,6 +17,10 @@ export default function ExportPDFPage() {
 
   return (
     <div className="container max-w-2xl mx-auto p-6 space-y-6">
+      <Link to="/app/home" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="h-4 w-4" />
+        Retour au dashboard
+      </Link>
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Export PDF</h1>
         <p className="text-muted-foreground">

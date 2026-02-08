@@ -1,12 +1,17 @@
+import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { FileSpreadsheet, Download } from 'lucide-react';
+import { FileSpreadsheet, Download, ArrowLeft } from 'lucide-react';
 
 export default function ExportCSVPage() {
   return (
     <div className="container max-w-2xl mx-auto p-6 space-y-6">
+      <Link to="/app/home" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="h-4 w-4" />
+        Retour au dashboard
+      </Link>
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Export CSV</h1>
         <p className="text-muted-foreground">

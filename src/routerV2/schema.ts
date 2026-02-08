@@ -18,6 +18,8 @@ export interface RouteMeta {
   component: string;         // chemin vers le composant
   aliases?: string[];        // ex: ['/music', '/b2c/login']
   deprecated?: boolean;      // pour audit/CI
+  hidden?: boolean;          // masqué de la navigation (dev-only, doublons)
+  status?: 'stable' | 'beta' | 'coming-soon' | 'dev-only'; // visibilité
   guard?: boolean;           // nécessite une protection
   requireAuth?: boolean;     // nécessite authentification
 }

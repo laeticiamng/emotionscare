@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { logger } from '@/lib/logger';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 interface Widget {
@@ -128,6 +129,10 @@ export default function WidgetsPage() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      <Link to="/app/home" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="h-4 w-4" />
+        Retour au dashboard
+      </Link>
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Widgets</h1>
         <p className="text-muted-foreground">
