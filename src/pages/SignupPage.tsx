@@ -37,6 +37,7 @@ const SignupPage: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const errorRef = useRef<HTMLDivElement>(null);
+  const confirmPasswordRef = useRef<HTMLDivElement>(null);
 
   const { signUp, isLoading, isAuthenticated } = useAuth();
 
@@ -68,13 +69,21 @@ const SignupPage: React.FC = () => {
     }
 
     // Validation des mots de passe
+    if (!confirmPassword) {
+      setError('Veuillez confirmer votre mot de passe');
+      setTimeout(() => confirmPasswordRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError('Les mots de passe ne correspondent pas');
+      setTimeout(() => confirmPasswordRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
       return;
     }
 
     if (password.length < 8) {
       setError('Le mot de passe doit contenir au moins 8 caractères');
+      setTimeout(() => errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
       return;
     }
 
@@ -219,7 +228,7 @@ const SignupPage: React.FC = () => {
                  </div>
                )}
               {/* Confirmation mot de passe */}
-              <div className="space-y-2">
+              <div className="space-y-2" ref={confirmPasswordRef}>
                 <label className="text-sm font-medium text-foreground/80">
                   Confirmer le mot de passe
                 </label>

@@ -365,8 +365,10 @@ export default function ModulesDashboard() {
                           module.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = selectedCategory === 'all' || module.category === selectedCategory;
       const matchesStatus = selectedStatus === 'all' || module.status === selectedStatus;
+      // Par défaut (sans filtre statut), masquer les coming-soon de la grille principale
+      const hideComingSoon = selectedStatus === 'all' ? module.status !== 'coming-soon' : true;
       
-      return matchesSearch && matchesCategory && matchesStatus;
+      return matchesSearch && matchesCategory && matchesStatus && hideComingSoon;
     });
   }, [searchQuery, selectedCategory, selectedStatus]);
 
@@ -462,13 +464,14 @@ export default function ModulesDashboard() {
         </div>
       </div>
 
-      {/* Modules mis en avant */}
+      {/* Recommandés pour vous */}
       {selectedCategory === 'all' && selectedStatus === 'all' && !searchQuery && (
         <div className="space-y-4">
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <Star className="h-6 w-6 text-warning fill-warning" aria-hidden="true" />
-            Modules mis en avant
+            Recommandés pour vous
           </h2>
+          <p className="text-muted-foreground">Commencez par ces modules essentiels</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {modules.filter(m => m.featured && m.status !== 'coming-soon').map((module) => {
               const Icon = module.icon;
@@ -622,6 +625,35 @@ export default function ModulesDashboard() {
               </div>
             );
           })
+      )}
+
+      {/* Coming Soon section - visible uniquement sans filtre */}
+      {selectedCategory === 'all' && selectedStatus === 'all' && !searchQuery && (
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold flex items-center gap-2 text-muted-foreground">
+            <Clock className="h-6 w-6" />
+            Bientôt disponibles
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {modules.filter(m => m.status === 'coming-soon').map((module) => {
+              const Icon = module.icon;
+              return (
+                <Card key={module.title} className="opacity-60 border-dashed border-muted-foreground/20">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="p-2 rounded-lg bg-muted" aria-hidden="true">
+                        <Icon className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      {getStatusBadge(module.status)}
+                    </div>
+                    <CardTitle className="text-base">{module.title}</CardTitle>
+                    <CardDescription className="text-sm">{module.description}</CardDescription>
+                  </CardHeader>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
       )}
 
       {/* Stats Summary */}
