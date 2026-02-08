@@ -441,20 +441,17 @@ export default function EntreprisePage() {
                 variant="outline" 
                 size="lg" 
                 className="px-8 py-4 text-lg"
+                onClick={() => window.location.href = 'mailto:contact@emotionscare.com'}
               >
-                <Phone className="w-5 h-5 mr-2" />
-                Nous Appeler
+                <Mail className="w-5 h-5 mr-2" />
+                Nous Contacter
               </Button>
             </div>
 
             <div className="flex justify-center space-x-8 text-sm text-muted-foreground">
               <div className="flex items-center">
                 <Mail className="w-4 h-4 mr-2" />
-                enterprise@emotionscare.com
-              </div>
-              <div className="flex items-center">
-                <Phone className="w-4 h-4 mr-2" />
-                +33 1 23 45 67 89
+                contact@emotionscare.com
               </div>
             </div>
           </motion.div>

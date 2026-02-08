@@ -74,14 +74,8 @@ const MainFooter: React.FC<MainFooterProps> = ({ className }) => {
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-center">
                   <Mail className="h-4 w-4 mr-2" />
-                  <a href="mailto:contact@emotions-care.com" className="hover:text-foreground transition-colors">
-                    contact@emotions-care.com
-                  </a>
-                </li>
-                <li className="flex items-center">
-                  <Phone className="h-4 w-4 mr-2" />
-                  <a href="tel:+33123456789" className="hover:text-foreground transition-colors">
-                    +33 1 23 45 67 89
+                  <a href="mailto:contact@emotionscare.com" className="hover:text-foreground transition-colors">
+                    contact@emotionscare.com
                   </a>
                 </li>
                 <li className="flex items-center">

@@ -58,8 +58,8 @@ export const PrivacyPolicyPage: React.FC = () => {
                 <p><strong>SIRET :</strong> 944 505 445 00014</p>
                 <p><strong>Email :</strong> <a href="mailto:contact@emotionscare.com" className="text-primary">contact@emotionscare.com</a></p>
                 <p><strong>Délégué à la Protection des Données (DPO) :</strong><br />
-                  Email : <a href="mailto:dpo@emotionscare.com" className="text-primary">dpo@emotionscare.com</a><br />
-                  Adresse : EmotionsCare SASU – DPO, 5 rue Caudron, 80000 Amiens
+                  Email : <a href="mailto:contact@emotionscare.com" className="text-primary">contact@emotionscare.com</a><br />
+                  Adresse : EmotionsCare SASU, 5 rue Caudron, 80000 Amiens
                 </p>
               </div>
             </section>
@@ -315,8 +315,8 @@ export const PrivacyPolicyPage: React.FC = () => {
                   Contact DPO (Délégué à la Protection des Données)
                 </p>
                 <ul>
-                  <li><strong>Email :</strong> <a href="mailto:dpo@emotionscare.com" className="text-primary hover:underline">dpo@emotionscare.com</a></li>
-                  <li><strong>Courrier :</strong> EmotionsCare SASU – DPO, 5 rue Caudron, 80000 Amiens</li>
+                  <li><strong>Email :</strong> <a href="mailto:contact@emotionscare.com" className="text-primary hover:underline">contact@emotionscare.com</a></li>
+                  <li><strong>Courrier :</strong> EmotionsCare SASU, 5 rue Caudron, 80000 Amiens</li>
                   <li><strong>Formulaire en ligne :</strong> <Link to="/app/settings/privacy" className="text-primary hover:underline">Paramètres compte → RGPD</Link></li>
                 </ul>
                 <p className="text-sm mt-3">
@@ -428,10 +428,8 @@ export const PrivacyPolicyPage: React.FC = () => {
               </h2>
               <p>Pour toute question concernant cette politique de confidentialité ou le traitement de vos données :</p>
               <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-                <p><strong>Email :</strong> <a href="mailto:privacy@emotionscare.com" className="text-primary hover:underline">privacy@emotionscare.com</a></p>
-                <p><strong>DPO :</strong> <a href="mailto:dpo@emotionscare.com" className="text-primary hover:underline">dpo@emotionscare.com</a></p>
-                <p><strong>Téléphone :</strong> +33 1 23 45 67 89</p>
-                <p><strong>Courrier :</strong> EmotionsCare SAS - Service Confidentialité - 123 Avenue de l'Innovation - 75001 Paris</p>
+                <p><strong>Email :</strong> <a href="mailto:contact@emotionscare.com" className="text-primary hover:underline">contact@emotionscare.com</a></p>
+                <p><strong>Courrier :</strong> EmotionsCare SASU – 5 rue Caudron, 80000 Amiens</p>
               </div>
             </section>
 

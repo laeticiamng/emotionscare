@@ -330,17 +330,10 @@ export default function SupportChatbotPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button variant="outline" size="sm" className="w-full justify-start">
+                <Button variant="outline" size="sm" className="w-full justify-start" onClick={() => window.location.href = 'mailto:contact@emotionscare.com'}>
                   <Mail className="h-4 w-4 mr-2" />
-                  support@emotionscare.com
+                  contact@emotionscare.com
                 </Button>
-                <Button variant="outline" size="sm" className="w-full justify-start">
-                  <Phone className="h-4 w-4 mr-2" />
-                  +33 1 23 45 67 89
-                </Button>
-                <div className="text-xs text-muted-foreground">
-                  Disponible Lun-Ven 9h-18h
-                </div>
               </CardContent>
             </Card>
 

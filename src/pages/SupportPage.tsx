@@ -121,7 +121,7 @@ export default function SupportPage() {
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-sm text-muted-foreground mb-4">
-                support@emotionscare.com
+                contact@emotionscare.com
               </p>
               <Button variant="outline" className="w-full">
                 Envoyer un Email

@@ -67,12 +67,8 @@ export const Footer: React.FC = () => {
                 <span>contact@emotionscare.com</span>
               </div>
               <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4" />
-                <span>+33 1 23 45 67 89</span>
-              </div>
-              <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
-                <span>Paris, France</span>
+                <span>Amiens, France</span>
               </div>
             </div>
           </div>

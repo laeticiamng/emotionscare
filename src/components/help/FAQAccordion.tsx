@@ -52,7 +52,7 @@ export const FAQAccordion: React.FC<FAQAccordionProps> = ({ items }) => {
           Vous ne trouvez pas votre réponse ? {' '}
           <button 
             className="text-primary hover:underline"
-            onClick={() => window.location.href = 'mailto:support@emotionscare.com'}
+            onClick={() => window.location.href = 'mailto:contact@emotionscare.com'}
           >
             Contactez-nous
           </button>

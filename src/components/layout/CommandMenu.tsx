@@ -114,7 +114,7 @@ const CommandMenu: React.FC<CommandMenuProps> = ({
         
         <CommandGroup heading="Aide">
           <CommandItem
-            onSelect={() => runCommand(() => window.open('https://docs.emotions-care.com', '_blank'))}
+            onSelect={() => runCommand(() => navigate('/help'))}
           >
             <HelpCircle className="mr-2 h-4 w-4" />
             <span>Centre d'aide</span>
