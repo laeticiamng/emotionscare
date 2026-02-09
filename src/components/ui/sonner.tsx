@@ -21,6 +21,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
             "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
         },
       }}
+      closeButton
+      aria-live="polite"
+      aria-label="Notifications"
+      role="region"
       {...props}
     />
   );

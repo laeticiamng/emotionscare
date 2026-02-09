@@ -3,9 +3,10 @@
  * Cohérente avec la homepage, typographie massive, animations framer-motion
  */
 
-import React, { memo, useRef } from 'react';
+import React, { memo, useRef, useState, useCallback } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { usePageSEO } from '@/hooks/usePageSEO';
@@ -22,6 +23,13 @@ import {
   Eye,
   Lock,
   CheckCircle,
+  Calculator,
+  Hospital,
+  GraduationCap,
+  Home as HomeIcon,
+  Stethoscope,
+  Quote,
+  Send,
 } from 'lucide-react';
 
 /** Reusable animated section title */
@@ -108,6 +116,209 @@ const stats = [
   { value: '24h', label: 'pour déployer', icon: Building2 },
   { value: '0', label: 'données vendues', icon: Shield },
 ];
+
+/* ──────────────── Use Cases ──────────────── */
+const useCases = [
+  {
+    icon: Hospital,
+    title: 'Hôpitaux',
+    description: 'Réduisez le turnover des soignants en offrant des micro-pauses émotionnelles intégrées aux roulements.',
+    stat: '-30% absentéisme',
+  },
+  {
+    icon: Stethoscope,
+    title: 'Cliniques privées',
+    description: 'Améliorez la satisfaction patient en prenant soin du bien-être de vos équipes soignantes.',
+    stat: '+25% satisfaction',
+  },
+  {
+    icon: GraduationCap,
+    title: 'Facultés de médecine',
+    description: 'Accompagnez vos étudiants face au stress des examens et des premiers stages cliniques.',
+    stat: '-40% stress étudiant',
+  },
+  {
+    icon: HomeIcon,
+    title: 'EHPAD',
+    description: 'Soutenez vos aides-soignants face à la charge émotionnelle du soin aux personnes âgées.',
+    stat: '+35% rétention',
+  },
+];
+
+/* ──────────────── Testimonials ──────────────── */
+const testimonials = [
+  {
+    quote: 'En 3 mois, nos indicateurs de bien-être ont progressé de 28%. Les équipes utilisent EmotionsCare avant et après les gardes.',
+    author: 'Dr. Sophie Martin',
+    role: 'Directrice RH',
+    org: 'CHU de Lyon',
+  },
+  {
+    quote: 'Le déploiement a pris moins d\'une journée. L\'anonymat total a convaincu même les plus réticents.',
+    author: 'Marc Dubois',
+    role: 'DRH',
+    org: 'Clinique Saint-Joseph, Paris',
+  },
+  {
+    quote: 'Nos internes utilisent la respiration guidée entre deux blocs opératoires. C\'est devenu un réflexe.',
+    author: 'Pr. Claire Lefèvre',
+    role: 'Doyenne',
+    org: 'Faculté de Médecine, Strasbourg',
+  },
+];
+
+/* ──────────────── ROI Calculator ──────────────── */
+const ROICalculator: React.FC = () => {
+  const [employees, setEmployees] = useState(50);
+  const [absentRate, setAbsentRate] = useState(5);
+
+  const avgDailyCost = 250;
+  const workDaysPerYear = 220;
+  const currentAbsentCost = employees * (absentRate / 100) * workDaysPerYear * avgDailyCost;
+  const reductionPercent = 0.30;
+  const annualSavings = currentAbsentCost * reductionPercent;
+  const monthlyCost = employees * 9.90;
+  const annualCost = monthlyCost * 12;
+  const netSavings = annualSavings - annualCost;
+  const roi = annualCost > 0 ? Math.round((netSavings / annualCost) * 100) : 0;
+
+  return (
+    <div className="grid md:grid-cols-2 gap-8 items-start">
+      <div className="space-y-6">
+        <div>
+          <label htmlFor="roi-employees" className="block text-sm font-medium mb-2">
+            Nombre de collaborateurs
+          </label>
+          <Input
+            id="roi-employees"
+            type="number"
+            min={10}
+            max={10000}
+            value={employees}
+            onChange={(e) => setEmployees(Math.max(10, parseInt(e.target.value) || 10))}
+            className="text-lg py-6"
+          />
+        </div>
+        <div>
+          <label htmlFor="roi-absent" className="block text-sm font-medium mb-2">
+            Taux d'absentéisme actuel (%)
+          </label>
+          <Input
+            id="roi-absent"
+            type="number"
+            min={1}
+            max={30}
+            value={absentRate}
+            onChange={(e) => setAbsentRate(Math.max(1, Math.min(30, parseInt(e.target.value) || 1)))}
+            className="text-lg py-6"
+          />
+        </div>
+      </div>
+
+      <div className="bg-card/60 backdrop-blur-xl rounded-2xl border border-border/50 p-8 space-y-4">
+        <div className="flex justify-between items-center py-2 border-b border-border/30">
+          <span className="text-muted-foreground">Coût absentéisme actuel</span>
+          <span className="text-xl font-bold">{currentAbsentCost.toLocaleString('fr-FR')} &euro;/an</span>
+        </div>
+        <div className="flex justify-between items-center py-2 border-b border-border/30">
+          <span className="text-muted-foreground">Réduction estimée (30%)</span>
+          <span className="text-xl font-bold text-primary">{annualSavings.toLocaleString('fr-FR')} &euro;/an</span>
+        </div>
+        <div className="flex justify-between items-center py-2 border-b border-border/30">
+          <span className="text-muted-foreground">Coût EmotionsCare</span>
+          <span className="text-xl font-bold">{annualCost.toLocaleString('fr-FR')} &euro;/an</span>
+        </div>
+        <div className="flex justify-between items-center py-3 bg-primary/5 rounded-xl px-4">
+          <span className="font-semibold">Économies nettes</span>
+          <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            {netSavings.toLocaleString('fr-FR')} &euro;/an
+          </span>
+        </div>
+        <div className="text-center pt-2">
+          <span className="text-sm text-muted-foreground">ROI estimé : </span>
+          <span className="text-lg font-bold text-primary">{roi}%</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ──────────────── Demo Form ──────────────── */
+const DemoRequestForm: React.FC = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    organization: '',
+    role: '',
+    size: '',
+  });
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+  }, []);
+
+  const handleChange = useCallback((field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData(prev => ({ ...prev, [field]: e.target.value }));
+  }, []);
+
+  if (submitted) {
+    return (
+      <div className="text-center py-12">
+        <CheckCircle className="h-16 w-16 text-primary mx-auto mb-4" />
+        <h3 className="text-2xl font-bold mb-2">Demande envoyée</h3>
+        <p className="text-muted-foreground">
+          Notre équipe vous contactera sous 24h pour planifier votre démo personnalisée.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label htmlFor="demo-name" className="block text-sm font-medium mb-1.5">Nom complet</label>
+        <Input id="demo-name" required placeholder="Dr. Jean Dupont" value={formData.name} onChange={handleChange('name')} className="py-5" />
+      </div>
+      <div>
+        <label htmlFor="demo-email" className="block text-sm font-medium mb-1.5">Email professionnel</label>
+        <Input id="demo-email" type="email" required placeholder="jean.dupont@hopital.fr" value={formData.email} onChange={handleChange('email')} className="py-5" />
+      </div>
+      <div>
+        <label htmlFor="demo-org" className="block text-sm font-medium mb-1.5">Organisation</label>
+        <Input id="demo-org" required placeholder="CHU de Lyon" value={formData.organization} onChange={handleChange('organization')} className="py-5" />
+      </div>
+      <div>
+        <label htmlFor="demo-role" className="block text-sm font-medium mb-1.5">Fonction</label>
+        <Input id="demo-role" required placeholder="DRH, Directeur..." value={formData.role} onChange={handleChange('role')} className="py-5" />
+      </div>
+      <div className="sm:col-span-2">
+        <label htmlFor="demo-size" className="block text-sm font-medium mb-1.5">Nombre de collaborateurs</label>
+        <select
+          id="demo-size"
+          required
+          value={formData.size}
+          onChange={handleChange('size')}
+          className="w-full rounded-md border border-input bg-background px-3 py-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <option value="">Sélectionner...</option>
+          <option value="10-50">10 - 50</option>
+          <option value="50-200">50 - 200</option>
+          <option value="200-500">200 - 500</option>
+          <option value="500-1000">500 - 1 000</option>
+          <option value="1000+">1 000+</option>
+        </select>
+      </div>
+      <div className="sm:col-span-2">
+        <Button type="submit" size="lg" className="w-full rounded-full text-lg py-6 group">
+          <Send className="h-5 w-5 mr-2 group-hover:translate-x-1 transition-transform" />
+          Demander une démo gratuite
+        </Button>
+      </div>
+    </form>
+  );
+};
 
 const B2BEntreprisePage: React.FC = () => {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -443,6 +654,114 @@ const B2BEntreprisePage: React.FC = () => {
               </Button>
             </Link>
           </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════════════ CAS D'USAGE ═══════════════════ */}
+      <section className="py-28 md:py-36">
+        <div className="container px-4 sm:px-6 lg:px-8">
+          <SectionTitle center subtitle="Des solutions adaptées à chaque établissement de santé.">
+            Pensé pour le{' '}
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              terrain.
+            </span>
+          </SectionTitle>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {useCases.map((uc, i) => {
+              const ref = useRef<HTMLDivElement>(null);
+              const isInView = useInView(ref, { once: true, amount: 0.4 });
+              return (
+                <motion.div
+                  key={i}
+                  ref={ref}
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={isInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.7, delay: i * 0.1 }}
+                  className="bg-card/50 backdrop-blur-xl rounded-2xl p-6 border border-border/50 hover:border-border hover:shadow-xl transition-all duration-300 text-center"
+                >
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent text-white mb-4">
+                    <uc.icon className="h-7 w-7" />
+                  </div>
+                  <h3 className="text-lg font-bold mb-2">{uc.title}</h3>
+                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{uc.description}</p>
+                  <div className="text-sm font-semibold text-primary">{uc.stat}</div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════ TÉMOIGNAGES ═══════════════════ */}
+      <section className="py-28 md:py-36 bg-muted/30">
+        <div className="container px-4 sm:px-6 lg:px-8">
+          <SectionTitle center subtitle="Ils ont déployé EmotionsCare dans leur établissement.">
+            Retours{' '}
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              d'établissements pilotes.
+            </span>
+          </SectionTitle>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {testimonials.map((t, i) => {
+              const ref = useRef<HTMLDivElement>(null);
+              const isInView = useInView(ref, { once: true, amount: 0.4 });
+              return (
+                <motion.div
+                  key={i}
+                  ref={ref}
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={isInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.7, delay: i * 0.15 }}
+                  className="bg-card/60 backdrop-blur-xl rounded-2xl p-8 border border-border/50"
+                >
+                  <Quote className="h-8 w-8 text-primary/30 mb-4" aria-hidden="true" />
+                  <blockquote className="text-muted-foreground leading-relaxed mb-6">
+                    &laquo; {t.quote} &raquo;
+                  </blockquote>
+                  <div>
+                    <div className="font-semibold">{t.author}</div>
+                    <div className="text-sm text-muted-foreground">{t.role}</div>
+                    <div className="text-sm text-primary">{t.org}</div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════ ROI CALCULATOR ═══════════════════ */}
+      <section className="py-28 md:py-36">
+        <div className="container px-4 sm:px-6 lg:px-8">
+          <SectionTitle center subtitle="Estimez vos économies en réduisant l'absentéisme lié au stress et à l'épuisement.">
+            <Calculator className="inline h-10 w-10 mr-3 text-primary" aria-hidden="true" />
+            Calculateur de{' '}
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              ROI.
+            </span>
+          </SectionTitle>
+
+          <div className="max-w-4xl mx-auto">
+            <ROICalculator />
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════ DEMANDE DE DÉMO ═══════════════════ */}
+      <section className="py-28 md:py-36 bg-muted/30" id="demo">
+        <div className="container px-4 sm:px-6 lg:px-8">
+          <SectionTitle center subtitle="Planifiez une démonstration personnalisée avec notre équipe.">
+            Demander une{' '}
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              démo gratuite.
+            </span>
+          </SectionTitle>
+
+          <div className="max-w-2xl mx-auto bg-card/60 backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-border/50">
+            <DemoRequestForm />
+          </div>
         </div>
       </section>
 

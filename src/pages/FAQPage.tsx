@@ -4,6 +4,7 @@
  * SEO, accessibilité, catégories étendues, recherche fonctionnelle
  */
 import React, { useState, useMemo, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -162,8 +163,30 @@ export default function FAQPage() {
   const totalQuestions = FAQS.reduce((acc, cat) => acc + cat.questions.length, 0);
   const filteredQuestionsCount = filteredFaqs.reduce((acc, cat) => acc + cat.questions.length, 0);
 
+  const faqJsonLd = useMemo(() => {
+    const allQuestions = FAQS.flatMap(cat => cat.questions);
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: allQuestions.map(faq => ({
+        '@type': 'Question',
+        name: faq.q,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.a,
+        },
+      })),
+    };
+  }, []);
+
   return (
     <div data-testid="page-root" className="min-h-screen bg-background">
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(faqJsonLd)}
+        </script>
+      </Helmet>
+
       {/* Skip Links */}
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md">
         Aller au contenu principal
