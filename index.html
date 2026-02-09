@@ -1,21 +1,28 @@
 
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EmotionsCare | ResiMax™</title>
-    <meta name="description" content="Plateforme de bien-être émotionnel en entreprise" />
-    <!-- Security Headers -->
-    <!-- CSP: Active en production via headers serveur. Meta tag désactivé pour compatibilité Lovable iframe -->
-    <!-- En production (Vercel/Netlify), configurer les headers HTTP suivants:
-         Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.gpteng.co; style-src 'self' 'unsafe-inline' https://rsms.me https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://rsms.me https://fonts.gstatic.com data:; connect-src 'self' https://yaincoxihiqdksxgrsrk.supabase.co https://*.supabase.co wss://*.supabase.co https://*.hume.ai wss://*.hume.ai https://api.openai.com https://*.sentry.io; media-src 'self' blob: https://*.supabase.co; frame-ancestors 'self'; worker-src 'self' blob:;
-         X-Content-Type-Options: nosniff
-         X-Frame-Options: SAMEORIGIN
-         Referrer-Policy: strict-origin-when-cross-origin
-         Permissions-Policy: camera=(), microphone=(self), geolocation=()
-    -->
+    <meta name="description" content="EmotionsCare — Plateforme de bien-être émotionnel pour soignants et étudiants en médecine. Scan émotionnel IA, coaching personnalisé, musicothérapie." />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="EmotionsCare | Bien-être émotionnel par l'IA" />
+    <meta property="og:description" content="Plateforme SaaS de bien-être émotionnel : scan IA, coaching Nyvée, musicothérapie et journal émotionnel pour soignants." />
+    <meta property="og:image" content="https://emotionscare.com/og-image.png" />
+    <meta property="og:url" content="https://emotionscare.com" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:site_name" content="EmotionsCare" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="EmotionsCare | Bien-être émotionnel par l'IA" />
+    <meta name="twitter:description" content="Plateforme SaaS de bien-être émotionnel : scan IA, coaching Nyvée, musicothérapie et journal émotionnel." />
+    <meta name="twitter:image" content="https://emotionscare.com/og-image.png" />
+    <!-- Security headers configured server-side (Vercel/Netlify/Cloudflare) -->
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
@@ -69,8 +76,6 @@
   </head>
   <body>
     <div id="root"></div>
-    <!-- Required Lovable script tag for new features -->
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

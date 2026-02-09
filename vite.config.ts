@@ -1,8 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import { componentTagger } from "lovable-tagger";
-import dyadComponentTagger from '@dyad-sh/react-vite-component-tagger';
+// Dev taggers conditionally imported
+// import { componentTagger } from "lovable-tagger";
+// import dyadComponentTagger from '@dyad-sh/react-vite-component-tagger';
 import { VitePWA } from 'vite-plugin-pwa';
 import { visualizer } from 'rollup-plugin-visualizer';
 
@@ -176,12 +177,10 @@ export default defineConfig(({ mode }) => ({
         suppressWarnings: true,
       },
     }),
-    dyadComponentTagger(),
     react({
       // Désactiver le fast refresh pour les edge functions
       exclude: /supabase\/functions/,
     }),
-    mode === 'development' && componentTagger(),
   ].filter(Boolean),
   server: {
     host: "::",
@@ -198,49 +197,116 @@ export default defineConfig(({ mode }) => ({
     target: 'esnext',
     minify: 'terser',
     sourcemap: mode === 'production' ? false : true,
-    chunkSizeWarningLimit: 500, // 500KB warning
+    chunkSizeWarningLimit: 300, // 300KB warning - stricter threshold
     // Ignorer les erreurs TypeScript des edge functions
     rollupOptions: {
       external: (id) => id.includes('supabase/functions') || id.includes('supabase/tests'),
       output: {
-        manualChunks: {
-          // Vendor chunks - Core React
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+        manualChunks(id) {
+          // Core React - loaded on every page
+          if (id.includes('react-dom') || (id.includes('/react/') && !id.includes('react-'))) {
+            return 'react-vendor';
+          }
+          if (id.includes('react-router-dom') || id.includes('@remix-run/router')) {
+            return 'router-vendor';
+          }
 
-          // UI framework chunks
-          'ui-radix': [
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-slider',
-            '@radix-ui/react-progress',
-            '@radix-ui/react-tabs',
-            '@radix-ui/react-toast',
-            '@radix-ui/react-select',
-            '@radix-ui/react-dropdown-menu',
-          ],
+          // UI framework - Radix primitives
+          if (id.includes('@radix-ui/')) {
+            return 'ui-radix';
+          }
 
-          // Data management
-          'data-vendor': ['@tanstack/react-query', '@supabase/supabase-js', 'zod'],
+          // Data layer
+          if (id.includes('@tanstack/react-query')) {
+            return 'data-query';
+          }
+          if (id.includes('@supabase/')) {
+            return 'data-supabase';
+          }
+          if (id.includes('/zod/')) {
+            return 'data-zod';
+          }
 
-          // Animation
-          'animation-vendor': ['framer-motion'],
+          // Animation - deferred
+          if (id.includes('framer-motion')) {
+            return 'animation-vendor';
+          }
 
-          // Charts
-          'charts-vendor': ['chart.js', 'react-chartjs-2', 'recharts'],
+          // Charts - lazy loaded
+          if (id.includes('chart.js') || id.includes('react-chartjs-2')) {
+            return 'charts-chartjs';
+          }
+          if (id.includes('recharts') || id.includes('d3-')) {
+            return 'charts-recharts';
+          }
+
+          // 3D / Heavy ML - lazy loaded, never in initial bundle
+          if (id.includes('three') || id.includes('@react-three/')) {
+            return 'vendor-3d';
+          }
+          if (id.includes('@mediapipe/') || id.includes('@huggingface/')) {
+            return 'vendor-ml';
+          }
+
+          // Audio / Music
+          if (id.includes('/tone/') || id.includes('hume')) {
+            return 'vendor-audio';
+          }
+
+          // i18n
+          if (id.includes('i18next') || id.includes('react-i18next')) {
+            return 'vendor-i18n';
+          }
+
+          // Date utilities
+          if (id.includes('date-fns') || id.includes('dayjs')) {
+            return 'vendor-date';
+          }
+
+          // Misc heavy vendors
+          if (id.includes('xlsx')) {
+            return 'vendor-xlsx';
+          }
+          if (id.includes('html2canvas')) {
+            return 'vendor-html2canvas';
+          }
+          if (id.includes('lottie-react') || id.includes('lottie-web')) {
+            return 'vendor-lottie';
+          }
+          if (id.includes('@sentry/')) {
+            return 'vendor-sentry';
+          }
+          if (id.includes('firebase')) {
+            return 'vendor-firebase';
+          }
+          if (id.includes('openai')) {
+            return 'vendor-openai';
+          }
 
           // Music module chunks
-          'music-player': [
-            './src/components/music/UnifiedMusicPlayer',
-            './src/hooks/music/useAudioPlayer',
-          ],
-          'music-generator': [
-            './src/components/music/EmotionalMusicGenerator',
-            './src/services/music/enhanced-music-service',
-          ],
-          'music-quota': [
-            './src/services/music/quota-service',
-            './src/hooks/music/useUserQuota',
-            './src/components/music/QuotaIndicator',
-          ],
+          if (id.includes('src/components/music/') || id.includes('src/hooks/music/') || id.includes('src/services/music/')) {
+            return 'module-music';
+          }
+
+          // Admin module chunks
+          if (id.includes('src/pages/admin/') || id.includes('src/components/admin/')) {
+            return 'module-admin';
+          }
+
+          // Gamification module chunks
+          if (id.includes('src/pages/gamification/') || id.includes('src/components/gamification/') || id.includes('src/features/leaderboard/')) {
+            return 'module-gamification';
+          }
+
+          // B2B module chunks
+          if (id.includes('src/pages/b2b/') || id.includes('src/components/b2b/')) {
+            return 'module-b2b';
+          }
+
+          // Journal module chunks
+          if (id.includes('src/pages/journal/') || id.includes('src/components/journal/')) {
+            return 'module-journal';
+          }
         },
       },
     },

@@ -223,8 +223,8 @@ export default function Footer() {
           <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
             {/* Copyright */}
             <div className="text-sm text-muted-foreground">
-              © {currentYear} EmotionsCare. Tous droits réservés. 
-              <span className="ml-2">Conçu avec ❤️ à Paris</span>
+              © {currentYear} EmotionsCare. Tous droits réservés.
+              <span className="ml-2">Conçu avec soin à Amiens, France</span>
             </div>
 
             {/* Social Links */}
