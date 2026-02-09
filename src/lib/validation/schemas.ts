@@ -159,6 +159,143 @@ export const fileUploadSchema = z.object({
   message: 'Type de fichier non autorisé'
 });
 
+// ──────────────────────────────────────────────
+// Emotional Scan schemas
+// ──────────────────────────────────────────────
+
+const scanMode = z.enum(['text', 'voice', 'facial', 'questionnaire'], {
+  message: 'Mode de scan invalide',
+});
+
+export const emotionalScanSchema = z.object({
+  mode: scanMode,
+  textInput: z.string()
+    .max(5000, { message: 'Le texte ne peut pas depasser 5000 caracteres' })
+    .optional(),
+  voiceDurationMs: z.number()
+    .min(500, { message: 'Enregistrement trop court (min 0.5s)' })
+    .max(300000, { message: 'Enregistrement trop long (max 5 min)' })
+    .optional(),
+  questionnaireAnswers: z.array(z.object({
+    questionId: z.string().uuid(),
+    value: z.number().min(0).max(10),
+  })).max(50, { message: 'Maximum 50 reponses' }).optional(),
+}).refine(
+  (data) => {
+    if (data.mode === 'text' && (!data.textInput || data.textInput.trim().length < 3)) {
+      return false;
+    }
+    return true;
+  },
+  { message: 'Le scan texte necessite au moins 3 caracteres', path: ['textInput'] }
+);
+
+export const scanResultSchema = z.object({
+  scanId: z.string().uuid(),
+  emotions: z.array(z.object({
+    name: z.string().min(1).max(50),
+    score: z.number().min(0).max(1),
+    confidence: z.number().min(0).max(1),
+  })).min(1).max(20),
+  dominantEmotion: z.string().min(1).max(50),
+  overallScore: z.number().min(0).max(100),
+  timestamp: z.string().datetime(),
+});
+
+// ──────────────────────────────────────────────
+// Music / Musicotherapy schemas
+// ──────────────────────────────────────────────
+
+export const musicGenerationSchema = z.object({
+  prompt: z.string()
+    .min(3, { message: 'La description doit contenir au moins 3 caracteres' })
+    .max(500, { message: 'La description ne peut pas depasser 500 caracteres' }),
+  emotion: z.string()
+    .min(1, { message: "L'emotion est requise" })
+    .max(50),
+  genre: z.enum([
+    'ambient', 'classical', 'lofi', 'nature', 'meditation',
+    'binaural', 'piano', 'jazz', 'electronic',
+  ], { message: 'Genre musical non supporte' }).optional(),
+  durationSeconds: z.number()
+    .min(15, { message: 'Duree minimale : 15 secondes' })
+    .max(300, { message: 'Duree maximale : 5 minutes' })
+    .default(60),
+  intensity: z.number()
+    .min(0, { message: "L'intensite doit etre entre 0 et 1" })
+    .max(1, { message: "L'intensite doit etre entre 0 et 1" })
+    .default(0.5),
+});
+
+export const musicPlaybackSchema = z.object({
+  trackId: z.string().uuid({ message: 'ID de piste invalide' }),
+  action: z.enum(['play', 'pause', 'stop', 'seek', 'volume'], {
+    message: 'Action de lecture invalide',
+  }),
+  seekPosition: z.number().min(0).optional(),
+  volume: z.number().min(0).max(1).optional(),
+});
+
+// ──────────────────────────────────────────────
+// Coach IA (Nyvee) schemas
+// ──────────────────────────────────────────────
+
+export const coachMessageSchema = z.object({
+  message: z.string()
+    .min(1, { message: 'Le message ne peut pas etre vide' })
+    .max(2000, { message: 'Le message ne peut pas depasser 2000 caracteres' }),
+  sessionId: z.string().uuid({ message: 'ID de session invalide' }).optional(),
+  context: z.enum([
+    'general', 'stress', 'anxiety', 'burnout', 'sleep',
+    'motivation', 'relationships', 'exam_prep',
+  ], { message: 'Contexte invalide' }).optional(),
+});
+
+export const coachSessionSchema = z.object({
+  title: z.string()
+    .min(1, { message: 'Le titre est requis' })
+    .max(100, { message: 'Le titre ne peut pas depasser 100 caracteres' })
+    .optional(),
+  goal: z.string()
+    .max(500, { message: "L'objectif ne peut pas depasser 500 caracteres" })
+    .optional(),
+  moodBefore: z.number()
+    .min(1, { message: "L'humeur doit etre entre 1 et 10" })
+    .max(10, { message: "L'humeur doit etre entre 1 et 10" })
+    .optional(),
+  moodAfter: z.number()
+    .min(1, { message: "L'humeur doit etre entre 1 et 10" })
+    .max(10, { message: "L'humeur doit etre entre 1 et 10" })
+    .optional(),
+});
+
+// ──────────────────────────────────────────────
+// Anomaly detection for emotional scans
+// ──────────────────────────────────────────────
+
+export const scanAnomalyDetectionSchema = z.object({
+  userId: z.string().uuid(),
+  scanId: z.string().uuid(),
+  emotionScores: z.array(z.number().min(0).max(1)),
+  previousAvgScore: z.number().min(0).max(1),
+  deviationThreshold: z.number().min(0.1).max(1).default(0.3),
+  frequencyPerHour: z.number().min(0).max(100),
+  maxScansPerHour: z.number().min(1).max(50).default(10),
+}).refine(
+  (data) => data.frequencyPerHour <= data.maxScansPerHour,
+  { message: 'Frequence de scan anormalement elevee', path: ['frequencyPerHour'] }
+);
+
+// ──────────────────────────────────────────────
+// Gamification schemas
+// ──────────────────────────────────────────────
+
+export const challengeSubmissionSchema = z.object({
+  challengeId: z.string().uuid({ message: 'ID de defi invalide' }),
+  completionData: z.record(z.string(), z.unknown()).optional(),
+  note: z.string().max(500, { message: 'La note ne peut pas depasser 500 caracteres' }).optional(),
+});
+
 // Type exports
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
@@ -172,3 +309,11 @@ export type InvitationInput = z.infer<typeof invitationSchema>;
 export type FileUploadInput = z.infer<typeof fileUploadSchema>;
 export type ContactFormInput = z.infer<typeof contactFormSchema>;
 export type FeedbackInput = z.infer<typeof feedbackSchema>;
+export type EmotionalScanInput = z.infer<typeof emotionalScanSchema>;
+export type ScanResultInput = z.infer<typeof scanResultSchema>;
+export type MusicGenerationInput = z.infer<typeof musicGenerationSchema>;
+export type MusicPlaybackInput = z.infer<typeof musicPlaybackSchema>;
+export type CoachMessageInput = z.infer<typeof coachMessageSchema>;
+export type CoachSessionInput = z.infer<typeof coachSessionSchema>;
+export type ScanAnomalyInput = z.infer<typeof scanAnomalyDetectionSchema>;
+export type ChallengeSubmissionInput = z.infer<typeof challengeSubmissionSchema>;

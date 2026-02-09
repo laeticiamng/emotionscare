@@ -32,11 +32,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Search, Crown, Shield, User, Trash2, Plus, History } from 'lucide-react';
+import { Search, Crown, Shield, User, Trash2, Plus, History, Users } from 'lucide-react';
 import { AppRole, getRoleLabel, getRoleColor } from '@/services/userRolesService';
 import { logger } from '@/lib/logger';
 import { RoleAuditLogsViewer } from './RoleAuditLogsViewer';
 import { AuditStatsDashboard } from './AuditStatsDashboard';
+import AdminTableSkeleton from './AdminTableSkeleton';
+import AdminEmptyState from './AdminEmptyState';
 
 interface UserWithRoles {
   id: string;
@@ -216,11 +218,7 @@ export const UserRolesManager = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <AdminTableSkeleton columns={5} rows={8} showStats showSearch />;
   }
 
   return (
@@ -348,6 +346,23 @@ export const UserRolesManager = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
+            {filteredUsers.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={5} className="h-48">
+                  <AdminEmptyState
+                    preset={searchQuery ? 'no-results' : 'no-data'}
+                    title={searchQuery ? 'Aucun utilisateur trouvé' : 'Aucun utilisateur'}
+                    description={
+                      searchQuery
+                        ? `Aucun résultat pour "${searchQuery}". Essayez un autre terme de recherche.`
+                        : 'Il n\'y a pas encore d\'utilisateurs enregistrés dans la plateforme.'
+                    }
+                    action={searchQuery ? { label: 'Réinitialiser', onClick: () => setSearchQuery('') } : undefined}
+                    icon={Users}
+                  />
+                </TableCell>
+              </TableRow>
+            )}
             {filteredUsers.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>
