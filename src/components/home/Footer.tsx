@@ -156,7 +156,7 @@ const Footer: React.FC = () => {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
             {/* Copyright */}
             <p className="text-sm text-muted-foreground">
-              © {currentYear} EmotionsCare. Tous droits réservés.
+              © {currentYear} EmotionsCare — EMOTIONSCARE SASU. Tous droits réservés.
             </p>
 
             {/* Contact & Status */}

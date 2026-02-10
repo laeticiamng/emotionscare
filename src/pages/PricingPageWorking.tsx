@@ -33,8 +33,9 @@ const PLANS = [
     period: '',
     description: 'Pour découvrir EmotionsCare',
     features: [
-      'Scan émotionnel de base',
-      '3 exercices de respiration',
+      'Accès basique à la plateforme',
+      '3 protocoles par jour (Stop, Reset, Respirez)',
+      'Scanner émotionnel de base',
       'Journal émotionnel',
       'Accès communauté',
     ],
@@ -44,41 +45,45 @@ const PLANS = [
     gradient: 'from-muted to-muted',
   },
   {
-    id: 'pro',
-    name: 'Pro',
-    price: 14.90,
+    id: 'premium',
+    name: 'Premium',
+    price: 9.90,
     period: '/mois',
-    description: 'Pour un accompagnement complet',
+    description: 'L\'accompagnement complet pour les soignants',
     features: [
       'Tout le plan Gratuit',
-      'Tous les exercices premium',
-      'Musique thérapeutique illimitée',
-      'Coach IA personnalisé',
-      'Analyses avancées',
+      'Accès illimité à tous les protocoles',
+      'Coach IA Nyvée personnalisé',
+      'Musicothérapie intégrale',
+      'Scanner émotionnel avancé',
+      'Gamification XP et badges',
+      'Analyses détaillées & tendances',
       'Support prioritaire',
     ],
-    cta: 'Passer à Pro',
+    cta: 'Passer à Premium',
     popular: true,
-    stripePlan: 'pro',
+    stripePlan: 'premium',
     gradient: 'from-primary to-accent',
   },
   {
-    id: 'business',
-    name: 'Business',
-    price: 49.90,
-    period: '/mois',
-    description: 'Pour les équipes et organisations',
+    id: 'etablissement',
+    name: 'Établissement',
+    price: 'Sur devis',
+    period: '',
+    description: 'Pour les hôpitaux, cliniques et établissements de santé',
     features: [
-      'Tout le plan Pro',
-      'Dashboard RH anonymisé',
-      'Rapports bien-être équipe',
-      'Alertes préventives',
-      'Déploiement en 24h',
-      'Accompagnement dédié',
+      'Tout le plan Premium pour chaque utilisateur',
+      'Dashboard B2B RH anonymisé',
+      'Analytics bien-être des équipes',
+      'Rapports hebdomadaires automatisés',
+      'Alertes préventives collectives',
+      'Déploiement et onboarding dédié',
+      'Interlocuteur et support dédiés',
+      'Facturation centralisée',
     ],
-    cta: 'Nous contacter',
+    cta: 'Demander un devis',
     popular: false,
-    stripePlan: 'business',
+    stripePlan: null,
     gradient: 'from-accent to-primary',
   },
 ];
@@ -103,14 +108,14 @@ const PricingPageWorking: React.FC = () => {
       return;
     }
 
-    if (plan.id === 'business') {
-      navigate('/b2b');
+    if (plan.id === 'etablissement') {
+      navigate('/contact');
       return;
     }
 
-    // Pro plan → Stripe checkout
+    // Premium plan → Stripe checkout
     if (!isAuthenticated) {
-      toast.info('Créez un compte pour accéder à l\'abonnement Pro');
+      toast.info('Créez un compte pour accéder à l\'abonnement Premium');
       navigate('/signup');
       return;
     }

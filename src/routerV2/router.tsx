@@ -227,6 +227,8 @@ const DailyChallengesPage = lazy(() => import('@/pages/gamification/DailyChallen
 const B2CGamificationPage = lazy(() => import('@/pages/b2c/B2CGamificationPage'));
 const ScoresPage = lazy(() => import('@/pages/gamification/ScoresPage'));
 const PricingPageWorking = lazy(() => import('@/pages/PricingPageWorking'));
+const ScannerEmotionnelPage = lazy(() => import('@/pages/ScannerEmotionnelPage'));
+const B2BDashboardAnalytics = lazy(() => import('@/pages/b2b/B2BDashboardAnalytics'));
 
 // Pages existantes à consolider
 const MessagesPage = lazy(() => import('@/pages/social/MessagesPage'));
@@ -616,6 +618,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // MusicLibraryPage supprimé
   PricingPageWorking,
   PricingPageWorkingPage: PricingPageWorking, // Alias pour registry
+  ScannerEmotionnelPage,
+  B2BDashboardAnalytics,
   ModeSelectionPage,
   B2CDashboardPage,
   // B2CMusicEnhancedPage - alias pour registry
