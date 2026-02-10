@@ -1,6 +1,6 @@
 /**
  * QuestionnaireScannerPage - Page du scanner émotionnel V1
- * Questionnaire en 7 étapes avec résultats et historique
+ * Questionnaire en 12 étapes avec résultats et historique
  */
 
 import React, { useState } from 'react';
@@ -20,7 +20,7 @@ type ViewState = 'scanner' | 'results' | 'history';
 const QuestionnaireScannerPage: React.FC = () => {
   usePageSEO({
     title: 'Scanner Émotionnel - EmotionsCare',
-    description: 'Évalue ton état émotionnel en 7 questions et reçois des recommandations personnalisées.',
+    description: 'Évalue ton état émotionnel en 12 questions et reçois des recommandations personnalisées.',
     keywords: 'scanner émotionnel, questionnaire bien-être, évaluation stress',
   });
 
@@ -62,7 +62,7 @@ const QuestionnaireScannerPage: React.FC = () => {
                 Scanner Émotionnel
               </h1>
               <p className="text-muted-foreground mt-1">
-                Évalue ton état émotionnel en 7 questions
+                Évalue ton état émotionnel en 12 questions
               </p>
             </div>
           </div>
@@ -102,7 +102,7 @@ const QuestionnaireScannerPage: React.FC = () => {
                 <div className="text-sm text-muted-foreground">
                   <p className="font-medium mb-1">Comment ça marche ?</p>
                   <p>
-                    Réponds honnêtement aux 7 questions pour obtenir une analyse de ton état 
+                    Réponds honnêtement aux 12 questions pour obtenir une analyse de ton état 
                     émotionnel et des recommandations personnalisées. Tes données sont 
                     confidentielles et sécurisées.
                   </p>
