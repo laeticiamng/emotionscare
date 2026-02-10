@@ -1,20 +1,40 @@
-// @ts-nocheck
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { AlertCircle, ShieldCheck } from 'lucide-react';
+import { AlertCircle, ShieldAlert, ShieldCheck } from 'lucide-react';
 
-interface Incident {
+export interface Incident {
   id: string;
   message: string;
   date: string;
 }
 
+type SecurityWidgetProps = {
+  incidents?: Incident[];
+};
+
+const getStatusBadge = (incidents: Incident[]) => {
+  if (incidents.length === 0) {
+    return {
+      icon: ShieldCheck,
+      label: 'Système nominal',
+      className: 'text-emerald-600',
+    };
+  }
+
+  return {
+    icon: ShieldAlert,
+    label: `${incidents.length} incident${incidents.length > 1 ? 's' : ''} récent${incidents.length > 1 ? 's' : ''}`,
+    className: 'text-amber-600',
+  };
+};
+
 /**
- * Simple security widget displaying latest incident and status.
- * This is a placeholder for the proactive security module.
+ * Widget sécurité synthétique (état + dernier incident).
  */
-const SecurityWidget: React.FC<{ incidents?: Incident[] }> = ({ incidents = [] }) => {
+const SecurityWidget: React.FC<SecurityWidgetProps> = ({ incidents = [] }) => {
   const lastIncident = incidents[0];
+  const status = getStatusBadge(incidents);
+  const StatusIcon = status.icon;
 
   return (
     <Card className="bg-muted/50">
@@ -23,7 +43,12 @@ const SecurityWidget: React.FC<{ incidents?: Incident[] }> = ({ incidents = [] }
           <ShieldCheck className="w-4 h-4" /> Sécurité
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-3">
+        <div className="flex items-center gap-2 text-sm">
+          <StatusIcon className={`w-4 h-4 ${status.className}`} />
+          <span className="text-muted-foreground">{status.label}</span>
+        </div>
+
         {lastIncident ? (
           <div className="flex items-start gap-2 text-sm">
             <AlertCircle className="w-4 h-4 text-destructive mt-0.5" />

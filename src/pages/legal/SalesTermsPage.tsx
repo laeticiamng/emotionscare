@@ -236,7 +236,7 @@ export const SalesTermsPage: React.FC = () => {
                   <strong>Email :</strong> <a href="mailto:retractation@emotionscare.com" className="text-primary hover:underline">retractation@emotionscare.com</a>
                 </li>
                 <li>
-                  <strong>Courrier recommandé :</strong> EmotionsCare SASU - Service Rétractation - [Adresse à compléter]
+                  <strong>Courrier recommandé :</strong> EmotionsCare SASU - Service Rétractation - 5 rue Caudron, 80000 Amiens
                 </li>
                 <li>
                   <strong>Formulaire type (annexe) :</strong> <a href="#formulaire-type" className="text-primary hover:underline">Télécharger le formulaire</a>
@@ -263,7 +263,7 @@ export const SalesTermsPage: React.FC = () => {
                   <p>À l'attention de :</p>
                   <p className="ml-4">
                     <strong>EmotionsCare SASU - Service Rétractation</strong><br />
-                    [Adresse à compléter]<br />
+                    5 rue Caudron, 80000 Amiens<br />
                     France<br />
                     Email : contact@emotionscare.com
                   </p>

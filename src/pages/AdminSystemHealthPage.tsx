@@ -378,7 +378,7 @@ const AdminSystemHealthPage: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-4xl font-bold text-yellow-600">103</div>
-                <p className="text-sm text-muted-foreground">à compléter (69%)</p>
+                <p className="text-sm text-muted-foreground">couverture restante (69%)</p>
                 <Progress value={69} className="mt-4 h-2" />
               </CardContent>
             </Card>
