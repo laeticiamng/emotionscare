@@ -7,22 +7,15 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Link } from 'react-router-dom';
 import { EmotionWheel, calculateEmotionData } from './EmotionWheel';
 import { ScannerAnswers } from './QuestionnaireScanner';
-import { 
-  Wind, BookOpen, Brain, Music, Heart, 
+import {
+  Wind, BookOpen, Brain, Music, Heart,
   TrendingUp, Calendar, RefreshCw, Sparkles,
   LucideIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-interface ScanResult {
-  score: number; // 0-100
-  dominantEmotion: string;
-  recommendations: Recommendation[];
-}
 
 interface Recommendation {
   id: string;
@@ -48,18 +41,28 @@ const calculateWellbeingScore = (answers: ScannerAnswers): number => {
     physical_tension,
     negative_thoughts,
     social_support,
+    focus_level,
+    workload_pressure,
+    irritability_level,
+    self_compassion,
+    recovery_capacity,
     emotional_state,
   } = answers;
 
   // Poids des facteurs
   const weights = {
-    physical: 0.15,
-    energy: 0.15,
-    sleep: 0.15,
-    tension: 0.15, // inversé
-    thoughts: 0.15, // inversé
-    support: 0.15,
-    emotions: 0.10,
+    physical: 0.1,
+    energy: 0.1,
+    sleep: 0.1,
+    tension: 0.1, // inversé
+    thoughts: 0.1, // inversé
+    support: 0.08,
+    focus: 0.08,
+    workload: 0.08,
+    irritability: 0.08,
+    selfCompassion: 0.08,
+    recovery: 0.08,
+    emotions: 0.02,
   };
 
   // Scores normalisés (0-10 -> 0-100)
@@ -69,6 +72,11 @@ const calculateWellbeingScore = (answers: ScannerAnswers): number => {
   const tensionScore = (11 - physical_tension) * 10; // Inversé
   const thoughtsScore = (11 - negative_thoughts) * 10; // Inversé
   const supportScore = social_support * 10;
+  const focusScore = focus_level * 10;
+  const workloadScore = (11 - workload_pressure) * 10; // Inversé
+  const irritabilityScore = (11 - irritability_level) * 10; // Inversé
+  const selfCompassionScore = self_compassion * 10;
+  const recoveryScore = recovery_capacity * 10;
 
   // Score émotionnel basé sur les émotions positives/négatives
   const positiveEmotions = ['serene', 'joyful', 'neutral'];
@@ -87,6 +95,11 @@ const calculateWellbeingScore = (answers: ScannerAnswers): number => {
     tensionScore * weights.tension +
     thoughtsScore * weights.thoughts +
     supportScore * weights.support +
+    focusScore * weights.focus +
+    workloadScore * weights.workload +
+    irritabilityScore * weights.irritability +
+    selfCompassionScore * weights.selfCompassion +
+    recoveryScore * weights.recovery +
     emotionScore * weights.emotions;
 
   return Math.round(Math.max(0, Math.min(100, totalScore)));
@@ -121,7 +134,7 @@ const generateRecommendations = (answers: ScannerAnswers, score: number): Recomm
       title: 'Exercice de respiration',
       description: 'Une séance de cohérence cardiaque pour réduire le stress',
       icon: Wind,
-      link: '/app/breath',
+      link: '/dashboard/breathing',
       priority: 'high',
     });
   }
@@ -133,7 +146,7 @@ const generateRecommendations = (answers: ScannerAnswers, score: number): Recomm
       title: 'Séance de relaxation',
       description: 'Détends-toi avec une méditation guidée',
       icon: Heart,
-      link: '/app/relaxation',
+      link: '/app/nyvee-cocon',
       priority: 'high',
     });
   }
@@ -157,8 +170,19 @@ const generateRecommendations = (answers: ScannerAnswers, score: number): Recomm
       title: 'Connexion sociale',
       description: 'Rejoins la communauté EmotionsCare',
       icon: Heart,
-      link: '/app/community',
+      link: '/app/entraide',
       priority: 'medium',
+    });
+  }
+
+  if (answers.workload_pressure >= 7 || answers.irritability_level >= 7) {
+    recommendations.push({
+      id: 'stop-protocol',
+      title: 'Protocole Stop (2 min)',
+      description: 'Coupe la surcharge immédiate avec un protocole guidé',
+      icon: Wind,
+      link: '/app/screen-silk',
+      priority: 'high',
     });
   }
 
@@ -190,9 +214,15 @@ const generateRecommendations = (answers: ScannerAnswers, score: number): Recomm
 };
 
 const getScoreColor = (score: number): string => {
-  if (score >= 70) return 'text-success';
-  if (score >= 40) return 'text-warning';
-  return 'text-destructive';
+  if (score >= 75) return 'text-emerald-500';
+  if (score >= 50) return 'text-amber-500';
+  return 'text-rose-500';
+};
+
+const getGaugeColor = (score: number): string => {
+  if (score >= 75) return '#10b981';
+  if (score >= 50) return '#f59e0b';
+  return '#f43f5e';
 };
 
 const getScoreLabel = (score: number): string => {
@@ -203,7 +233,7 @@ const getScoreLabel = (score: number): string => {
   return 'Préoccupant';
 };
 
-const getScoreMessage = (score: number, emotion: string): string => {
+const getScoreMessage = (score: number): string => {
   if (score >= 70) {
     return 'Tu sembles être dans un bon état émotionnel. Continue comme ça !';
   }
@@ -211,6 +241,27 @@ const getScoreMessage = (score: number, emotion: string): string => {
     return 'Quelques ajustements pourraient t\'aider à te sentir mieux.';
   }
   return 'Nous te recommandons de prendre soin de toi. Voici quelques suggestions.';
+};
+
+const EmotionalGauge: React.FC<{ score: number }> = ({ score }) => {
+  const angle = (score / 100) * 180 - 90;
+  return (
+    <div className="relative mx-auto h-40 w-72">
+      <div className="absolute bottom-0 left-1/2 h-36 w-72 -translate-x-1/2 overflow-hidden">
+        <div className="absolute bottom-0 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-[conic-gradient(from_180deg_at_50%_100%,#f43f5e_0deg,#f59e0b_90deg,#10b981_180deg)]" />
+        <div className="absolute bottom-1 left-1/2 h-56 w-56 -translate-x-1/2 rounded-full bg-card" />
+      </div>
+
+      <motion.div
+        className="absolute bottom-0 left-1/2 h-28 w-1 origin-bottom -translate-x-1/2 rounded-full"
+        style={{ backgroundColor: getGaugeColor(score) }}
+        initial={{ rotate: -90 }}
+        animate={{ rotate: angle }}
+        transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+      />
+      <div className="absolute bottom-0 left-1/2 h-4 w-4 -translate-x-1/2 rounded-full bg-foreground" />
+    </div>
+  );
 };
 
 export const ScannerResults: React.FC<ScannerResultsProps> = ({
@@ -253,9 +304,9 @@ export const ScannerResults: React.FC<ScannerResultsProps> = ({
               {score}
             </motion.div>
             <p className="text-lg font-medium mt-1">{getScoreLabel(score)}</p>
-            <Progress value={score} className="mt-4 h-3" />
+            <EmotionalGauge score={score} />
             <p className="text-sm text-muted-foreground mt-4">
-              {getScoreMessage(score, dominantEmotion)}
+              {getScoreMessage(score)}
             </p>
           </CardContent>
         </Card>

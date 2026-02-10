@@ -1,5 +1,5 @@
 /**
- * QuestionnaireScanner - Scanner émotionnel en 7 questions
+ * QuestionnaireScanner - Scanner émotionnel en 12 questions
  * Interface intuitive avec sliders et émojis
  */
 
@@ -19,6 +19,11 @@ export interface ScannerAnswers {
   physical_tension: number;
   negative_thoughts: number;
   social_support: number;
+  focus_level: number;
+  workload_pressure: number;
+  irritability_level: number;
+  self_compassion: number;
+  recovery_capacity: number;
 }
 
 interface Question {
@@ -88,6 +93,41 @@ const QUESTIONS: Question[] = [
     minLabel: 'Pas du tout',
     maxLabel: 'Très soutenu(e)',
   },
+  {
+    id: 'focus_level',
+    title: 'Ton niveau de concentration sur ton poste est…',
+    type: 'slider',
+    minLabel: 'Très difficile',
+    maxLabel: 'Très fluide',
+  },
+  {
+    id: 'workload_pressure',
+    title: 'Quelle pression ressens-tu face à ta charge de travail ?',
+    type: 'slider',
+    minLabel: 'Aucune pression',
+    maxLabel: 'Pression maximale',
+  },
+  {
+    id: 'irritability_level',
+    title: 'Te sens-tu irritable ou à fleur de peau ?',
+    type: 'slider',
+    minLabel: 'Pas du tout',
+    maxLabel: 'Très irritable',
+  },
+  {
+    id: 'self_compassion',
+    title: 'Es-tu bienveillant(e) avec toi-même aujourd’hui ?',
+    type: 'slider',
+    minLabel: 'Très dur(e) avec moi',
+    maxLabel: 'Très bienveillant(e)',
+  },
+  {
+    id: 'recovery_capacity',
+    title: 'Si tu prends 3 minutes maintenant, peux-tu récupérer rapidement ?',
+    type: 'slider',
+    minLabel: 'Pas du tout',
+    maxLabel: 'Oui, facilement',
+  },
 ];
 
 interface QuestionnaireScannerProps {
@@ -108,6 +148,11 @@ export const QuestionnaireScanner: React.FC<QuestionnaireScannerProps> = ({
     physical_tension: 5,
     negative_thoughts: 5,
     social_support: 5,
+    focus_level: 5,
+    workload_pressure: 5,
+    irritability_level: 5,
+    self_compassion: 5,
+    recovery_capacity: 5,
   });
 
   const question = QUESTIONS[currentStep];
@@ -155,8 +200,12 @@ export const QuestionnaireScanner: React.FC<QuestionnaireScannerProps> = ({
     return '😊';
   };
 
-  // Pour les questions inversées (tension, pensées négatives)
-  const isInvertedQuestion = question.id === 'physical_tension' || question.id === 'negative_thoughts';
+  // Pour les questions inversées (plus le score est haut, plus le risque augmente)
+  const isInvertedQuestion =
+    question.id === 'physical_tension' ||
+    question.id === 'negative_thoughts' ||
+    question.id === 'workload_pressure' ||
+    question.id === 'irritability_level';
   const getInvertedEmoji = (value: number): string => {
     if (value <= 2) return '😊';
     if (value <= 4) return '🙂';
