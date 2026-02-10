@@ -15,9 +15,9 @@ interface StatItem {
 
 const stats: StatItem[] = [
   { value: 6, suffix: '', label: 'Protocoles validés', description: 'Approche scientifique' },
-  { value: 3, suffix: 'min', label: 'Par session', description: 'Micro-interventions efficaces' },
+  { value: 3, suffix: ' min', label: 'Par session', description: 'Micro-interventions efficaces' },
   { value: 100, suffix: '%', label: 'Données protégées', description: 'Chiffrement & RGPD' },
-  { value: 24, suffix: '/7', label: 'Disponibilité', description: 'Accès permanent' },
+  { value: 7, suffix: '/7', label: 'Disponibilité', description: 'Accès permanent, jour et nuit' },
 ];
 
 const AnimatedCounter: React.FC<{ value: number; suffix: string; isInView: boolean }> = ({ 

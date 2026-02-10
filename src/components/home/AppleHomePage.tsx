@@ -11,6 +11,8 @@ import { ArrowRight, Menu, X, HelpCircle, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppleHeroSection from '@/components/home/AppleHeroSection';
 import { cn } from '@/lib/utils';
+import NyveeChat from '@/components/nyvee/NyveeChat';
+import XPBar from '@/components/gamification/XPBar';
 
 // Lazy load below-the-fold sections for better FCP/LCP
 const AppleFeatureSection = lazy(() => import('@/components/home/AppleFeatureSection'));
@@ -111,12 +113,15 @@ const AppleHomePage: React.FC = () => {
             {/* Desktop CTA */}
             <div className="hidden md:flex items-center gap-4">
               {isAuthenticated ? (
-                <Link to="/app/home">
-                  <Button variant="ghost" size="sm" className="gap-2">
-                    Mon espace
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
+                <>
+                  <XPBar />
+                  <Link to="/app/home">
+                    <Button variant="ghost" size="sm" className="gap-2">
+                      Mon espace
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </>
               ) : (
                 <>
                   <Link to="/login">
@@ -254,6 +259,8 @@ const AppleHomePage: React.FC = () => {
         <Footer />
       </Suspense>
 
+      {/* Coach IA Nyvée - bulle flottante */}
+      <NyveeChat />
     </div>
   );
 };
