@@ -88,7 +88,7 @@ const AppleHeroSection: React.FC = () => {
             className="mb-8"
           >
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium backdrop-blur-sm border border-primary/20">
-              <Sparkles className="h-4 w-4" />
+              <Sparkles className="h-4 w-4" aria-hidden="true" />
               Pour ceux qui prennent soin des autres
             </span>
           </motion.div>
@@ -151,7 +151,7 @@ const AppleHeroSection: React.FC = () => {
               >
                 <span className="relative z-10 flex items-center gap-2">
                   Commencer gratuitement
-                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
                 </span>
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-primary to-accent"
@@ -171,7 +171,7 @@ const AppleHeroSection: React.FC = () => {
               }}
               className="group px-8 py-7 text-lg font-medium text-muted-foreground hover:text-foreground rounded-full"
             >
-              <Sparkles className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
+              <Sparkles className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" aria-hidden="true" />
               Comment ça marche
             </Button>
           </motion.div>

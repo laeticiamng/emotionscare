@@ -28,7 +28,7 @@ interface Feature {
 
 const features: Feature[] = [
   {
-    icon: <Zap className="h-12 w-12" />,
+    icon: <Zap className="h-12 w-12" aria-hidden="true" />,
     title: "3 minutes.",
     subtitle: "C'est tout ce qu'il faut.",
     description: "Nos protocoles d'urgence sont conçus pour agir vite. Parce qu'en situation de stress, chaque seconde compte.",
@@ -36,7 +36,7 @@ const features: Feature[] = [
     stat: { value: "180s", label: "temps moyen d'intervention" }
   },
   {
-    icon: <Brain className="h-12 w-12" />,
+    icon: <Brain className="h-12 w-12" aria-hidden="true" />,
     title: "Basé sur la science.",
     subtitle: "Validé par les neurosciences.",
     description: "Chaque exercice repose sur des données probantes : cohérence cardiaque, pleine conscience, thérapies comportementales.",
@@ -44,7 +44,7 @@ const features: Feature[] = [
     stat: { value: "6", label: "protocoles scientifiques" }
   },
   {
-    icon: <Shield className="h-12 w-12" />,
+    icon: <Shield className="h-12 w-12" aria-hidden="true" />,
     title: "100% confidentiel.",
     subtitle: "Vos données vous appartiennent.",
     description: "Aucune donnée partagée, jamais. Conforme RGPD, hébergement HDS, et respect total de votre intimité.",
@@ -52,7 +52,7 @@ const features: Feature[] = [
     stat: { value: "0", label: "données vendues" }
   },
   {
-    icon: <Heart className="h-12 w-12" />,
+    icon: <Heart className="h-12 w-12" aria-hidden="true" />,
     title: "Par des soignants.",
     subtitle: "Pour des soignants.",
     description: "Créé avec et pour les professionnels de santé. Nous connaissons votre quotidien, vos contraintes, votre réalité.",

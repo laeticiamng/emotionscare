@@ -4,7 +4,7 @@
  */
 
 import React, { memo, useRef, useEffect, useState } from 'react';
-import { motion, useInView, useSpring, useMotionValue } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 
 interface StatItem {
   value: number;
@@ -20,34 +20,50 @@ const stats: StatItem[] = [
   { value: 24, suffix: '/7', label: 'Disponibilité', description: 'Accès permanent' },
 ];
 
-const AnimatedCounter: React.FC<{ value: number; suffix: string; isInView: boolean }> = ({ 
-  value, 
-  suffix, 
-  isInView 
+/** Check if user prefers reduced motion */
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+const AnimatedCounter: React.FC<{ value: number; suffix: string; isInView: boolean }> = ({
+  value,
+  suffix,
+  isInView,
 }) => {
-  const [displayValue, setDisplayValue] = useState(0);
+  const [displayValue, setDisplayValue] = useState(() =>
+    prefersReducedMotion() ? value : 0,
+  );
 
   useEffect(() => {
     if (!isInView) return;
 
+    // Skip animation for reduced-motion or if already at target
+    if (prefersReducedMotion() || displayValue === value) {
+      setDisplayValue(value);
+      return;
+    }
+
     const duration = 2000;
     const startTime = Date.now();
+    let rafId: number;
 
     const animate = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      
-      // Easing function
       const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-      
+
       setDisplayValue(Math.floor(easeOutQuart * value));
 
       if (progress < 1) {
-        requestAnimationFrame(animate);
+        rafId = requestAnimationFrame(animate);
+      } else {
+        // Ensure final value is always exact
+        setDisplayValue(value);
       }
     };
 
-    requestAnimationFrame(animate);
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
   }, [value, isInView]);
 
   return (
@@ -62,9 +78,11 @@ const AppleStatsSection: React.FC = () => {
   const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
 
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="relative py-32 md:py-48 bg-muted/30 overflow-hidden"
+      role="region"
+      aria-label="Statistiques EmotionsCare"
     >
       {/* Background pattern */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,hsl(var(--primary)/0.03)_1px,transparent_1px)] bg-[size:32px_32px]" />

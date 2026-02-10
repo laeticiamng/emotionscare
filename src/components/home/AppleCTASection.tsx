@@ -74,9 +74,9 @@ const AppleCTASection: React.FC = () => {
                 className="group relative overflow-hidden px-12 py-8 text-xl font-semibold bg-foreground text-background hover:bg-foreground/90 rounded-full shadow-2xl shadow-foreground/20 transition-all duration-500 hover:scale-105"
               >
                 <span className="relative z-10 flex items-center gap-3">
-                  <Heart className="h-6 w-6 group-hover:scale-110 transition-transform" />
+                  <Heart className="h-6 w-6 group-hover:scale-110 transition-transform" aria-hidden="true" />
                   Essayer gratuitement
-                  <ArrowRight className="h-6 w-6 group-hover:translate-x-2 transition-transform" />
+                  <ArrowRight className="h-6 w-6 group-hover:translate-x-2 transition-transform" aria-hidden="true" />
                 </span>
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-primary to-accent"
@@ -95,7 +95,7 @@ const AppleCTASection: React.FC = () => {
                 className="group px-8 py-6 text-lg font-medium rounded-full border-2 border-muted-foreground/30 hover:border-primary hover:bg-primary/5 transition-all duration-300"
               >
                 Découvrir les fonctionnalités
-                <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
               </Button>
             </Link>
           </motion.div>

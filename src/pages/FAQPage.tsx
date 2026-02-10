@@ -118,6 +118,17 @@ const FAQS: FAQCategory[] = [
       { q: 'Comment autoriser l\'accès à la caméra ?', a: 'Lors du premier scan, votre navigateur demandera l\'autorisation. Vous pouvez aussi l\'activer manuellement dans les paramètres du navigateur.' },
       { q: 'Le scan ne fonctionne pas, que faire ?', a: 'Vérifiez que votre caméra est bien connectée, que l\'éclairage est suffisant, et que vous avez autorisé l\'accès. Essayez aussi un autre navigateur.' },
       { q: 'Comment signaler un bug ?', a: 'Utilisez le formulaire de support ou envoyez un email à contact@emotionscare.com avec les détails du problème et des captures d\'écran.' },
+      { q: 'L\'application fonctionne-t-elle sur tablette ?', a: 'Oui, EmotionsCare est une Progressive Web App (PWA) parfaitement optimisée pour tablette, smartphone et desktop.' },
+    ],
+  },
+  {
+    id: 'clinical',
+    category: 'Évaluations Cliniques',
+    icon: Heart,
+    questions: [
+      { q: 'Quels questionnaires cliniques sont disponibles ?', a: 'Nous proposons le WHO-5 (bien-être), le PHQ-9 (dépression) et le GAD-7 (anxiété). Ces outils sont validés internationalement et recommandés par l\'OMS.' },
+      { q: 'Les résultats remplacent-ils un diagnostic médical ?', a: 'Non. Les évaluations cliniques sont des outils de dépistage indicatifs. Ils ne remplacent pas une consultation avec un professionnel de santé mentale.' },
+      { q: 'À quelle fréquence dois-je refaire les évaluations ?', a: 'Nous recommandons une évaluation toutes les 2 à 4 semaines pour suivre votre progression. Des rappels optionnels vous aideront à ne pas oublier.' },
     ],
   },
 ];

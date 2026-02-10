@@ -481,6 +481,74 @@ const HelpPage: React.FC = () => {
             </div>
           </section>
 
+          {/* ────── Support Channels ────── */}
+          <section className="py-16 md:py-24">
+            <div className="container px-4 sm:px-6 max-w-4xl mx-auto">
+              <Reveal>
+                <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-4">
+                  Contacter le{' '}
+                  <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    support
+                  </span>
+                </h2>
+                <p className="text-center text-muted-foreground mb-12 max-w-xl mx-auto">
+                  Notre équipe est disponible pour vous aider, quel que soit le canal.
+                </p>
+              </Reveal>
+
+              <div className="grid sm:grid-cols-3 gap-6">
+                {[
+                  {
+                    icon: Mail,
+                    title: 'Email',
+                    sub: 'contact@emotionscare.com',
+                    desc: 'Réponse sous 24h',
+                    href: '/contact',
+                    color: 'text-blue-500',
+                    bg: 'bg-blue-500/10 dark:bg-blue-500/20',
+                  },
+                  {
+                    icon: HelpCircle,
+                    title: 'FAQ',
+                    sub: '37+ questions couvertes',
+                    desc: 'Réponses instantanées',
+                    href: '/faq',
+                    color: 'text-violet-500',
+                    bg: 'bg-violet-500/10 dark:bg-violet-500/20',
+                  },
+                  {
+                    icon: Shield,
+                    title: 'Sécurité',
+                    sub: 'Signaler une faille',
+                    desc: 'security@emotionscare.com',
+                    href: '/contact',
+                    color: 'text-emerald-500',
+                    bg: 'bg-emerald-500/10 dark:bg-emerald-500/20',
+                  },
+                ].map((channel, i) => (
+                  <Reveal key={channel.title} delay={i * 0.08}>
+                    <Link
+                      to={channel.href}
+                      className="block group rounded-2xl border bg-card/60 backdrop-blur-sm p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center"
+                    >
+                      <div
+                        className={cn(
+                          'h-12 w-12 rounded-xl flex items-center justify-center mx-auto mb-4 transition-transform group-hover:scale-110',
+                          channel.bg,
+                        )}
+                      >
+                        <channel.icon className={cn('h-6 w-6', channel.color)} aria-hidden="true" />
+                      </div>
+                      <h3 className="font-semibold text-lg mb-1">{channel.title}</h3>
+                      <p className="text-sm text-primary font-medium mb-1">{channel.sub}</p>
+                      <p className="text-xs text-muted-foreground">{channel.desc}</p>
+                    </Link>
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+          </section>
+
           {/* ────── Contact CTA ────── */}
           <section className="py-20 md:py-28 bg-muted/30">
             <div className="container px-4 sm:px-6">
@@ -517,15 +585,15 @@ const HelpPage: React.FC = () => {
                   {/* Trust badges */}
                   <div className="flex flex-wrap items-center justify-center gap-6 mt-10">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Lock className="h-4 w-4 text-emerald-500" />
+                      <Lock className="h-4 w-4 text-emerald-500" aria-hidden="true" />
                       <span>Données chiffrées</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Shield className="h-4 w-4 text-emerald-500" />
+                      <Shield className="h-4 w-4 text-emerald-500" aria-hidden="true" />
                       <span>100% RGPD</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Heart className="h-4 w-4 text-rose-500" />
+                      <Heart className="h-4 w-4 text-rose-500" aria-hidden="true" />
                       <span>Made in France</span>
                     </div>
                   </div>

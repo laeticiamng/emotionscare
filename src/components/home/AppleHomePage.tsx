@@ -4,6 +4,7 @@
  */
 
 import React, { lazy, Suspense, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,9 @@ const SectionSkeleton = () => (
     </div>
   </div>
 );
+
+// Error fallback for individual sections — silent in production
+const SectionErrorFallback = () => null;
 
 const AppleHomePage: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -136,9 +140,9 @@ const AppleHomePage: React.FC = () => {
               aria-label={mobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
             >
               {mobileMenuOpen ? (
-                <X className="h-6 w-6" />
+                <X className="h-6 w-6" aria-hidden="true" />
               ) : (
-                <Menu className="h-6 w-6" />
+                <Menu className="h-6 w-6" aria-hidden="true" />
               )}
             </button>
           </div>
@@ -231,28 +235,38 @@ const AppleHomePage: React.FC = () => {
         {/* Hero Section - Full viewport, impactant */}
         <AppleHeroSection />
 
-        {/* Below-fold sections - lazy loaded */}
-        <Suspense fallback={<SectionSkeleton />}>
-          <AppleFeatureSection />
-        </Suspense>
+        {/* Below-fold sections - lazy loaded with error boundaries */}
+        <ErrorBoundary fallback={<SectionErrorFallback />}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <AppleFeatureSection />
+          </Suspense>
+        </ErrorBoundary>
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <AppleShowcaseSection />
-        </Suspense>
+        <ErrorBoundary fallback={<SectionErrorFallback />}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <AppleShowcaseSection />
+          </Suspense>
+        </ErrorBoundary>
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <AppleStatsSection />
-        </Suspense>
+        <ErrorBoundary fallback={<SectionErrorFallback />}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <AppleStatsSection />
+          </Suspense>
+        </ErrorBoundary>
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <AppleCTASection />
-        </Suspense>
+        <ErrorBoundary fallback={<SectionErrorFallback />}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <AppleCTASection />
+          </Suspense>
+        </ErrorBoundary>
       </main>
 
       {/* Footer */}
-      <Suspense fallback={<SectionSkeleton />}>
-        <Footer />
-      </Suspense>
+      <ErrorBoundary fallback={<SectionErrorFallback />}>
+        <Suspense fallback={<SectionSkeleton />}>
+          <Footer />
+        </Suspense>
+      </ErrorBoundary>
 
     </div>
   );

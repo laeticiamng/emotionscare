@@ -22,7 +22,7 @@ const NotificationToast: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-36 right-4 z-50">
+    <div className="fixed bottom-36 right-4 z-50" role="status" aria-live="polite" aria-atomic="true">
       <AnimatePresence>
         {toasts.map(({ id, title, description, action, ...props }) => (
           <motion.div
@@ -41,11 +41,11 @@ const NotificationToast: React.FC = () => {
             {/* Icon based on variant */}
             <div className="flex-shrink-0">
               {props.variant === "destructive" ? (
-                <AlertTriangle className="h-5 w-5 text-red-400" />
+                <AlertTriangle className="h-5 w-5 text-red-400" aria-hidden="true" />
               ) : props.variant === "success" ? (
-                <CheckCircle className="h-5 w-5 text-green-400" />
+                <CheckCircle className="h-5 w-5 text-green-400" aria-hidden="true" />
               ) : (
-                <Info className="h-5 w-5 text-blue-400" />
+                <Info className="h-5 w-5 text-blue-400" aria-hidden="true" />
               )}
             </div>
             
@@ -66,7 +66,7 @@ const NotificationToast: React.FC = () => {
                   : "hover:bg-muted"
               )}
             >
-              <X className="h-4 w-4" />
+              <X className="h-4 w-4" aria-hidden="true" />
               <span className="sr-only">Fermer</span>
             </button>
           </motion.div>

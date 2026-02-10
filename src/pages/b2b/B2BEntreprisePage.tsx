@@ -732,6 +732,118 @@ const B2BEntreprisePage: React.FC = () => {
         </div>
       </section>
 
+      {/* ═══════════════════ DASHBOARD RH PREVIEW ═══════════════════ */}
+      <section className="py-28 md:py-36">
+        <div className="container px-4 sm:px-6 lg:px-8">
+          <SectionTitle center subtitle="Un aperçu de ce que les RH voient — sans aucune donnée individuelle.">
+            Dashboard RH{' '}
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              anonyme.
+            </span>
+          </SectionTitle>
+
+          <div className="max-w-5xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.8 }}
+              className="bg-card/60 backdrop-blur-xl rounded-3xl border border-border/50 p-6 md:p-10 shadow-2xl"
+            >
+              {/* Dashboard header mock */}
+              <div className="flex items-center justify-between mb-8 pb-4 border-b border-border/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                    <BarChart3 className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">Tableau de bord bien-être</div>
+                    <div className="text-xs text-muted-foreground">Données agrégées &middot; Anonymes</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full">
+                  <Lock className="h-3 w-3" aria-hidden="true" />
+                  Aucune donnée individuelle
+                </div>
+              </div>
+
+              {/* Dashboard KPIs */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                {[
+                  { label: 'Bien-être moyen', value: '72/100', trend: '+8%', color: 'text-emerald-500' },
+                  { label: 'Taux d\'utilisation', value: '64%', trend: '+12%', color: 'text-primary' },
+                  { label: 'Sessions/semaine', value: '3.2', trend: '+0.5', color: 'text-blue-500' },
+                  { label: 'Satisfaction', value: '4.6/5', trend: '+0.3', color: 'text-amber-500' },
+                ].map((kpi) => (
+                  <div key={kpi.label} className="bg-muted/30 rounded-2xl p-4">
+                    <div className="text-xs text-muted-foreground mb-1">{kpi.label}</div>
+                    <div className="text-2xl font-bold">{kpi.value}</div>
+                    <div className={cn('text-xs font-medium mt-1', kpi.color)}>{kpi.trend} ce mois</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Chart placeholder */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-muted/20 rounded-2xl p-5">
+                  <div className="text-sm font-medium mb-4">Tendance bien-être (6 mois)</div>
+                  <div className="flex items-end gap-2 h-32">
+                    {[45, 52, 58, 63, 68, 72].map((val, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ height: 0 }}
+                        whileInView={{ height: `${val}%` }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5, delay: i * 0.1 }}
+                        className="flex-1 bg-gradient-to-t from-primary to-primary/50 rounded-t-lg"
+                      />
+                    ))}
+                  </div>
+                  <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+                    <span>Sept</span><span>Oct</span><span>Nov</span><span>Déc</span><span>Jan</span><span>Fév</span>
+                  </div>
+                </div>
+                <div className="bg-muted/20 rounded-2xl p-5">
+                  <div className="text-sm font-medium mb-4">Modules les plus utilisés</div>
+                  <div className="space-y-3">
+                    {[
+                      { name: 'Respiration guidée', pct: 85 },
+                      { name: 'Musicothérapie', pct: 72 },
+                      { name: 'Coach IA Nyvée', pct: 61 },
+                      { name: 'Journal émotionnel', pct: 48 },
+                    ].map((mod) => (
+                      <div key={mod.name}>
+                        <div className="flex justify-between text-xs mb-1">
+                          <span>{mod.name}</span>
+                          <span className="text-muted-foreground">{mod.pct}%</span>
+                        </div>
+                        <div className="h-2 bg-muted/50 rounded-full overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            whileInView={{ width: `${mod.pct}%` }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8 }}
+                            className="h-full bg-gradient-to-r from-primary to-accent rounded-full"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Disclaimer */}
+              <div className="mt-6 text-center">
+                <p className="text-xs text-muted-foreground flex items-center justify-center gap-1.5">
+                  <Shield className="h-3 w-3 text-emerald-500" aria-hidden="true" />
+                  Données fictives à titre illustratif — aucune donnée individuelle n'est jamais accessible
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* ═══════════════════ ROI CALCULATOR ═══════════════════ */}
       <section className="py-28 md:py-36">
         <div className="container px-4 sm:px-6 lg:px-8">
