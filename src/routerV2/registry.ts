@@ -2757,6 +2757,47 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   },
   // context-lens-duplicate supprimé — doublon de context-lens (ligne ~1007)
 
+  // ═══════════════════════════════════════════════════════════
+  // MODULE 18 - Programme de prévention (B2B)
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'b2b-prevention-program',
+    path: '/b2b/prevention',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'B2BPreventionProgramPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/app/rh/prevention'],
+  },
+  // ═══════════════════════════════════════════════════════════
+  // MODULE 31 - Visioconférence bien-être
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'visio',
+    path: '/app/visio',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'B2BVisioPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/visio', '/visioconference'],
+  },
+  // ═══════════════════════════════════════════════════════════
+  // MODULE 37 - Conformité HDS opérationnelle
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'hds-compliance',
+    path: '/compliance/hds',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'HDSCompliancePage',
+    guard: false,
+    aliases: ['/hds', '/conformite-hds'],
+  },
+
   // 404 FALLBACK ROUTE - Le fallback '*' est géré directement dans router.tsx
   // Cette entrée est gardée pour documentation mais n'est pas utilisée
   // car router.tsx a déjà un catch-all '*' à la fin

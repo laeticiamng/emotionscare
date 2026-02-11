@@ -23,6 +23,7 @@ import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import PageRoot from '@/components/common/PageRoot';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 // Types
 interface BreakSession {
@@ -345,6 +346,11 @@ const BreakTimer: React.FC<{
 
 // Main Component
 const B2CScreenSilkBreakPage: React.FC = () => {
+  usePageSEO({
+    title: 'Screen Silk Break - Pauses \u00e9cran intelligentes | EmotionsCare',
+    description: 'Timer 20-20-20, exercices oculaires guid\u00e9s et tracking de vos pauses \u00e9cran pour r\u00e9duire la fatigue visuelle.',
+  });
+
   const { user } = useAuth();
   const [activeSession, setActiveSession] = useState<BreakSession | null>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);

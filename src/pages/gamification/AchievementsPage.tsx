@@ -26,6 +26,7 @@ import {
   Filler
 } from 'chart.js';
 import { useToast } from '@/hooks/use-toast';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 ChartJS.register(
   CategoryScale,
@@ -41,6 +42,11 @@ ChartJS.register(
 );
 
 export default function AchievementsPage() {
+  usePageSEO({
+    title: 'Accomplissements & Badges - EmotionsCare',
+    description: 'D\u00e9couvrez tous vos badges, troph\u00e9es et accomplissements gagn\u00e9s dans votre parcours EmotionsCare.',
+  });
+
   const navigate = useNavigate();
   const { toast } = useToast();
   const { visitedAttractions, unlockedBadges } = useAttractionProgress();

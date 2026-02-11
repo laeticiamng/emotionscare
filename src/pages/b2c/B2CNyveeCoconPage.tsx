@@ -23,6 +23,7 @@ import { AmbientSound } from '@/features/nyvee/components/AmbientSound';
 import { ShareSessionButton } from '@/features/nyvee/components/ShareSessionButton';
 import { DurationSelector } from '@/features/nyvee/components/DurationSelector';
 import { useMediaQuery } from '@/hooks/use-media-query';
+import { usePageSEO } from '@/hooks/usePageSEO';
 import { useCocoonStore } from '@/features/nyvee/stores/cocoonStore';
 import { useNyveeSessions } from '@/modules/nyvee/hooks/useNyveeSessions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -47,6 +48,11 @@ const breathingPrompts = [
 type SessionPhase = 'ready' | 'mood-before' | 'breathing' | 'mood-after' | 'complete' | 'badge';
 
 const B2CNyveeCoconPage: FC = () => {
+  usePageSEO({
+    title: 'Nyv\u00e9e Cocon - Espace de respiration | EmotionsCare',
+    description: 'Retrouvez votre calme avec Nyv\u00e9e : respiration guid\u00e9e, ambiances sonores et suivi de votre \u00e9tat \u00e9motionnel.',
+  });
+
   const { has } = useFlags();
   const navigate = useNavigate();
   const zeroNumbersActive = has('FF_ZERO_NUMBERS');

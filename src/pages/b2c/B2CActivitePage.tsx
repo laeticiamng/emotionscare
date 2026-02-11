@@ -47,6 +47,7 @@ import { ActivityRecommendations } from '@/modules/activities/components/Activit
 import type { Activity as ActivityType, ActivityFilters as Filters } from '@/modules/activities/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 const CATEGORY_COLORS = {
   relaxation: '#3B82F6',
@@ -67,6 +68,11 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 const B2CActivitePage: React.FC = () => {
+  usePageSEO({
+    title: 'Syst\u00e8me XP & Activit\u00e9s - EmotionsCare',
+    description: 'Suivez votre progression, vos activit\u00e9s et gagnez de l\u2019exp\u00e9rience en prenant soin de votre bien-\u00eatre \u00e9motionnel.',
+  });
+
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [streak, setStreak] = useState<ActivityStreak | null>(null);

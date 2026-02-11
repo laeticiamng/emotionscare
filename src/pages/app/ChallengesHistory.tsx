@@ -12,6 +12,7 @@ import { fr } from 'date-fns/locale';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
+import { usePageSEO } from '@/hooks/usePageSEO';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -38,6 +39,11 @@ ChartJS.register(
 );
 
 const ChallengesHistory = () => {
+  usePageSEO({
+    title: 'Historique des d\u00e9fis - EmotionsCare',
+    description: 'Consultez l\u2019historique de vos d\u00e9fis quotidiens, vos statistiques de progression et vos s\u00e9ries en cours.',
+  });
+
   const { history, stats, loading } = useChallengesHistory();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [exportLoading, setExportLoading] = useState(false);
