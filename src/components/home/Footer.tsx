@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Mail, Shield, BookOpen, Users, Accessibility, Twitter, Linkedin, Instagram, Youtube, ExternalLink, LockKeyhole } from 'lucide-react';
+import { Heart, Mail, Shield, BookOpen, Users, Accessibility, Twitter, Linkedin, Instagram, Youtube, LockKeyhole } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const Footer: React.FC = () => {
@@ -33,10 +33,10 @@ const Footer: React.FC = () => {
       { label: 'Cookies', href: '/legal/cookies' },
     ],
     social: [
-      { label: 'Twitter', href: '#', icon: Twitter },
-      { label: 'LinkedIn', href: '#', icon: Linkedin },
-      { label: 'Instagram', href: '#', icon: Instagram },
-      { label: 'YouTube', href: '#', icon: Youtube },
+      { label: 'Twitter', href: 'https://twitter.com/emotionscare', icon: Twitter },
+      { label: 'LinkedIn', href: 'https://linkedin.com/company/emotionscare', icon: Linkedin },
+      { label: 'Instagram', href: 'https://instagram.com/emotionscare', icon: Instagram },
+      { label: 'YouTube', href: 'https://youtube.com/@emotionscare', icon: Youtube },
     ],
   };
 
@@ -71,17 +71,16 @@ const Footer: React.FC = () => {
             {/* Réseaux sociaux */}
             <div className="flex items-center gap-3 pt-2">
             {links.social.map((social) => (
-              <span
+              <a
                 key={social.label}
-                className="relative p-2 rounded-lg bg-muted text-muted-foreground/40 cursor-default group"
-                aria-label={`${social.label} (bientôt disponible)`}
-                title={`${social.label} — bientôt disponible`}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative p-2 rounded-lg bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                aria-label={`Suivre EmotionsCare sur ${social.label}`}
               >
                 <social.icon className="h-4 w-4" aria-hidden="true" />
-                <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                  Bientôt
-                </span>
-              </span>
+              </a>
             ))}
             </div>
           </div>
