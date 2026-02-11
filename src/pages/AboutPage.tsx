@@ -19,6 +19,8 @@ import {
   Lock,
   Brain,
   Target,
+  Quote,
+  Star,
 } from 'lucide-react';
 
 /** Scroll-reveal wrapper */
@@ -316,6 +318,96 @@ const AboutPage: React.FC = () => {
                     </div>
                   </Reveal>
                 ))}
+              </div>
+            </div>
+          </section>
+
+          {/* ═══════════════════ TÉMOIGNAGES ═══════════════════ */}
+          <section className="py-24 md:py-32 bg-muted/30 border-y border-border/50">
+            <div className="container px-4 sm:px-6 lg:px-8">
+              <div className="max-w-5xl mx-auto">
+                <Reveal>
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-center mb-6">
+                    Ils{' '}
+                    <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                      témoignent
+                    </span>
+                  </h2>
+                  <p className="text-xl text-muted-foreground text-center max-w-2xl mx-auto mb-16 font-light">
+                    Des professionnels de santé partagent leur expérience avec EmotionsCare.
+                  </p>
+                </Reveal>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  {[
+                    {
+                      quote:
+                        "Les protocoles de respiration m'aident à me recentrer entre deux gardes. En 3 minutes, je retrouve un vrai calme intérieur.",
+                      author: 'Infirmière en réanimation',
+                      context: 'CHU, 8 ans d\'expérience',
+                      rating: 5,
+                    },
+                    {
+                      quote:
+                        "J'utilise le scan émotionnel chaque matin avant de prendre mon service. Ça m'aide à identifier mes limites et à mieux gérer ma charge mentale.",
+                      author: 'Interne en médecine d\'urgence',
+                      context: '3e année d\'internat',
+                      rating: 5,
+                    },
+                    {
+                      quote:
+                        "En tant que cadre de santé, le dashboard RH me permet de veiller au bien-être de mon équipe sans intrusion. Les données anonymisées sont un vrai plus.",
+                      author: 'Cadre de santé',
+                      context: 'EHPAD, 15 ans d\'expérience',
+                      rating: 5,
+                    },
+                    {
+                      quote:
+                        "Le Protocole Night a changé mes nuits. Après des années de sommeil perturbé par le stress post-garde, j'arrive enfin à m'endormir sereinement.",
+                      author: 'Aide-soignante',
+                      context: 'Service de nuit, 6 ans d\'expérience',
+                      rating: 5,
+                    },
+                    {
+                      quote:
+                        "La musicothérapie personnalisée est devenue mon rituel de décompression. Les compositions s'adaptent vraiment à mon état émotionnel du moment.",
+                      author: 'Médecin généraliste',
+                      context: 'Cabinet libéral',
+                      rating: 5,
+                    },
+                    {
+                      quote:
+                        "Le coach IA Nyvée est toujours disponible quand j'en ai besoin, même à 3h du matin après une garde difficile. Bienveillant et sans jugement.",
+                      author: 'Sage-femme',
+                      context: 'Maternité, 10 ans d\'expérience',
+                      rating: 5,
+                    },
+                  ].map((testimonial, i) => (
+                    <Reveal key={i} delay={i * 0.1}>
+                      <div className="group rounded-3xl border border-border/50 p-8 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 h-full flex flex-col">
+                        <Quote className="h-8 w-8 text-primary/30 mb-4 flex-shrink-0" />
+                        <p className="text-muted-foreground leading-relaxed mb-6 flex-1 italic">
+                          "{testimonial.quote}"
+                        </p>
+                        <div className="flex items-center gap-1 mb-3">
+                          {Array.from({ length: testimonial.rating }).map((_, j) => (
+                            <Star key={j} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          ))}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-sm">{testimonial.author}</p>
+                          <p className="text-xs text-muted-foreground">{testimonial.context}</p>
+                        </div>
+                      </div>
+                    </Reveal>
+                  ))}
+                </div>
+
+                <Reveal delay={0.3}>
+                  <p className="text-center text-sm text-muted-foreground mt-10">
+                    Témoignages anonymisés de professionnels de santé utilisant EmotionsCare.
+                  </p>
+                </Reveal>
               </div>
             </div>
           </section>

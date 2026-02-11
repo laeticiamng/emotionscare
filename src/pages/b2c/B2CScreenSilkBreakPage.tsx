@@ -546,10 +546,11 @@ const B2CScreenSilkBreakPage: React.FC = () => {
               <Monitor className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              Screen-Silk Break
+              Protocole Stop
             </h1>
+            <p className="text-sm font-medium text-primary mb-1">Screen-Silk Break</p>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Protégez vos yeux avec des pauses intelligentes et des exercices guidés
+              Rupture rapide face au stress et à la fatigue visuelle. Pauses intelligentes, règle 20-20-20 et exercices oculaires guidés.
             </p>
           </motion.div>
 
