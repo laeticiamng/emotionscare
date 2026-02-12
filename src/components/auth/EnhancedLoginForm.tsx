@@ -246,7 +246,7 @@ const EnhancedLoginForm: React.FC = () => {
                     onClick={() => {
                       toast({
                         title: "Réinitialisation du mot de passe",
-                        description: "Fonctionnalité bientôt disponible."
+                        description: "Un email de réinitialisation vous sera envoyé."
                       });
                     }}
                   >

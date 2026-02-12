@@ -667,7 +667,7 @@ const EnhancedAnalyticsDashboard: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Brain className="h-5 w-5" />
-                Prédictions IA (Bientôt disponible)
+                Prédictions IA
               </CardTitle>
             </CardHeader>
             <CardContent>

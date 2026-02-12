@@ -136,7 +136,7 @@ const StorePage: React.FC = () => {
               <ShoppingBag className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">Aucun produit disponible</h3>
               <p className="text-muted-foreground">
-                Les produits arrivent bientôt...
+                Aucun produit n'est disponible pour le moment.
               </p>
             </CardContent>
           </Card>

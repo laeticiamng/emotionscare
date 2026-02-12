@@ -295,14 +295,16 @@ const AdvancedEmotionalScan: React.FC = () => {
             <TabsContent value="voice" className="space-y-4">
               <div className="text-center p-8 border-2 border-dashed border-muted rounded-lg">
                 <Mic className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <p className="text-muted-foreground">Analyse vocale disponible bientôt</p>
+                <p className="text-muted-foreground">Analyse vocale de vos émotions par le timbre et l'intonation</p>
+                <a href="/app/scan/voice" className="text-primary text-sm hover:underline mt-2 inline-block">Accéder au scan vocal</a>
               </div>
             </TabsContent>
 
             <TabsContent value="combined" className="space-y-4">
               <div className="text-center p-8 border-2 border-dashed border-muted rounded-lg">
                 <Zap className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <p className="text-muted-foreground">Analyse multi-modale disponible bientôt</p>
+                <p className="text-muted-foreground">Combinez texte, voix et expressions faciales pour une analyse complète</p>
+                <a href="/app/scan" className="text-primary text-sm hover:underline mt-2 inline-block">Accéder au scan complet</a>
               </div>
             </TabsContent>
           </Tabs>

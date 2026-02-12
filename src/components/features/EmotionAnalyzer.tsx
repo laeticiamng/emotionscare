@@ -148,10 +148,9 @@ const EmotionAnalyzer: React.FC = () => {
               variant={analysisType === 'camera' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setAnalysisType('camera')}
-              disabled
             >
               <Camera className="h-4 w-4 mr-2" />
-              Caméra (Bientôt)
+              Caméra
             </Button>
           </div>
 

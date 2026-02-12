@@ -389,7 +389,7 @@ export default function DataExportPage() {
               <p className="text-xs text-muted-foreground mt-3">
                 {format === 'json' && 'Format complet avec toutes les métadonnées. Idéal pour portabilité.'}
                 {format === 'csv' && 'Format tableur simplifié. Idéal pour analyse dans Excel.'}
-                {format === 'pdf' && 'Rapport PDF formaté (bientôt disponible).'}
+                {format === 'pdf' && 'Rapport PDF formaté avec mise en page professionnelle.'}
               </p>
             </CardContent>
           </Card>
