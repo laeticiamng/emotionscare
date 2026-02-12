@@ -376,8 +376,23 @@ const AurasLeaderboardPage = lazy(() => import('@/pages/AurasLeaderboardPage'));
 const ConsentManagementPage = lazy(() => import('@/pages/ConsentManagementPage'));
 const AccountDeletionPage = lazy(() => import('@/pages/AccountDeletionPage'));
 
+// Module 18 - Programme de prévention B2B
+const B2BPreventionProgramPage = lazy(() => import('@/pages/b2b/B2BPreventionProgramPage'));
+// Module 31 - Visioconférence bien-être
+const B2BVisioPage = lazy(() => import('@/pages/b2b/B2BVisioPage'));
+// Module 37 - Conformité HDS opérationnelle
+const HDSCompliancePage = lazy(() => import('@/pages/compliance/HDSCompliancePage'));
+
 // PWA Install Page
 const InstallPage = lazy(() => import('@/pages/InstallPage'));
+
+// Pages manquantes - ajoutées pour cohérence registry
+const MarketplacePage = lazy(() => import('@/pages/MarketplacePage'));
+const CreatorDashboardPage = lazy(() => import('@/pages/CreatorDashboardPage'));
+const BrainViewerPage = lazy(() => import('@/pages/BrainViewerPage'));
+const VRPage = lazy(() => import('@/pages/app/VRPage'));
+const PlatformAuditPage = lazy(() => import('@/pages/admin/PlatformAuditPage'));
+const ModuleSyncPage = lazy(() => import('@/pages/admin/ModuleSyncPage'));
 
 // ═══════════════════════════════════════════════════════════
 // MAPPING DES COMPOSANTS
@@ -783,6 +798,21 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // Alias pour chooseMode
   ChooseModePage: ModeSelectionPage,
+
+  // Module 18 - Programme de prévention B2B
+  B2BPreventionProgramPage,
+  // Module 31 - Visioconférence
+  B2BVisioPage,
+  // Module 37 - Conformité HDS
+  HDSCompliancePage,
+
+  // Pages manquantes ajoutées
+  MarketplacePage,
+  CreatorDashboardPage,
+  BrainViewerPage,
+  VRPage,
+  PlatformAuditPage,
+  ModuleSyncPage,
 };
 
 // ═══════════════════════════════════════════════════════════

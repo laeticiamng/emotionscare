@@ -55,7 +55,7 @@ const B2CAICoachPage = () => {
                       Retour
                     </Link>
                   </Button>
-                  <span className="text-sm font-medium text-muted-foreground">Coach IA</span>
+                  <span className="text-sm font-medium text-muted-foreground">Coach IA Nyvée - Votre accompagnement émotionnel 24/7</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" size="sm" asChild>

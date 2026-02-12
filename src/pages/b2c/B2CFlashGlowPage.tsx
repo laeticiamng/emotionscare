@@ -14,6 +14,7 @@ import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import EnhancedFlashGlow from '@/components/modules/EnhancedFlashGlow';
 import { useAuth } from '@/hooks/useAuth';
 import { useFlashGlowStats } from '@/hooks/useFlashGlowStats';
+import { usePageSEO } from '@/hooks/usePageSEO';
 import { useRealtimeLeaderboard } from '@/hooks/useRealtimeLeaderboard';
 import { useStreakTracker } from '@/hooks/useStreakTracker';
 import { SessionFeedback, type FeedbackData } from '@/components/feedback/SessionFeedback';
@@ -32,9 +33,11 @@ export default function B2CFlashGlowPage() {
   const [showFeedback, setShowFeedback] = useState(false);
   const [lastSession, setLastSession] = useState<{ duration: number; score: number; pattern: string } | null>(null);
 
-  useEffect(() => {
-    document.title = "Flash Glow - Respiration Gamifiée | EmotionsCare";
-  }, []);
+  usePageSEO({
+    title: 'Protocole Reset - Respiration gamifiée',
+    description: 'Micro-session de récupération en 2 à 10 minutes. Respiration gamifiée avec suivi de score et classement communautaire.',
+    keywords: 'respiration, gamification, reset, récupération, bien-être, score'
+  });
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -131,6 +134,15 @@ export default function B2CFlashGlowPage() {
 
           {/* Main Content */}
           <main id="main-content" role="main" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* Page Heading */}
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold text-foreground">Protocole Reset</h1>
+              <p className="text-sm font-medium text-primary mt-1">Flash Glow</p>
+              <p className="text-muted-foreground mt-2 max-w-xl mx-auto">
+                Micro-session de récupération par la respiration gamifiée. Choisissez votre durée, suivez votre score et progressez chaque jour.
+              </p>
+            </div>
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

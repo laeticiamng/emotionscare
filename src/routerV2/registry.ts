@@ -143,7 +143,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'b2c',
     layout: 'app',
     component: 'CreatorDashboardPage',
-    guard: 'auth',
+    guard: true,
+    requireAuth: true,
   },
   {
     name: 'privacy',
@@ -407,6 +408,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'ModulesDashboardPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'scan',
@@ -607,15 +609,17 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'simple',
     component: 'CoachProgramsPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'coach-program-detail',
-    path: '/app/coach/programs/:programid',
+    path: '/app/coach/programs/:programId',
     segment: 'consumer',
     role: 'consumer',
     layout: 'simple',
     component: 'CoachProgramDetailPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'coach-sessions',
@@ -625,6 +629,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'simple',
     component: 'CoachSessionsPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'coach-analytics',
@@ -634,6 +639,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'simple',
     component: 'CoachAnalyticsPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'coach-micro',
@@ -918,6 +924,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'B2CNyveeCoconPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'face-ar',
@@ -1089,6 +1096,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app',
     component: 'MoodPresetsAdminPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'ambition-arcade',
@@ -1231,6 +1239,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'B2CGamificationPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'activity',
@@ -1273,6 +1282,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'SessionDetailPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'goals',
@@ -1282,6 +1292,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'GoalsPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'goal-detail',
@@ -1291,6 +1302,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'GoalDetailPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'goal-new',
@@ -1300,6 +1312,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'GoalNewPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'park-achievements',
@@ -1309,6 +1322,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'AchievementsPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'daily-challenges',
@@ -1318,6 +1332,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'DailyChallengesPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'badges',
@@ -1327,6 +1342,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'BadgesPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'rewards',
@@ -1336,6 +1352,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'RewardsPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'challenges',
@@ -1345,6 +1362,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'ChallengesPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'challenge-detail',
@@ -1354,6 +1372,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'ChallengeDetailPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'challenge-create',
@@ -1363,6 +1382,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'ChallengeCreatePage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'notifications-center',
@@ -1372,6 +1392,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'NotificationsCenterPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'notification-settings',
@@ -1379,9 +1400,10 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app-sidebar',
-    component: 'NotificationSettingsPage',
+    component: 'B2CNotificationsPage',
     guard: true,
     requireAuth: true,
+    aliases: ['/notifications'],
   },
   {
     name: 'premium',
@@ -1410,6 +1432,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'BillingPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'support',
@@ -1422,7 +1445,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
   },
   {
-    name: 'faq',
+    name: 'app-faq',
     path: '/app/faq',
     segment: 'public',
     layout: 'simple',
@@ -1437,6 +1460,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'TicketsPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'insights',
@@ -1446,6 +1470,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'InsightsPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'trends',
@@ -1455,6 +1480,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'TrendsPage',
     guard: true,
+    requireAuth: true,
   },
   
   // ═══════════════════════════════════════════════════════════
@@ -1510,6 +1536,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'ReportingPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'export',
@@ -1519,6 +1546,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'ExportPage',
     guard: true,
+    requireAuth: true,
   },
   // modules-journal supprimé - utiliser /app/journal
 
@@ -1583,17 +1611,10 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app',
     component: 'HowItAdaptsPage',
     guard: true,
+    requireAuth: true,
   },
-  {
-    name: 'settings-notifications',
-    path: '/settings/notifications',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'B2CNotificationsPage',
-    guard: true,
-    aliases: ['/notifications'],
-  },
+  // settings-notifications supprimé - doublon de notification-settings (même path /settings/notifications)
+  // Fonctionnalité gérée par NotificationSettingsPage via notification-settings
   {
     name: 'settings-journal',
     path: '/settings/journal',
@@ -1602,6 +1623,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'JournalSettingsPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'settings-accessibility',
@@ -1611,6 +1633,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'AccessibilitySettingsPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'settings-language',
@@ -1620,6 +1643,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'LanguageSettingsPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'settings-security',
@@ -1629,6 +1653,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'SecuritySettingsPage',
     guard: true,
+    requireAuth: true,
   },
 
   // ═══════════════════════════════════════════════════════════
@@ -1652,6 +1677,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app',
     component: 'B2BSocialCoconPage',
     guard: true,
+    requireAuth: true,
   },
 
   // ═══════════════════════════════════════════════════════════
@@ -1675,6 +1701,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app',
     component: 'B2BReportDetailPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'admin-events',
@@ -1964,6 +1991,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app',
     component: 'CronMonitoringPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'gdpr-blockchain-backups',
@@ -1973,6 +2001,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app',
     component: 'BlockchainBackupsPage',
     guard: true,
+    requireAuth: true,
   },
 
   
@@ -2181,6 +2210,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'EventsCalendarPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'workshops',
@@ -2212,6 +2242,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'ExportPDFPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'export-csv',
@@ -2221,6 +2252,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'ExportCSVPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'share-data',
@@ -2230,6 +2262,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'ShareDataPage',
     guard: true,
+    requireAuth: true,
   },
   
   // Intégrations
@@ -2275,6 +2308,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'AccessibilitySettingsPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'shortcuts',
@@ -2284,6 +2318,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'ShortcutsPage',
     guard: true,
+    requireAuth: true,
   },
   
   // Rapports
@@ -2295,6 +2330,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'WeeklyReportPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'monthly-report',
@@ -2304,6 +2340,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'MonthlyReportPage',
     guard: true,
+    requireAuth: true,
   },
   
   // Navigation Hub - DOUBLON SUPPRIMÉ (défini ligne 781)
@@ -2321,7 +2358,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   },
   {
     name: 'guild-detail',
-    path: '/app/guilds/:guildid',
+    path: '/app/guilds/:guildId',
     segment: 'consumer',
     role: 'consumer',
     layout: 'app-sidebar',
@@ -2351,7 +2388,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   },
   {
     name: 'match-spectator',
-    path: '/app/match/:matchid/spectate',
+    path: '/app/match/:matchId/spectate',
     segment: 'consumer',
     role: 'consumer',
     layout: 'app-sidebar',
@@ -2756,6 +2793,47 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     },
   },
   // context-lens-duplicate supprimé — doublon de context-lens (ligne ~1007)
+
+  // ═══════════════════════════════════════════════════════════
+  // MODULE 18 - Programme de prévention (B2B)
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'b2b-prevention-program',
+    path: '/b2b/prevention',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'B2BPreventionProgramPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/app/rh/prevention'],
+  },
+  // ═══════════════════════════════════════════════════════════
+  // MODULE 31 - Visioconférence bien-être
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'visio',
+    path: '/app/visio',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'B2BVisioPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/visio', '/visioconference'],
+  },
+  // ═══════════════════════════════════════════════════════════
+  // MODULE 37 - Conformité HDS opérationnelle
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'hds-compliance',
+    path: '/compliance/hds',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'HDSCompliancePage',
+    guard: false,
+    aliases: ['/hds', '/conformite-hds'],
+  },
 
   // 404 FALLBACK ROUTE - Le fallback '*' est géré directement dans router.tsx
   // Cette entrée est gardée pour documentation mais n'est pas utilisée
