@@ -408,7 +408,7 @@ const EmotionAnalysisEngine: React.FC<EmotionAnalysisEngineProps> = ({
                 
                 <Button size="lg" variant="outline" className="bg-gradient-to-r from-blue-50 to-purple-50">
                   <Zap className="h-4 w-4 mr-2" />
-                  Analyse Multi-modale (Bientôt)
+                  Analyse Multi-modale
                 </Button>
                 
                 <p className="text-sm text-muted-foreground">

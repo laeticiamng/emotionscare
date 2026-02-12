@@ -181,19 +181,16 @@ function handleGuardedAction(node: NavNode, context: NavContext) {
 
 function handleFallbackAction(node: NavNode) {
   // Action de contournement pour les fonctionnalités non implémentées
-  const message = `La fonctionnalité "${getNodeLabel(node)}" sera bientôt disponible. 
-  
+  const message = `La fonctionnalité "${getNodeLabel(node)}" est en cours de déploiement.
+
 Voulez-vous :
-• Être notifié lors de sa sortie ?
 • Explorer d'autres fonctionnalités ?
+• Consulter le centre d'aide ?
 • Nous envoyer vos suggestions ?`;
 
   if (confirm(message)) {
-    // Ouvrir modal de feedback ou newsletter
     logger.info('Community action triggered', null, 'UI');
-    // Simulation d'ouverture de modal
-    window.alert('Rejoignez notre communauté ! Fonctionnalité bientôt disponible.');
-    window.location.href = '/help-center';
+    window.location.href = '/help';
   }
 }
 

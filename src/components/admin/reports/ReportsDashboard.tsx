@@ -18,7 +18,7 @@ const ReportsDashboard: React.FC = () => {
   const handleGenerateReport = () => {
     toast({
       title: "Rapport en cours de création",
-      description: "Cette fonctionnalité sera bientôt disponible"
+      description: "Votre rapport sera généré dans quelques instants."
     });
   };
 

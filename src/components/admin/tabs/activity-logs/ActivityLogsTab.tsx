@@ -46,7 +46,7 @@ const ActivityLogsTab: React.FC = () => {
     logger.info('Exporting activities', { activeTab, filters }, 'ADMIN');
     toast({
       title: "Export en cours",
-      description: "Cette fonctionnalité sera bientôt disponible"
+      description: "Le fichier d'export sera prêt dans quelques instants."
     });
   };
 

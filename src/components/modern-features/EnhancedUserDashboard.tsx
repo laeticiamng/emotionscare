@@ -72,7 +72,7 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
 
   const upcomingReminders = recommendations?.slice(0, 3).map((rec: any) => ({
     title: rec.title || 'Recommandation',
-    time: rec.suggested_timing || 'Bientôt',
+    time: rec.suggested_timing || 'À planifier',
     type: rec.module_name || 'session'
   })) || [];
 
