@@ -386,6 +386,14 @@ const HDSCompliancePage = lazy(() => import('@/pages/compliance/HDSCompliancePag
 // PWA Install Page
 const InstallPage = lazy(() => import('@/pages/InstallPage'));
 
+// Pages manquantes - ajoutées pour cohérence registry
+const MarketplacePage = lazy(() => import('@/pages/MarketplacePage'));
+const CreatorDashboardPage = lazy(() => import('@/pages/CreatorDashboardPage'));
+const BrainViewerPage = lazy(() => import('@/pages/BrainViewerPage'));
+const VRPage = lazy(() => import('@/pages/app/VRPage'));
+const PlatformAuditPage = lazy(() => import('@/pages/admin/PlatformAuditPage'));
+const ModuleSyncPage = lazy(() => import('@/pages/admin/ModuleSyncPage'));
+
 // ═══════════════════════════════════════════════════════════
 // MAPPING DES COMPOSANTS
 // ═══════════════════════════════════════════════════════════
@@ -797,6 +805,14 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2BVisioPage,
   // Module 37 - Conformité HDS
   HDSCompliancePage,
+
+  // Pages manquantes ajoutées
+  MarketplacePage,
+  CreatorDashboardPage,
+  BrainViewerPage,
+  VRPage,
+  PlatformAuditPage,
+  ModuleSyncPage,
 };
 
 // ═══════════════════════════════════════════════════════════
