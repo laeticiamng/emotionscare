@@ -242,7 +242,7 @@ const ProgressStats: React.FC<ProgressStatsProps> = ({ stats }) => {
               <div className="text-center text-muted-foreground py-8">
                 <BarChart3 className="h-12 w-12 mx-auto mb-4" />
                 <p>Graphiques de tendances en développement</p>
-                <p className="text-sm">Bientôt disponible</p>
+                <p className="text-sm">Complétez des sessions pour visualiser votre progression</p>
               </div>
             </CardContent>
           </Card>

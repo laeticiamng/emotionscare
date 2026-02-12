@@ -50,7 +50,7 @@ const EmptyModuleState: React.FC<EmptyModuleStateProps> = ({
           ? 'Essayez avec des termes différents ou vérifiez l\'orthographe.'
           : hasFilters
           ? 'Essayez de modifier vos critères de recherche.'
-          : 'Les modules seront bientôt disponibles.'}
+          : 'Aucun module à afficher pour le moment.'}
       </p>
       
       <div className="flex gap-3">

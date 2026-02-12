@@ -28,7 +28,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, className }
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground text-sm">
-            De nouveaux challenges seront bientôt disponibles. Revenez plus tard !
+            Aucun challenge actif pour le moment. Revenez plus tard !
           </p>
         </CardContent>
       </Card>

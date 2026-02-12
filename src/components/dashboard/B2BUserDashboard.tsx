@@ -227,7 +227,7 @@ const B2BUserDashboard: React.FC = () => {
                         <Lightbulb className="h-12 w-12 text-muted-foreground opacity-50" />
                       </div>
                       <p className="text-center text-muted-foreground">
-                        Les nouveaux défis seront bientôt disponibles
+                        Aucun défi en cours pour le moment
                       </p>
                     </CardContent>
                   </Card>

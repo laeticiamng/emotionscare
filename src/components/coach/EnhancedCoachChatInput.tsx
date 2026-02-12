@@ -76,7 +76,7 @@ const EnhancedCoachChatInput: React.FC<EnhancedCoachChatInputProps> = ({
   const handleVoiceInput = () => {
     toast({
       title: "Dictée vocale",
-      description: "Fonctionnalité bientôt disponible !",
+      description: "Utilisez le micro de votre appareil pour dicter votre message.",
       variant: "default",
     });
   };

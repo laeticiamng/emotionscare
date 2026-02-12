@@ -1020,7 +1020,7 @@ const B2CProfileSettingsPage: React.FC = () => {
               </ul>
             </div>
             <p className="text-sm text-muted-foreground">
-              Cette fonctionnalité sera bientôt disponible. Vous serez notifié dès son activation.
+              L'authentification à deux facteurs sera activée prochainement. Vous serez notifié dès son activation.
             </p>
           </div>
           <DialogFooter>

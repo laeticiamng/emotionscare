@@ -16,7 +16,7 @@ const NotificationToast: React.FC = () => {
   const showExampleToast = () => {
     toast({
       title: "Notification",
-      description: "Cette fonctionnalité sera bientôt disponible!",
+      description: "Votre notification a bien été enregistrée.",
       action: <ToastAction altText="Fermer">Fermer</ToastAction>,
     });
   };
