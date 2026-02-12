@@ -11,7 +11,7 @@ const FeatureHub: React.FC = () => {
       id: 'vr',
       title: 'VR Immersive',
       description: 'Expériences de réalité virtuelle pour un bien-être profond',
-      comingSoon: true
+      comingSoon: false
     },
     {
       id: 'ai-coach',
@@ -23,7 +23,7 @@ const FeatureHub: React.FC = () => {
       id: 'team-analytics',
       title: 'Analytiques d\'équipe',
       description: 'Visualisez le bien-être collectif de votre équipe',
-      comingSoon: true
+      comingSoon: false
     }
   ];
   

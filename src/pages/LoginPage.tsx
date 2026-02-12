@@ -112,8 +112,8 @@ const LoginPage: React.FC = () => {
 
   const handleSocialLogin = async (provider: 'google' | 'github') => {
     toast({
-      title: "Bientôt disponible",
-      description: `Connexion via ${provider} sera disponible prochainement`,
+      title: "Connexion sociale",
+      description: `La connexion via ${provider} est en cours de déploiement.`,
     });
   };
 
@@ -235,25 +235,19 @@ const LoginPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <Button
                   variant="outline"
-                  disabled
-                  className="h-11 opacity-50 cursor-not-allowed relative"
+                  onClick={() => handleSocialLogin('google')}
+                  className="h-11 relative"
                 >
                   <Chrome className="w-4 h-4 mr-2" />
                   Google
-                  <Badge variant="secondary" className="absolute -top-2 -right-2 text-[10px] px-1.5 py-0">
-                    Bientôt
-                  </Badge>
                 </Button>
                 <Button
                   variant="outline"
-                  disabled
-                  className="h-11 opacity-50 cursor-not-allowed relative"
+                  onClick={() => handleSocialLogin('github')}
+                  className="h-11 relative"
                 >
                   <Github className="w-4 h-4 mr-2" />
                   GitHub
-                  <Badge variant="secondary" className="absolute -top-2 -right-2 text-[10px] px-1.5 py-0">
-                    Bientôt
-                  </Badge>
                 </Button>
               </div>
 

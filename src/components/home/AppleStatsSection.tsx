@@ -3,7 +3,7 @@
  * Style Apple avec grandes typographies et animations fluides
  */
 
-import React, { memo, useRef, useEffect, useState } from 'react';
+import React, { memo, useRef, useEffect, useState, useCallback } from 'react';
 import { motion, useInView } from 'framer-motion';
 
 interface StatItem {
@@ -14,22 +14,22 @@ interface StatItem {
 }
 
 const stats: StatItem[] = [
-  { value: 6, suffix: '', label: 'Protocoles validés', description: 'Approche scientifique' },
+  { value: 37, suffix: '', label: 'Modules intégrés', description: 'Plateforme complète' },
   { value: 3, suffix: ' min', label: 'Par session', description: 'Micro-interventions efficaces' },
-  { value: 100, suffix: '%', label: 'Données protégées', description: 'Chiffrement & RGPD' },
+  { value: 100, suffix: '%', label: 'Données protégées', description: 'Chiffrement RGPD & HDS' },
   { value: 7, suffix: '/7', label: 'Disponibilité', description: 'Accès permanent, jour et nuit' },
 ];
 
-const AnimatedCounter: React.FC<{ value: number; suffix: string; isInView: boolean }> = ({
+const AnimatedCounter: React.FC<{ value: number; suffix: string; shouldAnimate: boolean }> = ({
   value,
   suffix,
-  isInView
+  shouldAnimate
 }) => {
   const [displayValue, setDisplayValue] = useState(0);
   const hasAnimated = useRef(false);
 
   useEffect(() => {
-    if (!isInView || hasAnimated.current) return;
+    if (!shouldAnimate || hasAnimated.current) return;
     hasAnimated.current = true;
 
     const duration = 2000;
@@ -57,7 +57,7 @@ const AnimatedCounter: React.FC<{ value: number; suffix: string; isInView: boole
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, [value, isInView]);
+  }, [value, shouldAnimate]);
 
   return (
     <span className="tabular-nums">
@@ -68,8 +68,32 @@ const AnimatedCounter: React.FC<{ value: number; suffix: string; isInView: boole
 
 const AppleStatsSection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  // Use lower threshold (0.1) for more reliable detection with lazy-loaded components
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
+  const [shouldAnimate, setShouldAnimate] = useState(false);
+
+  // Trigger animation when framer-motion detects visibility
+  useEffect(() => {
+    if (isInView) setShouldAnimate(true);
+  }, [isInView]);
+
+  // Fallback: manually check visibility after mount for lazy-loaded components
+  // where IntersectionObserver may miss the initial intersection
+  const checkVisibility = useCallback(() => {
+    if (shouldAnimate || !sectionRef.current) return;
+    const rect = sectionRef.current.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      setShouldAnimate(true);
+    }
+  }, [shouldAnimate]);
+
+  useEffect(() => {
+    // Check immediately after mount
+    checkVisibility();
+    // And again after a short delay to handle lazy load timing
+    const t1 = setTimeout(checkVisibility, 300);
+    const t2 = setTimeout(checkVisibility, 1000);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [checkVisibility]);
 
   return (
     <section 
@@ -83,7 +107,7 @@ const AppleStatsSection: React.FC = () => {
         {/* Title */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          animate={shouldAnimate ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
           className="text-center mb-20 md:mb-32"
         >
@@ -101,15 +125,15 @@ const AppleStatsSection: React.FC = () => {
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 50 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              animate={shouldAnimate ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: index * 0.1 }}
               className="text-center px-1 sm:px-2"
             >
               <div className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2 sm:mb-4 leading-tight whitespace-nowrap">
-                <AnimatedCounter 
-                  value={stat.value} 
-                  suffix={stat.suffix} 
-                  isInView={isInView} 
+                <AnimatedCounter
+                  value={stat.value}
+                  suffix={stat.suffix}
+                  shouldAnimate={shouldAnimate}
                 />
               </div>
               <div className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-foreground mb-1">

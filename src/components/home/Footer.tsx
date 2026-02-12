@@ -16,14 +16,22 @@ const Footer: React.FC = () => {
       { label: 'Accueil', href: '/', protected: false },
       { label: 'Mon espace', href: '/app/home', protected: true },
       { label: 'Scanner émotionnel', href: '/app/scan', protected: true },
+      { label: 'Coach IA Nyvée', href: '/app/coach', protected: true },
       { label: 'Musique thérapeutique', href: '/app/music', protected: true },
       { label: 'Parc émotionnel', href: '/app/emotional-park', protected: true },
+      { label: 'Journal émotionnel', href: '/app/journal', protected: true },
+      { label: 'Respiration guidée', href: '/app/breath', protected: false },
+      { label: 'Réalité virtuelle', href: '/app/vr', protected: true },
+      { label: 'Gamification', href: '/gamification', protected: true },
     ],
     resources: [
+      { label: 'Fonctionnalités (37 modules)', href: '/features' },
       { label: 'FAQ', href: '/faq' },
       { label: 'À propos', href: '/about' },
       { label: 'Aide & Support', href: '/help' },
       { label: 'Contact', href: '/contact' },
+      { label: 'Tarifs', href: '/pricing' },
+      { label: 'Entreprise B2B', href: '/b2b' },
     ],
     legal: [
       { label: 'Mentions légales', href: '/legal/mentions' },
@@ -61,6 +69,10 @@ const Footer: React.FC = () => {
               <Badge variant="secondary" className="text-xs">
                 <Shield className="h-3 w-3 mr-1" aria-hidden="true" />
                 RGPD
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                <LockKeyhole className="h-3 w-3 mr-1" aria-hidden="true" />
+                HDS
               </Badge>
               <Badge variant="secondary" className="text-xs">
                 <Accessibility className="h-3 w-3 mr-1" aria-hidden="true" />
