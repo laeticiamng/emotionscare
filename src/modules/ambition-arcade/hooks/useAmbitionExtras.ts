@@ -113,8 +113,14 @@ export function useAmbitionExport() {
         supabase.from('ambition_artifacts').select('*').in('run_id', runIds.length > 0 ? runIds : ['none']),
       ]);
 
-      const favorites = JSON.parse(localStorage.getItem(STORAGE_KEYS.favorites) || '[]');
-      const ratings = JSON.parse(localStorage.getItem(STORAGE_KEYS.ratings) || '{}');
+      let favorites: string[] = [];
+      let ratings: Record<string, number> = {};
+      try {
+        favorites = JSON.parse(localStorage.getItem(STORAGE_KEYS.favorites) || '[]');
+        ratings = JSON.parse(localStorage.getItem(STORAGE_KEYS.ratings) || '{}');
+      } catch {
+        // Corrupted localStorage data — reset
+      }
 
       const exportPayload = {
         exportDate: new Date().toISOString(),

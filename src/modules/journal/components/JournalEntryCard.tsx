@@ -34,8 +34,12 @@ export const JournalEntryCard = memo<JournalEntryCardProps>(({
 }) => {
   const { toast } = useToast();
   const [isFavorite, setIsFavorite] = useState(() => {
-    const favorites = JSON.parse(localStorage.getItem('journal_favorites') || '[]');
-    return favorites.includes(entry.id);
+    try {
+      const favorites = JSON.parse(localStorage.getItem('journal_favorites') || '[]');
+      return favorites.includes(entry.id);
+    } catch {
+      return false;
+    }
   });
   const [isSharing, setIsSharing] = useState(false);
 
@@ -57,7 +61,12 @@ export const JournalEntryCard = memo<JournalEntryCardProps>(({
     const newState = !isFavorite;
     setIsFavorite(newState);
     
-    const favorites = JSON.parse(localStorage.getItem('journal_favorites') || '[]');
+    let favorites: string[] = [];
+    try {
+      favorites = JSON.parse(localStorage.getItem('journal_favorites') || '[]');
+    } catch {
+      // Corrupted localStorage data
+    }
     if (newState) {
       favorites.push(entry.id);
     } else {

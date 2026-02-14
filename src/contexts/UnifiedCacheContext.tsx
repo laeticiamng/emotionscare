@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * CACHE CONTEXT UNIFIÉ - EmotionsCare
  * Fusion optimisée des trois versions de cache existantes
@@ -9,9 +8,9 @@ import { logger } from '@/lib/logger';
 
 // Types unifiés
 export type CacheKey = string;
-export type CacheValue = any;
+export type CacheValue = unknown;
 
-export interface CacheEntry<T = any> {
+export interface CacheEntry<T = unknown> {
   value: T;
   timestamp: number;
   ttl: number;
@@ -145,7 +144,7 @@ class UnifiedCacheManager {
     this.updateStats();
   }
 
-  private estimateSize(value: any): number {
+  private estimateSize(value: unknown): number {
     try {
       return JSON.stringify(value).length;
     } catch {

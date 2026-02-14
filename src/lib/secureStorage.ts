@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Secure Storage - Wrapper pour localStorage avec chiffrement
  * Conforme Art. 32 RGPD (sécurité des traitements)
@@ -87,7 +86,7 @@ const decryptValue = async (encrypted: string): Promise<string> => {
  * @param key - Clé de stockage
  * @param value - Valeur à stocker (sera stringifiée si objet)
  */
-export const setSecureItem = async (key: string, value: any): Promise<void> => {
+export const setSecureItem = async (key: string, value: unknown): Promise<void> => {
   if (typeof window === 'undefined') {
     return;
   }
@@ -107,7 +106,7 @@ export const setSecureItem = async (key: string, value: any): Promise<void> => {
  * @param key - Clé de stockage
  * @returns Valeur déchiffrée ou null si non trouvée
  */
-export const getSecureItem = async <T = any>(key: string): Promise<T | null> => {
+export const getSecureItem = async <T = unknown>(key: string): Promise<T | null> => {
   if (typeof window === 'undefined') {
     return null;
   }
@@ -185,7 +184,7 @@ export const clearSecureStorage = (): void => {
  */
 import { useState, useEffect } from 'react';
 
-export const useSecureStorage = <T = any>(
+export const useSecureStorage = <T = unknown>(
   key: string,
   defaultValue: T
 ): [T, (value: T) => Promise<void>, boolean] => {

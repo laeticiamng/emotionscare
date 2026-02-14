@@ -1,14 +1,19 @@
 # Headers pour sécurité et performances - Production Ready
 # Compatible Netlify
+# Dernière mise à jour: 2026-02-12 (Audit sécurité)
 
 /*
-  # Security Headers (CSP strict sans unsafe-eval en production)
+  # Security Headers — OWASP Recommended
   X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff
-  X-XSS-Protection: 1; mode=block
+  X-XSS-Protection: 0
   Referrer-Policy: strict-origin-when-cross-origin
-  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-  Permissions-Policy: geolocation=(), microphone=(self), camera=(self)
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  Permissions-Policy: geolocation=(), microphone=(self), camera=(self), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=(self)
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: credentialless
+  Cross-Origin-Resource-Policy: same-origin
+  X-Permitted-Cross-Domain-Policies: none
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.gpteng.co https://cdn.jsdelivr.net https://*.supabase.co https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://rsms.me; font-src 'self' https://fonts.gstatic.com https://rsms.me data:; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://*.hume.ai wss://*.hume.ai https://*.sentry.io https://*.ingest.sentry.io; media-src 'self' https: blob:; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests
 
   # Performance - Resource Hints
@@ -32,3 +37,8 @@
 
 /
   Cache-Control: public, max-age=0, must-revalidate
+
+# API responses should never be cached
+/api/*
+  Cache-Control: no-store, no-cache, must-revalidate
+  Pragma: no-cache

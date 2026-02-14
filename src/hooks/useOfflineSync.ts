@@ -102,7 +102,12 @@ export const useOfflineSync = (): UseOfflineSyncReturn => {
       return true;
     } catch {
       // Fallback localStorage
-      const drafts = JSON.parse(localStorage.getItem('offline_journal_drafts') || '[]');
+      let drafts: Array<JournalDraft & { savedAt: number }> = [];
+      try {
+        drafts = JSON.parse(localStorage.getItem('offline_journal_drafts') || '[]');
+      } catch {
+        // Corrupted data — reset
+      }
       drafts.push({ ...draft, savedAt: Date.now() });
       localStorage.setItem('offline_journal_drafts', JSON.stringify(drafts));
       return true;
@@ -120,7 +125,12 @@ export const useOfflineSync = (): UseOfflineSyncReturn => {
       return true;
     } catch {
       // Fallback localStorage
-      const sessions = JSON.parse(localStorage.getItem('offline_breath_sessions') || '[]');
+      let sessions: Array<BreathSession & { savedAt: number }> = [];
+      try {
+        sessions = JSON.parse(localStorage.getItem('offline_breath_sessions') || '[]');
+      } catch {
+        // Corrupted data — reset
+      }
       sessions.push({ ...session, savedAt: Date.now() });
       localStorage.setItem('offline_breath_sessions', JSON.stringify(sessions));
       return true;

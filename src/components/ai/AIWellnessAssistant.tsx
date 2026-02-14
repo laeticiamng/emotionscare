@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useCallback, memo } from 'react';
+import DOMPurify from 'dompurify';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -246,15 +247,15 @@ const AIWellnessAssistant: React.FC<AIWellnessAssistantProps> = memo(({
                 <ScrollArea className="h-[300px] rounded-lg border p-4 bg-muted/30">
                   <div 
                     className="prose prose-sm dark:prose-invert max-w-none"
-                    dangerouslySetInnerHTML={{ 
-                      __html: searchResult.answer
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize((searchResult.answer || '')
                         .replace(/\n\n/g, '</p><p>')
                         .replace(/\n/g, '<br/>')
                         .replace(/^/, '<p>')
                         .replace(/$/, '</p>')
                         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                         .replace(/### (.*?)(<br\/>|<\/p>)/g, '<h3 class="text-base font-semibold mt-4 mb-2">$1</h3>')
-                        .replace(/## (.*?)(<br\/>|<\/p>)/g, '<h2 class="text-lg font-semibold mt-4 mb-2">$1</h2>')
+                        .replace(/## (.*?)(<br\/>|<\/p>)/g, '<h2 class="text-lg font-semibold mt-4 mb-2">$1</h2>'))
                     }}
                   />
                 </ScrollArea>
@@ -329,13 +330,13 @@ const AIWellnessAssistant: React.FC<AIWellnessAssistantProps> = memo(({
                 <ScrollArea className="h-[250px] rounded-lg border p-4 bg-muted/30">
                   <div 
                     className="prose prose-sm dark:prose-invert max-w-none"
-                    dangerouslySetInnerHTML={{ 
-                      __html: emotionData.answer
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize((emotionData.answer || '')
                         .replace(/\n\n/g, '</p><p>')
                         .replace(/\n/g, '<br/>')
                         .replace(/^/, '<p>')
                         .replace(/$/, '</p>')
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'))
                     }}
                   />
                 </ScrollArea>
