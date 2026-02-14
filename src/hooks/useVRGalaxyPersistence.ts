@@ -143,7 +143,12 @@ export function useVRGalaxyPersistence() {
 
       // Save to history
       const historyKey = `vr_galaxy_history_${user.id}`;
-      const history: VRGalaxySession[] = JSON.parse(localStorage.getItem(historyKey) || '[]');
+      let history: VRGalaxySession[] = [];
+      try {
+        history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+      } catch {
+        // Corrupted localStorage data — reset
+      }
       history.unshift(completedSession);
       
       // Keep last 100 sessions
@@ -172,7 +177,12 @@ export function useVRGalaxyPersistence() {
 
     try {
       const historyKey = `vr_galaxy_history_${user.id}`;
-      const history: VRGalaxySession[] = JSON.parse(localStorage.getItem(historyKey) || '[]');
+      let history: VRGalaxySession[] = [];
+      try {
+        history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+      } catch {
+        // Corrupted localStorage data — reset
+      }
 
       if (history.length === 0) {
         return getDefaultStats();

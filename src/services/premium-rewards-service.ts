@@ -372,8 +372,8 @@ class PremiumRewardsService {
         totalRewards: allRewards.length,
         unlockedCount: unlockedIds.size,
         percentage: allRewards.length > 0 ? Math.round((unlockedIds.size / allRewards.length) * 100) : 0,
-        byRarity: byRarity as any,
-        byType: byType as any
+        byRarity: byRarity as Record<PremiumReward['rarity'], { total: number; unlocked: number }>,
+        byType: byType as Record<PremiumReward['reward_type'], { total: number; unlocked: number }>
       };
     } catch (error) {
       logger.error('Error fetching unlock progress', error as Error, 'PremiumRewardsService');
@@ -512,8 +512,8 @@ class PremiumRewardsService {
 
       return {
         totalRewards: rewards.length,
-        byRarity: byRarity as any,
-        byType: byType as any,
+        byRarity: byRarity as Record<PremiumReward['rarity'], number>,
+        byType: byType as Record<PremiumReward['reward_type'], number>,
         totalUnlockedGlobally: unlocksRes.count || 0
       };
     } catch (error) {

@@ -449,7 +449,12 @@ const RecordingStudio: React.FC = () => {
       };
 
       // Save to local storage for now (could be extended to Supabase)
-      const savedSessions = JSON.parse(localStorage.getItem('recording-sessions') || '[]');
+      let savedSessions: unknown[] = [];
+      try {
+        savedSessions = JSON.parse(localStorage.getItem('recording-sessions') || '[]');
+      } catch {
+        // Corrupted localStorage data — reset
+      }
       savedSessions.push(session);
       localStorage.setItem('recording-sessions', JSON.stringify(savedSessions));
 

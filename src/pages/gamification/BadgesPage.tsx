@@ -17,7 +17,12 @@ export default function BadgesPage() {
   
   useEffect(() => {
     // Charger les stats depuis différentes sources localStorage
-    const meditationStats = JSON.parse(localStorage.getItem('meditation_stats') || '{}');
+    let meditationStats: Record<string, unknown> = {};
+    try {
+      meditationStats = JSON.parse(localStorage.getItem('meditation_stats') || '{}');
+    } catch {
+      // Corrupted localStorage data
+    }
     const claimedMilestones = ['3', '7', '14', '30', '60', '100'].filter(
       d => localStorage.getItem(`milestone_claimed_${d}`) === 'true'
     ).length;

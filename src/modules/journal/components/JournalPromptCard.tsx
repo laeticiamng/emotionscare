@@ -58,10 +58,20 @@ export const JournalPromptCard = memo<JournalPromptCardProps>(({
 
   // Charger l'état depuis localStorage
   useEffect(() => {
-    const favorites = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
+    let favorites: string[] = [];
+    try {
+      favorites = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
+    } catch {
+      // Corrupted localStorage data
+    }
     setIsFavorite(favorites.includes(prompt.id));
 
-    const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '{}');
+    let history: Record<string, { count?: number; lastUsed?: string }> = {};
+    try {
+      history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '{}');
+    } catch {
+      // Corrupted localStorage data
+    }
     const promptHistory = history[prompt.id];
     if (promptHistory) {
       setUsedCount(promptHistory.count || 0);
@@ -73,7 +83,12 @@ export const JournalPromptCard = memo<JournalPromptCardProps>(({
     const newState = !isFavorite;
     setIsFavorite(newState);
 
-    const favorites = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
+    let favorites: string[] = [];
+    try {
+      favorites = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
+    } catch {
+      // Corrupted localStorage data
+    }
     if (newState) {
       favorites.push(prompt.id);
     } else {
@@ -90,7 +105,12 @@ export const JournalPromptCard = memo<JournalPromptCardProps>(({
 
   const handleUsePrompt = useCallback(() => {
     // Mettre à jour l'historique
-    const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '{}');
+    let history: Record<string, { count?: number; lastUsed?: string }> = {};
+    try {
+      history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '{}');
+    } catch {
+      // Corrupted localStorage data
+    }
     const now = new Date().toISOString();
     history[prompt.id] = {
       count: (history[prompt.id]?.count || 0) + 1,

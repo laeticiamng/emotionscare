@@ -258,8 +258,13 @@ export const innovationServiceEnriched = {
    */
   addComment(experimentId: string, content: string): ExperimentComment {
     const commentsKey = `innovation_comments_${experimentId}`;
-    const comments = JSON.parse(localStorage.getItem(commentsKey) || '[]');
-    
+    let comments: ExperimentComment[] = [];
+    try {
+      comments = JSON.parse(localStorage.getItem(commentsKey) || '[]');
+    } catch {
+      // Corrupted localStorage data
+    }
+
     const newComment: ExperimentComment = {
       id: Date.now().toString(),
       experimentId,

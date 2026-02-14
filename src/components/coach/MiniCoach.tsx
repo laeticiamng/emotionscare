@@ -69,9 +69,19 @@ const MiniCoach: React.FC<MiniCoachProps> = memo(({
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
-      const parsed: CoachStats = JSON.parse(saved);
+      let parsed: CoachStats;
+      try {
+        parsed = JSON.parse(saved);
+      } catch {
+        // Corrupted localStorage data
+        return;
+      }
       setStats(parsed);
-      setFeedbackGiven(JSON.parse(localStorage.getItem(`${STORAGE_KEY}-feedback`) || '{}'));
+      try {
+        setFeedbackGiven(JSON.parse(localStorage.getItem(`${STORAGE_KEY}-feedback`) || '{}'));
+      } catch {
+        // Corrupted localStorage data
+      }
       
       // Check streak
       const today = new Date().toDateString();
