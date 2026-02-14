@@ -241,7 +241,7 @@ const ADDITIONAL_MODULES: { category: string; modules: CompactModule[] }[] = [
     category: 'Accessibilité & Personnalisation',
     modules: [
       { title: 'Accessibilité WCAG 2.1 AA', description: 'Contraste élevé, mode daltonien, taille du texte, navigation clavier et lecteur d\'écran.', icon: Eye },
-      { title: 'Support multilingue', description: 'Interface disponible en Français, English, Español et Deutsch.', icon: Globe },
+      { title: 'Support multilingue', description: 'Interface disponible en Français et English.', icon: Globe },
       { title: 'Mode hors ligne (PWA)', description: 'Installez EmotionsCare sur votre appareil et accédez aux protocoles essentiels sans connexion.', icon: Smartphone },
     ],
   },

@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -102,18 +103,14 @@ export default function AIInsightsEnhanced() {
         return <p key={idx} className="mb-3 pl-4">{section}</p>;
       }
       if (section.includes('**')) {
-        // ✅ SÉCURITÉ: Sanitizer avant dangerouslySetInnerHTML (prévention XSS)
         const formatted = section.replace(/\*\*(.*?)\*\*/g, (_, text) => {
-          // Échapper les caractères HTML dangereux
-          const escaped = text
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-          return `<strong>${escaped}</strong>`;
+          return `<strong>${text}</strong>`;
         });
-        return <p key={idx} className="mb-3" dangerouslySetInnerHTML={{ __html: formatted }} />;
+        const sanitized = DOMPurify.sanitize(formatted, {
+          ALLOWED_TAGS: ['strong'],
+          ALLOWED_ATTR: [],
+        });
+        return <p key={idx} className="mb-3" dangerouslySetInnerHTML={{ __html: sanitized }} />;
       }
       return <p key={idx} className="mb-3">{section}</p>;
     });

@@ -100,6 +100,7 @@ export default [
       "ec/no-node-builtins-client": "error",
       "ec/no-hardcoded-paths": "error",
       "ec/no-hooks-in-blocks": "error",
+      "no-console": ["warn", { allow: ["warn", "error"] }],
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
       // Accessibility rules

@@ -49,8 +49,6 @@ const TIMEZONES = [
 const LANGUAGES = [
   { value: 'fr', label: 'Français', flag: '🇫🇷' },
   { value: 'en', label: 'English', flag: '🇬🇧' },
-  { value: 'es', label: 'Español', flag: '🇪🇸' },
-  { value: 'de', label: 'Deutsch', flag: '🇩🇪' },
 ];
 
 const FONT_SIZES = [

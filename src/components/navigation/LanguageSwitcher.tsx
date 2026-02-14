@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Globe } from 'lucide-react';
@@ -18,7 +19,6 @@ interface LanguageOption {
 const languages: LanguageOption[] = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
   { code: 'en', label: 'English', flag: '🇬🇧' },
-  { code: 'es', label: 'Español', flag: '🇪🇸' },
 ];
 
 const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ 
@@ -26,28 +26,24 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   size = "icon",
   className = "",
 }) => {
-  const [currentLanguage, setCurrentLanguage] = useState<LanguageOption>(languages[0]);
-  
-  // Detect browser language on mount
+  const { i18n } = useTranslation();
+  const [currentLanguage, setCurrentLanguage] = useState<LanguageOption>(
+    languages.find(l => l.code === i18n.language) || languages[0]
+  );
+
+  // Sync with i18n language on mount
   useEffect(() => {
-    const browserLang = navigator.language.substring(0, 2).toLowerCase();
-    const matchedLanguage = languages.find(lang => lang.code === browserLang);
-    
+    const matchedLanguage = languages.find(lang => lang.code === i18n.language);
     if (matchedLanguage) {
       setCurrentLanguage(matchedLanguage);
-      localStorage.setItem('preferredLanguage', matchedLanguage.code);
     }
-  }, []);
-  
+  }, [i18n.language]);
+
   const handleLanguageChange = (language: LanguageOption) => {
     setCurrentLanguage(language);
     localStorage.setItem('preferredLanguage', language.code);
-    
-    // Here you would trigger your app's internationalization system
-    // This is just a UI component example
-    
-    // Force page refresh to apply language change
-    // window.location.reload();
+    i18n.changeLanguage(language.code);
+    document.documentElement.lang = language.code;
   };
 
   return (

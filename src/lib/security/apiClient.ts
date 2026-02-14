@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { rateLimiter } from './rateLimiter';
 import { toast } from '@/hooks/use-toast';
 
@@ -43,8 +41,9 @@ class SecureApiClient {
       throw new Error(message);
     }
 
-    // Ajouter le token d'authentification
-    const token = localStorage.getItem('supabase.auth.token');
+    // Ajouter le token d'authentification (sessionStorage pour limiter l'exposition XSS)
+    const token = sessionStorage.getItem('supabase.auth.token')
+      || localStorage.getItem('supabase.auth.token');
     const headers = {
       ...this.defaultHeaders,
       ...(token && { Authorization: `Bearer ${token}` }),
