@@ -1,16 +1,10 @@
-// @ts-nocheck
+import { APP_BASE_CSP } from './headers';
 
 // Security configuration and utilities
+// NOTE: CSP is centralized in headers.ts (APP_BASE_CSP). Do NOT duplicate CSP directives here.
 export const SECURITY_CONFIG = {
-  // Content Security Policy
-  CSP_DIRECTIVES: {
-    defaultSrc: ["'self'"],
-    scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.gpteng.co"],
-    styleSrc: ["'self'", "'unsafe-inline'"],
-    imgSrc: ["'self'", "data:", "https:"],
-    connectSrc: ["'self'", "https://api.openai.com", "wss:"],
-    fontSrc: ["'self'", "https://fonts.googleapis.com"],
-  },
+  // Content Security Policy — single source of truth in headers.ts
+  CSP: APP_BASE_CSP,
 
   // Rate limiting
   RATE_LIMITS: {

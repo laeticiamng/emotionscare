@@ -11,8 +11,6 @@ import { usePageSEO } from '@/hooks/usePageSEO';
 const LANGUAGES = [
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
   { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
 ];
 
 const LanguageSettingsPage: React.FC = () => {
