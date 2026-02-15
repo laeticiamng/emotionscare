@@ -31,6 +31,7 @@ import {
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import ForgotPasswordDialog from '@/pages/b2c/login/ForgotPasswordDialog';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 interface LoginFormData {
   email: string;
@@ -42,6 +43,13 @@ const LoginPage: React.FC = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const segment = searchParams.get('segment') as 'b2c' | 'b2b' | null;
+
+  usePageSEO({
+    title: 'Connexion | EmotionsCare',
+    description: 'Connectez-vous a EmotionsCare, la plateforme de regulation emotionnelle pour soignants et etudiants en sante.',
+    keywords: 'connexion, login, emotionscare, soignants, bien-etre',
+    canonical: 'https://emotionscare.com/login',
+  });
   
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
