@@ -3,7 +3,7 @@
  * Page de contact accessible WCAG 2.1 AA
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
@@ -19,6 +19,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 import { contactFormSchema, type ContactFormInput } from '@/lib/validation/schemas';
 import { sanitizeInput } from '@/lib/validation/validator';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 interface SubmissionResult {
   success: boolean;
@@ -44,10 +45,12 @@ const ContactPage: React.FC = () => {
     }
   });
 
-  // Focus management pour l'accessibilité
-  useEffect(() => {
-    document.title = "Contact | EmotionsCare - Nous contacter";
-  }, []);
+  usePageSEO({
+    title: 'Contact | EmotionsCare - Nous contacter',
+    description: 'Contactez l\'equipe EmotionsCare pour toute question sur la plateforme de bien-etre emotionnel pour soignants et etudiants en sante.',
+    keywords: 'contact, emotionscare, support, aide, soignants, bien-etre emotionnel',
+    canonical: 'https://emotionscare.com/contact',
+  });
 
   const handleSubmit = async (values: ContactFormInput) => {
     try {

@@ -23,8 +23,16 @@ import {
   Github
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 const SignupPage: React.FC = () => {
+  usePageSEO({
+    title: 'Inscription | EmotionsCare',
+    description: 'Creez votre compte EmotionsCare et accedez a la plateforme de regulation emotionnelle pour soignants et etudiants en sante.',
+    keywords: 'inscription, signup, emotionscare, compte, soignants, bien-etre emotionnel',
+    canonical: 'https://emotionscare.com/signup',
+  });
+
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

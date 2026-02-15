@@ -22,6 +22,58 @@
     <meta name="twitter:title" content="EmotionsCare | Bien-être émotionnel par l'IA" />
     <meta name="twitter:description" content="Plateforme SaaS de bien-être émotionnel : scan IA, coaching Nyvée, musicothérapie et journal émotionnel." />
     <meta name="twitter:image" content="https://emotionscare.com/og-image.png" />
+    <!-- Structured Data - JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://emotionscare.com/#organization",
+          "name": "EMOTIONSCARE SASU",
+          "url": "https://emotionscare.com",
+          "logo": "https://emotionscare.com/og-image.png",
+          "description": "Premiere plateforme francaise de regulation emotionnelle pour soignants et etudiants en sante.",
+          "foundingDate": "2024",
+          "slogan": "Le bien-etre emotionnel par l'IA",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "url": "https://emotionscare.com/contact",
+            "availableLanguage": ["French", "English"]
+          },
+          "sameAs": []
+        },
+        {
+          "@type": "WebApplication",
+          "@id": "https://emotionscare.com/#app",
+          "name": "EmotionsCare",
+          "url": "https://emotionscare.com",
+          "description": "Plateforme SaaS de bien-etre emotionnel : scan IA, coaching Nyvee, musicotherapie et journal emotionnel pour soignants.",
+          "applicationCategory": "HealthApplication",
+          "operatingSystem": "Web",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "EUR",
+            "description": "Version gratuite disponible"
+          },
+          "provider": { "@id": "https://emotionscare.com/#organization" },
+          "featureList": "Scan emotionnel IA, Coaching Nyvee, Musicotherapie, Journal emotionnel, Exercices de respiration, Realite virtuelle, Gamification",
+          "inLanguage": "fr"
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://emotionscare.com/#website",
+          "name": "EmotionsCare",
+          "url": "https://emotionscare.com",
+          "publisher": { "@id": "https://emotionscare.com/#organization" },
+          "inLanguage": "fr"
+        }
+      ]
+    }
+    </script>
+
     <!-- Security headers configured server-side (Vercel/Netlify/Cloudflare) -->
 
     <!-- PWA Manifest -->

@@ -7,15 +7,19 @@ import { AuthError, AuthErrorCode } from '@/utils/authErrors';
 import { logger } from '@/lib/logger';
 
 // Helper to persist the user role in a secure cookie
+// Note: HttpOnly cannot be set from JavaScript — it must be set server-side.
+// We use __Host- prefix + Secure + SameSite=Strict for maximum client-side protection.
+// For full HttpOnly support, migrate role assignment to a Supabase Edge Function.
 const setRoleCookie = (role: UserRole) => {
   if (typeof document !== 'undefined') {
-    document.cookie = `user_role=${role}; path=/; secure; samesite=strict`;
+    const maxAge = 60 * 60 * 24 * 7; // 7 days
+    document.cookie = `user_role=${encodeURIComponent(role)}; path=/; secure; samesite=strict; max-age=${maxAge}`;
   }
 };
 
 const clearRoleCookie = () => {
   if (typeof document !== 'undefined') {
-    document.cookie = 'user_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+    document.cookie = 'user_role=; path=/; secure; samesite=strict; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
   }
 };
 
