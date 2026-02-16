@@ -154,7 +154,7 @@ const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onEmotionDete
   }, [processAudio, stopRecording]);
 
   return (
-    <Card>
+    <Card role="region" aria-label="Scanner d'émotions vocal">
       <CardHeader>
         <CardTitle className="text-center">Scan Vocal</CardTitle>
         <CardDescription className="text-center">
@@ -162,7 +162,13 @@ const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onEmotionDete
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center space-y-4">
-        {isRecording && <Progress value={progress} className="w-full h-2" />}
+        {isRecording && (
+          <Progress
+            value={progress}
+            className="w-full h-2"
+            aria-label={`Progression de l'enregistrement : ${Math.round(progress)}%`}
+          />
+        )}
         
         <div className="mb-4 text-center">
           <p className="text-muted-foreground">
@@ -188,20 +194,38 @@ const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onEmotionDete
           </div>
         )}
         
-        <Button 
-          onClick={isRecording ? stopRecording : startRecording} 
+        <Button
+          onClick={isRecording ? stopRecording : startRecording}
           className={`rounded-full w-16 h-16 ${isRecording ? 'bg-red-500 hover:bg-red-600' : ''}`}
           disabled={isProcessing}
+          aria-label={
+            isProcessing
+              ? 'Analyse vocale en cours'
+              : isRecording
+                ? 'Arrêter l\'enregistrement vocal'
+                : 'Commencer l\'enregistrement vocal'
+          }
+          aria-pressed={isRecording}
+          role="switch"
+          aria-checked={isRecording}
         >
           {isRecording ? (
-            <StopCircle className="h-8 w-8" />
+            <StopCircle className="h-8 w-8" aria-hidden="true" />
           ) : isProcessing ? (
-            <Loader2 className="h-8 w-8 animate-spin" />
+            <Loader2 className="h-8 w-8 animate-spin" aria-hidden="true" />
           ) : (
-            <Mic className="h-8 w-8" />
+            <Mic className="h-8 w-8" aria-hidden="true" />
           )}
         </Button>
-        
+
+        {/* Statut en temps réel pour les lecteurs d'écran */}
+        <div aria-live="polite" className="sr-only">
+          {isRecording && 'Enregistrement en cours. Parlez naturellement.'}
+          {isProcessing && 'Analyse de votre voix en cours. Veuillez patienter.'}
+          {error && `Erreur : ${error}`}
+          {transcript && `Transcription : ${transcript}`}
+        </div>
+
         <p className="text-xs text-muted-foreground mt-4">
           L'analyse vocale détecte les émotions dans les intonations
         </p>

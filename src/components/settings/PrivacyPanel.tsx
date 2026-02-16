@@ -1,5 +1,5 @@
-// @ts-nocheck
 import React from 'react';
+import { type LucideIcon } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,15 @@ import {
 } from 'lucide-react';
 import { useRouter } from '@/hooks/router';
 
-const PRIVACY_TOGGLES = [
+interface PrivacyToggle {
+  key: string;
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  sensitive: boolean;
+}
+
+const PRIVACY_TOGGLES: PrivacyToggle[] = [
   {
     key: 'cam',
     icon: Camera,
@@ -26,7 +34,7 @@ const PRIVACY_TOGGLES = [
   },
   {
     key: 'mic',
-    icon: Mic, 
+    icon: Mic,
     title: 'Microphone',
     description: 'Pour les sessions vocales et coaching',
     sensitive: true
@@ -185,11 +193,11 @@ export const PrivacyPanel: React.FC = () => {
           variant="outline"
           onClick={() => {
             // Reset all toggles to false (most private setting)
-            const resetPrefs = Object.keys(preferences).reduce((acc, key) => {
+            const resetPrefs = Object.keys(preferences).reduce<Record<string, boolean>>((acc, key) => {
               acc[key] = false;
               return acc;
-            }, {} as any);
-            setPreferences(resetPrefs);
+            }, {});
+            setPreferences(resetPrefs as typeof preferences);
           }}
           className="flex-1"
         >

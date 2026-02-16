@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { ArrowLeft, Save, Mic, MicOff, Camera, Image, Calendar, Loader2, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -26,6 +26,7 @@ const JournalNewPage: React.FC = () => {
   const [mood, setMood] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [isPrivate, setIsPrivate] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [showTemplates, setShowTemplates] = useState(true);
@@ -97,10 +98,75 @@ const JournalNewPage: React.FC = () => {
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
-  const toggleRecording = () => {
-    setIsRecording(!isRecording);
-    // Ici, implémenter la reconnaissance vocale
-  };
+  const toggleRecording = useCallback(() => {
+    // Arrêter l'enregistrement
+    if (isRecording && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+      return;
+    }
+
+    // Vérifier la disponibilité de l'API Web Speech
+    const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognitionAPI) {
+      toast({
+        title: "Dictée vocale indisponible",
+        description: "Votre navigateur ne supporte pas la reconnaissance vocale. Essayez Chrome ou Edge.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Démarrer la reconnaissance vocale
+    const recognition = new SpeechRecognitionAPI();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'fr-FR';
+
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      let finalTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        }
+      }
+      if (finalTranscript) {
+        setContent(prev => prev + (prev.length > 0 && !prev.endsWith(' ') ? ' ' : '') + finalTranscript);
+      }
+    };
+
+    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      logger.error('Speech recognition error', { error: event.error }, 'UI');
+      if (event.error === 'not-allowed') {
+        toast({
+          title: "Microphone refusé",
+          description: "Veuillez autoriser l'accès au microphone dans les paramètres de votre navigateur.",
+          variant: "destructive",
+        });
+      } else if (event.error !== 'aborted') {
+        toast({
+          title: "Erreur de dictée vocale",
+          description: "La reconnaissance vocale a rencontré un problème. Veuillez réessayer.",
+          variant: "destructive",
+        });
+      }
+      setIsRecording(false);
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+      recognitionRef.current = null;
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsRecording(true);
+
+    toast({
+      title: "Dictée vocale activée",
+      description: "Parlez, votre texte s'ajoutera automatiquement au contenu.",
+    });
+  }, [isRecording, toast]);
 
   const handleSelectTemplate = (template: JournalTemplate) => {
     setSelectedTemplate(template);

@@ -1,5 +1,5 @@
-// @ts-nocheck
 import React from 'react';
+import { type LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -13,7 +13,16 @@ import {
 } from 'lucide-react';
 import { useRouter } from '@/hooks/router';
 
-const SETTING_LINKS = [
+interface SettingLink {
+  key: string;
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  path: string;
+  color: string;
+}
+
+const SETTING_LINKS: SettingLink[] = [
   {
     key: 'profile',
     icon: User,

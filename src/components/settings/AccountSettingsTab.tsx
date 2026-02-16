@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -115,7 +114,13 @@ const AccountSettingsTab: React.FC = () => {
   });
 
   // Activity history
-  const [activityHistory, setActivityHistory] = useState(() => {
+  interface ActivityEntry {
+    date: string;
+    action: string;
+    duration: number;
+  }
+
+  const [activityHistory, setActivityHistory] = useState<ActivityEntry[]>(() => {
     const saved = localStorage.getItem('user_activity_history');
     return saved ? JSON.parse(saved) : [
       { date: new Date().toISOString(), action: 'Session de méditation', duration: 15 },

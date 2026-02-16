@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -164,8 +162,8 @@ const NotificationsSettingsTab: React.FC = () => {
     localStorage.setItem('notification_stats', JSON.stringify(stats));
   }, [history, stats]);
 
-  const updateCategory = (id: string, field: keyof NotificationCategory, value: any) => {
-    setCategories(categories.map(cat => 
+  const updateCategory = (id: string, field: keyof NotificationCategory, value: string | boolean) => {
+    setCategories(categories.map(cat =>
       cat.id === id ? { ...cat, [field]: value } : cat
     ));
   };

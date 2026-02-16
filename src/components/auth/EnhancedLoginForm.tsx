@@ -7,11 +7,12 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { EyeIcon, EyeOffIcon, Mail, Lock, ArrowRight } from 'lucide-react';
+import { EyeIcon, EyeOffIcon, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 import { usePreferredAccess } from '@/hooks/use-preferred-access';
 import LoadingAnimation from '@/components/ui/LoadingAnimation';
 import { logger } from '@/lib/logger';
+import { requestPasswordReset } from '@/lib/passwordResetService';
 
 const EnhancedLoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -21,6 +22,7 @@ const EnhancedLoginForm: React.FC = () => {
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [emailValid, setEmailValid] = useState<boolean | null>(null);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
   
   const navigate = useNavigate();
   const { signIn } = useAuth();
@@ -240,17 +242,45 @@ const EnhancedLoginForm: React.FC = () => {
                 </div>
                 
                 <div className="flex justify-end">
-                  <Button 
-                    variant="link" 
+                  <Button
+                    variant="link"
                     className="text-xs p-0 h-auto"
-                    onClick={() => {
-                      toast({
-                        title: "Réinitialisation du mot de passe",
-                        description: "Un email de réinitialisation vous sera envoyé."
-                      });
+                    disabled={isResettingPassword}
+                    onClick={async () => {
+                      if (!email || !emailValid) {
+                        toast({
+                          title: "Email requis",
+                          description: "Veuillez saisir votre adresse email avant de demander la réinitialisation.",
+                          variant: "destructive"
+                        });
+                        return;
+                      }
+                      setIsResettingPassword(true);
+                      try {
+                        await requestPasswordReset(email);
+                        toast({
+                          title: "Email envoyé",
+                          description: "Si un compte existe avec cette adresse, vous recevrez un lien de réinitialisation.",
+                        });
+                      } catch {
+                        toast({
+                          title: "Erreur",
+                          description: "Impossible d'envoyer l'email. Veuillez réessayer.",
+                          variant: "destructive"
+                        });
+                      } finally {
+                        setIsResettingPassword(false);
+                      }
                     }}
                   >
-                    Mot de passe oublié ?
+                    {isResettingPassword ? (
+                      <>
+                        <Loader2 className="h-3 w-3 mr-1 animate-spin inline" />
+                        Envoi en cours...
+                      </>
+                    ) : (
+                      'Mot de passe oublié ?'
+                    )}
                   </Button>
                 </div>
               </motion.div>

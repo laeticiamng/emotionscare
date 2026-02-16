@@ -81,13 +81,43 @@ export default function StreakTracker() {
     }
   }, [user]);
 
-  const loadFreezes = () => {
+  const loadFreezes = async () => {
+    if (!user) return;
+
+    try {
+      // Essayer de charger depuis Supabase d'abord
+      const { data, error } = await supabase
+        .from('user_streak_settings')
+        .select('freezes_available, weekly_goal')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (!error && data) {
+        setStreakData(prev => ({
+          ...prev,
+          freezesAvailable: data.freezes_available ?? 2,
+          weeklyGoal: data.weekly_goal ?? 5,
+        }));
+        // Sync localStorage avec les données serveur
+        localStorage.setItem(FREEZES_KEY, JSON.stringify({ count: data.freezes_available ?? 2 }));
+        localStorage.setItem(WEEKLY_GOAL_KEY, String(data.weekly_goal ?? 5));
+        return;
+      }
+    } catch {
+      // Fallback silencieux sur localStorage
+    }
+
+    // Fallback : localStorage si Supabase échoue ou table inexistante
     const stored = localStorage.getItem(FREEZES_KEY);
     if (stored) {
-      const data = JSON.parse(stored);
-      setStreakData(prev => ({ ...prev, freezesAvailable: data.count || 2 }));
+      try {
+        const data = JSON.parse(stored);
+        setStreakData(prev => ({ ...prev, freezesAvailable: data.count || 2 }));
+      } catch {
+        // JSON invalide, garder la valeur par défaut
+      }
     }
-    
+
     const goalStored = localStorage.getItem(WEEKLY_GOAL_KEY);
     if (goalStored) {
       setStreakData(prev => ({ ...prev, weeklyGoal: parseInt(goalStored) || 5 }));
@@ -260,7 +290,7 @@ export default function StreakTracker() {
     setTimeout(() => setShowCelebration(false), 3000);
   };
 
-  const useStreakFreeze = () => {
+  const useStreakFreeze = async () => {
     if (streakData.freezesAvailable <= 0) {
       toast({
         title: 'Pas de gel disponible',
@@ -269,11 +299,30 @@ export default function StreakTracker() {
       });
       return;
     }
-    
+
     const newCount = streakData.freezesAvailable - 1;
+
+    // Mettre à jour localStorage immédiatement (optimistic update)
     localStorage.setItem(FREEZES_KEY, JSON.stringify({ count: newCount }));
     setStreakData(prev => ({ ...prev, freezesAvailable: newCount }));
-    
+
+    // Synchroniser avec Supabase
+    if (user) {
+      try {
+        await supabase
+          .from('user_streak_settings')
+          .upsert({
+            user_id: user.id,
+            freezes_available: newCount,
+            weekly_goal: streakData.weeklyGoal,
+            last_freeze_used_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'user_id' });
+      } catch {
+        // Sync silencieuse - localStorage sert de fallback
+      }
+    }
+
     toast({
       title: '❄️ Série gelée!',
       description: 'Votre série est protégée pour aujourd\'hui.',
@@ -296,7 +345,7 @@ export default function StreakTracker() {
     }
   };
 
-  const claimMilestoneReward = (milestone: StreakMilestone) => {
+  const claimMilestoneReward = async (milestone: StreakMilestone) => {
     const claimed = localStorage.getItem(`milestone_claimed_${milestone.days}`);
     if (claimed) {
       toast({
@@ -305,15 +354,29 @@ export default function StreakTracker() {
       });
       return;
     }
-    
+
     localStorage.setItem(`milestone_claimed_${milestone.days}`, 'true');
-    
+
+    // Synchroniser avec Supabase
+    if (user) {
+      try {
+        await supabase.from('streak_milestones_claimed').upsert({
+          user_id: user.id,
+          milestone_days: milestone.days,
+          claimed_at: new Date().toISOString(),
+          xp_bonus: milestone.xpBonus,
+        }, { onConflict: 'user_id,milestone_days' });
+      } catch {
+        // Sync silencieuse
+      }
+    }
+
     confetti({
       particleCount: 50,
       spread: 60,
       origin: { y: 0.7 },
     });
-    
+
     toast({
       title: `${milestone.icon} Félicitations!`,
       description: `Vous avez débloqué: ${milestone.reward} (+${milestone.xpBonus} XP)`,

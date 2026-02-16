@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useMemo } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
