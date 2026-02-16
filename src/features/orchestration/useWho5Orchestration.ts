@@ -1,5 +1,11 @@
-// @ts-nocheck
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { getISOWeek, getISOWeekYear, isAfter, addHours, parseISO, isValid } from 'date-fns';
 import { logger } from '@/lib/logger';
+import { Sentry } from '@/lib/errors/sentry-compat';
+import { useConsent } from '@/features/clinical-optin/ConsentProvider';
+import { useFlags } from '@/hooks/useFlags';
+import { useAssessment } from '@/hooks/useAssessment';
+import { useAssessmentHistory } from '@/hooks/useAssessmentHistory';
 
 export type Who5Tone = 'very_low' | 'low' | 'neutral' | 'high' | 'very_high';
 
@@ -13,8 +19,6 @@ export interface Who5Orchestration {
   summaryLabel: string;
   snooze: (durationHours?: number) => void;
 }
-
-dayjs.extend(isoWeek);
 
 const SNOOZE_STORAGE_KEY = 'who5.invite.snooze_until';
 const DEFAULT_SUMMARY = 'équilibre stable';
@@ -92,7 +96,7 @@ const persistSnooze = (value: string | null) => {
   }
 };
 
-const isoWeekKey = (date: dayjs.Dayjs) => `${date.isoWeekYear()}-${date.isoWeek()}`;
+const isoWeekKey = (date: Date) => `${getISOWeekYear(date)}-${getISOWeek(date)}`;
 
 interface DueComputationInput {
   lastCompletedAt?: string;
@@ -101,7 +105,7 @@ interface DueComputationInput {
   isFlagEnabled: boolean;
   canDisplay: boolean;
   zeroNumbersReady: boolean;
-  now?: dayjs.Dayjs;
+  now?: Date;
 }
 
 export const isWho5Due = ({
@@ -111,15 +115,15 @@ export const isWho5Due = ({
   isFlagEnabled,
   canDisplay,
   zeroNumbersReady,
-  now = dayjs(),
+  now = new Date(),
 }: DueComputationInput): boolean => {
   if (!hasConsent || !isFlagEnabled || !canDisplay || !zeroNumbersReady) {
     return false;
   }
 
   if (snoozedUntil) {
-    const snoozeDate = dayjs(snoozedUntil);
-    if (snoozeDate.isValid() && snoozeDate.isAfter(now)) {
+    const snoozeDate = parseISO(snoozedUntil);
+    if (isValid(snoozeDate) && isAfter(snoozeDate, now)) {
       return false;
     }
   }
@@ -128,8 +132,8 @@ export const isWho5Due = ({
     return true;
   }
 
-  const lastDate = dayjs(lastCompletedAt);
-  if (!lastDate.isValid()) {
+  const lastDate = parseISO(lastCompletedAt);
+  if (!isValid(lastDate)) {
     return true;
   }
 
@@ -194,7 +198,7 @@ export function useWho5Orchestration(): Who5Orchestration {
     if (!due) {
       return;
     }
-    const now = dayjs();
+    const now = new Date();
     const key = isoWeekKey(now);
     if (inviteLoggedRef.current === key) {
       return;
@@ -226,7 +230,7 @@ export function useWho5Orchestration(): Who5Orchestration {
 
   const snooze = useCallback(
     (durationHours = 48) => {
-      const until = dayjs().add(durationHours, 'hour').toISOString();
+      const until = addHours(new Date(), durationHours).toISOString();
       setSnoozedUntil(until);
       Sentry.addBreadcrumb({ category: 'who5', message: 'who5:skipped', level: 'info', data: { tone, durationHours } });
     },

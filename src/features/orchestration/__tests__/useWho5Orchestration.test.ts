@@ -1,6 +1,4 @@
-// @ts-nocheck
-import dayjs from 'dayjs';
-import isoWeek from 'dayjs/plugin/isoWeek';
+import { parseISO, subWeeks, addHours } from 'date-fns';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -9,8 +7,6 @@ import {
   getCardOrderFromLevel,
   isWho5Due,
 } from '../useWho5Orchestration';
-
-dayjs.extend(isoWeek);
 
 describe('WHO-5 orchestration mapping', () => {
   it('maps level to tone consistently', () => {
@@ -38,7 +34,7 @@ describe('WHO-5 orchestration mapping', () => {
 });
 
 describe('WHO-5 due computation', () => {
-  const reference = dayjs('2024-05-15T10:00:00.000Z');
+  const reference = parseISO('2024-05-15T10:00:00.000Z');
 
   const baseInput = {
     snoozedUntil: null as string | null,
@@ -60,7 +56,7 @@ describe('WHO-5 due computation', () => {
   });
 
   it('triggers when previous week', () => {
-    const lastCompletedAt = reference.subtract(1, 'week').toISOString();
+    const lastCompletedAt = subWeeks(reference, 1).toISOString();
     expect(
       isWho5Due({
         ...baseInput,
@@ -70,7 +66,7 @@ describe('WHO-5 due computation', () => {
   });
 
   it('respects snooze period', () => {
-    const snoozedUntil = reference.add(2, 'hour').toISOString();
+    const snoozedUntil = addHours(reference, 2).toISOString();
     expect(
       isWho5Due({
         ...baseInput,

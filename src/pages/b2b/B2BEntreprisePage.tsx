@@ -445,26 +445,22 @@ const B2BEntreprisePage: React.FC = () => {
       <section className="py-16 bg-muted/30 border-y border-border/50">
         <div className="container px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-            {stats.map((stat, i) => {
-              const ref = useRef<HTMLDivElement>(null);
-              const isInView = useInView(ref, { once: true, amount: 0.5 });
-              return (
-                <motion.div
-                  key={i}
-                  ref={ref}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.6, delay: i * 0.1 }}
-                  className="text-center"
-                >
-                  <stat.icon className="h-6 w-6 mx-auto mb-3 text-primary" />
-                  <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                    {stat.value}
-                  </div>
-                  <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
-                </motion.div>
-              );
-            })}
+            {stats.map((stat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                className="text-center"
+              >
+                <stat.icon className="h-6 w-6 mx-auto mb-3 text-primary" />
+                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  {stat.value}
+                </div>
+                <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
@@ -482,46 +478,41 @@ const B2BEntreprisePage: React.FC = () => {
           </SectionTitle>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-            {features.map((feature, index) => {
-              const cardRef = useRef<HTMLDivElement>(null);
-              const isCardInView = useInView(cardRef, { once: true, amount: 0.4 });
-              return (
-                <motion.div
-                  key={index}
-                  ref={cardRef}
-                  initial={{ opacity: 0, y: 80 }}
-                  animate={isCardInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  className="group relative"
-                >
-                  <div className="relative bg-card/50 backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-border/50 hover:border-border transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5">
-                    <div
-                      className={cn(
-                        'inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6',
-                        'bg-gradient-to-br text-white shadow-lg shadow-primary/20',
-                        feature.gradient
-                      )}
-                    >
-                      <feature.icon className="h-8 w-8" />
-                    </div>
-                    <h3 className="text-2xl md:text-3xl font-bold mb-3 tracking-tight">
-                      {feature.title}
-                    </h3>
-                    <p className="text-lg text-muted-foreground leading-relaxed">
-                      {feature.description}
-                    </p>
-                    {/* Hover glow */}
-                    <div
-                      className={cn(
-                        'absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-[0.06] transition-opacity duration-500',
-                        'bg-gradient-to-br pointer-events-none blur-3xl -z-10',
-                        feature.gradient
-                      )}
-                    />
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 80 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.4 }}
+                transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                className="group relative"
+              >
+                <div className="relative bg-card/50 backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-border/50 hover:border-border transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5">
+                  <div
+                    className={cn(
+                      'inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6',
+                      'bg-gradient-to-br text-white shadow-lg shadow-primary/20',
+                      feature.gradient
+                    )}
+                  >
+                    <feature.icon className="h-8 w-8" />
                   </div>
-                </motion.div>
-              );
-            })}
+                  <h3 className="text-2xl md:text-3xl font-bold mb-3 tracking-tight">
+                    {feature.title}
+                  </h3>
+                  <p className="text-lg text-muted-foreground leading-relaxed">
+                    {feature.description}
+                  </p>
+                  <div
+                    className={cn(
+                      'absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-[0.06] transition-opacity duration-500',
+                      'bg-gradient-to-br pointer-events-none blur-3xl -z-10',
+                      feature.gradient
+                    )}
+                  />
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
@@ -538,26 +529,22 @@ const B2BEntreprisePage: React.FC = () => {
             </SectionTitle>
 
             <div className="grid md:grid-cols-3 gap-12 md:gap-8">
-              {steps.map((step, i) => {
-                const ref = useRef<HTMLDivElement>(null);
-                const isInView = useInView(ref, { once: true, amount: 0.5 });
-                return (
-                  <motion.div
-                    key={i}
-                    ref={ref}
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.7, delay: i * 0.15 }}
-                    className="text-center"
-                  >
-                    <div className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-4">
-                      {step.num}
-                    </div>
-                    <h3 className="text-xl md:text-2xl font-bold mb-3">{step.title}</h3>
-                    <p className="text-background/60 leading-relaxed">{step.desc}</p>
-                  </motion.div>
-                );
-              })}
+              {steps.map((step, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  transition={{ duration: 0.7, delay: i * 0.15 }}
+                  className="text-center"
+                >
+                  <div className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-4">
+                    {step.num}
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold mb-3">{step.title}</h3>
+                  <p className="text-background/60 leading-relaxed">{step.desc}</p>
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>
@@ -595,35 +582,31 @@ const B2BEntreprisePage: React.FC = () => {
                   'Conformité RGPD intégrée',
                 ],
               },
-            ].map((persona, i) => {
-              const ref = useRef<HTMLDivElement>(null);
-              const isInView = useInView(ref, { once: true, amount: 0.4 });
-              return (
-                <motion.div
-                  key={i}
-                  ref={ref}
-                  initial={{ opacity: 0, y: 60 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.8, delay: i * 0.15 }}
-                  className="bg-card/50 backdrop-blur-xl rounded-3xl p-8 md:p-10 border border-border/50"
-                >
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent text-white">
-                      <persona.icon className="h-6 w-6" />
-                    </div>
-                    <h3 className="text-xl font-bold">{persona.title}</h3>
+            ].map((persona, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 60 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.4 }}
+                transition={{ duration: 0.8, delay: i * 0.15 }}
+                className="bg-card/50 backdrop-blur-xl rounded-3xl p-8 md:p-10 border border-border/50"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent text-white">
+                    <persona.icon className="h-6 w-6" />
                   </div>
-                  <ul className="space-y-3">
-                    {persona.items.map((item, j) => (
-                      <li key={j} className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                        <span className="text-muted-foreground">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              );
-            })}
+                  <h3 className="text-xl font-bold">{persona.title}</h3>
+                </div>
+                <ul className="space-y-3">
+                  {persona.items.map((item, j) => (
+                    <li key={j} className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
@@ -668,27 +651,23 @@ const B2BEntreprisePage: React.FC = () => {
           </SectionTitle>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            {useCases.map((uc, i) => {
-              const ref = useRef<HTMLDivElement>(null);
-              const isInView = useInView(ref, { once: true, amount: 0.4 });
-              return (
-                <motion.div
-                  key={i}
-                  ref={ref}
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.7, delay: i * 0.1 }}
-                  className="bg-card/50 backdrop-blur-xl rounded-2xl p-6 border border-border/50 hover:border-border hover:shadow-xl transition-all duration-300 text-center"
-                >
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent text-white mb-4">
-                    <uc.icon className="h-7 w-7" />
-                  </div>
-                  <h3 className="text-lg font-bold mb-2">{uc.title}</h3>
-                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{uc.description}</p>
-                  <div className="text-sm font-semibold text-primary">{uc.stat}</div>
-                </motion.div>
-              );
-            })}
+            {useCases.map((uc, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.4 }}
+                transition={{ duration: 0.7, delay: i * 0.1 }}
+                className="bg-card/50 backdrop-blur-xl rounded-2xl p-6 border border-border/50 hover:border-border hover:shadow-xl transition-all duration-300 text-center"
+              >
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent text-white mb-4">
+                  <uc.icon className="h-7 w-7" />
+                </div>
+                <h3 className="text-lg font-bold mb-2">{uc.title}</h3>
+                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{uc.description}</p>
+                <div className="text-sm font-semibold text-primary">{uc.stat}</div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
@@ -704,30 +683,26 @@ const B2BEntreprisePage: React.FC = () => {
           </SectionTitle>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {testimonials.map((t, i) => {
-              const ref = useRef<HTMLDivElement>(null);
-              const isInView = useInView(ref, { once: true, amount: 0.4 });
-              return (
-                <motion.div
-                  key={i}
-                  ref={ref}
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.7, delay: i * 0.15 }}
-                  className="bg-card/60 backdrop-blur-xl rounded-2xl p-8 border border-border/50"
-                >
-                  <Quote className="h-8 w-8 text-primary/30 mb-4" aria-hidden="true" />
-                  <blockquote className="text-muted-foreground leading-relaxed mb-6">
-                    &laquo; {t.quote} &raquo;
-                  </blockquote>
-                  <div>
-                    <div className="font-semibold">{t.author}</div>
-                    <div className="text-sm text-muted-foreground">{t.role}</div>
-                    <div className="text-sm text-primary">{t.org}</div>
-                  </div>
-                </motion.div>
-              );
-            })}
+            {testimonials.map((t, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.4 }}
+                transition={{ duration: 0.7, delay: i * 0.15 }}
+                className="bg-card/60 backdrop-blur-xl rounded-2xl p-8 border border-border/50"
+              >
+                <Quote className="h-8 w-8 text-primary/30 mb-4" aria-hidden="true" />
+                <blockquote className="text-muted-foreground leading-relaxed mb-6">
+                  &laquo; {t.quote} &raquo;
+                </blockquote>
+                <div>
+                  <div className="font-semibold">{t.author}</div>
+                  <div className="text-sm text-muted-foreground">{t.role}</div>
+                  <div className="text-sm text-primary">{t.org}</div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>

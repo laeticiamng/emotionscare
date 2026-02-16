@@ -1,4 +1,4 @@
 // @ts-nocheck
 
 // Re-export du coach unifié optimisé
-export { useCoach, CoachProvider, useCoachQueries } from './UnifiedCoachContext';
+export { useCoach, CoachProvider, useCoachAskQuestion, useCoachAnalyzeEmotion } from './UnifiedCoachContext';

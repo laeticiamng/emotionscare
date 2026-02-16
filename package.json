@@ -136,7 +136,6 @@
     "cmdk": "^1.0.0",
     "cross-env": "^7.0.3",
     "date-fns": "^3.6.0",
-    "dayjs": "^1.11.19",
     "dompurify": "^3.2.7",
     "dotenv": "^16.5.0",
     "embla-carousel-react": "^8.3.0",
