@@ -116,7 +116,7 @@ class ApiService {
 
   // Journal avec backend complet
   async getJournalEntries(params?: JournalEntryParams): Promise<unknown> {
-    const queryString = params ? '?' + new URLSearchParams(params).toString() : '';
+    const queryString = params ? '?' + new URLSearchParams(params as Record<string, string>).toString() : '';
     return this.request(`/journal/entries${queryString}`);
   }
 

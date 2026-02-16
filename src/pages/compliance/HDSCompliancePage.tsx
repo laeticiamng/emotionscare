@@ -34,7 +34,7 @@ interface ComplianceItem {
   description: string;
   status: 'compliant' | 'in_progress' | 'planned';
   category: string;
-  icon: React.ElementType;
+  icon: React.FC<{ className?: string }>;
 }
 
 const COMPLIANCE_ITEMS: ComplianceItem[] = [

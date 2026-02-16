@@ -29,10 +29,10 @@ export default function BadgesPage() {
     
     setGlobalStats({
       totalBadges: claimedMilestones,
-      totalPoints: (meditationStats.totalSessions || 0) * 10 + claimedMilestones * 50,
+      totalPoints: (Number(meditationStats.totalSessions) || 0) * 10 + claimedMilestones * 50,
       currentStreak: 0, // Sera mis à jour par le composant
-      longestStreak: meditationStats.longestSession || 0,
-      lastActivity: meditationStats.lastSession
+      longestStreak: Number(meditationStats.longestSession) || 0,
+      lastActivity: (meditationStats.lastSession as string) ?? null
     });
   }, []);
 

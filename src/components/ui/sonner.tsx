@@ -24,7 +24,6 @@ const Toaster = ({ ...props }: ToasterProps) => {
       closeButton
       aria-live="polite"
       aria-label="Notifications"
-      role="region"
       {...props}
     />
   );

@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   XCircle,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   useAdminNotificationStore,
@@ -18,7 +19,7 @@ import {
 } from '@/stores/adminNotificationStore';
 import { cn } from '@/lib/utils';
 
-const typeConfig: Record<AdminNotificationType, { icon: React.ElementType; className: string }> = {
+const typeConfig: Record<AdminNotificationType, { icon: LucideIcon; className: string }> = {
   info: {
     icon: Info,
     className: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',

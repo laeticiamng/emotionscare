@@ -117,7 +117,7 @@ export const JournalPromptCard = memo<JournalPromptCardProps>(({
       lastUsed: now,
     };
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-    setUsedCount(history[prompt.id].count);
+    setUsedCount(history[prompt.id].count ?? 0);
     setLastUsed(now);
 
     onUsePrompt(prompt.prompt_text);

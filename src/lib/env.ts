@@ -92,7 +92,11 @@ if (!parsedEnv.success) {
   console.info('[SYSTEM] Using fallback values from CONFIG');
 }
 
-const env = parsedEnv.data;
+const env = parsedEnv.data ?? envSchema.parse({
+  MODE: rawEnv.MODE,
+  VITE_SUPABASE_URL: rawEnv.VITE_SUPABASE_URL ?? CONFIG.SUPABASE.URL,
+  VITE_SUPABASE_ANON_KEY: rawEnv.VITE_SUPABASE_ANON_KEY ?? CONFIG.SUPABASE.ANON_KEY,
+});
 
 export const NODE_ENV = env.MODE;
 export const IS_DEV = NODE_ENV === 'development';

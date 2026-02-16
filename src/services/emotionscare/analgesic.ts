@@ -4,7 +4,8 @@
  */
 import type { HumeEmotionScore } from './humeClient';
 import type { SunoGenerateRequest } from './sunoClient';
-import { PRESETS } from './presets';
+import { EMOTIONSCARE_PRESETS } from './presets';
+import type { EmotionsCarePreset } from './presets';
 
 export interface EmotionInput {
   name: string;
@@ -86,7 +87,7 @@ export async function generateAnalgesicTrack(
     const analgesicPreset = ANALGESIC_ROUTER(mainEmotion);
 
     // 3. Trouver le preset correspondant
-    const preset = PRESETS.find(p => p.tag === analgesicPreset.presetTag);
+    const preset = EMOTIONSCARE_PRESETS.find((p: EmotionsCarePreset) => p.tag === analgesicPreset.presetTag);
     if (!preset) {
       throw new Error(`Preset ${analgesicPreset.presetTag} introuvable`);
     }

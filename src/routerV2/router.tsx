@@ -30,7 +30,7 @@ import FloatingActionMenu from '@/components/layout/FloatingActionMenu';
 // ═══════════════════════════════════════════════════════════
 // COMPONENT MAP — importé depuis les modules par segment
 // ═══════════════════════════════════════════════════════════
-import { componentMap } from './routes';
+import { componentMap } from './routes/index';
 
 // Pages DEV-only (Nyvée test)
 const NyveeTestPage = lazy(() => import('@/pages/NyveeTestPage'));
