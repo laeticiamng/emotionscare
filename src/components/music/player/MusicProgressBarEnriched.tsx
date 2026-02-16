@@ -202,11 +202,17 @@ const MusicProgressBarEnriched: React.FC<MusicProgressBarEnrichedProps> = ({
             {formatTime(currentTime)}
           </span>
         )}
-        <div 
+        <div
           ref={progressRef}
           className={cn('flex-1 bg-muted rounded-full cursor-pointer relative group', sizes.bar)}
+          role="slider"
+          tabIndex={0}
+          aria-valuenow={Math.round(progress)}
+          aria-valuemin={0}
+          aria-valuemax={100}
           onMouseDown={handleMouseDown}
           onMouseLeave={handleMouseLeave}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click(); } }}
         >
           <div 
             className="absolute inset-y-0 left-0 bg-primary rounded-full transition-all"
@@ -268,12 +274,17 @@ const MusicProgressBarEnriched: React.FC<MusicProgressBarEnrichedProps> = ({
         {/* Progress bar with hover tooltip */}
         <TooltipProvider>
           <div className="space-y-1">
-            <div 
+            <div
               ref={progressRef}
               className={cn(
                 'relative bg-muted rounded-full cursor-pointer group',
                 sizes.bar
               )}
+              role="slider"
+              tabIndex={0}
+              aria-valuenow={Math.round(progress)}
+              aria-valuemin={0}
+              aria-valuemax={100}
               onMouseDown={handleMouseDown}
               onMouseMove={(e) => {
                 const rect = progressRef.current?.getBoundingClientRect();
@@ -283,6 +294,7 @@ const MusicProgressBarEnriched: React.FC<MusicProgressBarEnrichedProps> = ({
                 }
               }}
               onMouseLeave={handleMouseLeave}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click(); } }}
             >
               {/* Buffered indicator (placeholder) */}
               <div 
@@ -438,9 +450,12 @@ const MusicProgressBarEnriched: React.FC<MusicProgressBarEnrichedProps> = ({
     <div className={cn('space-y-2', className)}>
       {/* Expandable header */}
       {showTrackInfo && (
-        <div 
+        <div
           className="flex items-center gap-3 cursor-pointer"
+          role="button"
+          tabIndex={0}
           onClick={() => setIsExpanded(!isExpanded)}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click(); } }}
         >
           {trackCover && (
             <img 
@@ -467,14 +482,20 @@ const MusicProgressBarEnriched: React.FC<MusicProgressBarEnrichedProps> = ({
           </span>
         )}
         
-        <div 
+        <div
           ref={progressRef}
           className={cn(
             'flex-1 bg-muted rounded-full cursor-pointer relative group',
             sizes.bar
           )}
+          role="slider"
+          tabIndex={0}
+          aria-valuenow={Math.round(progress)}
+          aria-valuemin={0}
+          aria-valuemax={100}
           onMouseDown={handleMouseDown}
           onMouseLeave={handleMouseLeave}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click(); } }}
         >
           <div 
             className="absolute inset-y-0 left-0 bg-primary rounded-full transition-all"

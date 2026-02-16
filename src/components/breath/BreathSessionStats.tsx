@@ -30,7 +30,7 @@ const StatCard: React.FC<StatCardProps> = ({ icon, label, value, unit = '', tren
     onClick={onClick}
     role={onClick ? "button" : undefined}
     tabIndex={onClick ? 0 : undefined}
-    onKeyDown={onClick ? (e) => e.key === 'Enter' && onClick() : undefined}
+    onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click(); } } : undefined}
   >
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">

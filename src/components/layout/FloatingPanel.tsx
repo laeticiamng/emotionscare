@@ -130,10 +130,14 @@ const FloatingPanel: React.FC<FloatingPanelProps> = ({
             
             {/* Handle de redimensionnement */}
             {resizable && !isMinimized && (
-              <div 
+              <div
                 className="absolute bottom-0 right-0 w-3 h-3 cursor-se-resize bg-muted-foreground/20 hover:bg-muted-foreground/40 transition-colors"
+                role="separator"
+                tabIndex={0}
                 onMouseDown={() => setIsDragging(true)}
                 onMouseUp={() => setIsDragging(false)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click(); } }}
+                aria-label="Redimensionner le panneau"
               />
             )}
           </Card>
