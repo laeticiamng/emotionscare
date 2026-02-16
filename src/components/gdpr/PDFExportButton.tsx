@@ -14,6 +14,7 @@ import { Download, FileText, AlertTriangle, Users, FileBarChart } from 'lucide-r
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
+import DOMPurify from 'dompurify';
 
 interface PDFExportButtonProps {
   auditId?: string;
@@ -55,7 +56,7 @@ const PDFExportButton: React.FC<PDFExportButtonProps> = ({
         throw new Error('Popup bloquée - veuillez autoriser les popups pour ce site');
       }
 
-      printWindow.document.write(data.htmlContent);
+      printWindow.document.write(DOMPurify.sanitize(data.htmlContent, { WHOLE_DOCUMENT: true }));
       printWindow.document.close();
 
       // Attendre que le contenu soit chargé puis lancer l'impression

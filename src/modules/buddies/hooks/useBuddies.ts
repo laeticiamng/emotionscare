@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { BuddyService } from '../services/buddyService';
 import type { BuddyProfile, BuddyMatch, BuddyRequest, BuddyStats, BuddyFilters } from '../types';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 export function useBuddies() {
   const { user } = useAuth();
@@ -38,7 +39,7 @@ export function useBuddies() {
       setStats(statsData);
       setUnreadCount(unread);
     } catch (err) {
-      console.error('Error loading buddies data:', err);
+      logger.error('Error loading buddies data:', err as Error, 'BUDDIES');
     } finally {
       setLoading(false);
     }
@@ -51,7 +52,7 @@ export function useBuddies() {
       const buddies = await BuddyService.discoverBuddies(user.id, customFilters || filters);
       setDiscoveredBuddies(buddies);
     } catch (err) {
-      console.error('Error discovering buddies:', err);
+      logger.error('Error discovering buddies:', err as Error, 'BUDDIES');
     }
   }, [user, filters]);
 
@@ -74,7 +75,7 @@ export function useBuddies() {
       toast.success('Profil mis à jour !');
       return profile;
     } catch (err) {
-      console.error('Error updating profile:', err);
+      logger.error('Error updating profile:', err as Error, 'BUDDIES');
       toast.error('Erreur lors de la mise à jour du profil');
       return null;
     }
@@ -87,7 +88,7 @@ export function useBuddies() {
       await BuddyService.updateAvailability(user.id, status);
       setMyProfile(prev => prev ? { ...prev, availability_status: status as any } : null);
     } catch (err) {
-      console.error('Error updating availability:', err);
+      logger.error('Error updating availability:', err as Error, 'BUDDIES');
     }
   }, [user]);
 
@@ -127,7 +128,7 @@ export function useBuddies() {
       }
       return true;
     } catch (err) {
-      console.error('Error responding to request:', err);
+      logger.error('Error responding to request:', err as Error, 'BUDDIES');
       toast.error('Erreur lors de la réponse');
       return false;
     }
@@ -170,7 +171,7 @@ export function useBuddyChat(matchId: string, buddyUserId: string) {
         await BuddyService.markMessagesAsRead(matchId, user.id);
       }
     } catch (err) {
-      console.error('Error loading messages:', err);
+      logger.error('Error loading messages:', err as Error, 'BUDDIES');
     } finally {
       setLoading(false);
     }
@@ -188,7 +189,7 @@ export function useBuddyChat(matchId: string, buddyUserId: string) {
       setMessages(prev => [...prev, message]);
       return message;
     } catch (err) {
-      console.error('Error sending message:', err);
+      logger.error('Error sending message:', err as Error, 'BUDDIES');
       toast.error('Erreur lors de l\'envoi du message');
       return null;
     }

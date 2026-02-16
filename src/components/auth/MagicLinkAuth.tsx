@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Mail, ArrowLeft, Check } from 'lucide-react';
+import { Mail, ArrowLeft, Check, RefreshCw } from 'lucide-react';
 import AnimatedFormField from './AnimatedFormField';
+import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface MagicLinkAuthProps {
   onCancel: () => void;
@@ -14,27 +16,60 @@ const MagicLinkAuth: React.FC<MagicLinkAuthProps> = ({ onCancel }) => {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email) {
-      setError('Veuillez entrer votre adresse email');
-      return;
-    }
-    
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  const sendMagicLink = async () => {
     setLoading(true);
     setError('');
-    
+
     try {
-      // Mock API call for now - replace with actual implementation
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setSent(true);
+      const { error: supabaseError } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/app/consumer/home`,
+        },
+      });
+
+      if (supabaseError) {
+        if (supabaseError.message.includes('rate limit')) {
+          setError('Trop de tentatives. Veuillez patienter quelques minutes avant de réessayer.');
+        } else {
+          throw supabaseError;
+        }
+      } else {
+        setSent(true);
+        logger.info('Magic link envoyé', { email }, 'AUTH');
+      }
     } catch (err) {
+      logger.error('Erreur envoi magic link', err instanceof Error ? err : new Error(String(err)), 'AUTH');
       setError('Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleResend = async () => {
+    setSent(false);
+    setResendCooldown(60);
+    const interval = setInterval(() => {
+      setResendCooldown(prev => {
+        if (prev <= 1) { clearInterval(interval); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+    await sendMagicLink();
+    setSent(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email) {
+      setError('Veuillez entrer votre adresse email');
+      return;
+    }
+
+    await sendMagicLink();
   };
   
   return (
@@ -102,9 +137,19 @@ const MagicLinkAuth: React.FC<MagicLinkAuthProps> = ({ onCancel }) => {
                 Veuillez vérifier votre boîte de réception.
               </p>
               
-              <Button 
-                variant="outline" 
-                onClick={onCancel} 
+              <Button
+                variant="outline"
+                onClick={handleResend}
+                disabled={resendCooldown > 0 || loading}
+                className="w-full mb-2"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                {resendCooldown > 0 ? `Renvoyer dans ${resendCooldown}s` : 'Renvoyer le lien'}
+              </Button>
+
+              <Button
+                variant="ghost"
+                onClick={onCancel}
                 className="w-full"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />

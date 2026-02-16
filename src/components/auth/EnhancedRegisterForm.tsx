@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { EyeIcon, EyeOffIcon, Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { EyeIcon, EyeOffIcon, Mail, Lock, User, ArrowRight, Check, X } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { z } from 'zod';
@@ -16,6 +16,13 @@ import { useForm } from 'react-hook-form';
 import LoadingAnimation from '@/components/ui/LoadingAnimation';
 import { logger } from '@/lib/logger';
 
+const PASSWORD_RULES = [
+  { id: 'min', label: '8 caractères minimum', test: (p: string) => p.length >= 8 },
+  { id: 'upper', label: '1 majuscule', test: (p: string) => /[A-Z]/.test(p) },
+  { id: 'lower', label: '1 minuscule', test: (p: string) => /[a-z]/.test(p) },
+  { id: 'number', label: '1 chiffre', test: (p: string) => /[0-9]/.test(p) },
+];
+
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Le nom doit contenir au moins 2 caractères.",
@@ -23,9 +30,11 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Veuillez saisir une adresse email valide.",
   }),
-  password: z.string().min(8, {
-    message: "Le mot de passe doit contenir au moins 8 caractères.",
-  }),
+  password: z.string()
+    .min(8, { message: "Le mot de passe doit contenir au moins 8 caractères." })
+    .regex(/[A-Z]/, { message: "Le mot de passe doit contenir au moins 1 majuscule." })
+    .regex(/[a-z]/, { message: "Le mot de passe doit contenir au moins 1 minuscule." })
+    .regex(/[0-9]/, { message: "Le mot de passe doit contenir au moins 1 chiffre." }),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Les mots de passe ne correspondent pas.",
@@ -235,11 +244,49 @@ const EnhancedRegisterForm: React.FC = () => {
                           </div>
                         </FormControl>
                         <FormMessage className="text-xs text-destructive mt-1" />
+
+                        {/* Indicateur visuel des exigences mot de passe */}
+                        {field.value.length > 0 && (
+                          <div className="mt-2 space-y-1">
+                            {PASSWORD_RULES.map((rule) => {
+                              const passed = rule.test(field.value);
+                              return (
+                                <div key={rule.id} className="flex items-center gap-1.5 text-xs">
+                                  {passed ? (
+                                    <Check className="h-3 w-3 text-green-500" />
+                                  ) : (
+                                    <X className="h-3 w-3 text-muted-foreground" />
+                                  )}
+                                  <span className={passed ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}>
+                                    {rule.label}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                            {/* Jauge de robustesse */}
+                            <div className="flex gap-1 mt-1">
+                              {PASSWORD_RULES.map((rule, i) => (
+                                <div
+                                  key={i}
+                                  className={`h-1 flex-1 rounded-full transition-colors ${
+                                    rule.test(field.value)
+                                      ? PASSWORD_RULES.filter(r => r.test(field.value)).length >= 4
+                                        ? 'bg-green-500'
+                                        : PASSWORD_RULES.filter(r => r.test(field.value)).length >= 2
+                                          ? 'bg-yellow-500'
+                                          : 'bg-red-400'
+                                      : 'bg-muted'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </FormItem>
                     )}
                   />
                 </motion.div>
-                
+
                 <motion.div variants={itemVariants}>
                   <FormField
                     control={form.control}

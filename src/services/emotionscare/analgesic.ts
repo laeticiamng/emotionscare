@@ -1,9 +1,11 @@
-// @ts-nocheck
-
-// Routeur et générateur de musique antalgique EmotionsCare
-import { HumeEmotionScore } from './humeClient';
-import { SunoApiClient, SunoGenerateRequest } from './sunoClient';
-import { PRESETS } from './presets';
+/**
+ * Routeur et générateur de musique antalgique EmotionsCare
+ * Utilise les edge functions Supabase (pas de clé API côté client)
+ */
+import type { HumeEmotionScore } from './humeClient';
+import type { SunoGenerateRequest } from './sunoClient';
+import { EMOTIONSCARE_PRESETS } from './presets';
+import type { EmotionsCarePreset } from './presets';
 
 export interface EmotionInput {
   name: string;
@@ -66,51 +68,37 @@ export async function generateAnalgesicTrack(
   language: "Français" | "English" = "Français",
   callBackUrl?: string
 ): Promise<{ taskId: string; preset: AnalgesicPreset; emotions: EmotionInput[] }> {
-  
-  // Silent: starting analgesic generation
-  
+
   try {
-    // 1. Analyser les émotions avec Hume AI
-    const humeApiKey = import.meta.env.VITE_HUME_API_KEY;
-    if (!humeApiKey) {
-      throw new Error('VITE_HUME_API_KEY not configured');
-    }
-    
+    // 1. Analyser les émotions via edge function (pas de clé API côté client)
     const { HumeClient } = await import('./humeClient');
-    const hume = new HumeClient(humeApiKey);
+    const hume = new HumeClient();
     const rawEmotions = await hume.detectEmotion(text);
-    
+
     // Convertir vers EmotionInput
     const mainEmotion: EmotionInput = {
       name: rawEmotions[0]?.name || "neutral",
       score: rawEmotions[0]?.score || 0.5,
-      valence: 0, // À calculer si disponible
+      valence: 0,
       arousal: rawEmotions[0]?.score || 0.5
     };
-    
-    // Silent: main emotion detected
-    
+
     // 2. Router vers preset antalgique
     const analgesicPreset = ANALGESIC_ROUTER(mainEmotion);
-    // Silent: analgesic preset selected
+
     // 3. Trouver le preset correspondant
-    const preset = PRESETS.find(p => p.tag === analgesicPreset.presetTag);
+    const preset = EMOTIONSCARE_PRESETS.find((p: EmotionsCarePreset) => p.tag === analgesicPreset.presetTag);
     if (!preset) {
       throw new Error(`Preset ${analgesicPreset.presetTag} introuvable`);
     }
-    
+
     // 4. Construire le prompt thérapeutique
     const therapeuticPrompt = `${language} | ${preset.style} | mood ${preset.tag} | ${analgesicPreset.extraPrompt} | tempo ${analgesicPreset.tempo} BPM`;
-    
-    // Silent: therapeutic prompt generated
-    // 5. Générer avec Suno
-    const sunoApiKey = import.meta.env.VITE_SUNO_API_KEY;
-    if (!sunoApiKey) {
-      throw new Error('VITE_SUNO_API_KEY not configured');
-    }
-    
-    const suno = new SunoApiClient(sunoApiKey);
-    
+
+    // 5. Générer avec Suno via edge function (pas de clé API côté client)
+    const { SunoApiClient } = await import('./sunoClient');
+    const suno = new SunoApiClient();
+
     const musicResponse = await suno.generateMusic({
       prompt: therapeuticPrompt,
       style: preset.style,
@@ -120,17 +108,14 @@ export async function generateAnalgesicTrack(
       model: "V4_5",
       callBackUrl: callBackUrl || ""
     });
-    
-    // Silent: analgesic track generated
-    
+
     return {
       taskId: musicResponse.taskId,
       preset: analgesicPreset,
       emotions: [mainEmotion]
     };
-    
+
   } catch (error) {
-    // Silent: analgesic generation error logged internally
     throw new Error(`Génération antalgique échouée: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
   }
 }

@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
-import { Heart, Brain, Users, Sparkles, ArrowRight, Check, Loader2 } from 'lucide-react';
+import { Heart, Brain, Users, Sparkles, ArrowRight, Check, Loader2, SkipForward } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { useToast } from '@/hooks/use-toast';
@@ -175,9 +175,22 @@ const OnboardingPage: React.FC = () => {
         <main id="main-content" role="main" className="w-full max-w-2xl">
           {/* En-tête avec progression */}
           <header className="text-center mb-8">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Heart className="w-8 h-8 text-accent" aria-hidden="true" />
-              <h1 className="text-3xl font-bold text-foreground">EmotionsCare</h1>
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-24" /> {/* spacer */}
+              <div className="flex items-center gap-2">
+                <Heart className="w-8 h-8 text-accent" aria-hidden="true" />
+                <h1 className="text-3xl font-bold text-foreground">EmotionsCare</h1>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-24 text-muted-foreground hover:text-foreground"
+                onClick={() => navigate('/app/home')}
+                aria-label="Passer l'onboarding et accéder directement à l'application"
+              >
+                <SkipForward className="w-4 h-4 mr-1" aria-hidden="true" />
+                Passer
+              </Button>
             </div>
             <div 
               role="progressbar"

@@ -417,32 +417,25 @@ export const useUnifiedCoach = () => {
   return context;
 };
 
-// Hook pour requêtes avec React Query
-export const useCoachQueries = () => {
+// Hooks pour requêtes avec React Query
+export const useCoachAskQuestion = (question: string) => {
   const coach = useUnifiedCoach();
+  return useQuery({
+    queryKey: ['coach', 'askQuestion', question],
+    queryFn: () => coach.sendMessage(question),
+    enabled: !!question,
+    staleTime: 0, // Toujours fresh
+  });
+};
 
-  const askQuestion = (question: string) => {
-    return useQuery({
-      queryKey: ['coach', 'askQuestion', question],
-      queryFn: () => coach.sendMessage(question),
-      enabled: !!question,
-      staleTime: 0, // Toujours fresh
-    });
-  };
-
-  const analyzeEmotion = (text: string) => {
-    return useQuery({
-      queryKey: ['coach', 'emotion', text],
-      queryFn: () => coach.analyzeEmotion(text),
-      enabled: !!text,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-    });
-  };
-
-  return {
-    askQuestion,
-    analyzeEmotion,
-  };
+export const useCoachAnalyzeEmotion = (text: string) => {
+  const coach = useUnifiedCoach();
+  return useQuery({
+    queryKey: ['coach', 'emotion', text],
+    queryFn: () => coach.analyzeEmotion(text),
+    enabled: !!text,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 };
 
 // Exports pour compatibilité

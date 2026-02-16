@@ -88,6 +88,99 @@ const PLANS = [
   },
 ];
 
+/** Extracted plan card — uses hooks so must be its own component */
+const PlanCard: React.FC<{
+  plan: typeof PLANS[number];
+  index: number;
+  isLoading: boolean;
+  onCTA: (plan: typeof PLANS[number]) => void;
+}> = ({ plan, index, isLoading, onCTA }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const isCardInView = useInView(cardRef, { once: true, amount: 0.3 });
+
+  return (
+    <motion.div
+      key={plan.id}
+      ref={cardRef}
+      initial={{ opacity: 0, y: 60 }}
+      animate={isCardInView ? { opacity: 1, y: 0 } : {}}
+      transition={{
+        duration: 0.8,
+        delay: index * 0.1,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      className={cn(
+        'group relative rounded-3xl border transition-all duration-500',
+        plan.popular
+          ? 'border-primary shadow-2xl shadow-primary/10 scale-[1.02]'
+          : 'border-border/50 hover:border-border hover:shadow-xl hover:shadow-primary/5'
+      )}
+    >
+      {plan.popular && (
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-gradient-to-r from-primary to-accent text-white shadow-lg">
+            <Sparkles className="h-3.5 w-3.5" />
+            Populaire
+          </span>
+        </div>
+      )}
+
+      <div className="p-8 md:p-10">
+        <div className="mb-8">
+          <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
+          <p className="text-sm text-muted-foreground">{plan.description}</p>
+
+          <div className="mt-6">
+            {plan.price === 0 ? (
+              <span className="text-5xl font-bold">Gratuit</span>
+            ) : typeof plan.price === 'number' ? (
+              <div className="flex items-baseline gap-1">
+                <span className="text-5xl font-bold">{plan.price}€</span>
+                <span className="text-muted-foreground">{plan.period}</span>
+              </div>
+            ) : (
+              <span className="text-3xl font-bold">{plan.price}</span>
+            )}
+          </div>
+        </div>
+
+        <Button
+          size="lg"
+          className={cn(
+            'w-full rounded-full py-6 text-base font-semibold transition-all duration-300',
+            plan.popular
+              ? 'bg-foreground text-background hover:bg-foreground/90 shadow-lg hover:scale-[1.02]'
+              : 'bg-muted text-foreground hover:bg-muted/80'
+          )}
+          onClick={() => onCTA(plan)}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
+              Chargement...
+            </div>
+          ) : (
+            <span className="flex items-center gap-2">
+              {plan.cta}
+              <ArrowRight className="h-4 w-4" />
+            </span>
+          )}
+        </Button>
+
+        <ul className="mt-8 space-y-3">
+          {plan.features.map((feature, i) => (
+            <li key={i} className="flex items-start gap-3">
+              <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+              <span className="text-sm text-muted-foreground">{feature}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </motion.div>
+  );
+};
+
 const PricingPageWorking: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -185,97 +278,15 @@ const PricingPageWorking: React.FC = () => {
       <section className="pb-28 md:pb-36">
         <div className="container px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
-            {PLANS.map((plan, index) => {
-              const cardRef = useRef<HTMLDivElement>(null);
-              const isCardInView = useInView(cardRef, { once: true, amount: 0.3 });
-              const isLoading = loadingPlan === plan.id;
-
-              return (
-                <motion.div
-                  key={plan.id}
-                  ref={cardRef}
-                  initial={{ opacity: 0, y: 60 }}
-                  animate={isCardInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{
-                    duration: 0.8,
-                    delay: index * 0.1,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                  className={cn(
-                    'group relative rounded-3xl border transition-all duration-500',
-                    plan.popular
-                      ? 'border-primary shadow-2xl shadow-primary/10 scale-[1.02]'
-                      : 'border-border/50 hover:border-border hover:shadow-xl hover:shadow-primary/5'
-                  )}
-                >
-                  {/* Popular badge */}
-                  {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-                      <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-gradient-to-r from-primary to-accent text-white shadow-lg">
-                        <Sparkles className="h-3.5 w-3.5" />
-                        Populaire
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="p-8 md:p-10">
-                    {/* Header */}
-                    <div className="mb-8">
-                      <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
-                      <p className="text-sm text-muted-foreground">{plan.description}</p>
-
-                      <div className="mt-6">
-                        {plan.price === 0 ? (
-                          <span className="text-5xl font-bold">Gratuit</span>
-                        ) : typeof plan.price === 'number' ? (
-                          <div className="flex items-baseline gap-1">
-                            <span className="text-5xl font-bold">{plan.price}€</span>
-                            <span className="text-muted-foreground">{plan.period}</span>
-                          </div>
-                        ) : (
-                          <span className="text-3xl font-bold">{plan.price}</span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* CTA */}
-                    <Button
-                      size="lg"
-                      className={cn(
-                        'w-full rounded-full py-6 text-base font-semibold transition-all duration-300',
-                        plan.popular
-                          ? 'bg-foreground text-background hover:bg-foreground/90 shadow-lg hover:scale-[1.02]'
-                          : 'bg-muted text-foreground hover:bg-muted/80'
-                      )}
-                      onClick={() => handleCTA(plan)}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <div className="flex items-center gap-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
-                          Chargement...
-                        </div>
-                      ) : (
-                        <span className="flex items-center gap-2">
-                          {plan.cta}
-                          <ArrowRight className="h-4 w-4" />
-                        </span>
-                      )}
-                    </Button>
-
-                    {/* Features */}
-                    <ul className="mt-8 space-y-3">
-                      {plan.features.map((feature, i) => (
-                        <li key={i} className="flex items-start gap-3">
-                          <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                          <span className="text-sm text-muted-foreground">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </motion.div>
-              );
-            })}
+            {PLANS.map((plan, index) => (
+              <PlanCard
+                key={plan.id}
+                plan={plan}
+                index={index}
+                isLoading={loadingPlan === plan.id}
+                onCTA={handleCTA}
+              />
+            ))}
           </div>
         </div>
       </section>

@@ -3,6 +3,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 
 export interface MeditationSettings {
   defaultTechnique: 'mindfulness' | 'body-scan' | 'loving-kindness' | 'breath-focus' | 'visualization' | 'mantra';
@@ -46,7 +47,7 @@ export function useMeditationSettings() {
         setSettings({ ...DEFAULT_SETTINGS, ...parsed });
       }
     } catch (err) {
-      console.error('Error loading meditation settings:', err);
+      logger.error('Error loading meditation settings:', err as Error, 'HOOKS');
     }
     setIsLoaded(true);
   }, []);
@@ -57,7 +58,7 @@ export function useMeditationSettings() {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       } catch (err) {
-        console.error('Error saving meditation settings:', err);
+        logger.error('Error saving meditation settings:', err as Error, 'HOOKS');
       }
       return updated;
     });
@@ -68,7 +69,7 @@ export function useMeditationSettings() {
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch (err) {
-      console.error('Error resetting meditation settings:', err);
+      logger.error('Error resetting meditation settings:', err as Error, 'HOOKS');
     }
   }, []);
 

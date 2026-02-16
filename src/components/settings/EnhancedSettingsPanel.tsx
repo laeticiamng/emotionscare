@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -23,7 +22,7 @@ interface SettingsSection {
   id: string;
   title: string;
   description: string;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<{ className?: string }>;
   gradient: string;
   premium?: boolean;
 }
@@ -146,7 +145,7 @@ const EnhancedSettingsPanel: React.FC = () => {
     }
   ];
 
-  const updateSetting = (key: string, value: any) => {
+  const updateSetting = (key: string, value: string | boolean) => {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 

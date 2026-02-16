@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
 import html2canvas from 'html2canvas';
+import { escapeHtml } from '@/lib/sanitize';
 
 interface ExportOptions {
   title: string;
@@ -111,10 +112,10 @@ export const generatePrintablePDF = (options: ExportOptions) => {
     <h2>Données Détaillées</h2>
     <table>
       <thead>
-        <tr>${Object.keys(data[0]).map(key => `<th>${key}</th>`).join('')}</tr>
+        <tr>${Object.keys(data[0]).map(key => `<th>${escapeHtml(key)}</th>`).join('')}</tr>
       </thead>
       <tbody>
-        ${data.map(row => `<tr>${Object.values(row).map(val => `<td>${val ?? '-'}</td>`).join('')}</tr>`).join('')}
+        ${data.map(row => `<tr>${Object.values(row).map(val => `<td>${escapeHtml(val ?? '-')}</td>`).join('')}</tr>`).join('')}
       </tbody>
     </table>
   ` : '';
@@ -124,7 +125,7 @@ export const generatePrintablePDF = (options: ExportOptions) => {
     <div class="recommendations">
       ${mlRecommendations.map((rec, idx) => `
         <div class="recommendation">
-          <strong>${idx + 1}.</strong> ${rec}
+          <strong>${idx + 1}.</strong> ${escapeHtml(rec)}
         </div>
       `).join('')}
     </div>
@@ -134,13 +135,13 @@ export const generatePrintablePDF = (options: ExportOptions) => {
     <!DOCTYPE html>
     <html>
       <head>
-        <title>${title}</title>
+        <title>${escapeHtml(title)}</title>
         ${styles}
       </head>
       <body>
         <div class="header">
-          <h1>${title}</h1>
-          ${subtitle ? `<div class="subtitle">${subtitle}</div>` : ''}
+          <h1>${escapeHtml(title)}</h1>
+          ${subtitle ? `<div class="subtitle">${escapeHtml(subtitle)}</div>` : ''}
           <div class="timestamp">Généré le ${new Date().toLocaleString('fr-FR')}</div>
         </div>
         ${tableHTML}

@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useModuleInterconnect } from '@/hooks/useModuleInterconnect';
 import type { BreathingIntensity, BadgeType, CocoonType } from '../types';
+import { logger } from '@/lib/logger';
 
 export interface NyveeSessionRecord {
   id: string;
@@ -84,7 +85,7 @@ export const useNyveeSessions = () => {
         .limit(50);
 
       if (error) {
-        console.error('Error fetching nyvee sessions:', error);
+        logger.error('Error fetching nyvee sessions:', error as Error, 'NYVEE');
         return [];
       }
 
@@ -125,7 +126,7 @@ export const useNyveeSessions = () => {
         .limit(100);
 
       if (error) {
-        console.error('Error fetching stats:', error);
+        logger.error('Error fetching stats:', error as Error, 'NYVEE');
         return null;
       }
 
@@ -289,7 +290,7 @@ export const useNyveeSessions = () => {
           duration: params.durationSeconds
         });
       } catch (syncError) {
-        console.warn('Module sync failed:', syncError);
+        logger.warn('Module sync failed:', syncError, 'NYVEE');
       }
       
       return { success: true };

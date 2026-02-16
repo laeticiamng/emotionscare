@@ -6,6 +6,7 @@ import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 export interface ParkExportData {
   exportDate: string;
@@ -116,7 +117,7 @@ export function useParkExport() {
 
       return exportData;
     } catch (error) {
-      console.error('Failed to gather export data:', error);
+      logger.error('Failed to gather export data:', error as Error, 'HOOKS');
       return null;
     }
   }, [user]);
@@ -151,7 +152,7 @@ export function useParkExport() {
         description: 'Votre progression a été exportée'
       });
     } catch (error) {
-      console.error('Export failed:', error);
+      logger.error('Export failed:', error as Error, 'HOOKS');
       toast({
         title: 'Erreur',
         description: "L'export a échoué",
@@ -216,7 +217,7 @@ export function useParkExport() {
         description: 'Votre progression a été exportée en CSV'
       });
     } catch (error) {
-      console.error('Export failed:', error);
+      logger.error('Export failed:', error as Error, 'HOOKS');
       toast({
         title: 'Erreur',
         description: "L'export a échoué",

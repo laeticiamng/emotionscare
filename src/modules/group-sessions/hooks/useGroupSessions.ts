@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { GroupSessionService } from '../services/groupSessionService';
 import type { GroupSession, GroupSessionFilters, GroupSessionCategory, CreateSessionInput } from '../types';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface UseGroupSessionsOptions {
   autoLoad?: boolean;
@@ -42,7 +43,7 @@ export function useGroupSessions(options: UseGroupSessionsOptions = {}) {
         setMySessions(userSessions);
       }
     } catch (err) {
-      console.error('Error loading sessions:', err);
+      logger.error('Error loading sessions:', err as Error, 'GROUPS');
       setError('Erreur lors du chargement des sessions');
     } finally {
       setLoading(false);
@@ -67,7 +68,7 @@ export function useGroupSessions(options: UseGroupSessionsOptions = {}) {
       loadSessions();
       return session;
     } catch (err) {
-      console.error('Error creating session:', err);
+      logger.error('Error creating session:', err as Error, 'GROUPS');
       toast.error('Erreur lors de la création de la session');
       return null;
     }
@@ -88,7 +89,7 @@ export function useGroupSessions(options: UseGroupSessionsOptions = {}) {
       if (err.message?.includes('duplicate')) {
         toast.info('Vous êtes déjà inscrit à cette session');
       } else {
-        console.error('Error registering:', err);
+        logger.error('Error registering:', err as Error, 'GROUPS');
         toast.error('Erreur lors de l\'inscription');
       }
       return false;
@@ -104,7 +105,7 @@ export function useGroupSessions(options: UseGroupSessionsOptions = {}) {
       loadSessions();
       return true;
     } catch (err) {
-      console.error('Error unregistering:', err);
+      logger.error('Error unregistering:', err as Error, 'GROUPS');
       toast.error('Erreur lors de la désinscription');
       return false;
     }
@@ -127,7 +128,7 @@ export function useGroupSessions(options: UseGroupSessionsOptions = {}) {
       toast.success('Vous avez rejoint la session !');
       return true;
     } catch (err) {
-      console.error('Error joining session:', err);
+      logger.error('Error joining session:', err as Error, 'GROUPS');
       toast.error('Erreur lors de la connexion à la session');
       return false;
     }
@@ -147,7 +148,7 @@ export function useGroupSessions(options: UseGroupSessionsOptions = {}) {
       loadSessions();
       return true;
     } catch (err) {
-      console.error('Error leaving session:', err);
+      logger.error('Error leaving session:', err as Error, 'GROUPS');
       return false;
     }
   }, [user, loadSessions]);
@@ -207,7 +208,7 @@ export function useGroupSession(sessionId: string) {
         setIsRegistered(registered);
       }
     } catch (err) {
-      console.error('Error loading session:', err);
+      logger.error('Error loading session:', err as Error, 'GROUPS');
     } finally {
       setLoading(false);
     }
@@ -225,7 +226,7 @@ export function useGroupSession(sessionId: string) {
       setMessages(prev => [...prev, message]);
       return message;
     } catch (err) {
-      console.error('Error sending message:', err);
+      logger.error('Error sending message:', err as Error, 'GROUPS');
       toast.error('Erreur lors de l\'envoi du message');
       return null;
     }

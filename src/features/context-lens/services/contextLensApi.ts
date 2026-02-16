@@ -15,6 +15,7 @@ import type {
   ReportConfig,
   ReportStatus,
 } from '../types';
+import { logger } from '@/lib/logger';
 
 // ============ INSIGHTS API ============
 
@@ -40,7 +41,7 @@ export const contextLensApi = {
       if (error) throw error;
       return data.insights || [];
     } catch (err) {
-      console.error('[Context Lens] Failed to fetch insights:', err);
+      logger.error('[Context Lens] Failed to fetch insights:', err as Error, 'CONTEXT_LENS');
       return [];
     }
   },
@@ -78,7 +79,7 @@ export const contextLensApi = {
       if (error) throw error;
       return data.patterns || [];
     } catch (err) {
-      console.error('[Context Lens] Failed to fetch patterns:', err);
+      logger.error('[Context Lens] Failed to fetch patterns:', err as Error, 'CONTEXT_LENS');
       return [];
     }
   },
@@ -95,7 +96,7 @@ export const contextLensApi = {
       if (error) throw error;
       return data.patterns || [];
     } catch (err) {
-      console.error('[Context Lens] Pattern detection failed:', err);
+      logger.error('[Context Lens] Pattern detection failed:', err as Error, 'CONTEXT_LENS');
       return [];
     }
   },
@@ -121,7 +122,7 @@ export const contextLensApi = {
       if (error) throw error;
       return data.analysis;
     } catch (err) {
-      console.error('[Context Lens] NLP analysis failed:', err);
+      logger.error('[Context Lens] NLP analysis failed:', err as Error, 'CONTEXT_LENS');
       return null;
     }
   },
@@ -143,7 +144,7 @@ export const contextLensApi = {
       if (error) throw error;
       return data.note;
     } catch (err) {
-      console.error('[Context Lens] Failed to save note:', err);
+      logger.error('[Context Lens] Failed to save note:', err as Error, 'CONTEXT_LENS');
       return null;
     }
   },
@@ -189,7 +190,7 @@ export const contextLensApi = {
       if (error) throw error;
       return data.status;
     } catch (err) {
-      console.error('[Context Lens] Report generation failed:', err);
+      logger.error('[Context Lens] Report generation failed:', err as Error, 'CONTEXT_LENS');
       return null;
     }
   },
@@ -258,7 +259,7 @@ export const contextLensApi = {
       if (error) throw error;
       return data.history;
     } catch (err) {
-      console.error('[Context Lens] Failed to fetch emotion history:', err);
+      logger.error('[Context Lens] Failed to fetch emotion history:', err as Error, 'CONTEXT_LENS');
       return null;
     }
   },

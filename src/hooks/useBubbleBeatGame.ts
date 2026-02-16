@@ -5,6 +5,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 type GameMode = 'calm' | 'energetic' | 'focus';
 type GamePhase = 'idle' | 'playing' | 'paused' | 'completed';
@@ -74,7 +75,7 @@ export function useBubbleBeatGame() {
       try {
         setStats(JSON.parse(saved));
       } catch (e) {
-        console.error('Erreur chargement stats:', e);
+        logger.error('Erreur chargement stats:', e as Error, 'HOOKS');
       }
     }
     setIsLoadingStats(false);
@@ -120,7 +121,7 @@ export function useBubbleBeatGame() {
         body: { action: 'start', gameMode: state.mode, difficulty: state.difficulty }
       });
     } catch (e) {
-      console.warn('Failed to start session on backend:', e);
+      logger.warn('Failed to start session on backend:', e, 'HOOKS');
     }
 
     toast({ title: '🎮 C\'est parti !', description: 'Éclatez les bulles !' });
@@ -183,7 +184,7 @@ export function useBubbleBeatGame() {
         }
       });
     } catch (e) {
-      console.warn('Failed to end session on backend:', e);
+      logger.warn('Failed to end session on backend:', e, 'HOOKS');
     }
 
     toast({ 

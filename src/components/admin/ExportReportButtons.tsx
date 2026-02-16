@@ -10,6 +10,7 @@ import {
 import { Download, FileText, Table } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import DOMPurify from 'dompurify';
 
 interface ExportReportButtonsProps {
   dateRangeDays?: number;
@@ -52,7 +53,7 @@ export function ExportReportButtons({ dateRangeDays = 7 }: ExportReportButtonsPr
         // Ouvrir le HTML dans une nouvelle fenêtre pour permettre l'impression/PDF
         const printWindow = window.open('', '_blank');
         if (printWindow) {
-          printWindow.document.write(data.html);
+          printWindow.document.write(DOMPurify.sanitize(data.html, { WHOLE_DOCUMENT: true }));
           printWindow.document.close();
           printWindow.focus();
           setTimeout(() => {

@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import type { XPEvent, XPAction, UserLevel, LevelConfig } from '../types';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 // Configuration des niveaux
 const LEVEL_CONFIG: LevelConfig[] = [
@@ -95,7 +96,7 @@ export function useXPSystem() {
       const totalXP = data?.total_xp || 0;
       setUserLevel(calculateLevel(totalXP));
     } catch (error) {
-      console.error('Failed to load user level:', error);
+      logger.error('Failed to load user level:', error as Error, 'GAMIFICATION');
     } finally {
       setIsLoading(false);
     }
@@ -157,7 +158,7 @@ export function useXPSystem() {
 
       return amount;
     } catch (error) {
-      console.error('Failed to add XP:', error);
+      logger.error('Failed to add XP:', error as Error, 'GAMIFICATION');
       return 0;
     }
   }, [user?.id, userLevel, calculateLevel]);
@@ -177,7 +178,7 @@ export function useXPSystem() {
       if (error) throw error;
       setRecentXP((data as XPEvent[]) || []);
     } catch (error) {
-      console.error('Failed to load recent XP:', error);
+      logger.error('Failed to load recent XP:', error as Error, 'GAMIFICATION');
     }
   }, [user?.id]);
 

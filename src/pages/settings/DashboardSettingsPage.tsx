@@ -120,16 +120,34 @@ const DashboardSettingsPage: React.FC = () => {
 
   const handleDeleteAccount = async () => {
     if (deleteConfirmation !== 'SUPPRIMER' || !user) return;
-    
+
     setIsDeleting(true);
     try {
-      // In production, this would call an edge function to properly delete all user data
-      // For now, we'll just sign out and show a message
+      // Enregistrer la demande de suppression en base avec un délai de grâce de 30 jours
+      const { error: insertError } = await supabase
+        .from('account_deletion_requests')
+        .upsert({
+          user_id: user.id,
+          requested_at: new Date().toISOString(),
+          scheduled_deletion_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          status: 'pending',
+          reason: 'user_request',
+        }, { onConflict: 'user_id' });
+
+      if (insertError) {
+        // Si la table n'existe pas encore, utiliser l'edge function comme fallback
+        const { error: fnError } = await supabase.functions.invoke('delete-user-account', {
+          body: { userId: user.id, scheduledDeletion: true },
+        });
+        if (fnError) throw fnError;
+      }
+
+      // Déconnecter l'utilisateur après la demande
       await supabase.auth.signOut();
-      toast.success('Demande de suppression enregistrée. Votre compte sera supprimé sous 30 jours.');
+      toast.success('Demande de suppression enregistrée. Votre compte et toutes vos données seront définitivement supprimés sous 30 jours. Vous pouvez annuler en vous reconnectant avant cette date.');
     } catch (error) {
       logger.error('Error deleting account', error instanceof Error ? error : new Error(String(error)), 'UI');
-      toast.error('Erreur lors de la suppression du compte');
+      toast.error('Erreur lors de la suppression du compte. Veuillez contacter le support à support@emotionscare.com');
     } finally {
       setIsDeleting(false);
     }

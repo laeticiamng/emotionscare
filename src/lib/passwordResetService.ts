@@ -1,124 +1,62 @@
-// @ts-nocheck
-import { User } from '@/types';
-import { mockUsers } from '@/data/mockUsers';
+import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
-// Simuler une base de données de tokens de réinitialisation
-interface PasswordResetToken {
-  token: string;
-  email: string;
-  created: Date;
-  expires: Date;
-  isUsed: boolean;
-}
-
-// Collection simulée de tokens
-let resetTokens: PasswordResetToken[] = [];
-
-// Générer un token aléatoire
-const generateToken = (): string => {
-  return 'valid_' + Math.random().toString(36).substring(2, 15) + 
-         Math.random().toString(36).substring(2, 15);
-};
-
-// Requête de réinitialisation de mot de passe
+/**
+ * Envoie un email de réinitialisation de mot de passe via Supabase Auth.
+ * Retourne toujours { success: true } pour ne pas révéler si l'email existe.
+ */
 export const requestPasswordReset = async (email: string): Promise<{ success: boolean }> => {
-  // Dans une vraie implémentation, nous vérifions si l'email existe en base de données,
-  // mais nous ne divulguons pas cette information à l'utilisateur pour des raisons de sécurité
-  
-  // Vérifier si l'email existe
-  const userExists = mockUsers.some(user => user.email === email);
-
-  // Créer un token qu'il existe ou pas (pour éviter de révéler l'existence de l'email)
-  const token = generateToken();
-  const now = new Date();
-  const expires = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 heures plus tard
-
-  // Stocker le token uniquement si l'utilisateur existe
-  if (userExists) {
-    // Supprimer tout token existant pour cet email
-    resetTokens = resetTokens.filter(t => t.email !== email);
-    
-    // Ajouter le nouveau token
-    resetTokens.push({
-      token,
-      email,
-      created: now,
-      expires,
-      isUsed: false
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`,
     });
-    
-    // Dans une vraie implémentation, nous enverrions un email ici
-    logger.info(`Token de réinitialisation créé pour ${email}`, { token }, 'AUTH');
-  } else {
-    logger.info(`Tentative de réinitialisation pour un email non existant: ${email}`, undefined, 'AUTH');
+
+    if (error) {
+      logger.error('Erreur lors de la demande de réinitialisation', { error: error.message }, 'AUTH');
+    } else {
+      logger.info('Email de réinitialisation envoyé', { email }, 'AUTH');
+    }
+  } catch (err) {
+    logger.error('Erreur inattendue lors du reset', err instanceof Error ? err : new Error(String(err)), 'AUTH');
   }
 
-  // Toujours retourner success pour ne pas révéler si l'email existe
+  // Toujours retourner success pour ne pas révéler si l'email existe (sécurité)
   return { success: true };
 };
 
-// Vérifier la validité d'un token
-export const verifyResetToken = async (token: string): Promise<{ 
-  valid: boolean, 
-  email?: string 
+/**
+ * Met à jour le mot de passe de l'utilisateur connecté via le lien de réinitialisation.
+ * Supabase gère automatiquement la session via le lien magique de reset.
+ */
+export const resetPassword = async (_token: string, newPassword: string): Promise<{
+  success: boolean;
+  message?: string;
 }> => {
-  // Nettoyer les tokens expirés (bonne pratique)
-  const now = new Date();
-  resetTokens = resetTokens.filter(t => t.expires > now && !t.isUsed);
-  
-  // Rechercher le token
-  const tokenRecord = resetTokens.find(t => t.token === token);
-  
-  if (!tokenRecord) {
-    return { valid: false };
-  }
-  
-  return { 
-    valid: true,
-    email: tokenRecord.email
-  };
-};
+  try {
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
 
-// Réinitialiser le mot de passe
-export const resetPassword = async (token: string, newPassword: string): Promise<{ 
-  success: boolean, 
-  message?: string 
-}> => {
-  // Vérifier la validité du token
-  const { valid, email } = await verifyResetToken(token);
-  
-  if (!valid || !email) {
-    return { 
-      success: false, 
-      message: "Ce lien de réinitialisation est invalide ou a expiré." 
+    if (error) {
+      logger.error('Erreur lors de la réinitialisation du mot de passe', { error: error.message }, 'AUTH');
+      return {
+        success: false,
+        message: error.message === 'New password should be different from the old password.'
+          ? 'Le nouveau mot de passe doit être différent de l\'ancien.'
+          : 'Impossible de réinitialiser le mot de passe. Le lien a peut-être expiré.',
+      };
+    }
+
+    logger.info('Mot de passe réinitialisé avec succès', undefined, 'AUTH');
+    return {
+      success: true,
+      message: 'Votre mot de passe a été réinitialisé avec succès.',
+    };
+  } catch (err) {
+    logger.error('Erreur inattendue', err instanceof Error ? err : new Error(String(err)), 'AUTH');
+    return {
+      success: false,
+      message: 'Une erreur inattendue est survenue. Veuillez réessayer.',
     };
   }
-  
-  // Trouver l'utilisateur
-  const userIndex = mockUsers.findIndex(user => user.email === email);
-  
-  if (userIndex === -1) {
-    return { 
-      success: false, 
-      message: "Utilisateur introuvable." 
-    };
-  }
-  
-  // Dans une vraie implémentation, nous hasherions le mot de passe ici
-  // mockUsers[userIndex].password = hashPassword(newPassword);
-  
-  // Simuler la mise à jour du mot de passe
-  logger.info(`Mot de passe réinitialisé pour ${email}`, undefined, 'AUTH');
-  
-  // Marquer le token comme utilisé
-  const tokenIndex = resetTokens.findIndex(t => t.token === token);
-  if (tokenIndex !== -1) {
-    resetTokens[tokenIndex].isUsed = true;
-  }
-  
-  return { 
-    success: true,
-    message: "Votre mot de passe a été réinitialisé avec succès." 
-  };
 };

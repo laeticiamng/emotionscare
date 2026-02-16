@@ -55,9 +55,6 @@ export const DiagnosticsPanel: React.FC = () => {
   const [diagnostics, setDiagnostics] = useState<DiagnosticsData | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Only show in development
-  if (import.meta.env.PROD) return null;
-
   const runDiagnostics = async () => {
     setIsRefreshing(true);
     
@@ -120,6 +117,9 @@ export const DiagnosticsPanel: React.FC = () => {
       runDiagnostics();
     }
   }, [isOpen]);
+
+  // Only show in development
+  if (import.meta.env.PROD) return null;
 
   return (
     <div className="fixed bottom-4 right-4 z-50">

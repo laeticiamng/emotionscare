@@ -1,8 +1,8 @@
 import React from 'react';
 import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
-import dayjs from 'dayjs';
-import 'dayjs/locale/fr';
+import { parse, format, isValid } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { ArrowLeft, Download, Printer, Share2 } from 'lucide-react';
 import PageSEO from '@/components/seo/PageSEO';
@@ -18,8 +18,6 @@ import { generateMonthlyNarrative } from '@/features/b2b/reports/narrative';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import '@/styles/print-b2b.css';
 
-dayjs.locale('fr');
-
 const formatter = new Intl.DateTimeFormat('fr-FR', {
   year: 'numeric',
   month: 'long',
@@ -27,11 +25,11 @@ const formatter = new Intl.DateTimeFormat('fr-FR', {
 });
 
 function formatPeriodLabel(period: string): string {
-  const parsed = dayjs(`${period}-01`);
-  if (!parsed.isValid()) {
+  const parsed = parse(`${period}-01`, 'yyyy-MM-dd', new Date());
+  if (!isValid(parsed)) {
     return period;
   }
-  const label = parsed.format('MMMM YYYY');
+  const label = format(parsed, 'MMMM yyyy', { locale: fr });
   return label.charAt(0).toUpperCase() + label.slice(1);
 }
 

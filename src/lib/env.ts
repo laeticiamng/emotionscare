@@ -92,7 +92,16 @@ if (!parsedEnv.success) {
   console.info('[SYSTEM] Using fallback values from CONFIG');
 }
 
-const env = parsedEnv.data;
+const fallbackResult = envSchema.safeParse({
+  MODE: rawEnv.MODE,
+  VITE_SUPABASE_URL: rawEnv.VITE_SUPABASE_URL || CONFIG.SUPABASE.URL || 'https://placeholder.supabase.co',
+  VITE_SUPABASE_ANON_KEY: rawEnv.VITE_SUPABASE_ANON_KEY || CONFIG.SUPABASE.ANON_KEY || 'placeholder',
+});
+const env = parsedEnv.data ?? fallbackResult.data ?? {
+  MODE: 'development' as const,
+  VITE_SUPABASE_URL: 'https://placeholder.supabase.co',
+  VITE_SUPABASE_ANON_KEY: 'placeholder',
+};
 
 export const NODE_ENV = env.MODE;
 export const IS_DEV = NODE_ENV === 'development';

@@ -13,10 +13,10 @@ export const TEST_MODE: {
 };
 
 export const CONFIG = {
-  // APIs Configuration
+  // APIs Configuration — clés via variables d'environnement uniquement (pas de fallback en dur)
   SUPABASE: {
-    URL: 'https://yaincoxihiqdksxgrsrk.supabase.co',
-    ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhaW5jb3hpaGlxZGtzeGdyc3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTE4MjcsImV4cCI6MjA1ODM4NzgyN30.HBfwymB2F9VBvb3uyeTtHBMZFZYXzL0wQmS5fqd65yU'
+    URL: import.meta.env.VITE_SUPABASE_URL ?? '',
+    ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY ?? '',
   },
   
   // Edge Functions - Utilisant les vraies edge functions existantes
@@ -32,11 +32,11 @@ export const CONFIG = {
     SECURITY_AUDIT: 'security-audit'
   },
 
-  // Production Endpoints
+  // Production Endpoints — dérivés de l'URL Supabase
   ENDPOINTS: {
     BASE_API: '/api/v1',
-    WEBSOCKET: 'wss://yaincoxihiqdksxgrsrk.supabase.co/realtime/v1',
-    FUNCTIONS: 'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1'
+    WEBSOCKET: (import.meta.env.VITE_SUPABASE_URL ?? '').replace('https://', 'wss://') + '/realtime/v1',
+    FUNCTIONS: (import.meta.env.VITE_SUPABASE_URL ?? '') + '/functions/v1'
   },
 
   // Features Configuration  

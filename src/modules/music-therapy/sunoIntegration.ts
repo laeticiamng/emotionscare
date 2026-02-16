@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // TYPES
@@ -84,7 +85,7 @@ export class SunoMusicService {
     });
 
     if (error) {
-      console.error('Suno generation error:', error);
+      logger.error('Suno generation error:', error as Error, 'MUSIC');
       // Fallback vers une piste prédéfinie si l'API échoue
       return this.getFallbackTrack(request);
     }
@@ -180,7 +181,7 @@ export class SunoMusicService {
       .limit(50);
 
     if (error) {
-      console.error('Error fetching user tracks:', error);
+      logger.error('Error fetching user tracks:', error as Error, 'MUSIC');
       return [];
     }
 
@@ -396,7 +397,7 @@ export class SunoMusicService {
         therapeutic_score: 0.8
       });
     } catch (error) {
-      console.error('Error saving generated track:', error);
+      logger.error('Error saving generated track:', error as Error, 'MUSIC');
     }
   }
 }

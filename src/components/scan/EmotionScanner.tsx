@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Camera, Mic, Type, Upload, Play, Square, Loader2 } from 'lucide-react';
+import { Camera, Mic, Type, Upload, Play, Square, Loader2, AlertTriangle, Info } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useEmotionAnalysis } from '@/hooks/useEmotionAnalysis';
 import { EmotionResult } from '@/types/emotion';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
@@ -80,22 +81,48 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
     }
   };
 
+  const [showCameraPermissionDialog, setShowCameraPermissionDialog] = useState(false);
+  const [cameraPermissionDenied, setCameraPermissionDenied] = useState(false);
+
+  const requestCameraAccess = async () => {
+    // Vérifier d'abord l'état de la permission si l'API est disponible
+    if (navigator.permissions) {
+      try {
+        const status = await navigator.permissions.query({ name: 'camera' as PermissionName });
+        if (status.state === 'denied') {
+          setCameraPermissionDenied(true);
+          return;
+        }
+        if (status.state === 'prompt') {
+          setShowCameraPermissionDialog(true);
+          return;
+        }
+      } catch {
+        // L'API permissions n'est pas supportée pour la caméra, continuer normalement
+      }
+    }
+    // Permission déjà accordée ou API non supportée : activer directement
+    await startCamera();
+  };
+
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
+      setShowCameraPermissionDialog(false);
+      setCameraPermissionDenied(false);
+      const stream = await navigator.mediaDevices.getUserMedia({
         video: { width: 640, height: 480 },
-        audio: false 
+        audio: false
       });
-      
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
       }
     } catch (err) {
-      // Camera access error
+      setCameraPermissionDenied(true);
       toast({
-        title: "Erreur caméra",
-        description: "Impossible d'accéder à la caméra",
+        title: "Accès caméra refusé",
+        description: "Vous pouvez réactiver la caméra dans les paramètres de votre navigateur, ou utiliser le scan par texte ou par voix.",
         variant: "destructive"
       });
     }
@@ -256,25 +283,75 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
 
           <TabsContent value="facial" className="space-y-4">
             <div className="space-y-4">
+              {/* Dialogue pré-permission caméra */}
+              {showCameraPermissionDialog && (
+                <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-900/20">
+                  <Info className="h-4 w-4 text-blue-600" />
+                  <AlertTitle className="text-blue-800 dark:text-blue-200">Accès à la caméra requis</AlertTitle>
+                  <AlertDescription className="text-blue-700 dark:text-blue-300 space-y-2">
+                    <p>
+                      EmotionsCare a besoin d'accéder à votre caméra pour analyser vos expressions faciales
+                      et détecter vos émotions. Aucune image n'est enregistrée ni envoyée.
+                    </p>
+                    <div className="flex gap-2 mt-3">
+                      <Button size="sm" onClick={startCamera}>
+                        Autoriser la caméra
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => { setShowCameraPermissionDialog(false); setActiveTab('text'); }}>
+                        Utiliser le scan texte
+                      </Button>
+                    </div>
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Guide de récupération si permission refusée */}
+              {cameraPermissionDenied && (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>Caméra non disponible</AlertTitle>
+                  <AlertDescription className="space-y-2">
+                    <p>L'accès à la caméra a été refusé. Pour le réactiver :</p>
+                    <ol className="list-decimal list-inside text-sm space-y-1">
+                      <li>Cliquez sur l'icône de cadenas dans la barre d'adresse</li>
+                      <li>Cherchez "Caméra" dans les autorisations</li>
+                      <li>Changez le réglage sur "Autoriser"</li>
+                      <li>Rechargez la page</li>
+                    </ol>
+                    <div className="flex gap-2 mt-3">
+                      <Button size="sm" variant="outline" onClick={() => startCamera()}>
+                        Réessayer
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => { setCameraPermissionDenied(false); setActiveTab('text'); }}>
+                        Scan par texte
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => { setCameraPermissionDenied(false); setActiveTab('voice'); }}>
+                        Scan vocal
+                      </Button>
+                    </div>
+                  </AlertDescription>
+                </Alert>
+              )}
+
               <div className="border rounded-lg p-4">
-                <video 
+                <video
                   ref={videoRef}
                   autoPlay
                   muted
                   className="w-full max-w-md mx-auto rounded-lg"
                   style={{ display: streamRef.current ? 'block' : 'none' }}
                 />
-                {!streamRef.current && (
+                {!streamRef.current && !cameraPermissionDenied && !showCameraPermissionDialog && (
                   <div className="text-center py-8">
                     <Camera className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                     <p className="text-muted-foreground">Caméra non activée</p>
                   </div>
                 )}
               </div>
-              
+
               <div className="flex gap-2">
-                <Button 
-                  onClick={startCamera}
+                <Button
+                  onClick={requestCameraAccess}
                   variant="outline"
                   className="flex-1"
                 >

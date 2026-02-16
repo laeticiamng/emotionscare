@@ -65,7 +65,7 @@ export function usePresetExport(): UsePresetExportReturn {
       URL.revokeObjectURL(url);
       toast.success(`${presets.length} preset(s) exporté(s)`);
     } catch (error) {
-      console.error('Erreur export:', error);
+      logger.error('Erreur export:', error as Error, 'MOOD_MIXER');
       toast.error('Erreur lors de l\'export');
     } finally {
       setIsExporting(false);
@@ -93,7 +93,7 @@ export function usePresetExport(): UsePresetExportReturn {
       toast.success(`${importedPresets.length} preset(s) importé(s)`);
       return importedPresets;
     } catch (error) {
-      console.error('Erreur import:', error);
+      logger.error('Erreur import:', error as Error, 'MOOD_MIXER');
       toast.error('Erreur lors de l\'import du fichier');
       return [];
     } finally {
@@ -108,7 +108,7 @@ export function usePresetExport(): UsePresetExportReturn {
       await navigator.clipboard.writeText(JSON.stringify(exportData, null, 2));
       toast.success('Presets copiés dans le presse-papiers');
     } catch (error) {
-      console.error('Erreur copie:', error);
+      logger.error('Erreur copie:', error as Error, 'MOOD_MIXER');
       toast.error('Erreur lors de la copie');
     } finally {
       setIsExporting(false);
@@ -136,8 +136,9 @@ export function usePresetExport(): UsePresetExportReturn {
       toast.success(`${importedPresets.length} preset(s) importé(s)`);
       return importedPresets;
     } catch (error) {
-      console.error('Erreur import clipboard:', error);
+      logger.error('Erreur import clipboard:', error as Error, 'MOOD_MIXER');
       toast.error('Erreur lors de l\'import depuis le presse-papiers');
+import { logger } from '@/lib/logger';
       return [];
     } finally {
       setIsImporting(false);

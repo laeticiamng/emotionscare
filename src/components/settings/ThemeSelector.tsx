@@ -1,6 +1,4 @@
-// @ts-nocheck
-
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -23,7 +21,15 @@ interface ThemeSelectorProps {
   showPreview?: boolean;
 }
 
-const THEME_CONFIG = {
+interface ThemeConfigItem {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  description: string;
+  colors: { bg: string; card: string; accent: string; text: string };
+  isNew?: boolean;
+}
+
+const THEME_CONFIG: Record<string, ThemeConfigItem> = {
   light: {
     icon: Sun,
     label: 'Clair',
@@ -179,7 +185,7 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({
     }
   };
 
-  const ThemePreview = ({ theme }: { theme: keyof typeof THEME_CONFIG }) => {
+  const ThemePreview = ({ theme }: { theme: string }) => {
     const config = THEME_CONFIG[theme];
     return (
       <div className={cn("w-full h-12 rounded-lg overflow-hidden relative", config.colors.bg)}>

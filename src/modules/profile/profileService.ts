@@ -21,6 +21,7 @@ import {
   calculateLevel,
 } from './types';
 import { differenceInDays, subDays, format } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 class ProfileService {
   // ─────────────────────────────────────────────────────────────
@@ -38,7 +39,7 @@ class ProfileService {
       .single();
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Error fetching profile:', error);
+      logger.error('Error fetching profile:', error as Error, 'PROFILE');
       throw error;
     }
 
@@ -68,7 +69,7 @@ class ProfileService {
       .single();
 
     if (error) {
-      console.error('Error creating profile:', error);
+      logger.error('Error creating profile:', error as Error, 'PROFILE');
       throw error;
     }
 
@@ -90,7 +91,7 @@ class ProfileService {
       .single();
 
     if (error) {
-      console.error('Error updating profile:', error);
+      logger.error('Error updating profile:', error as Error, 'PROFILE');
       throw error;
     }
 
@@ -122,7 +123,7 @@ class ProfileService {
       .single();
 
     if (error) {
-      console.error('Error updating preferences:', error);
+      logger.error('Error updating preferences:', error as Error, 'PROFILE');
       throw error;
     }
 
@@ -147,7 +148,7 @@ class ProfileService {
       .upload(filePath, file, { upsert: true });
 
     if (uploadError) {
-      console.error('Error uploading avatar:', uploadError);
+      logger.error('Error uploading avatar:', uploadError as Error, 'PROFILE');
       throw uploadError;
     }
 
@@ -234,7 +235,7 @@ class ProfileService {
         memberSinceDays,
       };
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      logger.error('Error fetching stats:', error as Error, 'PROFILE');
       return DEFAULT_STATS;
     }
   }
@@ -267,7 +268,7 @@ class ProfileService {
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('Error fetching achievements:', error);
+      logger.error('Error fetching achievements:', error as Error, 'PROFILE');
       return [];
     }
 
@@ -296,7 +297,7 @@ class ProfileService {
       .order('earned_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching badges:', error);
+      logger.error('Error fetching badges:', error as Error, 'PROFILE');
       return [];
     }
 
@@ -373,7 +374,7 @@ class ProfileService {
 
       return Object.values(historyMap).reverse();
     } catch (error) {
-      console.error('Error fetching activity history:', error);
+      logger.error('Error fetching activity history:', error as Error, 'PROFILE');
       return [];
     }
   }

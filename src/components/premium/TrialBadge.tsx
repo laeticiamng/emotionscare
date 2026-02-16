@@ -87,11 +87,6 @@ const TrialBadge: React.FC<TrialBadgeProps> = ({
     seconds: number;
   } | null>(null);
 
-  // N'afficher le badge QUE si le flag trialEndingSoon existe et est true
-  if (!user?.trialEndingSoon || dismissed) {
-    return null;
-  }
-
   // Load trial stats from localStorage
   useEffect(() => {
     const stats = localStorage.getItem('trial-usage-stats');
@@ -145,6 +140,11 @@ const TrialBadge: React.FC<TrialBadgeProps> = ({
 
     return () => clearInterval(interval);
   }, [user?.trialEndsAt]);
+
+  // N'afficher le badge QUE si le flag trialEndingSoon existe et est true
+  if (!user?.trialEndingSoon || dismissed) {
+    return null;
+  }
 
   // Calculate progress percentage
   const getTrialProgress = () => {

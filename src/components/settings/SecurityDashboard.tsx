@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Dashboard de sécurité et conformité - Point de contrôle production
  */
@@ -42,7 +41,7 @@ interface SecurityStatus {
 const SecurityDashboard: React.FC = () => {
   const [securityStatus, setSecurityStatus] = useState<SecurityStatus | null>(null);
   const [loading, setLoading] = useState(true);
-  const [consents, setConsents] = useState<any>({});
+  const [consents, setConsents] = useState<Record<string, boolean>>({});
   
   const { getStats } = useAdvancedRateLimit();
   const { isSupported: pushSupported, isSubscribed } = useWebPush();
@@ -272,7 +271,7 @@ const SecurityDashboard: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {Object.entries(consents).map(([key, granted]) => (
+              {Object.entries(consents).map(([key, granted]: [string, boolean]) => (
                 <div key={key} className="flex items-center justify-between p-3 border rounded-lg">
                   <div className="flex items-center gap-3">
                     <Lock className="w-4 h-4" />
