@@ -1,8 +1,8 @@
 import React from 'react';
 import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
-import dayjs from 'dayjs';
-import 'dayjs/locale/fr';
+import { subMonths, format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { FileText, ArrowRight, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PageSEO from '@/components/seo/PageSEO';
@@ -15,8 +15,6 @@ import '@/styles/print-b2b.css';
 import { withGuard } from '@/routerV2/withGuard';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 
-dayjs.locale('fr');
-
 const PERIOD_COUNT = 6;
 
 interface PeriodOption {
@@ -26,10 +24,11 @@ interface PeriodOption {
 }
 
 function buildPeriodOptions(): PeriodOption[] {
+  const now = new Date();
   return Array.from({ length: PERIOD_COUNT }).map((_, index) => {
-    const date = dayjs().subtract(index, 'month');
-    const value = date.format('YYYY-MM');
-    const label = date.format('MMMM YYYY');
+    const date = subMonths(now, index);
+    const value = format(date, 'yyyy-MM');
+    const label = format(date, 'MMMM yyyy', { locale: fr });
     const subtitle = index === 0
       ? 'Synthèse la plus récente'
       : index === 1

@@ -2,8 +2,8 @@
 import React from 'react';
 import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
-import dayjs from 'dayjs';
-import 'dayjs/locale/fr';
+import { subMonths, parse, format, isValid } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
 import { Printer, Activity } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,26 +24,25 @@ import {
 } from '@/components/ui/select';
 import '@/styles/print-b2b.css';
 
-dayjs.locale('fr');
-
 const MONTH_WINDOW = 3;
 const PERIOD_OPTION_COUNT = 6;
 const ORG_TEAM_LABEL = 'Organisation';
 
 function formatPeriod(value: string): string {
-  const parsed = dayjs(value, 'YYYY-MM');
-  if (!parsed.isValid()) {
+  const parsed = parse(value, 'yyyy-MM', new Date());
+  if (!isValid(parsed)) {
     return value;
   }
-  return parsed.format('MMMM YYYY');
+  const label = format(parsed, 'MMMM yyyy', { locale: fr });
+  return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
 function buildPeriods(anchor: string): string[] {
-  const parsed = dayjs(anchor, 'YYYY-MM');
-  if (!parsed.isValid()) {
+  const parsed = parse(anchor, 'yyyy-MM', new Date());
+  if (!isValid(parsed)) {
     return [anchor];
   }
-  return Array.from({ length: MONTH_WINDOW }).map((_, index) => parsed.subtract(index, 'month').format('YYYY-MM'));
+  return Array.from({ length: MONTH_WINDOW }).map((_, index) => format(subMonths(parsed, index), 'yyyy-MM'));
 }
 
 function normalizeTeam(team?: string | null): string {
@@ -51,8 +50,9 @@ function normalizeTeam(team?: string | null): string {
   return value && value.length > 0 ? value : ORG_TEAM_LABEL;
 }
 
+const now = new Date();
 const PERIOD_OPTIONS = Array.from({ length: PERIOD_OPTION_COUNT }).map((_, index) =>
-  dayjs().subtract(index, 'month').format('YYYY-MM'),
+  format(subMonths(now, index), 'yyyy-MM'),
 );
 
 export default function B2BReportsHeatmapPage() {
@@ -192,7 +192,7 @@ export default function B2BReportsHeatmapPage() {
 
   const isLoading = query.isLoading || query.isFetching;
   const hasError = Boolean(query.error);
-  const todayLabel = dayjs().format('D MMMM YYYY');
+  const todayLabel = format(new Date(), 'd MMMM yyyy', { locale: fr });
 
   return (
     <main className="mx-auto max-w-6xl space-y-6 p-6" aria-labelledby="b2b-reports-title">
