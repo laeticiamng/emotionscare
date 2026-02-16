@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EXAMPLE_DATA } from './types';
+import { logger } from '@/lib/logger';
 
 interface TemplatePreviewProps {
   body: string;
@@ -33,7 +34,7 @@ export const TemplatePreview = ({ body, subject }: TemplatePreviewProps) => {
           return match.replace(/{{#if \w+}}|{{\/if}}/g, '');
         });
       } catch (error) {
-        console.error('Error handling conditionals:', error);
+        logger.error('Error handling conditionals:', error as Error, 'ADMIN');
       }
 
       // Handle loops (simplified)
@@ -42,10 +43,10 @@ export const TemplatePreview = ({ body, subject }: TemplatePreviewProps) => {
           EXAMPLE_DATA.preventionTips.map((tip, i) => `${i + 1}. ${tip}`).join('\n')
         );
       } catch (error) {
-        console.error('Error handling loops:', error);
+        logger.error('Error handling loops:', error as Error, 'ADMIN');
       }
     } catch (error) {
-      console.error('Error rendering preview:', error);
+      logger.error('Error rendering preview:', error as Error, 'ADMIN');
       return 'Erreur lors de la prévisualisation du template';
     }
 

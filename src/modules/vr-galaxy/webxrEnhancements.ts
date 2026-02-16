@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // TYPES
@@ -305,7 +306,7 @@ export class WebXREnhancementService {
     channel
       .on('broadcast', { event: 'controller_state' }, ({ payload }) => {
         // Mettre à jour la position du partenaire
-        console.log('Partner state:', payload);
+        logger.info('Partner state:', payload, 'VR');
       })
       .subscribe();
 
@@ -343,17 +344,17 @@ export class WebXREnhancementService {
   // --------------------------------------------------------------------------
 
   private handleSessionEnd(): void {
-    console.log('XR Session ended');
+    logger.info('XR Session ended', undefined, 'VR');
     this.xrSession = null;
     this.referenceSpace = null;
   }
 
   private handleInputSourcesChange(event: XRInputSourcesChangeEvent): void {
     for (const source of event.added) {
-      console.log('Controller added:', source.handedness);
+      logger.info('Controller added:', source.handedness, 'VR');
     }
     for (const source of event.removed) {
-      console.log('Controller removed:', source.handedness);
+      logger.info('Controller removed:', source.handedness, 'VR');
       this.controllers.delete(source.handedness || 'unknown');
     }
   }
@@ -369,7 +370,7 @@ export class WebXREnhancementService {
         });
       }
     } catch (error) {
-      console.error('Error logging session start:', error);
+      logger.error('Error logging session start:', error as Error, 'VR');
     }
   }
 

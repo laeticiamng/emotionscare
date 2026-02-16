@@ -29,6 +29,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { BuddyActivity, BuddyProfile } from '../types';
 import { BuddyService } from '../services/buddyService';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface BuddyActivitiesProps {
   matchId: string;
@@ -75,7 +76,7 @@ export const BuddyActivities: React.FC<BuddyActivitiesProps> = ({
       const data = await BuddyService.getActivities(matchId);
       setActivities(data);
     } catch (err) {
-      console.error('Error loading activities:', err);
+      logger.error('Error loading activities:', err as Error, 'BUDDIES');
     } finally {
       setLoading(false);
     }
@@ -101,7 +102,7 @@ export const BuddyActivities: React.FC<BuddyActivitiesProps> = ({
       });
       toast.success('Activité créée !');
     } catch (err) {
-      console.error('Error creating activity:', err);
+      logger.error('Error creating activity:', err as Error, 'BUDDIES');
       toast.error('Erreur lors de la création');
     } finally {
       setCreating(false);
@@ -116,7 +117,7 @@ export const BuddyActivities: React.FC<BuddyActivitiesProps> = ({
       );
       toast.success('Activité complétée ! +XP');
     } catch (err) {
-      console.error('Error completing activity:', err);
+      logger.error('Error completing activity:', err as Error, 'BUDDIES');
       toast.error('Erreur');
     }
   };

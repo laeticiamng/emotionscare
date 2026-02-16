@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { MoodPreset } from '../useMoodMixerEnriched';
+import { logger } from '@/lib/logger';
 
 export interface SharedPreset {
   id: string;
@@ -54,7 +55,7 @@ export function usePresetSharing(userId?: string): UsePresetSharingReturn {
         .limit(50);
 
       if (error) {
-        console.error('Erreur chargement presets partagés:', error);
+        logger.error('Erreur chargement presets partagés:', error as Error, 'MOOD_MIXER');
         return [];
       }
 
@@ -101,7 +102,7 @@ export function usePresetSharing(userId?: string): UsePresetSharingReturn {
       
       return shareCode;
     } catch (error) {
-      console.error('Erreur partage:', error);
+      logger.error('Erreur partage:', error as Error, 'MOOD_MIXER');
       toast.error('Erreur lors du partage');
       return '';
     } finally {
@@ -132,7 +133,7 @@ export function usePresetSharing(userId?: string): UsePresetSharingReturn {
       toast.success('Preset importé !');
       return data.preset_data as MoodPreset;
     } catch (error) {
-      console.error('Erreur import:', error);
+      logger.error('Erreur import:', error as Error, 'MOOD_MIXER');
       toast.error('Erreur lors de l\'import');
       return null;
     } finally {

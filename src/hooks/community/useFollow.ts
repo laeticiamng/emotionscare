@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { CommunityFollowService, FollowStats } from '@/modules/community/services';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface UseFollowReturn {
   isFollowing: boolean;
@@ -26,7 +27,7 @@ export function useFollow(targetUserId: string): UseFollowReturn {
       const following = await CommunityFollowService.isFollowing(targetUserId);
       setIsFollowing(following);
     } catch (err) {
-      console.error('Failed to check follow status:', err);
+      logger.error('Failed to check follow status:', err as Error, 'HOOKS');
     }
   }, [targetUserId]);
 
@@ -35,7 +36,7 @@ export function useFollow(targetUserId: string): UseFollowReturn {
       const s = await CommunityFollowService.getFollowStats(targetUserId);
       setStats(s);
     } catch (err) {
-      console.error('Failed to load follow stats:', err);
+      logger.error('Failed to load follow stats:', err as Error, 'HOOKS');
     }
   }, [targetUserId]);
 
@@ -117,7 +118,7 @@ export function useMyFollowStats() {
         const s = await CommunityFollowService.getFollowStats(user.id);
         setStats(s);
       } catch (err) {
-        console.error('Failed to load my follow stats:', err);
+        logger.error('Failed to load my follow stats:', err as Error, 'HOOKS');
       } finally {
         setLoading(false);
       }

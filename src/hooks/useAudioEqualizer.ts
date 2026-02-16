@@ -4,6 +4,7 @@
  */
 
 import { useRef, useCallback, useEffect, useState } from 'react';
+import { logger } from '@/lib/logger';
 
 // Fréquences centrales pour l'égaliseur 5 bandes
 const EQ_FREQUENCIES = [60, 250, 1000, 4000, 16000];
@@ -116,7 +117,7 @@ export function useAudioEqualizer(): UseAudioEqualizerReturn {
       gainNodeRef.current.connect(audioContextRef.current.destination);
 
     } catch (error) {
-      console.error('Failed to initialize Web Audio API:', error);
+      logger.error('Failed to initialize Web Audio API:', error as Error, 'HOOKS');
     }
   }, []);
 
@@ -130,7 +131,7 @@ export function useAudioEqualizer(): UseAudioEqualizerReturn {
     initializeAudioContext();
     
     if (!audioContextRef.current) {
-      console.warn('AudioContext not available');
+      logger.warn('AudioContext not available', undefined, 'HOOKS');
       return;
     }
 
@@ -158,10 +159,10 @@ export function useAudioEqualizer(): UseAudioEqualizerReturn {
       connectedElementRef.current = audioElement;
       setIsConnected(true);
       
-      console.log('Audio equalizer connected successfully');
+      logger.info('Audio equalizer connected successfully', undefined, 'HOOKS');
     } catch (error) {
       // L'élément audio est peut-être déjà connecté à un autre contexte
-      console.warn('Could not connect audio element:', error);
+      logger.warn('Could not connect audio element:', error, 'HOOKS');
       setIsConnected(false);
     }
   }, [initializeAudioContext, isConnected]);

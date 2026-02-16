@@ -19,6 +19,7 @@ import {
   UpdatePreferencesInput,
   DEFAULT_STATS,
 } from './types';
+import { logger } from '@/lib/logger';
 
 interface UseProfileReturn {
   // Data
@@ -86,7 +87,7 @@ export function useProfile(): UseProfileReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erreur de chargement';
       setError(message);
-      console.error('Error loading profile:', err);
+      logger.error('Error loading profile:', err as Error, 'PROFILE');
     } finally {
       setIsLoading(false);
     }
@@ -98,7 +99,7 @@ export function useProfile(): UseProfileReturn {
       const profileData = await profileService.getProfile();
       setProfile(profileData);
     } catch (err) {
-      console.error('Error refreshing profile:', err);
+      logger.error('Error refreshing profile:', err as Error, 'PROFILE');
     }
   }, []);
 
@@ -108,7 +109,7 @@ export function useProfile(): UseProfileReturn {
       const statsData = await profileService.getStats();
       setStats(statsData);
     } catch (err) {
-      console.error('Error refreshing stats:', err);
+      logger.error('Error refreshing stats:', err as Error, 'PROFILE');
     }
   }, []);
 

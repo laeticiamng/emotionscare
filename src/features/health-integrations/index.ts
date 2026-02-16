@@ -102,6 +102,7 @@ export interface WearableDevice {
 // ============================================================================
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export const healthIntegrationsService = {
   /**
@@ -114,7 +115,7 @@ export const healthIntegrationsService = {
       .eq('user_id', userId);
     
     if (error) {
-      console.error('Error fetching health connections:', error);
+      logger.error('Error fetching health connections:', error as Error, 'HEALTH');
       return [];
     }
 
@@ -213,7 +214,7 @@ export const healthIntegrationsService = {
       .eq('status', 'connected');
 
     if (error) {
-      console.error('Error fetching devices:', error);
+      logger.error('Error fetching devices:', error as Error, 'HEALTH');
       return [];
     }
 
@@ -244,7 +245,7 @@ export const healthIntegrationsService = {
       .order('recorded_at', { ascending: true });
 
     if (error) {
-      console.error('Error fetching health history:', error);
+      logger.error('Error fetching health history:', error as Error, 'HEALTH');
       return [];
     }
 

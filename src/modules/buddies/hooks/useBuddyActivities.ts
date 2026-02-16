@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { BuddyService } from '../services/buddyService';
 import type { BuddyActivity } from '../types';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 export function useBuddyActivities(matchId: string) {
   const { user } = useAuth();
@@ -22,7 +23,7 @@ export function useBuddyActivities(matchId: string) {
       const data = await BuddyService.getActivities(matchId);
       setActivities(data);
     } catch (err) {
-      console.error('Error loading activities:', err);
+      logger.error('Error loading activities:', err as Error, 'BUDDIES');
     } finally {
       setLoading(false);
     }
@@ -42,7 +43,7 @@ export function useBuddyActivities(matchId: string) {
       toast.success('Activité créée !');
       return created;
     } catch (err) {
-      console.error('Error creating activity:', err);
+      logger.error('Error creating activity:', err as Error, 'BUDDIES');
       toast.error('Erreur lors de la création');
       return null;
     } finally {
@@ -66,7 +67,7 @@ export function useBuddyActivities(matchId: string) {
       toast.success('Activité complétée ! +XP');
       return true;
     } catch (err) {
-      console.error('Error completing activity:', err);
+      logger.error('Error completing activity:', err as Error, 'BUDDIES');
       toast.error('Erreur');
       return false;
     }
@@ -84,7 +85,7 @@ export function useBuddyActivities(matchId: string) {
       toast.info('Activité démarrée !');
       return true;
     } catch (err) {
-      console.error('Error starting activity:', err);
+      logger.error('Error starting activity:', err as Error, 'BUDDIES');
       return false;
     }
   }, []);
@@ -100,7 +101,7 @@ export function useBuddyActivities(matchId: string) {
       toast.info('Activité annulée');
       return true;
     } catch (err) {
-      console.error('Error cancelling activity:', err);
+      logger.error('Error cancelling activity:', err as Error, 'BUDDIES');
       return false;
     }
   }, []);
