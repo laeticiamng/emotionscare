@@ -1,90 +1,60 @@
 /**
- * TestimonialsSection - Témoignages utilisateurs
- * Social proof avec framing interventionnel
+ * TestimonialsSection - Presentation des modules cles
+ * Remplace les faux temoignages par une description des fonctionnalites
  */
 
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Star, Quote, GraduationCap, Stethoscope, Heart } from 'lucide-react';
+import { Brain, Heart, Music, Shield, Clock, Sparkles } from 'lucide-react';
 
-interface Testimonial {
-  name: string;
-  role: string;
-  content: string;
-  rating: number;
-  avatar: string;
-  category: 'student' | 'nurse' | 'doctor';
+interface ModuleHighlight {
+  title: string;
+  description: string;
+  icon: React.ElementType;
   highlight?: string;
 }
 
 const TestimonialsSection: React.FC = () => {
-  const testimonials: Testimonial[] = [
+  const modules: ModuleHighlight[] = [
     {
-      name: "Camille D.",
-      role: "Étudiante en médecine, 4ème année",
-      content: "Les veilles d'examen, je ne dormais plus. Maintenant j'ai un réflexe : je lance la session \"Arrêt mental\" et en 5 minutes mon cerveau accepte de se poser.",
-      rating: 5,
-      avatar: "👩‍🎓",
-      category: 'student',
-      highlight: 'Sommeil retrouvé',
+      title: "Scan emotionnel IA",
+      description: "Evaluez votre etat emotionnel en quelques questions et recevez des recommandations personnalisees adaptees a votre situation.",
+      icon: Brain,
+      highlight: 'Auto-evaluation',
     },
     {
-      name: "Thomas R.",
-      role: "Interne en chirurgie",
-      content: "Entre deux gardes, je n'arrivais pas à récupérer. Le protocole Reset me permet de repartir sans être complètement vidé. C'est devenu mon rituel.",
-      rating: 5,
-      avatar: "👨‍⚕️",
-      category: 'doctor',
-      highlight: 'Récupération',
+      title: "Protocoles de respiration",
+      description: "Coherence cardiaque, technique 4-7-8, box breathing : des exercices guides de 3 minutes pour retrouver le calme.",
+      icon: Heart,
+      highlight: '3 minutes',
     },
     {
-      name: "Marine L.",
-      role: "Infirmière en réanimation",
-      content: "Après des situations difficiles, je restais bloquée des heures. La session Stop m'aide à sortir de la boucle de pensées.",
-      rating: 5,
-      avatar: "👩‍⚕️",
-      category: 'nurse',
-      highlight: 'Gestion du stress',
+      title: "Musicotherapie personnalisee",
+      description: "Frequences binaurales, ambiances apaisantes et compositions adaptees a votre etat emotionnel du moment.",
+      icon: Music,
+      highlight: 'Adaptatif',
     },
     {
-      name: "Lucas M.",
-      role: "Étudiant en pharmacie, 3ème année",
-      content: "J'utilise le protocole Concentration avant chaque session de révision. Ma capacité à rester focus a littéralement doublé.",
-      rating: 5,
-      avatar: "👨‍🎓",
-      category: 'student',
-      highlight: 'Focus amélioré',
+      title: "Coach IA Nyvee",
+      description: "Un accompagnement bienveillant disponible 24/7, adapte aux professionnels de sante et etudiants.",
+      icon: Sparkles,
+      highlight: 'Disponible 24/7',
     },
     {
-      name: "Sarah B.",
-      role: "Aide-soignante en EHPAD",
-      content: "Les journées sont émotionnellement intenses. Les 3 minutes de Reset entre les accompagnements me permettent de rester présente pour chaque résident.",
-      rating: 5,
-      avatar: "👩‍⚕️",
-      category: 'nurse',
-      highlight: 'Présence maintenue',
+      title: "Protocole Night",
+      description: "Un sas d'apaisement avant le sommeil avec respiration immersive et ambiance sonore pour un endormissement serein.",
+      icon: Clock,
+      highlight: 'Sommeil',
     },
     {
-      name: "Antoine V.",
-      role: "Chef de clinique, urgences",
-      content: "Je recommande EmotionsCare à tous mes internes. C'est devenu un outil de prévention du burn-out dans notre service.",
-      rating: 5,
-      avatar: "👨‍⚕️",
-      category: 'doctor',
-      highlight: 'Prévention burn-out',
+      title: "Donnees securisees",
+      description: "Vos donnees emotionnelles restent les votres. Conforme RGPD, heberge en France, aucune revente a des tiers.",
+      icon: Shield,
+      highlight: 'RGPD conforme',
     }
   ];
-
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'student': return <GraduationCap className="h-3 w-3" />;
-      case 'nurse': return <Heart className="h-3 w-3" />;
-      case 'doctor': return <Stethoscope className="h-3 w-3" />;
-      default: return null;
-    }
-  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -100,9 +70,9 @@ const TestimonialsSection: React.FC = () => {
   };
 
   return (
-    <section 
+    <section
       className="py-20 bg-gradient-to-b from-background to-primary/5"
-      aria-labelledby="testimonials-title"
+      aria-labelledby="modules-title"
     >
       <div className="container mx-auto px-4">
         <motion.div
@@ -115,67 +85,50 @@ const TestimonialsSection: React.FC = () => {
           {/* Header */}
           <motion.div variants={itemVariants} className="text-center space-y-4">
             <Badge variant="outline">
-              <Quote className="h-3 w-3 mr-2" aria-hidden="true" />
-              Ce qu'ils en disent
+              <Sparkles className="h-3 w-3 mr-2" aria-hidden="true" />
+              Nos modules
             </Badge>
-            <h2 id="testimonials-title" className="text-3xl lg:text-4xl font-bold text-foreground">
-              Ils ont repris le contrôle
+            <h2 id="modules-title" className="text-3xl lg:text-4xl font-bold text-foreground">
+              Des outils concrets pour votre bien-être
             </h2>
             <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-              Des étudiants et soignants qui utilisent EmotionsCare au quotidien.
+              Decouvrez les fonctionnalites d'EmotionsCare, concues pour les soignants et etudiants en sante.
             </p>
           </motion.div>
 
-          {/* Testimonials Grid */}
-          <motion.div 
+          {/* Modules Grid */}
+          <motion.div
             variants={containerVariants}
             className="grid md:grid-cols-3 gap-6"
             role="list"
-            aria-label="Témoignages d'utilisateurs"
+            aria-label="Modules EmotionsCare"
           >
-            {testimonials.map((testimonial, index) => (
-              <motion.article 
-                key={index} 
-                variants={itemVariants}
-                role="listitem"
-                aria-label={`Témoignage de ${testimonial.name}`}
-              >
-                <Card className="h-full border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all">
-                  <CardContent className="p-6 space-y-4">
-                    {/* Rating */}
-                    <div className="flex gap-0.5" role="img" aria-label={`Note : ${testimonial.rating} étoiles sur 5`}>
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="h-4 w-4 text-yellow-400 fill-yellow-400" aria-hidden="true" />
-                      ))}
-                    </div>
-                    
-                    {/* Quote */}
-                    <blockquote className="text-foreground/90 italic leading-relaxed">
-                      <p>"{testimonial.content}"</p>
-                    </blockquote>
-
-                    {/* Highlight Badge */}
-                    {testimonial.highlight && (
-                      <Badge variant="secondary" className="w-fit text-xs">
-                        <span aria-hidden="true">✨</span> {testimonial.highlight}
-                      </Badge>
-                    )}
-                    
-                    {/* Author */}
-                    <footer className="flex items-center gap-3 pt-4 border-t border-border/50">
-                      <div className="text-3xl" aria-hidden="true">{testimonial.avatar}</div>
-                      <div>
-                        <cite className="font-semibold text-foreground not-italic">{testimonial.name}</cite>
-                        <div className="text-sm text-muted-foreground flex items-center gap-1">
-                          <span aria-hidden="true">{getCategoryIcon(testimonial.category)}</span>
-                          <span>{testimonial.role}</span>
-                        </div>
-                      </div>
-                    </footer>
-                  </CardContent>
-                </Card>
-              </motion.article>
-            ))}
+            {modules.map((module, index) => {
+              const Icon = module.icon;
+              return (
+                <motion.article
+                  key={index}
+                  variants={itemVariants}
+                  role="listitem"
+                  aria-label={module.title}
+                >
+                  <Card className="h-full border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all">
+                    <CardContent className="p-6 space-y-4">
+                      <Icon className="h-8 w-8 text-primary" />
+                      <h3 className="text-lg font-semibold">{module.title}</h3>
+                      <p className="text-foreground/90 leading-relaxed">
+                        {module.description}
+                      </p>
+                      {module.highlight && (
+                        <Badge variant="secondary" className="w-fit text-xs">
+                          {module.highlight}
+                        </Badge>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.article>
+              );
+            })}
           </motion.div>
         </motion.div>
       </div>

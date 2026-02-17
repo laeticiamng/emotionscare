@@ -13,7 +13,6 @@ import {
   TrendingUp,
   Shield,
   Users,
-  Star,
   ArrowRight,
   CheckCircle,
   Zap,
@@ -82,24 +81,21 @@ const HomeB2CPage: React.FC = () => {
     'Conformité RGPD & sécurité maximale'
   ];
 
-  const testimonials = [
+  const moduleHighlights = [
     {
-      name: 'Marie L.',
-      role: 'Utilisatrice depuis 6 mois',
-      content: 'EmotionsCare a transformé ma gestion du stress. Le coach IA est incroyablement empathique et les insights sont précieux.',
-      rating: 5
+      icon: Brain,
+      title: 'Scan émotionnel IA',
+      content: 'Évaluez votre état émotionnel en quelques questions. Score sur 5 dimensions : humeur, énergie, stress, sommeil et charge mentale.',
     },
     {
-      name: 'Thomas B.',
-      role: 'Professionnel en reconversion',
-      content: 'La musicothérapie personnalisée m\'aide énormément à me concentrer et à retrouver mon calme en quelques minutes.',
-      rating: 5
+      icon: Music,
+      title: 'Musicothérapie personnalisée',
+      content: 'Fréquences binaurales, ambiances apaisantes et compositions adaptées à votre état émotionnel du moment.',
     },
     {
-      name: 'Sophie M.',
-      role: 'Étudiante',
-      content: 'Le scan émotionnel est bluffant de précision. J\'adore voir ma progression semaine après semaine.',
-      rating: 5
+      icon: MessageCircle,
+      title: 'Coach IA Nyvée',
+      content: 'Un accompagnement bienveillant disponible 24/7, adapté aux professionnels de santé et étudiants.',
     }
   ];
 
@@ -430,8 +426,8 @@ const HomeB2CPage: React.FC = () => {
                 <Card className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20">
                   <CardContent className="p-6 text-center">
                     <Music className="w-8 h-8 mx-auto mb-3 text-blue-500" />
-                    <div className="text-2xl font-bold mb-1">1000+</div>
-                    <div className="text-sm text-muted-foreground">Playlists thérapeutiques</div>
+                    <div className="text-2xl font-bold mb-1">37</div>
+                    <div className="text-sm text-muted-foreground">Modules disponibles</div>
                   </CardContent>
                 </Card>
                 <Card className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20">
@@ -461,44 +457,40 @@ const HomeB2CPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* Modules Highlights Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <Badge className="mb-4">Témoignages</Badge>
+            <Badge className="mb-4">Modules</Badge>
             <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              Ils ont transformé leur vie
+              Des outils concrets pour votre bien-être
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Découvrez l'expérience de nos utilisateurs
+              Découvrez nos modules conçus pour les professionnels de santé
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={testimonial.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card className="h-full hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex gap-1 mb-4">
-                      {Array.from({ length: testimonial.rating }).map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      ))}
-                    </div>
-                    <p className="text-muted-foreground mb-4 italic">"{testimonial.content}"</p>
-                    <div>
-                      <div className="font-semibold">{testimonial.name}</div>
-                      <div className="text-sm text-muted-foreground">{testimonial.role}</div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+            {moduleHighlights.map((module, index) => {
+              const Icon = module.icon;
+              return (
+                <motion.div
+                  key={module.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="h-full hover:shadow-lg transition-shadow">
+                    <CardContent className="p-6">
+                      <Icon className="w-8 h-8 text-primary mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">{module.title}</h3>
+                      <p className="text-muted-foreground">{module.content}</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -516,7 +508,7 @@ const HomeB2CPage: React.FC = () => {
               Prêt à transformer votre bien-être ?
             </h2>
             <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-              Rejoignez les professionnels de santé qui améliorent leur bien-être avec EmotionsCare
+              Découvrez des outils concrets pour prendre soin de votre bien-être émotionnel
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" variant="secondary" className="text-lg h-14 px-8 shadow-xl hover:shadow-2xl">
