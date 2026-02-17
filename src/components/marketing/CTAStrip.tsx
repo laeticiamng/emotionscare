@@ -92,7 +92,7 @@ export const CTAStrip: React.FC<CTAStripProps> = ({ segment }) => {
             Commencez votre parcours bien-être dès aujourd'hui
           </h2>
           <p className="text-lg text-purple-100 mb-8">
-            Rejoignez des milliers de personnes qui cultivent leur équilibre 
+            Découvrez des outils concrets pour cultiver votre équilibre
             émotionnel avec EmotionsCare.
           </p>
 

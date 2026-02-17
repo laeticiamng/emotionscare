@@ -85,7 +85,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
   
   // Initialiser les hooks et variables en dehors du try-catch
   const [searchParams] = useSearchParams();
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  // currentTestimonial removed - testimonials section replaced by module showcase
   const [statsVisible, setStatsVisible] = useState(false);
   const statsSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
   const featuresSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
@@ -160,42 +160,30 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
   ];
 
   const stats = [
-    { label: "Utilisateurs Actifs", value: "25,000+", description: "Personnes accompagnées quotidiennement", icon: Users, progress: 85 },
+    { label: "Modules", value: "37", description: "Outils disponibles pour votre bien-être", icon: Users, progress: 85 },
     { label: "Sessions Quotidiennes", value: "150K+", description: "Interactions IA par jour", icon: Activity, progress: 92 },
     { label: "Satisfaction Moyenne", value: "98.7%", description: "Taux de satisfaction utilisateur", icon: Star, progress: 98 },
     { label: "Disponibilité", value: "99.9%", description: "Uptime garantie premium", icon: Shield, progress: 99 }
   ];
 
-  const testimonials = [
+  const moduleShowcase = [
     {
-      name: "Sarah M.",
-      role: "Cadre supérieure",
-      avatar: "/images/avatar-sarah.jpg",
-      avatarAlt: "Photo de profil de Sarah M., cadre supérieure",
-      rating: 5,
-      text: "EmotionsCare a transformé ma gestion du stress. Le coach IA Nyvée m'aide quotidiennement à maintenir mon équilibre émotionnel.",
-      highlight: "Transformation complète",
-      company: "Fortune 500"
+      title: "Scan émotionnel IA",
+      icon: Brain,
+      text: "Évaluez votre état émotionnel en quelques questions. Score sur 5 dimensions : humeur, énergie, stress, sommeil et charge mentale.",
+      highlight: "Auto-évaluation",
     },
     {
-      name: "Marc D.",
-      role: "Entrepreneur",
-      avatar: "/images/avatar-marc.jpg",
-      avatarAlt: "Photo de profil de Marc D., entrepreneur",
-      rating: 5,
-      text: "L'analyse faciale en temps réel me permet d'adapter mes présentations. Un avantage concurrentiel incroyable.",
-      highlight: "Avantage concurrentiel",
-      company: "Startup Tech"
+      title: "Musicothérapie personnalisée",
+      icon: Music,
+      text: "Fréquences binaurales, ambiances apaisantes et compositions adaptées à votre état émotionnel du moment.",
+      highlight: "Adaptatif",
     },
     {
-      name: "Lisa K.",
-      role: "Psychologue",
-      avatar: "/images/avatar-lisa.jpg",
-      avatarAlt: "Photo de profil de Lisa K., psychologue",
-      rating: 5,
-      text: "J'utilise EmotionsCare avec mes patients. Les insights IA complètent parfaitement mes analyses cliniques.",
-      highlight: "Outil professionnel",
-      company: "Cabinet privé"
+      title: "Coach IA Nyvée",
+      icon: Sparkles,
+      text: "Un accompagnement bienveillant disponible 24/7, adapté aux professionnels de santé et étudiants.",
+      highlight: "Disponible 24/7",
     }
   ];
 
@@ -775,77 +763,37 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                 viewport={{ once: true }}
                 className="text-center space-y-4 mb-16"
               >
-                <Badge variant="secondary" className="mb-2">Témoignages</Badge>
+                <Badge variant="secondary" className="mb-2">Nos modules</Badge>
                 <h2 id="testimonials-heading" className="text-4xl lg:text-5xl font-bold">
-                  Ce que disent nos utilisateurs
+                  Des outils concrets pour votre bien-être
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Des milliers de personnes nous font confiance pour leur bien-être émotionnel
+                  Découvrez les fonctionnalités conçues pour les professionnels de santé
                 </p>
               </motion.div>
 
-              <div className="max-w-4xl mx-auto" role="group" aria-live="polite" aria-atomic="true" aria-label="Carousel de témoignages">
-                <motion.div
-                  key={currentTestimonial}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-3xl p-8 lg:p-12"
-                >
-                  <div className="text-center space-y-6">
-                    {/* Avatar */}
-                    <div className="flex justify-center mb-4">
-                      <img
-                        src={testimonials[currentTestimonial].avatar}
-                        alt={testimonials[currentTestimonial].avatarAlt}
-                        className="w-20 h-20 rounded-full object-cover border-4 border-primary/20"
-                        loading="lazy"
-                        onError={(e) => {
-                          // Fallback avec placeholder
-                          const target = e.currentTarget;
-                          target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80"%3E%3Crect fill="%23ddd" width="80" height="80"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="32"%3E👤%3C/text%3E%3C/svg%3E';
-                          target.onerror = null;
-                        }}
-                      />
-                    </div>
-
-                    <div className="flex justify-center space-x-1 mb-6" aria-label={`Note: ${testimonials[currentTestimonial].rating} étoiles sur 5`}>
-                      {Array.from({ length: testimonials[currentTestimonial].rating }).map((_, i) => (
-                        <Star key={i} className="h-6 w-6 fill-yellow-400 text-yellow-400" aria-hidden="true" />
-                      ))}
-                    </div>
-
-                    <blockquote className="text-xl lg:text-2xl font-medium leading-relaxed text-foreground">
-                      "{testimonials[currentTestimonial].text}"
-                    </blockquote>
-
-                    <div className="space-y-2">
-                      <div className="font-semibold text-lg">{testimonials[currentTestimonial].name}</div>
-                      <div className="text-muted-foreground">{testimonials[currentTestimonial].role}</div>
-                      <Badge variant="outline" className="mt-2">
-                        {testimonials[currentTestimonial].company}
-                      </Badge>
-                    </div>
-                  </div>
-                </motion.div>
-
-                <div className="flex justify-center space-x-2 mt-8" role="tablist" aria-label="Sélection de témoignage">
-                  {testimonials.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentTestimonial(index)}
-                      type="button"
-                      role="tab"
-                      aria-label={`Afficher le témoignage ${index + 1}`}
-                      aria-selected={index === currentTestimonial}
-                      className={cn(
-                        "w-3 h-3 rounded-full transition-all duration-300",
-                        index === currentTestimonial ? "bg-primary" : "bg-muted",
-                        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                      )}
-                    />
-                  ))}
-                </div>
+              <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                {moduleShowcase.map((module, index) => {
+                  const Icon = module.icon;
+                  return (
+                    <motion.div
+                      key={module.title}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      viewport={{ once: true }}
+                    >
+                      <Card className="h-full hover:shadow-lg transition-all border-border/50">
+                        <CardContent className="p-8 space-y-4">
+                          <Icon className="h-10 w-10 text-primary" />
+                          <h3 className="text-xl font-semibold">{module.title}</h3>
+                          <p className="text-muted-foreground leading-relaxed">{module.text}</p>
+                          <Badge variant="outline">{module.highlight}</Badge>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  );
+                })}
               </div>
             </div>
           ) : (
@@ -855,10 +803,9 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                 <span className="h-10 w-2/3 rounded-full bg-muted/40 animate-pulse md:w-1/2" />
                 <span className="h-4 w-1/2 rounded-full bg-muted/30 animate-pulse md:w-1/3" />
               </div>
-              <div className="max-w-4xl mx-auto h-72 rounded-3xl bg-muted/40 animate-pulse" />
-              <div className="flex justify-center space-x-2">
-                {Array.from({ length: testimonials.length }).map((_, index) => (
-                  <div key={index} className="h-3 w-3 rounded-full bg-muted/40" />
+              <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                {moduleShowcase.map((_, index) => (
+                  <div key={index} className="h-64 rounded-xl bg-muted/40 animate-pulse" />
                 ))}
               </div>
             </div>
@@ -879,8 +826,8 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                   Prêt à transformer votre vie émotionnelle ?
                 </h2>
                 <p className="text-xl opacity-90 leading-relaxed">
-                  Rejoignez plus de 25 000 utilisateurs qui ont déjà découvert le pouvoir de l'intelligence émotionnelle.
-                  Commencez votre parcours dès aujourd'hui avec notre essai gratuit de 30 jours.
+                  Découvrez des outils concrets pour prendre soin de votre bien-être émotionnel.
+                  Commencez votre parcours dès aujourd'hui.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">

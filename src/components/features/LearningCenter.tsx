@@ -190,12 +190,12 @@ const LearningCenter: React.FC = () => {
         <div className="flex items-start">
           <BookOpen className="h-5 w-5 text-primary mt-1 mr-3" />
           <div>
-            <h4 className="font-medium">Témoignages vidéo</h4>
+            <h4 className="font-medium">Guides pratiques</h4>
             <p className="text-sm text-muted-foreground mt-1">
-              Découvrez comment d'autres utilisateurs ont transformé leur vie grâce à nos outils émotionnels.
+              Découvrez comment tirer le meilleur parti de chaque module EmotionsCare.
             </p>
             <Button variant="link" className="p-0 mt-2 h-auto" size="sm">
-              Voir les témoignages
+              Voir les guides
             </Button>
           </div>
         </div>
