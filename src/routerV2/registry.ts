@@ -2049,6 +2049,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       guard: false,
     },
     {
+      name: 'security-dossier-b2b',
+      path: '/admin/security-dossier',
+      segment: 'public',
+      layout: 'marketing',
+      component: 'SecurityDossierB2B',
+      guard: false,
+    },
+    {
       name: 'seo-audit',
       path: '/admin/seo-audit',
       segment: 'public',
