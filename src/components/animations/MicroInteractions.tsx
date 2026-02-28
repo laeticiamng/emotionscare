@@ -224,26 +224,17 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
         )}
       </Button>
 
-      {/* CSS for ripple effect */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          .ripple-effect {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.6);
-            transform: scale(0);
-            animation: ripple 0.6s linear;
-            pointer-events: none;
-          }
-
-          @keyframes ripple {
-            to {
-              transform: scale(4);
-              opacity: 0;
-            }
-          }
-        `
-      }} />
+      {/* Ripple effect styles injected via useEffect to avoid dangerouslySetInnerHTML */}
+      {(() => {
+        const styleId = 'micro-interactions-ripple';
+        if (typeof document !== 'undefined' && !document.getElementById(styleId)) {
+          const style = document.createElement('style');
+          style.id = styleId;
+          style.textContent = `.ripple-effect{position:absolute;border-radius:50%;background:rgba(255,255,255,.6);transform:scale(0);animation:ripple .6s linear;pointer-events:none}@keyframes ripple{to{transform:scale(4);opacity:0}}`;
+          document.head.appendChild(style);
+        }
+        return null;
+      })()}
     </motion.div>
   );
 };

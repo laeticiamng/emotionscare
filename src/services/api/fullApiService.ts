@@ -24,7 +24,7 @@ class FullApiService {
     };
 
     // Ajouter le token d'authentification si disponible
-    const token = localStorage.getItem('auth_token');
+    const token = sessionStorage.getItem('auth_token') ?? localStorage.getItem('auth_token');
     if (token) {
       defaultOptions.headers = {
         ...defaultOptions.headers,

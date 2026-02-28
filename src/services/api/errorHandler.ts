@@ -85,7 +85,8 @@ export class ApiErrorHandler {
     // Sauvegarder l'URL actuelle pour redirection post-login
     sessionStorage.setItem('redirectUrl', window.location.pathname);
     
-    // Nettoyer le token
+    // Nettoyer le token (sessionStorage prioritaire, localStorage legacy)
+    sessionStorage.removeItem('auth_token');
     localStorage.removeItem('auth_token');
     
     // Rediriger vers login

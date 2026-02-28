@@ -29,7 +29,7 @@ class ApiService {
   }
 
   private getAuthToken(): string | null {
-    return localStorage.getItem('auth_token');
+    return sessionStorage.getItem('auth_token') ?? localStorage.getItem('auth_token');
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
