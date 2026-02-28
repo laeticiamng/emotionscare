@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck -- TODO: typer les 191 lignes de navigation latérale
 /**
  * QuickAccessSidebar - Navigation rapide latérale
  * Accès direct aux fonctionnalités principales

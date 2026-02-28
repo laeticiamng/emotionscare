@@ -1,11 +1,12 @@
-// @ts-nocheck
+import type React from 'react';
+// Types pour les KPIs
 
 export interface KpiCardProps {
   id: string;
   title: string;
   value: string | number;
   subtitle?: string;
-  icon?: React.ComponentType<any>;
+  icon?: React.ComponentType<{ className?: string }>;
   trend?: {
     value: number;
     isPositive: boolean;

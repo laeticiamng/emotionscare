@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck -- TODO: refactor ServiceCallConfig generics (cascade sur 170 lignes)
 import { z, type ZodType } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { API_URL } from '@/lib/env';

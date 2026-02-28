@@ -14,6 +14,7 @@
     "preview": "vite preview",
     "tsc": "tsc --noEmit",
     "test": "vitest run --reporter=dot",
+    "ci:check-secrets": "vitest run src/__tests__/no-secrets-in-bundle.test.ts",
     "test:ui": "vitest run src/pages/settings/SilkPage.test.tsx",
     "test:edge": "vitest --environment edge-runtime --no-browser-env-check",
     "test:db": "vitest run --config vitest.db.config.ts --reporter=json --outputFile=reports/db-tests.json && node -e \"const r=require('./reports/db-tests.json'); if(r.numFailedTests>0){process.exit(1)}\"",

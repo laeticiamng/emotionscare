@@ -1,4 +1,4 @@
-// @ts-nocheck
+// Types pour le sidebar
 
 export interface SidebarContextType {
   collapsed: boolean;

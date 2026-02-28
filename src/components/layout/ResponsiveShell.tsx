@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck -- TODO: typer les imports Header/Sidebar/Footer
 import React, { useState } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';

@@ -1,4 +1,4 @@
-// @ts-nocheck
+// Types pour l'historique VR
 
 import { VRSession } from './vr';
 

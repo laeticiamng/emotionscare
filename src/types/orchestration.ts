@@ -1,6 +1,4 @@
-// @ts-nocheck
-
-import { MoodData } from '@/types/audio';
+// Types pour l'orchestration émotionnelle
 
 export interface MoodEvent {
   id: string;
@@ -69,5 +67,5 @@ export interface OrchestrationEvent {
   id: string;
   type: string;
   timestamp: string;
-  data: any;
+  data: Record<string, unknown>;
 }

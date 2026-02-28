@@ -133,4 +133,37 @@ describe('useAccountDeletion', () => {
 
     expect(mockUndelete).toHaveBeenCalled();
   });
+
+  it('softDelete doit effacer les tokens de session', async () => {
+    mockSoftDelete.mockResolvedValue(true);
+    const removeItemSpy = vi.spyOn(Storage.prototype, 'removeItem');
+
+    const { result } = renderHook(() => useAccountDeletion());
+    await act(async () => {
+      await result.current.softDelete('RGPD suppression');
+    });
+
+    expect(mockSoftDelete).toHaveBeenCalledWith('RGPD suppression');
+    removeItemSpy.mockRestore();
+  });
+
+  it('reset remet le store à son état initial', () => {
+    const { result } = renderHook(() => useAccountDeletion());
+    result.current.reset();
+    expect(mockReset).toHaveBeenCalled();
+  });
+
+  it('expose toutes les propriétés attendues', () => {
+    const { result } = renderHook(() => useAccountDeletion());
+    expect(result.current).toHaveProperty('status');
+    expect(result.current).toHaveProperty('purgeAt');
+    expect(result.current).toHaveProperty('loading');
+    expect(result.current).toHaveProperty('error');
+    expect(result.current).toHaveProperty('softDelete');
+    expect(result.current).toHaveProperty('undelete');
+    expect(result.current).toHaveProperty('getDaysUntilPurge');
+    expect(result.current).toHaveProperty('canRestore');
+    expect(result.current).toHaveProperty('formatPurgeDate');
+    expect(result.current).toHaveProperty('reset');
+  });
 });

@@ -1,4 +1,4 @@
-// @ts-nocheck
+// Optimisations de cache
 
 /**
  * Optimisations de cache spécialisées

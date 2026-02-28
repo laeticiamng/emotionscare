@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck -- TODO: typer les retours Supabase dynamiques
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 import { startOfMonth, endOfMonth, subMonths, format } from 'date-fns';

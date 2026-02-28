@@ -1,4 +1,4 @@
-// @ts-nocheck
+// Types pour les modules d'activité
 export type ModuleState = 'loading' | 'content' | 'empty' | 'verbal-feedback';
 
 export interface SessionResult {
@@ -20,7 +20,7 @@ export interface ModuleContext {
   name: string;
   duration: number;
   preset?: string;
-  userState?: any;
+  userState?: Record<string, unknown>;
 }
 
 export interface DayPlanCard {

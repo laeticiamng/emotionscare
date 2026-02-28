@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import DOMPurify from 'dompurify'
+import { SafeHtml } from '@/components/ui/SafeHtml'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -271,14 +271,14 @@ const renderMarkdown = (input: string) => {
 }
 
 export function SafeNote({ text }: { text: string }) {
-  const html = useMemo(() => {
-    const rendered = renderMarkdown(text)
-    return DOMPurify.sanitize(rendered, {
-      ALLOWED_TAGS: ['p', 'em', 'strong', 'a', 'ul', 'li', 'code'],
-      ALLOWED_ATTR: { a: ['href', 'target', 'rel'] } as any,
-      ADD_ATTR: ['rel'],
-    })
-  }, [text])
+  const html = useMemo(() => renderMarkdown(text), [text])
 
-  return <div className="prose prose-sm dark:prose-invert" dangerouslySetInnerHTML={{ __html: html }} />
+  return (
+    <SafeHtml
+      className="prose prose-sm dark:prose-invert"
+      html={html}
+      allowedTags={['p', 'em', 'strong', 'a', 'ul', 'li', 'code']}
+      allowedAttr={['href', 'target', 'rel']}
+    />
+  )
 }

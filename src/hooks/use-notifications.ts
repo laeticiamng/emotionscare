@@ -1,4 +1,4 @@
-// @ts-nocheck
+// Hook de notifications
 
 import { ReactElement, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -7,7 +7,7 @@ type NotificationVariant = 'default' | 'success' | 'error' | 'warning' | 'info';
 
 interface NotificationOptions {
   title?: string;
-  description?: string | ReactNode;
+  description?: string;
   variant?: NotificationVariant;
   duration?: number;
   action?: ReactElement;
