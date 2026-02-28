@@ -214,13 +214,6 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
     }
   ];
 
-  // Auto-rotate testimonials
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     if (statsSection.isVisible) {

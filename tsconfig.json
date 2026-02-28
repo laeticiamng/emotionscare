@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "jsx": "react-jsx",
-"jsxImportSource": "react",
-"allowSyntheticDefaultImports": true,
+    "jsxImportSource": "react",
+    "allowSyntheticDefaultImports": true,
     "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -29,12 +29,19 @@
       ],
       "cross-fetch": [
         "./tests/polyfills/cross-fetch.ts"
+      ],
+      "@playwright/test": [
+        "./types/playwright-stub.d.ts"
+      ],
+      "@axe-core/playwright": [
+        "./types/playwright-stub.d.ts"
       ]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2020",
+    "noEmit": true,
     "types": [
       "vite/client",
       "node",
@@ -44,7 +51,12 @@
   },
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "src/e2e",
+    "src/**/*.e2e.test.ts",
+    "src/**/*.e2e.test.tsx",
+    "tests/e2e",
+    "supabase"
   ],
   "include": [
     "./src",
@@ -53,11 +65,9 @@
     "./test",
     "./services",
     "./scripts",
-    "./supabase",
     "./ci",
     "./tools",
     "./vitest.config.ts",
-    "./vitest.*.config.ts",
-    "./playwright.config.ts"
+    "./vitest.*.config.ts"
   ]
 }

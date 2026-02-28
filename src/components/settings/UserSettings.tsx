@@ -117,7 +117,7 @@ const UserSettings = () => {
 
   // Properly typed theme handler
   const handleThemeChange = (newTheme: ThemeName) => {
-    setTheme(newTheme);
+    setTheme(newTheme as 'light' | 'dark' | 'system');
     addToHistory('theme', `Thème changé vers "${newTheme}"`);
   };
 

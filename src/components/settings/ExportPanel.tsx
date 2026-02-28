@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { 
   Download, 
   FileText, 
@@ -17,42 +16,35 @@ import { useExportJob } from '@/hooks/useExportJob';
  */
 export const ExportPanel: React.FC = () => {
   const { 
-    lastExport, 
-    startExport, 
-    checkExportStatus, 
-    isExporting, 
-    isReady, 
-    hasError 
+    job, 
+    start, 
+    poll, 
+    loading, 
+    error, 
+    downloadAndTrack 
   } = useExportJob();
 
-  const handleDownload = async () => {
-    if (lastExport && isReady) {
-      try {
-        const status = await checkExportStatus(lastExport.jobId);
-        if (status.download_url) {
-          // In a real implementation, trigger download
-          window.open(status.download_url, '_blank');
-        }
-      } catch (error) {
-        // Download failed - silent
-      }
+  const isReady = job?.status === 'ready';
+  const hasError = !!error;
+
+  const handleDownload = () => {
+    if (job && isReady && job.download_url) {
+      downloadAndTrack(job.download_url);
     }
   };
 
   const getStatusDisplay = () => {
-    if (!lastExport) {
+    if (!job) {
       return {
         icon: <Info className="w-4 h-4 text-blue-600" />,
         text: 'Aucun export récent',
-        variant: 'default' as const
       };
     }
 
-    if (isExporting) {
+    if (loading) {
       return {
         icon: <Clock className="w-4 h-4 text-amber-600" />,
         text: 'Export en cours...',
-        variant: 'secondary' as const
       };
     }
 
@@ -60,7 +52,6 @@ export const ExportPanel: React.FC = () => {
       return {
         icon: <CheckCircle className="w-4 h-4 text-green-600" />,
         text: 'Export prêt',
-        variant: 'default' as const
       };
     }
 
@@ -68,19 +59,17 @@ export const ExportPanel: React.FC = () => {
       return {
         icon: <AlertCircle className="w-4 h-4 text-red-600" />,
         text: 'Erreur export',
-        variant: 'destructive' as const
       };
     }
 
     return {
       icon: <Clock className="w-4 h-4 text-gray-600" />,
       text: 'Statut inconnu',
-      variant: 'secondary' as const
     };
   };
 
   const status = getStatusDisplay();
-  const exportDate = lastExport ? new Date(lastExport.timestamp).toLocaleDateString('fr-FR') : null;
+  const exportDate = job ? new Date((job as any).timestamp || (job as any).created_at || Date.now()).toLocaleDateString('fr-FR') : null;
 
   return (
     <div className="space-y-4">
@@ -94,7 +83,7 @@ export const ExportPanel: React.FC = () => {
       </Alert>
 
       {/* Export Status */}
-      {lastExport && (
+      {job && (
         <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
           <div className="flex items-center gap-2">
             {status.icon}
@@ -126,12 +115,12 @@ export const ExportPanel: React.FC = () => {
       {/* Export Actions */}
       <div className="space-y-3">
         <Button
-          onClick={startExport}
-          disabled={isExporting}
+          onClick={start}
+          disabled={loading}
           className="w-full"
         >
           <FileText className="w-4 h-4 mr-2" />
-          {isExporting ? 'Préparation en cours...' : 'Démarrer un nouvel export'}
+          {loading ? 'Préparation en cours...' : 'Démarrer un nouvel export'}
         </Button>
 
         {/* Export Details */}
