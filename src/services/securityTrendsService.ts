@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 import { subDays, format, startOfDay, endOfDay } from 'date-fns';
@@ -250,7 +249,7 @@ function analyzeTrend(historical: TrendData[]): 'increasing' | 'decreasing' | 's
  */
 function calculateRiskLevel(
   historical: TrendData[],
-  alerts: any[]
+  alerts: Array<{ severity: string; created_at: string }>
 ): 'low' | 'medium' | 'high' | 'critical' {
   const recentDays = 7;
   const recentAlerts = historical.slice(-recentDays);

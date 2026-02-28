@@ -100,6 +100,7 @@ export default [
       "ec/no-node-builtins-client": "error",
       "ec/no-hardcoded-paths": "error",
       "ec/no-hooks-in-blocks": "error",
+      "ec/no-raw-innerhtml": "error",
       "no-console": ["warn", { allow: ["warn", "error"] }],
       "@typescript-eslint/ban-ts-comment": ["warn", {
         "ts-nocheck": "allow-with-description",
@@ -154,6 +155,7 @@ export default [
     },
     rules: {
       "ec/no-clinical-score-terms": "error",
+      "ec/no-unsourced-stats": "warn",
     }
   },
   {

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export interface AuditLog {
   id: string;
   userId: string;
@@ -10,7 +8,7 @@ export interface AuditLog {
   userAgent?: string;
   success: boolean;
   details?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ConsentRecord {

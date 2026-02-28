@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { sha256Hex } from '@/lib/hash';
 
 /**
@@ -12,6 +11,12 @@ export interface ConsentOptions {
   dataStorage?: boolean;
 }
 
+interface EmotionData {
+  valence: number;
+  arousal: number;
+  dominantEmotion: string;
+}
+
 export async function pseudonymizeUserId(userId: string): Promise<string> {
   const hash = await sha256Hex(userId);
   return hash.substring(0, 16);
@@ -21,14 +26,12 @@ export function shouldAggregateData(userCount: number, threshold: number = 5): b
   return userCount >= threshold;
 }
 
-export function sanitizeEmotionData(emotionData: any) {
-  // Ne garder que les données agrégées et anonymisées
+export function sanitizeEmotionData(emotionData: EmotionData) {
   return {
     valence: Math.round(emotionData.valence * 100) / 100,
     arousal: Math.round(emotionData.arousal * 100) / 100,
     dominantEmotion: emotionData.dominantEmotion,
     timestamp: new Date().toISOString(),
-    // Pas d'identifiants personnels
   };
 }
 
