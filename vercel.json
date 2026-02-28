@@ -33,7 +33,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' https://cdn.gpteng.co; style-src 'self' 'unsafe-inline' https://rsms.me https://fonts.googleapis.com; img-src 'self' data: blob: https://images.unsplash.com https://cdn.gpteng.co https://rsms.me; font-src 'self' https://rsms.me https://fonts.gstatic.com data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://api.hume.ai wss://*.hume.ai https://*.sentry.io https://*.ingest.sentry.io https://cdn.gpteng.co; media-src 'self' blob: https://*.supabase.co https://storage.googleapis.com; frame-ancestors 'self'; form-action 'self'; base-uri 'self'; object-src 'none'; worker-src 'self' blob:; manifest-src 'self'; frame-src 'self'"
+          "value": "default-src 'self'; script-src 'self' https://cdn.gpteng.co; style-src 'self' https://rsms.me https://fonts.googleapis.com; img-src 'self' data: blob: https://images.unsplash.com https://cdn.gpteng.co https://rsms.me; font-src 'self' https://rsms.me https://fonts.gstatic.com data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://api.hume.ai wss://*.hume.ai https://*.sentry.io https://*.ingest.sentry.io https://cdn.gpteng.co; media-src 'self' blob: https://*.supabase.co https://storage.googleapis.com; frame-ancestors 'self'; form-action 'self'; base-uri 'self'; object-src 'none'; worker-src 'self' blob:; manifest-src 'self'; frame-src 'self'"
         }
       ]
     },
