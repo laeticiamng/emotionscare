@@ -104,7 +104,7 @@ const TestimonialsSection: React.FC = () => {
             aria-label="Modules EmotionsCare"
           >
             {modules.map((module, index) => {
-              const Icon = module.icon;
+              const Icon = module.icon as React.FC<{ className?: string }>;
               return (
                 <motion.article
                   key={index}

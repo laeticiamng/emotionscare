@@ -20,7 +20,8 @@ import {
   BarChart3,
   MessageCircle,
   Award,
-  Trees
+  Trees,
+  Star
 } from 'lucide-react';
 import { routes } from '@/routerV2';
 import { usePageSEO } from '@/hooks/usePageSEO';

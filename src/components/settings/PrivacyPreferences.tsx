@@ -9,33 +9,22 @@ import { PrivacyPreferences } from '@/types/preferences';
 const PrivacyPreferencesComponent: React.FC = () => {
   const { preferences, updatePreferences } = useUserPreferences();
   
-  // Assurer que les propriétés sont définies avec des valeurs par défaut
   const getPrivacySettings = (): PrivacyPreferences => {
     if (!preferences?.privacy) {
       return {
-        shareData: false,
-        shareEmotions: false,
-        shareActivity: false,
-        publicProfile: false,
-        dataSharing: false,
-        analytics: true,
-        thirdParty: false,
-        anonymizeReports: false,
         profileVisibility: 'public',
+        dataCollection: false,
+        analytics: true,
+        marketing: false,
       };
     }
     
     if (typeof preferences.privacy === 'string') {
       return {
-        shareData: preferences.privacy !== 'private',
-        shareEmotions: preferences.privacy !== 'private',
-        shareActivity: preferences.privacy !== 'private',
-        publicProfile: preferences.privacy !== 'private',
-        dataSharing: preferences.privacy !== 'private',
-        analytics: preferences.privacy !== 'private',
-        thirdParty: preferences.privacy !== 'private',
-        anonymizeReports: false,
-        profileVisibility: preferences.privacy,
+        profileVisibility: preferences.privacy as 'private' | 'friends' | 'public',
+        dataCollection: preferences.privacy !== 'private',
+        analytics: true,
+        marketing: false,
       };
     }
     
@@ -44,21 +33,20 @@ const PrivacyPreferencesComponent: React.FC = () => {
   
   const privacySettings = getPrivacySettings();
   
-  const handleShareDataChange = (checked: boolean) => {
+  const handleDataCollectionChange = (checked: boolean) => {
     updatePreferences({
       privacy: {
         ...privacySettings,
-        shareData: checked,
-        dataSharing: checked, // Mise à jour des deux propriétés pour compatibilité
+        dataCollection: checked,
       },
     });
   };
   
-  const handleAnonymizeReportsChange = (checked: boolean) => {
+  const handleAnalyticsChange = (checked: boolean) => {
     updatePreferences({
       privacy: {
         ...privacySettings,
-        anonymizeReports: checked,
+        analytics: checked,
       },
     });
   };
@@ -67,7 +55,7 @@ const PrivacyPreferencesComponent: React.FC = () => {
     updatePreferences({
       privacy: {
         ...privacySettings,
-        profileVisibility: value,
+        profileVisibility: value as 'private' | 'friends' | 'public',
       },
     });
   };
@@ -80,29 +68,29 @@ const PrivacyPreferencesComponent: React.FC = () => {
       <CardContent className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="share-data">Partage de données</Label>
+            <Label htmlFor="data-collection">Collecte de données</Label>
             <p className="text-sm text-muted-foreground">
-              Autoriser le partage anonymisé de données pour améliorer le service
+              Autoriser la collecte anonymisée de données pour améliorer le service
             </p>
           </div>
           <Switch
-            id="share-data"
-            checked={privacySettings.shareData || privacySettings.dataSharing || false}
-            onCheckedChange={handleShareDataChange}
+            id="data-collection"
+            checked={privacySettings.dataCollection || false}
+            onCheckedChange={handleDataCollectionChange}
           />
         </div>
 
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="anonymize-reports">Anonymiser les rapports</Label>
+            <Label htmlFor="analytics">Analytics</Label>
             <p className="text-sm text-muted-foreground">
-              Masquer votre identité dans les rapports d'équipe
+              Activer les statistiques d'utilisation anonymes
             </p>
           </div>
           <Switch
-            id="anonymize-reports"
-            checked={privacySettings.anonymizeReports || false}
-            onCheckedChange={handleAnonymizeReportsChange}
+            id="analytics"
+            checked={privacySettings.analytics || false}
+            onCheckedChange={handleAnalyticsChange}
           />
         </div>
 
@@ -117,7 +105,7 @@ const PrivacyPreferencesComponent: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="public">Public</SelectItem>
-              <SelectItem value="team">Équipe seulement</SelectItem>
+              <SelectItem value="friends">Amis seulement</SelectItem>
               <SelectItem value="private">Privé</SelectItem>
             </SelectContent>
           </Select>

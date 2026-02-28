@@ -26,7 +26,7 @@ const JournalNewPage: React.FC = () => {
   const [mood, setMood] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [isRecording, setIsRecording] = useState(false);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
   const [isPrivate, setIsPrivate] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [showTemplates, setShowTemplates] = useState(true);
@@ -123,7 +123,7 @@ const JournalNewPage: React.FC = () => {
     recognition.interimResults = true;
     recognition.lang = 'fr-FR';
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event: any) => {
       let finalTranscript = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
         if (event.results[i].isFinal) {
@@ -135,7 +135,7 @@ const JournalNewPage: React.FC = () => {
       }
     };
 
-    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+    recognition.onerror = (event: any) => {
       logger.error('Speech recognition error', { error: event.error }, 'UI');
       if (event.error === 'not-allowed') {
         toast({

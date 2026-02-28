@@ -21,25 +21,17 @@ export { EthicsProvider, useEthics } from './EthicsContext';
 export { ErrorProvider, useErrorHandler as useError } from './ErrorContext';
 
 // ========== CONTEXTES SIMPLIFIÉS POUR COMPATIBILITÉ ==========
-// Ces providers existent mais avec des implémentations minimales
 
-export const UserPreferencesContext = React.createContext(null);
+// UserPreferences - utiliser l'implémentation complète
+export { UserPreferencesContext, UserPreferencesProvider, useUserPreferences } from './UserPreferencesContext';
+
 export const SidebarContext = React.createContext(null);
 export const SupportContext = React.createContext(null);
 export const OnboardingContext = React.createContext(null);
 
-export const UserPreferencesProvider = ({ children }: { children: React.ReactNode }) => children;
 export const SidebarProvider = ({ children }: { children: React.ReactNode }) => children;
 export const SupportProvider = ({ children }: { children: React.ReactNode }) => children;
 export const OnboardingProvider = ({ children }: { children: React.ReactNode }) => children;
-
-// Hooks simplifiés
-export const useUserPreferences = () => ({ 
-  theme: 'light',
-  language: 'fr',
-  accessibility: {},
-  updatePreferences: () => {}
-});
 
 export const useSidebar = () => ({ 
   collapsed: false, 

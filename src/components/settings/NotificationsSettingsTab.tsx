@@ -355,7 +355,7 @@ const NotificationsSettingsTab: React.FC = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               {categories.map((category) => {
-                const Icon = category.icon;
+                const Icon = category.icon as React.FC<{ className?: string }>;
                 return (
                   <motion.div 
                     key={category.id} 
@@ -518,7 +518,7 @@ const NotificationsSettingsTab: React.FC = () => {
                   <div className="space-y-2">
                     {[...history].reverse().map((notif) => {
                       const category = categories.find(c => c.id === notif.category);
-                      const Icon = category?.icon || Bell;
+                      const Icon = (category?.icon || Bell) as React.FC<{ className?: string }>;
                       return (
                         <motion.div
                           key={notif.id}
@@ -604,7 +604,7 @@ const NotificationsSettingsTab: React.FC = () => {
               <div className="space-y-4">
                 {Object.entries(stats.byCategory).map(([catId, catStats]) => {
                   const category = categories.find(c => c.id === catId);
-                  const Icon = category?.icon || Bell;
+                  const Icon = (category?.icon || Bell) as React.FC<{ className?: string }>;
                   const readPercent = catStats.sent > 0 ? (catStats.read / catStats.sent) * 100 : 0;
                   return (
                     <div key={catId}>

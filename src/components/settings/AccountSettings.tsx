@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { User } from '@/types';
+import { User } from '@/types/auth';
 import { useToast } from '@/hooks/use-toast';
 
 interface AccountSettingsProps {
@@ -15,8 +15,6 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    position: user?.position || '',
-    department: user?.department || ''
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,7 +23,6 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
   };
 
   const handleSave = () => {
-    // In a real app, you would update the user profile here
     setIsEditing(false);
     toast({
       title: "Profil mis à jour",
@@ -66,30 +63,6 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
             </p>
           </div>
           
-          <div className="grid gap-2">
-            <label htmlFor="position" className="text-sm font-medium">
-              Poste
-            </label>
-            <Input
-              id="position"
-              name="position"
-              value={formData.position}
-              onChange={handleChange}
-            />
-          </div>
-          
-          <div className="grid gap-2">
-            <label htmlFor="department" className="text-sm font-medium">
-              Département
-            </label>
-            <Input
-              id="department"
-              name="department"
-              value={formData.department}
-              onChange={handleChange}
-            />
-          </div>
-          
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setIsEditing(false)}>
               Annuler
@@ -115,21 +88,13 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
               
               <div className="grid grid-cols-2 gap-4 mt-4">
                 <div>
-                  <p className="text-sm font-medium mb-1">Poste</p>
-                  <p className="text-sm text-muted-foreground">{user?.position || 'Non spécifié'}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium mb-1">Département</p>
-                  <p className="text-sm text-muted-foreground">{user?.department || 'Non spécifié'}</p>
-                </div>
-                <div>
                   <p className="text-sm font-medium mb-1">Rôle</p>
                   <p className="text-sm text-muted-foreground">{user?.role || 'Utilisateur'}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium mb-1">Date d'inscription</p>
                   <p className="text-sm text-muted-foreground">
-                    {user?.joined_at ? new Date(user.joined_at).toLocaleDateString() : 'Non disponible'}
+                    {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'Non disponible'}
                   </p>
                 </div>
               </div>

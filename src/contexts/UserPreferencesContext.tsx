@@ -6,7 +6,7 @@ import { UserPreferences, UserPreferencesContextType, DEFAULT_PREFERENCES } from
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { logger } from '@/lib/logger';
 
-const UserPreferencesContext = createContext<UserPreferencesContextType | undefined>(undefined);
+export const UserPreferencesContext = createContext<UserPreferencesContextType | undefined>(undefined);
 
 interface UserPreferencesProviderProps {
   children: ReactNode;

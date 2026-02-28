@@ -4,21 +4,21 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { FontSize, FontFamily, Theme } from '@/types/theme';
+import { FontSize, FontFamily, Theme } from '@/types/preferences';
 
 const DisplayPreferences: React.FC = () => {
   const { preferences, updatePreferences } = useUserPreferences();
 
-  const handleThemeChange = (value: Theme) => {
-    updatePreferences({ theme: value });
+  const handleThemeChange = (value: string) => {
+    updatePreferences({ theme: value as Theme });
   };
 
-  const handleFontSizeChange = (value: FontSize) => {
-    updatePreferences({ fontSize: value });
+  const handleFontSizeChange = (value: string) => {
+    updatePreferences({ fontSize: value as FontSize });
   };
 
-  const handleFontFamilyChange = (value: FontFamily) => {
-    updatePreferences({ fontFamily: value });
+  const handleFontFamilyChange = (value: string) => {
+    updatePreferences({ fontFamily: value as FontFamily });
   };
 
   const handleDarkModeChange = (checked: boolean) => {
@@ -26,16 +26,20 @@ const DisplayPreferences: React.FC = () => {
   };
 
   const handleHighContrastChange = (checked: boolean) => {
-    updatePreferences({ highContrast: checked });
-  };
-
-  const handleColorBlindModeChange = (checked: boolean) => {
-    updatePreferences({ colorBlindMode: checked });
+    updatePreferences({
+      accessibility: {
+        ...(preferences.accessibility || { reduceMotion: false, screenReader: false, keyboardNavigation: false, largeText: false }),
+        highContrast: checked,
+      },
+    });
   };
 
   const handleReduceMotionChange = (checked: boolean) => {
     updatePreferences({
-      reduceMotion: checked
+      accessibility: {
+        ...(preferences.accessibility || { highContrast: false, screenReader: false, keyboardNavigation: false, largeText: false }),
+        reduceMotion: checked,
+      },
     });
   };
 
@@ -65,17 +69,16 @@ const DisplayPreferences: React.FC = () => {
         <div className="space-y-2">
           <Label htmlFor="font-size">Taille de police</Label>
           <Select
-            value={preferences.fontSize || 'md'}
+            value={preferences.fontSize || 'medium'}
             onValueChange={handleFontSizeChange}
           >
             <SelectTrigger id="font-size">
-              <SelectValue placeholder="Choisir une taille" />
+              <SelectValue placeholder="Choisir la taille" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="sm">Petite</SelectItem>
-              <SelectItem value="md">Moyenne</SelectItem>
-              <SelectItem value="lg">Grande</SelectItem>
-              <SelectItem value="xl">Très grande</SelectItem>
+              <SelectItem value="small">Petit</SelectItem>
+              <SelectItem value="medium">Moyen</SelectItem>
+              <SelectItem value="large">Grand</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -87,13 +90,12 @@ const DisplayPreferences: React.FC = () => {
             onValueChange={handleFontFamilyChange}
           >
             <SelectTrigger id="font-family">
-              <SelectValue placeholder="Choisir une police" />
+              <SelectValue placeholder="Choisir la police" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="sans">Sans-serif</SelectItem>
               <SelectItem value="serif">Serif</SelectItem>
               <SelectItem value="mono">Monospace</SelectItem>
-              <SelectItem value="rounded">Arrondie</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -121,22 +123,8 @@ const DisplayPreferences: React.FC = () => {
           </div>
           <Switch
             id="high-contrast"
-            checked={preferences.highContrast || false}
+            checked={preferences.accessibility?.highContrast || false}
             onCheckedChange={handleHighContrastChange}
-          />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label htmlFor="color-blind">Mode daltonien</Label>
-            <p className="text-sm text-muted-foreground">
-              Adapter les couleurs pour les personnes daltoniennes
-            </p>
-          </div>
-          <Switch
-            id="color-blind"
-            checked={preferences.colorBlindMode || false}
-            onCheckedChange={handleColorBlindModeChange}
           />
         </div>
 
@@ -149,7 +137,7 @@ const DisplayPreferences: React.FC = () => {
           </div>
           <Switch
             id="reduce-motion"
-            checked={preferences.reduceMotion || false}
+            checked={preferences.accessibility?.reduceMotion || false}
             onCheckedChange={handleReduceMotionChange}
           />
         </div>
