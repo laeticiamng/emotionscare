@@ -10,5 +10,7 @@ module.exports = {
     "no-hardcoded-paths": require("./rules/no-hardcoded-paths"),
     "no-node-builtins-client": require("./lib/rules/no-node-builtins-client"),
     "no-hooks-in-blocks": require("./rules/no-hooks-in-blocks"),
+    "no-raw-innerhtml": require("./rules/no-raw-innerhtml"),
+    "no-unsourced-stats": require("./rules/no-unsourced-stats"),
   }
 };

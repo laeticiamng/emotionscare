@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Gestion des consentements privacy avec horodatage et source
  */
@@ -17,7 +16,7 @@ export interface PrivacyConsent {
   source: ConsentSource;
   granted_at: string;
   revoked_at?: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   created_at: string;
 }
 
@@ -29,8 +28,8 @@ class PrivacyConsentManager {
     consentType: ConsentType,
     granted: boolean,
     source: ConsentSource = 'settings',
-    metadata: Record<string, any> = {}
-  ): Promise<{ data: any; error: any }> {
+    metadata: Record<string, unknown> = {}
+  ): Promise<{ data: unknown; error: unknown }> {
     const { data: user } = await supabase.auth.getUser();
     if (!user.user) {
       return { data: null, error: new Error('User not authenticated') };

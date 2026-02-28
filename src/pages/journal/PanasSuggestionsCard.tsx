@@ -1,7 +1,8 @@
 // @ts-nocheck
-import DOMPurify from 'dompurify'
 import { useMemo } from 'react'
+import DOMPurify from 'dompurify'
 import { AlertCircle, Brain, Sparkles } from 'lucide-react'
+import SafeHtml from '@/components/ui/SafeHtml'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -120,9 +121,10 @@ export function PanasSuggestionsCard({ composer }: PanasSuggestionsCardProps) {
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-2">
                   <h3 className="text-sm font-semibold leading-snug sm:text-base">{suggestion.title}</h3>
-                  <p
+                  <SafeHtml
+                    html={suggestion.sanitized}
                     className="text-sm text-muted-foreground"
-                    dangerouslySetInnerHTML={{ __html: suggestion.sanitized }}
+                    allowedTags={['strong', 'em']}
                   />
                 </div>
                 <Button

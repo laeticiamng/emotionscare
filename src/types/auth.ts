@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin';
 
 export interface User {
@@ -8,7 +6,7 @@ export interface User {
   name: string;
   role: string;
   created_at: string;
-  user_metadata?: any;
+  user_metadata?: Record<string, unknown>;
   firstName?: string;
   avatar?: string;
 }

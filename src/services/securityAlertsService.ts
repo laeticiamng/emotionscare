@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
@@ -7,7 +6,7 @@ export interface SecurityAlert {
   alert_type: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   message: string;
-  details: Record<string, any>;
+  details: Record<string, unknown>;
   created_at: string;
   acknowledged: boolean;
   acknowledged_by?: string;
@@ -139,7 +138,7 @@ export async function createAlert(alert: {
   alertType: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   message: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }): Promise<SecurityAlert | null> {
   try {
     const { data, error } = await supabase

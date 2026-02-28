@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useEffect, useCallback, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
@@ -7,7 +5,7 @@ import { logger } from '@/lib/logger';
 interface SecurityEvent {
   type: 'suspicious_activity' | 'multiple_failed_logins' | 'unusual_access_pattern';
   timestamp: number;
-  details: Record<string, any>;
+  details: Record<string, unknown>;
 }
 
 export const useSecurityMonitor = () => {
