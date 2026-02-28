@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Type fixes pour éviter les erreurs lucide-react et TypeScript
 import { LucideProps, LucideIcon } from 'lucide-react';
 import { ComponentType, ForwardRefExoticComponent, RefAttributes, createElement } from 'react';
@@ -8,7 +7,7 @@ import { logger } from '@/lib/logger';
 export type LucideIconType = ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>;
 
 // Type générique pour les composants
-export type ComponentTypeGeneric<T = {}> = ComponentType<T>;
+export type ComponentTypeGeneric<T = object> = ComponentType<T>;
 
 // Type pour les actions avec icônes
 export interface ActionWithIcon {
@@ -69,8 +68,8 @@ export interface Exercise {
 }
 
 // Utilitaire pour vérifier si un composant est une icône lucide
-export const isLucideIcon = (component: any): component is LucideIconType => {
-  return component && typeof component === 'object' && '$$typeof' in component;
+export const isLucideIcon = (component: unknown): component is LucideIconType => {
+  return component != null && typeof component === 'object' && '$$typeof' in component;
 };
 
 // Helper pour rendre une icône de manière sécurisée
@@ -81,17 +80,4 @@ export const renderIcon = (Icon: LucideIconType, props: Partial<LucideProps> = {
   }
   const iconComponent = Icon as ComponentType<LucideProps>;
   return createElement(iconComponent, props as LucideProps);
-};
-
-export default {
-  LucideIconType,
-  ComponentTypeGeneric,
-  ActionWithIcon,
-  NavigationItem,
-  MenuItem,
-  Template,
-  Feature,
-  Exercise,
-  isLucideIcon,
-  renderIcon
 };

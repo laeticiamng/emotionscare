@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 
 import { EmotionResult } from './emotion';
 
@@ -82,4 +82,4 @@ export interface EnhancedEmotionResult extends EmotionResult {
   };
 }
 
-export { EmotionResult };
+export type { EmotionResult };

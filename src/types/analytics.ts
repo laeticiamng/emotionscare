@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 export interface UserMetrics {
   dailyActiveTime: number;
   weeklyActiveTime: number;
