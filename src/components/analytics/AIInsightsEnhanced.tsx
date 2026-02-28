@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
-import DOMPurify from 'dompurify';
+import { SafeHtml } from '@/components/ui/SafeHtml';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -106,11 +106,7 @@ export default function AIInsightsEnhanced() {
         const formatted = section.replace(/\*\*(.*?)\*\*/g, (_, text) => {
           return `<strong>${text}</strong>`;
         });
-        const sanitized = DOMPurify.sanitize(formatted, {
-          ALLOWED_TAGS: ['strong'],
-          ALLOWED_ATTR: [],
-        });
-        return <p key={idx} className="mb-3" dangerouslySetInnerHTML={{ __html: sanitized }} />;
+        return <SafeHtml key={idx} className="mb-3" html={formatted} allowedTags={['strong']} allowedAttr={[]} />;
       }
       return <p key={idx} className="mb-3">{section}</p>;
     });

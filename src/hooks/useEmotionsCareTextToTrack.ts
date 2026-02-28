@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck -- TODO: typer les réponses Edge Function text-to-track
 
 // Hook React pour la génération de tracks EmotionsCare à partir de texte
 import { useState } from 'react';

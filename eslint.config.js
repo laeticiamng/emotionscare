@@ -155,7 +155,7 @@ export default [
     },
     rules: {
       "ec/no-clinical-score-terms": "error",
-      "ec/no-unsourced-stats": "warn",
+      "ec/no-unsourced-stats": "error",
     }
   },
   {

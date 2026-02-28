@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useCallback, memo } from 'react';
-import DOMPurify from 'dompurify';
+import { SafeHtml } from '@/components/ui/SafeHtml';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -245,18 +245,17 @@ const AIWellnessAssistant: React.FC<AIWellnessAssistantProps> = memo(({
                 </div>
                 
                 <ScrollArea className="h-[300px] rounded-lg border p-4 bg-muted/30">
-                  <div 
+                  <SafeHtml
                     className="prose prose-sm dark:prose-invert max-w-none"
-                    dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize((searchResult.answer || '')
-                        .replace(/\n\n/g, '</p><p>')
-                        .replace(/\n/g, '<br/>')
-                        .replace(/^/, '<p>')
-                        .replace(/$/, '</p>')
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/### (.*?)(<br\/>|<\/p>)/g, '<h3 class="text-base font-semibold mt-4 mb-2">$1</h3>')
-                        .replace(/## (.*?)(<br\/>|<\/p>)/g, '<h2 class="text-lg font-semibold mt-4 mb-2">$1</h2>'))
-                    }}
+                    html={(searchResult.answer || '')
+                      .replace(/\n\n/g, '</p><p>')
+                      .replace(/\n/g, '<br/>')
+                      .replace(/^/, '<p>')
+                      .replace(/$/, '</p>')
+                      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                      .replace(/### (.*?)(<br\/>|<\/p>)/g, '<h3 class="text-base font-semibold mt-4 mb-2">$1</h3>')
+                      .replace(/## (.*?)(<br\/>|<\/p>)/g, '<h2 class="text-lg font-semibold mt-4 mb-2">$1</h2>')}
+                    allowedTags={['p', 'br', 'strong', 'em', 'h2', 'h3']}
                   />
                 </ScrollArea>
 
@@ -328,16 +327,15 @@ const AIWellnessAssistant: React.FC<AIWellnessAssistantProps> = memo(({
 
               {emotionData?.answer && (
                 <ScrollArea className="h-[250px] rounded-lg border p-4 bg-muted/30">
-                  <div 
+                  <SafeHtml
                     className="prose prose-sm dark:prose-invert max-w-none"
-                    dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize((emotionData.answer || '')
-                        .replace(/\n\n/g, '</p><p>')
-                        .replace(/\n/g, '<br/>')
-                        .replace(/^/, '<p>')
-                        .replace(/$/, '</p>')
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'))
-                    }}
+                    html={(emotionData.answer || '')
+                      .replace(/\n\n/g, '</p><p>')
+                      .replace(/\n/g, '<br/>')
+                      .replace(/^/, '<p>')
+                      .replace(/$/, '</p>')
+                      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}
+                    allowedTags={['p', 'br', 'strong', 'em']}
                   />
                 </ScrollArea>
               )}

@@ -5,7 +5,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import DOMPurify from 'dompurify';
+import { SafeHtml } from '@/components/ui/SafeHtml';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -196,14 +196,11 @@ const ProductDetailPage: React.FC = () => {
               </div>
             </div>
 
-            <div 
+            <SafeHtml
               className="prose prose-sm max-w-none text-muted-foreground"
-              dangerouslySetInnerHTML={{ 
-                __html: DOMPurify.sanitize(product.description || '', {
-                  ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h3', 'h4'],
-                  ALLOWED_ATTR: []
-                })
-              }}
+              html={product.description || ''}
+              allowedTags={['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h3', 'h4']}
+              allowedAttr={[]}
             />
 
             {/* Variants si présents */}

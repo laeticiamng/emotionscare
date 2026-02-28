@@ -1,4 +1,4 @@
-// @ts-nocheck
+// Analytics sécurisées
 
 import { GlobalInterceptor } from './globalInterceptor';
 import { logger } from '@/lib/logger';
@@ -17,7 +17,7 @@ export class SecureAnalytics {
    */
   static async trackEvent(eventData: {
     event: string;
-    data?: any;
+    data?: Record<string, unknown>;
     userId?: string;
   }): Promise<void> {
     // Si offline détecté, ne pas essayer
@@ -91,7 +91,7 @@ export class SecureAnalytics {
   /**
    * Track user action
    */
-  static async trackAction(action: string, data?: any, userId?: string): Promise<void> {
+  static async trackAction(action: string, data?: Record<string, unknown>, userId?: string): Promise<void> {
     await this.trackEvent({
       event: 'user_action',
       data: { action, ...data },
