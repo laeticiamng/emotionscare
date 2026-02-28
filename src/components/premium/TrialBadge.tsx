@@ -395,7 +395,7 @@ const TrialBadge: React.FC<TrialBadgeProps> = ({
             <div className="bg-primary/5 rounded-lg p-3 space-y-2">
               <div className="flex items-center gap-1">
                 <Users className="h-4 w-4 text-primary" />
-                <span className="text-xs font-medium">+12,000 utilisateurs satisfaits</span>
+                <span className="text-xs font-medium">Plateforme en lancement — Essayez gratuitement</span>
               </div>
               
               {/* Testimonial carousel */}

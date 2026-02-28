@@ -101,6 +101,11 @@ export default [
       "ec/no-hardcoded-paths": "error",
       "ec/no-hooks-in-blocks": "error",
       "no-console": ["warn", { allow: ["warn", "error"] }],
+      "@typescript-eslint/ban-ts-comment": ["warn", {
+        "ts-nocheck": "allow-with-description",
+        "ts-ignore": true,
+        "ts-expect-error": "allow-with-description",
+      }],
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
       // Accessibility rules

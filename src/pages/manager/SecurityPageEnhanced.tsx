@@ -279,7 +279,7 @@ const SecurityPageEnhanced: React.FC = () => {
                   </div>
                   <Progress value={89} />
                   <p className="text-sm text-muted-foreground">
-                    234 utilisateurs sur 263 ont activé la MFA
+                    Pourcentage d'utilisateurs ayant activé la MFA
                   </p>
                 </div>
               </CardContent>
