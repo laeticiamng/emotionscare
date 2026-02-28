@@ -60,6 +60,7 @@ const BlockchainBackups = lazy(() => import('@/pages/BlockchainBackups'));
 
 // Dev-only
 const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
+const SecurityAuditScorecard = lazy(() => import('@/pages/admin/SecurityAuditScorecard'));
 const ErrorBoundaryTestPage = lazy(() => import('@/pages/dev/ErrorBoundaryTestPage'));
 const TestAccountsPage = lazy(() => import('@/pages/TestAccountsPage'));
 const TestPage = lazy(() => import('@/pages/TestPage'));
@@ -145,6 +146,8 @@ export const adminComponentMap = {
 
   // Dev-only
   ComprehensiveSystemAuditPage,
+  SecurityAuditScorecard,
+  SecurityAuditScorecardPage: SecurityAuditScorecard,
   ErrorBoundaryTestPage,
   TestAccountsPage,
   TestPage,
