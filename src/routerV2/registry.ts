@@ -2041,6 +2041,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       guard: false,
     },
     {
+      name: 'security-audit-scorecard',
+      path: '/admin/security-scorecard',
+      segment: 'public',
+      layout: 'marketing',
+      component: 'SecurityAuditScorecard',
+      guard: false,
+    },
+    {
       name: 'seo-audit',
       path: '/admin/seo-audit',
       segment: 'public',
