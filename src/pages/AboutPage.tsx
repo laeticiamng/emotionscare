@@ -68,7 +68,7 @@ const AboutPage: React.FC = () => {
       <div className="min-h-screen bg-background">
         <main id="main-content">
           {/* ═══════════════════ HERO ═══════════════════ */}
-          <section className="relative py-24 md:py-36 overflow-hidden">
+          <section className="relative py-16 md:py-24 overflow-hidden">
             <div
               className="absolute inset-0 pointer-events-none"
               aria-hidden="true"
@@ -144,7 +144,7 @@ const AboutPage: React.FC = () => {
           </section>
 
           {/* ═══════════════════ FONDATRICE ═══════════════════ */}
-          <section className="py-24 md:py-32 bg-muted/30 border-y border-border/50">
+          <section className="py-16 md:py-24 bg-muted/30 border-y border-border/50">
             <div className="container px-4 sm:px-6 lg:px-8">
               <div className="max-w-4xl mx-auto">
                 <Reveal>
@@ -179,7 +179,7 @@ const AboutPage: React.FC = () => {
           </section>
 
           {/* ═══════════════════ MISSION ═══════════════════ */}
-          <section className="py-24 md:py-32">
+          <section className="py-16 md:py-24">
             <div className="container px-4 sm:px-6 lg:px-8">
               <div className="max-w-4xl mx-auto">
                 <Reveal>
@@ -241,7 +241,7 @@ const AboutPage: React.FC = () => {
           </section>
 
           {/* ═══════════════════ VALEURS ═══════════════════ */}
-          <section className="py-24 md:py-32 bg-muted/30 border-y border-border/50">
+          <section className="py-16 md:py-24 bg-muted/30 border-y border-border/50">
             <div className="container px-4 sm:px-6 lg:px-8">
               <div className="max-w-4xl mx-auto">
                 <Reveal>
@@ -321,7 +321,7 @@ const AboutPage: React.FC = () => {
           </section>
 
           {/* ═══════════════════ NOS MODULES ═══════════════════ */}
-          <section className="py-24 md:py-32 bg-muted/30 border-y border-border/50">
+          <section className="py-16 md:py-24 bg-muted/30 border-y border-border/50">
             <div className="container px-4 sm:px-6 lg:px-8">
               <div className="max-w-5xl mx-auto">
                 <Reveal>
