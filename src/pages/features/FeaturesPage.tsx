@@ -286,7 +286,7 @@ const FeaturesPage: React.FC = () => {
       />
 
       {/* ═══ HERO ═══ */}
-      <section className="relative pt-28 pb-20 md:pt-36 md:pb-28 overflow-hidden">
+      <section className="relative pt-20 pb-16 md:pt-24 md:pb-20 overflow-hidden">
         {/* Ambient glow */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]" />

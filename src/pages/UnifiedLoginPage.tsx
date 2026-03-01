@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { loginSchema, type LoginFormData } from '@/lib/validations/auth';
 import { sanitizeInput } from '@/lib/validation/validator';
 import { getFriendlyAuthError } from '@/lib/auth/authErrorService';
+import ForgotPasswordDialog from '@/pages/b2c/login/ForgotPasswordDialog';
 
 interface LocationState {
   from?: string;
@@ -20,6 +21,7 @@ export default function UnifiedLoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const [forgotOpen, setForgotOpen] = useState(false);
   
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -132,9 +134,13 @@ export default function UnifiedLoginPage() {
 
               <div className="text-center text-sm text-muted-foreground space-y-2">
                 <div>
-                  <Link to="/forgot-password" className="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
+                  <button
+                    type="button"
+                    onClick={() => setForgotOpen(true)}
+                    className="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
+                  >
                     Mot de passe oublié ?
-                  </Link>
+                  </button>
                 </div>
                 <div>
                   Pas encore de compte ?{' '}
@@ -147,6 +153,12 @@ export default function UnifiedLoginPage() {
           </Form>
         </CardContent>
       </Card>
+
+      <ForgotPasswordDialog
+        open={forgotOpen}
+        onOpenChange={setForgotOpen}
+        email={form.getValues('email')}
+      />
     </div>
   );
 }
