@@ -76,7 +76,7 @@ const AppleHeroSection: React.FC = () => {
       <motion.div 
         ref={heroRef}
         style={{ y: ySpring, opacity: opacitySpring, scale: scaleSpring }}
-        className="container relative z-10 px-4 sm:px-6 lg:px-8 py-20"
+        className="container relative z-10 px-4 sm:px-6 lg:px-8 py-12 md:py-16"
       >
         <div className="max-w-5xl mx-auto text-center">
           {/* Eyebrow - subtle intro */}
@@ -84,7 +84,7 @@ const AppleHeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="mb-8"
+            className="mb-6"
           >
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium backdrop-blur-sm border border-primary/20">
               <Sparkles className="h-4 w-4" />
@@ -93,7 +93,7 @@ const AppleHeroSection: React.FC = () => {
           </motion.div>
 
           {/* Main headline - word by word reveal */}
-          <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-[0.95] mb-6 sm:mb-8 px-2 sm:px-0">
+          <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-[0.95] mb-4 sm:mb-6 px-2 sm:px-0">
             {words.map((word, i) => (
               <motion.span
                 key={i}
@@ -131,7 +131,7 @@ const AppleHeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.9 }}
-            className="text-base sm:text-lg text-muted-foreground/80 max-w-xl mx-auto mb-12"
+            className="text-base sm:text-lg text-muted-foreground/80 max-w-xl mx-auto mb-8"
           >
             Exercices guidés contre le stress. Sans rendez-vous. Sans jugement. <span className="text-primary font-medium">100% gratuit pour commencer.</span>
           </motion.p>
