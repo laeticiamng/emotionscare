@@ -95,17 +95,13 @@ const PlanCard: React.FC<{
   isLoading: boolean;
   onCTA: (plan: typeof PLANS[number]) => void;
 }> = ({ plan, index, isLoading, onCTA }) => {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const isCardInView = useInView(cardRef, { once: true, amount: 0.3 });
-
   return (
     <motion.div
       key={plan.id}
-      ref={cardRef}
-      initial={{ opacity: 0, y: 60 }}
-      animate={isCardInView ? { opacity: 1, y: 0 } : {}}
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{
-        duration: 0.8,
+        duration: 0.6,
         delay: index * 0.1,
         ease: [0.16, 1, 0.3, 1],
       }}
@@ -234,7 +230,7 @@ const PricingPageWorking: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* ═══════════════════ HERO ═══════════════════ */}
-      <section className="relative py-24 md:py-32 overflow-hidden">
+      <section className="relative py-16 md:py-24 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-gradient-radial from-primary/8 via-primary/3 to-transparent rounded-full blur-3xl" />
         </div>

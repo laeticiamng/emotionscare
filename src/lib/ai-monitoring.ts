@@ -182,6 +182,12 @@ class AIMonitoring {
    * Envoyer l'événement à l'edge function pour analyse AI
    */
   private async sendToEdgeFunction(event: MonitoringEvent): Promise<void> {
+    // Circuit-breaker: skip if Supabase URL is not configured (placeholder)
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+    if (!supabaseUrl || supabaseUrl.includes('placeholder')) {
+      return; // Silently skip — no backend configured
+    }
+
     try {
       const { data, error } = await supabase.functions.invoke('ai-monitoring', {
         body: event,
@@ -230,9 +236,8 @@ class AIMonitoring {
         
         console.groupEnd();
       }
-    } catch (error) {
-      // Ne pas logger ici pour éviter la recursion
-      logger.error('[AI-Monitoring] Failed to send event to AI monitoring:', error, 'LIB');
+    } catch {
+      // Silently swallow — never log here to prevent infinite recursion
     }
   }
 

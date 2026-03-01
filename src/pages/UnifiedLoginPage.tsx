@@ -130,11 +130,18 @@ export default function UnifiedLoginPage() {
                 {form.formState.isSubmitting ? 'Connexion...' : 'Se connecter'}
               </Button>
 
-              <div className="text-center text-sm text-muted-foreground">
-                Pas encore de compte ?{' '}
-                <Link to="/signup" className="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
-                  S'inscrire
-                </Link>
+              <div className="text-center text-sm text-muted-foreground space-y-2">
+                <div>
+                  <Link to="/forgot-password" className="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
+                    Mot de passe oublié ?
+                  </Link>
+                </div>
+                <div>
+                  Pas encore de compte ?{' '}
+                  <Link to="/signup" className="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
+                    S'inscrire
+                  </Link>
+                </div>
               </div>
             </form>
           </Form>
