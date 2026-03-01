@@ -40,8 +40,7 @@ const AppleHeroSection: React.FC = () => {
   return (
     <section 
       ref={containerRef}
-      className="relative min-h-dvh flex items-center justify-center overflow-hidden bg-background"
-      style={{ minHeight: '100dvh' }}
+      className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-background"
     >
       {/* Gradient orbs - subtle and premium, responsive sizes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">

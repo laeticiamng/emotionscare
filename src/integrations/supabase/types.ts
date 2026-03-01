@@ -29040,6 +29040,69 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_results: {
+        Row: {
+          batch_id: string | null
+          created_at: string | null
+          id: string
+          issues: Json | null
+          item_code: string
+          item_title: string
+          overall_score: number | null
+          rang_a_issues: number | null
+          rang_a_verified: number | null
+          rang_b_issues: number | null
+          rang_b_verified: number | null
+          raw_response: string | null
+          sources: Json | null
+          title_match: boolean | null
+          title_notes: string | null
+          title_official: string | null
+          verification_type: string
+          verified_at: string | null
+        }
+        Insert: {
+          batch_id?: string | null
+          created_at?: string | null
+          id?: string
+          issues?: Json | null
+          item_code: string
+          item_title: string
+          overall_score?: number | null
+          rang_a_issues?: number | null
+          rang_a_verified?: number | null
+          rang_b_issues?: number | null
+          rang_b_verified?: number | null
+          raw_response?: string | null
+          sources?: Json | null
+          title_match?: boolean | null
+          title_notes?: string | null
+          title_official?: string | null
+          verification_type?: string
+          verified_at?: string | null
+        }
+        Update: {
+          batch_id?: string | null
+          created_at?: string | null
+          id?: string
+          issues?: Json | null
+          item_code?: string
+          item_title?: string
+          overall_score?: number | null
+          rang_a_issues?: number | null
+          rang_a_verified?: number | null
+          rang_b_issues?: number | null
+          rang_b_verified?: number | null
+          raw_response?: string | null
+          sources?: Json | null
+          title_match?: boolean | null
+          title_notes?: string | null
+          title_official?: string | null
+          verification_type?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       violation_alerts: {
         Row: {
           alert_type: string
