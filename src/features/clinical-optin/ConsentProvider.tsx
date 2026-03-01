@@ -63,6 +63,12 @@ const normalizeSnapshot = (record: SupabaseRecord | null): ConsentSnapshot => {
 };
 
 async function fetchConsentSnapshot(): Promise<ConsentSnapshot> {
+  // Guard: skip requests when using placeholder Supabase URL
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? '';
+  if (!supabaseUrl || supabaseUrl.includes('placeholder')) {
+    return { status: 'none', scope: null, wasRevoked: false };
+  }
+
   const { data: active, error: activeError } = await supabase
     .from('clinical_optins')
     .select('scope, revoked_at')
