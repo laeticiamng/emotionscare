@@ -116,7 +116,7 @@ const SignupPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-start justify-center p-4 pt-20 pb-36">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col items-center p-4 pt-20 pb-40">
       {/* Header */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}

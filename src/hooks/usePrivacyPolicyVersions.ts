@@ -73,6 +73,12 @@ export const usePrivacyPolicyVersions = () => {
   const loadCurrentPolicy = useCallback(async () => {
     try {
       setLoading(true);
+      // Guard: skip requests when using placeholder Supabase URL
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? '';
+      if (!supabaseUrl || supabaseUrl.includes('placeholder')) {
+        setLoading(false);
+        return;
+      }
       const { data, error } = await supabase
         .from('privacy_policies')
         .select('*')
