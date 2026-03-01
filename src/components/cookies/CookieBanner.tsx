@@ -82,9 +82,9 @@ export const CookieBanner: React.FC = () => {
           exit={{ y: 100, opacity: 0 }}
           className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none"
         >
-          <div className="pointer-events-auto p-4 bg-background/95 backdrop-blur-sm border-t shadow-lg">
+          <div className="pointer-events-auto p-3 md:p-4 bg-background/95 backdrop-blur-sm border-t shadow-lg max-h-[40vh] md:max-h-none overflow-y-auto">
           <div className="container mx-auto max-w-5xl">
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4">
               <div className="flex items-start gap-3 flex-1">
                 <Cookie className="h-6 w-6 text-primary mt-1 shrink-0" />
                 <div className="space-y-1">
