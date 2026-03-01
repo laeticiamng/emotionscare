@@ -5,8 +5,16 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EmotionsCare | ResiMax™</title>
-    <meta name="description" content="EmotionsCare — Plateforme de bien-être émotionnel pour soignants et étudiants en médecine. Scan émotionnel IA, coaching personnalisé, musicothérapie." />
+    <title>EmotionsCare | Régulation émotionnelle pour soignants en 3 minutes</title>
+    <meta name="description" content="Première plateforme française de régulation émotionnelle pour soignants et étudiants en santé. Protocoles de 2 à 5 minutes basés sur les neurosciences. Gratuit pour commencer." />
+    
+    <!-- GEO: AI-readable metadata -->
+    <meta name="ai-content-description" content="EmotionsCare est une plateforme française de régulation émotionnelle qui propose des protocoles de 2 à 5 minutes basés sur les neurosciences (théorie polyvagale, cohérence cardiaque), spécifiquement conçus pour les soignants et étudiants en santé confrontés au stress et au burn-out. Modèle freemium, conforme RGPD et HDS." />
+    <meta name="subject" content="Régulation émotionnelle pour professionnels de santé" />
+    <meta name="topic" content="Santé mentale des soignants, prévention burn-out, gestion du stress hospitalier" />
+    <meta name="coverage" content="France, Europe francophone" />
+    <meta name="target-audience" content="Étudiants en médecine, infirmiers, aides-soignants, cadres de santé, DRH hospitaliers" />
+    <link rel="llms" href="/llms.txt" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -33,13 +41,36 @@
           "name": "EMOTIONSCARE SASU",
           "url": "https://emotionscare.com",
           "logo": "https://emotionscare.com/og-image.png",
-          "description": "Premiere plateforme francaise de regulation emotionnelle pour soignants et etudiants en sante.",
+          "description": "Première plateforme française de régulation émotionnelle pour soignants et étudiants en santé. Protocoles de 2 à 5 minutes basés sur les neurosciences.",
           "foundingDate": "2024",
-          "slogan": "Le bien-etre emotionnel par l'IA",
+          "slogan": "Régulation émotionnelle en 3 minutes pour les soignants",
+          "areaServed": {
+            "@type": "Place",
+            "name": "France"
+          },
+          "audience": {
+            "@type": "MedicalAudience",
+            "audienceType": "Clinician",
+            "healthCondition": {
+              "@type": "MedicalCondition",
+              "name": "Burn-out professionnel",
+              "alternateName": "Épuisement professionnel des soignants"
+            }
+          },
+          "knowsAbout": [
+            "Régulation émotionnelle",
+            "Théorie polyvagale",
+            "Cohérence cardiaque",
+            "Prévention du burn-out",
+            "Santé mentale des soignants",
+            "Neurosciences affectives",
+            "Psychologie positive"
+          ],
           "contactPoint": {
             "@type": "ContactPoint",
             "contactType": "customer service",
             "url": "https://emotionscare.com/contact",
+            "email": "contact@emotionscare.com",
             "availableLanguage": ["French", "English"]
           },
           "sameAs": []
@@ -49,18 +80,33 @@
           "@id": "https://emotionscare.com/#app",
           "name": "EmotionsCare",
           "url": "https://emotionscare.com",
-          "description": "Plateforme SaaS de bien-etre emotionnel : scan IA, coaching Nyvee, musicotherapie et journal emotionnel pour soignants.",
+          "description": "Plateforme de régulation émotionnelle pour soignants : protocoles neuro-régulateurs de 2-5 min, scan émotionnel IA, coaching Nyvée 24/7, musicothérapie adaptative.",
           "applicationCategory": "HealthApplication",
+          "applicationSubCategory": "Mental Health",
           "operatingSystem": "Web",
           "offers": {
             "@type": "Offer",
             "price": "0",
             "priceCurrency": "EUR",
-            "description": "Version gratuite disponible"
+            "description": "Version gratuite disponible — 37 modules, 3 minutes par session",
+            "availability": "https://schema.org/InStock"
           },
           "provider": { "@id": "https://emotionscare.com/#organization" },
-          "featureList": "Scan emotionnel IA, Coaching Nyvee, Musicotherapie, Journal emotionnel, Exercices de respiration, Realite virtuelle, Gamification",
-          "inLanguage": "fr"
+          "featureList": [
+            "Scan émotionnel IA en temps réel",
+            "37 protocoles ResiMax™ de 2-5 minutes",
+            "Coach virtuel Nyvée spécialisé soignants",
+            "Musicothérapie adaptative",
+            "Journal émotionnel avec insights IA",
+            "Exercices de cohérence cardiaque",
+            "Tableau de bord B2B anonymisé (prévention RPS)",
+            "Gamification et système de progression"
+          ],
+          "inLanguage": "fr",
+          "browserRequirements": "Requires JavaScript. Requires HTML5.",
+          "softwareVersion": "2.0",
+          "datePublished": "2024-01-01",
+          "dateModified": "2026-03-01"
         },
         {
           "@type": "WebSite",
@@ -68,7 +114,67 @@
           "name": "EmotionsCare",
           "url": "https://emotionscare.com",
           "publisher": { "@id": "https://emotionscare.com/#organization" },
-          "inLanguage": "fr"
+          "inLanguage": "fr",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://emotionscare.com/help?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "MedicalWebPage",
+          "@id": "https://emotionscare.com/#medicalpage",
+          "name": "Régulation émotionnelle pour soignants",
+          "url": "https://emotionscare.com",
+          "about": {
+            "@type": "MedicalCondition",
+            "name": "Burn-out des professionnels de santé",
+            "description": "50% des internes en médecine présentent des symptômes de burn-out. EmotionsCare propose des interventions rapides (2-5 min) basées sur la théorie polyvagale et la cohérence cardiaque.",
+            "signOrSymptom": [
+              { "@type": "MedicalSignOrSymptom", "name": "Épuisement émotionnel" },
+              { "@type": "MedicalSignOrSymptom", "name": "Fatigue compassionnelle" },
+              { "@type": "MedicalSignOrSymptom", "name": "Stress chronique" }
+            ]
+          },
+          "specialty": {
+            "@type": "MedicalSpecialty",
+            "name": "Psychiatry"
+          },
+          "medicineSystem": "WesternConventional",
+          "lastReviewed": "2026-03-01"
+        },
+        {
+          "@type": "HowTo",
+          "@id": "https://emotionscare.com/#howto",
+          "name": "Comment réguler son stress en 3 minutes avec EmotionsCare",
+          "description": "Protocole de régulation émotionnelle rapide pour soignants, basé sur les neurosciences.",
+          "totalTime": "PT3M",
+          "step": [
+            {
+              "@type": "HowToStep",
+              "position": 1,
+              "name": "Scanner son état émotionnel",
+              "text": "Utilisez le scan émotionnel IA pour identifier votre niveau de stress et l'émotion dominante en 30 secondes."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 2,
+              "name": "Recevoir un protocole personnalisé",
+              "text": "L'IA sélectionne le protocole ResiMax™ le plus adapté à votre état : respiration, audio-visuel ou coaching."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 3,
+              "name": "Suivre l'intervention guidée",
+              "text": "Laissez-vous guider par le protocole de 2-5 minutes. Pas besoin de croire : l'effet est physiologique."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 4,
+              "name": "Mesurer le résultat",
+              "text": "Un nouveau scan post-intervention mesure l'évolution de votre état émotionnel."
+            }
+          ]
         }
       ]
     }

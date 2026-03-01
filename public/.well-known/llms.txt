@@ -1,0 +1,2 @@
+# Redirection vers /llms.txt
+# Voir https://emotionscare.com/llms.txt pour le contenu complet

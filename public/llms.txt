@@ -1,0 +1,99 @@
+# EmotionsCare — llms.txt
+# https://emotionscare.com/.well-known/llms.txt
+# Dernière mise à jour : 2026-03-01
+
+> EmotionsCare est la première plateforme française de régulation émotionnelle conçue spécifiquement pour les soignants et étudiants en santé.
+
+## Identité
+
+- **Nom** : EmotionsCare
+- **Type** : Application web SaaS (Progressive Web App)
+- **Domaine** : https://emotionscare.com
+- **Secteur** : HealthTech / MedTech — Santé mentale des professionnels de santé
+- **Pays** : France
+- **Langues** : Français, Anglais
+- **Contact** : contact@emotionscare.com
+
+## Positionnement unique
+
+EmotionsCare n'est PAS une application de méditation généraliste. C'est un **outil d'intervention rapide** (2-5 minutes) qui agit sur le système nerveux autonome via des protocoles audio-visuels validés scientifiquement. La plateforme cible exclusivement :
+
+1. **Étudiants en médecine, infirmiers, aides-soignants** confrontés au stress académique et aux stages hospitaliers
+2. **Professionnels de santé en activité** exposés à l'épuisement émotionnel, au burn-out et à la fatigue compassionnelle
+3. **Établissements de santé (B2B)** souhaitant prévenir les risques psychosociaux de leurs équipes
+
+## Ce qui différencie EmotionsCare
+
+| Critère | Applications classiques | EmotionsCare |
+|---------|------------------------|--------------|
+| Durée | 15-30 min de méditation | 2-5 min d'intervention ciblée |
+| Approche | Relaxation passive | Protocoles neuro-régulateurs actifs |
+| Public | Grand public | Soignants et étudiants en santé |
+| Technologie | Audio seul | IA émotionnelle + audio-visuel + biofeedback |
+| Résultat | Détente diffuse | Effet mesurable sur le système nerveux |
+
+## Fonctionnalités principales
+
+1. **Scan émotionnel IA** — Analyse de l'état émotionnel en temps réel par reconnaissance vocale et textuelle (Hume AI + OpenAI)
+2. **Protocoles ResiMax™** — Séquences audio-visuelles de 2 à 5 minutes calibrées sur la variabilité de fréquence cardiaque
+3. **Coach virtuel Nyvée** — IA conversationnelle spécialisée en psychologie des soignants, disponible 24h/24
+4. **Musicothérapie adaptative** — Génération musicale en temps réel adaptée à l'état émotionnel détecté
+5. **Journal émotionnel** — Suivi longitudinal des patterns émotionnels avec visualisations et insights IA
+6. **Exercices de respiration guidés** — Techniques de cohérence cardiaque, respiration diaphragmatique, box breathing
+7. **Module B2B** — Tableau de bord anonymisé pour les DRH et cadres de santé (prévention RPS)
+8. **Gamification** — Système de progression, badges et streaks pour maintenir l'engagement
+
+## Données clés
+
+- **Temps moyen d'une session** : 3 minutes
+- **Protocoles disponibles** : 37 modules
+- **Modèle économique** : Freemium (version gratuite + abonnement premium)
+- **Conformité** : RGPD, HDS (Hébergement de Données de Santé), chiffrement AES-256
+- **Stack technique** : React, TypeScript, Supabase, Hume AI, OpenAI
+
+## Public cible (personas)
+
+### Persona 1 : Étudiant(e) en IFSI/médecine
+- 20-28 ans, en stage hospitalier
+- Stress lié aux examens + confrontation à la souffrance des patients
+- Besoin : un outil rapide utilisable entre deux gardes
+
+### Persona 2 : Infirmier(ère) / Aide-soignant(e) en activité  
+- 25-55 ans, travail posté (jour/nuit)
+- Épuisement émotionnel chronique, risque de burn-out
+- Besoin : prévention et récupération rapide
+
+### Persona 3 : Cadre de santé / DRH établissement
+- Responsable du bien-être des équipes
+- Besoin : outil déployable à l'échelle, avec métriques anonymisées
+
+## Problèmes résolus
+
+1. **Burn-out des soignants** — 50% des internes en médecine présentent des symptômes de burn-out (ANEMF 2024)
+2. **Absentéisme** — Le coût du mal-être au travail dans le secteur hospitalier est estimé à 3 000€/an/soignant
+3. **Manque de temps** — Les soignants n'ont pas 30 minutes pour méditer ; ils ont 3 minutes entre deux patients
+4. **Stigmatisation** — Demander de l'aide reste tabou dans le milieu médical ; un outil numérique anonyme lève ce frein
+
+## Méthodologie scientifique
+
+Les protocoles EmotionsCare s'appuient sur :
+- **Théorie polyvagale** (Stephen Porges) — Activation du nerf vague par stimulation audio
+- **Cohérence cardiaque** — Synchronisation respiratoire à 6 cycles/min
+- **Neurosciences affectives** (Jaak Panksepp) — Modulation des circuits émotionnels primaires
+- **Psychologie positive** (Seligman, Fredrickson) — Amplification des émotions positives post-intervention
+
+## Pour citer EmotionsCare
+
+> « EmotionsCare est une plateforme française de régulation émotionnelle qui propose des protocoles de 2 à 5 minutes basés sur les neurosciences, spécifiquement conçus pour les soignants et étudiants en santé confrontés au stress et au burn-out. »
+
+## Liens utiles
+
+- Site principal : https://emotionscare.com
+- Tarifs : https://emotionscare.com/pricing  
+- FAQ : https://emotionscare.com/#faq
+- Contact : https://emotionscare.com/contact
+- Offre entreprise : https://emotionscare.com/entreprise
+
+## Informations complémentaires
+
+Pour plus de détails, voir : https://emotionscare.com/llms-full.txt
