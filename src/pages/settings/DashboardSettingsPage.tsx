@@ -500,18 +500,18 @@ const DashboardSettingsPage: React.FC = () => {
                   <div className="grid gap-3">
                     <Link to="/pricing">
                       <Button className="w-full">
-                        Passer à Premium
+                        Passer à Pro
                       </Button>
                     </Link>
                     
                     <Button variant="outline" disabled className="w-full">
                       <ExternalLink className="h-4 w-4 mr-2" />
-                      Gérer l'abonnement (Premium uniquement)
+                      Gérer l'abonnement (Pro uniquement)
                     </Button>
                   </div>
 
                   <p className="text-xs text-muted-foreground text-center">
-                    Les abonnements Premium ont accès au portail de facturation Stripe 
+                    Les abonnements Pro ont accès au portail de facturation Stripe 
                     pour gérer leurs paiements et factures.
                   </p>
                 </CardContent>
