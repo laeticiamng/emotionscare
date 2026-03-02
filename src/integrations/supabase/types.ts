@@ -2769,6 +2769,33 @@ export type Database = {
         }
         Relationships: []
       }
+      b2b_leads: {
+        Row: {
+          created_at: string
+          email: string
+          employee_count: string
+          id: string
+          name: string
+          organization: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          employee_count: string
+          id?: string
+          name: string
+          organization: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          employee_count?: string
+          id?: string
+          name?: string
+          organization?: string
+        }
+        Relationships: []
+      }
       b2b_music_aggregates: {
         Row: {
           cohort_size: number
