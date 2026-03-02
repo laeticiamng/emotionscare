@@ -365,9 +365,9 @@ export function QuotaIndicator({
                 {/* CTA Upgrade pour Free tier */}
                 {tier === UserTier.FREE && showUpgrade && (
                   <Button className="w-full" variant="default" size="sm" asChild>
-                    <Link to="/premium">
+                    <Link to="/pricing">
                       <TrendingUp className="h-4 w-4 mr-2" />
-                      Passer à Premium
+                      Passer à Pro
                       <span className="ml-2 text-xs opacity-80">(100 générations/mois)</span>
                     </Link>
                   </Button>
@@ -567,9 +567,9 @@ export function QuotaWarning({ className = '' }: { className?: string }) {
             )}
             {tier === UserTier.FREE && (
               <Button size="sm" variant="default" className="mt-3" asChild>
-                <Link to="/premium">
+                <Link to="/pricing">
                   <Sparkles className="h-3 w-3 mr-1" />
-                  Passer à Premium
+                  Passer à Pro
                 </Link>
               </Button>
             )}
