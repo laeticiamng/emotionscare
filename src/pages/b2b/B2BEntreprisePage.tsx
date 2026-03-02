@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import {
   Users,
@@ -244,20 +246,35 @@ const ROICalculator: React.FC = () => {
 };
 
 /* ──────────────── Demo Form ──────────────── */
-const DemoRequestForm: React.FC = () => {
+const B2BLeadForm: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     organization: '',
-    role: '',
     size: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-  }, []);
+    setLoading(true);
+    try {
+      const { error } = await supabase.from('b2b_leads' as any).insert({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        organization: formData.organization.trim(),
+        employee_count: formData.size,
+      });
+      if (error) throw error;
+      setSubmitted(true);
+      toast.success('Demande envoyée !');
+    } catch {
+      toast.error('Une erreur est survenue. Veuillez réessayer.');
+    } finally {
+      setLoading(false);
+    }
+  }, [formData]);
 
   const handleChange = useCallback((field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData(prev => ({ ...prev, [field]: e.target.value }));
@@ -278,25 +295,21 @@ const DemoRequestForm: React.FC = () => {
   return (
     <form onSubmit={handleSubmit} className="grid sm:grid-cols-2 gap-4">
       <div>
-        <label htmlFor="demo-name" className="block text-sm font-medium mb-1.5">Nom complet</label>
-        <Input id="demo-name" required placeholder="Dr. Jean Dupont" value={formData.name} onChange={handleChange('name')} className="py-5" />
+        <label htmlFor="lead-name" className="block text-sm font-medium mb-1.5">Nom complet</label>
+        <Input id="lead-name" required placeholder="Dr. Jean Dupont" value={formData.name} onChange={handleChange('name')} className="py-5" maxLength={100} />
       </div>
       <div>
-        <label htmlFor="demo-email" className="block text-sm font-medium mb-1.5">Email professionnel</label>
-        <Input id="demo-email" type="email" required placeholder="jean.dupont@hopital.fr" value={formData.email} onChange={handleChange('email')} className="py-5" />
+        <label htmlFor="lead-email" className="block text-sm font-medium mb-1.5">Email professionnel</label>
+        <Input id="lead-email" type="email" required placeholder="jean.dupont@hopital.fr" value={formData.email} onChange={handleChange('email')} className="py-5" maxLength={255} />
       </div>
       <div>
-        <label htmlFor="demo-org" className="block text-sm font-medium mb-1.5">Organisation</label>
-        <Input id="demo-org" required placeholder="CHU de Lyon" value={formData.organization} onChange={handleChange('organization')} className="py-5" />
+        <label htmlFor="lead-org" className="block text-sm font-medium mb-1.5">Établissement</label>
+        <Input id="lead-org" required placeholder="CHU de Lyon" value={formData.organization} onChange={handleChange('organization')} className="py-5" maxLength={200} />
       </div>
       <div>
-        <label htmlFor="demo-role" className="block text-sm font-medium mb-1.5">Fonction</label>
-        <Input id="demo-role" required placeholder="DRH, Directeur..." value={formData.role} onChange={handleChange('role')} className="py-5" />
-      </div>
-      <div className="sm:col-span-2">
-        <label htmlFor="demo-size" className="block text-sm font-medium mb-1.5">Nombre de collaborateurs</label>
+        <label htmlFor="lead-size" className="block text-sm font-medium mb-1.5">Nombre de collaborateurs</label>
         <select
-          id="demo-size"
+          id="lead-size"
           required
           value={formData.size}
           onChange={handleChange('size')}
@@ -311,9 +324,9 @@ const DemoRequestForm: React.FC = () => {
         </select>
       </div>
       <div className="sm:col-span-2">
-        <Button type="submit" size="lg" className="w-full rounded-full text-lg py-6 group">
+        <Button type="submit" size="lg" disabled={loading} className="w-full rounded-full text-lg py-6 group">
           <Send className="h-5 w-5 mr-2 group-hover:translate-x-1 transition-transform" />
-          Demander une démo gratuite
+          {loading ? 'Envoi en cours…' : 'Être recontacté'}
         </Button>
       </div>
     </form>
@@ -385,15 +398,15 @@ const B2BEntreprisePage: React.FC = () => {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-              <Link to="/contact">
+              <a href="#lead-form">
                 <Button
                   size="lg"
                   className="group px-10 py-7 text-lg font-semibold bg-foreground text-background hover:bg-foreground/90 rounded-full shadow-xl transition-all duration-300 hover:scale-105"
                 >
-                  Échanger avec notre équipe
+                  Être recontacté
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
-              </Link>
+              </a>
               <Link to="/b2b/access">
                 <Button
                   variant="outline"
@@ -724,18 +737,18 @@ const B2BEntreprisePage: React.FC = () => {
         </div>
       </section>
 
-      {/* ═══════════════════ DEMANDE DE DÉMO ═══════════════════ */}
-      <section className="py-28 md:py-36 bg-muted/30" id="demo">
+      {/* ═══════════════════ FORMULAIRE LEAD ═══════════════════ */}
+      <section className="py-28 md:py-36 bg-muted/30" id="lead-form">
         <div className="container px-4 sm:px-6 lg:px-8">
-          <SectionTitle center subtitle="Planifiez une démonstration personnalisée avec notre équipe.">
-            Demander une{' '}
+          <SectionTitle center subtitle="Laissez-nous vos coordonnées, notre équipe vous recontacte sous 24h.">
+            Être{' '}
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              démo gratuite.
+              recontacté.
             </span>
           </SectionTitle>
 
           <div className="max-w-2xl mx-auto bg-card/60 backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-border/50">
-            <DemoRequestForm />
+            <B2BLeadForm />
           </div>
         </div>
       </section>
@@ -782,16 +795,16 @@ const B2BEntreprisePage: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              <Link to="/contact">
+              <a href="#lead-form">
                 <Button
                   size="lg"
                   className="group px-12 py-8 text-xl font-semibold bg-foreground text-background hover:bg-foreground/90 rounded-full shadow-2xl shadow-foreground/20 transition-all duration-500 hover:scale-105"
                 >
                   <Users className="h-6 w-6 mr-3 group-hover:scale-110 transition-transform" />
-                  Échanger avec notre équipe
+                  Être recontacté
                   <ArrowRight className="h-6 w-6 ml-3 group-hover:translate-x-2 transition-transform" />
                 </Button>
-              </Link>
+              </a>
             </motion.div>
           </div>
         </div>
