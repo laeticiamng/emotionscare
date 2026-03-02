@@ -5,7 +5,9 @@
 
 import React, { memo, useRef } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import { 
   Brain, 
   Shield, 
@@ -14,7 +16,8 @@ import {
   Sparkles, 
   Clock,
   Users,
-  TrendingUp
+  TrendingUp,
+  ArrowRight
 } from 'lucide-react';
 
 interface Feature {
@@ -135,6 +138,7 @@ const AppleFeatureSection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const isTitleInView = useInView(titleRef, { once: true, amount: 0.5 });
+  const navigate = useNavigate();
 
   return (
     <section 
@@ -169,6 +173,24 @@ const AppleFeatureSection: React.FC = () => {
             <FeatureCard key={index} feature={feature} index={index} />
           ))}
         </div>
+
+        {/* Micro-CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="text-center mt-16"
+        >
+          <Button
+            size="lg"
+            className="rounded-full px-8 py-6 text-base font-semibold bg-foreground text-background hover:bg-foreground/90"
+            onClick={() => navigate('/signup')}
+          >
+            Essayer gratuitement
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </motion.div>
       </div>
     </section>
   );
