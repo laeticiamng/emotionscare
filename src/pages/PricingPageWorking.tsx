@@ -45,9 +45,9 @@ const PLANS = [
     gradient: 'from-muted to-muted',
   },
   {
-    id: 'premium',
-    name: 'Premium',
-    price: 9.90,
+    id: 'pro',
+    name: 'Pro',
+    price: 14.90,
     period: '/mois',
     description: 'L\'accompagnement complet pour les soignants',
     features: [
@@ -60,9 +60,9 @@ const PLANS = [
       'Analyses détaillées & tendances',
       'Support prioritaire',
     ],
-    cta: 'Passer à Premium',
+    cta: 'Passer à Pro',
     popular: true,
-    stripePlan: 'premium',
+    stripePlan: 'pro',
     gradient: 'from-primary to-accent',
   },
   {
@@ -204,7 +204,7 @@ const PricingPageWorking: React.FC = () => {
 
     // Premium plan → Stripe checkout
     if (!isAuthenticated) {
-      toast.info('Créez un compte pour accéder à l\'abonnement Premium');
+      toast.info('Créez un compte pour accéder à l\'abonnement Pro');
       navigate('/signup');
       return;
     }

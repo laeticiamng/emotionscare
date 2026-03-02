@@ -5,6 +5,9 @@
 
 import React, { memo, useRef, useEffect, useState, useCallback } from 'react';
 import { motion, useInView } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
 
 interface StatItem {
   value: number;
@@ -70,6 +73,7 @@ const AppleStatsSection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
   const [shouldAnimate, setShouldAnimate] = useState(false);
+  const navigate = useNavigate();
 
   // Trigger animation when framer-motion detects visibility
   useEffect(() => {
@@ -145,6 +149,23 @@ const AppleStatsSection: React.FC = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* Micro-CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={shouldAnimate ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="text-center mt-16"
+        >
+          <Button
+            size="lg"
+            className="rounded-full px-8 py-6 text-base font-semibold bg-foreground text-background hover:bg-foreground/90"
+            onClick={() => navigate('/signup')}
+          >
+            Essayer gratuitement
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </motion.div>
       </div>
     </section>
   );
