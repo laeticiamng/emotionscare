@@ -36,7 +36,16 @@ export default defineConfig(({ mode }) => ({
         if (warning.code === 'MODULE_LEVEL_DIRECTIVE') return;
         if (warning.code === 'UNUSED_EXTERNAL_IMPORT') return;
         warn(warning);
-      }
+      },
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-charts': ['recharts'],
+          'vendor-motion': ['framer-motion'],
+          'vendor-ui': ['lucide-react', '@radix-ui/react-dialog', '@radix-ui/react-popover', '@radix-ui/react-tooltip'],
+          'vendor-query': ['@tanstack/react-query'],
+        },
+      },
     }
   },
   
