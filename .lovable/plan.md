@@ -1,47 +1,64 @@
 
 
-## Triage des 8 tickets — État actuel et plan d'action
+## Plan : Ajouter les traductions allemandes et compléter FR/EN/DE sur toute la plateforme
 
-### Tickets DÉJÀ RÉSOLUS (aucune action requise)
+### Constat actuel
 
-| Ticket | Statut | Preuve |
-|--------|--------|--------|
-| **T1 — Hero desktop** | FAIT | `AppleHeroSection.tsx` utilise déjà `min-h-[80vh]`, `py-12 md:py-16`, `lg:text-7xl xl:text-8xl`. Confirmé visuellement lors de l'audit précédent. |
-| **T2 — Cookie banner mobile** | FAIT | `SignupPage.tsx` a `pt-20 pb-40`. `CookieBanner.tsx` utilise `pointer-events-none` sur le wrapper fixe, `pointer-events-auto` sur le contenu, `max-h-[40vh]` sur mobile. |
-| **T3 — Scroll signup mobile** | FAIT | Dernière correction appliquée : `min-h-[calc(100vh-4rem)]` + suppression de `overflow-y-auto` (diff confirmé). |
-| **T7 — Vendor splitting** | FAIT | `vite.config.js` a déjà `manualChunks` pour react, recharts, framer-motion, lucide-react, radix, tanstack-query. |
-| **T8 — Checklist QA** | FAIT | `docs/qa/release-checklist.md` existe avec toutes les sections requises (desktop, mobile, tunnel, console, Lighthouse, RGPD, tests). |
+L'application dispose de deux systèmes i18n parallèles :
+1. **Système principal** (`src/lib/i18n/locales/{fr,en}/`) — 11 namespaces (common, navigation, dashboard, settings, modules, auth, consent, errors, legal, journal, coach) avec FR et EN complets
+2. **Système secondaire** (`src/i18n/locales/{fr,en,de}.ts`) — squelettique, utilisé par `src/i18n/config.ts`
+3. **Fichiers JSON** (`public/locales/{fr,en}/`) — partiels (common, errors, breath)
 
-### Tickets À IMPLÉMENTER (3 restants)
+Le **DE (allemand)** existe uniquement dans `src/i18n/locales/de.ts` avec un contenu riche mais n'est **pas branché** dans le système principal (`src/providers/i18n/resources.ts` ne charge que `fr` et `en`).
 
-#### T4 — Icône PWA : compression (P1)
-**Problème :** L'icône `icon-144x144.png` dépasse potentiellement 50KB (contrainte mémoire project).
-**Action :** Je ne peux pas compresser des images binaires. L'utilisateur doit compresser manuellement avec un outil comme Squoosh ou TinyPNG, puis remplacer le fichier dans `public/icons/`.
-**Manifest :** `manifest.json` est déjà valide et complet.
+De plus, de nombreuses pages (100+) contiennent encore des **chaînes hardcodées en français** non internationalisées.
 
-#### T5 — Guard requêtes Supabase placeholder (P1)
-**Problème :** `src/lib/env.ts` utilise `https://placeholder.supabase.co` comme fallback (lignes 97, 102). Si les env vars sont manquantes en preview, le client Supabase envoie des requêtes vers ce domaine inexistant.
-**Action :** Ajouter un guard dans `src/lib/env.ts` qui détecte si l'URL contient "placeholder" et bloque les requêtes en loggant un warning au lieu de tenter la connexion.
+### Plan d'implémentation
 
-| Fichier | Modification |
-|---------|-------------|
-| `src/lib/env.ts` | Ajouter un export `IS_PLACEHOLDER` basé sur `SUPABASE_URL.includes('placeholder')` |
-| `src/integrations/supabase/client.ts` | Ajouter un guard qui retourne un client inerte si `IS_PLACEHOLDER` est true, ou logger un warning |
+#### 1. Creer les fichiers de traduction DE (11 fichiers)
 
-#### T6 — Tests E2E tunnel complet (P1)
-**Problème :** Pas de tests E2E pour le tunnel signup → login → pricing → checkout.
-**Action :** Créer 2 fichiers de tests Playwright avec mocking des API Supabase et Stripe via `page.route()`.
+Creer `src/lib/i18n/locales/de/` avec les 11 fichiers miroirs de FR/EN :
+- `common.ts`, `navigation.ts`, `dashboard.ts`, `settings.ts`, `modules.ts`, `auth.ts`, `consent.ts`, `errors.ts`, `legal.ts`, `journal.ts`, `coach.ts`
 
-| Fichier | Contenu |
-|---------|---------|
-| `tests/e2e/tunnel-desktop.spec.ts` | 5 tests : signup, login, pricing display, checkout redirect, unauthenticated redirect. Viewport 1366x768. |
-| `tests/e2e/tunnel-mobile.spec.ts` | 3 tests : signup scroll, pricing mobile, checkout mobile. Viewport 390x844. |
+Chaque fichier sera la traduction allemande complète des clés existantes en FR/EN.
 
-`playwright.config.ts` existe déjà avec les projects nécessaires.
+#### 2. Brancher DE dans le système principal
 
-### Résumé
+Modifier `src/providers/i18n/resources.ts` pour :
+- Importer les 11 modules DE
+- Ajouter la locale `de` dans l'objet `resources`
 
-- **5 tickets sur 8** sont déjà résolus par les travaux précédents
-- **1 ticket (T4)** nécessite une action manuelle de l'utilisateur (compression image)
-- **2 tickets (T5, T6)** sont implémentables : guard Supabase placeholder + tests E2E tunnel
+#### 3. Mettre à jour la configuration i18n
+
+- `src/lib/i18n.ts` : ajouter `'de'` dans `supportedLngs`
+- `src/lib/i18n/i18n.tsx` : ajouter le type `'de'` au type `Lang`
+- `src/i18n/locales/fr.ts` et `src/i18n/locales/en.ts` : ajouter `de: 'Allemand'` / `de: 'German'` dans `languageNames`
+
+#### 4. Mettre à jour le sélecteur de langue
+
+- `src/ui/NavBar.tsx` : supporter le cycle FR → EN → DE → FR
+- `src/i18n/LanguageSwitcher.tsx` : s'assurer que DE est dans les options (il utilise `SUPPORTED_LOCALES` qui inclut déjà `de`)
+
+#### 5. Ajouter les fichiers JSON DE dans public/locales
+
+Creer `public/locales/de/` avec `common.json`, `errors.json`, `breath.json`
+
+#### 6. Internationaliser les composants avec chaînes hardcodees
+
+Migrer progressivement les composants critiques contenant du texte FR hardcode :
+- `GroupHeader.tsx` : remplacer "Aujourd'hui"/"Hier" par `t('common.today')`/`t('common.yesterday')` et utiliser la locale dynamique pour `Intl.DateTimeFormat`
+- `NavBar.tsx` : utiliser les clés de traduction pour les liens
+- `Footer.tsx` : utiliser les clés de traduction pour les liens legaux
+
+### Details techniques
+
+- Les 11 fichiers DE suivront exactement la structure des fichiers EN existants
+- Le type `Lang` sera etendu a `'fr' | 'en' | 'de'`
+- Le `fallbackLng` reste `'fr'`
+- Environ **15-20 fichiers** seront modifies ou crees
+
+### Limites
+
+- Les 100+ pages avec texte FR hardcode ne seront pas toutes migrées dans cette iteration — seuls les composants partagés (NavBar, Footer, GroupHeader) et la configuration seront traités
+- Les pages individuelles (ModulesDashboard, UnifiedHomePage, etc.) necessiteront des passes supplementaires
 
