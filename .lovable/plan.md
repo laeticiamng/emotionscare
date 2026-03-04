@@ -1,32 +1,47 @@
 
 
-## Publication et mesure Lighthouse
+## Triage des 8 tickets — État actuel et plan d'action
 
-### Publication
+### Tickets DÉJÀ RÉSOLUS (aucune action requise)
 
-Pour publier l'app, cliquez sur le bouton **Publish** en haut a droite de l'editeur (icone web), puis cliquez sur **Update** dans la boite de dialogue.
+| Ticket | Statut | Preuve |
+|--------|--------|--------|
+| **T1 — Hero desktop** | FAIT | `AppleHeroSection.tsx` utilise déjà `min-h-[80vh]`, `py-12 md:py-16`, `lg:text-7xl xl:text-8xl`. Confirmé visuellement lors de l'audit précédent. |
+| **T2 — Cookie banner mobile** | FAIT | `SignupPage.tsx` a `pt-20 pb-40`. `CookieBanner.tsx` utilise `pointer-events-none` sur le wrapper fixe, `pointer-events-auto` sur le contenu, `max-h-[40vh]` sur mobile. |
+| **T3 — Scroll signup mobile** | FAIT | Dernière correction appliquée : `min-h-[calc(100vh-4rem)]` + suppression de `overflow-y-auto` (diff confirmé). |
+| **T7 — Vendor splitting** | FAIT | `vite.config.js` a déjà `manualChunks` pour react, recharts, framer-motion, lucide-react, radix, tanstack-query. |
+| **T8 — Checklist QA** | FAIT | `docs/qa/release-checklist.md` existe avec toutes les sections requises (desktop, mobile, tunnel, console, Lighthouse, RGPD, tests). |
 
-### Mesure Lighthouse
+### Tickets À IMPLÉMENTER (3 restants)
 
-Une fois publie sur `https://emotions-care.lovable.app`, vous pouvez mesurer les scores Lighthouse de deux facons :
+#### T4 — Icône PWA : compression (P1)
+**Problème :** L'icône `icon-144x144.png` dépasse potentiellement 50KB (contrainte mémoire project).
+**Action :** Je ne peux pas compresser des images binaires. L'utilisateur doit compresser manuellement avec un outil comme Squoosh ou TinyPNG, puis remplacer le fichier dans `public/icons/`.
+**Manifest :** `manifest.json` est déjà valide et complet.
 
-**Option 1 -- Chrome DevTools (recommande)**
-1. Ouvrir `https://emotions-care.lovable.app` dans Chrome
-2. F12 → onglet **Lighthouse**
-3. Cocher Performance + Accessibility + Best Practices + SEO
-4. Selectionner Desktop puis Mobile
-5. Cliquer **Analyze page load**
+#### T5 — Guard requêtes Supabase placeholder (P1)
+**Problème :** `src/lib/env.ts` utilise `https://placeholder.supabase.co` comme fallback (lignes 97, 102). Si les env vars sont manquantes en preview, le client Supabase envoie des requêtes vers ce domaine inexistant.
+**Action :** Ajouter un guard dans `src/lib/env.ts` qui détecte si l'URL contient "placeholder" et bloque les requêtes en loggant un warning au lieu de tenter la connexion.
 
-**Option 2 -- PageSpeed Insights**
-1. Aller sur [pagespeed.web.dev](https://pagespeed.web.dev)
-2. Entrer `https://emotions-care.lovable.app`
-3. Les resultats incluent les Core Web Vitals reels (CrUX) + les scores de laboratoire
+| Fichier | Modification |
+|---------|-------------|
+| `src/lib/env.ts` | Ajouter un export `IS_PLACEHOLDER` basé sur `SUPABASE_URL.includes('placeholder')` |
+| `src/integrations/supabase/client.ts` | Ajouter un guard qui retourne un client inerte si `IS_PLACEHOLDER` est true, ou logger un warning |
 
-### Ce que je peux faire
+#### T6 — Tests E2E tunnel complet (P1)
+**Problème :** Pas de tests E2E pour le tunnel signup → login → pricing → checkout.
+**Action :** Créer 2 fichiers de tests Playwright avec mocking des API Supabase et Stripe via `page.route()`.
 
-Je ne peux pas publier l'app a votre place (l'action "Update" dans le dialogue de publication est manuelle). Une fois publiee, je peux naviguer sur l'URL de production avec le navigateur integre et executer un profiling de performance pour identifier les goulots d'etranglement restants.
+| Fichier | Contenu |
+|---------|---------|
+| `tests/e2e/tunnel-desktop.spec.ts` | 5 tests : signup, login, pricing display, checkout redirect, unauthenticated redirect. Viewport 1366x768. |
+| `tests/e2e/tunnel-mobile.spec.ts` | 3 tests : signup scroll, pricing mobile, checkout mobile. Viewport 390x844. |
 
-### Prochaine etape suggeree
+`playwright.config.ts` existe déjà avec les projects nécessaires.
 
-Publiez l'app, puis dites-moi "Profil de performance sur la production" et je lancerai un audit depuis le navigateur integre sur l'URL publiee.
+### Résumé
+
+- **5 tickets sur 8** sont déjà résolus par les travaux précédents
+- **1 ticket (T4)** nécessite une action manuelle de l'utilisateur (compression image)
+- **2 tickets (T5, T6)** sont implémentables : guard Supabase placeholder + tests E2E tunnel
 
