@@ -1,56 +1,32 @@
 
 
-## Audit visuel -- Resultats
+## Publication et mesure Lighthouse
 
-### Test 1 : Hero desktop 1366x768 -- PASSE
+### Publication
 
-Badge, titre, sous-titre, et les 2 CTAs ("Commencer gratuitement" + "Comment ca marche") sont tous visibles above-the-fold. Aucun probleme.
+Pour publier l'app, cliquez sur le bouton **Publish** en haut a droite de l'editeur (icone web), puis cliquez sur **Update** dans la boite de dialogue.
 
-### Test 2 : Signup mobile 390x844 -- ECHEC (persiste)
+### Mesure Lighthouse
 
-Le correctif precedent (`justify-start overflow-y-auto`) n'a pas resolu le probleme. Le bouton "Creer mon compte", les options Google/GitHub et le lien "Se connecter" restent inaccessibles en scrollant.
+Une fois publie sur `https://emotions-care.lovable.app`, vous pouvez mesurer les scores Lighthouse de deux facons :
 
-### Cause racine
+**Option 1 -- Chrome DevTools (recommande)**
+1. Ouvrir `https://emotions-care.lovable.app` dans Chrome
+2. F12 → onglet **Lighthouse**
+3. Cocher Performance + Accessibility + Best Practices + SEO
+4. Selectionner Desktop puis Mobile
+5. Cliquer **Analyze page load**
 
-Le `SignupPage` est rendu a l'interieur de `MarketingLayout` qui a cette structure :
+**Option 2 -- PageSpeed Insights**
+1. Aller sur [pagespeed.web.dev](https://pagespeed.web.dev)
+2. Entrer `https://emotions-care.lovable.app`
+3. Les resultats incluent les Core Web Vitals reels (CrUX) + les scores de laboratoire
 
-```text
-<div class="relative min-h-screen">           ← MarketingLayout wrapper
-  <header class="fixed top-0 h-16 z-50">      ← header fixe 64px
-  <main class="pt-16">                         ← padding-top pour le header
-    <div class="min-h-screen overflow-y-auto"> ← SignupPage container (PROBLEME)
-      ... formulaire ...
-    </div>
-  </main>
-  <Footer />
-</div>
-```
+### Ce que je peux faire
 
-Le probleme : `min-h-screen` (100vh) sur le container du SignupPage cree un conteneur de scroll imbrique qui prend exactement la hauteur du viewport. Mais ce conteneur est deja a l'interieur de `<main class="pt-16">`, donc le scroll du document ne peut pas atteindre le bas du formulaire. Le `overflow-y-auto` cree un scroll interne qui entre en conflit avec le scroll natif de la page.
+Je ne peux pas publier l'app a votre place (l'action "Update" dans le dialogue de publication est manuelle). Une fois publiee, je peux naviguer sur l'URL de production avec le navigateur integre et executer un profiling de performance pour identifier les goulots d'etranglement restants.
 
-### Correction
+### Prochaine etape suggeree
 
-Fichier : `src/pages/SignupPage.tsx`, ligne 119.
-
-Remplacer :
-```
-min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col items-center justify-start p-4 pt-20 pb-40 overflow-y-auto
-```
-
-Par :
-```
-min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-background to-primary/5 flex flex-col items-center justify-start p-4 pt-20 pb-40
-```
-
-Changements :
-- `min-h-screen` → `min-h-[calc(100vh-4rem)]` : soustrait les 64px du header fixe pour que la hauteur minimale soit correcte
-- Suppression de `overflow-y-auto` : laisse le scroll natif du document gerer le defilement au lieu de creer un scroll imbrique
-
-Le formulaire depassant 100vh sur mobile, le scroll natif de la page permettra d'atteindre le bouton "Creer mon compte" et les options sociales en bas.
-
-### Fichiers a modifier
-
-| Fichier | Modification |
-|---------|-------------|
-| `src/pages/SignupPage.tsx` ligne 119 | Remplacer `min-h-screen` par `min-h-[calc(100vh-4rem)]` et supprimer `overflow-y-auto` |
+Publiez l'app, puis dites-moi "Profil de performance sur la production" et je lancerai un audit depuis le navigateur integre sur l'URL publiee.
 
