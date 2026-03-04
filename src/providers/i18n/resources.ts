@@ -23,6 +23,18 @@ import { modules as enModules } from '@/lib/i18n/locales/en/modules';
 import { navigation as enNavigation } from '@/lib/i18n/locales/en/navigation';
 import { settings as enSettings } from '@/lib/i18n/locales/en/settings';
 
+import { auth as deAuth } from '@/lib/i18n/locales/de/auth';
+import { coach as deCoach } from '@/lib/i18n/locales/de/coach';
+import { common as deCommon } from '@/lib/i18n/locales/de/common';
+import { consent as deConsent } from '@/lib/i18n/locales/de/consent';
+import { dashboard as deDashboard } from '@/lib/i18n/locales/de/dashboard';
+import { errors as deErrors } from '@/lib/i18n/locales/de/errors';
+import { journal as deJournal } from '@/lib/i18n/locales/de/journal';
+import { legal as deLegal } from '@/lib/i18n/locales/de/legal';
+import { modules as deModules } from '@/lib/i18n/locales/de/modules';
+import { navigation as deNavigation } from '@/lib/i18n/locales/de/navigation';
+import { settings as deSettings } from '@/lib/i18n/locales/de/settings';
+
 export const namespaces = [
   'common',
   'navigation',
@@ -63,6 +75,19 @@ export const resources = {
     legal: enLegal,
     journal: enJournal,
     coach: enCoach,
+  },
+  de: {
+    common: deCommon,
+    navigation: deNavigation,
+    dashboard: deDashboard,
+    settings: deSettings,
+    modules: deModules,
+    auth: deAuth,
+    consent: deConsent,
+    errors: deErrors,
+    legal: deLegal,
+    journal: deJournal,
+    coach: deCoach,
   },
 } as const;
 

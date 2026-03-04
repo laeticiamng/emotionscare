@@ -1,0 +1,19 @@
+{
+  "notAuthenticated": "Nicht authentifiziert",
+  "sessionExpired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
+  "accessDenied": "Zugriff verweigert",
+  "forbidden": "Sie haben nicht die erforderlichen Berechtigungen für diese Ressource.",
+  "notFound": "Seite nicht gefunden",
+  "somethingWentWrong": "Der gesuchte Link scheint sich geändert zu haben. Kehren Sie zur Startseite zurück.",
+  "internalServerError": "Interner Serverfehler",
+  "contactSupport": "Ein unerwarteter Fehler ist aufgetreten. Unser Team wurde benachrichtigt. Bitte versuchen Sie es später erneut.",
+  "badRequest": "Ungültige Anfrage",
+  "unauthorized": "Nicht autorisiert",
+  "validationError": "Validierungsfehler",
+  "rateLimitExceeded": "Anfragelimit überschritten",
+  "timeoutError": "Zeitüberschreitung",
+  "networkError": "Netzwerkfehler",
+  "operationAborted": "Vorgang abgebrochen",
+  "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+  "journalError": "Fehler beim Zugriff auf das Tagebuch"
+}

@@ -1,0 +1,9 @@
+{
+  "title": "Atem-Dashboard",
+  "hrvStress": "HRV-Stressindex",
+  "coherence": "Kohärenz",
+  "mvpa": "Aktive Minuten",
+  "relax": "Entspannung",
+  "mindfulness": "Achtsamkeit",
+  "mood": "Stimmung"
+}
