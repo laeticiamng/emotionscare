@@ -9,7 +9,7 @@ import i18n from '@/lib/i18n';
 import { useSettingsStore } from '@/store/settings.store';
 import { logger } from '@/lib/logger';
 
-export type Lang = 'fr' | 'en';
+export type Lang = 'fr' | 'en' | 'de';
 
 interface I18nContextValue {
   lang: Lang;
@@ -35,7 +35,9 @@ const resolveNavigatorLanguage = (fallback: Lang = DEFAULT_LANG): Lang => {
   }
 
   const normalized = navigatorLang.slice(0, 2).toLowerCase();
-  return normalized === 'en' ? 'en' : 'fr';
+  if (normalized === 'en') return 'en';
+  if (normalized === 'de') return 'de';
+  return 'fr';
 };
 
 const updateDocumentLanguage = (lang: Lang) => {
@@ -50,13 +52,15 @@ export function I18nProvider({ children, defaultLang = DEFAULT_LANG }: { childre
 
   const [lang, setLangState] = React.useState<Lang>(() => {
     const current = (i18n.language?.slice(0, 2) as Lang | undefined) ?? defaultLang;
-    return current === 'en' ? 'en' : 'fr';
+    if (current === 'en') return 'en';
+    if (current === 'de') return 'de';
+    return 'fr';
   });
   const [hydrated, setHydrated] = React.useState(false);
 
   const applyLanguage = React.useCallback(
     async (nextLang: Lang, persistToProfile: boolean) => {
-      const normalized = nextLang === 'en' ? 'en' : 'fr';
+      const normalized: Lang = nextLang === 'en' ? 'en' : nextLang === 'de' ? 'de' : 'fr';
 
       try {
         if (!i18n.language?.startsWith(normalized)) {

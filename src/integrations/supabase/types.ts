@@ -31372,7 +31372,7 @@ export type Database = {
       get_violation_stats: {
         Args: { days?: number }
         Returns: {
-          avg_resolution_time: unknown
+          avg_resolution_time: string
           critical_violations: number
           high_violations: number
           resolved_violations: number

@@ -10,6 +10,7 @@ const en = {
     languageNames: {
       fr: 'French',
       en: 'English',
+      de: 'German',
     },
   },
 } satisfies LocaleResources;

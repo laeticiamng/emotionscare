@@ -1,0 +1,17 @@
+{
+  "retry": "Erneut versuchen",
+  "back": "Zurück",
+  "home": "Startseite",
+  "help": "Hilfe",
+  "cancel": "Abbrechen",
+  "confirm": "Bestätigen",
+  "save": "Speichern",
+  "delete": "Löschen",
+  "edit": "Bearbeiten",
+  "close": "Schließen",
+  "loading": "Laden...",
+  "error": "Fehler",
+  "success": "Erfolg",
+  "warning": "Warnung",
+  "info": "Information"
+}

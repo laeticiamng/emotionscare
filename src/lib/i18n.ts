@@ -23,7 +23,7 @@ function initializeI18n() {
       fallbackNS: ['common'],
       lng: locale,
       fallbackLng: 'fr',
-      supportedLngs: ['fr', 'en'],
+      supportedLngs: ['fr', 'en', 'de'],
       load: 'languageOnly',
       debug: false,
       interpolation: { escapeValue: false },
