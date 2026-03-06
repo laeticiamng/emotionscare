@@ -89,7 +89,7 @@ const MODULES: PlatformModule[] = [
   { id: 34, title: 'Support multilingue', category: 'Fonctionnalités avancées', status: 'partial', route: '/settings/language', description: 'Choisissez la langue de l\'interface parmi 2 options : Français et English. Sélecteur intuitif avec drapeaux et prévisualisation.', nextStep: 'Ajouter support ES/DE avec fichiers de traduction complets.' },
   { id: 35, title: 'Accessibilité WCAG 2.1 AA', category: 'Fonctionnalités avancées', status: 'partial', route: '/settings/accessibility', description: 'Personnalisez votre expérience : contraste élevé, mode daltonien, taille du texte (75-150%), espacement des lignes, navigation clavier et support lecteur d\'écran.', nextStep: 'Audit complet contrastes, clavier, lecteurs écran.' },
   { id: 36, title: 'Analytics produit', category: 'Fonctionnalités avancées', status: 'partial', route: '/app/analytics', description: 'Tableau de bord analytique personnel : humeur moyenne, tendances, sessions par module, durée moyenne et streaks. Filtrage sur 7, 30 ou 90 jours avec export.', nextStep: 'Ajouter analytics parcours émotionnels orientés impact.' },
-  { id: 37, title: 'Conformité HDS opérationnelle', category: 'Fonctionnalités avancées', status: 'complete', route: '/compliance/hds', description: 'Hébergement de Données de Santé conforme à la réglementation française. Certification HDS, procédures d\'audit, chiffrement et traçabilité des accès.' },
+  { id: 37, title: 'Conformité données de santé', category: 'Fonctionnalités avancées', status: 'partial', route: '/compliance/hds', description: 'Hébergement sécurisé conforme RGPD avec chiffrement, traçabilité des accès et procédures d\'audit.', nextStep: 'Finaliser la documentation de conformité.' },
 ];
 
 const STATUS_LABELS = {
@@ -267,7 +267,7 @@ export default function ModulesDashboard() {
             <CardContent className="space-y-2 text-sm text-muted-foreground">
               <p>• WCAG 2.1 AA complet + outillage QA accessibilité.</p>
               <p>• i18n FR/EN/ES, offline-first, push intelligents.</p>
-              <p>• HDS + gouvernance RGPD opérationnelle.</p>
+              <p>• Sécurité données de santé + gouvernance RGPD opérationnelle.</p>
             </CardContent>
           </Card>
         </div>
@@ -277,7 +277,7 @@ export default function ModulesDashboard() {
         <Card><CardContent className="pt-6 text-sm text-muted-foreground flex items-center gap-2"><Brain className="h-4 w-4" /> IA thérapeutique sécurisée</CardContent></Card>
         <Card><CardContent className="pt-6 text-sm text-muted-foreground flex items-center gap-2"><Music className="h-4 w-4" /> Musicothérapie personnalisée</CardContent></Card>
         <Card><CardContent className="pt-6 text-sm text-muted-foreground flex items-center gap-2"><Users className="h-4 w-4" /> Impact B2B mesurable</CardContent></Card>
-        <Card><CardContent className="pt-6 text-sm text-muted-foreground flex items-center gap-2"><Lock className="h-4 w-4" /> RGPD/HDS by design</CardContent></Card>
+        <Card><CardContent className="pt-6 text-sm text-muted-foreground flex items-center gap-2"><Lock className="h-4 w-4" /> RGPD by design</CardContent></Card>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">

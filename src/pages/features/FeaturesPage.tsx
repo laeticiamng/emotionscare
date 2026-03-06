@@ -234,7 +234,7 @@ const ADDITIONAL_MODULES: { category: string; modules: CompactModule[] }[] = [
     modules: [
       { title: 'Export RGPD', description: 'Exportez toutes vos données personnelles aux formats PDF, JSON ou CSV.', icon: FileText },
       { title: 'Paramètres confidentialité', description: 'Contrôle fin de vos données : caméra, micro, analytics et consentements.', icon: Lock },
-      { title: 'Conformité HDS', description: 'Hébergement de Données de Santé conforme à la réglementation française.', icon: Shield },
+      { title: 'Conformité données de santé', description: 'Hébergement sécurisé conforme RGPD avec chiffrement et traçabilité des accès.', icon: Shield },
     ],
   },
   {

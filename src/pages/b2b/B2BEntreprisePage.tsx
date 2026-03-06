@@ -82,7 +82,7 @@ const features = [
     icon: Shield,
     title: 'RGPD natif',
     description:
-      'Anonymat garanti par design. Aucune donnée individuelle n\'est accessible aux managers. Conforme HDS.',
+      'Anonymat garanti par design. Aucune donnée individuelle n\'est accessible aux managers. Hébergement sécurisé en UE.',
     gradient: 'from-primary/80 to-primary',
   },
   {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, ArrowLeft } from 'lucide-react';
+import { Heart, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -23,6 +23,7 @@ export default function UnifiedLoginPage() {
   const location = useLocation();
   const { toast } = useToast();
   const [forgotOpen, setForgotOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -121,16 +122,26 @@ export default function UnifiedLoginPage() {
                       Mot de passe <span className="text-destructive" aria-label="requis">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        id="login-password"
-                        type="password"
-                        placeholder="••••••••"
-                        autoComplete="current-password"
-                        aria-required="true"
-                        aria-invalid={!!form.formState.errors.password}
-                        aria-describedby={form.formState.errors.password ? "login-password-error" : undefined}
-                      />
+                      <div className="relative">
+                        <Input
+                          {...field}
+                          id="login-password"
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder="••••••••"
+                          autoComplete="current-password"
+                          aria-required="true"
+                          aria-invalid={!!form.formState.errors.password}
+                          aria-describedby={form.formState.errors.password ? "login-password-error" : undefined}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
+                          aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                        >
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
                     </FormControl>
                     <FormMessage id="login-password-error" />
                   </FormItem>

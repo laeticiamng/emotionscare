@@ -149,7 +149,7 @@ const MODULES: ModuleStatus[] = [
     coverage: 95,
     tests: 42,
     issues: [],
-    recommendations: ['Ajouter rapport HDS pour certification'],
+    recommendations: ['Préparer documentation conformité données de santé'],
     icon: Shield,
   },
 ];
@@ -157,7 +157,7 @@ const MODULES: ModuleStatus[] = [
 const TOP_ENHANCEMENTS = [
   'Intégration Llama 3.1 local pour réponses ultra-rapides',
   'Support WebXR complet pour Meta Quest 3',
-  'Certification HDS (Hébergeur Données de Santé)',
+  'Conformité données de santé (objectif futur)',
   'Validation clinique CHU partenaire',
   'Application native iOS/Android avec React Native',
 ];
