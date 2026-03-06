@@ -1,6 +1,6 @@
 /**
- * HDSCompliancePage - Conformité HDS opérationnelle
- * Module 37 : Hébergement de Données de Santé conforme à la réglementation française
+ * HDSCompliancePage - Sécurité des données de santé
+ * Module 37 : Protection des données de santé — Feuille de route
  */
 
 import React from 'react';
@@ -56,8 +56,8 @@ const COMPLIANCE_ITEMS: ComplianceItem[] = [
   },
   {
     id: 'hosting',
-    title: 'Hébergement certifié HDS',
-    description: 'Infrastructure hébergée chez un prestataire certifié HDS en France métropolitaine.',
+    title: 'Hébergement sécurisé en France',
+    description: 'Infrastructure hébergée chez un prestataire sécurisé en France métropolitaine.',
     status: 'in_progress',
     category: 'Infrastructure',
     icon: Server,
@@ -112,8 +112,8 @@ const COMPLIANCE_ITEMS: ComplianceItem[] = [
   },
   {
     id: 'certification',
-    title: 'Certification HDS officielle',
-    description: 'Obtention de la certification HDS par un organisme accrédité COFRAC.',
+    title: 'Certification HDS (objectif futur)',
+    description: 'Objectif : obtention de la certification HDS par un organisme accrédité COFRAC.',
     status: 'planned',
     category: 'Certification',
     icon: Shield,
@@ -128,9 +128,9 @@ const STATUS_CONFIG = {
 
 export default function HDSCompliancePage() {
   usePageSEO({
-    title: 'Conformité HDS - Hébergement Données de Santé | EmotionsCare',
-    description: 'EmotionsCare respecte les exigences HDS pour l\'hébergement des données de santé. Chiffrement, résidence France, traçabilité et audit de sécurité.',
-    keywords: 'HDS, hébergement données santé, conformité, RGPD, chiffrement, sécurité, certification',
+    title: 'Sécurité des données de santé | EmotionsCare',
+    description: 'Découvrez comment EmotionsCare protège vos données de santé : chiffrement, résidence France, traçabilité et audits de sécurité réguliers.',
+    keywords: 'sécurité données santé, RGPD, chiffrement, protection données, hébergement sécurisé',
   });
 
   const compliantCount = COMPLIANCE_ITEMS.filter(i => i.status === 'compliant').length;
@@ -158,12 +158,18 @@ export default function HDSCompliancePage() {
             </Badge>
             <h1 className="text-3xl md:text-4xl font-bold">
               <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                Conformité HDS opérationnelle
+                Sécurité des données de santé
               </span>
             </h1>
             <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
-              EmotionsCare s'engage à respecter les exigences les plus strictes en matière d'hébergement de données de santé. Voici l'état de notre conformité.
+              EmotionsCare s'engage à protéger vos données de santé selon les standards les plus exigeants. Voici notre feuille de route.
             </p>
+            <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg max-w-2xl mx-auto">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                <AlertTriangle className="h-4 w-4 inline mr-1 -mt-0.5" />
+                EmotionsCare n'est pas certifié HDS à ce jour. Cette page présente notre progression vers les standards de sécurité des données de santé.
+              </p>
+            </div>
           </div>
 
           {/* Global Progress */}
@@ -259,7 +265,7 @@ export default function HDSCompliancePage() {
                 <Button size="sm" asChild>
                   <Link to="/contact">
                     <FileCheck className="h-4 w-4 mr-1" />
-                    Demander le dossier HDS
+                    Demander le dossier de sécurité
                   </Link>
                 </Button>
               </div>
