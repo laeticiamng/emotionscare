@@ -50,13 +50,20 @@ export default defineConfig(({ mode }) => ({
   },
   
   esbuild: {
-    target: 'esnext', // esbuild transforms TypeScript without type checking
+    target: 'esnext',
     logOverride: { 
       'this-is-undefined-in-esm': 'silent',
       'direct-eval': 'silent'
     }
   },
   
+  optimizeDeps: {
+    exclude: [
+      'sharp', 'pg', 'fastify', '@fastify/cors', '@fastify/helmet', '@fastify/rate-limit',
+      'kysely', 'tsx', 'imagemin-avif', 'imagemin-webp', 'node-fetch',
+    ],
+  },
+
   define: {
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
   }
