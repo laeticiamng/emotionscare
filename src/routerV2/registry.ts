@@ -2839,16 +2839,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/visio', '/visioconference'],
   },
   // ═══════════════════════════════════════════════════════════
-  // MODULE 37 - Conformité HDS opérationnelle
+  // MODULE 37 - Sécurité des données de santé
   // ═══════════════════════════════════════════════════════════
   {
-    name: 'hds-compliance',
-    path: '/compliance/hds',
+    name: 'securite-sante',
+    path: '/compliance/securite-sante',
     segment: 'public',
     layout: 'marketing',
     component: 'HDSCompliancePage',
     guard: false,
-    aliases: ['/hds', '/conformite-hds'],
+    aliases: ['/compliance/hds', '/hds', '/conformite-hds'],
   },
 
   // 404 FALLBACK ROUTE - Le fallback '*' est géré directement dans router.tsx
