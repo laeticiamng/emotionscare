@@ -3,7 +3,7 @@
  * /features
  */
 
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
@@ -429,6 +429,11 @@ const FeaturesPage: React.FC = () => {
           </div>
         </section>
       ))}
+
+      {/* ═══ PRODUCT SCREENSHOTS ═══ */}
+      <Suspense fallback={<div className="py-16 bg-background"><div className="container"><div className="h-48 bg-muted/30 rounded-2xl animate-pulse" /></div></div>}>
+        <ProductScreenshots compact />
+      </Suspense>
 
       {/* ═══ ADDITIONAL MODULES (compact grid) ═══ */}
       <section className="py-20 md:py-28 bg-muted/10">
