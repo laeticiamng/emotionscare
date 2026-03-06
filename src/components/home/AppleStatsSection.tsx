@@ -19,7 +19,7 @@ interface StatItem {
 const stats: StatItem[] = [
   { value: 37, suffix: '', label: 'Modules intégrés', description: 'Plateforme complète' },
   { value: 3, suffix: ' min', label: 'Par session', description: 'Micro-interventions efficaces' },
-  { value: 100, suffix: '%', label: 'Données protégées', description: 'Chiffrement RGPD & HDS' },
+  { value: 100, suffix: '%', label: 'Données protégées', description: 'Chiffrement RGPD conforme' },
   { value: 7, suffix: '/7', label: 'Disponibilité', description: 'Accès permanent, jour et nuit' },
 ];
 

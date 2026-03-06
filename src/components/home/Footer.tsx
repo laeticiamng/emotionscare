@@ -72,7 +72,7 @@ const Footer: React.FC = () => {
               </Badge>
               <Badge variant="secondary" className="text-xs">
                 <LockKeyhole className="h-3 w-3 mr-1" aria-hidden="true" />
-                HDS
+                Sécurité renforcée
               </Badge>
               <Badge variant="secondary" className="text-xs">
                 <Accessibility className="h-3 w-3 mr-1" aria-hidden="true" />

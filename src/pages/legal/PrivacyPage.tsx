@@ -37,7 +37,7 @@ export const PrivacyPage: React.FC = () => {
               <CardTitle className="text-3xl">Politique de Confidentialité</CardTitle>
             </div>
             <p className="text-sm text-muted-foreground">
-              Dernière mise à jour : {new Date().toLocaleDateString('fr-FR')}
+              Dernière mise à jour : 1 mars 2026
             </p>
           </CardHeader>
 
