@@ -19,8 +19,6 @@ import {
   ArrowLeft,
   UserPlus,
   AlertCircle,
-  Chrome,
-  Github
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { usePageSEO } from '@/hooks/usePageSEO';
