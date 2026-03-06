@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -100,6 +101,7 @@ function getRecommendation(scores: Record<string, number>) {
       description:
         'Votre niveau de stress est élevé. Le protocole Stop vous aidera à interrompre le cycle de stress immédiatement avec une technique de pause en 3 minutes.',
       urgency: 'high' as const,
+      route: '/app/breath',
     };
   }
   if (sleepScore <= 3) {
@@ -109,6 +111,8 @@ function getRecommendation(scores: Record<string, number>) {
       description:
         'Votre sommeil semble perturbé. Le protocole Night combine relaxation progressive et exercices de respiration pour améliorer votre endormissement.',
       urgency: 'medium' as const,
+      route: '/app/breath',
+      isPro: true,
     };
   }
   if (energyScore <= 3) {
@@ -118,6 +122,7 @@ function getRecommendation(scores: Record<string, number>) {
       description:
         'Votre énergie est basse. Le protocole Reset propose une micro-récupération guidée pour retrouver votre vitalité en quelques minutes.',
       urgency: 'medium' as const,
+      route: '/app/breath',
     };
   }
   if (avg <= 4) {
@@ -127,6 +132,7 @@ function getRecommendation(scores: Record<string, number>) {
       description:
         'Votre état émotionnel global mérite attention. Le protocole Respirez utilise la cohérence cardiaque pour rétablir votre équilibre intérieur.',
       urgency: 'medium' as const,
+      route: '/app/breath',
     };
   }
   return {
@@ -135,10 +141,12 @@ function getRecommendation(scores: Record<string, number>) {
     description:
       'Votre état émotionnel est bon ! Continuez à prendre soin de vous. Revenez faire un scan régulièrement pour suivre votre évolution.',
     urgency: 'low' as const,
+    route: '/app/home',
   };
 }
 
 const ScannerEmotionnelPage: React.FC = () => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [scores, setScores] = useState<Record<string, number>>({});
   const [showResults, setShowResults] = useState(false);
@@ -294,7 +302,13 @@ const ScannerEmotionnelPage: React.FC = () => {
                     <RotateCcw className="h-4 w-4" />
                     Refaire le scan
                   </Button>
-                  <Button className="rounded-full gap-2 flex-1">
+                  <Button 
+                    className="rounded-full gap-2 flex-1"
+                    onClick={() => navigate(recommendation.route || '/app/breath')}
+                  >
+                    {recommendation.isPro && (
+                      <Badge variant="secondary" className="mr-1 text-xs">Pro</Badge>
+                    )}
                     Commencer le protocole
                     <ArrowRight className="h-4 w-4" />
                   </Button>
