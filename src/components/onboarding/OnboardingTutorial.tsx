@@ -60,7 +60,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
   {
     id: 'breath',
     title: 'Exercices de Respiration',
-    description: 'Retrouvez le calme avec des techniques de respiration scientifiquement validées.',
+    description: 'Retrouvez le calme avec des techniques de respiration basées sur les neurosciences.',
     icon: <Wind className="h-12 w-12 text-primary" />,
     features: [
       'Patterns 4-7-8, Carré, Énergisant',

@@ -103,7 +103,7 @@ const SignupPage: React.FC = () => {
         full_name: fullName.trim()
       });
       toast({ title: 'Bienvenue !', description: 'Votre compte a été créé avec succès.' });
-      navigate('/app/home', { replace: true });
+      navigate('/onboarding', { replace: true });
     } catch (err: unknown) {
       logger.error('Erreur d\'inscription', err as Error, 'AUTH');
       // Use authErrorService for user-friendly messages

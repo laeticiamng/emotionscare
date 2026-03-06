@@ -51,17 +51,17 @@ const rgpdSection: ComplianceSection = {
 };
 
 const hdsSection: ComplianceSection = {
-  title: 'HDS (Hébergeur de Données de Santé)',
+  title: 'Sécurité des données de santé',
   icon: HeartPulse,
   score: 68,
   items: [
-    { label: 'Architecture compatible HDS (isolation des données)', status: 'compliant' },
+    { label: 'Architecture sécurisée (isolation des données)', status: 'compliant' },
     { label: 'Chiffrement au repos AES-256 (Supabase)', status: 'compliant' },
     { label: 'Chiffrement en transit TLS 1.3', status: 'compliant' },
     { label: 'Localisation des données — UE (AWS eu-west)', status: 'compliant' },
     { label: 'Journalisation des accès (audit logs)', status: 'compliant' },
     { label: 'Pseudonymisation des identifiants utilisateur', status: 'compliant' },
-    { label: 'Hébergeur certifié HDS', status: 'planned', detail: 'Migration planifiée M1-M9 (Backlog 2.0)' },
+    { label: 'Hébergement sécurisé en UE', status: 'compliant' },
     { label: 'Certification ISO 27001', status: 'planned', detail: 'Objectif Q4 2026' },
     { label: 'Certification SOC 2 Type II', status: 'planned', detail: 'Objectif 2027' },
     { label: 'PAS (Plan d\'Assurance Sécurité)', status: 'in_progress', detail: 'Rédaction en cours' },

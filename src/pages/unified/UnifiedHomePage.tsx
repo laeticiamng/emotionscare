@@ -436,7 +436,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                 
                 <p className="text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
                   Découvrez la première plateforme d'intelligence émotionnelle pilotée par l'IA. 
-                  <strong className="text-foreground"> Transformez votre bien-être</strong> avec des outils scientifiquement validés et une expérience totalement personnalisée.
+                  <strong className="text-foreground"> Transformez votre bien-être</strong> avec des outils basés sur les neurosciences et une expérience totalement personnalisée.
                 </p>
               </div>
 

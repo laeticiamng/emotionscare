@@ -114,7 +114,7 @@ export const complianceData = {
   lastPentest: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
   gdprCompliance: 'Complet',
   dataRetention: 'Conforme',
-  certifications: ['ISO 27001', 'RGPD', 'HDS']
+  certifications: ['ISO 27001', 'RGPD', 'Sécurité renforcée']
 };
 
 // Legacy exports for backward compatibility (will use async versions in components)
