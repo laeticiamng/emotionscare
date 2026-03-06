@@ -7,10 +7,10 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-import screenshotDashboard from '@/assets/screenshots/screenshot-dashboard.jpg';
-import screenshotScanner from '@/assets/screenshots/screenshot-scanner.jpg';
-import screenshotCoach from '@/assets/screenshots/screenshot-coach.jpg';
-import screenshotJournal from '@/assets/screenshots/screenshot-journal.jpg';
+const screenshotDashboard = '/images/screenshots/screenshot-dashboard.jpg';
+const screenshotScanner = '/images/screenshots/screenshot-scanner.jpg';
+const screenshotCoach = '/images/screenshots/screenshot-coach.jpg';
+const screenshotJournal = '/images/screenshots/screenshot-journal.jpg';
 
 const SCREENS = [
   {
