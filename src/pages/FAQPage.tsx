@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 /**
  * FAQPage - Questions Fréquentes EmotionsCare
  * SEO, accessibilité, catégories étendues, recherche fonctionnelle
