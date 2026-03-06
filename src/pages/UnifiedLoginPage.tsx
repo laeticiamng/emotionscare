@@ -62,10 +62,23 @@ export default function UnifiedLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-secondary/20 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle id="login-title">Connexion</CardTitle>
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-background to-primary/5 flex flex-col items-center justify-start p-4 pt-20 pb-40">
+      {/* Back button */}
+      <div className="absolute top-4 left-4">
+        <Link to="/">
+          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Retour
+          </Button>
+        </Link>
+      </div>
+
+      <Card className="w-full max-w-md shadow-2xl border-0 bg-card/95 backdrop-blur">
+        <CardHeader className="text-center pb-2">
+          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center mb-4">
+            <Heart className="w-8 h-8 text-primary-foreground" />
+          </div>
+          <CardTitle id="login-title" className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">Connexion</CardTitle>
           <CardDescription>
             Connectez-vous à votre compte EmotionsCare
           </CardDescription>
