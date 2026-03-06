@@ -34,7 +34,7 @@ export const TermsPage: React.FC = () => {
           <CardHeader>
             <CardTitle className="text-3xl">Conditions Générales d&apos;Utilisation</CardTitle>
             <p className="text-sm text-muted-foreground">
-              Dernière mise à jour : {new Date().toLocaleDateString('fr-FR')}
+              Dernière mise à jour : 1 mars 2026
             </p>
           </CardHeader>
 

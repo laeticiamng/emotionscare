@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
+
 import {
   Heart,
   Mail,
@@ -19,8 +19,6 @@ import {
   ArrowLeft,
   UserPlus,
   AlertCircle,
-  Chrome,
-  Github
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { usePageSEO } from '@/hooks/usePageSEO';
@@ -358,38 +356,6 @@ const SignupPage: React.FC = () => {
                 )}
               </Button>
 
-              {/* Social Login Options */}
-              <div className="space-y-3">
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <Separator className="w-full" />
-                  </div>
-                  <div className="relative flex justify-center text-xs">
-                    <span className="bg-card px-2 text-muted-foreground">
-                      OU CONTINUER AVEC
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-11 relative"
-                  >
-                    <Chrome className="w-4 h-4 mr-2" />
-                    Google
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-11 relative"
-                  >
-                    <Github className="w-4 h-4 mr-2" />
-                    GitHub
-                  </Button>
-                </div>
-              </div>
 
               {/* Lien vers connexion */}
               <div className="text-center pt-4">

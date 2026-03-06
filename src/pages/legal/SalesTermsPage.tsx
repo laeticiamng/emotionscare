@@ -39,7 +39,7 @@ export const SalesTermsPage: React.FC = () => {
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground">
-              Applicables aux offres Premium EmotionsCare | Dernière mise à jour : {new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+              Applicables aux offres Premium EmotionsCare | Dernière mise à jour : 1 mars 2026
             </p>
           </CardHeader>
 
@@ -418,7 +418,7 @@ export const SalesTermsPage: React.FC = () => {
             </section>
 
             <section className="text-sm text-muted-foreground border-t pt-4">
-              <p><strong>Date d'entrée en vigueur :</strong> {new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+              <p><strong>Date d'entrée en vigueur :</strong> 1 mars 2026</p>
               <p><strong>Version :</strong> 1.0</p>
             </section>
           </CardContent>

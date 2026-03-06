@@ -50,7 +50,7 @@ const features: Feature[] = [
     icon: <Shield className="h-12 w-12" />,
     title: "100% confidentiel.",
     subtitle: "Vos données vous appartiennent.",
-    description: "Aucune donnée partagée, jamais. Conforme RGPD, hébergement HDS, et respect total de votre intimité.",
+    description: "Aucune donnée partagée, jamais. Conforme RGPD, hébergement sécurisé en UE, et respect total de votre intimité.",
     gradient: "from-primary/80 to-primary",
     stat: { value: "0", label: "données vendues" }
   },

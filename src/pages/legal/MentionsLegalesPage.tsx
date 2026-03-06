@@ -183,7 +183,7 @@ export const MentionsLegalesPage: React.FC = () => {
             </section>
 
             <section className="text-sm text-muted-foreground border-t pt-4">
-              <p><strong>Dernière mise à jour :</strong> {new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+              <p><strong>Dernière mise à jour :</strong> 1 mars 2026</p>
               <p><strong>Version :</strong> 1.0</p>
             </section>
           </CardContent>

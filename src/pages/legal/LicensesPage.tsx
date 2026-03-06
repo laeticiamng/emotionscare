@@ -257,7 +257,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.`}
             </section>
 
             <section className="text-xs text-muted-foreground border-t pt-4">
-              <p><strong>Dernière mise à jour :</strong> {new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+              <p><strong>Dernière mise à jour :</strong> 1 mars 2026</p>
               <p><strong>Version :</strong> 1.0</p>
             </section>
           </CardContent>

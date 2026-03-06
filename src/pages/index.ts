@@ -6,7 +6,7 @@ export { default as HomePage } from '@/components/HomePage';
 export { default as AboutPage } from './AboutPage';
 export { default as ContactPage } from './ContactPage';
 export { default as HelpPage } from './HelpPage';
-export { default as LoginPage } from './LoginPage';
+export { default as LoginPage } from './unified/UnifiedLoginPage';
 export { default as SignupPage } from './SignupPage';
 
 // App & Dashboards

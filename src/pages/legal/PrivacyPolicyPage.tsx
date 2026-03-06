@@ -39,7 +39,7 @@ export const PrivacyPolicyPage: React.FC = () => {
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground">
-              Dernière mise à jour : {new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })} | Version 1.0
+              Dernière mise à jour : 1 mars 2026 | Version 1.0
             </p>
           </CardHeader>
 
@@ -434,7 +434,7 @@ export const PrivacyPolicyPage: React.FC = () => {
             </section>
 
             <section className="text-sm text-muted-foreground border-t pt-4">
-              <p><strong>Date d'entrée en vigueur :</strong> {new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+              <p><strong>Date d'entrée en vigueur :</strong> 1 mars 2026</p>
               <p><strong>Version :</strong> 1.0</p>
               <p className="mt-2">
                 Cette politique de confidentialité a été rédigée conformément au Règlement (UE) 2016/679 (RGPD), 
