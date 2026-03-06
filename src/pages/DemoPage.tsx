@@ -183,8 +183,8 @@ const DemoPage: React.FC = () => {
     },
     {
       icon: <Star className="w-5 h-5" />,
-      title: "Scientifiquement validé",
-      description: "Basé sur des protocoles reconnus"
+      title: "Basé sur les neurosciences",
+      description: "Protocoles reconnus en régulation émotionnelle"
     },
     {
       icon: <Users className="w-5 h-5" />,

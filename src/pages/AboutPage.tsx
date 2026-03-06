@@ -206,7 +206,7 @@ const AboutPage: React.FC = () => {
                     },
                     {
                       icon: Brain,
-                      title: 'Approche scientifique',
+                      title: 'Fondée sur les neurosciences',
                       description:
                         'Chaque exercice est fondé sur les neurosciences et la psychologie positive. Pas de promesses vagues, des résultats mesurables.',
                     },

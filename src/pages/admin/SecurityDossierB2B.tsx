@@ -51,7 +51,7 @@ const rgpdSection: ComplianceSection = {
 };
 
 const hdsSection: ComplianceSection = {
-  title: 'Sécurité des données de santé',
+  title: 'Sécurité des données de santé (en préparation — non certifié HDS)',
   icon: HeartPulse,
   score: 68,
   items: [
