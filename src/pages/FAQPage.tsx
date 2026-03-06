@@ -50,8 +50,8 @@ const FAQS: FAQCategory[] = [
     category: 'Général',
     icon: HelpCircle,
     questions: [
-      { q: 'Comment créer un compte ?', a: 'Cliquez sur "S\'inscrire" en haut à droite et suivez les étapes. Vous pouvez vous inscrire avec votre email ou via Google/Apple.' },
-      { q: 'L\'application est-elle gratuite ?', a: 'Oui, nous proposons un plan gratuit avec les fonctionnalités essentielles. Des plans Premium sont disponibles pour plus de fonctionnalités avancées.' },
+      { q: 'Comment créer un compte ?', a: 'Cliquez sur "S\'inscrire" en haut à droite et suivez les étapes. Vous pouvez vous inscrire avec votre adresse email en quelques secondes.' },
+      { q: 'L\'application est-elle gratuite ?', a: 'Oui, nous proposons un plan gratuit avec les fonctionnalités essentielles. Des plans Pro et Business sont disponibles pour accéder à tous les modules avancés.' },
       { q: 'Puis-je utiliser EmotionsCare sur mobile ?', a: 'Absolument ! EmotionsCare est une application web responsive accessible depuis n\'importe quel navigateur mobile.' },
       { q: 'Dans quelles langues l\'application est-elle disponible ?', a: 'EmotionsCare est actuellement disponible en français et en anglais. D\'autres langues seront ajoutées prochainement.' },
       { q: 'Comment supprimer mon compte ?', a: 'Allez dans Paramètres > Compte > Supprimer mon compte. Cette action est irréversible et supprime toutes vos données.' },
@@ -76,7 +76,7 @@ const FAQS: FAQCategory[] = [
     icon: CreditCard,
     questions: [
       { q: 'Comment changer mon plan ?', a: 'Allez dans Paramètres > Abonnement pour voir les plans disponibles et changer à tout moment. La différence est calculée au prorata.' },
-      { q: 'Puis-je annuler mon abonnement ?', a: 'Oui, vous pouvez annuler à tout moment sans frais. Votre accès Premium restera actif jusqu\'à la fin de la période payée.' },
+      { q: 'Puis-je annuler mon abonnement ?', a: 'Oui, vous pouvez annuler à tout moment sans frais. Votre accès Pro restera actif jusqu\'à la fin de la période payée.' },
       { q: 'Quels moyens de paiement acceptez-vous ?', a: 'Nous acceptons les cartes bancaires (Visa, Mastercard, American Express), PayPal, Apple Pay et Google Pay.' },
       { q: 'Comment obtenir une facture ?', a: 'Toutes vos factures sont disponibles dans Paramètres > Facturation > Historique des paiements. Vous pouvez les télécharger en PDF.' },
       { q: 'Y a-t-il une période d\'essai ?', a: 'Oui, tous les nouveaux utilisateurs bénéficient de 7 jours d\'essai Premium gratuit sans engagement.' },

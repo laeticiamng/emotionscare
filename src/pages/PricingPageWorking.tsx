@@ -217,11 +217,10 @@ const PricingPageWorking: React.FC = () => {
 
       if (error) throw error;
       if (data?.url) {
-        window.open(data.url, '_blank');
+        window.location.href = data.url;
       }
     } catch (err) {
       toast.error('Erreur lors de la création du checkout. Réessayez.');
-      console.error('[Pricing] Checkout error:', err);
     } finally {
       setLoadingPlan(null);
     }

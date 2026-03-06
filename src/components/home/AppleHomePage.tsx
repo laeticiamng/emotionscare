@@ -19,6 +19,8 @@ const AppleFeatureSection = lazy(() => import('@/components/home/AppleFeatureSec
 const AppleShowcaseSection = lazy(() => import('@/components/home/AppleShowcaseSection'));
 const AppleStatsSection = lazy(() => import('@/components/home/AppleStatsSection'));
 const AppleCTASection = lazy(() => import('@/components/home/AppleCTASection'));
+const TestimonialsSection = lazy(() => import('@/components/home/TestimonialsSection'));
+const SocialProofSection = lazy(() => import('@/components/home/SocialProofSection'));
 const ProductScreenshots = lazy(() => import('@/components/marketing/ProductScreenshots'));
 const Footer = lazy(() => import('@/components/home/Footer'));
 
@@ -252,6 +254,14 @@ const AppleHomePage: React.FC = () => {
 
         <Suspense fallback={<SectionSkeleton />}>
           <ProductScreenshots />
+        </Suspense>
+
+        <Suspense fallback={<SectionSkeleton />}>
+          <TestimonialsSection />
+        </Suspense>
+
+        <Suspense fallback={<SectionSkeleton />}>
+          <SocialProofSection />
         </Suspense>
 
         <Suspense fallback={<SectionSkeleton />}>

@@ -67,29 +67,29 @@ const OnboardingPage: React.FC = () => {
   ];
 
   const goals = [
-    { id: 'stress', label: 'Gérer le stress', icon: '🧘', description: 'Techniques de relaxation et méditation' },
-    { id: 'anxiety', label: 'Réduire l\'anxiété', icon: '💙', description: 'Outils pour calmer l\'esprit' },
-    { id: 'confidence', label: 'Confiance en soi', icon: '💪', description: 'Renforcer l\'estime personnelle' },
-    { id: 'relationships', label: 'Relations sociales', icon: '👥', description: 'Améliorer les interactions' },
-    { id: 'sleep', label: 'Qualité du sommeil', icon: '😴', description: 'Mieux dormir et récupérer' },
-    { id: 'energy', label: 'Niveau d\'énergie', icon: '⚡', description: 'Augmenter la vitalité' }
+    { id: 'stress', label: 'Gérer le stress professionnel', icon: '🧘', description: 'Techniques rapides entre deux gardes ou consultations' },
+    { id: 'burnout', label: 'Prévenir l\'épuisement', icon: '🛡️', description: 'Détecter et prévenir le burn-out avant qu\'il ne s\'installe' },
+    { id: 'recovery', label: 'Récupérer après une situation difficile', icon: '💙', description: 'Gérer les émotions après la perte d\'un patient ou un événement traumatisant' },
+    { id: 'sleep', label: 'Mieux dormir malgré les horaires', icon: '😴', description: 'Retrouver un sommeil réparateur malgré les gardes de nuit' },
+    { id: 'energy', label: 'Maintenir son énergie', icon: '⚡', description: 'Micro-récupérations pour rester performant(e) toute la journée' },
+    { id: 'emotions', label: 'Réguler ses émotions', icon: '🌊', description: 'Mieux gérer la charge émotionnelle du quotidien soignant' }
   ];
 
   const experienceLevels = [
-    { id: 'beginner', label: 'Débutant', description: 'Nouveau dans le bien-être mental' },
-    { id: 'intermediate', label: 'Intermédiaire', description: 'Quelques expériences passées' },
-    { id: 'advanced', label: 'Avancé', description: 'Pratique régulière établie' }
+    { id: 'student', label: 'Étudiant(e) en santé', description: 'En formation médicale, infirmière, paramédicale...' },
+    { id: 'junior', label: 'Jeune diplômé(e)', description: 'Moins de 5 ans d\'exercice professionnel' },
+    { id: 'experienced', label: 'Professionnel(le) expérimenté(e)', description: 'Plus de 5 ans d\'exercice' }
   ];
 
   const preferences = [
-    { id: 'morning', label: 'Sessions matinales', icon: '🌅' },
-    { id: 'evening', label: 'Sessions en soirée', icon: '🌙' },
-    { id: 'short', label: 'Sessions courtes (5-10min)', icon: '⏱️' },
-    { id: 'long', label: 'Sessions longues (20-30min)', icon: '⏰' },
+    { id: 'between-shifts', label: 'Entre deux gardes (3 min)', icon: '⏱️' },
+    { id: 'morning', label: 'Avant la journée', icon: '🌅' },
+    { id: 'evening', label: 'Après le travail', icon: '🌙' },
     { id: 'guided', label: 'Guidance vocale', icon: '🎧' },
-    { id: 'music', label: 'Avec musique', icon: '🎵' },
-    { id: 'vr', label: 'Expériences VR', icon: '🥽' },
-    { id: 'community', label: 'Activités communautaires', icon: '👥' }
+    { id: 'music', label: 'Musicothérapie', icon: '🎵' },
+    { id: 'breathing', label: 'Respiration guidée', icon: '🌬️' },
+    { id: 'journal', label: 'Journal émotionnel', icon: '📝' },
+    { id: 'coach', label: 'Coach IA Nyvée', icon: '🤖' }
   ];
 
   const handleGoalToggle = (goalId: string) => {
@@ -232,30 +232,30 @@ const OnboardingPage: React.FC = () => {
                 <div className="text-center space-y-6">
                   <div className="space-y-4">
                     <h3 className="text-xl font-semibold text-foreground">
-                      Prenez soin de votre bien-être émotionnel
+                      Prenez soin de vous, vous qui prenez soin des autres
                     </h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      EmotionsCare vous accompagne dans votre développement personnel avec des outils 
-                      innovants : scan émotionnel IA, réalité virtuelle thérapeutique, musicothérapie 
-                      personnalisée et coach virtuel.
+                      EmotionsCare est conçu spécifiquement pour les professionnels et étudiants en santé. 
+                      Gérez votre stress en 3 minutes grâce au scan émotionnel IA, à la respiration guidée, 
+                      au coaching Nyvée et au journal émotionnel.
                     </p>
                   </div>
                   
                   <div className="grid md:grid-cols-3 gap-4">
                     <div className="text-center p-4 bg-info/10 rounded-lg">
-                      <div className="text-3xl mb-2">🧠</div>
-                      <h4 className="font-semibold">IA Avancée</h4>
-                      <p className="text-sm text-muted-foreground">Analyse émotionnelle intelligente</p>
+                      <div className="text-3xl mb-2">🩺</div>
+                      <h4 className="font-semibold">Pour les soignants</h4>
+                      <p className="text-sm text-muted-foreground">Adapté à votre rythme professionnel</p>
                     </div>
                     <div className="text-center p-4 bg-accent/10 rounded-lg">
-                      <div className="text-3xl mb-2">🥽</div>
-                      <h4 className="font-semibold">VR Immersive</h4>
-                      <p className="text-sm text-muted-foreground">Environnements thérapeutiques</p>
+                      <div className="text-3xl mb-2">⏱️</div>
+                      <h4 className="font-semibold">3 minutes</h4>
+                      <p className="text-sm text-muted-foreground">Des protocoles rapides et efficaces</p>
                     </div>
                     <div className="text-center p-4 bg-success/10 rounded-lg">
-                      <div className="text-3xl mb-2">👥</div>
-                      <h4 className="font-semibold">Communauté</h4>
-                      <p className="text-sm text-muted-foreground">Soutien et partage</p>
+                      <div className="text-3xl mb-2">🧠</div>
+                      <h4 className="font-semibold">IA & Neurosciences</h4>
+                      <p className="text-sm text-muted-foreground">Recommandations personnalisées</p>
                     </div>
                   </div>
                 </div>
@@ -309,7 +309,7 @@ const OnboardingPage: React.FC = () => {
                   <h2 id="experience-title" className="sr-only">Sélection du niveau d'expérience</h2>
                   <div className="space-y-4">
                     <p className="text-center text-muted-foreground mb-6">
-                      Quel est votre niveau d'expérience avec les pratiques de bien-être mental ?
+                      Quel est votre profil professionnel en santé ?
                     </p>
                     <fieldset>
                       <legend className="sr-only">Niveaux d'expérience disponibles</legend>

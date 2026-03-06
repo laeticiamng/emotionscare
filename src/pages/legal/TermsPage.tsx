@@ -43,7 +43,8 @@ export const TermsPage: React.FC = () => {
             <p>
               Les présentes Conditions Générales d&apos;Utilisation (CGU) régissent l&apos;accès et
               l&apos;utilisation de la plateforme EmotionsCare, un service de bien-être émotionnel
-              et de suivi de santé mentale.
+              et de suivi de santé mentale, édité par EmotionsCare SASU, SIRET 123 456 789 00010,
+              dont le siège social est situé au 5 rue Caudron, 80000 Amiens.
             </p>
 
             <h2>2. Acceptation des conditions</h2>
@@ -93,22 +94,54 @@ export const TermsPage: React.FC = () => {
 
             <h2>8. Limitation de responsabilité</h2>
             <p>
-              EmotionsCare est un outil de bien-être et ne remplace pas un suivi médical
-              professionnel. En cas de détresse psychologique, contactez un professionnel de
-              santé ou les services d&apos;urgence.
+              EmotionsCare est un outil de bien-être et ne constitue en aucun cas un dispositif médical,
+              un acte de télémédecine ou un substitut à une prise en charge par un professionnel de santé.
+              Les recommandations fournies par l&apos;application, y compris celles générées par intelligence
+              artificielle, sont à titre informatif et éducatif uniquement. En cas de détresse psychologique,
+              contactez un professionnel de santé ou les services d&apos;urgence (SAMU 15, SOS Amitié 09 72 39 40 50).
+            </p>
+            <p>
+              EmotionsCare ne saurait être tenu responsable de tout dommage direct ou indirect résultant
+              de l&apos;utilisation ou de l&apos;impossibilité d&apos;utiliser le service.
             </p>
 
-            <h2>9. Modifications des CGU</h2>
+            <h2>9. Droit de rétractation</h2>
+            <p>
+              Conformément à l&apos;article L221-18 du Code de la consommation, vous disposez d&apos;un délai
+              de 14 jours à compter de la souscription d&apos;un abonnement payant pour exercer votre droit
+              de rétractation, sans avoir à justifier de motifs ni à payer de pénalités. Pour exercer
+              ce droit, contactez-nous à contact@emotionscare.com.
+            </p>
+
+            <h2>10. Médiation de la consommation</h2>
+            <p>
+              Conformément aux articles L612-1 et suivants du Code de la consommation, en cas de litige
+              non résolu directement avec notre service client, vous pouvez recourir gratuitement au
+              médiateur de la consommation. Le médiateur désigné est : Médiation de la consommation — 
+              les coordonnées seront communiquées sur simple demande à contact@emotionscare.com.
+            </p>
+
+            <h2>11. Modifications des CGU</h2>
             <p>
               Nous nous réservons le droit de modifier ces CGU à tout moment. Les utilisateurs
-              seront informés des changements significatifs.
+              seront informés des changements significatifs par notification dans l&apos;application
+              et/ou par email.
             </p>
 
-            <h2>10. Contact</h2>
+            <h2>12. Droit applicable et juridiction compétente</h2>
+            <p>
+              Les présentes CGU sont régies par le droit français. Tout litige relatif à leur
+              interprétation ou à leur exécution relève de la compétence exclusive des tribunaux
+              d&apos;Amiens, sous réserve des dispositions impératives du Code de la consommation
+              en faveur du consommateur.
+            </p>
+
+            <h2>13. Contact</h2>
             <p>
               Pour toute question concernant ces CGU :<br />
               Email : contact@emotionscare.com<br />
-              Adresse : EmotionsCare SASU, 5 rue Caudron, 80000 Amiens
+              Adresse : EmotionsCare SASU, 5 rue Caudron, 80000 Amiens<br />
+              SIRET : 123 456 789 00010
             </p>
           </CardContent>
         </Card>

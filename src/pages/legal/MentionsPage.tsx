@@ -141,7 +141,7 @@ const sections: Section[] = [
     title: '8. Date de dernière mise à jour',
     content: (
       <>
-        <p>Les présentes mentions légales ont été mises à jour le 30 août 2025.</p>
+        <p>Les présentes mentions légales ont été mises à jour le 1 mars 2026.</p>
       </>
     ),
   },

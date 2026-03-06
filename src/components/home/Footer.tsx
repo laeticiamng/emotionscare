@@ -25,7 +25,7 @@ const Footer: React.FC = () => {
       { label: 'Gamification', href: '/gamification', protected: true },
     ],
     resources: [
-      { label: 'Fonctionnalités (37 modules)', href: '/features' },
+      { label: 'Fonctionnalités', href: '/features' },
       { label: 'FAQ', href: '/faq' },
       { label: 'À propos', href: '/about' },
       { label: 'Aide & Support', href: '/help' },

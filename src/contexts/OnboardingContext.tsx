@@ -48,19 +48,19 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     {
       id: 'welcome',
       title: 'Bienvenue',
-      content: <div>Bienvenue dans votre parcours de bien-être</div>,
+      content: <div>Bienvenue — prenez soin de vous, vous qui prenez soin des autres</div>,
       isComplete: false,
     },
     {
       id: 'goals',
       title: 'Vos objectifs',
-      content: <div>Définissez vos objectifs de bien-être</div>,
+      content: <div>Quels aspects de votre bien-être souhaitez-vous améliorer ?</div>,
       isComplete: false,
     },
     {
       id: 'preferences',
       title: 'Préférences',
-      content: <div>Configurez vos préférences</div>,
+      content: <div>Personnalisez votre expérience EmotionsCare</div>,
       isComplete: false,
     },
   ];
