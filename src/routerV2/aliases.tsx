@@ -24,8 +24,19 @@ export const ROUTE_ALIASES = {
   // ═══════════════════════════════════════════════════════════
   // LANDING PAGES
   // ═══════════════════════════════════════════════════════════
-  '/choose-mode': '/mode-selection',
+  '/choose-mode': '/',
+  '/mode-selection': '/',
   '/feed': '/app/entraide',
+  '/app/feed': '/app/entraide',
+  '/app/community': '/app/entraide',
+  '/app/communaute': '/app/entraide',
+  '/app/social-cocon': '/app/entraide',
+  '/app/particulier': '/app/consumer/home',
+  '/app/particulier/mood': '/app/scan',
+  '/app/voice-analysis': '/app/scan',
+  '/app/friends': '/app/buddies',
+  '/app/groups': '/app/entraide',
+  '/app/auras': '/app/leaderboard',
   '/b2b': '/entreprise',
   '/b2b/selection': '/entreprise',
   '/help-center': '/help',

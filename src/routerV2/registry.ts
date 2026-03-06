@@ -810,41 +810,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // ═══════════════════════════════════════════════════════════
   // B2C INTEGRATION - PARTICULIER ROUTES
   // ═══════════════════════════════════════════════════════════
-  {
-    name: 'mode-selection',
-    path: '/mode-selection',
-    segment: 'public',
-    layout: 'simple',
-    component: 'ModeSelectionPage',
-    guard: false,
-    aliases: ['/choose-mode'],
-    deprecated: true,
-    redirectTo: '/',
-  },
-  {
-    name: 'b2c-dashboard',
-    path: '/app/particulier',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'B2CDashboardPage',
-    guard: true,
-    requireAuth: true,
-    deprecated: true,
-    redirectTo: '/app/consumer/home',
-  },
-  {
-    name: 'b2c-mood',
-    path: '/app/particulier/mood',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'B2CScanPage',
-    guard: true,
-    requireAuth: true,
-    deprecated: true,
-    redirectTo: '/app/scan',
-  },
+  // Routes deprecated supprimées : mode-selection, b2c-dashboard, b2c-mood
+  // Redirections gérées dans aliases.tsx
   {
     name: 'advanced-analytics',
     path: '/app/analytics/advanced',
@@ -889,24 +856,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
     aliases: ['/meditation'],
   },
-  {
-    name: 'nyvee-test',
-    path: '/test-nyvee',
-    segment: 'public',
-    layout: 'simple',
-    component: 'NyveeTestPage',
-    guard: false,
-  },
-  {
-    name: 'test-accounts-dev',
-    path: '/dev/test-accounts',
-    segment: 'public',
-    layout: 'marketing',
-    component: 'TestAccountsPage',
-    guard: false,
-    hidden: true,
-    status: 'dev-only',
-  },
+  // nyvee-test et test-accounts-dev supprimés — routes dev-only gérées directement dans router.tsx
   {
     name: 'navigation-hub',
     path: '/navigation',
@@ -982,19 +932,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
     aliases: ['/community', '/community-groups', '/groups', '/buddies-hub', '/social', '/entraide'],
   },
-  // Routes legacy maintenues pour compatibilité (redirigent vers entraide)
-  {
-    name: 'community-legacy',
-    path: '/app/community',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'EntraidePage',
-    guard: true,
-    requireAuth: true,
-    deprecated: true,
-    redirectTo: '/app/entraide',
-  },
+  // community-legacy supprimé — redirection dans aliases.tsx
   // ═══════════════════════════════════════════════════════════
   // EXCHANGE HUB V2.0 - 4 Marchés
   // ═══════════════════════════════════════════════════════════
@@ -1139,30 +1077,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
     aliases: ['/group-sessions', '/sessions-groupe'],
   },
-  {
-    name: 'social-cocon-b2c',
-    path: '/app/social-cocon',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'B2CSocialCoconPage',
-    guard: true,
-    aliases: ['/social-cocon'],
-    deprecated: true,
-    redirectTo: '/app/entraide',
-  },
-  {
-    name: 'communaute-b2c',
-    path: '/app/communaute',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'B2CCommunautePage',
-    guard: true,
-    aliases: ['/communaute'],
-    deprecated: true,
-    redirectTo: '/app/entraide',
-  },
+  // social-cocon-b2c et communaute-b2c supprimés — redirections dans aliases.tsx
 
   // ═══════════════════════════════════════════════════════════
   // PARC ÉMOTIONNEL (NAVIGATION & IMMERSION)
@@ -1516,16 +1431,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/recuperation-20'],
   },
-  {
-    name: 'test-page',
-    path: '/test',
-    segment: 'public',
-    layout: 'simple',
-    component: 'TestPage',
-    guard: false,
-    hidden: true,
-    status: 'dev-only',
-  },
+  // test-page supprimé — route dev-only
   // Routes legacy supprimées - redirection automatique via aliases dans les routes principales
   // emotions-legacy supprimé - utiliser /app/scan directement
   {
@@ -2136,54 +2042,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // NOUVELLES ROUTES - COMPLEMENTAIRES
   // ═══════════════════════════════════════════════════════════
   
-  // Audio & Voice
-  // journal-audio supprimé - fonctionnalité dans B2CJournalPage
-  {
-    name: 'voice-analysis',
-    path: '/app/voice-analysis',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'VoiceAnalysisPage',
-    guard: true,
-    deprecated: true,
-    redirectTo: '/app/scan',
-  },
-  
-  // Social
-  {
-    name: 'friends',
-    path: '/app/friends',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'FriendsPage',
-    guard: true,
-    deprecated: true,
-    redirectTo: '/app/buddies',
-  },
-  {
-    name: 'groups',
-    path: '/app/groups',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'GroupsPage',
-    guard: true,
-    deprecated: true,
-    redirectTo: '/app/entraide',
-  },
-  {
-    name: 'feed',
-    path: '/app/feed',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'B2CCommunautePage',
-    guard: true,
-    deprecated: true,
-    redirectTo: '/app/entraide',
-  },
+  // Routes deprecated supprimées : voice-analysis, friends, groups, feed
+  // Redirections gérées dans aliases.tsx
   
   // Personnalisation
   {
@@ -2292,28 +2152,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     status: 'beta',
   },
-  {
-    name: 'api-keys',
-    path: '/app/api-keys',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'APIKeysPage',
-    guard: true,
-    hidden: true,
-    status: 'dev-only',
-  },
-  {
-    name: 'webhooks',
-    path: '/app/webhooks',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'WebhooksPage',
-    guard: true,
-    hidden: true,
-    status: 'dev-only',
-  },
+  // api-keys et webhooks supprimés — routes dev-only
   
   // Accessibilité
   {
@@ -2572,20 +2411,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
   },
-  {
-    name: 'app-api-docs',
-    path: '/app/api-docs',
-    segment: 'public',
-    layout: 'app',
-    component: 'PublicAPIPage',
-    guard: false,
-    hidden: true,
-    status: 'dev-only',
-    meta: {
-      title: 'API Documentation - EmotionsCare',
-      description: 'Documentation des APIs publiques',
-    },
-  },
+  // app-api-docs supprimé — route dev-only
   {
     name: 'app-b2b-analytics',
     path: '/app/b2b/analytics',
@@ -2705,34 +2531,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // ═══════════════════════════════════════════════════════════
   // SYSTEM & MONITORING
   // ═══════════════════════════════════════════════════════════
-  {
-    name: 'system-health',
-    path: '/system-health',
-    segment: 'public',
-    layout: 'marketing',
-    component: 'SystemHealthPage',
-    guard: false,
-    hidden: true,
-    status: 'dev-only',
-    meta: {
-      title: 'Santé Système - EmotionsCare',
-      description: 'Monitoring et santé du système',
-    },
-  },
-  {
-    name: 'k6-analytics',
-    path: '/k6-analytics',
-    segment: 'public',
-    layout: 'marketing',
-    component: 'K6AnalyticsDashboardPage',
-    guard: false,
-    hidden: true,
-    status: 'dev-only',
-    meta: {
-      title: 'K6 Analytics - EmotionsCare',
-      description: 'Dashboard analytics des tests de charge K6',
-    },
-  },
+  // system-health et k6-analytics supprimés — routes dev-only
   
   // ═══════════════════════════════════════════════════════════
   // ROUTES MANQUANTES - AJOUTÉES POUR COHÉRENCE
@@ -2761,19 +2560,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/suno', '/ai-music-generator'],
     status: 'beta',
   },
-  {
-    name: 'auras-leaderboard',
-    path: '/app/auras',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'AurasLeaderboardPage',
-    guard: true,
-    requireAuth: true,
-    aliases: ['/auras', '/aura-ranking'],
-    deprecated: true,
-    redirectTo: '/app/leaderboard',
-  },
+  // auras-leaderboard supprimé — redirection dans aliases.tsx
   {
     name: 'consent-management',
     path: '/app/consent',
