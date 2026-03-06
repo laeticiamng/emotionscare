@@ -154,7 +154,7 @@ const B2BAuditPage: React.FC = () => {
       passed: 28
     },
     {
-      name: 'HDS (Hébergement Données Santé)',
+      name: 'Sécurité des données de santé',
       status: 'in_progress',
       score: 45,
       expiry: '—',

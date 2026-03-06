@@ -93,7 +93,7 @@ const SECTIONS: {
   {
     label: 'Agir',
     title: 'Passez à l\'action',
-    subtitle: 'Des techniques validées scientifiquement pour réguler votre stress et renforcer votre résilience.',
+    subtitle: 'Des techniques basées sur les neurosciences pour réguler votre stress et renforcer votre résilience.',
     modules: [
       {
         id: 'breathing',
@@ -259,7 +259,7 @@ const ADDITIONAL_MODULES: { category: string; modules: CompactModule[] }[] = [
 const STATS = [
   { value: '37', label: 'modules intégrés', icon: Zap },
   { value: '3 min', label: 'par exercice', icon: Clock },
-  { value: '100%', label: 'RGPD & HDS', icon: Shield },
+  { value: '100%', label: 'RGPD conforme', icon: Shield },
   { value: '24/7', label: 'disponible', icon: Heart },
 ];
 
@@ -313,7 +313,7 @@ const FeaturesPage: React.FC = () => {
 
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
               La plateforme la plus complète de régulation émotionnelle pour soignants
-              et étudiants en santé — scientifiquement validée, accessible partout.
+              et étudiants en santé — basée sur les neurosciences, accessible partout.
             </p>
 
             <div className="flex flex-wrap justify-center gap-4">
@@ -518,7 +518,7 @@ const FeaturesPage: React.FC = () => {
             <div className="flex flex-wrap justify-center gap-4 mb-10">
               {[
                 { icon: Shield, text: 'RGPD Compliant' },
-                { icon: Lock, text: 'HDS Certifié' },
+                { icon: Lock, text: 'Sécurité renforcée' },
                 { icon: Heart, text: 'Made in France' },
                 { icon: Eye, text: 'WCAG 2.1 AA' },
               ].map((badge, i) => {

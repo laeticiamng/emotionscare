@@ -228,7 +228,7 @@ export default function B2BVisioPage() {
               <div className="space-y-2">
                 <p className="text-sm font-medium">Module en cours de déploiement</p>
                 <p className="text-sm text-muted-foreground">
-                  La visioconférence EmotionsCare utilise le chiffrement de bout en bout et respecte les normes HDS pour la protection des données de santé.
+                  La visioconférence EmotionsCare utilise le chiffrement de bout en bout et respecte les exigences RGPD pour la protection des données de santé.
                   Les sessions de groupe sont animées par des professionnels certifiés. Pour toute question, contactez-nous.
                 </p>
                 <Button variant="link" className="p-0 h-auto text-sm" asChild>

@@ -90,7 +90,7 @@ const categories: CategoryMetric[] = [
       { label: 'Export données personnelles', status: 'done' },
       { label: 'Gestion des consentements', status: 'done' },
       { label: 'privacy_prefs table', status: 'done' },
-      { label: 'Documentation HDS dans docs/compliance/', status: 'done' },
+      { label: 'Documentation conformité dans docs/compliance/', status: 'done' },
       { label: 'Registre de traitements complet', status: 'partial', detail: 'En cours' },
     ],
   },
