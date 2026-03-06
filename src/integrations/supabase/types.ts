@@ -7476,6 +7476,101 @@ export type Database = {
         }
         Relationships: []
       }
+      duel_answers: {
+        Row: {
+          answer_time_ms: number | null
+          created_at: string
+          duel_id: string
+          id: string
+          is_correct: boolean
+          points_earned: number
+          round_id: string
+          selected_answer: number | null
+          user_id: string
+        }
+        Insert: {
+          answer_time_ms?: number | null
+          created_at?: string
+          duel_id: string
+          id?: string
+          is_correct?: boolean
+          points_earned?: number
+          round_id: string
+          selected_answer?: number | null
+          user_id: string
+        }
+        Update: {
+          answer_time_ms?: number | null
+          created_at?: string
+          duel_id?: string
+          id?: string
+          is_correct?: boolean
+          points_earned?: number
+          round_id?: string
+          selected_answer?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "duel_answers_duel_id_fkey"
+            columns: ["duel_id"]
+            isOneToOne: false
+            referencedRelation: "karaoke_duels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duel_answers_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "duel_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      duel_rounds: {
+        Row: {
+          correct_answer: number
+          created_at: string
+          duel_id: string
+          id: string
+          item_code: string | null
+          options: Json
+          question: string
+          round_number: number
+          time_limit_seconds: number
+        }
+        Insert: {
+          correct_answer: number
+          created_at?: string
+          duel_id: string
+          id?: string
+          item_code?: string | null
+          options?: Json
+          question: string
+          round_number: number
+          time_limit_seconds?: number
+        }
+        Update: {
+          correct_answer?: number
+          created_at?: string
+          duel_id?: string
+          id?: string
+          item_code?: string | null
+          options?: Json
+          question?: string
+          round_number?: number
+          time_limit_seconds?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "duel_rounds_duel_id_fkey"
+            columns: ["duel_id"]
+            isOneToOne: false
+            referencedRelation: "karaoke_duels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ecn_predictions: {
         Row: {
           confidence_interval: number | null
@@ -13530,6 +13625,60 @@ export type Database = {
           user_hash?: string | null
           user_id?: string
           valence?: number | null
+        }
+        Relationships: []
+      }
+      karaoke_duels: {
+        Row: {
+          created_at: string
+          current_round: number
+          finished_at: string | null
+          id: string
+          item_code: string | null
+          player1_id: string
+          player1_score: number
+          player2_id: string | null
+          player2_score: number
+          round_count: number
+          song_id: string | null
+          started_at: string | null
+          status: string
+          updated_at: string
+          winner_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_round?: number
+          finished_at?: string | null
+          id?: string
+          item_code?: string | null
+          player1_id: string
+          player1_score?: number
+          player2_id?: string | null
+          player2_score?: number
+          round_count?: number
+          song_id?: string | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          winner_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_round?: number
+          finished_at?: string | null
+          id?: string
+          item_code?: string | null
+          player1_id?: string
+          player1_score?: number
+          player2_id?: string | null
+          player2_score?: number
+          round_count?: number
+          song_id?: string | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          winner_id?: string | null
         }
         Relationships: []
       }
@@ -21395,6 +21544,45 @@ export type Database = {
         }
         Relationships: []
       }
+      referrals: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          referral_code: string
+          referred_email: string | null
+          referred_id: string | null
+          referrer_id: string
+          status: string
+          xp_awarded_referred: number | null
+          xp_awarded_referrer: number | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          referral_code: string
+          referred_email?: string | null
+          referred_id?: string | null
+          referrer_id: string
+          status?: string
+          xp_awarded_referred?: number | null
+          xp_awarded_referrer?: number | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          referral_code?: string
+          referred_email?: string | null
+          referred_id?: string | null
+          referrer_id?: string
+          status?: string
+          xp_awarded_referred?: number | null
+          xp_awarded_referrer?: number | null
+        }
+        Relationships: []
+      }
       report_send_history: {
         Row: {
           error_message: string | null
@@ -23320,6 +23508,33 @@ export type Database = {
         }
         Relationships: []
       }
+      social_shares: {
+        Row: {
+          content_data: Json | null
+          created_at: string
+          id: string
+          platform: string
+          share_type: string
+          user_id: string
+        }
+        Insert: {
+          content_data?: Json | null
+          created_at?: string
+          id?: string
+          platform: string
+          share_type: string
+          user_id: string
+        }
+        Update: {
+          content_data?: Json | null
+          created_at?: string
+          id?: string
+          platform?: string
+          share_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       special_badges: {
         Row: {
           category: string
@@ -23356,6 +23571,95 @@ export type Database = {
           name?: string
           rarity?: string | null
           xp_reward?: number | null
+        }
+        Relationships: []
+      }
+      specialty_path_steps: {
+        Row: {
+          checkpoint_type: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_checkpoint: boolean | null
+          item_code: string
+          min_score_percent: number | null
+          path_id: string
+          step_order: number
+          title: string
+        }
+        Insert: {
+          checkpoint_type?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_checkpoint?: boolean | null
+          item_code: string
+          min_score_percent?: number | null
+          path_id: string
+          step_order: number
+          title: string
+        }
+        Update: {
+          checkpoint_type?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_checkpoint?: boolean | null
+          item_code?: string
+          min_score_percent?: number | null
+          path_id?: string
+          step_order?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "specialty_path_steps_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "specialty_paths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      specialty_paths: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          description: string | null
+          difficulty: string | null
+          estimated_hours: number | null
+          icon: string | null
+          id: string
+          is_published: boolean | null
+          name: string
+          slug: string
+          updated_at: string | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          difficulty?: string | null
+          estimated_hours?: number | null
+          icon?: string | null
+          id?: string
+          is_published?: boolean | null
+          name: string
+          slug: string
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          difficulty?: string | null
+          estimated_hours?: number | null
+          icon?: string | null
+          id?: string
+          is_published?: boolean | null
+          name?: string
+          slug?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -27711,6 +28015,50 @@ export type Database = {
         }
         Relationships: []
       }
+      user_path_progress: {
+        Row: {
+          certificate_id: string | null
+          completed_at: string | null
+          current_step_order: number | null
+          id: string
+          is_certified: boolean | null
+          path_id: string
+          started_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          certificate_id?: string | null
+          completed_at?: string | null
+          current_step_order?: number | null
+          id?: string
+          is_certified?: boolean | null
+          path_id: string
+          started_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          certificate_id?: string | null
+          completed_at?: string | null
+          current_step_order?: number | null
+          id?: string
+          is_certified?: boolean | null
+          path_id?: string
+          started_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_path_progress_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "specialty_paths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_personalization: {
         Row: {
           created_at: string | null
@@ -28185,6 +28533,33 @@ export type Database = {
           quota_reset_date?: string | null
           subscription_type?: string | null
           updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_referral_codes: {
+        Row: {
+          created_at: string
+          id: string
+          referral_code: string
+          total_referrals: number | null
+          total_xp_earned: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          referral_code: string
+          total_referrals?: number | null
+          total_xp_earned?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          referral_code?: string
+          total_referrals?: number | null
+          total_xp_earned?: number | null
           user_id?: string
         }
         Relationships: []
@@ -28760,6 +29135,50 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_step_progress: {
+        Row: {
+          attempts: number | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          score: number | null
+          status: string | null
+          step_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          attempts?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          score?: number | null
+          status?: string | null
+          step_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          attempts?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          score?: number | null
+          status?: string | null
+          step_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_step_progress_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "specialty_path_steps"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_study_stats: {
         Row: {
@@ -30732,6 +31151,7 @@ export type Database = {
         Returns: string[]
       }
       generate_master_content: { Args: { p_item_id: string }; Returns: Json }
+      generate_referral_code: { Args: never; Returns: string }
       generate_security_audit_report: { Args: never; Returns: Json }
       generate_slug:
         | { Args: { input_text: string }; Returns: string }
