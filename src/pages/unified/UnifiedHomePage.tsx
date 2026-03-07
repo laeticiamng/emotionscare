@@ -41,6 +41,7 @@ import { cn } from "@/lib/utils";
 import { withLandingUtm } from "@/lib/utm";
 import { useLazyRender } from "@/hooks/useLazyRender";
 import { logger } from '@/lib/logger';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 const Footer = lazy(() => import("@/components/layout/Footer"));
 
