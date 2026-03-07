@@ -16,7 +16,7 @@ interface ModuleHighlight {
   highlight?: string;
 }
 
-const TestimonialsSection: React.FC = () => {
+const ModulesHighlightSection: React.FC = () => {
   const modules: ModuleHighlight[] = [
     {
       title: "Scan émotionnel IA",
@@ -136,4 +136,4 @@ const TestimonialsSection: React.FC = () => {
   );
 };
 
-export default TestimonialsSection;
+export default ModulesHighlightSection;

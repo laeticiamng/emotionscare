@@ -1,10 +1,10 @@
-// @ts-nocheck
 /**
  * EnhancedUserDashboard - Version améliorée du tableau de bord utilisateur
  * Ajoute des fonctionnalités modernes tout en conservant la structure existante
  */
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +13,6 @@ import { Progress } from '@/components/ui/progress';
 import GlobalOverviewTab from '../dashboard/tabs/GlobalOverviewTab';
 import AnalyticsTab from '../dashboard/tabs/AnalyticsTab';
 import JournalTab from '../dashboard/tabs/JournalTab';
-import PersonalDataTab from '../dashboard/tabs/PersonalDataTab';
 import { User } from '@/types/user';
 import {
   TrendingUp,
@@ -42,9 +41,10 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   // Les collaborateurs B2B n'ont accès qu'à leurs données personnelles
-  const isB2BUser = user.role === 'b2b_user';
+  const isB2BUser = user.role === 'b2b';
 
   // Fetch real dashboard data via hooks
   const { stats, weeklySummary, recommendations, isLoading } = useDashboard(user.id);
@@ -53,8 +53,8 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
   // Calculate dashboard stats from real API data
   const dashboardStats = {
     weeklyProgress: stats?.wellnessScore || 0,
-    monthlyGoals: stats?.monthlyGoals || 10,
-    completedGoals: stats?.completedGoals || 0,
+    monthlyGoals: 10,
+    completedGoals: Math.min(stats?.totalSessions || 0, 10),
     currentStreak: stats?.streakDays || 0,
     totalSessions: stats?.totalSessions || 0,
     averageRating: weeklyData?.today?.glow_score ? weeklyData.today.glow_score / 10 : 0,
@@ -63,14 +63,14 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
   };
 
   // Map recent activities from real data
-  const recentActivities = stats?.recentActivity?.slice(0, 4).map((activity: any) => ({
+  const recentActivities = (stats?.recentActivity?.slice(0, 4) ?? []).map((activity: { module_name: string; created_at: string }) => ({
     type: activity.module_name,
     title: `Session ${activity.module_name}`,
     time: new Date(activity.created_at).toLocaleDateString('fr-FR'),
     status: 'completed'
   })) || [];
 
-  const upcomingReminders = recommendations?.slice(0, 3).map((rec: any) => ({
+  const upcomingReminders = (recommendations?.slice(0, 3) ?? []).map((rec: { title?: string; suggested_timing?: string; module_name?: string }) => ({
     title: rec.title || 'Recommandation',
     time: rec.suggested_timing || 'À planifier',
     type: rec.module_name || 'session'
@@ -81,21 +81,21 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
       title: 'Nouvelle session', 
       desc: 'Commencer maintenant',
       icon: <TrendingUp className="h-4 w-4" />,
-      action: () => logger.debug('Nouvelle session', undefined, 'UI'),
+      action: () => navigate('/app/scan'),
       variant: 'default' as const
     },
     { 
       title: 'Ajouter entrée', 
       desc: 'Journal personnel',
       icon: <Calendar className="h-4 w-4" />,
-      action: () => logger.debug('Nouveau journal', undefined, 'UI'),
+      action: () => navigate('/app/journal'),
       variant: 'outline' as const
     },
     { 
       title: 'Voir objectifs', 
       desc: 'Gérer vos buts',
       icon: <Target className="h-4 w-4" />,
-      action: () => logger.debug('Objectifs', undefined, 'UI'),
+      action: () => navigate('/app/modules'),
       variant: 'outline' as const
     }
   ];
@@ -159,7 +159,7 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
               </p>
             </div>
             <Button asChild className="flex-shrink-0">
-              <a href="/app/scanner">
+              <a href="/app/scan">
                 Faire mon premier scan
                 <TrendingUp className="h-4 w-4 ml-2" />
               </a>
