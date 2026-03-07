@@ -13,16 +13,10 @@ const Footer: React.FC = () => {
 
   const links = {
     platform: [
-      { label: 'Accueil', href: '/', protected: false },
-      { label: 'Mon espace', href: '/app/home', protected: true },
-      { label: 'Scanner émotionnel', href: '/app/scan', protected: true },
-      { label: 'Coach IA Nyvée', href: '/app/coach', protected: true },
-      { label: 'Musique thérapeutique', href: '/app/music', protected: true },
-      { label: 'Parc émotionnel', href: '/app/emotional-park', protected: true },
-      { label: 'Journal émotionnel', href: '/app/journal', protected: true },
-      { label: 'Respiration guidée', href: '/app/breath', protected: false },
-      { label: 'Réalité virtuelle', href: '/app/vr', protected: true },
-      { label: 'Gamification', href: '/gamification', protected: true },
+      { label: 'Accueil', href: '/' },
+      { label: 'Respiration guidée', href: '/app/breath' },
+      { label: 'Fonctionnalités', href: '/features' },
+      { label: 'Tarifs', href: '/pricing' },
     ],
     resources: [
       { label: 'Fonctionnalités', href: '/features' },
@@ -41,10 +35,8 @@ const Footer: React.FC = () => {
       { label: 'Cookies', href: '/legal/cookies' },
     ],
     social: [
-      { label: 'Twitter', href: 'https://twitter.com/emotionscare', icon: Twitter },
-      { label: 'LinkedIn', href: 'https://linkedin.com/company/emotionscare', icon: Linkedin },
-      { label: 'Instagram', href: 'https://instagram.com/emotionscare', icon: Instagram },
-      { label: 'YouTube', href: 'https://youtube.com/@emotionscare', icon: Youtube },
+      { label: 'Twitter', icon: Twitter },
+      { label: 'LinkedIn', icon: Linkedin },
     ],
   };
 
@@ -80,20 +72,18 @@ const Footer: React.FC = () => {
               </Badge>
             </div>
 
-            {/* Réseaux sociaux */}
-            <div className="flex items-center gap-3 pt-2">
-            {links.social.map((social) => (
-              <a
-                key={social.label}
-                href={social.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative p-2 rounded-lg bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                aria-label={`Suivre EmotionsCare sur ${social.label}`}
-              >
-                <social.icon className="h-4 w-4" aria-hidden="true" />
-              </a>
-            ))}
+            {/* Réseaux sociaux — bientôt disponibles */}
+            <div className="flex items-center gap-3 pt-2 text-xs text-muted-foreground">
+              {links.social.map((social) => (
+                <span
+                  key={social.label}
+                  className="flex items-center gap-1 p-2 rounded-lg bg-muted opacity-60 cursor-default"
+                  title="Bientôt disponible"
+                >
+                  <social.icon className="h-3 w-3" aria-hidden="true" />
+                  Bientôt
+                </span>
+              ))}
             </div>
           </div>
 
@@ -108,13 +98,9 @@ const Footer: React.FC = () => {
                 <li key={link.href}>
                   <Link 
                     to={link.href} 
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
-                    title={link.protected ? 'Connexion requise pour accéder à cette fonctionnalité' : undefined}
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
                     {link.label}
-                    {link.protected && (
-                      <LockKeyhole className="h-3 w-3 opacity-60" aria-label="Connexion requise" />
-                    )}
                   </Link>
                 </li>
               ))}
