@@ -59,6 +59,10 @@ export const usePageSEO = ({
     const canonicalUrl = canonical ?? `${BASE_URL}${window.location.pathname}`;
     upsertLink('canonical', canonicalUrl);
 
+    // ── hreflang ──
+    upsertLinkAlternate('fr', canonicalUrl);
+    upsertLinkAlternate('x-default', canonicalUrl);
+
     // ── Open Graph ──
     upsertMeta('og:title', fullTitle, 'property');
     upsertMeta('og:description', description, 'property');
@@ -123,6 +127,17 @@ function upsertLink(rel: string, href: string) {
   if (!el) {
     el = document.createElement('link');
     el.rel = rel;
+    document.head.appendChild(el);
+  }
+  el.href = href;
+}
+
+function upsertLinkAlternate(hreflang: string, href: string) {
+  let el = document.querySelector(`link[rel="alternate"][hreflang="${hreflang}"]`) as HTMLLinkElement | null;
+  if (!el) {
+    el = document.createElement('link');
+    el.rel = 'alternate';
+    el.setAttribute('hreflang', hreflang);
     document.head.appendChild(el);
   }
   el.href = href;

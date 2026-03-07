@@ -120,6 +120,19 @@ const FAQS: FAQCategory[] = [
       { q: 'Comment signaler un bug ?', a: 'Utilisez le formulaire de support ou envoyez un email à contact@emotionscare.com avec les détails du problème et des captures d\'écran.' },
     ],
   },
+  {
+    id: 'soignants',
+    category: 'Soignants & Étudiants',
+    icon: Heart,
+    questions: [
+      { q: 'EmotionsCare remplace-t-il un psychologue ou un psychiatre ?', a: 'Non. EmotionsCare est un outil de prévention et de régulation émotionnelle au quotidien. Il ne remplace en aucun cas un suivi psychologique ou psychiatrique. En cas de détresse, nous orientons vers les dispositifs d\'aide (3114, médecin traitant).' },
+      { q: 'Peut-on utiliser EmotionsCare entre deux gardes à l\'hôpital ?', a: 'Oui, c\'est précisément le cas d\'usage principal. Les protocoles durent 2 à 5 minutes et ne nécessitent qu\'un smartphone. Pas besoin de casque, de lieu calme ni de matériel spécifique.' },
+      { q: 'Mon employeur peut-il voir mes données EmotionsCare ?', a: 'Non. En mode B2B, seules des statistiques anonymisées et agrégées sont visibles par l\'établissement. Aucune donnée individuelle n\'est jamais partagée. Conformité RGPD stricte.' },
+      { q: 'Les protocoles sont-ils validés scientifiquement ?', a: 'Les techniques utilisées (cohérence cardiaque, théorie polyvagale de Stephen Porges, neurosciences affectives de Jaak Panksepp) sont issues de la recherche publiée. EmotionsCare adapte ces protocoles pour une utilisation rapide en contexte hospitalier.' },
+      { q: 'Puis-je utiliser EmotionsCare si je suis étudiant en IFSI ?', a: 'Oui. EmotionsCare a été conçu pour les étudiants en santé (médecine, IFSI, aides-soignants). Le plan gratuit donne accès aux protocoles essentiels sans abonnement.' },
+      { q: 'EmotionsCare est-il adapté aux infirmiers de nuit ?', a: 'Oui. Nos protocoles sont conçus pour être utilisables à tout moment, y compris pendant les pauses de nuit. La musicothérapie et la respiration guidée fonctionnent avec ou sans écouteurs.' },
+    ],
+  },
 ];
 
 export default function FAQPage() {

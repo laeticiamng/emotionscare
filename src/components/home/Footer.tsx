@@ -15,6 +15,7 @@ const Footer: React.FC = () => {
     platform: [
       { label: 'Accueil', href: '/' },
       { label: 'Fonctionnalités', href: '/features' },
+      { label: 'Cas d\'usage', href: '/use-cases' },
       { label: 'À propos', href: '/about' },
     ],
     resources: [
@@ -23,6 +24,7 @@ const Footer: React.FC = () => {
       { label: 'Contact', href: '/contact' },
       { label: 'Tarifs', href: '/pricing' },
       { label: 'Entreprise B2B', href: '/b2b' },
+      { label: 'Sécurité', href: '/security' },
     ],
     legal: [
       { label: 'Mentions légales', href: '/legal/mentions' },
@@ -30,6 +32,7 @@ const Footer: React.FC = () => {
       { label: 'CGV', href: '/legal/sales' },
       { label: 'Confidentialité', href: '/legal/privacy' },
       { label: 'Cookies', href: '/legal/cookies' },
+      { label: 'Licences', href: '/legal/licenses' },
     ],
     social: [
       { label: 'Twitter', icon: Twitter },
