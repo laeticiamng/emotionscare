@@ -26,8 +26,8 @@ import { usePageSEO } from '@/hooks/usePageSEO';
 const SignupPage: React.FC = () => {
   usePageSEO({
     title: 'Inscription | EmotionsCare',
-    description: 'Creez votre compte EmotionsCare et accedez a la plateforme de regulation emotionnelle pour soignants et etudiants en sante.',
-    keywords: 'inscription, signup, emotionscare, compte, soignants, bien-etre emotionnel',
+    description: 'Créez votre compte EmotionsCare et accédez à la plateforme de régulation émotionnelle pour soignants et étudiants en santé.',
+    keywords: 'inscription, signup, emotionscare, compte, soignants, bien-être émotionnel',
     canonical: 'https://emotionscare.com/signup',
   });
 

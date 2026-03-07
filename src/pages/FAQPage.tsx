@@ -1,4 +1,4 @@
-// @ts-nocheck
+// FAQPage - Questions Fréquentes EmotionsCare
 /**
  * FAQPage - Questions Fréquentes EmotionsCare
  * SEO, accessibilité, catégories étendues, recherche fonctionnelle
@@ -77,9 +77,9 @@ const FAQS: FAQCategory[] = [
     questions: [
       { q: 'Comment changer mon plan ?', a: 'Allez dans Paramètres > Abonnement pour voir les plans disponibles et changer à tout moment. La différence est calculée au prorata.' },
       { q: 'Puis-je annuler mon abonnement ?', a: 'Oui, vous pouvez annuler à tout moment sans frais. Votre accès Pro restera actif jusqu\'à la fin de la période payée.' },
-      { q: 'Quels moyens de paiement acceptez-vous ?', a: 'Nous acceptons les cartes bancaires (Visa, Mastercard, American Express), PayPal, Apple Pay et Google Pay.' },
+      { q: 'Quels moyens de paiement acceptez-vous ?', a: 'Nous acceptons les cartes bancaires (Visa, Mastercard, American Express) via notre partenaire de paiement sécurisé Stripe.' },
       { q: 'Comment obtenir une facture ?', a: 'Toutes vos factures sont disponibles dans Paramètres > Facturation > Historique des paiements. Vous pouvez les télécharger en PDF.' },
-      { q: 'Y a-t-il une période d\'essai ?', a: 'Oui, tous les nouveaux utilisateurs bénéficient de 7 jours d\'essai Premium gratuit sans engagement.' },
+      { q: 'Y a-t-il une période d\'essai ?', a: 'Le plan Gratuit vous permet de découvrir les fonctionnalités essentielles sans engagement. Vous pouvez passer au plan Pro à tout moment pour accéder à tous les modules.' },
       { q: 'Comment appliquer un code promo ?', a: 'Lors du paiement, entrez votre code dans le champ "Code promotionnel" avant de valider. La réduction sera appliquée immédiatement.' },
     ],
   },
