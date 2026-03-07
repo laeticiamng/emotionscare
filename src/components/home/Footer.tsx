@@ -18,9 +18,7 @@ const Footer: React.FC = () => {
       { label: 'À propos', href: '/about' },
     ],
     resources: [
-      { label: 'Fonctionnalités', href: '/features' },
       { label: 'FAQ', href: '/faq' },
-      { label: 'À propos', href: '/about' },
       { label: 'Aide & Support', href: '/help' },
       { label: 'Contact', href: '/contact' },
       { label: 'Tarifs', href: '/pricing' },

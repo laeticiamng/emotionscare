@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -132,6 +133,7 @@ export const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
   onComplete, 
   onSkip 
 }) => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
 
@@ -270,8 +272,7 @@ export const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                   <Button
                     variant="outline"
                     onClick={() => {
-                      // Navigate to the feature
-                      window.location.href = step.action!.route;
+                      navigate(step.action!.route);
                     }}
                   >
                     {step.action.label}

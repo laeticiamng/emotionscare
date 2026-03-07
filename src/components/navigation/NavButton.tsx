@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import * as Icons from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { useNavigate } from 'react-router-dom';
 
 interface NavButtonProps {
   node: NavNode;
@@ -28,9 +29,11 @@ export function NavButton({
   variant = 'ghost',
   size = 'default',
   className,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showLabel = true,
   showBadge = true,
 }: NavButtonProps) {
+  const navigate = useNavigate();
   const { executeAction, getContext } = useNavAction();
   const { isAuthenticated } = useAuth();
   
@@ -49,7 +52,7 @@ export function NavButton({
   const handleClick = async () => {
     if (isDisabled) {
       // Action de fallback pour les boutons gardés
-      handleGuardedAction(node, context);
+      handleGuardedAction(node, context, navigate);
       return;
     }
 
@@ -58,10 +61,10 @@ export function NavButton({
     } else if (hasChildren) {
       // Ouvrir sous-menu ou naviguer vers la première action disponible
       logger.debug('Navigation action', { type, path, nodeId: node.id }, 'UI');
-      if (path) window.location.href = path;
+      if (path) navigate(path);
     } else {
       // Fallback pour les actions non encore implémentées
-      handleFallbackAction(node);
+      handleFallbackAction(node, navigate);
     }
   };
 
@@ -162,10 +165,9 @@ function checkGuard(node: NavNode, context: NavContext): boolean {
   return true;
 }
 
-function handleGuardedAction(node: NavNode, context: NavContext) {
+function handleGuardedAction(node: NavNode, context: NavContext, navigate: (path: string) => void) {
   if (node.guard?.requiresAuth && !context.isAuthenticated) {
-    // Rediriger vers l'authentification
-    window.location.href = '/mode-selection';
+    navigate('/mode-selection');
     return;
   }
 
@@ -179,8 +181,7 @@ function handleGuardedAction(node: NavNode, context: NavContext) {
   alert('Cette fonctionnalité n\'est pas disponible pour le moment.');
 }
 
-function handleFallbackAction(node: NavNode) {
-  // Action de contournement pour les fonctionnalités non implémentées
+function handleFallbackAction(node: NavNode, navigate: (path: string) => void) {
   const message = `La fonctionnalité "${getNodeLabel(node)}" est en cours de déploiement.
 
 Voulez-vous :
@@ -190,7 +191,7 @@ Voulez-vous :
 
   if (confirm(message)) {
     logger.info('Community action triggered', null, 'UI');
-    window.location.href = '/help';
+    navigate('/help');
   }
 }
 
