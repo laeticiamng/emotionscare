@@ -7,15 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
-  Sparkles, Play, Clock, Users, Heart, Brain, Music, 
-  Shield, Star, CheckCircle2, ArrowRight, Zap, Award
+  Sparkles, Play, Clock, Brain, Music, 
+  Shield, CheckCircle2, ArrowRight, Zap
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-  Tooltip,
-  TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
 } from "@/components/ui/tooltip";
 
 interface WelcomeSectionProps {
@@ -23,45 +20,6 @@ interface WelcomeSectionProps {
   videoRef: React.RefObject<HTMLVideoElement>;
   onResponse: (key: string, value: any) => void;
 }
-
-interface Testimonial {
-  name: string;
-  role: string;
-  quote: string;
-  avatar: string;
-  rating: number;
-}
-
-const testimonials: Testimonial[] = [
-  {
-    name: 'Marie L.',
-    role: 'Utilisatrice depuis 6 mois',
-    quote: 'EmotionsCare m\'a aidée à mieux comprendre mes émotions au quotidien.',
-    avatar: 'ML',
-    rating: 5
-  },
-  {
-    name: 'Thomas D.',
-    role: 'Entrepreneur',
-    quote: 'Les exercices de respiration m\'ont permis de gérer mon stress efficacement.',
-    avatar: 'TD',
-    rating: 5
-  },
-  {
-    name: 'Sophie R.',
-    role: 'Étudiante',
-    quote: 'Le journal émotionnel est devenu mon rituel quotidien de bien-être.',
-    avatar: 'SR',
-    rating: 5
-  }
-];
-
-const platformStats = [
-  { icon: Users, value: '50K+', label: 'Utilisateurs actifs' },
-  { icon: Heart, value: '2M+', label: 'Émotions analysées' },
-  { icon: Clock, value: '15min', label: 'Temps moyen/jour' },
-  { icon: Star, value: '4.8', label: 'Note moyenne' }
-];
 
 const features = [
   {
@@ -91,7 +49,6 @@ const features = [
 ];
 
 const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onContinue, videoRef, onResponse }) => {
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [videoPlaying, setVideoPlaying] = useState(false);
   const [estimatedTime] = useState(3); // minutes
 
@@ -100,13 +57,6 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onContinue, videoRef, o
     onResponse('welcome_timestamp', new Date().toISOString());
   }, [onResponse]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-  
   const playWelcomeVideo = () => {
     if (videoRef.current) {
       videoRef.current.play();
@@ -151,22 +101,6 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onContinue, videoRef, o
               <span>100% confidentiel</span>
             </div>
           </div>
-        </motion.div>
-
-        {/* Platform Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4"
-        >
-          {platformStats.map((stat, index) => (
-            <Card key={index} className="text-center p-4 bg-gradient-to-br from-background to-muted/30">
-              <stat.icon className="h-6 w-6 mx-auto mb-2 text-primary" />
-              <p className="text-2xl font-bold">{stat.value}</p>
-              <p className="text-xs text-muted-foreground">{stat.label}</p>
-            </Card>
-          ))}
         </motion.div>
         
         {/* Video Section */}
@@ -231,63 +165,6 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onContinue, videoRef, o
               </CardContent>
             </Card>
           ))}
-        </motion.div>
-
-        {/* Testimonials Carousel */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          <Card className="bg-gradient-to-r from-primary/5 via-purple-500/5 to-pink-500/5">
-            <CardContent className="p-6">
-              <h3 className="text-sm font-medium text-muted-foreground mb-4 text-center">
-                Ce que disent nos utilisateurs
-              </h3>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentTestimonial}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="text-center"
-                >
-                  <div className="flex justify-center mb-2">
-                    {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-lg italic mb-4">
-                    "{testimonials[currentTestimonial].quote}"
-                  </p>
-                  <div className="flex items-center justify-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">
-                      {testimonials[currentTestimonial].avatar}
-                    </div>
-                    <div className="text-left">
-                      <p className="font-medium">{testimonials[currentTestimonial].name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {testimonials[currentTestimonial].role}
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-              
-              {/* Dots indicator */}
-              <div className="flex justify-center gap-2 mt-4">
-                {testimonials.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentTestimonial(index)}
-                    className={`h-2 w-2 rounded-full transition-colors ${
-                      index === currentTestimonial ? 'bg-primary' : 'bg-muted-foreground/30'
-                    }`}
-                  />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
         </motion.div>
 
         {/* Onboarding Progress Preview */}

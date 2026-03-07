@@ -291,28 +291,6 @@ const CommunityEngagement: React.FC = () => {
             </motion.div>
           </motion.div>
 
-          {/* Community Stats - Reframés */}
-          <motion.div
-            variants={itemVariants}
-            className="grid grid-cols-2 md:grid-cols-4 gap-4"
-          >
-            {[
-              { icon: <Heart className="h-6 w-6 text-pink-500" />, label: 'Personnes qui luttent ensemble', value: '25K+' },
-              { icon: <StopCircle className="h-6 w-6 text-red-500" />, label: 'Crises interrompues', value: '150K+' },
-              { icon: <Zap className="h-6 w-6 text-amber-500" />, label: 'Resets réussis', value: '5M+' },
-              { icon: <Moon className="h-6 w-6 text-indigo-500" />, label: 'Nuits récupérées', value: '500K+' },
-            ].map((stat, i) => (
-              <motion.div
-                key={i}
-                className="text-center p-4 rounded-lg bg-muted/30 border border-border/50"
-                whileHover={{ scale: 1.02 }}
-              >
-                <div className="mx-auto w-fit mb-2">{stat.icon}</div>
-                <div className="text-2xl font-bold text-primary mb-1">{stat.value}</div>
-                <div className="text-xs text-muted-foreground">{stat.label}</div>
-              </motion.div>
-            ))}
-          </motion.div>
         </motion.div>
       </div>
     </section>

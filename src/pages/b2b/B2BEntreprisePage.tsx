@@ -30,7 +30,7 @@ import {
   GraduationCap,
   Home as HomeIcon,
   Stethoscope,
-  Quote,
+  
   Send,
 } from 'lucide-react';
 
@@ -147,27 +147,6 @@ const useCases = [
   },
 ];
 
-/* ──────────────── Testimonials ──────────────── */
-const testimonials = [
-  {
-    quote: 'En 3 mois, nos indicateurs de bien-être ont progressé de 28%. Les équipes utilisent EmotionsCare avant et après les gardes.',
-    author: 'Dr. Sophie Martin',
-    role: 'Directrice RH',
-    org: 'CHU de Lyon',
-  },
-  {
-    quote: 'Le déploiement a pris moins d\'une journée. L\'anonymat total a convaincu même les plus réticents.',
-    author: 'Marc Dubois',
-    role: 'DRH',
-    org: 'Clinique Saint-Joseph, Paris',
-  },
-  {
-    quote: 'Nos internes utilisent la respiration guidée entre deux blocs opératoires. C\'est devenu un réflexe.',
-    author: 'Pr. Claire Lefèvre',
-    role: 'Doyenne',
-    org: 'Faculté de Médecine, Strasbourg',
-  },
-];
 
 /* ──────────────── ROI Calculator ──────────────── */
 const ROICalculator: React.FC = () => {
@@ -685,40 +664,6 @@ const B2BEntreprisePage: React.FC = () => {
         </div>
       </section>
 
-      {/* ═══════════════════ TÉMOIGNAGES ═══════════════════ */}
-      <section className="py-28 md:py-36 bg-muted/30">
-        <div className="container px-4 sm:px-6 lg:px-8">
-          <SectionTitle center subtitle="Ils ont déployé EmotionsCare dans leur établissement.">
-            Retours{' '}
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              d'établissements pilotes.
-            </span>
-          </SectionTitle>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {testimonials.map((t, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.4 }}
-                transition={{ duration: 0.7, delay: i * 0.15 }}
-                className="bg-card/60 backdrop-blur-xl rounded-2xl p-8 border border-border/50"
-              >
-                <Quote className="h-8 w-8 text-primary/30 mb-4" aria-hidden="true" />
-                <blockquote className="text-muted-foreground leading-relaxed mb-6">
-                  &laquo; {t.quote} &raquo;
-                </blockquote>
-                <div>
-                  <div className="font-semibold">{t.author}</div>
-                  <div className="text-sm text-muted-foreground">{t.role}</div>
-                  <div className="text-sm text-primary">{t.org}</div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ═══════════════════ ROI CALCULATOR ═══════════════════ */}
       <section className="py-28 md:py-36">
