@@ -364,7 +364,7 @@ export default function FAQPage() {
             <CardContent className="py-8 text-center">
               <h2 className="text-xl font-semibold mb-2">Vous n'avez pas trouvé votre réponse ?</h2>
               <p className="text-muted-foreground mb-4">
-                Notre équipe support est disponible 24/7 pour vous aider.
+                Notre équipe est disponible du lundi au vendredi pour vous aider.
               </p>
               <div className="flex flex-wrap justify-center gap-3">
                 <Button asChild>

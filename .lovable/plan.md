@@ -1,95 +1,64 @@
 
 
-# AUDIT v5 — EmotionsCare
+## Plan : Ajouter les traductions allemandes et compléter FR/EN/DE sur toute la plateforme
 
-## 1. RESUME EXECUTIF
+### Constat actuel
 
-**Verdict : OUI SOUS CONDITIONS — Note globale : 17,5/20**
+L'application dispose de deux systèmes i18n parallèles :
+1. **Système principal** (`src/lib/i18n/locales/{fr,en}/`) — 11 namespaces (common, navigation, dashboard, settings, modules, auth, consent, errors, legal, journal, coach) avec FR et EN complets
+2. **Système secondaire** (`src/i18n/locales/{fr,en,de}.ts`) — squelettique, utilisé par `src/i18n/config.ts`
+3. **Fichiers JSON** (`public/locales/{fr,en}/`) — partiels (common, errors, breath)
 
-Les corrections des audits v1-v4 sont en place : scanner fonctionnel, onboarding soignant, FAQ nettoyee, CGU completes, accents corriges, dashboard quick actions fonctionnelles, Link SPA, boutons morts retires. Cependant, un probleme majeur subsiste : le footer utilise par la homepage (components/home/Footer.tsx) n'a jamais ete corrige — il contient encore des liens sociaux actifs vers des comptes inexistants et 10 liens vers des pages protegees.
+Le **DE (allemand)** existe uniquement dans `src/i18n/locales/de.ts` avec un contenu riche mais n'est **pas branché** dans le système principal (`src/providers/i18n/resources.ts` ne charge que `fr` et `en`).
 
-**Publiable aujourd'hui : OUI SOUS CONDITIONS** (2 corrections, ~20 min)
+De plus, de nombreuses pages (100+) contiennent encore des **chaînes hardcodées en français** non internationalisées.
 
-### Top 5 risques restants
-1. Footer homepage : 4 liens sociaux actifs (twitter/linkedin/instagram/youtube) vers des comptes probablement inexistants — 404 externes, perte de credibilite immediate
-2. Footer homepage : 10 liens "Plateforme" dont 8 vers /app/* — redirection silencieuse vers /login pour visiteurs
-3. Deux composants Footer distincts (home/Footer.tsx vs marketing/Footer.tsx) — incoh​erence de maintenance
-4. FAQ affirme "support disponible 24/7" (ligne 367) — verifiable ? Si non, promesse mensongere
-5. Copyright footer marketing dit "2025" alors que nous sommes en 2026
+### Plan d'implémentation
 
-### Top 5 forces
-1. Scanner emotionnel → protocole avec badge Pro : promesse centrale fonctionnelle
-2. Hero impactant : "Gerez votre stress en 3 minutes" — comprehension en <5 secondes
-3. Dashboard complet avec quick actions, premier pas, refresh, stats
-4. CGU/RGPD completes, consentements obligatoires au signup
-5. Accessibilite WCAG AA : skip links, ARIA, keyboard, labels
+#### 1. Creer les fichiers de traduction DE (11 fichiers)
 
----
+Creer `src/lib/i18n/locales/de/` avec les 11 fichiers miroirs de FR/EN :
+- `common.ts`, `navigation.ts`, `dashboard.ts`, `settings.ts`, `modules.ts`, `auth.ts`, `consent.ts`, `errors.ts`, `legal.ts`, `journal.ts`, `coach.ts`
 
-## 2. TABLEAU SCORE GLOBAL
+Chaque fichier sera la traduction allemande complète des clés existantes en FR/EN.
 
-```text
-Dimension                    | Note | Observation                                       | Criticite | Decision
------------------------------|------|---------------------------------------------------|-----------|------------------
-Comprehension produit        | 18   | Hero + eyebrow + modules = clarte immediate       | -         | Pret
-Landing / Accueil            | 17   | Premium Apple-style, lazy loading, social proof    | -         | Pret
-Onboarding                   | 18   | Aligne soignants, ARIA, progression                | -         | Pret
-Navigation                   | 16   | Header propre, footer homepage non corrige         | Majeur    | Corriger
-Clarte UX                    | 17   | Dashboard guide, quick actions fonctionnelles      | -         | Pret
-Copywriting                  | 17   | Accents corriges, FAQ propre, hero percutant       | -         | Pret
-Credibilite / confiance      | 15   | Footer liens sociaux morts = signal amateur        | Critique  | Corriger
-Fonctionnalite principale    | 18   | Scanner→protocole OK                               | -         | Pret
-Parcours utilisateur         | 17   | Signup→onboarding→scan→dashboard complet           | -         | Pret
-Bugs / QA                    | 16   | 2 footers incoherents, copyright 2025              | Majeur    | Corriger
-Securite preproduction       | 17   | RLS, auth, sanitisation, TEST_MODE off             | -         | Pret
-Conformite go-live           | 18   | CGU, mediation, SIRET, cookies, RGPD               | -         | Pret
-```
+#### 2. Brancher DE dans le système principal
 
----
+Modifier `src/providers/i18n/resources.ts` pour :
+- Importer les 11 modules DE
+- Ajouter la locale `de` dans l'objet `resources`
 
-## 3. PROBLEMES RESTANTS PRIORISES
+#### 3. Mettre à jour la configuration i18n
 
-### P1 — Tres important
+- `src/lib/i18n.ts` : ajouter `'de'` dans `supportedLngs`
+- `src/lib/i18n/i18n.tsx` : ajouter le type `'de'` au type `Lang`
+- `src/i18n/locales/fr.ts` et `src/i18n/locales/en.ts` : ajouter `de: 'Allemand'` / `de: 'German'` dans `languageNames`
 
-**P1-1. Footer homepage : liens sociaux actifs vers comptes inexistants**
-- Ou : `src/components/home/Footer.tsx` lignes 43-48
-- Probleme : 4 liens `<a>` actifs vers twitter.com/emotionscare, linkedin.com/company/emotionscare, etc. Ces comptes n'existent probablement pas. Un visiteur qui clique atterrit sur un 404 externe — signal amateur immediat.
-- Impact : Perte de credibilite sur la premiere page. Un beta-testeur le signalerait en 30 secondes.
-- Correction : Remplacer par des spans desactives "Bientot disponible" (comme dans marketing/Footer.tsx) ou retirer completement.
+#### 4. Mettre à jour le sélecteur de langue
 
-**P1-2. Footer homepage : 10 liens Plateforme dont 8 proteges**
-- Ou : `src/components/home/Footer.tsx` lignes 15-26
-- Probleme : Un visiteur non connecte qui clique "Scanner emotionnel" ou "Coach IA" est redirige silencieusement vers /login. Aucune indication visuelle que ces liens necessitent une connexion.
-- Correction : Reduire la liste aux pages publiques, ou ajouter une icone cadenas (deja present dans le code via `protected: true` mais les liens restent cliquables et accessibles).
+- `src/ui/NavBar.tsx` : supporter le cycle FR → EN → DE → FR
+- `src/i18n/LanguageSwitcher.tsx` : s'assurer que DE est dans les options (il utilise `SUPPORTED_LOCALES` qui inclut déjà `de`)
 
-### P2 — Ameliorations forte valeur
+#### 5. Ajouter les fichiers JSON DE dans public/locales
 
-**P2-1. Deux composants Footer incoherents**
-- `src/components/home/Footer.tsx` (utilise par AppleHomePage) : non corrige, liens sociaux actifs, 10 liens plateforme
-- `src/components/marketing/Footer.tsx` (corrige) : liens sociaux desactives, footer propre — mais n'est importe par aucune page
-- Correction : Supprimer `marketing/Footer.tsx` et corriger `home/Footer.tsx` directement (c'est celui utilise en production)
+Creer `public/locales/de/` avec `common.json`, `errors.json`, `breath.json`
 
-**P2-2. Copyright marketing/Footer.tsx dit "2025"**
-- Ligne 139 : `© 2025 EmotionsCare`
-- Nous sommes en 2026. Le home/Footer.tsx utilise `new Date().getFullYear()` (correct).
-- Correction : Sans objet si on supprime marketing/Footer.tsx
+#### 6. Internationaliser les composants avec chaînes hardcodees
 
-**P2-3. FAQ : "support disponible 24/7"**
-- `FAQPage.tsx` ligne 367 : "Notre equipe support est disponible 24/7"
-- Si pas de support reel 24/7, c'est une fausse promesse.
-- Correction : Remplacer par "Notre equipe est disponible pour vous aider du lundi au vendredi." ou verifier la veracite.
+Migrer progressivement les composants critiques contenant du texte FR hardcode :
+- `GroupHeader.tsx` : remplacer "Aujourd'hui"/"Hier" par `t('common.today')`/`t('common.yesterday')` et utiliser la locale dynamique pour `Intl.DateTimeFormat`
+- `NavBar.tsx` : utiliser les clés de traduction pour les liens
+- `Footer.tsx` : utiliser les clés de traduction pour les liens legaux
 
----
+### Details techniques
 
-## 4. PLAN D'IMPLEMENTATION
+- Les 11 fichiers DE suivront exactement la structure des fichiers EN existants
+- Le type `Lang` sera etendu a `'fr' | 'en' | 'de'`
+- Le `fallbackLng` reste `'fr'`
+- Environ **15-20 fichiers** seront modifies ou crees
 
-### Tache 1 : Corriger le footer homepage (home/Footer.tsx)
-- Remplacer les 4 liens sociaux actifs par des spans "Bientot" desactives (comme deja fait dans marketing/Footer.tsx)
-- Reduire la liste "Plateforme" : ne garder que les 2-3 liens publics (Accueil, Respiration guidee) et retirer les 8 liens proteges, OU rendre les liens proteges non-cliquables pour les visiteurs
+### Limites
 
-### Tache 2 : Supprimer le footer marketing inutilise
-- Supprimer `src/components/marketing/Footer.tsx` pour eviter la confusion entre deux composants Footer
-
-### Tache 3 : Corriger "support 24/7" dans la FAQ
-- Remplacer "disponible 24/7" par un message realiste
+- Les 100+ pages avec texte FR hardcode ne seront pas toutes migrées dans cette iteration — seuls les composants partagés (NavBar, Footer, GroupHeader) et la configuration seront traités
+- Les pages individuelles (ModulesDashboard, UnifiedHomePage, etc.) necessiteront des passes supplementaires
 
