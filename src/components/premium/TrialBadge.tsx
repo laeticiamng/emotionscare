@@ -35,26 +35,6 @@ interface TrialStats {
   emotionsTracked: number;
 }
 
-const TESTIMONIALS = [
-  {
-    name: 'Marie L.',
-    role: 'Utilisatrice Premium',
-    quote: 'EmotionsCare a transformé ma gestion du stress quotidien.',
-    rating: 5,
-  },
-  {
-    name: 'Thomas B.',
-    role: 'Coach bien-être',
-    quote: 'Un outil indispensable pour mes clients et moi-même.',
-    rating: 5,
-  },
-  {
-    name: 'Sophie M.',
-    role: 'Professionnelle',
-    quote: 'Les analyses IA m\'ont vraiment aidée à me comprendre.',
-    rating: 5,
-  },
-];
 
 const PREMIUM_FEATURES = [
   { icon: <Zap className="h-4 w-4" />, label: 'Analyses IA illimitées', free: '5/jour', premium: 'Illimité' },
@@ -73,7 +53,7 @@ const TrialBadge: React.FC<TrialBadgeProps> = ({
   const navigate = useNavigate();
   const { toast } = useToast();
   const [dismissed, setDismissed] = useState(false);
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  
   const [trialStats, setTrialStats] = useState<TrialStats>({
     featuresUsed: 0,
     totalFeatures: 12,
@@ -105,13 +85,6 @@ const TrialBadge: React.FC<TrialBadgeProps> = ({
     }
   }, []);
 
-  // Rotate testimonials
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTestimonial(prev => (prev + 1) % TESTIMONIALS.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
   // Calculate time remaining with seconds
   useEffect(() => {
@@ -391,30 +364,11 @@ const TrialBadge: React.FC<TrialBadgeProps> = ({
               </div>
             </div>
 
-            {/* Social proof */}
-            <div className="bg-primary/5 rounded-lg p-3 space-y-2">
+            {/* Platform info */}
+            <div className="bg-primary/5 rounded-lg p-3">
               <div className="flex items-center gap-1">
                 <Users className="h-4 w-4 text-primary" />
                 <span className="text-xs font-medium">Plateforme en lancement — Essayez gratuitement</span>
-              </div>
-              
-              {/* Testimonial carousel */}
-              <div className="relative overflow-hidden">
-                <div className="flex items-start gap-2 transition-all duration-500">
-                  <div className="flex-shrink-0">
-                    <div className="flex">
-                      {[...Array(TESTIMONIALS[currentTestimonial].rating)].map((_, i) => (
-                        <Star key={i} className="h-3 w-3 text-amber-500 fill-amber-500" />
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xs italic">"{TESTIMONIALS[currentTestimonial].quote}"</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      — {TESTIMONIALS[currentTestimonial].name}
-                    </p>
-                  </div>
-                </div>
               </div>
             </div>
 
