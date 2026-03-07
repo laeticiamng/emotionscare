@@ -22,6 +22,7 @@ const AppleCTASection = lazy(() => import('@/components/home/AppleCTASection'));
 const ModulesHighlightSection = lazy(() => import('@/components/home/ModulesHighlightSection'));
 const SocialProofSection = lazy(() => import('@/components/home/SocialProofSection'));
 const ProductScreenshots = lazy(() => import('@/components/marketing/ProductScreenshots'));
+const GeoSummarySection = lazy(() => import('@/components/home/GeoSummarySection'));
 const Footer = lazy(() => import('@/components/home/Footer'));
 
 // Skeleton for lazy sections
@@ -238,6 +239,11 @@ const AppleHomePage: React.FC = () => {
       <main id="main-content" role="main" className="pt-16">
         {/* Hero Section - Full viewport, impactant */}
         <AppleHeroSection />
+
+        {/* GEO Summary - "En bref" pour moteurs génératifs */}
+        <Suspense fallback={<SectionSkeleton />}>
+          <GeoSummarySection />
+        </Suspense>
 
         {/* Below-fold sections - lazy loaded */}
         <Suspense fallback={<SectionSkeleton />}>
