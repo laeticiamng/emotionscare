@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePageSEO } from '@/hooks/usePageSEO';
-import { SeoHead } from '@/lib/seo/SeoHead';
 
 const ProductScreenshots = lazy(() => import('@/components/marketing/ProductScreenshots'));
 
