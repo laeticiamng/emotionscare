@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,6 +24,7 @@ interface NavItem {
 
 const EnhancedNavigation: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -197,7 +198,7 @@ const EnhancedNavigation: React.FC = () => {
               <Button
                 variant="outline"
                 className="border-border/50 hover:bg-muted/80 backdrop-blur-sm"
-                onClick={() => window.location.href = '/login'}
+                onClick={() => navigate('/login')}
               >
                 <User className="h-4 w-4 mr-2" />
                 Connexion
@@ -205,7 +206,7 @@ const EnhancedNavigation: React.FC = () => {
               
               <Button
                 className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-primary-foreground shadow-xl hover:shadow-2xl"
-                onClick={() => window.location.href = '/mode-selection'}
+                onClick={() => navigate('/mode-selection')}
               >
                 Commencer
               </Button>
@@ -306,7 +307,7 @@ const EnhancedNavigation: React.FC = () => {
                 <div className="border-t border-border/50 pt-4 space-y-3">
                   <Button
                     onClick={() => {
-                      window.location.href = '/login';
+                      navigate('/login');
                       setMobileMenuOpen(false);
                     }}
                     variant="outline"
@@ -318,7 +319,7 @@ const EnhancedNavigation: React.FC = () => {
                   
                   <Button
                     onClick={() => {
-                      window.location.href = '/mode-selection';
+                      navigate('/mode-selection');
                       setMobileMenuOpen(false);
                     }}
                     className="w-full bg-gradient-to-r from-primary to-purple-600"

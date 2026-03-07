@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import EnhancedHeader from './enhanced-header';
 import EnhancedFooter from './enhanced-footer';
 import CommandMenu from './command-menu';
@@ -17,6 +17,7 @@ interface ToastNotification {
 }
 
 const EnhancedShell: React.FC = () => {
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [scrollProgress, setScrollProgress] = React.useState(0);
   const [notifications, setNotifications] = React.useState<ToastNotification[]>([]);
@@ -56,7 +57,7 @@ const EnhancedShell: React.FC = () => {
     {
       icon: Settings,
       label: 'Paramètres',
-      onClick: () => window.location.href = '/preferences'
+      onClick: () => navigate('/preferences')
     },
     {
       icon: HelpCircle,

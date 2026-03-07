@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -117,6 +118,7 @@ const InsightCard: React.FC<{ title: string; description: string; type: 'tip' | 
   };
 
 export const EnhancedScanDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const { data: history = [], isLoading } = useScanHistory(30);
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -306,7 +308,7 @@ export const EnhancedScanDashboard: React.FC = () => {
             Vous n'avez pas encore effectué de scan émotionnel.
             Commencez votre premier scan pour voir vos analyses apparaître ici.
           </p>
-          <Button onClick={() => window.location.href = '/scan'}>
+          <Button onClick={() => navigate('/scan')}>
             <Activity className="h-4 w-4 mr-2" />
             Faire mon premier scan
           </Button>

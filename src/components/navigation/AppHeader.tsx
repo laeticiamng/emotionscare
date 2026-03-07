@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Bell, Search, Menu, Sun, Moon, Maximize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +16,7 @@ interface AppHeaderProps {
 }
 
 const AppHeader: React.FC<AppHeaderProps> = ({ onNotificationsToggle, notificationsOpen }) => {
+  const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const { theme, setTheme } = useTheme();
@@ -40,10 +42,10 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onNotificationsToggle, notificati
   };
 
   const quickActions = [
-    { label: 'Scan rapide', action: () => window.location.href = '/app/scan' },
-    { label: 'Flash Glow', action: () => window.location.href = '/app/flash-glow' },
-    { label: 'Respiration', action: () => window.location.href = '/app/breath' },
-    { label: 'Journal', action: () => window.location.href = '/app/journal' }
+    { label: 'Scan rapide', action: () => navigate('/app/scan') },
+    { label: 'Flash Glow', action: () => navigate('/app/flash-glow') },
+    { label: 'Respiration', action: () => navigate('/app/breath') },
+    { label: 'Journal', action: () => navigate('/app/journal') }
   ];
 
   return (
