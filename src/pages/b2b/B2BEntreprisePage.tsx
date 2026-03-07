@@ -30,7 +30,7 @@ import {
   GraduationCap,
   Home as HomeIcon,
   Stethoscope,
-  Quote,
+  
   Send,
 } from 'lucide-react';
 
