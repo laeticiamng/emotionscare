@@ -17,11 +17,19 @@ import { formatPrice } from '@/lib/currency';
 import type { ShopifyProduct } from '@/types/shopify';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 const StorePage: React.FC = () => {
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const addItem = useCartStore(state => state.addItem);
+
+  usePageSEO({
+    title: 'Boutique EmotionsCare — Accessoires bien-être',
+    description: 'Découvrez la boutique EmotionsCare : accessoires et outils de bien-être émotionnel pour soignants et étudiants en santé.',
+    keywords: 'boutique, accessoires, bien-être, soignants, EmotionsCare',
+    canonical: 'https://emotionscare.com/store',
+  });
 
   useEffect(() => {
     const fetchProducts = async () => {

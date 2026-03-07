@@ -48,11 +48,13 @@ const AboutPage: React.FC = () => {
   const isHeroInView = useInView(heroRef, { once: true, amount: 0.3 });
 
   usePageSEO({
-    title: 'À propos - EmotionsCare | Bien-être des soignants',
+    title: 'À propos d\'EmotionsCare — Régulation émotionnelle pour soignants',
     description:
-      'EmotionsCare est une plateforme créée par le Dr Laeticia Motongane, médecin, pour accompagner les soignants vers un meilleur équilibre émotionnel.',
+      'EmotionsCare est une plateforme créée par Laeticia Motongane, médecin, pour aider les soignants et étudiants en santé à réguler leur stress en 3 minutes grâce aux neurosciences.',
     keywords:
-      'EmotionsCare, à propos, bien-être soignants, santé mentale, Dr Motongane',
+      'EmotionsCare, à propos, régulation émotionnelle, soignants, étudiants santé, Laeticia Motongane, stress soignants',
+    canonical: 'https://emotionscare.com/about',
+    includeOrganization: true,
   });
 
   return (

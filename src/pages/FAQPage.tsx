@@ -5,7 +5,6 @@
  */
 import React, { useState, useMemo, useEffect } from 'react';
 import type { LucideIcon } from 'lucide-react';
-import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -127,11 +126,27 @@ export default function FAQPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
+  const faqStructuredData = useMemo(() => {
+    const allQuestions = FAQS.flatMap(cat => cat.questions);
+    return {
+      '@type': 'FAQPage',
+      mainEntity: allQuestions.map(faq => ({
+        '@type': 'Question',
+        name: faq.q,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.a,
+        },
+      })),
+    };
+  }, []);
+
   usePageSEO({
-    title: 'FAQ - Questions Fréquentes',
-    description: 'Trouvez les réponses à toutes vos questions sur EmotionsCare. Compte, fonctionnalités, facturation, sécurité et plus.',
-    keywords: 'FAQ, questions, aide, EmotionsCare, support, bien-être',
+    title: 'FAQ - Questions Fréquentes sur EmotionsCare',
+    description: 'Trouvez les réponses à toutes vos questions sur EmotionsCare : compte, fonctionnalités, facturation, sécurité des données et confidentialité.',
+    keywords: 'FAQ, questions fréquentes, aide EmotionsCare, support, soignants, bien-être émotionnel',
     canonical: 'https://emotionscare.com/faq',
+    structuredData: faqStructuredData,
   });
 
   const { runAudit } = useAccessibilityAudit();
@@ -165,29 +180,8 @@ export default function FAQPage() {
   const totalQuestions = FAQS.reduce((acc, cat) => acc + cat.questions.length, 0);
   const filteredQuestionsCount = filteredFaqs.reduce((acc, cat) => acc + cat.questions.length, 0);
 
-  const faqJsonLd = useMemo(() => {
-    const allQuestions = FAQS.flatMap(cat => cat.questions);
-    return {
-      '@context': 'https://schema.org',
-      '@type': 'FAQPage',
-      mainEntity: allQuestions.map(faq => ({
-        '@type': 'Question',
-        name: faq.q,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: faq.a,
-        },
-      })),
-    };
-  }, []);
-
   return (
     <div data-testid="page-root" className="min-h-screen bg-background">
-      <Helmet>
-        <script type="application/ld+json">
-          {JSON.stringify(faqJsonLd)}
-        </script>
-      </Helmet>
 
       {/* Skip Links */}
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md">
