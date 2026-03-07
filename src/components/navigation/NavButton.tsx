@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import * as Icons from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { useNavigate } from 'react-router-dom';
 
 interface NavButtonProps {
   node: NavNode;
@@ -28,6 +29,7 @@ export function NavButton({
   variant = 'ghost',
   size = 'default',
   className,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showLabel = true,
   showBadge = true,
 }: NavButtonProps) {

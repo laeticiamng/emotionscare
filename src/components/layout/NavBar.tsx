@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { routes } from '@/routerV2';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -20,6 +20,7 @@ import {
 
 const NavBar: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
@@ -106,7 +107,7 @@ const NavBar: React.FC = () => {
             </div>
 
             <Button
-              onClick={() => window.location.href = '/login'}
+              onClick={() => navigate('/login')}
               variant="outline"
               className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm"
             >
@@ -115,7 +116,7 @@ const NavBar: React.FC = () => {
             </Button>
             
             <Button
-              onClick={() => window.location.href = '/mode-selection'}
+              onClick={() => navigate('/mode-selection')}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl hover:shadow-blue-500/25"
             >
               Commencer
@@ -167,7 +168,7 @@ const NavBar: React.FC = () => {
               <div className="border-t border-white/10 pt-4 space-y-3">
                 <Button
                   onClick={() => {
-                    window.location.href = '/login';
+                    navigate('/login');
                     setMobileMenuOpen(false);
                   }}
                   variant="outline"
@@ -179,7 +180,7 @@ const NavBar: React.FC = () => {
                 
                 <Button
                   onClick={() => {
-                    window.location.href = '/mode-selection';
+                    navigate('/mode-selection');
                     setMobileMenuOpen(false);
                   }}
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"

@@ -103,39 +103,24 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onContinue, videoRef, o
           </div>
         </motion.div>
         
-        {/* Video Section */}
+        {/* Illustration Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="aspect-video bg-muted rounded-xl overflow-hidden relative shadow-lg"
+          className="bg-gradient-to-br from-primary/5 via-purple-500/5 to-pink-500/5 rounded-xl p-8 text-center shadow-sm border border-border/50"
         >
-          <video 
-            ref={videoRef}
-            className="w-full h-full object-cover"
-            poster="/images/welcome-poster.jpg"
-            controls
-            onPlay={() => setVideoPlaying(true)}
-            onPause={() => setVideoPlaying(false)}
-          >
-            <source src="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4" />
-            Votre navigateur ne prend pas en charge la lecture vidéo.
-          </video>
-          
-          {!videoPlaying && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/60 to-transparent video-overlay">
-              <div className="text-center">
-                <Button 
-                  size="lg" 
-                  className="rounded-full h-20 w-20 flex items-center justify-center mb-4 shadow-lg"
-                  onClick={playWelcomeVideo}
-                >
-                  <Play size={32} />
-                </Button>
-                <p className="text-white font-medium">Découvrir EmotionsCare en 2 minutes</p>
-              </div>
-            </div>
-          )}
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <Brain className="h-8 w-8 text-primary" />
+            <Sparkles className="h-6 w-6 text-purple-500" />
+            <Shield className="h-8 w-8 text-primary" />
+          </div>
+          <p className="text-lg font-medium text-foreground">
+            Votre compagnon de bien-être émotionnel
+          </p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Scanner, comprendre et réguler vos émotions au quotidien
+          </p>
         </motion.div>
         
         {/* Features Grid */}
