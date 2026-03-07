@@ -18,7 +18,7 @@ import {
 
 type Section = {
   id: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' | 'false' }>;
   title: string;
   content: React.ReactNode;
 };
