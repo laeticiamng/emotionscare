@@ -8,7 +8,7 @@ import { Star, Quote } from 'lucide-react';
 
 const testimonials = [
   {
-    name: 'Dr. Sarah M.',
+    name: 'Sarah M.',
     role: 'Médecin urgentiste, CHU Amiens',
     quote: 'Entre deux gardes, les protocoles de 3 minutes me permettent de décompresser sans perdre de temps. Le scanner émotionnel m\'aide à prendre conscience de mon état avant de reprendre.',
     rating: 5,
@@ -78,7 +78,7 @@ const SocialProofSection: React.FC = () => {
           className="text-center bg-card border border-border/50 rounded-2xl p-8 max-w-2xl mx-auto"
         >
           <p className="text-muted-foreground text-sm mb-2">Créée par</p>
-          <p className="text-xl font-semibold text-foreground">Dr. Laeticia Motongane</p>
+          <p className="text-xl font-semibold text-foreground">Laeticia Motongane</p>
           <p className="text-muted-foreground">
             Médecin · Fondatrice d&apos;EmotionsCare · Engagée pour le bien-être des soignants
           </p>
