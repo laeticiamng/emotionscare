@@ -623,12 +623,13 @@ function StatsCard({ title, value, icon: Icon, trend, color }: {
 
 function QuickActionCard({ action }: { action: QuickAction }) {
   const IconComponent = (Brain as any); // Fallback icon
+  const navigate = useNavigate();
   
   return (
     <Button
       variant="outline"
       className="h-auto p-4 flex-col items-start gap-2 text-left w-full"
-      onClick={() => window.location.href = action.action}
+      onClick={() => navigate(action.action)}
     >
       <div className="flex items-center gap-2 w-full">
         <IconComponent className="h-4 w-4" />

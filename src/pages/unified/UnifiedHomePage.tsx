@@ -105,65 +105,65 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
   const features = [
     {
       icon: Brain,
-      title: "IA Personnalisée",
-      description: "Coach virtuel Nyvée adapté à vos besoins émotionnels uniques",
+      title: "Scan émotionnel IA",
+      description: "Évaluez votre état émotionnel en quelques questions grâce à l'intelligence artificielle",
       color: "text-blue-500",
       gradient: "from-blue-500 to-cyan-500",
-      benefits: ["Analyse comportementale avancée", "Recommandations personnalisées", "Support 24/7"],
-      demo: "/app/coach"
+      benefits: ["Auto-évaluation sur 5 dimensions", "Recommandations personnalisées", "Suivi de progression"],
+      demo: "/app/scan"
     },
     {
       icon: Music,
-      title: "Musique Thérapeutique",
-      description: "Compositions générées par IA selon votre état émotionnel actuel",
+      title: "Musicothérapie",
+      description: "Fréquences binaurales et ambiances sonores adaptées à votre état émotionnel",
       color: "text-purple-500",
       gradient: "from-purple-500 to-pink-500",
-      benefits: ["Génération en temps réel", "Binaural beats", "Playlist adaptatives"],
+      benefits: ["Compositions adaptatives", "Fréquences binaurales", "Ambiances apaisantes"],
       demo: "/app/music"
     },
     {
       icon: Camera,
-      title: "Analyse Faciale Avancée",
-      description: "Détection d'émotions en temps réel avec 99% de précision",
+      title: "Journal émotionnel",
+      description: "Espace sécurisé pour documenter et analyser vos émotions au quotidien",
       color: "text-green-500",
       gradient: "from-green-500 to-emerald-500",
-      benefits: ["Reconnaissance micro-expressions", "Analyse en continu", "Graphiques détaillés"],
-      demo: "/app/scan"
-    },
-    {
-      icon: MessageCircle,
-      title: "Journal Intelligent",
-      description: "Espace sécurisé avec analyse automatique de sentiments",
-      color: "text-orange-500",
-      gradient: "from-orange-500 to-red-500",
-      benefits: ["Chiffrement end-to-end", "Analyse de tendances", "Rappels personnalisés"],
+      benefits: ["Analyse de tendances", "Chiffrement des données", "Rappels personnalisés"],
       demo: "/app/journal"
     },
     {
+      icon: MessageCircle,
+      title: "Coach IA 24h/24",
+      description: "Accompagnement bienveillant adapté aux professionnels de santé",
+      color: "text-orange-500",
+      gradient: "from-orange-500 to-red-500",
+      benefits: ["Disponible jour et nuit", "Techniques validées (TCC)", "Adapté aux soignants"],
+      demo: "/app/coach"
+    },
+    {
       icon: Headphones,
-      title: "VR Thérapie",
-      description: "Immersion thérapeutique avec environnements adaptatifs",
+      title: "Respiration guidée",
+      description: "Exercices de respiration et relaxation en 3 minutes",
       color: "text-indigo-500",
       gradient: "from-indigo-500 to-purple-500",
-      benefits: ["Environnements 3D", "Respiration guidée", "Réalité mixte"],
-      demo: "/app/vr-breath-guide"
+      benefits: ["Protocoles courts", "Guidage audio", "Suivi des sessions"],
+      demo: "/app/breathwork"
     },
     {
       icon: Activity,
-      title: "Analytics Wellness",
-      description: "Tableau de bord complet de votre progression émotionnelle",
+      title: "Tableau de bord",
+      description: "Suivez votre progression émotionnelle avec des métriques concrètes",
       color: "text-teal-500",
       gradient: "from-teal-500 to-blue-500",
-      benefits: ["Métriques détaillées", "Tendances long-terme", "Rapports exportables"],
+      benefits: ["Métriques détaillées", "Tendances hebdomadaires", "Rapports exportables"],
       demo: "/app/activity"
     }
   ];
 
   const stats = [
-    { label: "Modules", value: "37", description: "Outils disponibles pour votre bien-être", icon: Users, progress: 85 },
-    { label: "Sessions Quotidiennes", value: "150K+", description: "Interactions IA par jour", icon: Activity, progress: 92 },
-    { label: "Satisfaction Moyenne", value: "98.7%", description: "Taux de satisfaction utilisateur", icon: Star, progress: 98 },
-    { label: "Disponibilité", value: "99.9%", description: "Uptime garantie premium", icon: Shield, progress: 99 }
+    { label: "Modules", value: "37", description: "Outils intégrés pour votre bien-être", icon: Users, progress: 85 },
+    { label: "Par session", value: "3 min", description: "Micro-interventions efficaces", icon: Clock, progress: 92 },
+    { label: "Données protégées", value: "100%", description: "Chiffrement RGPD conforme", icon: Shield, progress: 100 },
+    { label: "Disponibilité", value: "7/7", description: "Accès permanent, jour et nuit", icon: Activity, progress: 99 }
   ];
 
   const moduleShowcase = [
@@ -180,7 +180,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
       highlight: "Adaptatif",
     },
     {
-      title: "Coach IA Nyvée",
+      title: "Coach IA 24h/24",
       icon: Sparkles,
       text: "Un accompagnement bienveillant disponible 24/7, adapté aux professionnels de santé et étudiants.",
       highlight: "Disponible 24/7",
@@ -189,28 +189,28 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
 
   const useCases = [
     {
-      title: "Développement Personnel",
-      description: "Découvrez votre potentiel émotionnel complet",
+      title: "Étudiants en santé",
+      description: "Gérez le stress des études et des stages hospitaliers",
       icon: Target,
-      features: ["Auto-évaluation continue", "Plans de développement", "Suivi des progrès"],
-      cta: "Commencer le parcours",
+      features: ["Gestion du stress d'examen", "Récupération post-garde", "Suivi de progression"],
+      cta: "Commencer gratuitement",
       link: "/b2c"
     },
     {
-      title: "Performance Professionnelle", 
-      description: "Optimisez vos interactions et leadership",
+      title: "Établissements de santé", 
+      description: "Prévention du burn-out et bien-être de vos équipes",
       icon: TrendingUp,
-      features: ["Communication optimisée", "Gestion d'équipe", "Résilience au stress"],
-      cta: "Découvrir les solutions",
+      features: ["Tableau de bord RH", "Alertes préventives", "Rapports anonymisés"],
+      cta: "Découvrir l'offre B2B",
       link: "/entreprise"
     },
     {
-      title: "Bien-être Quotidien",
-      description: "Maintenez un équilibre émotionnel optimal",
+      title: "Soignants en activité",
+      description: "Des micro-interventions adaptées à votre rythme",
       icon: Smile,
-      features: ["Routines personnalisées", "Alertes préventives", "Techniques de relaxation"],
+      features: ["Sessions de 3 minutes", "Protocoles d'urgence", "Respiration guidée"],
       cta: "Essayer gratuitement", 
-      link: "/login"
+      link: "/b2c"
     }
   ];
 
@@ -381,7 +381,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
             </div>
             
             <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-              <p>&copy; 2024 EmotionsCare. Tous droits réservés.</p>
+              <p>&copy; {new Date().getFullYear()} EmotionsCare — EMOTIONSCARE SASU. Tous droits réservés.</p>
             </div>
           </div>
         </footer>
@@ -417,7 +417,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                   transition={{ delay: 0.2, duration: 0.6 }}
                 >
                   <Badge variant="secondary" className="mb-4 px-4 py-2 text-sm font-medium bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
-                    ✨ Nouveau : Coach IA disponible 24h/24
+                    ✨ Pour ceux qui prennent soin des autres
                   </Badge>
                 </motion.div>
                 
@@ -429,14 +429,14 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                     EmotionsCare
                   </span>
                   <br />
-                  <span className="text-3xl lg:text-5xl text-foreground/90 font-medium">
-                    L'IA qui comprend vos émotions
+                   <span className="text-3xl lg:text-5xl text-foreground/90 font-medium">
+                    Régulation émotionnelle pour soignants
                   </span>
                 </h1>
                 
                 <p className="text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-                  Découvrez la première plateforme d'intelligence émotionnelle pilotée par l'IA. 
-                  <strong className="text-foreground"> Transformez votre bien-être</strong> avec des outils basés sur les neurosciences et une expérience totalement personnalisée.
+                  La première plateforme de régulation émotionnelle conçue par et pour les soignants. 
+                  <strong className="text-foreground"> Gérez votre stress en 3 minutes</strong> avec des exercices basés sur les neurosciences.
                 </p>
               </div>
 
@@ -497,12 +497,12 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                 viewport={{ once: true }}
                 className="text-center space-y-4 mb-12"
               >
-                <Badge variant="outline" className="mb-2">Performance en temps réel</Badge>
+                <Badge variant="outline" className="mb-2">La plateforme en chiffres</Badge>
                 <h2 id="stats-section-heading" className="text-3xl lg:text-4xl font-bold">
-                  Des résultats qui parlent d'eux-mêmes
+                  Une plateforme complète
                 </h2>
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                  Notre communauté grandit chaque jour et obtient des résultats mesurables
+                  Des outils conçus pour s'intégrer dans le quotidien des soignants
                 </p>
               </motion.div>
 
@@ -665,13 +665,13 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                 viewport={{ once: true }}
                 className="text-center space-y-4 mb-16"
               >
-                <Badge variant="outline" className="mb-2">Cas d'usage</Badge>
+                <Badge variant="outline" className="mb-2">Pour qui ?</Badge>
                 <h2 className="text-4xl lg:text-5xl font-bold">
-                  Pour tous vos besoins émotionnels
+                  Conçu pour le monde de la santé
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                  Que vous soyez un particulier, un professionnel ou une entreprise,
-                  nos solutions s'adaptent parfaitement à votre contexte.
+                  Étudiants, soignants et établissements de santé :
+                  des solutions adaptées à chaque contexte.
                 </p>
               </motion.div>
 

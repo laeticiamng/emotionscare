@@ -302,10 +302,12 @@ const UnifiedDashboard: React.FC = () => {
                     key={index}
                     variant="outline"
                     className="h-20 flex flex-col gap-2"
-                    onClick={() => window.location.href = action.path}
+                    asChild
                   >
-                    <action.icon className="h-5 w-5" />
-                    <span className="text-xs text-center">{action.label}</span>
+                    <Link to={action.path}>
+                      <action.icon className="h-5 w-5" />
+                      <span className="text-xs text-center">{action.label}</span>
+                    </Link>
                   </Button>
                 ))}
               </div>

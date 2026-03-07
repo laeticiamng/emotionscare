@@ -38,15 +38,16 @@ export const MusicPageHeader: React.FC<MusicPageHeaderProps> = ({
           </Button>
         )}
         
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => window.location.href = '/app/music/analytics'}
-          className="gap-2"
-        >
-          <TrendingUp className="h-4 w-4" />
-          Analytics
-        </Button>
+        <Link to="/app/music/analytics">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+          >
+            <TrendingUp className="h-4 w-4" />
+            Analytics
+          </Button>
+        </Link>
         
         <Link to="/app/music/profile">
           <Button

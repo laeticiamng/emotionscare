@@ -114,18 +114,19 @@ export const useNotificationsFeed = () => {
 
   const handleNotificationAction = (action: string) => {
     // Handle different notification actions
-    switch (action) {
-      case 'open_breathwork':
-        window.location.href = '/breathwork';
-        break;
-      case 'scan_mood':
-        window.location.href = '/scan';
-        break;
-      case 'play_music':
-        window.location.href = '/music';
-        break;
-      default:
-        logger.debug('Unknown notification action', { action }, 'SYSTEM');
+    const actionMap: Record<string, string> = {
+      'open_breathwork': '/breathwork',
+      'scan_mood': '/scan',
+      'play_music': '/music',
+    };
+    const path = actionMap[action];
+    if (path && typeof window !== 'undefined') {
+      // Use pushState for SPA navigation when possible
+      window.dispatchEvent(new CustomEvent('navigate', { detail: { path } }));
+      // Fallback
+      window.location.href = path;
+    } else {
+      logger.debug('Unknown notification action', { action }, 'SYSTEM');
     }
   };
 
