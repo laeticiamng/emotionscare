@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Brain, Music, Heart, TrendingUp, Calendar, Clock,
