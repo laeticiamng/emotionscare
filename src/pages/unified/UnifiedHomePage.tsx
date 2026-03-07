@@ -417,7 +417,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                   transition={{ delay: 0.2, duration: 0.6 }}
                 >
                   <Badge variant="secondary" className="mb-4 px-4 py-2 text-sm font-medium bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
-                    ✨ Nouveau : Assistant IA Nyvée disponible
+                    ✨ Nouveau : Coach IA disponible 24h/24
                   </Badge>
                 </motion.div>
                 
@@ -442,9 +442,9 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Button size="lg" className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-xl hover:shadow-2xl transition-all duration-300 px-8 py-4 text-lg" asChild>
-                  <Link to="/b2c">
+                  <Link to="/mode-selection">
                     <Play className="h-5 w-5 mr-2" />
-                    <span>Essai gratuit 30 jours</span>
+                    <span>Commencer gratuitement</span>
                     <ArrowRight className="h-5 w-5 ml-2" />
                   </Link>
                 </Button>
