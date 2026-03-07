@@ -5,12 +5,19 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Code, Shield, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { routes } from '@/lib/routes';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 /**
  * Page Crédits & Licences Open Source
  */
 export const LicensesPage: React.FC = () => {
   const navigate = useNavigate();
+
+  usePageSEO({
+    title: 'Licences Open Source',
+    description: 'Crédits et licences des librairies open source utilisées par EmotionsCare. Transparence sur les dépendances logicielles.',
+    canonical: 'https://emotionscare.com/legal/licenses',
+  });
 
   const licenses = [
     {

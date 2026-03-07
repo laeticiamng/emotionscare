@@ -8,12 +8,20 @@ import {
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { routes } from '@/lib/routes';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 /**
  * Page Politique de Confidentialité - Conforme RGPD (Art. 13 & 14)
  */
 export const PrivacyPolicyPage: React.FC = () => {
   const navigate = useNavigate();
+
+  usePageSEO({
+    title: 'Politique de Confidentialité',
+    description: 'Politique de confidentialité EmotionsCare : traitement des données personnelles, droits RGPD, durée de conservation, transferts et DPO.',
+    keywords: 'confidentialité, RGPD, données personnelles, vie privée, EmotionsCare, DPO',
+    canonical: 'https://emotionscare.com/legal/privacy',
+  });
 
   return (
     <div className="min-h-screen bg-background p-6">

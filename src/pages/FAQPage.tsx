@@ -128,9 +128,10 @@ export default function FAQPage() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   usePageSEO({
-    title: 'FAQ - Questions Fréquentes - EmotionsCare',
+    title: 'FAQ - Questions Fréquentes',
     description: 'Trouvez les réponses à toutes vos questions sur EmotionsCare. Compte, fonctionnalités, facturation, sécurité et plus.',
     keywords: 'FAQ, questions, aide, EmotionsCare, support, bien-être',
+    canonical: 'https://emotionscare.com/faq',
   });
 
   const { runAudit } = useAccessibilityAudit();
