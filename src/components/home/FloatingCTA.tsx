@@ -86,7 +86,7 @@ const FloatingCTA: React.FC<FloatingCTAProps> = ({
             >
               <Link to="/b2c">
                 <Heart className="h-5 w-5 mr-2 group-hover:animate-heartbeat" aria-hidden="true" />
-                Essai gratuit 30 jours
+                Commencer gratuitement
                 <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
               </Link>
             </Button>

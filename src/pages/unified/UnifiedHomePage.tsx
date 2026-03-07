@@ -841,7 +841,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                 <div className="flex items-center justify-center space-x-8 text-sm opacity-80">
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4" aria-hidden="true" />
-                    <span>Essai gratuit 30 jours</span>
+                    <span>100% gratuit pour commencer</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Shield className="h-4 w-4" aria-hidden="true" />
