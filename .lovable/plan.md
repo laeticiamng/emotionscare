@@ -1,111 +1,64 @@
 
 
-# AUDIT v4 — EmotionsCare
+## Plan : Ajouter les traductions allemandes et compléter FR/EN/DE sur toute la plateforme
 
-## 1. RESUME EXECUTIF
+### Constat actuel
 
-**Verdict : OUI SOUS CONDITIONS — Note globale : 17/20**
+L'application dispose de deux systèmes i18n parallèles :
+1. **Système principal** (`src/lib/i18n/locales/{fr,en}/`) — 11 namespaces (common, navigation, dashboard, settings, modules, auth, consent, errors, legal, journal, coach) avec FR et EN complets
+2. **Système secondaire** (`src/i18n/locales/{fr,en,de}.ts`) — squelettique, utilisé par `src/i18n/config.ts`
+3. **Fichiers JSON** (`public/locales/{fr,en}/`) — partiels (common, errors, breath)
 
-La plateforme a progressé de 13,5 (v1) à 16,5 (v3) à 17 (v4). Les bloquants P0 des trois audits précédents sont résolus : scanner connecté aux protocoles, onboarding soignant, FAQ nettoyée, CGU complètes, accents corrigés, quick actions fonctionnelles, lien "Premier pas" corrigé, ModulesHighlightSection renommée. La plateforme est production-grade pour une beta ouverte.
+Le **DE (allemand)** existe uniquement dans `src/i18n/locales/de.ts` avec un contenu riche mais n'est **pas branché** dans le système principal (`src/providers/i18n/resources.ts` ne charge que `fr` et `en`).
 
-**Publiable aujourd'hui : OUI SOUS CONDITIONS** (3 corrections mineures restantes, ~30 min)
+De plus, de nombreuses pages (100+) contiennent encore des **chaînes hardcodées en français** non internationalisées.
 
-### Top 5 risques restants
-1. **Boutons "Exporter" et "Partager" du dashboard** — `exportData()` fait un `logger.debug`, "Partager" n'a aucun `onClick`. Boutons morts sur le dashboard principal
-2. **Bouton "Settings" du dashboard** — aucun `onClick`, aucune navigation
-3. **Footer : liens sociaux non vérifiables** — twitter.com/emotionscare, instagram.com/emotionscare, etc. — probablement inexistants, liens morts = perte de crédibilité
-4. **Footer : 8 liens "Plateforme" vers pages protégées** — un visiteur non connecté est redirigé vers /login sans comprendre pourquoi
-5. **`<a href="/app/scan">` dans "Premier pas"** — utilise un tag `<a>` au lieu de `<Link>` de react-router, ce qui provoque un full page reload au lieu d'une navigation SPA
+### Plan d'implémentation
 
-### Top 5 forces
-1. Scanner émotionnel → protocole avec badge Pro : promesse centrale fonctionnelle
-2. Onboarding parfaitement aligné soignants (objectifs, expérience, préférences)
-3. FAQ propre, sans @ts-nocheck, sans affirmations mensongères
-4. CGU complètes (médiation, rétractation, SIRET, juridiction)
-5. Dashboard avec quick actions fonctionnelles et bloc "Premier pas"
+#### 1. Creer les fichiers de traduction DE (11 fichiers)
 
----
+Creer `src/lib/i18n/locales/de/` avec les 11 fichiers miroirs de FR/EN :
+- `common.ts`, `navigation.ts`, `dashboard.ts`, `settings.ts`, `modules.ts`, `auth.ts`, `consent.ts`, `errors.ts`, `legal.ts`, `journal.ts`, `coach.ts`
 
-## 2. TABLEAU SCORE GLOBAL
+Chaque fichier sera la traduction allemande complète des clés existantes en FR/EN.
 
-```text
-Dimension                    | Note | Observation                                      | Criticité   | Décision
------------------------------|------|--------------------------------------------------|-------------|------------------
-Compréhension produit        | 18   | Hero + onboarding + modules alignés soignants    | -           | Prêt
-Landing / Accueil            | 17   | Premium, sections cohérentes, proof sociale       | -           | Prêt
-Onboarding                   | 18   | Soignants, ARIA, progression, préférences         | -           | Prêt
-Navigation                   | 16   | Cohérente, footer liens protégés sans indication  | Mineur      | Améliorer
-Clarté UX                    | 16   | Dashboard guidé, 3 boutons morts restants         | Majeur      | Corriger
-Copywriting                  | 17   | Accents corrigés, textes clairs, FAQ propre       | -           | Prêt
-Crédibilité / confiance      | 17   | Fondatrice, témoignages, RGPD, CGU complètes     | -           | Prêt
-Fonctionnalité principale    | 18   | Scanner→protocole OK avec badge Pro               | -           | Prêt
-Parcours utilisateur         | 17   | Signup→onboarding→scan→protocole complet          | -           | Prêt
-Bugs / QA                    | 15   | 3 boutons morts dashboard, <a> au lieu de <Link>  | Majeur      | Corriger
-Sécurité préproduction       | 17   | RLS, auth, TEST_MODE off, sanitisation            | -           | Prêt
-Conformité go-live           | 18   | CGU, médiation, rétractation, SIRET, cookies      | -           | Prêt
-```
+#### 2. Brancher DE dans le système principal
 
----
+Modifier `src/providers/i18n/resources.ts` pour :
+- Importer les 11 modules DE
+- Ajouter la locale `de` dans l'objet `resources`
 
-## 3. PROBLEMES RESTANTS PRIORISES
+#### 3. Mettre à jour la configuration i18n
 
-### P1 — Très important
+- `src/lib/i18n.ts` : ajouter `'de'` dans `supportedLngs`
+- `src/lib/i18n/i18n.tsx` : ajouter le type `'de'` au type `Lang`
+- `src/i18n/locales/fr.ts` et `src/i18n/locales/en.ts` : ajouter `de: 'Allemand'` / `de: 'German'` dans `languageNames`
 
-**P1-1. Boutons "Exporter", "Partager", "Settings" du dashboard sont morts**
-- Où : `EnhancedUserDashboard.tsx` lignes 186-196
-- Problème : `exportData()` fait `logger.debug()`. "Partager" et "Settings" n'ont aucun `onClick`. Trois boutons visibles qui ne font rien.
-- Impact : L'utilisateur clique et rien ne se passe. Signal de produit inachevé.
-- Correction : Soit implémenter (export CSV, partager via URL, settings → /app/settings), soit retirer ces boutons en attendant l'implémentation.
+#### 4. Mettre à jour le sélecteur de langue
 
-**P1-2. `<a href="/app/scan">` au lieu de `<Link to="/app/scan">`**
-- Où : `EnhancedUserDashboard.tsx` ligne 162
-- Problème : Le CTA "Faire mon premier scan" dans le bloc "Premier pas" utilise `<a>` avec `Button asChild`, ce qui provoque un full page reload au lieu d'une navigation SPA fluide.
-- Correction : Remplacer par `<Link to="/app/scan">` pour maintenir l'état SPA.
+- `src/ui/NavBar.tsx` : supporter le cycle FR → EN → DE → FR
+- `src/i18n/LanguageSwitcher.tsx` : s'assurer que DE est dans les options (il utilise `SUPPORTED_LOCALES` qui inclut déjà `de`)
 
-### P2 — Amélioration forte valeur
+#### 5. Ajouter les fichiers JSON DE dans public/locales
 
-**P2-1. Footer : liens protégés sans indication pour visiteurs**
-- 8 liens sur 10 dans "Plateforme" pointent vers `/app/*`
-- Un visiteur non connecté sera redirigé vers /login silencieusement
-- Correction : Masquer les liens protégés pour les visiteurs non connectés ou ajouter un indicateur visuel (cadenas)
+Creer `public/locales/de/` avec `common.json`, `errors.json`, `breath.json`
 
-**P2-2. Footer : liens réseaux sociaux non vérifiables**
-- twitter.com/emotionscare, linkedin.com/company/emotionscare, instagram.com/emotionscare, youtube.com/@emotionscare
-- Si ces comptes n'existent pas = liens morts = perte de crédibilité immédiate
-- Correction : Vérifier l'existence, retirer ceux qui n'existent pas
+#### 6. Internationaliser les composants avec chaînes hardcodees
 
-### P3 — Finition
+Migrer progressivement les composants critiques contenant du texte FR hardcode :
+- `GroupHeader.tsx` : remplacer "Aujourd'hui"/"Hier" par `t('common.today')`/`t('common.yesterday')` et utiliser la locale dynamique pour `Intl.DateTimeFormat`
+- `NavBar.tsx` : utiliser les clés de traduction pour les liens
+- `Footer.tsx` : utiliser les clés de traduction pour les liens legaux
 
-- P3-1. `isB2BUser` vérifie `user.role === 'b2b'` mais les rôles définis sont `b2b_user` et `b2b_admin` — vérification probablement incorrecte
+### Details techniques
 
----
+- Les 11 fichiers DE suivront exactement la structure des fichiers EN existants
+- Le type `Lang` sera etendu a `'fr' | 'en' | 'de'`
+- Le `fallbackLng` reste `'fr'`
+- Environ **15-20 fichiers** seront modifies ou crees
 
-## 4. PLAN D'IMPLEMENTATION
+### Limites
 
-### Tâche 1 : Retirer ou implémenter les boutons morts du dashboard
-- Option recommandée : retirer "Exporter", "Partager", "Settings" (plus rapide, pas de fausse promesse)
-- Ou implémenter : export CSV des stats, settings → `/app/settings`
-
-### Tâche 2 : Corriger `<a>` → `<Link>` dans "Premier pas"
-- Ligne 162 : remplacer `<a href="/app/scan">` par `<Link to="/app/scan">`
-- Ajouter import `Link` depuis react-router-dom (déjà dans le fichier? à vérifier)
-
-### Tâche 3 : Corriger vérification rôle B2B
-- Ligne 47 : `user.role === 'b2b'` → `user.role === 'b2b_user' || user.role === 'b2b_admin'`
-
-### Tâche 4 : Nettoyer footer liens protégés
-- Conditionner l'affichage des liens `/app/*` à l'état d'authentification
-
----
-
-## 5. VERDICT FINAL
-
-La plateforme est **production-ready pour une beta ouverte**. Score 17/20. Toutes les corrections critiques des 3 audits précédents sont en place. Il reste 3 boutons morts sur le dashboard et un tag `<a>` à corriger — des défauts mineurs qui prennent 15 minutes.
-
-**Les 3 corrections les plus rentables :**
-1. Retirer les boutons Exporter/Partager/Settings morts (5 min, élimine la sensation de produit inachevé)
-2. Corriger `<a>` → `<Link>` dans "Premier pas" (2 min, navigation SPA propre)
-3. Corriger la vérification rôle B2B `'b2b'` → `'b2b_user' || 'b2b_admin'` (2 min, évite un bug logique)
-
-**Si j'étais décideur externe : je publierais aujourd'hui** après ces 3 micro-corrections. La plateforme est cohérente, professionnelle, sécurisée et la promesse centrale fonctionne de bout en bout.
+- Les 100+ pages avec texte FR hardcode ne seront pas toutes migrées dans cette iteration — seuls les composants partagés (NavBar, Footer, GroupHeader) et la configuration seront traités
+- Les pages individuelles (ModulesDashboard, UnifiedHomePage, etc.) necessiteront des passes supplementaires
 

@@ -1,19 +1,14 @@
-// @ts-nocheck
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { 
   Heart, 
   Mail, 
   MapPin, 
-  Phone,
   Twitter,
-  Linkedin,
-  Github
+  Linkedin
 } from 'lucide-react';
 
 const FOOTER_LINKS = {
   product: [
-    { label: 'Fonctionnalités', href: '/app/modules' },
     { label: 'Tarifs', href: '/pricing' },
     { label: 'Entreprise', href: '/entreprise' },
     { label: 'Démo', href: '/demo' }
@@ -21,12 +16,10 @@ const FOOTER_LINKS = {
   support: [
     { label: 'Centre d\'aide', href: '/help' },
     { label: 'FAQ', href: '/faq' },
-    { label: 'Contact', href: '/contact' },
-    { label: 'Tickets', href: '/support/tickets' }
+    { label: 'Contact', href: '/contact' }
   ],
   company: [
     { label: 'À propos', href: '/about' },
-    { label: 'Aide', href: '/help' },
     { label: 'FAQ', href: '/faq' },
     { label: 'Contact', href: '/contact' }
   ],
@@ -146,20 +139,14 @@ export const Footer: React.FC = () => {
             © 2025 EmotionsCare. Tous droits réservés.
           </p>
 
-          {/* Social links */}
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" className="p-2">
-              <Twitter className="w-4 h-4" />
-              <span className="sr-only">Twitter</span>
-            </Button>
-            <Button variant="ghost" size="sm" className="p-2">
-              <Linkedin className="w-4 h-4" />
-              <span className="sr-only">LinkedIn</span>
-            </Button>
-            <Button variant="ghost" size="sm" className="p-2">
-              <Github className="w-4 h-4" />
-              <span className="sr-only">GitHub</span>
-            </Button>
+          {/* Social links — disabled until accounts exist */}
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1" title="Bientôt disponible">
+              <Twitter className="w-3 h-3" /> Bientôt
+            </span>
+            <span className="flex items-center gap-1" title="Bientôt disponible">
+              <Linkedin className="w-3 h-3" /> Bientôt
+            </span>
           </div>
         </div>
       </div>
