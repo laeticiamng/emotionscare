@@ -145,6 +145,28 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
 
+      {/* Bloc Premier pas — affiché si aucune session réalisée */}
+      {dashboardStats.totalSessions === 0 && (
+        <Card className="border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10">
+          <CardContent className="flex flex-col sm:flex-row items-center gap-4 py-6">
+            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Target className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1 text-center sm:text-left">
+              <h2 className="text-lg font-semibold">Bienvenue sur EmotionsCare !</h2>
+              <p className="text-muted-foreground text-sm">
+                Commencez par un scan émotionnel de 2 minutes pour recevoir des recommandations personnalisées.
+              </p>
+            </div>
+            <Button asChild className="flex-shrink-0">
+              <a href="/app/scanner">
+                Faire mon premier scan
+                <TrendingUp className="h-4 w-4 ml-2" />
+              </a>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
       {/* En-tête amélioré */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>

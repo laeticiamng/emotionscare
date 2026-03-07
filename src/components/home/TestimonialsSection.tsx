@@ -1,6 +1,6 @@
 /**
- * TestimonialsSection - Presentation des modules cles
- * Remplace les faux temoignages par une description des fonctionnalites
+ * ModulesHighlightSection - Présentation des modules clés
+ * Présente les fonctionnalités principales d'EmotionsCare
  */
 
 import React from 'react';
@@ -19,26 +19,26 @@ interface ModuleHighlight {
 const TestimonialsSection: React.FC = () => {
   const modules: ModuleHighlight[] = [
     {
-      title: "Scan emotionnel IA",
-      description: "Evaluez votre etat emotionnel en quelques questions et recevez des recommandations personnalisees adaptees a votre situation.",
+      title: "Scan émotionnel IA",
+      description: "Évaluez votre état émotionnel en quelques questions et recevez des recommandations personnalisées adaptées à votre situation.",
       icon: Brain,
-      highlight: 'Auto-evaluation',
+      highlight: 'Auto-évaluation',
     },
     {
       title: "Protocoles de respiration",
-      description: "Coherence cardiaque, technique 4-7-8, box breathing : des exercices guides de 3 minutes pour retrouver le calme.",
+      description: "Cohérence cardiaque, technique 4-7-8, box breathing : des exercices guidés de 3 minutes pour retrouver le calme.",
       icon: Heart,
       highlight: '3 minutes',
     },
     {
-      title: "Musicotherapie personnalisee",
-      description: "Frequences binaurales, ambiances apaisantes et compositions adaptees a votre etat emotionnel du moment.",
+      title: "Musicothérapie personnalisée",
+      description: "Fréquences binaurales, ambiances apaisantes et compositions adaptées à votre état émotionnel du moment.",
       icon: Music,
       highlight: 'Adaptatif',
     },
     {
-      title: "Coach IA Nyvee",
-      description: "Un accompagnement bienveillant disponible 24/7, adapte aux professionnels de sante et etudiants.",
+      title: "Coach IA Nyvée",
+      description: "Un accompagnement bienveillant disponible 24/7, adapté aux professionnels de santé et étudiants.",
       icon: Sparkles,
       highlight: 'Disponible 24/7',
     },
@@ -49,8 +49,8 @@ const TestimonialsSection: React.FC = () => {
       highlight: 'Sommeil',
     },
     {
-      title: "Donnees securisees",
-      description: "Vos donnees emotionnelles restent les votres. Conforme RGPD, heberge en France, aucune revente a des tiers.",
+      title: "Données sécurisées",
+      description: "Vos données émotionnelles restent les vôtres. Conforme RGPD, hébergé en France, aucune revente à des tiers.",
       icon: Shield,
       highlight: 'RGPD conforme',
     }
@@ -92,7 +92,7 @@ const TestimonialsSection: React.FC = () => {
               Des outils concrets pour votre bien-être
             </h2>
             <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-              Decouvrez les fonctionnalites d'EmotionsCare, concues pour les soignants et etudiants en sante.
+              Découvrez les fonctionnalités d'EmotionsCare, conçues pour les soignants et étudiants en santé.
             </p>
           </motion.div>
 

@@ -40,7 +40,7 @@ const LoginPage: React.FC = () => {
 
   usePageSEO({
     title: 'Connexion | EmotionsCare',
-    description: 'Connectez-vous a EmotionsCare, la plateforme de bien-etre emotionnel pour soignants et etudiants en sante.',
+    description: 'Connectez-vous à EmotionsCare, la plateforme de bien-être émotionnel pour soignants et étudiants en santé.',
     keywords: 'connexion, login, emotionscare, soignants, bien-etre',
     canonical: 'https://emotionscare.com/login',
   });
@@ -85,7 +85,7 @@ const LoginPage: React.FC = () => {
       await signIn(formData.email.trim(), formData.password);
 
       toast({
-        title: "Connexion reussie",
+        title: "Connexion réussie",
         description: "Bienvenue sur EmotionsCare !",
       });
 
@@ -98,8 +98,8 @@ const LoginPage: React.FC = () => {
       const errorMessages: Record<string, string> = {
         'Invalid login credentials': 'Email ou mot de passe incorrect',
         'Email not confirmed': 'Veuillez confirmer votre email',
-        'Too many requests': 'Trop de tentatives, reessayez plus tard',
-        'User not found': 'Aucun compte trouve avec cet email'
+        'Too many requests': 'Trop de tentatives, réessayez plus tard',
+        'User not found': 'Aucun compte trouvé avec cet email'
       };
 
       const errMsg = error instanceof Error ? error.message : 'Une erreur est survenue';
@@ -133,7 +133,7 @@ const LoginPage: React.FC = () => {
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6 group"
           >
             <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Retour a l'accueil</span>
+            <span>Retour à l'accueil</span>
           </Link>
 
           {/* Logo */}
@@ -156,7 +156,7 @@ const LoginPage: React.FC = () => {
               Connexion
             </CardTitle>
             <CardDescription className="text-center">
-              Accedez a votre espace EmotionsCare
+              Accédez à votre espace EmotionsCare
             </CardDescription>
           </CardHeader>
 
@@ -255,7 +255,7 @@ const LoginPage: React.FC = () => {
                   onClick={() => setForgotPasswordOpen(true)}
                   className="text-sm text-primary hover:underline focus:underline bg-transparent border-none cursor-pointer"
                 >
-                  Mot de passe oublie ?
+                  Mot de passe oublié ?
                 </button>
               </div>
 
@@ -293,7 +293,7 @@ const LoginPage: React.FC = () => {
                     to="/signup"
                     className="text-primary hover:underline font-medium focus:underline"
                   >
-                    Creer un compte
+                    Créer un compte
                   </Link>
                 </p>
               </div>
@@ -302,7 +302,7 @@ const LoginPage: React.FC = () => {
             {/* Security Notice */}
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground bg-muted/30 rounded-lg p-3">
               <Shield className="w-3 h-3" />
-              <span>Connexion securisee - RGPD conforme</span>
+              <span>Connexion sécurisée — RGPD conforme</span>
             </div>
           </CardContent>
         </Card>
