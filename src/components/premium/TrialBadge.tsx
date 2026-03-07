@@ -71,17 +71,11 @@ const TrialBadge: React.FC<TrialBadgeProps> = ({
   useEffect(() => {
     const stats = localStorage.getItem('trial-usage-stats');
     if (stats) {
-      setTrialStats(JSON.parse(stats));
-    } else {
-      // Generate sample stats for demo
-      const sampleStats = {
-        featuresUsed: Math.floor(Math.random() * 8) + 3,
-        totalFeatures: 12,
-        sessionsCompleted: Math.floor(Math.random() * 15) + 5,
-        emotionsTracked: Math.floor(Math.random() * 30) + 10,
-      };
-      setTrialStats(sampleStats);
-      localStorage.setItem('trial-usage-stats', JSON.stringify(sampleStats));
+      try {
+        setTrialStats(JSON.parse(stats));
+      } catch {
+        // Ignore parse errors
+      }
     }
   }, []);
 

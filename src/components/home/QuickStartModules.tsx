@@ -261,7 +261,7 @@ const QuickStartModules: React.FC = () => {
             className="text-center pt-8 space-y-4"
           >
             <p className="text-muted-foreground italic">
-              "Reviens avant que ton corps n'explose."
+              "Prenez quelques minutes pour réguler votre stress, entre deux gardes."
             </p>
             <Button size="lg" variant="outline" asChild>
               <Link to="/signup">
