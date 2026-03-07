@@ -41,7 +41,7 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
   const navigate = useNavigate();
 
   // Les collaborateurs B2B n'ont accès qu'à leurs données personnelles
-  const isB2BUser = user.role === 'b2b_user' || user.role === 'b2b_admin';
+  const isB2BUser = String(user.role).includes('b2b');
 
   // Fetch real dashboard data via hooks
   const { stats, weeklySummary, recommendations, isLoading } = useDashboard(user.id);
