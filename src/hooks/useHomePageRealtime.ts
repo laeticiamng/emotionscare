@@ -127,31 +127,7 @@ export function useHomePageRealtime(): UseHomePageRealtimeReturn {
     };
   }, []);
 
-  // Simuler des notifications communautaires
-  useEffect(() => {
-    const messages = [
-      'Marie vient de terminer son protocole Reset 🎉',
-      'Thomas a atteint 30 jours de série 🔥',
-      'Nouveau record : 500 sessions aujourd\'hui !',
-      'La communauté a atteint 25 000 membres !',
-      'Protocole nocturne le plus populaire ce soir 🌙',
-    ];
-
-    const interval = setInterval(() => {
-      if (Math.random() > 0.7) {
-        const newNotification: RealtimeNotification = {
-          id: crypto.randomUUID(),
-          type: 'community',
-          message: messages[Math.floor(Math.random() * messages.length)],
-          timestamp: new Date(),
-        };
-
-        setNotifications(prev => [newNotification, ...prev].slice(0, 10));
-      }
-    }, 45000);
-
-    return () => clearInterval(interval);
-  }, []);
+  // Notifications communautaires fictives supprimées (politique anti-fake)
 
   const clearNotifications = useCallback(() => {
     setNotifications([]);
