@@ -33,7 +33,6 @@ import {
 } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
 import { usePageSEO } from '@/hooks/usePageSEO';
-import SeoHead from '@/components/seo/SeoHead';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -236,12 +235,6 @@ const HelpPage: React.FC = () => {
 
   return (
     <>
-      <SeoHead
-        title="Centre d'Aide - EmotionsCare"
-        description="Trouvez des réponses à vos questions sur EmotionsCare. FAQ, guides et contact support."
-        keywords="aide,support,FAQ,EmotionsCare,bien-être,santé mentale"
-      />
-
       <div className="min-h-screen bg-background">
         {/* Skip link */}
         <a

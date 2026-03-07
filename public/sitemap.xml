@@ -50,15 +50,21 @@
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://emotionscare.com/how-it-adapts</loc>
+    <loc>https://emotionscare.com/demo</loc>
     <lastmod>2026-03-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://emotionscare.com/demo</loc>
+    <loc>https://emotionscare.com/scanner</loc>
     <lastmod>2026-03-07</lastmod>
     <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://emotionscare.com/store</loc>
+    <lastmod>2026-03-07</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
 
@@ -74,14 +80,6 @@
     <lastmod>2026-03-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-  </url>
-
-  <!-- Boutique -->
-  <url>
-    <loc>https://emotionscare.com/store</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
   </url>
 
   <!-- Pages légales -->
@@ -115,24 +113,28 @@
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
+  <url>
+    <loc>https://emotionscare.com/legal/licenses</loc>
+    <lastmod>2026-03-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://emotionscare.com/privacy</loc>
+    <lastmod>2026-03-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
 
-  <!-- Auth pages -->
+  <!-- Auth pages (noindex mais présentes pour exhaustivité crawl) -->
   <url>
     <loc>https://emotionscare.com/login</loc>
     <lastmod>2026-03-07</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.4</priority>
   </url>
   <url>
     <loc>https://emotionscare.com/signup</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <!-- API publique -->
-  <url>
-    <loc>https://emotionscare.com/api-publique</loc>
     <lastmod>2026-03-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>

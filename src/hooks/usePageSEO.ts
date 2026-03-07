@@ -1,5 +1,14 @@
 import { useEffect } from 'react';
 
+const BASE_URL = 'https://emotionscare.com';
+const SITE_NAME = 'EmotionsCare';
+const DEFAULT_OG_IMAGE = `${BASE_URL}/og-image.png`;
+const DEFAULT_DESCRIPTION =
+  "Première plateforme française de régulation émotionnelle pour soignants et étudiants en santé. Protocoles de 2 à 5 minutes basés sur les neurosciences.";
+
+/** Marker attribute so the hook only removes JSON-LD it owns */
+const JSONLD_MARKER = 'data-seo-hook';
+
 interface PageSEOOptions {
   title: string;
   description?: string;
@@ -10,227 +19,176 @@ interface PageSEOOptions {
   twitterCard?: string;
   twitterImage?: string;
   canonical?: string;
-  structuredData?: Record<string, any>;
+  noIndex?: boolean;
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
   includeOrganization?: boolean;
 }
 
 /**
- * Hook pour gérer le SEO d'une page
- * Ajoute automatiquement title, meta description, balises Open Graph et JSON-LD structured data
- * 
- * @example
- * usePageSEO({
- *   title: 'Dashboard Particulier',
- *   description: 'Suivez vos émotions et progressez avec EmotionsCare',
- *   keywords: 'émotions, bien-être, dashboard',
- *   structuredData: {
- *     '@context': 'https://schema.org',
- *     '@type': 'WebApplication',
- *     name: 'EmotionsCare'
- *   }
- * });
+ * Hook pour gérer le SEO d'une page.
+ * - Title, meta description, OG, Twitter Card, canonical, robots.
+ * - JSON-LD structuré (ne supprime que les scripts qu'il a lui-même créés).
  */
 export const usePageSEO = ({
   title,
-  description,
+  description = DEFAULT_DESCRIPTION,
   keywords,
-  ogImage,
+  ogImage = DEFAULT_OG_IMAGE,
   ogImageAlt,
   ogType = 'website',
   twitterCard = 'summary_large_image',
   twitterImage,
   canonical,
+  noIndex = false,
   structuredData,
-  includeOrganization = false
+  includeOrganization = false,
 }: PageSEOOptions) => {
   useEffect(() => {
-    // Title
-    document.title = `${title} | EmotionsCare`;
+    // ── Title ──
+    const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
+    document.title = fullTitle;
 
-    // Meta description
-    if (description) {
-      updateOrCreateMeta('description', description);
-    }
+    // ── Meta ──
+    upsertMeta('description', description);
+    if (keywords) upsertMeta('keywords', keywords);
 
-    // Meta keywords
-    if (keywords) {
-      updateOrCreateMeta('keywords', keywords);
-    }
+    // ── Robots ──
+    upsertMeta('robots', noIndex ? 'noindex, follow' : 'index, follow');
 
-    // Canonical URL
-    if (canonical) {
-      updateOrCreateLink('canonical', canonical);
-    } else {
-      // Auto-générer l'URL canonique basée sur l'URL actuelle
-      const currentUrl = `${window.location.origin}${window.location.pathname}`;
-      updateOrCreateLink('canonical', currentUrl);
-    }
+    // ── Canonical ──
+    const canonicalUrl = canonical ?? `${BASE_URL}${window.location.pathname}`;
+    upsertLink('canonical', canonicalUrl);
 
-    // Open Graph
-    updateOrCreateMeta('og:title', `${title} | EmotionsCare`, 'property');
-    if (description) {
-      updateOrCreateMeta('og:description', description, 'property');
-    }
-    if (ogImage) {
-      updateOrCreateMeta('og:image', ogImage, 'property');
-      if (ogImageAlt) {
-        updateOrCreateMeta('og:image:alt', ogImageAlt, 'property');
+    // ── Open Graph ──
+    upsertMeta('og:title', fullTitle, 'property');
+    upsertMeta('og:description', description, 'property');
+    upsertMeta('og:image', resolveUrl(ogImage), 'property');
+    if (ogImageAlt) upsertMeta('og:image:alt', ogImageAlt, 'property');
+    upsertMeta('og:type', ogType, 'property');
+    upsertMeta('og:url', canonicalUrl, 'property');
+    upsertMeta('og:locale', 'fr_FR', 'property');
+    upsertMeta('og:site_name', SITE_NAME, 'property');
+
+    // ── Twitter Card ──
+    upsertMeta('twitter:card', twitterCard);
+    upsertMeta('twitter:title', fullTitle);
+    upsertMeta('twitter:description', description);
+    upsertMeta('twitter:image', resolveUrl(twitterImage ?? ogImage));
+
+    // ── JSON-LD ──
+    const schemas: Record<string, unknown>[] = [];
+
+    if (includeOrganization) schemas.push(getOrganizationSchema());
+
+    if (structuredData) {
+      if (Array.isArray(structuredData)) {
+        schemas.push(...structuredData);
+      } else {
+        schemas.push(structuredData);
       }
     }
-    updateOrCreateMeta('og:type', ogType, 'property');
-    updateOrCreateMeta('og:url', canonical || window.location.href, 'property');
 
-    // Twitter Card
-    updateOrCreateMeta('twitter:card', twitterCard);
-    updateOrCreateMeta('twitter:title', `${title} | EmotionsCare`);
-    if (description) {
-      updateOrCreateMeta('twitter:description', description);
-    }
-    if (twitterImage) {
-      updateOrCreateMeta('twitter:image', twitterImage);
-    }
-
-    // Structured Data (JSON-LD)
-    const allStructuredData: any[] = [];
-
-    // Ajouter Organization schema si demandé
-    if (includeOrganization) {
-      allStructuredData.push(getOrganizationSchema());
-    }
-
-    // Ajouter les données structurées personnalisées
-    if (structuredData) {
-      allStructuredData.push(structuredData);
-    }
-
-    // Ajouter BreadcrumbList automatiquement
+    // BreadcrumbList auto
     const breadcrumbs = generateBreadcrumbs();
-    if (breadcrumbs.itemListElement.length > 1) {
-      allStructuredData.push(breadcrumbs);
-    }
+    if (breadcrumbs.itemListElement.length > 1) schemas.push(breadcrumbs);
 
-    // Injecter tous les schémas
-    if (allStructuredData.length > 0) {
-      updateOrCreateStructuredData(allStructuredData);
-    }
-  }, [title, description, keywords, ogImage, ogImageAlt, ogType, twitterCard, twitterImage, canonical, structuredData, includeOrganization]);
+    if (schemas.length > 0) injectJsonLd(schemas);
+
+    // Cleanup only hook-owned JSON-LD on unmount
+    return () => {
+      document.querySelectorAll(`script[${JSONLD_MARKER}]`).forEach((s) => s.remove());
+    };
+  }, [title, description, keywords, ogImage, ogImageAlt, ogType, twitterCard, twitterImage, canonical, noIndex, structuredData, includeOrganization]);
 };
 
-function updateOrCreateMeta(
-  name: string, 
-  content: string, 
-  attribute: 'name' | 'property' = 'name'
-) {
-  let meta = document.querySelector(`meta[${attribute}="${name}"]`) as HTMLMetaElement;
-  
-  if (!meta) {
-    meta = document.createElement('meta');
-    meta.setAttribute(attribute, name);
-    document.head.appendChild(meta);
-  }
-  
-  meta.setAttribute('content', content);
+/* ── Helpers ── */
+
+function resolveUrl(value: string): string {
+  if (/^https?:\/\//i.test(value)) return value;
+  return `${BASE_URL}${value.startsWith('/') ? value : `/${value}`}`;
 }
 
-function updateOrCreateStructuredData(data: any | any[]) {
-  // Supprimer tous les anciens scripts JSON-LD
-  const existingScripts = document.querySelectorAll('script[type="application/ld+json"]');
-  existingScripts.forEach(script => script.remove());
-
-  // Si on a un tableau de données, créer un graphe JSON-LD
-  if (Array.isArray(data)) {
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.textContent = JSON.stringify({
-      '@context': 'https://schema.org',
-      '@graph': data
-    }, null, 2);
-    document.head.appendChild(script);
-  } else {
-    // Sinon créer un script simple
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.textContent = JSON.stringify(data, null, 2);
-    document.head.appendChild(script);
+function upsertMeta(name: string, content: string, attr: 'name' | 'property' = 'name') {
+  let el = document.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
+  if (!el) {
+    el = document.createElement('meta');
+    el.setAttribute(attr, name);
+    document.head.appendChild(el);
   }
+  el.setAttribute('content', content);
 }
 
-function updateOrCreateLink(rel: string, href: string) {
-  let link = document.querySelector(`link[rel="${rel}"]`) as HTMLLinkElement;
-
-  if (!link) {
-    link = document.createElement('link');
-    link.rel = rel;
-    document.head.appendChild(link);
+function upsertLink(rel: string, href: string) {
+  let el = document.querySelector(`link[rel="${rel}"]`) as HTMLLinkElement | null;
+  if (!el) {
+    el = document.createElement('link');
+    el.rel = rel;
+    document.head.appendChild(el);
   }
-
-  link.href = href;
+  el.href = href;
 }
 
-/**
- * Génère le schema Organization pour EmotionsCare
- */
-function getOrganizationSchema() {
+function injectJsonLd(data: Record<string, unknown>[]) {
+  // Remove only hook-owned scripts
+  document.querySelectorAll(`script[${JSONLD_MARKER}]`).forEach((s) => s.remove());
+
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.setAttribute(JSONLD_MARKER, 'true');
+  script.textContent = JSON.stringify(
+    { '@context': 'https://schema.org', '@graph': data },
+    null,
+    2,
+  );
+  document.head.appendChild(script);
+}
+
+function getOrganizationSchema(): Record<string, unknown> {
   return {
     '@type': 'Organization',
-    '@id': 'https://emotionscare.com/#organization',
-    name: 'EmotionsCare',
-    url: 'https://emotionscare.com',
+    '@id': `${BASE_URL}/#organization`,
+    name: 'EMOTIONSCARE SASU',
+    url: BASE_URL,
     logo: {
       '@type': 'ImageObject',
-      url: 'https://emotionscare.com/logo.svg',
-      width: 512,
-      height: 512
+      url: `${BASE_URL}/og-image.png`,
+      width: 1200,
+      height: 630,
     },
-    sameAs: [],
+    description: DEFAULT_DESCRIPTION,
+    foundingDate: '2024',
+    areaServed: { '@type': 'Place', name: 'France' },
     contactPoint: {
       '@type': 'ContactPoint',
-      contactType: 'customer support',
+      contactType: 'customer service',
       email: 'contact@emotionscare.com',
-      availableLanguage: ['fr', 'en']
+      url: `${BASE_URL}/contact`,
+      availableLanguage: ['French', 'English'],
     },
-    description: 'Plateforme d\'intelligence émotionnelle pour le bien-être personnel et professionnel. Analysez et améliorez vos émotions avec nos outils innovants.',
-    foundingDate: '2023',
-    slogan: 'Transformez votre bien-être émotionnel avec l\'IA'
+    sameAs: [],
   };
 }
 
-/**
- * Génère automatiquement le schema BreadcrumbList basé sur l'URL
- */
-function generateBreadcrumbs() {
+function generateBreadcrumbs(): { '@type': string; itemListElement: Record<string, unknown>[] } {
   const pathname = window.location.pathname;
   const segments = pathname.split('/').filter(Boolean);
 
-  const breadcrumbItems = [
-    {
-      '@type': 'ListItem',
-      position: 1,
-      name: 'Accueil',
-      item: window.location.origin
-    }
+  const items: Record<string, unknown>[] = [
+    { '@type': 'ListItem', position: 1, name: 'Accueil', item: BASE_URL },
   ];
 
   let currentPath = '';
-  segments.forEach((segment, index) => {
-    currentPath += `/${segment}`;
-    const name = segment
-      .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-
-    breadcrumbItems.push({
+  segments.forEach((seg, i) => {
+    currentPath += `/${seg}`;
+    items.push({
       '@type': 'ListItem',
-      position: index + 2,
-      name,
-      item: `${window.location.origin}${currentPath}`
+      position: i + 2,
+      name: seg.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+      item: `${BASE_URL}${currentPath}`,
     });
   });
 
-  return {
-    '@type': 'BreadcrumbList',
-    itemListElement: breadcrumbItems
-  };
+  return { '@type': 'BreadcrumbList', itemListElement: items };
 }
 
 export default usePageSEO;

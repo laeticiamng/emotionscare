@@ -13,12 +13,19 @@ import { loginSchema, type LoginFormData } from '@/lib/validations/auth';
 import { sanitizeInput } from '@/lib/validation/validator';
 import { getFriendlyAuthError } from '@/lib/auth/authErrorService';
 import ForgotPasswordDialog from '@/pages/b2c/login/ForgotPasswordDialog';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 interface LocationState {
   from?: string;
 }
 
 export default function UnifiedLoginPage() {
+  usePageSEO({
+    title: 'Connexion',
+    description: 'Connectez-vous à votre espace EmotionsCare pour accéder à vos outils de régulation émotionnelle.',
+    canonical: 'https://emotionscare.com/login',
+    noIndex: true,
+  });
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();

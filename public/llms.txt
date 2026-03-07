@@ -96,4 +96,4 @@ Les protocoles EmotionsCare s'appuient sur :
 
 ## Informations complémentaires
 
-Pour plus de détails, voir : https://emotionscare.com/llms-full.txt
+Ce fichier est également disponible à : https://emotionscare.com/.well-known/llms.txt

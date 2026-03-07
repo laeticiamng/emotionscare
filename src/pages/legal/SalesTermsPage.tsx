@@ -8,12 +8,20 @@ import {
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { routes } from '@/lib/routes';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 /**
  * Page Conditions Générales de Vente (CGV) - Conforme Code de la Consommation
  */
 export const SalesTermsPage: React.FC = () => {
   const navigate = useNavigate();
+
+  usePageSEO({
+    title: 'Conditions Générales de Vente',
+    description: 'Conditions générales de vente EmotionsCare : prix, paiement, droit de rétractation, livraison et garanties pour les abonnements premium.',
+    keywords: 'CGV, conditions de vente, prix, abonnement, rétractation, EmotionsCare',
+    canonical: 'https://emotionscare.com/legal/sales',
+  });
 
   return (
     <div className="min-h-screen bg-background p-6">

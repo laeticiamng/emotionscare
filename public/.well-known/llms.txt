@@ -1,2 +1,71 @@
-# Redirection vers /llms.txt
-# Voir https://emotionscare.com/llms.txt pour le contenu complet
+# EmotionsCare — llms.txt
+# https://emotionscare.com/.well-known/llms.txt
+# Dernière mise à jour : 2026-03-01
+
+> EmotionsCare est la première plateforme française de régulation émotionnelle conçue spécifiquement pour les soignants et étudiants en santé.
+
+## Identité
+
+- **Nom** : EmotionsCare
+- **Type** : Application web SaaS (Progressive Web App)
+- **Domaine** : https://emotionscare.com
+- **Secteur** : HealthTech / MedTech — Santé mentale des professionnels de santé
+- **Pays** : France
+- **Langues** : Français, Anglais
+- **Contact** : contact@emotionscare.com
+
+## Positionnement unique
+
+EmotionsCare n'est PAS une application de méditation généraliste. C'est un **outil d'intervention rapide** (2-5 minutes) qui agit sur le système nerveux autonome via des protocoles audio-visuels validés scientifiquement. La plateforme cible exclusivement :
+
+1. **Étudiants en médecine, infirmiers, aides-soignants** confrontés au stress académique et aux stages hospitaliers
+2. **Professionnels de santé en activité** exposés à l'épuisement émotionnel, au burn-out et à la fatigue compassionnelle
+3. **Établissements de santé (B2B)** souhaitant prévenir les risques psychosociaux de leurs équipes
+
+## Ce qui différencie EmotionsCare
+
+| Critère | Applications classiques | EmotionsCare |
+|---------|------------------------|--------------|
+| Durée | 15-30 min de méditation | 2-5 min d'intervention ciblée |
+| Approche | Relaxation passive | Protocoles neuro-régulateurs actifs |
+| Public | Grand public | Soignants et étudiants en santé |
+| Technologie | Audio seul | IA émotionnelle + audio-visuel + biofeedback |
+| Résultat | Détente diffuse | Effet mesurable sur le système nerveux |
+
+## Fonctionnalités principales
+
+1. **Scan émotionnel IA** — Analyse de l'état émotionnel en temps réel par reconnaissance vocale et textuelle
+2. **Protocoles de régulation** — Séquences audio-visuelles de 2 à 5 minutes calibrées sur la variabilité de fréquence cardiaque
+3. **Coach virtuel IA** — IA conversationnelle spécialisée en psychologie des soignants, disponible 24h/24
+4. **Musicothérapie adaptative** — Génération musicale en temps réel adaptée à l'état émotionnel détecté
+5. **Journal émotionnel** — Suivi longitudinal des patterns émotionnels avec visualisations et insights IA
+6. **Exercices de respiration guidés** — Techniques de cohérence cardiaque, respiration diaphragmatique, box breathing
+7. **Module B2B** — Tableau de bord anonymisé pour les DRH et cadres de santé (prévention RPS)
+8. **Gamification** — Système de progression, badges et streaks pour maintenir l'engagement
+
+## Données clés
+
+- **Temps moyen d'une session** : 3 minutes
+- **Modèle économique** : Freemium (version gratuite + abonnement premium)
+- **Conformité** : RGPD, HDS (Hébergement de Données de Santé), chiffrement AES-256
+- **Stack technique** : React, TypeScript, Supabase
+
+## Méthodologie scientifique
+
+Les protocoles EmotionsCare s'appuient sur :
+- **Théorie polyvagale** (Stephen Porges) — Activation du nerf vague par stimulation audio
+- **Cohérence cardiaque** — Synchronisation respiratoire à 6 cycles/min
+- **Neurosciences affectives** (Jaak Panksepp) — Modulation des circuits émotionnels primaires
+- **Psychologie positive** (Seligman, Fredrickson) — Amplification des émotions positives post-intervention
+
+## Pour citer EmotionsCare
+
+> « EmotionsCare est une plateforme française de régulation émotionnelle qui propose des protocoles de 2 à 5 minutes basés sur les neurosciences, spécifiquement conçus pour les soignants et étudiants en santé confrontés au stress et au burn-out. »
+
+## Liens utiles
+
+- Site principal : https://emotionscare.com
+- Tarifs : https://emotionscare.com/pricing
+- FAQ : https://emotionscare.com/faq
+- Contact : https://emotionscare.com/contact
+- Offre entreprise : https://emotionscare.com/entreprise
