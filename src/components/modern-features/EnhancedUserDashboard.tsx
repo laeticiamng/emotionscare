@@ -44,7 +44,7 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
   const navigate = useNavigate();
 
   // Les collaborateurs B2B n'ont accès qu'à leurs données personnelles
-  const isB2BUser = user.role === 'b2b_user';
+  const isB2BUser = user.role === 'b2b';
 
   // Fetch real dashboard data via hooks
   const { stats, weeklySummary, recommendations, isLoading } = useDashboard(user.id);
@@ -53,8 +53,8 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
   // Calculate dashboard stats from real API data
   const dashboardStats = {
     weeklyProgress: stats?.wellnessScore || 0,
-    monthlyGoals: stats?.monthlyGoals || 10,
-    completedGoals: stats?.completedGoals || 0,
+    monthlyGoals: 10,
+    completedGoals: Math.min(stats?.totalSessions || 0, 10),
     currentStreak: stats?.streakDays || 0,
     totalSessions: stats?.totalSessions || 0,
     averageRating: weeklyData?.today?.glow_score ? weeklyData.today.glow_score / 10 : 0,
