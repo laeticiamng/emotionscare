@@ -40,7 +40,7 @@ interface FAQQuestion {
 interface FAQCategory {
   id: string;
   category: string;
-  icon: React.ElementType;
+  icon: React.FC<{ className?: string; 'aria-hidden'?: string | boolean }>;
   questions: FAQQuestion[];
 }
 
