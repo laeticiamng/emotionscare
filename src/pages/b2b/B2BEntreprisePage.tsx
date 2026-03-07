@@ -124,26 +124,26 @@ const useCases = [
   {
     icon: Hospital,
     title: 'Hôpitaux',
-    description: 'Réduisez le turnover des soignants en offrant des micro-pauses émotionnelles intégrées aux roulements.',
-    stat: '-30% absentéisme',
+    description: 'Offrez des micro-pauses émotionnelles intégrées aux roulements pour soutenir vos soignants au quotidien.',
+    stat: '3 min/exercice',
   },
   {
     icon: Stethoscope,
     title: 'Cliniques privées',
-    description: 'Améliorez la satisfaction patient en prenant soin du bien-être de vos équipes soignantes.',
-    stat: '+25% satisfaction',
+    description: 'Prenez soin du bien-être de vos équipes soignantes avec des protocoles validés et non intrusifs.',
+    stat: '100% anonyme',
   },
   {
     icon: GraduationCap,
     title: 'Facultés de médecine',
     description: 'Accompagnez vos étudiants face au stress des examens et des premiers stages cliniques.',
-    stat: '-40% stress étudiant',
+    stat: '2-5 min/session',
   },
   {
     icon: HomeIcon,
     title: 'EHPAD',
     description: 'Soutenez vos aides-soignants face à la charge émotionnelle du soin aux personnes âgées.',
-    stat: '+35% rétention',
+    stat: '24h déploiement',
   },
 ];
 
