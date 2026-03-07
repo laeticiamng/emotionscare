@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import EnhancedHeader from './enhanced-header';
 import EnhancedFooter from './enhanced-footer';
 import CommandMenu from './command-menu';
@@ -56,7 +56,7 @@ const EnhancedShell: React.FC = () => {
     {
       icon: Settings,
       label: 'Paramètres',
-      onClick: () => window.location.href = '/preferences'
+      onClick: () => navigate('/preferences')
     },
     {
       icon: HelpCircle,

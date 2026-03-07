@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Zap, Wind, Heart, Brain, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -7,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
 const QuickActions = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
   const quickActions = [
@@ -15,7 +17,7 @@ const QuickActions = () => {
       label: 'Scan Express',
       description: 'État émotionnel en 30s',
       action: () => {
-        window.location.href = '/app/scan';
+        navigate('/app/scan');
         toast.success('Scan émotionnel lancé');
       },
       color: 'from-blue-500 to-cyan-500'
@@ -25,7 +27,7 @@ const QuickActions = () => {
       label: 'Flash Glow',
       description: 'Boost instantané',
       action: () => {
-        window.location.href = '/app/flash-glow';
+        navigate('/app/flash-glow');
         toast.success('Flash Glow activé');
       },
       color: 'from-yellow-500 to-orange-500'
@@ -35,7 +37,7 @@ const QuickActions = () => {
       label: 'Respiration',
       description: 'Calme immédiat',
       action: () => {
-        window.location.href = '/app/breath';
+        navigate('/app/breath');
         toast.success('Session respiration démarrée');
       },
       color: 'from-green-500 to-emerald-500'
@@ -45,7 +47,7 @@ const QuickActions = () => {
       label: 'Journal',
       description: 'Exprimer ses pensées',
       action: () => {
-        window.location.href = '/app/journal';
+        navigate('/app/journal');
         toast.success('Journal ouvert');
       },
       color: 'from-pink-500 to-rose-500'
