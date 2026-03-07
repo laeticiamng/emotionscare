@@ -129,7 +129,7 @@ export default function FAQPage() {
   usePageSEO({
     title: 'FAQ - Questions Fréquentes - EmotionsCare',
     description: 'Trouvez les réponses à toutes vos questions sur EmotionsCare. Compte, fonctionnalités, facturation, sécurité et plus.',
-    keywords: ['FAQ', 'questions', 'aide', 'EmotionsCare', 'support', 'bien-être'],
+    keywords: 'FAQ, questions, aide, EmotionsCare, support, bien-être',
   });
 
   const { runAudit } = useAccessibilityAudit();
