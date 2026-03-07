@@ -44,7 +44,7 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
   const navigate = useNavigate();
 
   // Les collaborateurs B2B n'ont accès qu'à leurs données personnelles
-  const isB2BUser = user.role === 'b2b';
+  const isB2BUser = user.role === 'b2b_user' || user.role === 'b2b_admin';
 
   // Fetch real dashboard data via hooks
   const { stats, weeklySummary, recommendations, isLoading } = useDashboard(user.id);
@@ -117,11 +117,6 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
     }
   };
 
-  const exportData = () => {
-    // Simulation de l'export
-    logger.debug('Export des données...', undefined, 'UI');
-  };
-
   useEffect(() => {
     const interval = setInterval(() => {
       setLastUpdate(new Date());
@@ -159,10 +154,10 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
               </p>
             </div>
             <Button asChild className="flex-shrink-0">
-              <a href="/app/scan">
+              <Link to="/app/scan">
                 Faire mon premier scan
                 <TrendingUp className="h-4 w-4 ml-2" />
-              </a>
+              </Link>
             </Button>
           </CardContent>
         </Card>
