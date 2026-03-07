@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePageSEO } from '@/hooks/usePageSEO';
-import { SeoHead } from '@/lib/seo/SeoHead';
 
 const ProductScreenshots = lazy(() => import('@/components/marketing/ProductScreenshots'));
 
@@ -281,11 +280,6 @@ const FeaturesPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
-      <SeoHead
-        title="Fonctionnalités"
-        description="37 modules intégrés pour gérer votre stress et améliorer votre bien-être émotionnel. Scanner IA, respiration, journal, coach Nyvée, musicothérapie, VR et plus."
-        url="/features"
-      />
 
       {/* ═══ HERO ═══ */}
       <section className="relative pt-20 pb-16 md:pt-24 md:pb-20 overflow-hidden">

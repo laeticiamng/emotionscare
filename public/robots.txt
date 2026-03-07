@@ -83,6 +83,14 @@ Disallow: /dashboard/
 Disallow: /admin/
 Disallow: /api/
 
+User-agent: OAI-SearchBot
+Allow: /
+Allow: /llms.txt
+Disallow: /app/
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /api/
+
 # Bloquer les scrapers non pertinents
 User-agent: CCBot
 Disallow: /
