@@ -23,6 +23,8 @@ const SupportChatbotPage = lazy(() => import('@/pages/SupportChatbotPage'));
 const PublicAPIPage = lazy(() => import('@/pages/PublicAPIPage'));
 const InstallPage = lazy(() => import('@/pages/InstallPage'));
 const HowItAdaptsPage = lazy(() => import('@/pages/HowItAdaptsPage'));
+const UseCasesPage = lazy(() => import('@/pages/UseCasesPage'));
+const SecurityPage = lazy(() => import('@/pages/SecurityPage'));
 
 // Pages légales
 const MentionsLegalesPage = lazy(() => import('@/pages/legal/MentionsLegalesPage'));
@@ -71,6 +73,8 @@ export const publicComponentMap = {
   PublicAPIPage,
   InstallPage,
   HowItAdaptsPage,
+  UseCasesPage,
+  SecurityPage,
 
   // Legal
   MentionsLegalesPage,
