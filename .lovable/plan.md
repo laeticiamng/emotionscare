@@ -1,64 +1,112 @@
 
 
-## Plan : Ajouter les traductions allemandes et compléter FR/EN/DE sur toute la plateforme
+# AUDIT v7 — EmotionsCare
 
-### Constat actuel
+## 1. RESUME EXECUTIF
 
-L'application dispose de deux systèmes i18n parallèles :
-1. **Système principal** (`src/lib/i18n/locales/{fr,en}/`) — 11 namespaces (common, navigation, dashboard, settings, modules, auth, consent, errors, legal, journal, coach) avec FR et EN complets
-2. **Système secondaire** (`src/i18n/locales/{fr,en,de}.ts`) — squelettique, utilisé par `src/i18n/config.ts`
-3. **Fichiers JSON** (`public/locales/{fr,en}/`) — partiels (common, errors, breath)
+**Verdict : OUI SOUS CONDITIONS — Note globale : 17,5/20**
 
-Le **DE (allemand)** existe uniquement dans `src/i18n/locales/de.ts` avec un contenu riche mais n'est **pas branché** dans le système principal (`src/providers/i18n/resources.ts` ne charge que `fr` et `en`).
+La plateforme est solide sur son coeur fonctionnel (scanner, onboarding, dashboard, securite). Les audits v1-v6 ont corrige les bloquants majeurs. Cependant, trois problemes subsistent qui empechent un 20/20 : (1) CommunityEngagement.tsx contient des fausses donnees (3421 participants, leaderboard fictif, micro-copy inapproprie), (2) des dizaines de `window.location.href` au lieu de `useNavigate` provoquent des full page reloads cassant l'experience SPA, (3) la video d'onboarding utilise un sample video Google ("Big Buck Bunny") au lieu d'un vrai contenu.
 
-De plus, de nombreuses pages (100+) contiennent encore des **chaînes hardcodées en français** non internationalisées.
+**Publiable aujourd'hui : OUI SOUS CONDITIONS** (~45 min de corrections)
 
-### Plan d'implémentation
+### Top 5 risques restants
+1. **CommunityEngagement.tsx** : fausses stats (3421/2156/1847 participants), leaderboard fictif (Alex C., Jordan M., etc.), micro-copy "Reviens avant que ton corps n'explose" — inapproprie pour une plateforme sante
+2. **~60 occurrences de `window.location.href`** dans 16 fichiers de composants — chaque clic provoque un full page reload au lieu d'une navigation SPA fluide
+3. **Video onboarding** : Big Buck Bunny (sample Google) comme video de bienvenue — signal de produit non termine
+4. **Footer "Fonctionnalites" en doublon** : present dans Plateforme ET Ressources (lignes 16+21)
+5. **Footer "A propos" en doublon** : present dans Plateforme ET Ressources (lignes 18+23)
 
-#### 1. Creer les fichiers de traduction DE (11 fichiers)
+### Top 5 forces
+1. Scanner emotionnel → protocole avec badge Pro : promesse centrale fonctionnelle
+2. Dashboard complet avec donnees reelles (hooks useDashboard, useDashboardWeekly)
+3. Securite solide : RLS, auth, TEST_MODE off, sanitisation, CSP
+4. Onboarding soignant : objectifs, experience, preferences
+5. Footer propre : liens sociaux desactives, liens proteges retires, copyright dynamique
 
-Creer `src/lib/i18n/locales/de/` avec les 11 fichiers miroirs de FR/EN :
-- `common.ts`, `navigation.ts`, `dashboard.ts`, `settings.ts`, `modules.ts`, `auth.ts`, `consent.ts`, `errors.ts`, `legal.ts`, `journal.ts`, `coach.ts`
+---
 
-Chaque fichier sera la traduction allemande complète des clés existantes en FR/EN.
+## 2. TABLEAU SCORE GLOBAL
 
-#### 2. Brancher DE dans le système principal
+```text
+Dimension                    | Note | Observation                                       | Criticite | Decision
+-----------------------------|------|---------------------------------------------------|-----------|------------------
+Comprehension produit        | 18   | Hero clair, value prop immediate                  | -         | Pret
+Landing / Accueil            | 16   | CommunityEngagement = fausses donnees             | Majeur    | Corriger
+Onboarding                   | 15   | Video placeholder Big Buck Bunny                  | Majeur    | Corriger
+Navigation                   | 15   | ~60 window.location.href = full reloads           | Majeur    | Corriger
+Clarte UX                    | 17   | Dashboard guide, quick actions fonctionnelles      | -         | Pret
+Copywriting                  | 16   | "Reviens avant que ton corps n'explose" inadapte  | Majeur    | Corriger
+Credibilite / confiance      | 16   | Faux leaderboard + faux participants              | Majeur    | Corriger
+Fonctionnalite principale    | 18   | Scanner→protocole OK                               | -         | Pret
+Parcours utilisateur         | 17   | Signup→onboarding→scan→dashboard complet           | -         | Pret
+Bugs / QA                    | 16   | Footer doublons, window.location.href             | Majeur    | Corriger
+Securite preproduction       | 17   | RLS, auth, sanitisation OK                         | -         | Pret
+Conformite go-live           | 18   | CGU, mediation, SIRET, cookies, RGPD               | -         | Pret
+```
 
-Modifier `src/providers/i18n/resources.ts` pour :
-- Importer les 11 modules DE
-- Ajouter la locale `de` dans l'objet `resources`
+---
 
-#### 3. Mettre à jour la configuration i18n
+## 3. PROBLEMES PRIORISES
 
-- `src/lib/i18n.ts` : ajouter `'de'` dans `supportedLngs`
-- `src/lib/i18n/i18n.tsx` : ajouter le type `'de'` au type `Lang`
-- `src/i18n/locales/fr.ts` et `src/i18n/locales/en.ts` : ajouter `de: 'Allemand'` / `de: 'German'` dans `languageNames`
+### P0 — Bloquant production
 
-#### 4. Mettre à jour le sélecteur de langue
+**P0-1. CommunityEngagement.tsx : fausses donnees et micro-copy inapproprie**
+- Ou : `src/components/home/CommunityEngagement.tsx`
+- Probleme : 3421/2156/1847 "participants actifs" sont des nombres inventes. Leaderboard avec "Alex C.", "Jordan M." etc. sont fictifs. Le micro-copy "Reviens avant que ton corps n'explose" est inapproprie pour une plateforme de sante destinee a des soignants.
+- Impact : Perte de credibilite immediate si un beta-testeur decouvre ces faux chiffres. Le micro-copy peut choquer des professionnels de sante.
+- Correction : Ce composant n'est importe nulle part (confirmed par search). **Le supprimer entierement** — il est orphelin et contient uniquement des donnees fictives.
 
-- `src/ui/NavBar.tsx` : supporter le cycle FR → EN → DE → FR
-- `src/i18n/LanguageSwitcher.tsx` : s'assurer que DE est dans les options (il utilise `SUPPORTED_LOCALES` qui inclut déjà `de`)
+### P1 — Tres important
 
-#### 5. Ajouter les fichiers JSON DE dans public/locales
+**P1-1. ~60 `window.location.href` dans 16 fichiers de composants**
+- Ou : NavBar.tsx, QuickActions.tsx, AppHeader.tsx, enhanced-shell.tsx, enhanced-navigation.tsx, OnboardingTutorial.tsx, CommunityEngagement.tsx, EnhancedScanDashboard.tsx, etc.
+- Probleme : Chaque `window.location.href = '/path'` provoque un full page reload — perte de l'etat React, flash blanc, rechargement de tous les bundles JS/CSS. Contraire a une experience SPA.
+- Impact : L'utilisateur percoit le produit comme lent et non-fini. Sur mobile, chaque reload ajoute 1-3 secondes.
+- Correction : Remplacer par `useNavigate()` de react-router-dom dans tous les composants. Les error boundaries (`ErrorBoundary.tsx`, `CriticalErrorBoundary.tsx`, `ErrorFallback.tsx`) peuvent garder `window.location.href = '/'` car c'est intentionnel pour un hard reset.
 
-Creer `public/locales/de/` avec `common.json`, `errors.json`, `breath.json`
+**P1-2. Video onboarding = Big Buck Bunny**
+- Ou : `src/components/onboarding/WelcomeSection.tsx` ligne 121
+- Probleme : `src="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"` — un dessin anime de test Google. Un soignant qui decouvre la plateforme voit un lapin.
+- Impact : Perte de credibilite totale au premier contact post-signup.
+- Correction : Retirer la video entierement et mettre une illustration statique ou un placeholder "Video de presentation a venir", ou mieux : supprimer la section video et laisser les features + CTA.
 
-#### 6. Internationaliser les composants avec chaînes hardcodees
+### P2 — Amelioration forte valeur
 
-Migrer progressivement les composants critiques contenant du texte FR hardcode :
-- `GroupHeader.tsx` : remplacer "Aujourd'hui"/"Hier" par `t('common.today')`/`t('common.yesterday')` et utiliser la locale dynamique pour `Intl.DateTimeFormat`
-- `NavBar.tsx` : utiliser les clés de traduction pour les liens
-- `Footer.tsx` : utiliser les clés de traduction pour les liens legaux
+**P2-1. Footer : doublons de liens**
+- Ou : `src/components/home/Footer.tsx` lignes 14-28
+- Probleme : "Fonctionnalites" apparait dans Plateforme (ligne 17) ET Ressources (ligne 21). "A propos" apparait dans Plateforme (ligne 18) ET Ressources (ligne 23).
+- Correction : Retirer les doublons. Garder "Fonctionnalites" et "A propos" dans une seule colonne.
 
-### Details techniques
+---
 
-- Les 11 fichiers DE suivront exactement la structure des fichiers EN existants
-- Le type `Lang` sera etendu a `'fr' | 'en' | 'de'`
-- Le `fallbackLng` reste `'fr'`
-- Environ **15-20 fichiers** seront modifies ou crees
+## 4. PLAN D'IMPLEMENTATION
 
-### Limites
+### Tache 1 : Supprimer CommunityEngagement.tsx (orphelin, fausses donnees)
+- Le fichier n'est importe nulle part — suppression sans impact
+- Elimine faux participants, faux leaderboard, micro-copy inapproprie
 
-- Les 100+ pages avec texte FR hardcode ne seront pas toutes migrées dans cette iteration — seuls les composants partagés (NavBar, Footer, GroupHeader) et la configuration seront traités
-- Les pages individuelles (ModulesDashboard, UnifiedHomePage, etc.) necessiteront des passes supplementaires
+### Tache 2 : Corriger video onboarding WelcomeSection.tsx
+- Retirer la section video Big Buck Bunny
+- La remplacer par un espace vide ou une simple illustration placeholder
+
+### Tache 3 : Corriger doublons footer
+- Retirer "Fonctionnalites" et "A propos" de la colonne Ressources (ils sont deja dans Plateforme)
+
+### Tache 4 : Migrer window.location.href vers useNavigate (fichiers critiques)
+- Priorite : NavBar.tsx, enhanced-navigation.tsx, QuickActions.tsx, AppHeader.tsx, enhanced-shell.tsx, OnboardingTutorial.tsx, EnhancedScanDashboard.tsx
+- Conserver window.location.href uniquement dans les error boundaries (hard reset intentionnel) et les cas de share/navigator.share
+
+---
+
+## 5. VERDICT FINAL
+
+La plateforme est **production-ready pour une beta** apres ces 4 corrections. Score 17,5/20. Le coeur fonctionne. La securite est solide. L'UX est guidee.
+
+**Les 3 corrections les plus rentables :**
+1. Supprimer CommunityEngagement.tsx (2 min, elimine toutes les fausses donnees restantes)
+2. Retirer la video Big Buck Bunny de l'onboarding (5 min, elimine le signal "produit non fini")
+3. Corriger les doublons footer (2 min, proprete)
+
+La migration `window.location.href` est la plus longue (~30 min, 16 fichiers) mais la plus impactante sur la perception de qualite. Chaque full reload est un micro-abandon potentiel.
 
