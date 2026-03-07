@@ -47,8 +47,8 @@ const ContactPage: React.FC = () => {
 
   usePageSEO({
     title: 'Contact | EmotionsCare - Nous contacter',
-    description: 'Contactez l\'equipe EmotionsCare pour toute question sur la plateforme de bien-etre emotionnel pour soignants et etudiants en sante.',
-    keywords: 'contact, emotionscare, support, aide, soignants, bien-etre emotionnel',
+    description: 'Contactez l\'équipe EmotionsCare pour toute question sur la plateforme de bien-être émotionnel pour soignants et étudiants en santé.',
+    keywords: 'contact, EmotionsCare, support, aide, soignants, bien-être émotionnel',
     canonical: 'https://emotionscare.com/contact',
   });
 

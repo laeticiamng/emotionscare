@@ -90,7 +90,7 @@ Les protocoles EmotionsCare s'appuient sur :
 
 - Site principal : https://emotionscare.com
 - Tarifs : https://emotionscare.com/pricing  
-- FAQ : https://emotionscare.com/#faq
+- FAQ : https://emotionscare.com/faq
 - Contact : https://emotionscare.com/contact
 - Offre entreprise : https://emotionscare.com/entreprise
 
