@@ -24,6 +24,7 @@ interface NavItem {
 
 const EnhancedNavigation: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);

@@ -118,6 +118,7 @@ const InsightCard: React.FC<{ title: string; description: string; type: 'tip' | 
   };
 
 export const EnhancedScanDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const { data: history = [], isLoading } = useScanHistory(30);
   const [activeTab, setActiveTab] = useState('overview');
 

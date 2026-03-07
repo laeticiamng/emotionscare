@@ -17,6 +17,7 @@ interface ToastNotification {
 }
 
 const EnhancedShell: React.FC = () => {
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [scrollProgress, setScrollProgress] = React.useState(0);
   const [notifications, setNotifications] = React.useState<ToastNotification[]>([]);
