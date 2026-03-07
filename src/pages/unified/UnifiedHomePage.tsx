@@ -83,6 +83,17 @@ interface UseCase {
 
 export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePageProps) {
   logger.debug('[UnifiedHomePage] Starting render', { variant }, 'UI');
+
+  usePageSEO({
+    title: 'EmotionsCare - Régulation émotionnelle pour soignants en 3 minutes',
+    description: 'Première plateforme française de régulation émotionnelle pour soignants et étudiants en santé. Protocoles de 2 à 5 minutes basés sur les neurosciences. Gratuit pour commencer.',
+    keywords: 'soignants, étudiants santé, stress, burn-out, régulation émotionnelle, bien-être soignants',
+    ogType: 'website',
+    ogImage: 'https://emotionscare.com/og-image.svg',
+    ogImageAlt: 'EmotionsCare - Régulation émotionnelle pour soignants',
+    canonical: 'https://emotionscare.com/',
+    includeOrganization: true,
+  });
   
   // Initialiser les hooks et variables en dehors du try-catch
   const [searchParams] = useSearchParams();
