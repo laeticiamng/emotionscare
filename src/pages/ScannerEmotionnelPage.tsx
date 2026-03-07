@@ -7,6 +7,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePageSEO } from '@/hooks/usePageSEO';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -148,6 +149,13 @@ function getRecommendation(scores: Record<string, number>) {
 
 const ScannerEmotionnelPage: React.FC = () => {
   const navigate = useNavigate();
+
+  usePageSEO({
+    title: 'Scanner Émotionnel — Évaluez votre état en 60 secondes',
+    description: 'Évaluez votre état émotionnel en 5 dimensions (humeur, énergie, stress, sommeil, charge mentale) et recevez un protocole de régulation personnalisé.',
+    keywords: 'scanner émotionnel, auto-évaluation, stress soignants, humeur, énergie, bien-être',
+    canonical: 'https://emotionscare.com/scanner',
+  });
   const [currentStep, setCurrentStep] = useState(0);
   const [scores, setScores] = useState<Record<string, number>>({});
   const [showResults, setShowResults] = useState(false);
