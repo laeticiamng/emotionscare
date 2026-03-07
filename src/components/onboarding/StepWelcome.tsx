@@ -5,9 +5,8 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
-  Sparkles, ArrowRight, SkipForward, Users, Star, Shield, 
-  Clock, Heart, CheckCircle, Quote, ChevronLeft, ChevronRight,
-  Brain, Music, BookOpen, Activity
+  Sparkles, ArrowRight, SkipForward, Shield, 
+  Clock, CheckCircle, Brain, Music, BookOpen, Activity
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -15,40 +14,6 @@ interface StepWelcomeProps {
   onNext: () => void;
   onSkip: () => void;
 }
-
-const PLATFORM_STATS = {
-  users: 12500,
-  scansPerDay: 8700,
-  satisfactionRate: 96,
-  countries: 24
-};
-
-const TESTIMONIALS = [
-  {
-    id: 1,
-    name: 'Marie L.',
-    role: 'Professeur de yoga',
-    text: 'EmotionsCare m\'aide à mieux comprendre mes émotions au quotidien.',
-    rating: 5,
-    avatar: '🧘‍♀️'
-  },
-  {
-    id: 2,
-    name: 'Thomas D.',
-    role: 'Entrepreneur',
-    text: 'Les exercices de respiration m\'ont transformé. Je gère beaucoup mieux mon stress.',
-    rating: 5,
-    avatar: '💼'
-  },
-  {
-    id: 3,
-    name: 'Sophie M.',
-    role: 'Étudiante',
-    text: 'Le journal émotionnel est devenu mon meilleur allié pendant les examens.',
-    rating: 5,
-    avatar: '📚'
-  }
-];
 
 const FEATURES_PREVIEW = [
   { icon: Brain, label: 'Analyse émotionnelle', color: 'from-purple-500 to-pink-500' },
@@ -58,46 +23,13 @@ const FEATURES_PREVIEW = [
 ];
 
 export const StepWelcome: React.FC<StepWelcomeProps> = ({ onNext, onSkip }) => {
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const [animatedUsers, setAnimatedUsers] = useState(0);
   const [showFeatures, setShowFeatures] = useState(false);
-
-  // Animate user count
-  useEffect(() => {
-    const duration = 2000;
-    const steps = 50;
-    const increment = PLATFORM_STATS.users / steps;
-    let current = 0;
-    
-    const timer = setInterval(() => {
-      current += increment;
-      if (current >= PLATFORM_STATS.users) {
-        setAnimatedUsers(PLATFORM_STATS.users);
-        clearInterval(timer);
-      } else {
-        setAnimatedUsers(Math.floor(current));
-      }
-    }, duration / steps);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  // Auto-rotate testimonials
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTestimonial(prev => (prev + 1) % TESTIMONIALS.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
   // Show features after a delay
   useEffect(() => {
     const timer = setTimeout(() => setShowFeatures(true), 1000);
     return () => clearTimeout(timer);
   }, []);
-
-  const nextTestimonial = () => setCurrentTestimonial(prev => (prev + 1) % TESTIMONIALS.length);
-  const prevTestimonial = () => setCurrentTestimonial(prev => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
 
   return (
     <Card className="max-w-lg mx-auto overflow-hidden">
@@ -124,30 +56,24 @@ export const StepWelcome: React.FC<StepWelcomeProps> = ({ onNext, onSkip }) => {
       </CardHeader>
       
       <CardContent className="space-y-6 p-6">
-        {/* Platform stats */}
+        {/* Factual product highlights */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="grid grid-cols-4 gap-2 text-center"
+          className="grid grid-cols-3 gap-2 text-center"
         >
           <div className="p-2">
-            <div className="text-xl font-bold text-primary">
-              {animatedUsers.toLocaleString()}+
-            </div>
-            <div className="text-[10px] text-muted-foreground">Utilisateurs</div>
+            <div className="text-xl font-bold text-primary">3 min</div>
+            <div className="text-[10px] text-muted-foreground">Par session</div>
           </div>
           <div className="p-2">
-            <div className="text-xl font-bold text-green-500">{PLATFORM_STATS.satisfactionRate}%</div>
-            <div className="text-[10px] text-muted-foreground">Satisfaction</div>
+            <div className="text-xl font-bold text-green-500">100%</div>
+            <div className="text-[10px] text-muted-foreground">Privé & RGPD</div>
           </div>
           <div className="p-2">
-            <div className="text-xl font-bold text-blue-500">{PLATFORM_STATS.scansPerDay.toLocaleString()}</div>
-            <div className="text-[10px] text-muted-foreground">Scans/jour</div>
-          </div>
-          <div className="p-2">
-            <div className="text-xl font-bold text-amber-500">{PLATFORM_STATS.countries}</div>
-            <div className="text-[10px] text-muted-foreground">Pays</div>
+            <div className="text-xl font-bold text-blue-500">37</div>
+            <div className="text-[10px] text-muted-foreground">Modules</div>
           </div>
         </motion.div>
 
@@ -177,62 +103,6 @@ export const StepWelcome: React.FC<StepWelcomeProps> = ({ onNext, onSkip }) => {
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Testimonial carousel */}
-        <div className="relative">
-          <div className="bg-muted/30 rounded-xl p-4">
-            <Quote className="h-5 w-5 text-primary/40 mb-2" />
-            
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentTestimonial}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <p className="text-sm italic mb-3">
-                  "{TESTIMONIALS[currentTestimonial].text}"
-                </p>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">{TESTIMONIALS[currentTestimonial].avatar}</span>
-                    <div>
-                      <div className="text-sm font-medium">{TESTIMONIALS[currentTestimonial].name}</div>
-                      <div className="text-xs text-muted-foreground">{TESTIMONIALS[currentTestimonial].role}</div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-0.5">
-                    {[...Array(TESTIMONIALS[currentTestimonial].rating)].map((_, i) => (
-                      <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Navigation dots */}
-            <div className="flex items-center justify-center gap-2 mt-3">
-              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={prevTestimonial}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              {TESTIMONIALS.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentTestimonial(idx)}
-                  className={`h-2 w-2 rounded-full transition-colors ${
-                    idx === currentTestimonial ? 'bg-primary' : 'bg-primary/30'
-                  }`}
-                />
-              ))}
-              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={nextTestimonial}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
 
         {/* Trust badges */}
         <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground">
@@ -288,7 +158,7 @@ export const StepWelcome: React.FC<StepWelcomeProps> = ({ onNext, onSkip }) => {
         </div>
 
         <p className="text-center text-xs text-muted-foreground">
-          Tu peux modifier ces réglages à tout moment dans les paramètres
+          Vous pouvez modifier ces réglages à tout moment dans les paramètres
         </p>
       </CardContent>
     </Card>

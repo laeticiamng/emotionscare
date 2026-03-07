@@ -15,16 +15,20 @@ const Footer: React.FC = () => {
     platform: [
       { label: 'Accueil', href: '/' },
       { label: 'Fonctionnalités', href: '/features' },
-      { label: 'Cas d\'usage', href: '/use-cases' },
-      { label: 'À propos', href: '/about' },
+      { label: 'Scanner émotionnel', href: '/scanner' },
+      { label: 'Tarifs', href: '/pricing' },
     ],
     resources: [
       { label: 'FAQ', href: '/faq' },
-      { label: 'Aide & Support', href: '/help' },
       { label: 'Contact', href: '/contact' },
-      { label: 'Tarifs', href: '/pricing' },
-      { label: 'Entreprise B2B', href: '/b2b' },
+      { label: 'Cas d\'usage', href: '/use-cases' },
+      { label: 'Aide & Support', href: '/help' },
+    ],
+    company: [
+      { label: 'À propos', href: '/about' },
       { label: 'Sécurité', href: '/security' },
+      { label: 'Entreprise B2B', href: '/b2b' },
+      { label: 'Licences', href: '/legal/licenses' },
     ],
     legal: [
       { label: 'Mentions légales', href: '/legal/mentions' },
@@ -32,7 +36,6 @@ const Footer: React.FC = () => {
       { label: 'CGV', href: '/legal/sales' },
       { label: 'Confidentialité', href: '/legal/privacy' },
       { label: 'Cookies', href: '/legal/cookies' },
-      { label: 'Licences', href: '/legal/licenses' },
     ],
     social: [
       { label: 'Twitter', icon: Twitter },

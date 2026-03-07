@@ -367,38 +367,15 @@ export default function CoachProgramDetailPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Témoignages</CardTitle>
+                <CardTitle>À propos de ce programme</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="rounded-lg border bg-card/50 p-4">
-                  <div className="mb-2 flex items-center gap-2">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                      <span className="font-semibold text-primary">MJ</span>
-                    </div>
-                    <div>
-                      <p className="font-medium">Marie J.</p>
-                      <p className="text-xs text-muted-foreground">Il y a 2 semaines</p>
-                    </div>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    "Ce programme m'a vraiment aidé à mieux comprendre mes émotions et à développer des stratégies concrètes. Je me sens beaucoup plus sereine au quotidien."
-                  </p>
-                </div>
-
-                <div className="rounded-lg border bg-card/50 p-4">
-                  <div className="mb-2 flex items-center gap-2">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                      <span className="font-semibold text-primary">TL</span>
-                    </div>
-                    <div>
-                      <p className="font-medium">Thomas L.</p>
-                      <p className="text-xs text-muted-foreground">Il y a 1 mois</p>
-                    </div>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    "Les exercices pratiques sont excellents et faciles à intégrer dans ma routine quotidienne. Je recommande vivement ce programme !"
-                  </p>
-                </div>
+              <CardContent className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Ce programme a été conçu pour vous aider à développer des stratégies concrètes de régulation émotionnelle, adaptées à votre rythme.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Les exercices sont courts (3 à 5 minutes) et peuvent être intégrés facilement dans votre routine quotidienne.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>
