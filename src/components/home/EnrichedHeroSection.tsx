@@ -84,7 +84,7 @@ const EnrichedHeroSection: React.FC = () => {
                   className="relative overflow-hidden bg-gradient-to-r from-primary via-primary to-accent hover:from-primary hover:via-accent hover:to-primary shadow-2xl shadow-primary/30 hover:shadow-primary/50 transition-all duration-500 px-10 py-7 text-lg font-bold group border-0 ring-2 ring-primary/20 hover:ring-primary/40"
                 >
                   <Heart className="h-5 w-5 mr-3 group-hover:scale-110 transition-transform" aria-hidden="true" />
-                  <span>Essai gratuit 30 jours</span>
+                  <span>Commencer gratuitement</span>
                   
                   {/* Effet de brillance au hover - CSS only */}
                   <span 
