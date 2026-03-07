@@ -161,6 +161,7 @@ const difficultyLabels = {
  * Composant de tips rapides enrichi pour le journal
  */
 export const JournalQuickTips = memo<JournalQuickTipsProps>(({ className = '' }) => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
@@ -300,7 +301,7 @@ export const JournalQuickTips = memo<JournalQuickTipsProps>(({ className = '' })
                     className="h-7 text-xs"
                     onClick={() => {
                       if (currentTip.actionLink) {
-                        window.location.href = currentTip.actionLink;
+                        navigate(currentTip.actionLink);
                       }
                     }}
                   >
