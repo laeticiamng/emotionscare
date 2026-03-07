@@ -60,13 +60,13 @@ const RealTimeNotifications: React.FC<RealTimeNotificationsProps> = ({
       },
       {
         id: '2',
-        type: 'social',
-        title: 'Nouveau membre dans votre groupe',
-        message: 'Marie a rejoint votre groupe "Méditation du matin"',
+        type: 'info',
+        title: 'Nouvelle playlist disponible',
+        message: 'Une nouvelle ambiance sonore correspond à votre profil',
         timestamp: new Date(Date.now() - 300000),
         read: false,
         priority: 'medium',
-        icon: <Users className="w-4 h-4 text-blue-400" />,
+        icon: <Music className="w-4 h-4 text-blue-400" />,
         autoHide: true,
         hideDelay: 5000
       },

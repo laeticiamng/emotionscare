@@ -355,7 +355,7 @@ export class SunoMusicService {
       },
       {
         id: 'fallback-energy-1',
-        audioUrl: 'https://storage.googleapis.com/media-session/big-buck-bunny/prelude.mp3',
+        audioUrl: 'https://storage.googleapis.com/media-session/elephants-dream/the-wires.mp3',
         title: 'Énergie Positive',
         style: 'uplifting'
       }

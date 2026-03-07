@@ -50,9 +50,9 @@ const SAMPLE_NOTIFICATIONS: Notification[] = [
   },
   {
     id: '3',
-    type: 'social',
-    title: 'Nouvelle activité',
-    message: 'Marie a rejoint votre cercle de soutien.',
+    type: 'info',
+    title: 'Conseil bien-être',
+    message: 'Pensez à prendre 3 minutes pour un exercice de respiration.',
     read: true,
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
   },

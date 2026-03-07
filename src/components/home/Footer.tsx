@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Mail, Shield, BookOpen, Accessibility, Twitter, Linkedin, LockKeyhole } from 'lucide-react';
+import { Heart, Mail, Shield, BookOpen, Accessibility, Twitter, Linkedin, LockKeyhole, Building2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const Footer: React.FC = () => {
@@ -15,16 +15,20 @@ const Footer: React.FC = () => {
     platform: [
       { label: 'Accueil', href: '/' },
       { label: 'Fonctionnalités', href: '/features' },
-      { label: 'Cas d\'usage', href: '/use-cases' },
-      { label: 'À propos', href: '/about' },
+      { label: 'Scanner émotionnel', href: '/scanner' },
+      { label: 'Tarifs', href: '/pricing' },
     ],
     resources: [
       { label: 'FAQ', href: '/faq' },
-      { label: 'Aide & Support', href: '/help' },
       { label: 'Contact', href: '/contact' },
-      { label: 'Tarifs', href: '/pricing' },
-      { label: 'Entreprise B2B', href: '/b2b' },
+      { label: 'Cas d\'usage', href: '/use-cases' },
+      { label: 'Aide & Support', href: '/help' },
+    ],
+    company: [
+      { label: 'À propos', href: '/about' },
       { label: 'Sécurité', href: '/security' },
+      { label: 'Entreprise B2B', href: '/b2b' },
+      { label: 'Licences', href: '/legal/licenses' },
     ],
     legal: [
       { label: 'Mentions légales', href: '/legal/mentions' },
@@ -32,7 +36,6 @@ const Footer: React.FC = () => {
       { label: 'CGV', href: '/legal/sales' },
       { label: 'Confidentialité', href: '/legal/privacy' },
       { label: 'Cookies', href: '/legal/cookies' },
-      { label: 'Licences', href: '/legal/licenses' },
     ],
     social: [
       { label: 'Twitter', icon: Twitter },
@@ -44,7 +47,7 @@ const Footer: React.FC = () => {
     <footer className="bg-muted/30 border-t border-border/50 safe-area-bottom" role="contentinfo">
       <div className="container mx-auto px-4 py-12 pb-safe-bottom">
         {/* Main Footer Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 mb-8">
           {/* Brand */}
           <div className="lg:col-span-2 space-y-4">
             <Link to="/" className="flex items-center gap-2 text-xl font-bold text-primary">
@@ -115,6 +118,26 @@ const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2">
               {links.resources.map((link) => (
+                <li key={link.href}>
+                  <Link 
+                    to={link.href} 
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Building2 className="h-4 w-4 text-primary" aria-hidden="true" />
+              Entreprise
+            </h4>
+            <ul className="space-y-2">
+              {links.company.map((link) => (
                 <li key={link.href}>
                   <Link 
                     to={link.href} 
