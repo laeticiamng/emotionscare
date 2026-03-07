@@ -4,6 +4,7 @@
  * SEO, accessibilité, catégories étendues, recherche fonctionnelle
  */
 import React, { useState, useMemo, useEffect } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,7 +41,7 @@ interface FAQQuestion {
 interface FAQCategory {
   id: string;
   category: string;
-  icon: React.FC<{ className?: string; 'aria-hidden'?: string | boolean }>;
+  icon: LucideIcon;
   questions: FAQQuestion[];
 }
 
