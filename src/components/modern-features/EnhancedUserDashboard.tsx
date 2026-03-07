@@ -199,11 +199,11 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Objectifs</p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-2xl font-bold text-primary">
                   {dashboardStats.completedGoals}/{dashboardStats.monthlyGoals}
                 </p>
               </div>
-              <Target className="h-8 w-8 text-green-600/60" />
+              <Target className="h-8 w-8 text-primary/60" />
             </div>
             <Progress 
               value={(dashboardStats.completedGoals / dashboardStats.monthlyGoals) * 100} 
@@ -218,9 +218,9 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Série actuelle</p>
-                <p className="text-2xl font-bold text-orange-600">{dashboardStats.currentStreak}</p>
+                <p className="text-2xl font-bold text-accent-foreground">{dashboardStats.currentStreak}</p>
               </div>
-              <Award className="h-8 w-8 text-orange-600/60" />
+              <Award className="h-8 w-8 text-accent-foreground/60" />
             </div>
             <p className="text-xs text-muted-foreground mt-1">Jours consécutifs</p>
           </CardContent>
@@ -231,9 +231,9 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Temps total</p>
-                <p className="text-2xl font-bold text-purple-600">{dashboardStats.timeSpent}min</p>
+                <p className="text-2xl font-bold text-secondary-foreground">{dashboardStats.timeSpent}min</p>
               </div>
-              <Clock className="h-8 w-8 text-purple-600/60" />
+              <Clock className="h-8 w-8 text-secondary-foreground/60" />
             </div>
             <p className="text-xs text-muted-foreground mt-1">Cette semaine</p>
           </CardContent>
@@ -282,9 +282,9 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
               {recentActivities.slice(0, 4).map((activity, index) => (
                 <div key={index} className="flex items-center gap-3">
                   <div className={`h-2 w-2 rounded-full ${
-                    activity.status === 'completed' ? 'bg-green-500' :
-                    activity.status === 'pending' ? 'bg-yellow-500' :
-                    activity.status === 'achieved' ? 'bg-blue-500' : 'bg-gray-300'
+                    activity.status === 'completed' ? 'bg-primary' :
+                    activity.status === 'pending' ? 'bg-muted-foreground' :
+                    activity.status === 'achieved' ? 'bg-secondary-foreground' : 'bg-muted'
                   }`} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{activity.title}</p>
@@ -345,16 +345,16 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-              <h4 className="font-medium text-blue-900">Prochain objectif suggéré</h4>
-              <p className="text-sm text-blue-700 mt-1">
+            <div className="p-4 bg-primary/5 rounded-lg border-l-4 border-primary">
+              <h4 className="font-medium text-foreground">Prochain objectif suggéré</h4>
+              <p className="text-sm text-muted-foreground mt-1">
                 Vous approchez de votre {dashboardStats.nextMilestone}e session ! 
                 Continuez sur cette lancée pour débloquer de nouveaux badges.
               </p>
             </div>
-            <div className="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
-              <h4 className="font-medium text-green-900">Habitude en formation</h4>
-              <p className="text-sm text-green-700 mt-1">
+            <div className="p-4 bg-secondary/30 rounded-lg border-l-4 border-secondary">
+              <h4 className="font-medium text-foreground">Habitude en formation</h4>
+              <p className="text-sm text-muted-foreground mt-1">
                 Votre série de {dashboardStats.currentStreak} jours est excellente ! 
                 Maintenez le rythme pour atteindre la série de 7 jours.
               </p>

@@ -14,9 +14,8 @@ const Footer: React.FC = () => {
   const links = {
     platform: [
       { label: 'Accueil', href: '/' },
-      { label: 'Respiration guidée', href: '/app/breath' },
       { label: 'Fonctionnalités', href: '/features' },
-      { label: 'Tarifs', href: '/pricing' },
+      { label: 'À propos', href: '/about' },
     ],
     resources: [
       { label: 'Fonctionnalités', href: '/features' },
@@ -165,12 +164,6 @@ const Footer: React.FC = () => {
                 <Mail className="h-4 w-4" aria-hidden="true" />
                 contact@emotionscare.com
               </a>
-              
-              {/* Status indicator */}
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span className="h-2 w-2 bg-green-500 rounded-full animate-pulse" aria-hidden="true" />
-                <span>Tous les services opérationnels</span>
-              </div>
             </div>
           </div>
         </div>
