@@ -183,7 +183,7 @@ const MessagesPage: React.FC = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <div className="font-semibold">Nyvée</div>
+                  <div className="font-semibold">Coach IA</div>
                   <div className="text-sm text-muted-foreground">Assistant IA Émotionnel</div>
                 </div>
                 <div className="ml-auto flex gap-2">
