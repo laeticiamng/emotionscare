@@ -68,7 +68,7 @@ interface VirtualCoachEngineProps {
  * Assistant thérapeutique intelligent avec personnalité adaptative
  */
 const VirtualCoachEngine: React.FC<VirtualCoachEngineProps> = ({
-  initialPersonality = 'nyvee',
+  initialPersonality = 'coach-ia',
   userName = 'utilisateur',
   contextualMode = true,
   voiceEnabled = true,
