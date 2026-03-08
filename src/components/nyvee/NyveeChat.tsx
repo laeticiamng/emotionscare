@@ -1,5 +1,5 @@
 /**
- * NyveeChat - Coach IA Nyvée, bulle flottante bottom-right
+ * NyveeChat - Coach IA, bulle flottante bottom-right
  * Interface de chat avec réponses pré-écrites contextuelles
  */
 
