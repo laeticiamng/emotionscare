@@ -113,8 +113,8 @@ const SECTIONS: {
         description: 'Votre coach émotionnel IA disponible 24/7. Conversations bienveillantes avec techniques CBT validées, adaptées aux professionnels de santé.',
         icon: Bot,
         highlights: ['Conversations naturelles', 'Techniques CBT', 'Disponible 24/7'],
-        gradient: 'from-amber-500 to-orange-600',
-        iconBg: 'bg-amber-500/20 text-amber-400',
+        gradient: 'from-accent/80 to-accent',
+        iconBg: 'bg-accent/20 text-accent',
       },
       {
         id: 'journal',
