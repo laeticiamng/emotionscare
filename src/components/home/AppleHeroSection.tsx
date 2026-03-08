@@ -184,13 +184,13 @@ const AppleHeroSection: React.FC = () => {
           >
             <div className="flex flex-wrap justify-center gap-4 items-center">
               <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
-                Basée sur les neurosciences
+                Protocoles validés scientifiquement
               </span>
               <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
-                Données protégées
+                Gratuit pour commencer
               </span>
               <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
-                Made in France 🇫🇷
+                Conçu en France 🇫🇷
               </span>
             </div>
           </motion.div>
