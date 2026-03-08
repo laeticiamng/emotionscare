@@ -321,7 +321,7 @@ const PricingPageWorking: React.FC = () => {
               { icon: Shield, label: 'Conforme RGPD' },
               { icon: Lock, label: 'Paiement sécurisé Stripe' },
               { icon: Clock, label: 'Droit de rétractation 14j' },
-              { icon: Heart, label: 'Made in France' },
+              { icon: Heart, label: 'Conçu en France 🇫🇷' },
             ].map((badge, i) => (
               <motion.div
                 key={i}
