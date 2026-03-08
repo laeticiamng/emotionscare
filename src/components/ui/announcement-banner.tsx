@@ -4,6 +4,7 @@
  */
 
 import React, { memo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { X, ArrowRight, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -54,6 +55,8 @@ const AnnouncementBanner: React.FC<AnnouncementBannerProps> = ({
     }
   };
 
+  const isInternalLink = Boolean(href?.startsWith('/') && !href.startsWith('//'));
+
   if (dismissed) return null;
 
   const content = (
@@ -83,9 +86,15 @@ const AnnouncementBanner: React.FC<AnnouncementBannerProps> = ({
         >
           <div className="container mx-auto px-4 py-2 flex items-center justify-center gap-3">
             {href ? (
-              <a href={href} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-                {content}
-              </a>
+              isInternalLink ? (
+                <Link to={href} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+                  {content}
+                </Link>
+              ) : (
+                <a href={href} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+                  {content}
+                </a>
+              )
             ) : (
               <div className="flex items-center gap-2">{content}</div>
             )}
@@ -120,9 +129,15 @@ const AnnouncementBanner: React.FC<AnnouncementBannerProps> = ({
           )}
         >
           {href ? (
-            <a href={href} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-              {content}
-            </a>
+            isInternalLink ? (
+              <Link to={href} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+                {content}
+              </Link>
+            ) : (
+              <a href={href} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+                {content}
+              </a>
+            )
           ) : (
             <div className="flex items-center gap-2">{content}</div>
           )}
@@ -151,9 +166,15 @@ const AnnouncementBanner: React.FC<AnnouncementBannerProps> = ({
       >
         <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/50 backdrop-blur-sm px-4 py-1.5 shadow-sm">
           {href ? (
-            <a href={href} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              {content}
-            </a>
+            isInternalLink ? (
+              <Link to={href} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                {content}
+              </Link>
+            ) : (
+              <a href={href} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                {content}
+              </a>
+            )
           ) : (
             <div className="flex items-center gap-2">{content}</div>
           )}

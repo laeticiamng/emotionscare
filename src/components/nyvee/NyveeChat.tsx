@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, Sparkles, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -107,6 +108,7 @@ const PROTOCOL_RECOMMENDATIONS: Record<string, { name: string; description: stri
 };
 
 const NyveeChat: React.FC = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [quickReplies, setQuickReplies] = useState<QuickReply[]>([]);
@@ -207,7 +209,7 @@ const NyveeChat: React.FC = () => {
         }
         setStep(3);
       } else if (reply.value === 'signup') {
-        window.location.href = '/signup';
+        navigate('/signup');
       } else if (reply.value === 'restart') {
         setMessages([]);
         setStep(0);
