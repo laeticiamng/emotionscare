@@ -103,8 +103,8 @@ const SECTIONS: {
         description: 'Cohérence cardiaque, 4-7-8, Box Breathing et plus. Animations visuelles apaisantes et sons ambiants. Inclut les protocoles Stop, Reset, Night et Respirez.',
         icon: Wind,
         highlights: ['6 protocoles validés', 'Cohérence cardiaque', 'Protocole Stop / Reset / Night'],
-        gradient: 'from-cyan-500 to-blue-600',
-        iconBg: 'bg-cyan-500/20 text-cyan-400',
+        gradient: 'from-primary/80 to-primary',
+        iconBg: 'bg-primary/20 text-primary',
       },
       {
         id: 'coach',
