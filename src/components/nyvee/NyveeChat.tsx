@@ -282,6 +282,9 @@ const NyveeChat: React.FC = () => {
           >
             <Sparkles className="h-6 w-6" />
             <span className="absolute -top-1 -right-1 w-4 h-4 bg-accent rounded-full border-2 border-background animate-pulse" />
+            <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-medium text-muted-foreground bg-background/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-border/50 shadow-sm">
+              Coach IA
+            </span>
           </motion.button>
         )}
       </AnimatePresence>
