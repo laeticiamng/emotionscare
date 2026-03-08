@@ -47,8 +47,10 @@ const AppleHomePage: React.FC = () => {
       <main id="main-content" role="main" className="pt-16">
         {/* Announcement pill — opens Coach Chat on click */}
         <div className="pt-6 pb-2">
-        <AnnouncementBanner
+          <AnnouncementBanner
             message="Nouveau : Coach IA disponible 24h/24"
+            href="/signup"
+            linkLabel="Essayer"
             variant="pill"
             storageKey="home-announcement-v1"
             dismissible

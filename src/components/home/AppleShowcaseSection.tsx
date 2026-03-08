@@ -118,15 +118,16 @@ const AppleShowcaseSection: React.FC = () => {
             className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 md:mt-24"
           >
             {[
-              { title: "Stop", desc: "Pause d'urgence — interrompez le cycle de stress entre deux consultations", badge: "3 min" },
-              { title: "Reset", desc: "Rechargez votre énergie mentale après un moment difficile ou une garde", badge: "5 min" },
-              { title: "Night", desc: "Sas de décompression avant le sommeil avec respiration et sons apaisants", badge: "Sommeil" },
+              { title: "Stop", desc: "Pause d'urgence — interrompez le cycle de stress entre deux consultations", badge: "3 min", href: "/signup" },
+              { title: "Reset", desc: "Rechargez votre énergie mentale après un moment difficile ou une garde", badge: "5 min", href: "/signup" },
+              { title: "Night", desc: "Sas de décompression avant le sommeil avec respiration et sons apaisants", badge: "Sommeil", href: "/signup" },
             ].map((item, i) => (
-              <div key={i} className="text-center p-4 rounded-2xl border border-background/10 hover:border-background/20 transition-colors">
+              <a key={i} href={item.href} className="text-center p-6 rounded-2xl border border-background/10 hover:border-primary/50 hover:bg-background/5 transition-all duration-300 cursor-pointer group block">
                 <span className="inline-block text-xs font-medium text-primary bg-primary/20 rounded-full px-3 py-1 mb-3">{item.badge}</span>
-                <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
-                <p className="text-background/60 text-sm">{item.desc}</p>
-              </div>
+                <h3 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">{item.title}</h3>
+                <p className="text-background/60 text-sm mb-3">{item.desc}</p>
+                <span className="text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">Essayer →</span>
+              </a>
             ))}
           </motion.div>
         </div>
