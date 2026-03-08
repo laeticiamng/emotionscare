@@ -553,6 +553,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
     status: 'beta',
+    hidden: true,
   },
   {
     name: 'music',
@@ -1935,6 +1936,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'BlockchainBackupsPage',
     guard: true,
     requireAuth: true,
+    hidden: true,
   },
 
   
