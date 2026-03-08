@@ -294,9 +294,9 @@ export class CrossModuleIntelligence {
     const vrToMood = await this.analyzeVRtoMood(userId);
     if (vrToMood) insights.push(vrToMood);
 
-    // Analyse 2: Nyvee → Story Synth
-    const nyveeToStory = await this.analyzeNyveeToStory(userId);
-    if (nyveeToStory) insights.push(nyveeToStory);
+    // Analyse 2: Cocon Respiration → Story Synth
+    const cocoonToStory = await this.analyzeCocoonToStory(userId);
+    if (cocoonToStory) insights.push(cocoonToStory);
 
     // Analyse 3: Music Therapy → Bubble Beat
     const musicToBubble = await this.analyzeMusicToBubble(userId);
