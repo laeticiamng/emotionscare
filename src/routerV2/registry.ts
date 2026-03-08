@@ -553,6 +553,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
     status: 'beta',
+    hidden: true,
   },
   {
     name: 'music',
