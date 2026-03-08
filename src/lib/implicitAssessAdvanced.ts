@@ -458,7 +458,7 @@ export class CrossModuleIntelligence {
     try {
       // Identifier les modules sous-utilisés
       const modules = [
-        { name: 'nyvee_sessions', label: 'Nyvee' },
+        { name: 'nyvee_sessions', label: 'Cocon Respiration' },
         { name: 'vr_nebula_sessions', label: 'VR Galaxy' },
         { name: 'story_synth_sessions', label: 'Story Synth' },
         { name: 'mood_mixer_sessions', label: 'Mood Mixer' },
