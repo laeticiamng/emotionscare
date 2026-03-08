@@ -100,7 +100,7 @@ const BentoCard: React.FC<{ module: ModuleHighlight; index: number }> = memo(({ 
               "bg-background/80 shadow-sm",
               isLarge ? "w-16 h-16" : "w-12 h-12"
             )}>
-              {React.createElement(module.icon, { className: cn("text-primary", isLarge ? "h-8 w-8" : "h-5 w-5"), 'aria-hidden': true })}
+              <Icon className={cn("text-primary", isLarge ? "h-8 w-8" : "h-5 w-5")} aria-hidden />
             </div>
 
             <h3 className={cn(
