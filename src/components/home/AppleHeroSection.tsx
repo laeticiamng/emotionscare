@@ -33,8 +33,8 @@ const AppleHeroSection: React.FC = () => {
   const opacitySpring = useSpring(opacity, springConfig);
   const scaleSpring = useSpring(scale, springConfig);
 
-  // Text reveal animation
-  const words = ["Gérez", "votre", "stress", "en 3 minutes.", "Concrètement."];
+  // Text reveal animation — grouped for reading flow
+  const words = ["Gérez", "votre stress", "en 3 minutes."];
   
   return (
     <section 
