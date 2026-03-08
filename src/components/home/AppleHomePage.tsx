@@ -82,6 +82,9 @@ const AppleHomePage: React.FC = () => {
           <SocialProofSection />
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
+          <ComparisonSection />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
           <AppleCTASection />
         </Suspense>
       </main>
