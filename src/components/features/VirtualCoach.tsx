@@ -53,7 +53,7 @@ const VirtualCoach: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
-      content: 'Bonjour ! Je suis Nyvée, votre coach émotionnel personnel. Je suis là pour vous accompagner dans votre bien-être. Comment vous sentez-vous aujourd\'hui ?',
+      content: 'Bonjour ! Je suis votre coach émotionnel personnel. Je suis là pour vous accompagner dans votre bien-être. Comment vous sentez-vous aujourd\'hui ?',
       sender: 'coach',
       timestamp: new Date(),
       type: 'question'
