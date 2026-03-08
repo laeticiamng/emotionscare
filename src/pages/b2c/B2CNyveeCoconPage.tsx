@@ -49,8 +49,8 @@ type SessionPhase = 'ready' | 'mood-before' | 'breathing' | 'mood-after' | 'comp
 
 const B2CNyveeCoconPage: FC = () => {
   usePageSEO({
-    title: 'Nyv\u00e9e Cocon - Espace de respiration | EmotionsCare',
-    description: 'Retrouvez votre calme avec Nyv\u00e9e : respiration guid\u00e9e, ambiances sonores et suivi de votre \u00e9tat \u00e9motionnel.',
+    title: 'Cocon Respiration - Espace de respiration | EmotionsCare',
+    description: 'Retrouvez votre calme avec le Cocon Respiration : respiration guidée, ambiances sonores et suivi de votre état émotionnel.',
   });
 
   const { has } = useFlags();
