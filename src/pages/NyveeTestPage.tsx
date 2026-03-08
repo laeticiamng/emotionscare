@@ -42,7 +42,7 @@ export default function NyveeTestPage() {
             fontWeight: '600'
           }}
         >
-          🌿 Aller vers Nyvée
+          🌿 Aller vers le Cocon
         </Link>
       </div>
     </div>
