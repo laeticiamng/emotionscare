@@ -188,7 +188,7 @@ const PricingPageWorking: React.FC = () => {
     title: 'Tarifs - EmotionsCare | Plans pour soignants',
     description:
       'Découvrez les tarifs EmotionsCare : gratuit pour commencer, Pro à 14,90€/mois pour un accompagnement complet. Droit de rétractation 14 jours.',
-    keywords: 'tarifs, prix, abonnement, premium, soignants, bien-être',
+    keywords: 'tarifs, prix, abonnement, pro, soignants, bien-être',
     structuredData: [
       {
         '@type': 'Product',
@@ -229,7 +229,7 @@ const PricingPageWorking: React.FC = () => {
       return;
     }
 
-    // Premium plan → Stripe checkout
+    // Pro plan → Stripe checkout
     if (!isAuthenticated) {
       toast.info('Créez un compte pour accéder à l\'abonnement Pro');
       navigate('/signup');
@@ -371,8 +371,8 @@ const PricingPageWorking: React.FC = () => {
                   a: 'Conformément à la loi française, vous disposez de 14 jours après votre souscription pour vous rétracter et obtenir un remboursement intégral, sans justification.',
                 },
                 {
-                  q: 'Comment fonctionne le plan Business ?',
-                  a: 'Le plan Business est conçu pour les organisations (hôpitaux, cliniques, EHPAD). Il inclut un dashboard RH anonymisé et des rapports d\'équipe. Contactez-nous pour un devis personnalisé.',
+                  q: 'Comment fonctionne le plan Établissement ?',
+                  a: 'Le plan Établissement est conçu pour les organisations (hôpitaux, cliniques, EHPAD). Il inclut un dashboard RH anonymisé et des rapports d\'équipe. Contactez-nous pour un devis personnalisé.',
                 },
                 {
                   q: 'Mes données sont-elles protégées ?',

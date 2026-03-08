@@ -30,10 +30,10 @@ const principles = [
 ];
 
 const trustBadges = [
-  { icon: Shield, label: 'Chiffrement AES-256' },
-  { icon: Award, label: 'Hébergement UE' },
-  { icon: GraduationCap, label: 'Théorie polyvagale' },
-  { icon: Heart, label: 'Créée par une soignante' },
+  { icon: Shield, label: 'Conforme RGPD' },
+  { icon: Award, label: 'Hébergé en UE' },
+  { icon: GraduationCap, label: 'Basé sur les neurosciences' },
+  { icon: Heart, label: 'Créé par une soignante' },
 ];
 
 const SocialProofSection: React.FC = () => {
