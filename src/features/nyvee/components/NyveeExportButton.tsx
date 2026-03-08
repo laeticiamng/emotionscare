@@ -105,7 +105,7 @@ export const NyveeExportButton = memo(({ className }: NyveeExportButtonProps) =>
       
       const link = document.createElement('a');
       link.href = url;
-      link.download = `nyvee-data-${format(new Date(), 'yyyy-MM-dd')}.json`;
+      link.download = `cocoon-data-${format(new Date(), 'yyyy-MM-dd')}.json`;
       link.click();
       
       URL.revokeObjectURL(url);

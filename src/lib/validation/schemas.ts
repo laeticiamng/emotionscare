@@ -237,7 +237,7 @@ export const musicPlaybackSchema = z.object({
 });
 
 // ──────────────────────────────────────────────
-// Coach IA (Nyvee) schemas
+// Coach IA schemas
 // ──────────────────────────────────────────────
 
 export const coachMessageSchema = z.object({

@@ -200,7 +200,7 @@ export const nyveeService = {
       };
 
       Sentry.addBreadcrumb({
-        category: 'nyvee',
+        category: 'cocoon',
         message: 'Session completed and persisted',
         data: {
           sessionId: data.sessionId,

@@ -1,4 +1,4 @@
-// @ts-nocheck
+// RouterV2 Registry - routes canoniques
 /**
  * RouterV2 Registry - Toutes les routes canoniques
  * TICKET: FE/BE-Router-Cleanup-01

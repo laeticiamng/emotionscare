@@ -46,7 +46,7 @@ export const DEFAULT_CYCLE_CONFIG: BreathingCycleConfig = {
   totalCycles: 6,
 };
 
-// Schema pour une session Nyvee
+// Schema pour une session Cocon Respiration
 export const NyveeSessionSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid(),

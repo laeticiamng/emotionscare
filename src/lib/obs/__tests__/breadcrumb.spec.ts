@@ -39,7 +39,7 @@ describe('addBreadcrumb helper', () => {
     expect(payload).toMatchObject({
       category: 'ui.click',
       level: 'info',
-      message: 'nyvee:start',
+      message: 'cocoon:start',
       data: {
         email: '[REDACTED]',
         safe: 'ok',

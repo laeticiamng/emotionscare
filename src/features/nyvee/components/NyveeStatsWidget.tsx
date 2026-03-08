@@ -1,5 +1,5 @@
 /**
- * NyveeStatsWidget - Widget de statistiques pour le module Cocon Respiration
+ * CocoonStatsWidget - Widget de statistiques pour le module Cocon Respiration
  */
 
 import { memo } from 'react';
