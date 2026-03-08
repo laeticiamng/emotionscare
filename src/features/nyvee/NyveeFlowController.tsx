@@ -134,7 +134,7 @@ const NyveeFlowController = ({
       setSoftExitTriggered(true);
       setPhase('soft_exit');
 
-      logger.info('nyvee:exit:soft', undefined, 'NYVEE');
+      logger.info('cocoon:exit:soft', undefined, 'COACH');
 
       toast({
         title: softExitCopy.title,

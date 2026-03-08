@@ -1,5 +1,5 @@
 /**
- * useNyvee - Hook principal pour le module Nyvee
+ * useNyvee - Hook principal pour le module Cocon Respiration
  * Respiration guidée avec bulle interactive
  */
 

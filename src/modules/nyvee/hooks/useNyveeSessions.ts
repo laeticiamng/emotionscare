@@ -290,7 +290,7 @@ export const useNyveeSessions = () => {
           duration: params.durationSeconds
         });
       } catch (syncError) {
-        logger.warn('Module sync failed:', syncError, 'NYVEE');
+        logger.warn('Module sync failed:', syncError, 'COACH');
       }
       
       return { success: true };

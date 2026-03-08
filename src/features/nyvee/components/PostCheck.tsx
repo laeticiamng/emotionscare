@@ -1,5 +1,5 @@
 /**
- * PostCheck - Composant de post-vérification après session Nyvee
+ * PostCheck - Composant de post-vérification après session Cocon Respiration
  */
 
 import type { FC } from 'react';
