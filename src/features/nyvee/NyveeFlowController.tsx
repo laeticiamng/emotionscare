@@ -112,7 +112,7 @@ const NyveeFlowController = ({
     const step: NyveeNextStep = decision === 'down' ? 'repeat_soft_anchor' : 'offer_54321';
     setNextStep(step);
 
-    logger.info(step === 'repeat_soft_anchor' ? 'nyvee:next:anchor' : 'nyvee:next:54321', undefined, 'NYVEE');
+    logger.info(step === 'repeat_soft_anchor' ? 'cocoon:next:anchor' : 'cocoon:next:54321', undefined, 'COACH');
 
     setPhase(step === 'repeat_soft_anchor' ? 'anchor_prompt' : 'grounding');
   }, [decision, decisionReady, nextStep]);
