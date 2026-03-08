@@ -364,9 +364,9 @@ export class CrossModuleIntelligence {
     }
   }
 
-  private async analyzeNyveeToStory(userId: string): Promise<CrossModuleInsight | null> {
+  private async analyzeCocoonToStory(userId: string): Promise<CrossModuleInsight | null> {
     try {
-      // Si Nyvee détecte tristesse, Story Synth devrait proposer contes réconfortants
+      // Si le Cocon détecte tristesse, Story Synth devrait proposer contes réconfortants
       const { data: recentScans } = await supabase
         .from('emotion_scans')
         .select('scan_result, created_at')
