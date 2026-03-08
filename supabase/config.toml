@@ -68,6 +68,9 @@ verify_jwt = false
 
 [functions.implicit-assess]
 verify_jwt = false
+
+[functions.create-checkout]
+verify_jwt = false
 # ========================================
 # API CONFIGURATION
 # ========================================

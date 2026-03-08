@@ -65,6 +65,7 @@ export const publicComponentMap = {
   FeaturesPage,
   UnifiedLoginPage,
   SignupPage,
+  ResetPasswordPage,
   ExamModePage,
   PricingPageWorking,
   PricingPageWorkingPage: PricingPageWorking,
