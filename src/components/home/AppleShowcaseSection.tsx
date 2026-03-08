@@ -5,6 +5,8 @@
 
 import React, { memo, useRef } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 
 const AppleShowcaseSection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
