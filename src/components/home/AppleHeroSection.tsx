@@ -92,7 +92,7 @@ const AppleHeroSection: React.FC = () => {
           </motion.div>
 
           {/* Main headline - word by word reveal */}
-          <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-[0.95] mb-4 sm:mb-6 px-2 sm:px-0">
+          <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-[1.05] mb-4 sm:mb-6 px-2 sm:px-0">
             {words.map((word, i) => (
               <motion.span
                 key={i}
@@ -100,7 +100,7 @@ const AppleHeroSection: React.FC = () => {
                 animate={isInView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
                 transition={{ 
                   duration: 0.8, 
-                  delay: 0.2 + i * 0.15,
+                  delay: 0.2 + i * 0.2,
                   ease: [0.16, 1, 0.3, 1]
                 }}
                 className={cn(
