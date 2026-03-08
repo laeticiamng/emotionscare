@@ -108,6 +108,7 @@ const PROTOCOL_RECOMMENDATIONS: Record<string, { name: string; description: stri
 };
 
 const NyveeChat: React.FC = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [quickReplies, setQuickReplies] = useState<QuickReply[]>([]);
