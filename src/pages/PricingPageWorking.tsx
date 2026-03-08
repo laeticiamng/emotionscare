@@ -189,6 +189,33 @@ const PricingPageWorking: React.FC = () => {
     description:
       'Découvrez les tarifs EmotionsCare : gratuit pour commencer, Pro à 14,90€/mois pour un accompagnement complet. Droit de rétractation 14 jours.',
     keywords: 'tarifs, prix, abonnement, premium, soignants, bien-être',
+    structuredData: [
+      {
+        '@type': 'Product',
+        name: 'EmotionsCare Pro',
+        description: 'Accompagnement complet de régulation émotionnelle pour soignants',
+        brand: { '@type': 'Organization', name: 'EmotionsCare' },
+        offers: [
+          {
+            '@type': 'Offer',
+            name: 'Gratuit',
+            price: '0',
+            priceCurrency: 'EUR',
+            availability: 'https://schema.org/InStock',
+            url: 'https://emotionscare.com/pricing',
+          },
+          {
+            '@type': 'Offer',
+            name: 'Pro',
+            price: '14.90',
+            priceCurrency: 'EUR',
+            availability: 'https://schema.org/InStock',
+            priceValidUntil: '2027-12-31',
+            url: 'https://emotionscare.com/pricing',
+          },
+        ],
+      },
+    ],
   });
 
   const handleCTA = async (plan: typeof PLANS[number]) => {

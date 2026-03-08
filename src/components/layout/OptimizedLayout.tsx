@@ -44,9 +44,7 @@ const OptimizedLayout: React.FC = () => {
       </Helmet>
       
       <div className="min-h-screen bg-background">
-        <div className="hidden">
-          <BreadcrumbNav />
-        </div>
+        <BreadcrumbNav className="container mx-auto px-4 pt-4" />
         
         <Suspense fallback={
           <div className="flex items-center justify-center min-h-[400px]">
