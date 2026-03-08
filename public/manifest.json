@@ -97,7 +97,7 @@
     {
       "name": "Coach IA",
       "short_name": "Coach",
-      "description": "Parler avec Nyvée",
+      "description": "Parler avec le Coach IA",
       "url": "/app/coach",
       "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
     },
