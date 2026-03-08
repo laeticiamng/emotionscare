@@ -81,7 +81,7 @@ export const nyveeService = {
   // --------------------------------------------------------------------------
 
   /**
-   * Créer une nouvelle session Nyvee simple avec persistance DB
+   * Créer une nouvelle session Cocon Respiration avec persistance DB
    */
   async createSession(data: CreateNyveeSession): Promise<NyveeSession> {
     try {
