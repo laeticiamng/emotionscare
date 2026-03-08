@@ -27,7 +27,7 @@ const LEVELS: Level[] = [
 const BADGES = [
   { id: 'first_scan', name: 'Premier Scan', icon: '🔍', earned: true },
   { id: 'week_streak', name: '7 jours consécutifs', icon: '🔥', earned: true },
-  { id: 'night_owl', name: 'Protocole Night x5', icon: '🌙', earned: true },
+  { id: 'night_owl', name: '5 séances sommeil', icon: '🌙', earned: true },
   { id: 'zen_master', name: '50 respirations', icon: '🧘', earned: false },
   { id: 'community', name: 'Entraide active', icon: '🤝', earned: false },
 ];

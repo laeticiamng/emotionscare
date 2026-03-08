@@ -27,10 +27,10 @@ interface ModuleHighlight {
 
 const modules: ModuleHighlight[] = [
   {
-    title: "Scan émotionnel",
-    description: "Répondez à quelques questions simples pour évaluer votre niveau de stress et recevoir un exercice adapté.",
+    title: "Bilan de stress",
+    description: "Répondez à quelques questions simples pour évaluer votre niveau de stress et recevoir un exercice adapté à votre état.",
     icon: Brain,
-    highlight: 'Auto-évaluation',
+    highlight: '1 minute',
     span: 'md:col-span-2 md:row-span-2',
     gradient: 'from-primary/15 to-accent/10',
     authHref: '/app/scan',
