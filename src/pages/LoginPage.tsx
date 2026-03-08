@@ -27,6 +27,7 @@ import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import ForgotPasswordDialog from '@/pages/b2c/login/ForgotPasswordDialog';
 import { usePageSEO } from '@/hooks/usePageSEO';
+import SharedHeader from '@/components/layout/SharedHeader';
 
 interface LoginFormData {
   email: string;
