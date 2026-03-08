@@ -140,8 +140,8 @@ const SECTIONS: {
         description: 'Musiques thérapeutiques IA, fréquences binaurales, vinyles thématiques et playlists personnalisées qui s\'adaptent à vos émotions et préférences.',
         icon: Music,
         highlights: ['Génération IA Suno', 'Fréquences binaurales', 'Playlists adaptatives'],
-        gradient: 'from-indigo-500 to-blue-700',
-        iconBg: 'bg-indigo-500/20 text-indigo-400',
+        gradient: 'from-accent to-primary',
+        iconBg: 'bg-accent/20 text-accent',
       },
       {
         id: 'immersive',
