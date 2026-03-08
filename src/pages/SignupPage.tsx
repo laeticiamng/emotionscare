@@ -139,7 +139,7 @@ const SignupPage: React.FC = () => {
               Créer votre compte
             </CardTitle>
             <p className="text-muted-foreground">
-              Rejoignez EmotionsCare pour commencer votre parcours bien-être
+              Accédez gratuitement à vos exercices anti-stress en 30 secondes
             </p>
           </CardHeader>
           

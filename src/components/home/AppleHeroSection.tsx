@@ -178,18 +178,18 @@ const AppleHeroSection: React.FC = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
-            transition={{ duration: 1, delay: 1.3 }}
+            transition={{ duration: 1, delay: 1.2 }}
             className="mt-16 pt-16 border-t border-border/50"
           >
             <div className="flex flex-wrap justify-center gap-4 items-center">
               <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
-                Cohérence cardiaque & pleine conscience
+                Exercices de 2 à 5 minutes
               </span>
               <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
-                Gratuit pour commencer
+                Aucune carte bancaire requise
               </span>
               <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
-                Conçu en France 🇫🇷
+                Créé par une médecin 🇫🇷
               </span>
             </div>
           </motion.div>

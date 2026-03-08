@@ -86,13 +86,16 @@ const GeoSummarySection: React.FC = () => {
         </div>
 
         {/* CTA de transition */}
-        <div className="text-center">
+        <div className="text-center space-y-2">
           <Link to={isAuthenticated ? '/app/home' : '/signup'}>
             <Button size="lg" className="rounded-full px-8 gap-2">
               {isAuthenticated ? 'Accéder à mon espace' : 'Essayer gratuitement'}
               <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
+          {!isAuthenticated && (
+            <p className="text-xs text-muted-foreground">Aucune carte bancaire requise · Compte créé en 30 secondes</p>
+          )}
         </div>
       </div>
     </section>

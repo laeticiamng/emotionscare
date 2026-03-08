@@ -254,7 +254,7 @@ const PricingPageWorking: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-16">
       {/* ═══════════════════ HERO ═══════════════════ */}
       <section className="relative py-16 md:py-24 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
