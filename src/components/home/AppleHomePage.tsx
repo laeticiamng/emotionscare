@@ -17,6 +17,7 @@ const AppleShowcaseSection = lazy(() => import('@/components/home/AppleShowcaseS
 const AppleStatsSection = lazy(() => import('@/components/home/AppleStatsSection'));
 const AppleCTASection = lazy(() => import('@/components/home/AppleCTASection'));
 const ModulesHighlightSection = lazy(() => import('@/components/home/ModulesHighlightSection'));
+const ComparisonSection = lazy(() => import('@/components/home/ComparisonSection'));
 const SocialProofSection = lazy(() => import('@/components/home/SocialProofSection'));
 const ProductScreenshots = lazy(() => import('@/components/marketing/ProductScreenshots'));
 const GeoSummarySection = lazy(() => import('@/components/home/GeoSummarySection'));
