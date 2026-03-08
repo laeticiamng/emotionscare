@@ -387,7 +387,7 @@ export class CrossModuleIntelligence {
 
       if (avgValence < 40) {
         return {
-          source_module: 'nyvee',
+          source_module: 'cocoon',
           target_module: 'story_synth',
           correlation: 0.75,
           recommendation: 'Tristesse détectée. Proposer contes apaisants ou héroïques (empowerment).',
