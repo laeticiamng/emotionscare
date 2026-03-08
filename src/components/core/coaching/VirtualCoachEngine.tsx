@@ -96,7 +96,7 @@ const VirtualCoachEngine: React.FC<VirtualCoachEngineProps> = ({
   // Personnalités de coach disponibles
   const availablePersonalities: CoachPersonality[] = [
     {
-      id: 'nyvee',
+      id: 'coach-ia',
       name: 'Coach IA',
       description: 'Coach empathique spécialisé en bien-être émotionnel',
       traits: ['Empathique', 'Bienveillante', 'Intuitive', 'Patiente'],
