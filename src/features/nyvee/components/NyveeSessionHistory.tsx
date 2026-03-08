@@ -1,5 +1,5 @@
 /**
- * NyveeSessionHistory - Historique des sessions Nyvee
+ * NyveeSessionHistory - Historique des sessions Cocon Respiration
  */
 
 import { memo, useState } from 'react';
