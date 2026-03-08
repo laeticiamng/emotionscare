@@ -1,5 +1,5 @@
 /**
- * useNyveeSessions - Hook React Query pour les sessions Nyvee
+ * useNyveeSessions - Hook React Query pour les sessions Cocon Respiration
  * Gère la persistance et le fetching des sessions
  * Synchronise avec le système d'interconnexion des modules
  */
