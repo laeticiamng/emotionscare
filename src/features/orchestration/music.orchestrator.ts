@@ -78,7 +78,7 @@ export function computeMusicActions(inputs: MusicOrchestrationInputs): MusicActi
   }
 
   if (highTension) {
-    actions.push({ action: 'set_crossfade', ms: 18000 }, { action: 'post_cta', key: 'nyvee' });
+    actions.push({ action: 'set_crossfade', ms: 18000 }, { action: 'post_cta', key: 'cocoon' });
   } else if (lowTension) {
     actions.push({ action: 'set_crossfade', ms: 12000 }, { action: 'post_cta', key: 'encore_2min' });
   } else {

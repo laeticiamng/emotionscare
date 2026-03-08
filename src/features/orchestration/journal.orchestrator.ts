@@ -3,7 +3,7 @@ export type JournalAction =
   | { action: 'pin_themes'; keys: string[] }
   | { action: 'show_banner'; key: 'calm_suggest' }
   | { action: 'preset_composer'; text: string }
-  | { action: 'suggest_next'; key: 'nyvee' | 'breath_sleep' | 'flash_glow' | 'none' };
+  | { action: 'suggest_next'; key: 'cocoon' | 'breath_sleep' | 'flash_glow' | 'none' };
 
 export interface JournalSignals {
   paLevel?: 0 | 1 | 2 | 3 | 4;
