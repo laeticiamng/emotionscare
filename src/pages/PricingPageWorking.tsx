@@ -53,7 +53,7 @@ const PLANS = [
     features: [
       'Tout le plan Gratuit',
       'Accès illimité à tous les protocoles',
-      'Coach IA Nyvée personnalisé',
+      'Coach IA personnalisé 24/7',
       'Musicothérapie intégrale',
       'Scanner émotionnel avancé',
       'Gamification XP et badges',

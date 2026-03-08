@@ -111,7 +111,7 @@ const UnifiedDashboard: React.FC = () => {
     },
     { 
       type: 'chat',
-      title: displayMode === 'consumer' ? 'Discussion avec Nyvée' : 'Support RH',
+      title: displayMode === 'consumer' ? 'Discussion avec le Coach IA' : 'Support RH',
       time: '16:45',
       mood: 'neutral'
     }
