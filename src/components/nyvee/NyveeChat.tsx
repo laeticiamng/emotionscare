@@ -270,7 +270,7 @@ const NyveeChat: React.FC = () => {
             whileTap={{ scale: 0.95 }}
             onClick={handleOpen}
             className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-primary to-accent text-white shadow-lg shadow-primary/30 flex items-center justify-center hover:shadow-xl hover:shadow-primary/40 transition-shadow"
-            aria-label="Ouvrir le chat avec Nyvée, coach IA"
+            aria-label="Ouvrir le chat avec le Coach IA"
           >
             <Sparkles className="h-6 w-6" />
             {/* Notification dot */}
