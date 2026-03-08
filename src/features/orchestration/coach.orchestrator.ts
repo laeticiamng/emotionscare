@@ -21,7 +21,7 @@ export function computeCoachActions({ aaqLevel, distressHint }: ComputeCoachActi
     acts.push(
       { action: 'set_response_mode', key: 'micro' },
       { action: 'queue_microcards', keys: ['defusion_observe', 'label_thought', 'ground_body'] },
-      { action: 'suggest_next', key: distressHint === 'high' ? 'nyvee' : 'breath_1min' },
+      { action: 'suggest_next', key: distressHint === 'high' ? 'cocoon' : 'breath_1min' },
     );
   } else if (aaqLevel === 2) {
     acts.push(
