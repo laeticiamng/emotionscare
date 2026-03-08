@@ -27,7 +27,7 @@ const NUDGE_LIBRARY: Record<'default' | NudgeTone, Nudge[]> = {
       emoji: '🫧',
     },
     {
-      text: `${NUDGE_TONE_LABELS.delicate} : Nyvée est disponible`,
+      text: `${NUDGE_TONE_LABELS.delicate} : le Coach IA est disponible`,
       deeplink: '/app/coach',
       emoji: '🤍',
     },

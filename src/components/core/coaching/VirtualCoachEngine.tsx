@@ -97,8 +97,8 @@ const VirtualCoachEngine: React.FC<VirtualCoachEngineProps> = ({
   const availablePersonalities: CoachPersonality[] = [
     {
       id: 'nyvee',
-      name: 'Nyvée',
-      description: 'Coach empathique spécialisée en bien-être émotionnel',
+      name: 'Coach IA',
+      description: 'Coach empathique spécialisé en bien-être émotionnel',
       traits: ['Empathique', 'Bienveillante', 'Intuitive', 'Patiente'],
       avatar: '🌸',
       voice: 'empathetic',
@@ -191,7 +191,7 @@ const VirtualCoachEngine: React.FC<VirtualCoachEngineProps> = ({
 
   const generateWelcomeMessage = (personality: CoachPersonality, userName: string): string => {
     const welcomeMessages = {
-      nyvee: `Bonjour ${userName} ! Je suis Nyvée, votre coach en bien-être émotionnel. Je suis là pour vous accompagner avec bienveillance dans votre parcours. Comment vous sentez-vous aujourd'hui ? 🌸`,
+      nyvee: `Bonjour ${userName} ! Je suis votre coach en bien-être émotionnel, disponible 24h/24. Je suis là pour vous accompagner avec bienveillance dans votre parcours. Comment vous sentez-vous aujourd'hui ? 🌸`,
       marcus: `Salut ${userName} ! Marcus à votre service ! 💪 Prêt à débloquer votre potentiel et atteindre vos objectifs ? Dites-moi ce qui vous motive aujourd'hui !`,
       sophia: `Bonjour ${userName}. Je suis Sophia, thérapeute professionnelle. Mon approche est structurée et bienveillante. Quel aspect de votre bien-être souhaitez-vous explorer aujourd'hui ?`,
       zen: `Namaste ${userName} 🙏 Je suis Zen, votre guide vers l'équilibre intérieur. Prenons un moment pour nous connecter à l'instant présent. Qu'est-ce qui occupe votre esprit aujourd'hui ?`
