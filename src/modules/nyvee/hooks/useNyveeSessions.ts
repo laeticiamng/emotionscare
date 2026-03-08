@@ -126,7 +126,7 @@ export const useNyveeSessions = () => {
         .limit(100);
 
       if (error) {
-        logger.error('Error fetching stats:', error as Error, 'NYVEE');
+        logger.error('Error fetching stats:', error as Error, 'COACH');
         return null;
       }
 
