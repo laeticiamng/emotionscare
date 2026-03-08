@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 
-const BASE_URL = 'https://emotionscare.com';
+const BASE_URL = typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+  ? window.location.origin
+  : 'https://emotionscare.com';
 const SITE_NAME = 'EmotionsCare';
 const DEFAULT_OG_IMAGE = `${BASE_URL}/og-image.png`;
 const DEFAULT_DESCRIPTION =
