@@ -4,6 +4,7 @@
  */
 
 import React, { memo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { X, ArrowRight, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
