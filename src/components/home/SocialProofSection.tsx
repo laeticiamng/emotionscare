@@ -116,12 +116,16 @@ const SocialProofSection: React.FC = () => {
           </div>
           <blockquote className="text-muted-foreground italic mb-4 max-w-lg mx-auto">
             <Quote className="h-4 w-4 text-primary inline mr-1" aria-hidden="true" />
-            J'ai créé EmotionsCare parce que les soignants méritent des outils à la hauteur de ce qu'ils donnent chaque jour.
+            J'ai créé EmotionsCare parce que les soignants méritent des outils à la hauteur de ce qu'ils donnent chaque jour. Le stress ne devrait pas être le prix du soin.
           </blockquote>
           <p className="text-lg font-display font-semibold text-foreground">Laeticia Motongane</p>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground text-sm mb-4">
             Médecin · Fondatrice d&apos;EmotionsCare
           </p>
+          <Link to="/about" className="inline-flex items-center gap-1 text-sm text-primary hover:underline font-medium">
+            Découvrir notre histoire
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </motion.div>
       </div>
     </section>
