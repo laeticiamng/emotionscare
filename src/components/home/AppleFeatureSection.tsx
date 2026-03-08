@@ -60,7 +60,7 @@ const features: Feature[] = [
     subtitle: "Pour des soignants.",
     description: "Créé avec et pour les professionnels de santé. Nous connaissons votre quotidien, vos contraintes, votre réalité.",
     gradient: "from-accent/80 to-accent",
-    stat: { value: "4", label: "protocoles co-construits" }
+    stat: { value: "6", label: "protocoles dédiés soignants" }
   },
 ];
 
