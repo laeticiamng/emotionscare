@@ -115,8 +115,8 @@ const ProductScreenshots: React.FC<ProductScreenshotsProps> = ({ compact = false
                 <div className="flex items-center gap-2 px-4 py-2.5 bg-muted/50 border-b border-border/50">
                   <div className="flex gap-1.5">
                     <div className="w-3 h-3 rounded-full bg-destructive/60" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                    <div className="w-3 h-3 rounded-full bg-green-500/60" />
+                    <div className="w-3 h-3 rounded-full bg-muted-foreground/40" />
+                    <div className="w-3 h-3 rounded-full bg-primary/40" />
                   </div>
                   <div className="flex-1 mx-4">
                     <div className="bg-background/80 rounded-md px-3 py-1 text-xs text-muted-foreground text-center max-w-xs mx-auto">
