@@ -76,8 +76,8 @@ const SECTIONS: {
         description: 'Notre IA analyse vos expressions faciales et votre voix pour identifier vos émotions avec précision. Obtenez un rapport détaillé sur 5 dimensions : humeur, énergie, stress, sommeil et charge mentale.',
         icon: Scan,
         highlights: ['Analyse faciale IA', 'Détection en temps réel', 'Score sur 5 dimensions'],
-        gradient: 'from-rose-500 to-pink-600',
-        iconBg: 'bg-rose-500/20 text-rose-400',
+        gradient: 'from-primary to-accent',
+        iconBg: 'bg-primary/20 text-primary',
       },
       {
         id: 'assessments',
