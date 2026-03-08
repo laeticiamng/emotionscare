@@ -183,7 +183,7 @@ const AppleHeroSection: React.FC = () => {
           >
             <div className="flex flex-wrap justify-center gap-4 items-center">
               <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
-                Protocoles validés scientifiquement
+                Cohérence cardiaque & pleine conscience
               </span>
               <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
                 Gratuit pour commencer

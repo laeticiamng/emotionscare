@@ -77,7 +77,7 @@ const GeoSummarySection: React.FC = () => {
             </li>
             <li className="flex items-start gap-2">
               <Shield className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
-              <span>Offre B2B avec tableau de bord anonymisé pour prévention des RPS</span>
+              <span>Mode B2B avec tableau de bord pour responsables bien-être en établissement</span>
             </li>
           </ul>
         </div>
