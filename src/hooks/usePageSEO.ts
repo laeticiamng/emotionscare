@@ -56,7 +56,7 @@ export const usePageSEO = ({
     upsertMeta('robots', noIndex ? 'noindex, follow' : 'index, follow');
 
     // ── Canonical ──
-    const canonicalUrl = canonical ?? `${BASE_URL}${window.location.pathname}`;
+    const canonicalUrl = canonical ?? `${BASE_URL}${window.location.pathname.replace(/\/$/, '') || '/'}`;
     upsertLink('canonical', canonicalUrl);
 
     // ── hreflang ──

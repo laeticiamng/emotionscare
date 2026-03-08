@@ -1,59 +1,64 @@
 
 
-## Plan : Finaliser les 8 actions SEO/GEO de l'audit
+## Plan : Ajouter les traductions allemandes et compléter FR/EN/DE sur toute la plateforme
 
-Analyse des écarts constatés dans le code actuel :
+### Constat actuel
 
-| Action audit | État actuel | À faire |
-|---|---|---|
-| 1. JSON-LD @graph complet | Déjà complet dans `index.html` (Organization, WebApp, WebSite, WebPage, HowTo) | Rien |
-| 2. Canonical explicite | `usePageSEO` utilise `window.location.pathname` en fallback → risque preview domain | Forcer `BASE_URL` dans le fallback |
-| 3. hreflang | Déjà implémenté dans `usePageSEO` | Rien |
-| 4. og:locale | Déjà présent (`fr_FR`) dans `usePageSEO` + `index.html` | Rien |
-| 5. Sitemap | Contient `/login` et `/signup` (noindex) | Retirer les auth pages |
-| 6. noscript fallback SEO | `index.html` (root) n'a aucun `<noscript>` avec contenu SEO | Ajouter bloc noscript riche |
-| 7. robots.txt AI bots | Manque `ClaudeBot` | Ajouter `ClaudeBot` |
-| 8. Blocs GEO citables | `GeoSummarySection` existe déjà | Rien |
+L'application dispose de deux systèmes i18n parallèles :
+1. **Système principal** (`src/lib/i18n/locales/{fr,en}/`) — 11 namespaces (common, navigation, dashboard, settings, modules, auth, consent, errors, legal, journal, coach) avec FR et EN complets
+2. **Système secondaire** (`src/i18n/locales/{fr,en,de}.ts`) — squelettique, utilisé par `src/i18n/config.ts`
+3. **Fichiers JSON** (`public/locales/{fr,en}/`) — partiels (common, errors, breath)
 
-**+ 1 bug OG image :** `HomePage.tsx` et `UnifiedHomePage.tsx` référencent `/og-image.svg` au lieu de `/og-image.png` (le fichier réel).
+Le **DE (allemand)** existe uniquement dans `src/i18n/locales/de.ts` avec un contenu riche mais n'est **pas branché** dans le système principal (`src/providers/i18n/resources.ts` ne charge que `fr` et `en`).
 
----
+De plus, de nombreuses pages (100+) contiennent encore des **chaînes hardcodées en français** non internationalisées.
 
-### Modifications prévues
+### Plan d'implémentation
 
-**1. `src/hooks/usePageSEO.ts` (ligne 59)**
-Remplacer le fallback canonical dynamique par un fallback basé sur `BASE_URL` + `pathname` nettoyé (sans query params ni preview domain) :
-```ts
-const canonicalUrl = canonical ?? `${BASE_URL}${window.location.pathname.replace(/\/$/, '') || '/'}`;
-```
-Pas de changement fonctionnel majeur puisque `BASE_URL` est déjà hardcodé, mais on nettoie le trailing slash.
+#### 1. Creer les fichiers de traduction DE (11 fichiers)
 
-**2. `index.html` (body, avant `<div id="root">`)**
-Ajouter un `<noscript>` avec du contenu SEO structuré pour les crawlers sans JS :
-```html
-<noscript>
-  <h1>EmotionsCare — Régulation émotionnelle pour soignants en 3 minutes</h1>
-  <p>Première plateforme française de régulation émotionnelle pour soignants et étudiants en santé. Protocoles de 2 à 5 minutes basés sur les neurosciences.</p>
-  <ul>
-    <li>Pour qui : soignants, étudiants en médecine et IFSI</li>
-    <li>Durée : exercices de 2-5 minutes</li>
-    <li>Objectif : régulation du stress, prévention du burn-out</li>
-    <li>Accès : plateforme web gratuite</li>
-  </ul>
-  <p>Visitez <a href="https://emotionscare.com">emotionscare.com</a></p>
-</noscript>
-```
+Creer `src/lib/i18n/locales/de/` avec les 11 fichiers miroirs de FR/EN :
+- `common.ts`, `navigation.ts`, `dashboard.ts`, `settings.ts`, `modules.ts`, `auth.ts`, `consent.ts`, `errors.ts`, `legal.ts`, `journal.ts`, `coach.ts`
 
-**3. `public/robots.txt`**
-Ajouter le bloc `ClaudeBot` manquant (entre les blocs Anthropic-AI et PerplexityBot).
+Chaque fichier sera la traduction allemande complète des clés existantes en FR/EN.
 
-**4. `public/sitemap.xml`**
-Supprimer les entrées `/login` et `/signup` (pages noindex, pas leur place dans un sitemap).
+#### 2. Brancher DE dans le système principal
 
-**5. `src/components/home/HomePage.tsx` + `src/pages/unified/UnifiedHomePage.tsx`**
-Corriger `ogImage: '/og-image.svg'` → `'/og-image.png'` et supprimer `twitterImage: '/twitter-card.svg'` (inexistant, le hook utilise déjà ogImage en fallback).
+Modifier `src/providers/i18n/resources.ts` pour :
+- Importer les 11 modules DE
+- Ajouter la locale `de` dans l'objet `resources`
 
----
+#### 3. Mettre à jour la configuration i18n
 
-Estimation : ~30 min. 5 fichiers, corrections ciblées, aucun risque de régression.
+- `src/lib/i18n.ts` : ajouter `'de'` dans `supportedLngs`
+- `src/lib/i18n/i18n.tsx` : ajouter le type `'de'` au type `Lang`
+- `src/i18n/locales/fr.ts` et `src/i18n/locales/en.ts` : ajouter `de: 'Allemand'` / `de: 'German'` dans `languageNames`
+
+#### 4. Mettre à jour le sélecteur de langue
+
+- `src/ui/NavBar.tsx` : supporter le cycle FR → EN → DE → FR
+- `src/i18n/LanguageSwitcher.tsx` : s'assurer que DE est dans les options (il utilise `SUPPORTED_LOCALES` qui inclut déjà `de`)
+
+#### 5. Ajouter les fichiers JSON DE dans public/locales
+
+Creer `public/locales/de/` avec `common.json`, `errors.json`, `breath.json`
+
+#### 6. Internationaliser les composants avec chaînes hardcodees
+
+Migrer progressivement les composants critiques contenant du texte FR hardcode :
+- `GroupHeader.tsx` : remplacer "Aujourd'hui"/"Hier" par `t('common.today')`/`t('common.yesterday')` et utiliser la locale dynamique pour `Intl.DateTimeFormat`
+- `NavBar.tsx` : utiliser les clés de traduction pour les liens
+- `Footer.tsx` : utiliser les clés de traduction pour les liens legaux
+
+### Details techniques
+
+- Les 11 fichiers DE suivront exactement la structure des fichiers EN existants
+- Le type `Lang` sera etendu a `'fr' | 'en' | 'de'`
+- Le `fallbackLng` reste `'fr'`
+- Environ **15-20 fichiers** seront modifies ou crees
+
+### Limites
+
+- Les 100+ pages avec texte FR hardcode ne seront pas toutes migrées dans cette iteration — seuls les composants partagés (NavBar, Footer, GroupHeader) et la configuration seront traités
+- Les pages individuelles (ModulesDashboard, UnifiedHomePage, etc.) necessiteront des passes supplementaires
 

@@ -59,6 +59,14 @@ Disallow: /dashboard/
 Disallow: /admin/
 Disallow: /api/
 
+User-agent: ClaudeBot
+Allow: /
+Allow: /llms.txt
+Disallow: /app/
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /api/
+
 User-agent: PerplexityBot
 Allow: /
 Allow: /llms.txt

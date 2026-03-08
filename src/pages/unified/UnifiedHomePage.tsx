@@ -89,7 +89,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
     description: 'Première plateforme française de régulation émotionnelle pour soignants et étudiants en santé. Protocoles de 2 à 5 minutes basés sur les neurosciences. Gratuit pour commencer.',
     keywords: 'soignants, étudiants santé, stress, burn-out, régulation émotionnelle, bien-être soignants',
     ogType: 'website',
-    ogImage: 'https://emotionscare.com/og-image.svg',
+    ogImage: '/og-image.png',
     ogImageAlt: 'EmotionsCare - Régulation émotionnelle pour soignants',
     canonical: 'https://emotionscare.com/',
     includeOrganization: true,

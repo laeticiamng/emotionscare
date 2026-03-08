@@ -16,11 +16,10 @@ const HomePage: React.FC = () => {
     keywords: 'soignants, étudiants santé, stress, burn-out, régulation émotionnelle, médecine, infirmier, bien-être santé',
     // Open Graph pour partage social
     ogType: 'website',
-    ogImage: '/og-image.svg',
+    ogImage: '/og-image.png',
     ogImageAlt: 'EmotionsCare - Régulation émotionnelle pour soignants',
     // Twitter Cards
     twitterCard: 'summary_large_image',
-    twitterImage: '/twitter-card.svg',
     // Canonical URL
     canonical: 'https://emotionscare.com/',
     // Inclure le schema Organization
