@@ -1,5 +1,5 @@
 /**
- * IntensitySelector - Composant de sélection d'intensité pour Nyvee
+ * IntensitySelector - Composant de sélection d'intensité pour Cocon Respiration
  */
 
 import { memo } from 'react';

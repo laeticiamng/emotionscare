@@ -1,5 +1,5 @@
 /**
- * Service unifié pour Nyvee - Respiration guidée avec bulle interactive et personnalisation
+ * Service unifié pour Cocon Respiration - Respiration guidée avec bulle interactive et personnalisation
  * Consolide nyveeService.ts + nyveeServiceEnriched.ts
  */
 

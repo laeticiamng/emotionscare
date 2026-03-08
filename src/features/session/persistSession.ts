@@ -160,7 +160,7 @@ export async function persistNyveeSession(
       },
     });
   } catch (error) {
-    logger.error('[Nyvee] persist session failed', error as Error, 'SYSTEM');
+    logger.error('[Cocoon] persist session failed', error as Error, 'SYSTEM');
     Sentry.captureException(error);
   }
 }

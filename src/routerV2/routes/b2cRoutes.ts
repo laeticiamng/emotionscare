@@ -338,7 +338,7 @@ export const b2cComponentMap = {
   ExchangeHubPage,
   EntraidePage,
 
-  // Nyvée
+  // Cocon Respiration
   B2CNyveeCoconPage,
   NyveeTestPage,
   ValidationPage,
