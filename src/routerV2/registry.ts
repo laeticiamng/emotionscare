@@ -2667,6 +2667,81 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/compliance/hds', '/hds', '/conformite-hds'],
   },
 
+  // ═══════════════════════════════════════════════════════════
+  // MODULE 38 - Burnout Assessment (MBI-HSS)
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'burnout-assessment',
+    path: '/app/assess/burnout',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'BurnoutAssessmentPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/assess/burnout', '/burnout'],
+    status: 'stable',
+  },
+  // ═══════════════════════════════════════════════════════════
+  // MODULE 39 - Team Wellbeing Dashboard
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'team-wellbeing',
+    path: '/b2b/team-wellbeing',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'TeamWellbeingDashboard',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/b2b/admin/team-wellbeing'],
+    status: 'stable',
+  },
+  // ═══════════════════════════════════════════════════════════
+  // MODULE 40 - Interventions Library
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'interventions-library',
+    path: '/b2b/interventions',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'InterventionsLibraryPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/b2b/admin/interventions'],
+    status: 'stable',
+  },
+  // ═══════════════════════════════════════════════════════════
+  // MODULE 41 - Research Export
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'research-export',
+    path: '/b2b/research-export',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'ResearchExportPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/b2b/admin/research-export'],
+    status: 'stable',
+  },
+  // ═══════════════════════════════════════════════════════════
+  // MODULE 42 - Institutional QVT Reports
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'institutional-report',
+    path: '/b2b/institutional-report',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'InstitutionalReportPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/b2b/admin/institutional-report', '/b2b/qvt-report'],
+    status: 'stable',
+  },
+
   // 404 FALLBACK ROUTE - Le fallback '*' est géré directement dans router.tsx
   // Cette entrée est gardée pour documentation mais n'est pas utilisée
   // car router.tsx a déjà un catch-all '*' à la fin

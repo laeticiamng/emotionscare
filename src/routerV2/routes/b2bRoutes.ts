@@ -38,6 +38,13 @@ const B2BInstitutionalReportsPage = lazy(() => import('@/pages/b2b/reports/Repor
 const B2BPreventionProgramPage = lazy(() => import('@/pages/b2b/B2BPreventionProgramPage'));
 const B2BVisioPage = lazy(() => import('@/pages/b2b/B2BVisioPage'));
 
+// B2B New Features
+const TeamWellbeingDashboard = lazy(() => import('@/pages/b2b/TeamWellbeingDashboard'));
+const InterventionsLibraryPage = lazy(() => import('@/pages/b2b/InterventionsLibraryPage'));
+const ResearchExportPage = lazy(() => import('@/pages/b2b/ResearchExportPage'));
+const InstitutionalReportPage = lazy(() => import('@/pages/b2b/InstitutionalReportPage'));
+const BurnoutAssessmentPage = lazy(() => import('@/pages/assess/BurnoutAssessmentPage'));
+
 // TIMECRAFT B2B
 const TimeCraftB2BPage = lazy(() => import('@/pages/timecraft/TimeCraftB2BPage'));
 
@@ -78,6 +85,13 @@ export const b2bComponentMap = {
   // Specialized
   B2BPreventionProgramPage,
   B2BVisioPage,
+
+  // New Features
+  TeamWellbeingDashboard,
+  InterventionsLibraryPage,
+  ResearchExportPage,
+  InstitutionalReportPage,
+  BurnoutAssessmentPage,
 
   // TIMECRAFT
   TimeCraftB2BPage,
