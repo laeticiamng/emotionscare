@@ -142,13 +142,13 @@ const AppleHeroSection: React.FC = () => {
             transition={{ duration: 0.8, delay: 1 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <Link to="/signup">
+            <Link to={isAuthenticated ? '/app/home' : '/signup'}>
               <Button 
                 size="lg" 
                 className="group relative overflow-hidden px-8 py-7 text-lg font-semibold bg-foreground text-background hover:bg-foreground/90 rounded-full shadow-2xl shadow-foreground/20 transition-all duration-500 hover:scale-105 hover:shadow-foreground/30"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  Commencer gratuitement
+                  {isAuthenticated ? 'Accéder à mon espace' : 'Commencer gratuitement'}
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </span>
                 <motion.div
