@@ -1,5 +1,5 @@
 /**
- * Nyvee Module - Types & Schemas
+ * Cocon Respiration Module - Types & Schemas
  */
 
 import { z } from 'zod';
