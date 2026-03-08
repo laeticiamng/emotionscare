@@ -156,7 +156,7 @@ const B2CNyveeCoconPage: FC = () => {
           durationSeconds,
         });
       } catch (error) {
-        logger.error('Failed to complete session', error, 'NYVEE');
+        logger.error('Failed to complete session', error, 'COACH');
       }
     }
 
