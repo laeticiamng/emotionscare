@@ -362,6 +362,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: false,
   },
   {
+    name: 'reset-password',
+    path: '/reset-password',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'ResetPasswordPage',
+    aliases: ['/auth/reset-password'],
+    guard: false,
+  },
+  {
     name: 'exam-mode',
     path: '/exam-mode',
     segment: 'public',
