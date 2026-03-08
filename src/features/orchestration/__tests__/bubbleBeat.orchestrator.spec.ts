@@ -9,7 +9,7 @@ describe('bubbleBeatOrchestrator', () => {
 
     expect(actions).toContainEqual({ action: 'set_path_variant', key: 'hr' });
     expect(actions).toContainEqual({ action: 'set_path_duration', ms: 120_000 });
-    expect(actions).toContainEqual({ action: 'post_cta', key: 'nyvee' });
+    expect(actions).toContainEqual({ action: 'post_cta', key: 'cocoon' });
   });
 
   it('keeps the default journey when stress is lower', () => {

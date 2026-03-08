@@ -20,10 +20,10 @@ describe('coach orchestrator', () => {
     expect(suggestionAction).toEqual({ action: 'suggest_next', key: 'breath_1min' });
   });
 
-  it('routes to Nyvée when distress is very high', () => {
+  it('routes to Cocoon when distress is very high', () => {
     const actions = computeCoachActions({ aaqLevel: 4, distressHint: 'high' });
     const suggestionAction = actions.find((action) => action.action === 'suggest_next');
-    expect(suggestionAction).toEqual({ action: 'suggest_next', key: 'nyvee' });
+    expect(suggestionAction).toEqual({ action: 'suggest_next', key: 'cocoon' });
   });
 
   it('keeps responses brief and skips microcards when rigidity is low', () => {
