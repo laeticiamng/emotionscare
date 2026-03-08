@@ -371,8 +371,8 @@ const PricingPageWorking: React.FC = () => {
                   a: 'Conformément à la loi française, vous disposez de 14 jours après votre souscription pour vous rétracter et obtenir un remboursement intégral, sans justification.',
                 },
                 {
-                  q: 'Comment fonctionne le plan Business ?',
-                  a: 'Le plan Business est conçu pour les organisations (hôpitaux, cliniques, EHPAD). Il inclut un dashboard RH anonymisé et des rapports d\'équipe. Contactez-nous pour un devis personnalisé.',
+                  q: 'Comment fonctionne le plan Établissement ?',
+                  a: 'Le plan Établissement est conçu pour les organisations (hôpitaux, cliniques, EHPAD). Il inclut un dashboard RH anonymisé et des rapports d\'équipe. Contactez-nous pour un devis personnalisé.',
                 },
                 {
                   q: 'Mes données sont-elles protégées ?',

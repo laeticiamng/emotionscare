@@ -30,79 +30,76 @@ const SubscribePage: React.FC = () => {
   const plans: Plan[] = [
     {
       id: 'free',
-      name: 'Découverte',
+      name: 'Gratuit',
       price: '0€',
       period: 'gratuit',
-      description: 'Parfait pour commencer votre voyage bien-être',
+      description: 'Pour découvrir EmotionsCare',
       icon: <Zap className="h-6 w-6" />,
       features: [
-        { text: '3 sessions Flash Glow / jour', included: true },
-        { text: 'Scan émotionnel de base', included: true },
-        { text: 'Journal personnel', included: true },
-        { text: 'Musicothérapie limitée', included: true },
-        { text: 'Coach IA avancé', included: false },
-        { text: 'VR et AR', included: false },
-        { text: 'Analytics détaillés', included: false },
+        { text: '3 exercices par jour', included: true },
+        { text: 'Scanner émotionnel de base', included: true },
+        { text: 'Journal émotionnel', included: true },
+        { text: 'Accès communauté', included: true },
+        { text: 'Coach IA personnalisé', included: false },
+        { text: 'Musicothérapie complète', included: false },
+        { text: 'Analyses détaillées', included: false },
         { text: 'Export de données', included: false },
       ],
     },
     {
-      id: 'premium',
-      name: 'Premium',
-      price: billingPeriod === 'monthly' ? '9.99€' : '7.99€',
+      id: 'pro',
+      name: 'Pro',
+      price: billingPeriod === 'monthly' ? '14,90€' : '11,90€',
       period: billingPeriod === 'monthly' ? '/mois' : '/mois (facturé annuellement)',
-      description: 'Expérience complète pour votre bien-être quotidien',
+      description: 'L\'accompagnement complet pour les soignants',
       badge: 'Recommandé',
       highlighted: true,
       icon: <Crown className="h-6 w-6" />,
       features: [
-        { text: 'Sessions illimitées', included: true },
-        { text: 'Tous les modules (VR, AR, etc.)', included: true },
-        { text: 'Coach IA personnalisé', included: true },
-        { text: 'Analytics détaillés', included: true },
+        { text: 'Exercices illimités', included: true },
+        { text: 'Tous les modules', included: true },
+        { text: 'Coach IA personnalisé 24/7', included: true },
+        { text: 'Musicothérapie intégrale', included: true },
+        { text: 'Scanner émotionnel avancé', included: true },
+        { text: 'Analyses détaillées & tendances', included: true },
         { text: 'Export RGPD complet', included: true },
-        { text: 'Accès prioritaire aux nouveautés', included: true },
-        { text: 'Support premium', included: true },
-        { text: 'Mode hors-ligne', included: true },
+        { text: 'Support prioritaire', included: true },
       ],
     },
     {
-      id: 'enterprise',
-      name: 'Entreprise',
-      price: 'Sur mesure',
+      id: 'etablissement',
+      name: 'Établissement',
+      price: 'Sur devis',
       period: 'par utilisateur',
-      description: 'Solution complète pour teams et organisations',
+      description: 'Pour les hôpitaux, cliniques et établissements de santé',
       icon: <Users className="h-6 w-6" />,
       features: [
-        { text: 'Tout du Premium', included: true },
+        { text: 'Tout le plan Pro pour chaque utilisateur', included: true },
         { text: 'Dashboard RH anonymisé', included: true },
-        { text: 'Heatmaps d\'équipe', included: true },
-        { text: 'Rapports de bien-être', included: true },
-        { text: 'API personnalisée', included: true },
-        { text: 'Formation équipe', included: true },
-        { text: 'Support dédié', included: true },
-        { text: 'Conformité SOC2/ISO27001', included: true },
+        { text: 'Analytics bien-être des équipes', included: true },
+        { text: 'Rapports hebdomadaires automatisés', included: true },
+        { text: 'Déploiement et onboarding dédié', included: true },
+        { text: 'Interlocuteur et support dédiés', included: true },
+        { text: 'Facturation centralisée', included: true },
+        { text: 'Conformité RGPD renforcée', included: true },
       ],
     },
   ];
 
   const handleSubscribe = (planId: string) => {
     if (planId === 'free') {
-      // Navigate to signup
       navigate('/signup');
       return;
     }
     
-    if (planId === 'enterprise') {
-      // Navigate to contact
+    if (planId === 'etablissement') {
       navigate('/contact');
       return;
     }
 
-    // For premium plan - would redirect to Stripe Checkout
+    // Pro plan - redirect to Stripe Checkout via pricing page
     logger.info('Redirecting to checkout for plan', { planId, billingPeriod }, 'SYSTEM');
-    // Here you would integrate with Stripe via your Render backend
-    // window.location.href = `/api/billing/checkout?plan=${planId}&period=${billingPeriod}`;
+    navigate('/pricing');
   };
 
   return (
@@ -111,10 +108,10 @@ const SubscribePage: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">
-            Choisissez votre plan bien-être
+            Choisissez votre plan
           </h1>
           <p className="text-xl text-muted-foreground mb-8">
-            Commencez gratuitement, évoluez selon vos besoins
+            Commencez gratuitement. Passez à Pro quand vous êtes prêt.
           </p>
           
           {/* Billing Period Toggle */}
@@ -189,11 +186,11 @@ const SubscribePage: React.FC = () => {
                     <div key={index} className="flex items-center gap-3">
                       <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${
                         feature.included 
-                          ? 'bg-green-100 dark:bg-green-900/30' 
+                          ? 'bg-primary/10' 
                           : 'bg-muted'
                       }`}>
                         {feature.included ? (
-                          <Check className="w-3 h-3 text-green-600 dark:text-green-400" />
+                          <Check className="w-3 h-3 text-primary" />
                         ) : (
                           <div className="w-2 h-2 bg-muted-foreground rounded-full" />
                         )}
@@ -214,8 +211,8 @@ const SubscribePage: React.FC = () => {
                   onClick={() => handleSubscribe(plan.id)}
                 >
                   {plan.id === 'free' ? 'Commencer gratuitement' : 
-                   plan.id === 'enterprise' ? 'Nous contacter' : 
-                   'Choisir ce plan'}
+                   plan.id === 'etablissement' ? 'Demander un devis' : 
+                   'Passer à Pro'}
                 </Button>
               </CardContent>
             </Card>
@@ -234,7 +231,7 @@ const SubscribePage: React.FC = () => {
               <CardContent>
                 <p className="text-muted-foreground">
                   Oui, vous pouvez annuler votre abonnement à tout moment depuis vos paramètres. 
-                  Aucune période d'engagement, aucun frais d'annulation.
+                  Aucune période d'engagement, aucun frais d'annulation. Droit de rétractation de 14 jours.
                 </p>
               </CardContent>
             </Card>
@@ -245,7 +242,7 @@ const SubscribePage: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Absolument. Toutes vos données sont chiffrées et stockées de manière sécurisée. 
+                  Absolument. Toutes vos données sont chiffrées et hébergées en Union Européenne. 
                   Nous respectons le RGPD et vous pouvez exporter ou supprimer vos données à tout moment.
                 </p>
               </CardContent>
@@ -253,12 +250,12 @@ const SubscribePage: React.FC = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Comment fonctionne l'essai gratuit ?</CardTitle>
+                <CardTitle className="text-lg">Le plan Gratuit est-il vraiment gratuit ?</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Le plan Découverte est entièrement gratuit et sans limite de temps. 
-                  Vous pouvez l'utiliser aussi longtemps que vous le souhaitez avant de passer au Premium.
+                  Oui, 100% gratuit, sans carte bancaire et sans limite de temps. 
+                  Vous pouvez l'utiliser aussi longtemps que vous le souhaitez avant de passer au Pro.
                 </p>
               </CardContent>
             </Card>
@@ -282,7 +279,7 @@ const SubscribePage: React.FC = () => {
           <div className="flex justify-center items-center gap-8 text-muted-foreground mb-6">
             <div className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
-              <span className="text-sm">Paiement sécurisé</span>
+              <span className="text-sm">Paiement sécurisé Stripe</span>
             </div>
             <div className="flex items-center gap-2">
               <Check className="h-5 w-5" />
@@ -290,12 +287,12 @@ const SubscribePage: React.FC = () => {
             </div>
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              <span className="text-sm">Support 7j/7</span>
+              <span className="text-sm">Support réactif</span>
             </div>
           </div>
           
           <p className="text-sm text-muted-foreground">
-            Rejoignez les premiers utilisateurs d'EmotionsCare pour votre bien-être quotidien
+            Sans engagement · Annulez quand vous voulez
           </p>
         </div>
       </div>
