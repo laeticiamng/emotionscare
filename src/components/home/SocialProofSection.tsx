@@ -6,7 +6,8 @@
 
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Award, Heart, GraduationCap, Sparkles, Quote, Brain, Clock } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Shield, Award, Heart, GraduationCap, Sparkles, Quote, Brain, Clock, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 /** Principes vérifiables — pas de témoignages inventés */
