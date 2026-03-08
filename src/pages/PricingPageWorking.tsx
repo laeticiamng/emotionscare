@@ -229,7 +229,7 @@ const PricingPageWorking: React.FC = () => {
       return;
     }
 
-    // Premium plan → Stripe checkout
+    // Pro plan → Stripe checkout
     if (!isAuthenticated) {
       toast.info('Créez un compte pour accéder à l\'abonnement Pro');
       navigate('/signup');
