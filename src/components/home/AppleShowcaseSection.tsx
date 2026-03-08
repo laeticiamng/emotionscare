@@ -118,9 +118,9 @@ const AppleShowcaseSection: React.FC = () => {
             className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 md:mt-24"
           >
             {[
-              { title: "Stop", desc: "Stoppez une crise en cours" },
-              { title: "Reset", desc: "Récupérez en 3 minutes" },
-              { title: "Night", desc: "Coupez le mental instantanément" },
+              { title: "Stop", desc: "Interrompez le cycle de stress avec une pause guidée de 3 min" },
+              { title: "Reset", desc: "Rechargez votre énergie entre deux gardes ou consultations" },
+              { title: "Night", desc: "Apaisez votre mental avant le sommeil avec un sas de décompression" },
             ].map((item, i) => (
               <div key={i} className="text-center">
                 <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
