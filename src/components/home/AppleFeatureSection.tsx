@@ -26,35 +26,35 @@ interface Feature {
 const features: Feature[] = [
   {
     icon: <Zap className="h-12 w-12" />,
-    title: "3 minutes.",
-    subtitle: "C'est tout ce qu'il faut.",
-    description: "Nos protocoles d'urgence sont conçus pour agir vite. Parce qu'en situation de stress, chaque seconde compte.",
+    title: "Agit immédiatement.",
+    subtitle: "Pas de préparation, pas de matériel.",
+    description: "Ouvrez l'app, choisissez un protocole et suivez le guide. Pensé pour s'intégrer entre deux consultations, sans perturber votre rythme.",
     gradient: "from-primary to-accent",
-    stat: { value: "180s", label: "temps moyen d'intervention" }
+    stat: { value: "4", label: "protocoles d'urgence" }
   },
   {
     icon: <Brain className="h-12 w-12" />,
-    title: "Basé sur la science.",
-    subtitle: "Validé par les neurosciences.",
-    description: "Chaque exercice repose sur des données probantes : cohérence cardiaque, pleine conscience, thérapies comportementales.",
+    title: "Personnalisé par l'IA.",
+    subtitle: "Chaque recommandation est adaptée.",
+    description: "Le scanner émotionnel analyse votre état et vous oriente vers l'exercice le plus pertinent. Plus vous l'utilisez, plus il vous connaît.",
     gradient: "from-accent to-primary",
-    stat: { value: "6", label: "protocoles scientifiques" }
+    stat: { value: "24/7", label: "coach IA disponible" }
   },
   {
     icon: <Shield className="h-12 w-12" />,
-    title: "100% confidentiel.",
-    subtitle: "Vos données vous appartiennent.",
-    description: "Aucune donnée partagée, jamais. Conforme RGPD, hébergement sécurisé en UE, et respect total de votre intimité.",
+    title: "Rien ne sort.",
+    subtitle: "Analyse locale, zéro image stockée.",
+    description: "Le scan facial tourne sur votre appareil. Aucune vidéo, aucune photo ne quitte votre téléphone. Jamais.",
     gradient: "from-primary/80 to-primary",
-    stat: { value: "0", label: "données vendues" }
+    stat: { value: "0", label: "images envoyées au serveur" }
   },
   {
     icon: <Heart className="h-12 w-12" />,
-    title: "Par des soignants.",
-    subtitle: "Pour des soignants.",
-    description: "Créé avec et pour les professionnels de santé. Nous connaissons votre quotidien, vos contraintes, votre réalité.",
+    title: "Pensé pour le terrain.",
+    subtitle: "Pas une appli de méditation de plus.",
+    description: "Gardes de nuit, stress post-consultation, charge émotionnelle : chaque protocole répond à un moment précis de votre quotidien.",
     gradient: "from-accent/80 to-accent",
-    stat: { value: "6", label: "protocoles dédiés soignants" }
+    stat: { value: "3", label: "contextes : urgence, récupération, sommeil" }
   },
 ];
 

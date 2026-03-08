@@ -100,7 +100,7 @@ const AppleCTASection: React.FC = () => {
             </Link>
           </motion.div>
 
-          {/* Trust badges */}
+          {/* Trust badges — différents du hero pour éviter la répétition */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
@@ -109,15 +109,15 @@ const AppleCTASection: React.FC = () => {
           >
             <span className="flex items-center gap-2">
               <div className="w-2 h-2 bg-primary/70 rounded-full" />
-              100% confidentiel
+              Aucune carte bancaire requise
             </span>
             <span className="flex items-center gap-2">
               <div className="w-2 h-2 bg-primary rounded-full" />
-              Conforme RGPD
+              Résiliation en 1 clic
             </span>
             <span className="flex items-center gap-2">
               <div className="w-2 h-2 bg-accent rounded-full" />
-              Made in France
+              Accès immédiat aux protocoles
             </span>
           </motion.div>
         </div>
