@@ -52,5 +52,10 @@
       "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "prerender": {
+    "expiration": 86400,
+    "allowQuery": ["utm_source", "utm_medium", "utm_campaign"],
+    "group": 1
+  }
 }
