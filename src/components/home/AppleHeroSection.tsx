@@ -6,13 +6,12 @@
 import React, { memo, useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Play, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 
 const AppleHeroSection: React.FC = () => {
-  const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -143,13 +142,13 @@ const AppleHeroSection: React.FC = () => {
             transition={{ duration: 0.8, delay: 1 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <Link to="/signup">
+            <Link to={isAuthenticated ? '/app/home' : '/signup'}>
               <Button 
                 size="lg" 
                 className="group relative overflow-hidden px-8 py-7 text-lg font-semibold bg-foreground text-background hover:bg-foreground/90 rounded-full shadow-2xl shadow-foreground/20 transition-all duration-500 hover:scale-105 hover:shadow-foreground/30"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  Commencer gratuitement
+                  {isAuthenticated ? 'Accéder à mon espace' : 'Commencer gratuitement'}
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </span>
                 <motion.div

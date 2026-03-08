@@ -8,9 +8,11 @@ import { motion, useInView } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Heart } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const AppleCTASection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const { isAuthenticated } = useAuth();
   const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
 
   return (
@@ -68,14 +70,14 @@ const AppleCTASection: React.FC = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <Link to="/signup">
+            <Link to={isAuthenticated ? '/app/home' : '/signup'}>
               <Button 
                 size="lg" 
                 className="group relative overflow-hidden px-12 py-8 text-xl font-semibold bg-foreground text-background hover:bg-foreground/90 rounded-full shadow-2xl shadow-foreground/20 transition-all duration-500 hover:scale-105"
               >
                 <span className="relative z-10 flex items-center gap-3">
                   <Heart className="h-6 w-6 group-hover:scale-110 transition-transform" />
-                  Essayer gratuitement
+                  {isAuthenticated ? 'Accéder à mon espace' : 'Essayer gratuitement'}
                   <ArrowRight className="h-6 w-6 group-hover:translate-x-2 transition-transform" />
                 </span>
                 <motion.div
