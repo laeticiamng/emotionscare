@@ -289,7 +289,7 @@ const NyveeChat: React.FC = () => {
             transition={{ duration: 0.2 }}
             className="fixed bottom-6 right-6 z-50 w-[360px] max-w-[calc(100vw-2rem)] h-[520px] max-h-[calc(100vh-6rem)] bg-background border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
             role="dialog"
-            aria-label="Chat avec Nyvée"
+            aria-label="Chat avec le Coach IA"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-primary to-accent text-white">
