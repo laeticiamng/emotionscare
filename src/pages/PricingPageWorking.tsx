@@ -33,9 +33,9 @@ const PLANS = [
     period: '',
     description: 'Pour découvrir EmotionsCare',
     features: [
-      'Accès basique à la plateforme',
-      '3 protocoles par jour (Stop, Reset, Respirez)',
-      'Scanner émotionnel de base',
+      'Accès aux exercices de base',
+      '3 séances de respiration guidée par jour',
+      'Auto-évaluation émotionnelle',
       'Journal émotionnel',
       'Accès communauté',
     ],
