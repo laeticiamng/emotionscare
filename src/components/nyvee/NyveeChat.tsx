@@ -193,8 +193,11 @@ const NyveeChat: React.FC = () => {
           );
         } else if (reply.value === 'other') {
           addCoachMessage(
-            'Voici d\'autres ressources disponibles :\n\n🛑 Protocole Stop — Pause d\'urgence\n🔄 Protocole Reset — Récupération\n🌙 Protocole Night — Sommeil\n🌬️ Protocole Respirez — Apaisement\n📊 Scanner Émotionnel — Bilan complet',
-            [{ label: 'Nouvelle conversation', value: 'restart' }]
+            'Voici d\'autres ressources disponibles :\n\n🛑 Protocole Stop — Pause d\'urgence\n🔄 Protocole Reset — Récupération\n🌙 Protocole Night — Sommeil\n🌬️ Protocole Respirez — Apaisement\n📊 Scanner Émotionnel — Bilan complet\n\nCréez un compte gratuit pour y accéder !',
+            [
+              { label: 'Créer mon compte', value: 'signup' },
+              { label: 'Nouvelle conversation', value: 'restart' },
+            ]
           );
         } else {
           addCoachMessage(

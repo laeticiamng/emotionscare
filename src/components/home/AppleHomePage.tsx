@@ -45,13 +45,13 @@ const AppleHomePage: React.FC = () => {
       <SharedHeader extraDesktopCTA={isAuthenticated ? <XPBar /> : undefined} />
 
       <main id="main-content" role="main" className="pt-16">
-        {/* Announcement pill */}
+        {/* Announcement pill — opens Coach Chat on click */}
         <div className="pt-6 pb-2">
         <AnnouncementBanner
             message="Nouveau : Coach IA disponible 24h/24"
-            linkLabel="Essayer"
             variant="pill"
             storageKey="home-announcement-v1"
+            dismissible
           />
         </div>
 

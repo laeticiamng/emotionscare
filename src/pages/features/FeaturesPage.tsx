@@ -76,8 +76,8 @@ const SECTIONS: {
         description: 'Notre IA analyse vos expressions faciales et votre voix pour identifier vos émotions avec précision. Obtenez un rapport détaillé sur 5 dimensions : humeur, énergie, stress, sommeil et charge mentale.',
         icon: Scan,
         highlights: ['Analyse faciale IA', 'Détection en temps réel', 'Score sur 5 dimensions'],
-        gradient: 'from-rose-500 to-pink-600',
-        iconBg: 'bg-rose-500/20 text-rose-400',
+        gradient: 'from-primary to-accent',
+        iconBg: 'bg-primary/20 text-primary',
       },
       {
         id: 'assessments',
@@ -86,8 +86,8 @@ const SECTIONS: {
         description: 'Évaluez votre bien-être avec les outils WHO-5 et PHQ-9, reconnus par l\'OMS. Suivez votre évolution avec des graphiques détaillés.',
         icon: ClipboardCheck,
         highlights: ['WHO-5 (OMS)', 'PHQ-9 (Dépression)', 'Graphiques d\'évolution'],
-        gradient: 'from-emerald-500 to-teal-600',
-        iconBg: 'bg-emerald-500/20 text-emerald-400',
+        gradient: 'from-accent to-primary',
+        iconBg: 'bg-accent/20 text-accent',
       },
     ],
   },
@@ -103,8 +103,8 @@ const SECTIONS: {
         description: 'Cohérence cardiaque, 4-7-8, Box Breathing et plus. Animations visuelles apaisantes et sons ambiants. Inclut les protocoles Stop, Reset, Night et Respirez.',
         icon: Wind,
         highlights: ['6 protocoles validés', 'Cohérence cardiaque', 'Protocole Stop / Reset / Night'],
-        gradient: 'from-cyan-500 to-blue-600',
-        iconBg: 'bg-cyan-500/20 text-cyan-400',
+        gradient: 'from-primary/80 to-primary',
+        iconBg: 'bg-primary/20 text-primary',
       },
       {
         id: 'coach',
@@ -113,8 +113,8 @@ const SECTIONS: {
         description: 'Votre coach émotionnel IA disponible 24/7. Conversations bienveillantes avec techniques CBT validées, adaptées aux professionnels de santé.',
         icon: Bot,
         highlights: ['Conversations naturelles', 'Techniques CBT', 'Disponible 24/7'],
-        gradient: 'from-amber-500 to-orange-600',
-        iconBg: 'bg-amber-500/20 text-amber-400',
+        gradient: 'from-accent/80 to-accent',
+        iconBg: 'bg-accent/20 text-accent',
       },
       {
         id: 'journal',
@@ -123,8 +123,8 @@ const SECTIONS: {
         description: 'Journal chiffré pour consigner pensées et émotions. Écriture libre, dictée vocale, tags personnalisés et partage sécurisé avec votre coach IA.',
         icon: BookOpen,
         highlights: ['Écriture & dictée vocale', 'Tags personnalisés', 'Export RGPD'],
-        gradient: 'from-violet-500 to-purple-600',
-        iconBg: 'bg-violet-500/20 text-violet-400',
+        gradient: 'from-primary to-accent',
+        iconBg: 'bg-primary/20 text-primary',
       },
     ],
   },
@@ -140,8 +140,8 @@ const SECTIONS: {
         description: 'Musiques thérapeutiques IA, fréquences binaurales, vinyles thématiques et playlists personnalisées qui s\'adaptent à vos émotions et préférences.',
         icon: Music,
         highlights: ['Génération IA Suno', 'Fréquences binaurales', 'Playlists adaptatives'],
-        gradient: 'from-indigo-500 to-blue-700',
-        iconBg: 'bg-indigo-500/20 text-indigo-400',
+        gradient: 'from-accent to-primary',
+        iconBg: 'bg-accent/20 text-accent',
       },
       {
         id: 'immersive',
@@ -150,8 +150,8 @@ const SECTIONS: {
         description: 'Galaxie VR pour la méditation, respiration guidée 3D, filtres AR émotionnels et environnements adaptatifs pour une relaxation profonde.',
         icon: Headphones,
         highlights: ['Galaxie VR', 'Filtres AR', 'Environnements 3D adaptatifs'],
-        gradient: 'from-fuchsia-500 to-pink-700',
-        iconBg: 'bg-fuchsia-500/20 text-fuchsia-400',
+        gradient: 'from-primary/80 to-accent',
+        iconBg: 'bg-primary/20 text-primary',
       },
       {
         id: 'park',
@@ -160,8 +160,8 @@ const SECTIONS: {
         description: 'Espace interactif et immersif pour décompresser. Zones thématiques, parcours guidés, atlas des émotions et quêtes dans un univers apaisant.',
         icon: Map,
         highlights: ['Atlas des émotions', 'Parcours guidés', 'Badges & quêtes'],
-        gradient: 'from-teal-500 to-emerald-600',
-        iconBg: 'bg-teal-500/20 text-teal-400',
+        gradient: 'from-accent/80 to-primary',
+        iconBg: 'bg-accent/20 text-accent',
       },
     ],
   },
@@ -177,8 +177,8 @@ const SECTIONS: {
         description: 'Système XP, niveaux, badges, défis quotidiens et classement communautaire anonymisé. Restez motivé avec des streaks et des récompenses.',
         icon: Gamepad2,
         highlights: ['Système XP & niveaux', 'Défis quotidiens', 'Classement anonymisé'],
-        gradient: 'from-orange-500 to-red-600',
-        iconBg: 'bg-orange-500/20 text-orange-400',
+        gradient: 'from-primary to-accent',
+        iconBg: 'bg-primary/20 text-primary',
       },
       {
         id: 'analytics',
@@ -187,8 +187,8 @@ const SECTIONS: {
         description: 'Tableau de bord personnel avec tendances d\'humeur, fréquence de sessions, durée moyenne, engagement et recommandations IA personnalisées.',
         icon: BarChart3,
         highlights: ['Tendances visuelles', 'Corrélations multi-modules', 'Export PDF/CSV'],
-        gradient: 'from-sky-500 to-blue-600',
-        iconBg: 'bg-sky-500/20 text-sky-400',
+        gradient: 'from-accent to-primary',
+        iconBg: 'bg-accent/20 text-accent',
       },
     ],
   },
@@ -204,8 +204,8 @@ const SECTIONS: {
         description: 'Tableau de bord manager avec KPIs agrégés, indicateurs de charge et de récupération, alertes anonymisées et rapports mensuels conformes RGPD.',
         icon: Activity,
         highlights: ['KPIs anonymisés', 'Alertes bien-être', 'Rapports conformes RGPD'],
-        gradient: 'from-slate-500 to-gray-600',
-        iconBg: 'bg-slate-500/20 text-slate-400',
+        gradient: 'from-primary/70 to-primary',
+        iconBg: 'bg-primary/20 text-primary',
       },
       {
         id: 'community',
@@ -214,8 +214,8 @@ const SECTIONS: {
         description: 'Forum d\'entraide, groupes de parole, parrainage et bibliothèque de ressources. Terminologie adaptée au contexte hospitalier.',
         icon: Users,
         highlights: ['Cercles de soutien', 'Parrainage entre pairs', 'Ressources validées'],
-        gradient: 'from-lime-500 to-green-600',
-        iconBg: 'bg-lime-500/20 text-lime-400',
+        gradient: 'from-accent/70 to-accent',
+        iconBg: 'bg-accent/20 text-accent',
       },
     ],
   },
@@ -258,7 +258,7 @@ const ADDITIONAL_MODULES: { category: string; modules: CompactModule[] }[] = [
 ];
 
 const STATS = [
-  { value: '37', label: 'modules intégrés', icon: Zap },
+  { value: '10+', label: 'modules intégrés', icon: Zap },
   { value: '3 min', label: 'par exercice', icon: Clock },
   { value: '100%', label: 'RGPD conforme', icon: Shield },
   { value: '24/7', label: 'disponible', icon: Heart },
@@ -273,8 +273,8 @@ const HOW_IT_WORKS = [
 /* ─── Component ─── */
 const FeaturesPage: React.FC = () => {
   usePageSEO({
-    title: 'Fonctionnalités - EmotionsCare | 37 modules intégrés',
-    description: 'Découvrez les 37 modules EmotionsCare : scanner émotionnel IA, coach IA, musicothérapie, réalité virtuelle, gamification, journal émotionnel et plus.',
+    title: 'Fonctionnalités - EmotionsCare | Tous nos modules',
+    description: 'Découvrez les modules EmotionsCare : scanner émotionnel IA, coach IA, musicothérapie, réalité virtuelle, gamification, journal émotionnel et plus.',
     keywords: 'gestion du stress, bien-être au travail, santé mentale soignants, scanner émotionnel, respiration guidée, journal émotionnel, musicothérapie, réalité virtuelle, coach IA, gamification',
   });
 
@@ -297,13 +297,13 @@ const FeaturesPage: React.FC = () => {
           >
             <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
               <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-              37 modules intégrés
+              Plateforme complète
             </span>
 
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.05] mb-6">
-              37 modules.{' '}
+              Tout ce qu'il faut.{' '}
               <span className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] bg-clip-text text-transparent">
-                3 minutes.
+                En 3 minutes.
               </span>
             </h1>
 
