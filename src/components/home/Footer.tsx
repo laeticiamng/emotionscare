@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Mail, Shield, BookOpen, Accessibility, Twitter, Linkedin, LockKeyhole, Building2 } from 'lucide-react';
+import { Heart, Mail, Shield, BookOpen, Accessibility, LockKeyhole, Building2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const Footer: React.FC = () => {
@@ -36,10 +36,6 @@ const Footer: React.FC = () => {
       { label: 'CGV', href: '/legal/sales' },
       { label: 'Confidentialité', href: '/legal/privacy' },
       { label: 'Cookies', href: '/legal/cookies' },
-    ],
-    social: [
-      { label: 'Twitter', icon: Twitter },
-      { label: 'LinkedIn', icon: Linkedin },
     ],
   };
 
@@ -75,18 +71,14 @@ const Footer: React.FC = () => {
               </Badge>
             </div>
 
-            {/* Réseaux sociaux — bientôt disponibles */}
-            <div className="flex items-center gap-3 pt-2 text-xs text-muted-foreground">
-              {links.social.map((social) => (
-                <span
-                  key={social.label}
-                  className="flex items-center gap-1 p-2 rounded-lg bg-muted opacity-60 cursor-default"
-                  title="Bientôt disponible"
-                >
-                  <social.icon className="h-3 w-3" aria-hidden="true" />
-                  Bientôt
-                </span>
-              ))}
+            {/* Contact email */}
+            <div className="pt-2">
+              <a 
+                href="mailto:contact@emotionscare.com" 
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                contact@emotionscare.com
+              </a>
             </div>
           </div>
 

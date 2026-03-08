@@ -165,7 +165,7 @@ const AppleHeroSection: React.FC = () => {
               size="lg" 
               variant="ghost"
               onClick={() => {
-                const el = document.getElementById('features');
+                const el = document.getElementById('geo-summary-heading');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
               className="group px-8 py-7 text-lg font-medium text-muted-foreground hover:text-foreground rounded-full"
