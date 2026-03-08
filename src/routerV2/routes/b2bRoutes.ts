@@ -86,6 +86,13 @@ export const b2bComponentMap = {
   B2BPreventionProgramPage,
   B2BVisioPage,
 
+  // New Features
+  TeamWellbeingDashboard,
+  InterventionsLibraryPage,
+  ResearchExportPage,
+  InstitutionalReportPage,
+  BurnoutAssessmentPage,
+
   // TIMECRAFT
   TimeCraftB2BPage,
 } as const;
