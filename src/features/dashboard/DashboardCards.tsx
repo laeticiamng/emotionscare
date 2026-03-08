@@ -68,7 +68,7 @@ const CARD_CATALOG: Record<DashboardCardId, CardConfig> = {
 };
 
 const DEFAULT_ORDER: DashboardCardId[] = [
-  'card-nyvee',
+  'card-coach-ia',
   'card-breath',
   'card-music',
   'card-journal',
