@@ -16,7 +16,7 @@ const AppleCTASection: React.FC = () => {
   return (
     <section 
       ref={sectionRef}
-      className="relative py-32 md:py-48 lg:py-64 overflow-hidden bg-background"
+      className="relative py-32 md:py-48 lg:py-64 overflow-hidden bg-background noise-texture"
     >
       {/* Gradient orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
