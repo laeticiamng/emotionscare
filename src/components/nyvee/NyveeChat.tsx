@@ -209,7 +209,7 @@ const NyveeChat: React.FC = () => {
         }
         setStep(3);
       } else if (reply.value === 'signup') {
-        window.location.href = '/signup';
+        navigate('/signup');
       } else if (reply.value === 'restart') {
         setMessages([]);
         setStep(0);
