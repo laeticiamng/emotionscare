@@ -258,7 +258,7 @@ const VirtualCoachEngine: React.FC<VirtualCoachEngineProps> = ({
     await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
     
     const responsePatterns = {
-      nyvee: {
+      'coach-ia': {
         empathetic: [
           `Je comprends que vous ressentez de la ${analysis.emotion}. C'est tout à fait naturel et valide. `,
           `Merci de partager cela avec moi. Vos émotions sont importantes et méritent d'être entendues. `,
