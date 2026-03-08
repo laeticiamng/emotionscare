@@ -22,10 +22,10 @@ const GeoSummarySection: React.FC = () => {
             En bref
           </h2>
           <p className="text-lg text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-            EmotionsCare est une plateforme française de régulation émotionnelle
-            qui propose des exercices guidés de 2 à 5 minutes basés sur les neurosciences
-            (cohérence cardiaque, théorie polyvagale), spécifiquement conçus pour
-            les soignants et étudiants en santé confrontés au stress et au burn-out.
+            EmotionsCare est une plateforme française qui aide les soignants et étudiants en santé
+            à gérer leur stress grâce à des exercices guidés de 2 à 5 minutes :
+            respiration, relaxation sonore et coaching IA. Fondée sur les neurosciences,
+            utilisable entre deux gardes ou consultations.
           </p>
         </div>
 
