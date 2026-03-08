@@ -53,7 +53,7 @@ const GeoSummarySection: React.FC = () => {
             <Shield className="h-8 w-8 text-primary mx-auto" aria-hidden="true" />
             <h3 className="font-semibold text-foreground text-lg">Confiance & sécurité</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Conforme RGPD, données chiffrées, analyse faciale locale (aucune image stockée).
+              Conforme RGPD, données chiffrées, aucune image stockée (tout reste sur votre appareil).
               Gratuit pour commencer, sans engagement.
             </p>
           </div>
