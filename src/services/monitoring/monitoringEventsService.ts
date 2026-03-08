@@ -21,7 +21,7 @@ export type MonitoringEventInsert = Omit<MonitoringEvent, 'id' | 'created_at'> &
 
 export type EventType = 'error' | 'warning' | 'info' | 'performance' | 'user_action';
 export type EventSeverity = 'low' | 'medium' | 'high' | 'critical';
-export type EventContext = 'AUTH' | 'API' | 'UI' | 'SCAN' | 'VR' | 'MUSIC' | 'ANALYTICS' | 'SYSTEM' | 'ERROR_BOUNDARY' | 'SESSION' | 'CONSENT' | 'SOCIAL' | 'NYVEE' | 'WHO5' | 'STAI6' | 'BREATH' | 'FLASH' | 'MIXER' | 'SCORES' | 'COACH';
+export type EventContext = 'AUTH' | 'API' | 'UI' | 'SCAN' | 'VR' | 'MUSIC' | 'ANALYTICS' | 'SYSTEM' | 'ERROR_BOUNDARY' | 'SESSION' | 'CONSENT' | 'SOCIAL' | 'COCOON' | 'WHO5' | 'STAI6' | 'BREATH' | 'FLASH' | 'MIXER' | 'SCORES' | 'COACH';
 
 export interface MonitoringEventStats {
   totalEvents: number;

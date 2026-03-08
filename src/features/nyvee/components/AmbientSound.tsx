@@ -1,5 +1,5 @@
 /**
- * Composant d'ambiance sonore pour Nyvee
+ * Composant d'ambiance sonore pour Cocon Respiration
  * Joue des sons apaisants pendant la session de respiration
  */
 

@@ -1,6 +1,6 @@
 /**
  * Service unifié pour Cocon Respiration - Respiration guidée avec bulle interactive et personnalisation
- * Consolide nyveeService.ts + nyveeServiceEnriched.ts
+ * Consolide les anciens services en un service unifié
  */
 
 import { supabase } from '@/integrations/supabase/client';
@@ -81,7 +81,7 @@ export const nyveeService = {
   // --------------------------------------------------------------------------
 
   /**
-   * Créer une nouvelle session Nyvee simple avec persistance DB
+   * Créer une nouvelle session Cocon Respiration avec persistance DB
    */
   async createSession(data: CreateNyveeSession): Promise<NyveeSession> {
     try {
@@ -124,7 +124,7 @@ export const nyveeService = {
       };
 
       Sentry.addBreadcrumb({
-        category: 'nyvee',
+        category: 'cocoon',
         message: 'Session created and persisted',
         data: { sessionId: session.id, intensity: data.intensity, targetCycles: data.targetCycles },
       });
@@ -137,7 +137,7 @@ export const nyveeService = {
   },
 
   /**
-   * Compléter une session Nyvee avec persistance DB
+   * Compléter une session Cocon Respiration avec persistance DB
    */
   async completeSession(data: CompleteNyveeSession): Promise<NyveeSession> {
     try {
@@ -200,7 +200,7 @@ export const nyveeService = {
       };
 
       Sentry.addBreadcrumb({
-        category: 'nyvee',
+        category: 'cocoon',
         message: 'Session completed and persisted',
         data: {
           sessionId: data.sessionId,

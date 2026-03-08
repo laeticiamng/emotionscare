@@ -1,4 +1,4 @@
-// @ts-nocheck
+// Predictive Analytics Provider re-export
 
 import { PredictiveAnalyticsProvider as ContextProvider } from '@/contexts/PredictiveAnalyticsContext';
 

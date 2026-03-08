@@ -1,6 +1,6 @@
 /**
- * Feature: Nyvee
- * Assistant IA émotionnel personnalisé
+ * Feature: Cocon Respiration
+ * Respiration guidée immersive avec bulle interactive
  */
 
 // Components

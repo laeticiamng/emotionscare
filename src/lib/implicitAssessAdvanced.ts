@@ -144,7 +144,7 @@ export class AuthenticityDetector {
 
   private async checkFacialVoiceAlignment(userId: string): Promise<number> {
     try {
-      // Récupérer les dernières analyses Nyvee (5 dernières heures)
+      // Récupérer les dernières analyses émotionnelles (5 dernières heures)
       const { data: scans } = await supabase
         .from('emotion_scans')
         .select('scan_result')
@@ -294,9 +294,9 @@ export class CrossModuleIntelligence {
     const vrToMood = await this.analyzeVRtoMood(userId);
     if (vrToMood) insights.push(vrToMood);
 
-    // Analyse 2: Nyvee → Story Synth
-    const nyveeToStory = await this.analyzeNyveeToStory(userId);
-    if (nyveeToStory) insights.push(nyveeToStory);
+    // Analyse 2: Cocon Respiration → Story Synth
+    const cocoonToStory = await this.analyzeCocoonToStory(userId);
+    if (cocoonToStory) insights.push(cocoonToStory);
 
     // Analyse 3: Music Therapy → Bubble Beat
     const musicToBubble = await this.analyzeMusicToBubble(userId);
@@ -364,9 +364,9 @@ export class CrossModuleIntelligence {
     }
   }
 
-  private async analyzeNyveeToStory(userId: string): Promise<CrossModuleInsight | null> {
+  private async analyzeCocoonToStory(userId: string): Promise<CrossModuleInsight | null> {
     try {
-      // Si Nyvee détecte tristesse, Story Synth devrait proposer contes réconfortants
+      // Si le Cocon détecte tristesse, Story Synth devrait proposer contes réconfortants
       const { data: recentScans } = await supabase
         .from('emotion_scans')
         .select('scan_result, created_at')
@@ -387,7 +387,7 @@ export class CrossModuleIntelligence {
 
       if (avgValence < 40) {
         return {
-          source_module: 'nyvee',
+          source_module: 'cocoon',
           target_module: 'story_synth',
           correlation: 0.75,
           recommendation: 'Tristesse détectée. Proposer contes apaisants ou héroïques (empowerment).',
@@ -395,7 +395,7 @@ export class CrossModuleIntelligence {
         };
       } else if (avgValence > 70) {
         return {
-          source_module: 'nyvee',
+          source_module: 'cocoon',
           target_module: 'story_synth',
           correlation: 0.7,
           recommendation: 'Humeur positive. Proposer contes aventureux ou créatifs.',
@@ -405,7 +405,7 @@ export class CrossModuleIntelligence {
 
       return null;
     } catch (error) {
-      logger.warn('Erreur analyzeNyveeToStory', error as Error, 'ANALYTICS');
+      logger.warn('Erreur analyzeCocoonToStory', error as Error, 'ANALYTICS');
       return null;
     }
   }
@@ -458,7 +458,7 @@ export class CrossModuleIntelligence {
     try {
       // Identifier les modules sous-utilisés
       const modules = [
-        { name: 'nyvee_sessions', label: 'Cocon Respiration' },
+        { name: 'breathing_vr_sessions', label: 'Cocon Respiration' },
         { name: 'vr_nebula_sessions', label: 'VR Galaxy' },
         { name: 'story_synth_sessions', label: 'Story Synth' },
         { name: 'mood_mixer_sessions', label: 'Mood Mixer' },

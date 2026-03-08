@@ -1,4 +1,4 @@
-// @ts-nocheck
+// Cocoon Store - Zustand persistent store pour les cocons débloqués
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -36,7 +36,7 @@ export const useCocoonStore = create<CocoonState>()(
       reset: () => set({ unlockedCocoons: ['crystal'] }),
     }),
     {
-      name: 'nyvee-cocoons',
+      name: 'cocoon-respiration-store',
     }
   )
 );

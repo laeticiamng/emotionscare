@@ -49,8 +49,8 @@ type SessionPhase = 'ready' | 'mood-before' | 'breathing' | 'mood-after' | 'comp
 
 const B2CNyveeCoconPage: FC = () => {
   usePageSEO({
-    title: 'Nyv\u00e9e Cocon - Espace de respiration | EmotionsCare',
-    description: 'Retrouvez votre calme avec Nyv\u00e9e : respiration guid\u00e9e, ambiances sonores et suivi de votre \u00e9tat \u00e9motionnel.',
+    title: 'Cocon Respiration - Espace de respiration | EmotionsCare',
+    description: 'Retrouvez votre calme avec le Cocon Respiration : respiration guidée, ambiances sonores et suivi de votre état émotionnel.',
   });
 
   const { has } = useFlags();
@@ -95,7 +95,7 @@ const B2CNyveeCoconPage: FC = () => {
       });
       setCurrentSessionId(result.id);
     } catch (error) {
-      logger.error('Failed to create session', error, 'NYVEE');
+      logger.error('Failed to create session', error, 'COACH');
     }
     
     setSessionPhase('breathing');
@@ -111,7 +111,7 @@ const B2CNyveeCoconPage: FC = () => {
       });
       setCurrentSessionId(result.id);
     } catch (error) {
-      logger.error('Failed to create session', error, 'NYVEE');
+      logger.error('Failed to create session', error, 'COACH');
     }
     
     setSessionPhase('breathing');
@@ -156,7 +156,7 @@ const B2CNyveeCoconPage: FC = () => {
           durationSeconds,
         });
       } catch (error) {
-        logger.error('Failed to complete session', error, 'NYVEE');
+        logger.error('Failed to complete session', error, 'COACH');
       }
     }
 
@@ -176,7 +176,7 @@ const B2CNyveeCoconPage: FC = () => {
           durationSeconds,
         });
       } catch (error) {
-        logger.error('Failed to complete session', error, 'NYVEE');
+        logger.error('Failed to complete session', error, 'COACH');
       }
     }
 
@@ -219,7 +219,7 @@ const B2CNyveeCoconPage: FC = () => {
           {/* Header */}
           <div className="text-center">
             <h1 className="text-4xl font-bold text-foreground">Protocole Night</h1>
-            <p className="text-sm font-medium text-primary mt-1">Nyvée - Ta bulle respirante</p>
+            <p className="text-sm font-medium text-primary mt-1">Cocon Respiration - Ta bulle respirante</p>
             <p className="mt-2 text-lg text-muted-foreground max-w-xl mx-auto">
               Sas d'apaisement avant le sommeil. Respiration immersive, suivi de l'humeur et collection de cocons pour un endormissement serein.
             </p>

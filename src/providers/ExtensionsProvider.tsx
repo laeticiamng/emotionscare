@@ -1,4 +1,4 @@
-// @ts-nocheck
+// Extensions Provider
 
 import React, { createContext, useContext, useState } from 'react';
 

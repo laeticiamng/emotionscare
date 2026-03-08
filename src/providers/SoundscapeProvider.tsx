@@ -1,4 +1,4 @@
-// @ts-nocheck
+// Soundscape Provider
 
 import React, { createContext, useContext, useState } from 'react';
 import { logger } from '@/lib/logger';

@@ -1,5 +1,5 @@
 /**
- * NyveeStreakWidget - Widget de série pour le module Nyvee
+ * CocoonStreakWidget - Widget de série pour le module Cocon Respiration
  */
 
 import { memo } from 'react';

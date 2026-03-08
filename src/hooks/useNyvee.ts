@@ -1,5 +1,5 @@
 /**
- * Hook React Query pour Nyvee
+ * Hook React Query pour Cocon Respiration
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';

@@ -1,5 +1,5 @@
 /**
- * NyveeFlowController - Contrôleur de flux post-session Cocon Respiration avec transitions douces
+ * CocoonFlowController - Contrôleur de flux post-session Cocon Respiration avec transitions douces
  */
 
 import { useState, useRef, useMemo, useEffect, useCallback, type ReactNode } from 'react';

@@ -1,5 +1,5 @@
 /**
- * NyveeExportButton - Bouton d'export des données Nyvee
+ * NyveeExportButton - Bouton d'export des données Cocon Respiration
  */
 
 import { memo, useState, useCallback } from 'react';
@@ -79,7 +79,7 @@ export const NyveeExportButton = memo(({ className }: NyveeExportButtonProps) =>
       
       const link = document.createElement('a');
       link.href = url;
-      link.download = `nyvee-sessions-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+      link.download = `cocoon-sessions-${format(new Date(), 'yyyy-MM-dd')}.csv`;
       link.click();
       
       URL.revokeObjectURL(url);
@@ -105,7 +105,7 @@ export const NyveeExportButton = memo(({ className }: NyveeExportButtonProps) =>
       
       const link = document.createElement('a');
       link.href = url;
-      link.download = `nyvee-data-${format(new Date(), 'yyyy-MM-dd')}.json`;
+      link.download = `cocoon-data-${format(new Date(), 'yyyy-MM-dd')}.json`;
       link.click();
       
       URL.revokeObjectURL(url);

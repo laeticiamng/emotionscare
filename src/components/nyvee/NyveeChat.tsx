@@ -1,5 +1,5 @@
 /**
- * NyveeChat - Coach IA, bulle flottante bottom-right
+ * CoachChat - Coach IA, bulle flottante bottom-right
  * Interface de chat avec réponses pré-écrites contextuelles
  */
 
@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 
 interface Message {
   id: string;
-  role: 'user' | 'nyvee';
+  role: 'user' | 'coach';
   text: string;
   timestamp: Date;
 }
@@ -22,7 +22,7 @@ interface QuickReply {
 }
 
 interface ConversationStep {
-  nyveeMessage: string;
+  coachMessage: string;
   quickReplies: QuickReply[];
   getResponse: (userChoice: string) => string;
   nextQuickReplies?: (userChoice: string) => QuickReply[];
@@ -30,7 +30,7 @@ interface ConversationStep {
 
 const CONVERSATION_FLOW: ConversationStep[] = [
   {
-    nyveeMessage: 'Bonjour, je suis votre coach en régulation émotionnelle. Comment vous sentez-vous en ce moment ?',
+    coachMessage: 'Bonjour, je suis votre coach en régulation émotionnelle. Comment vous sentez-vous en ce moment ?',
     quickReplies: [
       { label: 'Stressé(e)', value: 'stressed' },
       { label: 'Fatigué(e)', value: 'tired' },
@@ -75,7 +75,7 @@ const CONVERSATION_FLOW: ConversationStep[] = [
     },
   },
   {
-    nyveeMessage: '',
+    coachMessage: '',
     quickReplies: [],
     getResponse: () => {
       return 'Merci pour votre confiance. Voici ce que je vous recommande :';
@@ -125,14 +125,14 @@ const NyveeChat: React.FC = () => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  const addNyveeMessage = useCallback((text: string, replies?: QuickReply[]) => {
+  const addCoachMessage = useCallback((text: string, replies?: QuickReply[]) => {
     setIsTyping(true);
     setTimeout(() => {
       setMessages((prev) => [
         ...prev,
         {
-          id: `nyvee-${Date.now()}`,
-          role: 'nyvee',
+          id: `coach-${Date.now()}`,
+          role: 'coach',
           text,
           timestamp: new Date(),
         },
@@ -148,14 +148,13 @@ const NyveeChat: React.FC = () => {
     setIsOpen(true);
     if (messages.length === 0) {
       const firstStep = CONVERSATION_FLOW[0];
-      addNyveeMessage(firstStep.nyveeMessage, firstStep.quickReplies);
+      addCoachMessage(firstStep.coachMessage, firstStep.quickReplies);
       setStep(0);
     }
-  }, [messages.length, addNyveeMessage]);
+  }, [messages.length, addCoachMessage]);
 
   const handleQuickReply = useCallback(
     (reply: QuickReply) => {
-      // Add user message
       setMessages((prev) => [
         ...prev,
         {
@@ -172,13 +171,12 @@ const NyveeChat: React.FC = () => {
         const currentStep = CONVERSATION_FLOW[0];
         const responseText = currentStep.getResponse(reply.value);
         const nextReplies = currentStep.nextQuickReplies?.(reply.value) || [];
-        addNyveeMessage(responseText, nextReplies);
+        addCoachMessage(responseText, nextReplies);
         setStep(1);
       } else if (step === 1) {
-        // Second step - provide protocol recommendation
         const recommendation = PROTOCOL_RECOMMENDATIONS[initialEmotion] || PROTOCOL_RECOMMENDATIONS.good;
         const recMessage = `${recommendation.icon} **${recommendation.name}**\n\n${recommendation.description}\n\nVoulez-vous commencer ce protocole maintenant ?`;
-        addNyveeMessage(recMessage, [
+        addCoachMessage(recMessage, [
           { label: 'Oui, commencer', value: 'start' },
           { label: 'Voir d\'autres options', value: 'other' },
           { label: 'Merci, plus tard', value: 'later' },
@@ -186,17 +184,17 @@ const NyveeChat: React.FC = () => {
         setStep(2);
       } else if (step === 2) {
         if (reply.value === 'start') {
-          addNyveeMessage(
+          addCoachMessage(
             'Parfait ! Rendez-vous dans la section protocoles pour démarrer votre séance. Prenez soin de vous. 💙',
             [{ label: 'Nouvelle conversation', value: 'restart' }]
           );
         } else if (reply.value === 'other') {
-          addNyveeMessage(
+          addCoachMessage(
             'Voici d\'autres ressources disponibles :\n\n🛑 Protocole Stop — Pause d\'urgence\n🔄 Protocole Reset — Récupération\n🌙 Protocole Night — Sommeil\n🌬️ Protocole Respirez — Apaisement\n📊 Scanner Émotionnel — Bilan complet',
             [{ label: 'Nouvelle conversation', value: 'restart' }]
           );
         } else {
-          addNyveeMessage(
+          addCoachMessage(
             'Pas de problème. Je suis là quand vous en aurez besoin. N\'hésitez pas à revenir. 💙',
             [{ label: 'Nouvelle conversation', value: 'restart' }]
           );
@@ -208,10 +206,10 @@ const NyveeChat: React.FC = () => {
         setInitialEmotion('');
         setQuickReplies([]);
         const firstStep = CONVERSATION_FLOW[0];
-        addNyveeMessage(firstStep.nyveeMessage, firstStep.quickReplies);
+        addCoachMessage(firstStep.coachMessage, firstStep.quickReplies);
       }
     },
-    [step, initialEmotion, addNyveeMessage]
+    [step, initialEmotion, addCoachMessage]
   );
 
   const handleSendMessage = useCallback(() => {
@@ -228,13 +226,13 @@ const NyveeChat: React.FC = () => {
     ]);
     setInputValue('');
 
-    addNyveeMessage(
+    addCoachMessage(
       'Merci pour votre message. Pour vous accompagner au mieux, utilisez les suggestions ci-dessous ou explorez nos protocoles de régulation émotionnelle.',
       step < 1
         ? CONVERSATION_FLOW[0].quickReplies
         : [{ label: 'Nouvelle conversation', value: 'restart' }]
     );
-  }, [inputValue, step, addNyveeMessage]);
+  }, [inputValue, step, addCoachMessage]);
 
   const formatMessage = (text: string) => {
     return text.split('\n').map((line, i) => {
@@ -273,7 +271,6 @@ const NyveeChat: React.FC = () => {
             aria-label="Ouvrir le chat avec le Coach IA"
           >
             <Sparkles className="h-6 w-6" />
-            {/* Notification dot */}
             <span className="absolute -top-1 -right-1 w-4 h-4 bg-accent rounded-full border-2 border-background animate-pulse" />
           </motion.button>
         )}

@@ -9,7 +9,7 @@ describe('activityJardinOrchestrator', () => {
     expect(hints).toHaveLength(1);
     expect(hints[0]).toEqual({
       action: 'show_highlights',
-      items: ['Respirer doucement 1 min', 'Journal court (2 phrases)', 'Nyvée en silence'],
+      items: ['Respirer doucement 1 min', 'Journal court (2 phrases)', 'Coach IA en silence'],
     });
   });
 });

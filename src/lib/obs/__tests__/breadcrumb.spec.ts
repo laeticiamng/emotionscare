@@ -26,7 +26,7 @@ describe('addBreadcrumb helper', () => {
     const { addBreadcrumb } = await import('../breadcrumb');
 
     addBreadcrumb('ui.click', {
-      message: 'nyvee:start',
+      message: 'cocoon:start',
       data: {
         email: 'user@example.com',
         safe: 'ok',
@@ -39,7 +39,7 @@ describe('addBreadcrumb helper', () => {
     expect(payload).toMatchObject({
       category: 'ui.click',
       level: 'info',
-      message: 'nyvee:start',
+      message: 'cocoon:start',
       data: {
         email: '[REDACTED]',
         safe: 'ok',
