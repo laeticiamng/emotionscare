@@ -27,7 +27,7 @@ const rows: ComparisonRow[] = [
 ];
 
 const StatusIcon: React.FC<{ status: 'yes' | 'no' | 'partial' }> = ({ status }) => {
-  if (status === 'yes') return <Check className="h-5 w-5 text-emerald-500" aria-label="Oui" />;
+  if (status === 'yes') return <Check className="h-5 w-5 text-primary" aria-label="Oui" />;
   if (status === 'no') return <X className="h-5 w-5 text-destructive/60" aria-label="Non" />;
   return <Minus className="h-5 w-5 text-muted-foreground" aria-label="Partiel" />;
 };
