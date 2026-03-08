@@ -134,9 +134,9 @@ const AppleShowcaseSection: React.FC = () => {
             className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 md:mt-24"
           >
             {[
-              { title: "Stop", desc: "Pause d'urgence — interrompez le cycle de stress entre deux consultations", badge: "3 min" },
-              { title: "Reset", desc: "Rechargez votre énergie mentale après un moment difficile ou une garde", badge: "5 min" },
-              { title: "Night", desc: "Sas de décompression avant le sommeil avec respiration et sons apaisants", badge: "Sommeil" },
+              { title: "Pause d'urgence", desc: "Interrompez le cycle de stress entre deux consultations grâce à une respiration guidée.", badge: "3 min" },
+              { title: "Recharge mentale", desc: "Rechargez votre énergie après un moment difficile ou une garde.", badge: "5 min" },
+              { title: "Sas sommeil", desc: "Décompressez avant le coucher avec respiration immersive et sons apaisants.", badge: "Avant le coucher" },
             ].map((item, i) => (
               <Link key={i} to={ctaPath} className="text-center p-6 rounded-2xl border border-background/10 hover:border-primary/50 hover:bg-background/5 transition-all duration-300 cursor-pointer group block">
                 <span className="inline-block text-xs font-medium text-primary bg-primary/20 rounded-full px-3 py-1 mb-3">{item.badge}</span>
