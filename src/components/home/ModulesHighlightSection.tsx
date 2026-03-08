@@ -1,6 +1,7 @@
 /**
  * ModulesHighlightSection - Bento Grid layout inspiré 21st.dev
  * Cards cliquables avec hover effects premium
+ * Auth-aware: redirige vers le module ou vers /signup
  */
 
 import React, { memo } from 'react';
@@ -9,17 +10,19 @@ import { Badge } from '@/components/ui/badge';
 import { Brain, Heart, Music, Shield, Clock, Sparkles, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ModuleHighlight {
   title: string;
   description: string;
   icon: React.ElementType;
   highlight?: string;
-  /** Tailwind col/row span classes for bento sizing */
   span: string;
   gradient: string;
-  /** Link target when user clicks — /signup for unauthenticated */
-  href: string;
+  /** Route for authenticated users */
+  authHref: string;
+  /** Route for anonymous users */
+  anonHref: string;
 }
 
 const modules: ModuleHighlight[] = [
@@ -30,16 +33,18 @@ const modules: ModuleHighlight[] = [
     highlight: 'Auto-évaluation',
     span: 'md:col-span-2 md:row-span-2',
     gradient: 'from-primary/15 to-accent/10',
-    href: '/signup',
+    authHref: '/app/scan',
+    anonHref: '/signup',
   },
   {
     title: "Protocoles de respiration",
     description: "Cohérence cardiaque, technique 4-7-8, box breathing : retrouvez le calme rapidement.",
     icon: Heart,
-    highlight: 'Exercices guidés',
+    highlight: '2–5 min',
     span: 'md:col-span-1 md:row-span-1',
     gradient: 'from-accent/15 to-primary/10',
-    href: '/signup',
+    authHref: '/app/breathing',
+    anonHref: '/signup',
   },
   {
     title: "Coach IA",
@@ -48,7 +53,8 @@ const modules: ModuleHighlight[] = [
     highlight: 'Disponible 24/7',
     span: 'md:col-span-1 md:row-span-1',
     gradient: 'from-primary/10 to-accent/15',
-    href: '/signup',
+    authHref: '/app/coach',
+    anonHref: '/signup',
   },
   {
     title: "Musicothérapie",
@@ -57,16 +63,18 @@ const modules: ModuleHighlight[] = [
     highlight: 'Adaptatif',
     span: 'md:col-span-1 md:row-span-1',
     gradient: 'from-accent/10 to-primary/15',
-    href: '/signup',
+    authHref: '/app/music',
+    anonHref: '/signup',
   },
   {
-    title: "Protocole Night",
+    title: "Protocole Sommeil",
     description: "Sas d'apaisement avant le sommeil avec respiration immersive et ambiance sonore.",
     icon: Clock,
-    highlight: 'Sommeil',
+    highlight: 'Avant le coucher',
     span: 'md:col-span-1 md:row-span-1',
     gradient: 'from-primary/15 to-accent/5',
-    href: '/signup',
+    authHref: '/app/breathing',
+    anonHref: '/signup',
   },
   {
     title: "Données sécurisées",
@@ -75,13 +83,15 @@ const modules: ModuleHighlight[] = [
     highlight: 'RGPD',
     span: 'md:col-span-2 md:row-span-1',
     gradient: 'from-muted/50 to-muted/30',
-    href: '/legal/privacy',
+    authHref: '/legal/privacy',
+    anonHref: '/legal/privacy',
   },
 ];
 
-const BentoCard: React.FC<{ module: ModuleHighlight; index: number }> = memo(({ module, index }) => {
+const BentoCard: React.FC<{ module: ModuleHighlight; index: number; isAuthenticated: boolean }> = memo(({ module, index, isAuthenticated }) => {
   const Icon = module.icon as React.FC<{ className?: string; 'aria-hidden'?: boolean }>;
   const isLarge = module.span.includes('col-span-2') && module.span.includes('row-span-2');
+  const href = isAuthenticated ? module.authHref : module.anonHref;
 
   return (
     <motion.div
@@ -91,7 +101,7 @@ const BentoCard: React.FC<{ module: ModuleHighlight; index: number }> = memo(({ 
       transition={{ duration: 0.5, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
       className={cn('group relative', module.span)}
     >
-      <Link to={module.href} className="block h-full" aria-label={`${module.title} — ${module.highlight}`}>
+      <Link to={href} className="block h-full" aria-label={`${module.title} — ${module.highlight}`}>
         <div className={cn(
           "relative h-full rounded-3xl border border-border/50 p-6 md:p-8 overflow-hidden",
           "bg-gradient-to-br backdrop-blur-sm",
@@ -99,7 +109,6 @@ const BentoCard: React.FC<{ module: ModuleHighlight; index: number }> = memo(({ 
           module.gradient,
           isLarge && "md:p-10"
         )}>
-          {/* Animated border glow on hover */}
           <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none animated-border-glow" />
 
           <div className={cn("relative z-10 flex flex-col h-full", isLarge && "justify-between")}>
@@ -133,7 +142,10 @@ const BentoCard: React.FC<{ module: ModuleHighlight; index: number }> = memo(({ 
                   {module.highlight}
                 </Badge>
               )}
-              <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" aria-hidden="true" />
+              <span className="flex items-center gap-1 text-xs text-muted-foreground group-hover:text-primary transition-colors">
+                {isAuthenticated ? 'Ouvrir' : 'Essayer'}
+                <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+              </span>
             </div>
           </div>
         </div>
@@ -145,6 +157,8 @@ const BentoCard: React.FC<{ module: ModuleHighlight; index: number }> = memo(({ 
 BentoCard.displayName = 'BentoCard';
 
 const ModulesHighlightSection: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+
   return (
     <section
       className="py-24 md:py-32 bg-background"
@@ -170,7 +184,9 @@ const ModulesHighlightSection: React.FC = () => {
             </span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Cliquez sur un module pour l'essayer.
+            {isAuthenticated
+              ? 'Retrouvez vos modules favoris en un clic.'
+              : 'Découvrez chaque module — créez un compte gratuit pour commencer.'}
           </p>
         </motion.div>
 
@@ -181,7 +197,7 @@ const ModulesHighlightSection: React.FC = () => {
           aria-label="Modules EmotionsCare"
         >
           {modules.map((module, index) => (
-            <BentoCard key={index} module={module} index={index} />
+            <BentoCard key={index} module={module} index={index} isAuthenticated={isAuthenticated} />
           ))}
         </div>
       </div>
