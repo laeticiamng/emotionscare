@@ -1,6 +1,6 @@
 /**
  * Service unifié pour Cocon Respiration - Respiration guidée avec bulle interactive et personnalisation
- * Consolide nyveeService.ts + nyveeServiceEnriched.ts
+ * Consolide les anciens services en un service unifié
  */
 
 import { supabase } from '@/integrations/supabase/client';
