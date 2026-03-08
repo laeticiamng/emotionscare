@@ -85,7 +85,7 @@ export const useNyveeSessions = () => {
         .limit(50);
 
       if (error) {
-        logger.error('Error fetching nyvee sessions:', error as Error, 'NYVEE');
+        logger.error('Error fetching cocoon sessions:', error as Error, 'COACH');
         return [];
       }
 
