@@ -8,7 +8,7 @@ export type MusicAction =
   | { action: 'set_intensity'; key: MusicIntensityKey }
   | { action: 'set_bpm_profile'; key: MusicBpmProfile }
   | { action: 'set_crossfade'; ms: number }
-  | { action: 'post_cta'; key: 'nyvee' | 'encore_2min' | 'none' }
+  | { action: 'post_cta'; key: 'cocoon' | 'encore_2min' | 'none' }
   | { action: 'visualizer_mode'; key: 'reduced' | 'standard' };
 
 export interface MusicOrchestrationInputs {
