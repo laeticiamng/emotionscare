@@ -52,12 +52,12 @@ const PLANS = [
     description: 'L\'accompagnement complet pour les soignants',
     features: [
       'Tout le plan Gratuit',
-      'Accès illimité à tous les protocoles',
+      'Exercices illimités (respiration, relaxation, sommeil)',
       'Coach IA personnalisé 24/7',
-      'Musicothérapie intégrale',
-      'Scanner émotionnel avancé',
-      'Gamification XP et badges',
-      'Analyses détaillées & tendances',
+      'Musique apaisante intégrale',
+      'Auto-évaluation avancée avec suivi',
+      'Suivi de progression et récompenses',
+      'Analyses détaillées de votre évolution',
       'Support prioritaire',
     ],
     cta: 'Passer à Pro',
@@ -72,12 +72,12 @@ const PLANS = [
     period: '',
     description: 'Pour les hôpitaux, cliniques et établissements de santé',
     features: [
-      'Tout le plan Pro pour chaque utilisateur',
-      'Dashboard B2B RH anonymisé',
-      'Analytics bien-être des équipes',
+      'Tout le plan Pro pour chaque membre',
+      'Tableau de bord RH anonymisé',
+      'Suivi du bien-être des équipes',
       'Rapports hebdomadaires automatisés',
       'Alertes préventives collectives',
-      'Déploiement et onboarding dédié',
+      'Déploiement et accompagnement dédié',
       'Interlocuteur et support dédiés',
       'Facturation centralisée',
     ],
@@ -321,7 +321,7 @@ const PricingPageWorking: React.FC = () => {
               { icon: Shield, label: 'Conforme RGPD' },
               { icon: Lock, label: 'Paiement sécurisé Stripe' },
               { icon: Clock, label: 'Droit de rétractation 14j' },
-              { icon: Heart, label: 'Made in France' },
+              { icon: Heart, label: 'Conçu en France 🇫🇷' },
             ].map((badge, i) => (
               <motion.div
                 key={i}
@@ -372,7 +372,7 @@ const PricingPageWorking: React.FC = () => {
                 },
                 {
                   q: 'Comment fonctionne le plan Établissement ?',
-                  a: 'Le plan Établissement est conçu pour les organisations (hôpitaux, cliniques, EHPAD). Il inclut un dashboard RH anonymisé et des rapports d\'équipe. Contactez-nous pour un devis personnalisé.',
+                  a: 'Le plan Établissement est conçu pour les organisations (hôpitaux, cliniques, EHPAD). Il inclut un tableau de bord RH anonymisé et des rapports d\'équipe. Contactez-nous pour un devis personnalisé.',
                 },
                 {
                   q: 'Mes données sont-elles protégées ?',

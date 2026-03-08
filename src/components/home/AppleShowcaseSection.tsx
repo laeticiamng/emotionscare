@@ -40,14 +40,14 @@ const AppleShowcaseSection: React.FC = () => {
             className="text-center mb-16 md:mb-24"
           >
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-              Une expérience{' '}
+              Respirez.{' '}
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                immersive
+                C'est tout.
               </span>
             </h2>
             <p className="text-xl md:text-2xl text-background/70 max-w-2xl mx-auto">
               Des exercices courts qui vous recentrent immédiatement.
-              Coupez le mental. Retrouvez le calme en quelques respirations.
+              Suivez le guide visuel, laissez-vous porter.
             </p>
           </motion.div>
 

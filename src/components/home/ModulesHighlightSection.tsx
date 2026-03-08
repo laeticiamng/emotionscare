@@ -27,8 +27,8 @@ interface ModuleHighlight {
 
 const modules: ModuleHighlight[] = [
   {
-    title: "Scan émotionnel IA",
-    description: "Évaluez votre état émotionnel en quelques questions et recevez des recommandations personnalisées.",
+    title: "Scan émotionnel",
+    description: "Répondez à quelques questions simples pour évaluer votre niveau de stress et recevoir un exercice adapté.",
     icon: Brain,
     highlight: 'Auto-évaluation',
     span: 'md:col-span-2 md:row-span-2',
@@ -37,8 +37,8 @@ const modules: ModuleHighlight[] = [
     anonHref: '/signup',
   },
   {
-    title: "Protocoles de respiration",
-    description: "Cohérence cardiaque, technique 4-7-8, box breathing : retrouvez le calme rapidement.",
+    title: "Respiration guidée",
+    description: "Exercices de respiration animés, avec guide visuel et sonore. Retrouvez le calme en 2 à 5 minutes.",
     icon: Heart,
     highlight: '2–5 min',
     span: 'md:col-span-1 md:row-span-1',
@@ -48,7 +48,7 @@ const modules: ModuleHighlight[] = [
   },
   {
     title: "Coach IA",
-    description: "Accompagnement bienveillant 24/7, adapté aux professionnels de santé.",
+    description: "Un assistant bienveillant disponible 24h/24 pour vous écouter et vous guider.",
     icon: Sparkles,
     highlight: 'Disponible 24/7',
     span: 'md:col-span-1 md:row-span-1',
@@ -57,8 +57,8 @@ const modules: ModuleHighlight[] = [
     anonHref: '/signup',
   },
   {
-    title: "Musicothérapie",
-    description: "Fréquences binaurales et ambiances adaptées à votre état émotionnel.",
+    title: "Musique apaisante",
+    description: "Sons et ambiances sonores pour vous détendre, vous concentrer ou vous endormir.",
     icon: Music,
     highlight: 'Adaptatif',
     span: 'md:col-span-1 md:row-span-1',
@@ -67,8 +67,8 @@ const modules: ModuleHighlight[] = [
     anonHref: '/signup',
   },
   {
-    title: "Protocole Sommeil",
-    description: "Sas d'apaisement avant le sommeil avec respiration immersive et ambiance sonore.",
+    title: "Exercice sommeil",
+    description: "Un sas d'apaisement avant le coucher avec respiration lente et sons relaxants.",
     icon: Clock,
     highlight: 'Avant le coucher',
     span: 'md:col-span-1 md:row-span-1',

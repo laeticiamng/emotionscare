@@ -15,25 +15,25 @@ const principles = [
   {
     icon: Brain,
     title: "Fondée sur les neurosciences",
-    description: "Chaque exercice repose sur des protocoles validés : cohérence cardiaque, théorie polyvagale, pleine conscience.",
+    description: "Chaque exercice repose sur des techniques scientifiquement validées : respiration contrôlée, relaxation guidée, pleine conscience.",
   },
   {
     icon: Heart,
-    title: "Conçue par une soignante",
+    title: "Conçue par une médecin",
     description: "Créée par une médecin qui connaît la réalité du terrain : gardes, stress, charge émotionnelle quotidienne.",
   },
   {
     icon: Clock,
     title: "Adaptée à votre rythme",
-    description: "Des micro-interventions de 2 à 5 minutes, utilisables entre deux consultations ou pendant une pause.",
+    description: "Des exercices de 2 à 5 minutes, utilisables entre deux consultations ou pendant une pause.",
   },
 ];
 
 const trustBadges = [
   { icon: Shield, label: 'Conforme RGPD' },
-  { icon: Award, label: 'Hébergé en UE' },
-  { icon: GraduationCap, label: 'Basé sur les neurosciences' },
-  { icon: Heart, label: 'Créé par une soignante' },
+  { icon: Award, label: 'Hébergé en France' },
+  { icon: GraduationCap, label: 'Validé scientifiquement' },
+  { icon: Heart, label: 'Créé par une médecin' },
 ];
 
 const SocialProofSection: React.FC = () => {

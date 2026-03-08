@@ -22,10 +22,10 @@ const GeoSummarySection: React.FC = () => {
             En bref
           </h2>
           <p className="text-lg text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-            EmotionsCare est une plateforme française de régulation émotionnelle
-            qui propose des exercices guidés de 2 à 5 minutes basés sur les neurosciences
-            (cohérence cardiaque, théorie polyvagale), spécifiquement conçus pour
-            les soignants et étudiants en santé confrontés au stress et au burn-out.
+            EmotionsCare est une plateforme française qui aide les soignants et étudiants en santé
+            à gérer leur stress grâce à des exercices guidés de 2 à 5 minutes :
+            respiration, relaxation sonore et coaching IA. Fondée sur les neurosciences,
+            utilisable entre deux gardes ou consultations.
           </p>
         </div>
 
@@ -44,8 +44,8 @@ const GeoSummarySection: React.FC = () => {
             <Brain className="h-8 w-8 text-primary mx-auto" aria-hidden="true" />
             <h3 className="font-semibold text-foreground text-lg">Comment ça marche ?</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Exercices guidés de 2 à 5 minutes : respiration, scan émotionnel,
-              musicothérapie et coach IA disponible 24/7. Utilisable entre deux gardes.
+              Exercices guidés de 2 à 5 minutes : respiration animée, auto-évaluation,
+              musique apaisante et coaching IA disponible 24/7. Utilisable entre deux gardes.
             </p>
           </div>
 
@@ -53,7 +53,7 @@ const GeoSummarySection: React.FC = () => {
             <Shield className="h-8 w-8 text-primary mx-auto" aria-hidden="true" />
             <h3 className="font-semibold text-foreground text-lg">Confiance & sécurité</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Conforme RGPD, données chiffrées, analyse faciale locale (aucune image stockée).
+              Conforme RGPD, données chiffrées, aucune image stockée (tout reste sur votre appareil).
               Gratuit pour commencer, sans engagement.
             </p>
           </div>
@@ -76,7 +76,7 @@ const GeoSummarySection: React.FC = () => {
             </li>
             <li className="flex items-start gap-2">
               <Brain className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
-              <span>Fondé sur la cohérence cardiaque et la théorie polyvagale</span>
+              <span>Fondé sur les neurosciences (techniques de respiration validées scientifiquement)</span>
             </li>
             <li className="flex items-start gap-2">
               <Shield className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
