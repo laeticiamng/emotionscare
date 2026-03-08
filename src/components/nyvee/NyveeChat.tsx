@@ -30,7 +30,7 @@ interface ConversationStep {
 
 const CONVERSATION_FLOW: ConversationStep[] = [
   {
-    nyveeMessage: 'Bonjour, je suis Nyvée, votre coach en régulation émotionnelle. Comment vous sentez-vous en ce moment ?',
+    nyveeMessage: 'Bonjour, je suis votre coach en régulation émotionnelle. Comment vous sentez-vous en ce moment ?',
     quickReplies: [
       { label: 'Stressé(e)', value: 'stressed' },
       { label: 'Fatigué(e)', value: 'tired' },

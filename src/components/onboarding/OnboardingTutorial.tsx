@@ -92,7 +92,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
   },
   {
     id: 'coach',
-    title: 'Coach IA Nyvée',
+    title: 'Coach IA',
     description: 'Un accompagnement bienveillant et personnalisé, disponible 24h/24.',
     icon: <Heart className="h-12 w-12 text-destructive" />,
     features: [

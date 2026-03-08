@@ -95,7 +95,7 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
     modules: [
       { path: '/app/coach', label: 'Coach IA', icon: '🤖', description: 'Accompagnement IA' },
       { path: '/app/coach-micro', label: 'Micro-Décisions', icon: '⚡', description: 'Aide rapide' },
-      { path: '/app/nyvee', label: 'Nyvée Cocon', icon: '🦋', description: 'Compagnon bienveillant' },
+      { path: '/app/nyvee', label: 'Cocon Respiration', icon: '🦋', description: 'Compagnon bienveillant' },
       { path: '/app/coach/programs', label: 'Programmes', icon: '📋', description: 'Plans structurés' },
       { path: '/app/coach/sessions', label: 'Historique', icon: '📜', description: 'Sessions passées' },
       { path: '/app/support/chatbot', label: 'Support IA', icon: '💬', description: 'Assistance chatbot' },

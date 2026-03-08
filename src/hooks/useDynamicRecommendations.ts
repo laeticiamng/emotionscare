@@ -64,7 +64,7 @@ const RECOMMENDATIONS_CONFIG: Record<string, Recommendation> = {
   },
   coach_talk: {
     id: 'coach_talk',
-    title: 'Discuter avec Nyvée',
+    title: 'Discuter avec le Coach IA',
     description: 'Votre coach IA est disponible pour vous écouter',
     reason: 'Un soutien bienveillant à portée de main',
     to: '/app/coach',

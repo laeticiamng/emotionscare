@@ -354,7 +354,7 @@ const AboutPage: React.FC = () => {
                     },
                     {
                       icon: Sparkles,
-                      title: 'Coach IA Nyvée',
+                      title: 'Coach IA',
                       description:
                         'Un accompagnement bienveillant disponible 24/7, adapté aux professionnels de santé.',
                     },

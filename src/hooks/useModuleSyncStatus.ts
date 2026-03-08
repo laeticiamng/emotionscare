@@ -56,7 +56,7 @@ const MODULE_DEFINITIONS = [
   // Coaching
   { name: 'Coach IA', category: 'Coaching', table: 'ai_coach_sessions', edgeFunction: 'ai-coach' },
   { name: 'Coach Micro', category: 'Coaching', table: 'micro_decisions', edgeFunction: 'ai-coach-response' },
-  { name: 'Nyvee Cocon', category: 'Coaching', table: 'nyvee_conversations', edgeFunction: 'chat-coach' },
+  { name: 'Cocon Respiration', category: 'Coaching', table: 'nyvee_conversations', edgeFunction: 'chat-coach' },
   
   // Immersif
   { name: 'VR Galaxy', category: 'Immersif', table: 'vr_sessions', edgeFunction: 'vr-galaxy-metrics' },

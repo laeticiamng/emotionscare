@@ -155,7 +155,7 @@ export default function ParkJourney() {
       number: 2,
       icon: Wind,
       title: "La Bulle Respirante",
-      subtitle: "Nyvée /app/nyvee",
+      subtitle: "Cocon Respiration",
       narrative: "Tu traverses un couloir de brume et découvres une immense bulle suspendue.\nElle respire avec toi, gonfle et dégonfle, résonnant comme un cœur géant.\nPlus tu respires calmement, plus la bulle devient transparente… révélant des constellations cachées.\nTu en ressors plus léger, comme si tu avais inspiré des étoiles.",
       gradient: "from-blue-500/20 to-cyan-500/20",
       route: "/app/nyvee"
