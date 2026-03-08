@@ -37,7 +37,7 @@ const CARD_ORDER: CardOrderMapping = {
 
 const PRIMARY_CTA: PrimaryCtaMapping = {
   very_low: 'breath_soft',
-  low: 'nyvee_calm',
+  low: 'coach_ia_calm',
   neutral: 'scan',
   high: 'music_soft',
   very_high: 'coach_micro',
