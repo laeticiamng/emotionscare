@@ -1,7 +1,6 @@
 /**
  * AppleFeatureSection - Section produit style Apple avec scroll reveal
  * Chaque feature se révèle progressivement au scroll
- * CTA retiré pour éviter la fatigue — seuls Hero et CTA finale en ont
  */
 
 import React, { memo, useRef } from 'react';
@@ -28,9 +27,9 @@ const features: Feature[] = [
     icon: <Zap className="h-12 w-12" />,
     title: "Agit immédiatement.",
     subtitle: "Pas de préparation, pas de matériel.",
-    description: "Ouvrez l'app, choisissez un protocole et suivez le guide. Pensé pour s'intégrer entre deux consultations, sans perturber votre rythme.",
+    description: "Ouvrez l'app, choisissez un exercice et suivez le guide. Pensé pour s'intégrer entre deux consultations, sans perturber votre rythme.",
     gradient: "from-primary to-accent",
-    stat: { value: "4", label: "protocoles d'urgence" }
+    stat: { value: "2–5", label: "minutes par exercice" }
   },
   {
     icon: <Brain className="h-12 w-12" />,
@@ -42,19 +41,19 @@ const features: Feature[] = [
   },
   {
     icon: <Shield className="h-12 w-12" />,
-    title: "Rien ne sort.",
+    title: "Vos données restent chez vous.",
     subtitle: "Analyse locale, zéro image stockée.",
-    description: "Le scan facial tourne sur votre appareil. Aucune vidéo, aucune photo ne quitte votre téléphone. Jamais.",
+    description: "Le scan facial tourne sur votre appareil. Aucune vidéo, aucune photo ne quitte votre téléphone. Jamais. Conforme RGPD.",
     gradient: "from-primary/80 to-primary",
-    stat: { value: "0", label: "images envoyées au serveur" }
+    stat: { value: "100%", label: "traitement local des images" }
   },
   {
     icon: <Heart className="h-12 w-12" />,
     title: "Pensé pour le terrain.",
     subtitle: "Pas une appli de méditation de plus.",
-    description: "Gardes de nuit, stress post-consultation, charge émotionnelle : chaque protocole répond à un moment précis de votre quotidien.",
+    description: "Gardes de nuit, stress post-consultation, charge émotionnelle : chaque exercice répond à un moment précis de votre quotidien de soignant.",
     gradient: "from-accent/80 to-accent",
-    stat: { value: "3", label: "contextes : urgence, récupération, sommeil" }
+    stat: { value: "3", label: "modes : urgence, récupération, sommeil" }
   },
 ];
 
@@ -146,9 +145,9 @@ const AppleFeatureSection: React.FC = () => {
           className="max-w-4xl"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-            Pourquoi personne n'y avait{' '}
+            Pourquoi les soignants{' '}
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              pensé avant ?
+              choisissent EmotionsCare
             </span>
           </h2>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl">
