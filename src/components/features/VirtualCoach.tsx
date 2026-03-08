@@ -53,7 +53,7 @@ const VirtualCoach: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
-      content: 'Bonjour ! Je suis Nyvée, votre coach émotionnel personnel. Je suis là pour vous accompagner dans votre bien-être. Comment vous sentez-vous aujourd\'hui ?',
+      content: 'Bonjour ! Je suis votre coach émotionnel personnel. Je suis là pour vous accompagner dans votre bien-être. Comment vous sentez-vous aujourd\'hui ?',
       sender: 'coach',
       timestamp: new Date(),
       type: 'question'
@@ -66,7 +66,7 @@ const VirtualCoach: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const coach: CoachPersonality = {
-    name: 'Nyvée',
+    name: 'Coach IA',
     role: 'Coach Émotionnel IA',
     approach: 'Bienveillant & Personnalisé',
     avatar: '🤖',
@@ -366,7 +366,7 @@ const VirtualCoach: React.FC = () => {
         <CardContent className="p-4">
           <div className="flex gap-3">
             <Textarea
-              placeholder="Exprimez-vous librement... Nyvée vous écoute avec bienveillance."
+              placeholder="Exprimez-vous librement... Votre coach vous écoute avec bienveillance."
               value={currentMessage}
               onChange={(e) => setCurrentMessage(e.target.value)}
               className="min-h-[60px] resize-none"

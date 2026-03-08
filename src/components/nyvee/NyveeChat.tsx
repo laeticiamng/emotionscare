@@ -1,5 +1,5 @@
 /**
- * NyveeChat - Coach IA Nyvée, bulle flottante bottom-right
+ * NyveeChat - Coach IA, bulle flottante bottom-right
  * Interface de chat avec réponses pré-écrites contextuelles
  */
 
@@ -30,7 +30,7 @@ interface ConversationStep {
 
 const CONVERSATION_FLOW: ConversationStep[] = [
   {
-    nyveeMessage: 'Bonjour, je suis Nyvée, votre coach en régulation émotionnelle. Comment vous sentez-vous en ce moment ?',
+    nyveeMessage: 'Bonjour, je suis votre coach en régulation émotionnelle. Comment vous sentez-vous en ce moment ?',
     quickReplies: [
       { label: 'Stressé(e)', value: 'stressed' },
       { label: 'Fatigué(e)', value: 'tired' },
@@ -270,7 +270,7 @@ const NyveeChat: React.FC = () => {
             whileTap={{ scale: 0.95 }}
             onClick={handleOpen}
             className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-primary to-accent text-white shadow-lg shadow-primary/30 flex items-center justify-center hover:shadow-xl hover:shadow-primary/40 transition-shadow"
-            aria-label="Ouvrir le chat avec Nyvée, coach IA"
+            aria-label="Ouvrir le chat avec le Coach IA"
           >
             <Sparkles className="h-6 w-6" />
             {/* Notification dot */}
@@ -289,7 +289,7 @@ const NyveeChat: React.FC = () => {
             transition={{ duration: 0.2 }}
             className="fixed bottom-6 right-6 z-50 w-[360px] max-w-[calc(100vw-2rem)] h-[520px] max-h-[calc(100vh-6rem)] bg-background border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
             role="dialog"
-            aria-label="Chat avec Nyvée"
+            aria-label="Chat avec le Coach IA"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-primary to-accent text-white">
@@ -298,7 +298,7 @@ const NyveeChat: React.FC = () => {
                   <Heart className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="font-semibold text-sm">Nyvée</p>
+                  <p className="font-semibold text-sm">Coach IA</p>
                   <p className="text-xs text-white/80">Coach IA EmotionsCare</p>
                 </div>
               </div>

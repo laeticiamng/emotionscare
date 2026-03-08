@@ -25,7 +25,7 @@ export default function NyveeTestPage() {
           fontWeight: 'bold',
           marginBottom: '1rem'
         }}>
-          ✅ Page de test Nyvée
+          ✅ Page de test Cocon Respiration
         </h1>
         <p style={{ marginBottom: '1.5rem', color: '#6b7280' }}>
           Si tu vois cette page, la route /test-nyvee fonctionne correctement !
@@ -42,7 +42,7 @@ export default function NyveeTestPage() {
             fontWeight: '600'
           }}
         >
-          🌿 Aller vers Nyvée
+          🌿 Aller vers le Cocon
         </Link>
       </div>
     </div>

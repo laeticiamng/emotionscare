@@ -61,7 +61,7 @@ const MessagesPage: React.FC = () => {
     {
       id: 1,
       sender: 'ai',
-      content: 'Bonjour ! Je suis Nyvée, votre assistant IA émotionnel. Comment vous sentez-vous aujourd\'hui ?',
+      content: 'Bonjour ! Je suis votre assistant Coach IA émotionnel. Comment vous sentez-vous aujourd\'hui ?',
       timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
     },
   ];
@@ -126,7 +126,7 @@ const MessagesPage: React.FC = () => {
   };
 
   const exportConversation = () => {
-    const text = messages.map(m => `[${m.timestamp}] ${m.sender === 'user' ? 'Vous' : 'Nyvée'}: ${m.content}`).join('\n');
+    const text = messages.map(m => `[${m.timestamp}] ${m.sender === 'user' ? 'Vous' : 'Coach IA'}: ${m.content}`).join('\n');
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -160,7 +160,7 @@ const MessagesPage: React.FC = () => {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <MessageSquare className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold tracking-tight">Messages avec Nyvée</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Messages avec le Coach IA</h1>
           <Badge variant="outline" className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-400">
             <Bot className="h-3 w-3 mr-1" />
             IA Active
@@ -183,7 +183,7 @@ const MessagesPage: React.FC = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <div className="font-semibold">Nyvée</div>
+                  <div className="font-semibold">Coach IA</div>
                   <div className="text-sm text-muted-foreground">Assistant IA Émotionnel</div>
                 </div>
                 <div className="ml-auto flex gap-2">
@@ -237,7 +237,7 @@ const MessagesPage: React.FC = () => {
                     <div className="p-3 rounded-lg bg-muted">
                       <div className="flex gap-1">
                         <RefreshCw className="h-4 w-4 animate-spin" />
-                        <span className="text-sm text-muted-foreground">Nyvée réfléchit...</span>
+                        <span className="text-sm text-muted-foreground">Coach IA réfléchit...</span>
                       </div>
                     </div>
                   </div>
@@ -255,7 +255,7 @@ const MessagesPage: React.FC = () => {
                 </Button>
                 <div className="flex-1 flex gap-2">
                   <Input
-                    placeholder="Tapez votre message à Nyvée..."
+                    placeholder="Tapez votre message au Coach IA..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}

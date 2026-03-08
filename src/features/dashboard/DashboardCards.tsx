@@ -24,7 +24,7 @@ type CardConfig = {
 
 const CARD_CATALOG: Record<DashboardCardId, CardConfig> = {
   'card-nyvee': {
-    title: 'Nyvée',
+    title: 'Coach IA',
     description: 'Un échange chaleureux avec l’IA compagnon.',
     to: '/app/coach',
     icon: MessageCircle,

@@ -65,7 +65,7 @@ export const ShareSessionButton = memo(({
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Ma session Nyvée',
+          title: 'Ma session EmotionsCare',
           text: generateShareText(),
         });
       } catch (error) {

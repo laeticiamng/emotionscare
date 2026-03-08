@@ -188,7 +188,7 @@ const allRoutes: RouteItem[] = [
   { path: '/app/coach/sessions', label: 'Sessions Coach', description: 'Historique coaching', category: 'Coaching', icon: MessageCircle, requiresAuth: true },
   { path: '/app/coach/analytics', label: 'Analytics Coach', description: 'Statistiques coaching', category: 'Coaching', icon: BarChart3, requiresAuth: true },
   { path: '/app/coach-micro', label: 'Coach Micro', description: 'Micro-décisions', category: 'Coaching', icon: Zap, requiresAuth: true },
-  { path: '/app/nyvee', label: 'Nyvee Cocon', description: 'Compagnon virtuel', category: 'Coaching', icon: Heart, requiresAuth: true },
+  { path: '/app/nyvee', label: 'Cocon Respiration', description: 'Compagnon virtuel', category: 'Coaching', icon: Heart, requiresAuth: true },
   { path: '/app/how-it-adapts', label: 'Comment ça marche', description: 'L\'adaptation IA', category: 'Coaching', icon: Brain, requiresAuth: true },
   { path: '/app/support/chatbot', label: 'Support Chatbot', description: 'Assistance IA', category: 'Coaching', icon: MessageCircle, requiresAuth: true },
   
@@ -408,7 +408,7 @@ const allRoutes: RouteItem[] = [
   { path: '/403', label: '403 Forbidden', description: 'Accès interdit', category: 'Système', icon: Shield },
   { path: '/404', label: '404 Not Found', description: 'Page introuvable', category: 'Système', icon: HelpCircle },
   { path: '/500', label: '500 Server Error', description: 'Erreur serveur', category: 'Système', icon: AlertTriangle },
-  { path: '/test-nyvee', label: 'Test Nyvee', description: 'Test compagnon', category: 'Système', icon: Bug },
+  { path: '/test-nyvee', label: 'Test Cocon', description: 'Test compagnon', category: 'Système', icon: Bug },
   { path: '/test', label: 'Test Page', description: 'Page de test', category: 'Système', icon: Bug },
 ];
 

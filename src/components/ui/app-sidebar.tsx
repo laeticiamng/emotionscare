@@ -46,7 +46,7 @@ const navigationItems = [
     items: [
       { title: 'Respiration', url: '/app/breath', icon: Heart },
       { title: 'VR Galaxy', url: '/app/vr', icon: Sparkles },
-      { title: 'Cocon Nyvee', url: '/app/nyvee', icon: Heart },
+      { title: 'Cocon Respiration', url: '/app/nyvee', icon: Heart },
     ],
   },
   {

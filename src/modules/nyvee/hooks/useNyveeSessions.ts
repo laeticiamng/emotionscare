@@ -241,7 +241,7 @@ export const useNyveeSessions = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['nyvee-sessions', userId] });
-      toast({ title: 'Session Nyvee démarrée' });
+      toast({ title: 'Session démarrée' });
     },
     onError: (error: Error) => {
       toast({

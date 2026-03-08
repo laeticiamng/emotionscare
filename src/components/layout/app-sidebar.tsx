@@ -207,12 +207,12 @@ export function AppSidebar() {
           description: "Nouvelle interface journal enrichie"
         },
         {
-          title: "Nyvee Cocon",
+          title: "Cocon Respiration",
           url: routes.b2c.nyvee(),
           icon: Heart,
           badge: "Beta",
           gradient: "from-rose-500 to-pink-500",
-          description: "Cocoon émotionnel Nyvee"
+          description: "Cocon émotionnel de respiration"
         },
         {
           title: "Story Synth",

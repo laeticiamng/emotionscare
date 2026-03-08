@@ -95,7 +95,7 @@ const HomeB2CPage: React.FC = () => {
     },
     {
       icon: MessageCircle,
-      title: 'Coach IA Nyvée',
+      title: 'Coach IA',
       content: 'Un accompagnement bienveillant disponible 24/7, adapté aux professionnels de santé et étudiants.',
     }
   ];

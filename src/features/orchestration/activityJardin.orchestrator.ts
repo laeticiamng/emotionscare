@@ -7,7 +7,7 @@ export interface ActivityJardinOrchestratorInput {
 
 export const activityJardinOrchestrator = ({ who5Level }: ActivityJardinOrchestratorInput): UIHint[] => {
   void who5Level;
-  const items = ['Respirer doucement 1 min', 'Journal court (2 phrases)', 'Nyvée en silence'];
+  const items = ['Respirer doucement 1 min', 'Journal court (2 phrases)', 'Coach IA en silence'];
   return [{ action: 'show_highlights', items }];
 };
 

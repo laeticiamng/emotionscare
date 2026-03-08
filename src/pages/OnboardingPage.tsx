@@ -89,7 +89,7 @@ const OnboardingPage: React.FC = () => {
     { id: 'music', label: 'Musicothérapie', icon: '🎵' },
     { id: 'breathing', label: 'Respiration guidée', icon: '🌬️' },
     { id: 'journal', label: 'Journal émotionnel', icon: '📝' },
-    { id: 'coach', label: 'Coach IA Nyvée', icon: '🤖' }
+    { id: 'coach', label: 'Coach IA', icon: '🤖' }
   ];
 
   const handleGoalToggle = (goalId: string) => {

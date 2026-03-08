@@ -238,7 +238,7 @@ const Header: React.FC<HeaderProps> = ({
       icon: Brain,
       badge: 'Premium',
       children: [
-        { label: 'Chat avec Nyvée', href: '/app/coach' },
+        { label: 'Chat avec le Coach IA', href: '/app/coach' },
         { label: 'Séances guidées', href: '/app/coach/sessions' },
         { label: 'Programmes', href: '/app/coach/programs' },
       ]

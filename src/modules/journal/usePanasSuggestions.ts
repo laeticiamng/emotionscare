@@ -66,8 +66,8 @@ const SUGGESTIONS: SuggestionSet = {
       id: 'micro-kindness',
       title: 'Micro-attention douce',
       description:
-        "Liste trois attentions délicates que tu pourrais t'offrir aujourd'hui (Nyvée doux, chaleur, pause) pour <em>adoucir la journée</em>.",
-      prompt: "Quelles petites attentions ou ressources Nyvée douces peux-tu t'accorder pour rendre cette journée plus douce ?",
+        "Liste trois attentions délicates que tu pourrais t'offrir aujourd'hui (cocon doux, chaleur, pause) pour <em>adoucir la journée</em>.",
+      prompt: "Quelles petites attentions ou ressources douces peux-tu t'accorder pour rendre cette journée plus douce ?",
     },
     {
       id: 'compassion-letter',

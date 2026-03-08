@@ -29,7 +29,7 @@ const SCREENS = [
   },
   {
     id: 'coach',
-    label: 'Coach Nyvée',
+    label: 'Coach IA',
     title: 'Accompagnement IA personnalisé',
     description: 'Un coach IA empathique qui vous guide avec des techniques adaptées à votre situation.',
     image: screenshotCoach,

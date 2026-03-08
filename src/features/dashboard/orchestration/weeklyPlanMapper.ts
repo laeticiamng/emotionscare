@@ -17,7 +17,7 @@ const QUICK_ACTION_ORDER: Record<'default' | WellbeingTone, string[]> = {
 export const PLAN_DESCRIPTIONS: Record<WellbeingTone, { intro: string; helper: string }> = {
   delicate: {
     intro: 'On ralentit pour prendre soin de vous cette semaine.',
-    helper: 'Respiration douce et cocon Nyvée passent en premier.',
+    helper: 'Respiration douce et cocon passent en premier.',
   },
   steady: {
     intro: 'Le rythme reste posé et équilibré.',

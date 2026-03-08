@@ -68,7 +68,7 @@ interface VirtualCoachEngineProps {
  * Assistant thérapeutique intelligent avec personnalité adaptative
  */
 const VirtualCoachEngine: React.FC<VirtualCoachEngineProps> = ({
-  initialPersonality = 'nyvee',
+  initialPersonality = 'coach-ia',
   userName = 'utilisateur',
   contextualMode = true,
   voiceEnabled = true,
@@ -96,7 +96,7 @@ const VirtualCoachEngine: React.FC<VirtualCoachEngineProps> = ({
   // Personnalités de coach disponibles
   const availablePersonalities: CoachPersonality[] = [
     {
-      id: 'nyvee',
+      id: 'coach-ia',
       name: 'Coach IA',
       description: 'Coach empathique spécialisé en bien-être émotionnel',
       traits: ['Empathique', 'Bienveillante', 'Intuitive', 'Patiente'],
@@ -191,7 +191,7 @@ const VirtualCoachEngine: React.FC<VirtualCoachEngineProps> = ({
 
   const generateWelcomeMessage = (personality: CoachPersonality, userName: string): string => {
     const welcomeMessages = {
-      nyvee: `Bonjour ${userName} ! Je suis votre coach en bien-être émotionnel, disponible 24h/24. Je suis là pour vous accompagner avec bienveillance dans votre parcours. Comment vous sentez-vous aujourd'hui ? 🌸`,
+      'coach-ia': `Bonjour ${userName} ! Je suis votre coach en bien-être émotionnel, disponible 24h/24. Je suis là pour vous accompagner avec bienveillance dans votre parcours. Comment vous sentez-vous aujourd'hui ? 🌸`,
       marcus: `Salut ${userName} ! Marcus à votre service ! 💪 Prêt à débloquer votre potentiel et atteindre vos objectifs ? Dites-moi ce qui vous motive aujourd'hui !`,
       sophia: `Bonjour ${userName}. Je suis Sophia, thérapeute professionnelle. Mon approche est structurée et bienveillante. Quel aspect de votre bien-être souhaitez-vous explorer aujourd'hui ?`,
       zen: `Namaste ${userName} 🙏 Je suis Zen, votre guide vers l'équilibre intérieur. Prenons un moment pour nous connecter à l'instant présent. Qu'est-ce qui occupe votre esprit aujourd'hui ?`
@@ -258,7 +258,7 @@ const VirtualCoachEngine: React.FC<VirtualCoachEngineProps> = ({
     await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
     
     const responsePatterns = {
-      nyvee: {
+      'coach-ia': {
         empathetic: [
           `Je comprends que vous ressentez de la ${analysis.emotion}. C'est tout à fait naturel et valide. `,
           `Merci de partager cela avec moi. Vos émotions sont importantes et méritent d'être entendues. `,

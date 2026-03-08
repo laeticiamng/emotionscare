@@ -84,7 +84,7 @@ export const PreCheck: FC<PreCheckProps> = memo(({
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
                 <p id={statusId} className="text-sm font-medium text-foreground">
-                  {announcement || 'Préparer un ancrage doux avant de plonger dans Nyvée.'}
+                  {announcement || 'Préparer un ancrage doux avant de plonger dans la session.'}
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Ton ressenti actuel guidera la scène : {summaryLabel}.

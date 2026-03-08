@@ -185,7 +185,7 @@ const NyveeFlowController = ({
       return (
         <Card className="border-primary/50 bg-primary/10">
           <CardHeader>
-            <CardTitle className="text-base font-semibold text-foreground">Nyvée t'écoute</CardTitle>
+            <CardTitle className="text-base font-semibold text-foreground">Coach IA à l'écoute</CardTitle>
             <CardDescription className="text-sm text-muted-foreground">
               Partage ton ressenti avant et après pour que je puisse t'orienter en douceur.
             </CardDescription>
