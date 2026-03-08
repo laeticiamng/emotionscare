@@ -145,13 +145,13 @@ const AppleFeatureSection: React.FC = () => {
           className="max-w-4xl"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-            Pourquoi les soignants{' '}
+            Ce qui rend EmotionsCare{' '}
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              choisissent EmotionsCare
+              différent
             </span>
           </h2>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl">
-            Parce qu'il fallait vivre ce que vivent les soignants pour créer les bonnes solutions.
+            Conçu par une médecin qui connaît la réalité du terrain.
           </p>
         </motion.div>
       </div>

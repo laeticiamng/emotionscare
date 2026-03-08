@@ -76,7 +76,7 @@ const GeoSummarySection: React.FC = () => {
             </li>
             <li className="flex items-start gap-2">
               <Brain className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
-              <span>Fondé sur la cohérence cardiaque et la théorie polyvagale</span>
+              <span>Fondé sur les neurosciences (techniques de respiration validées scientifiquement)</span>
             </li>
             <li className="flex items-start gap-2">
               <Shield className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />

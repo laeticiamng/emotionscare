@@ -31,9 +31,9 @@ const principles = [
 
 const trustBadges = [
   { icon: Shield, label: 'Conforme RGPD' },
-  { icon: Award, label: 'Hébergé en UE' },
-  { icon: GraduationCap, label: 'Basé sur les neurosciences' },
-  { icon: Heart, label: 'Créé par une soignante' },
+  { icon: Award, label: 'Hébergé en France' },
+  { icon: GraduationCap, label: 'Validé scientifiquement' },
+  { icon: Heart, label: 'Créé par une médecin' },
 ];
 
 const SocialProofSection: React.FC = () => {
