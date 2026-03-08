@@ -405,7 +405,7 @@ export class CrossModuleIntelligence {
 
       return null;
     } catch (error) {
-      logger.warn('Erreur analyzeNyveeToStory', error as Error, 'ANALYTICS');
+      logger.warn('Erreur analyzeCocoonToStory', error as Error, 'ANALYTICS');
       return null;
     }
   }
