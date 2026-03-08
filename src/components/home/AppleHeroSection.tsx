@@ -118,21 +118,21 @@ const AppleHeroSection: React.FC = () => {
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.8 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
             className="text-xl sm:text-2xl md:text-3xl text-muted-foreground max-w-3xl mx-auto mb-4 font-light leading-relaxed"
           >
-            La première plateforme de régulation émotionnelle
-            <span className="text-foreground font-medium"> conçue par et pour les soignants.</span>
+            Respiration guidée, coaching IA et exercices anti-stress
+            <span className="text-foreground font-medium"> pensés pour les soignants.</span>
           </motion.p>
 
           {/* Concrete value prop */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.9 }}
+            transition={{ duration: 0.8, delay: 0.85 }}
             className="text-base sm:text-lg text-muted-foreground/80 max-w-xl mx-auto mb-8"
           >
-            Exercices guidés contre le stress. Sans rendez-vous. Sans jugement. <span className="text-primary font-medium">100% gratuit pour commencer.</span>
+            Utilisable entre deux consultations. Sans rendez-vous. Sans jugement. <span className="text-primary font-medium">Gratuit pour commencer.</span>
           </motion.p>
 
           {/* CTAs */}
