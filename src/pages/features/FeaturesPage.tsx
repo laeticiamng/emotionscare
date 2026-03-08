@@ -108,7 +108,7 @@ const SECTIONS: {
       },
       {
         id: 'coach',
-        title: 'Coach IA Nyvée',
+        title: 'Coach IA',
         tagline: 'Un accompagnateur empathique, disponible 24/7',
         description: 'Votre coach émotionnel IA disponible 24/7. Conversations bienveillantes avec techniques CBT validées, adaptées aux professionnels de santé.',
         icon: Bot,
