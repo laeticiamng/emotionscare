@@ -237,7 +237,7 @@ const MessagesPage: React.FC = () => {
                     <div className="p-3 rounded-lg bg-muted">
                       <div className="flex gap-1">
                         <RefreshCw className="h-4 w-4 animate-spin" />
-                        <span className="text-sm text-muted-foreground">Nyvée réfléchit...</span>
+                        <span className="text-sm text-muted-foreground">Coach IA réfléchit...</span>
                       </div>
                     </div>
                   </div>
