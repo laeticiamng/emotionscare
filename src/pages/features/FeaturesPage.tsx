@@ -258,7 +258,7 @@ const ADDITIONAL_MODULES: { category: string; modules: CompactModule[] }[] = [
 ];
 
 const STATS = [
-  { value: '37', label: 'modules intégrés', icon: Zap },
+  { value: '10+', label: 'modules intégrés', icon: Zap },
   { value: '3 min', label: 'par exercice', icon: Clock },
   { value: '100%', label: 'RGPD conforme', icon: Shield },
   { value: '24/7', label: 'disponible', icon: Heart },
