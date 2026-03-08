@@ -8,6 +8,7 @@ import { motion, useInView } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Heart } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const AppleCTASection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
