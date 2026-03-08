@@ -71,7 +71,7 @@ const modules: ModuleHighlight[] = [
 ];
 
 const BentoCard: React.FC<{ module: ModuleHighlight; index: number }> = memo(({ module, index }) => {
-  const Icon = module.icon;
+  const Icon = module.icon as React.FC<{ className?: string; 'aria-hidden'?: boolean }>;
   const isLarge = module.span.includes('col-span-2') && module.span.includes('row-span-2');
 
   return (
