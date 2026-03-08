@@ -33,8 +33,8 @@ const AppleHeroSection: React.FC = () => {
   const opacitySpring = useSpring(opacity, springConfig);
   const scaleSpring = useSpring(scale, springConfig);
 
-  // Text reveal animation
-  const words = ["Gérez", "votre", "stress", "en 3 minutes.", "Concrètement."];
+  // Text reveal animation — grouped for reading flow
+  const words = ["Gérez", "votre stress", "en 3 minutes."];
   
   return (
     <section 
@@ -92,7 +92,7 @@ const AppleHeroSection: React.FC = () => {
           </motion.div>
 
           {/* Main headline - word by word reveal */}
-          <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-[0.95] mb-4 sm:mb-6 px-2 sm:px-0">
+          <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-[1.05] mb-4 sm:mb-6 px-2 sm:px-0">
             {words.map((word, i) => (
               <motion.span
                 key={i}
@@ -100,7 +100,7 @@ const AppleHeroSection: React.FC = () => {
                 animate={isInView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
                 transition={{ 
                   duration: 0.8, 
-                  delay: 0.2 + i * 0.15,
+                  delay: 0.2 + i * 0.2,
                   ease: [0.16, 1, 0.3, 1]
                 }}
                 className={cn(
@@ -118,21 +118,21 @@ const AppleHeroSection: React.FC = () => {
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.8 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
             className="text-xl sm:text-2xl md:text-3xl text-muted-foreground max-w-3xl mx-auto mb-4 font-light leading-relaxed"
           >
-            La première plateforme de régulation émotionnelle
-            <span className="text-foreground font-medium"> conçue par et pour les soignants.</span>
+            Respiration guidée, coaching IA et exercices anti-stress
+            <span className="text-foreground font-medium"> pensés pour les soignants.</span>
           </motion.p>
 
           {/* Concrete value prop */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.9 }}
+            transition={{ duration: 0.8, delay: 0.85 }}
             className="text-base sm:text-lg text-muted-foreground/80 max-w-xl mx-auto mb-8"
           >
-            Exercices guidés contre le stress. Sans rendez-vous. Sans jugement. <span className="text-primary font-medium">100% gratuit pour commencer.</span>
+            Utilisable entre deux consultations. Sans rendez-vous. Sans jugement. <span className="text-primary font-medium">Gratuit pour commencer.</span>
           </motion.p>
 
           {/* CTAs */}
@@ -178,18 +178,18 @@ const AppleHeroSection: React.FC = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
-            transition={{ duration: 1, delay: 1.3 }}
+            transition={{ duration: 1, delay: 1.2 }}
             className="mt-16 pt-16 border-t border-border/50"
           >
             <div className="flex flex-wrap justify-center gap-4 items-center">
               <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
-                Cohérence cardiaque & pleine conscience
+                Exercices de 2 à 5 minutes
               </span>
               <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
-                Gratuit pour commencer
+                Aucune carte bancaire requise
               </span>
               <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
-                Conçu en France 🇫🇷
+                Créé par une médecin 🇫🇷
               </span>
             </div>
           </motion.div>

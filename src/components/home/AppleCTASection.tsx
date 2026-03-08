@@ -58,9 +58,9 @@ const AppleCTASection: React.FC = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-12"
           >
-            {isAuthenticated ? 'Reprenez votre session en quelques secondes.' : 'Créez votre compte en 30 secondes.'}
+            {isAuthenticated ? 'Reprenez là où vous en étiez.' : 'Créez votre compte en 30 secondes.'}
             <br className="hidden sm:block" />
-            {isAuthenticated ? 'Vos protocoles vous attendent.' : 'Aucune carte bancaire demandée.'}
+            {isAuthenticated ? 'Vos exercices vous attendent.' : 'Aucune carte bancaire demandée.'}
           </motion.p>
 
           {/* CTA Buttons */}
@@ -113,15 +113,15 @@ const AppleCTASection: React.FC = () => {
               <>
                 <span className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-primary/70 rounded-full" />
-                  Accès direct à votre dashboard
+                  Accès direct à vos exercices
                 </span>
                 <span className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-primary rounded-full" />
-                  Protocoles déjà personnalisés
+                  Recommandations personnalisées
                 </span>
                 <span className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-accent rounded-full" />
-                  Reprenez où vous vous étiez arrêté
+                  Reprenez là où vous en étiez
                 </span>
               </>
             ) : (
@@ -132,11 +132,11 @@ const AppleCTASection: React.FC = () => {
                 </span>
                 <span className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-primary rounded-full" />
-                  Résiliation en 1 clic
+                  Annulation libre, sans justification
                 </span>
                 <span className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-accent rounded-full" />
-                  Accès immédiat aux protocoles
+                  Accès immédiat aux exercices
                 </span>
               </>
             )}

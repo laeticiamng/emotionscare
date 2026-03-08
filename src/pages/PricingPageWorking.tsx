@@ -33,9 +33,9 @@ const PLANS = [
     period: '',
     description: 'Pour découvrir EmotionsCare',
     features: [
-      'Accès basique à la plateforme',
-      '3 protocoles par jour (Stop, Reset, Respirez)',
-      'Scanner émotionnel de base',
+      'Accès aux exercices de base',
+      '3 séances de respiration guidée par jour',
+      'Auto-évaluation émotionnelle',
       'Journal émotionnel',
       'Accès communauté',
     ],
@@ -254,7 +254,7 @@ const PricingPageWorking: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-16">
       {/* ═══════════════════ HERO ═══════════════════ */}
       <section className="relative py-16 md:py-24 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
