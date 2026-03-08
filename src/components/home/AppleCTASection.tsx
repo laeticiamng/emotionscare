@@ -16,7 +16,7 @@ const AppleCTASection: React.FC = () => {
   return (
     <section 
       ref={sectionRef}
-      className="relative py-32 md:py-48 lg:py-64 overflow-hidden bg-background"
+      className="relative py-32 md:py-48 lg:py-64 overflow-hidden bg-background noise-texture"
     >
       {/* Gradient orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
@@ -108,7 +108,7 @@ const AppleCTASection: React.FC = () => {
             className="flex flex-wrap justify-center gap-6 mt-16 text-sm text-muted-foreground"
           >
             <span className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full" />
+              <div className="w-2 h-2 bg-primary/70 rounded-full" />
               100% confidentiel
             </span>
             <span className="flex items-center gap-2">
