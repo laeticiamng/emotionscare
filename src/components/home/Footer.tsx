@@ -37,10 +37,6 @@ const Footer: React.FC = () => {
       { label: 'Confidentialité', href: '/legal/privacy' },
       { label: 'Cookies', href: '/legal/cookies' },
     ],
-    social: [
-      { label: 'Twitter', icon: Twitter },
-      { label: 'LinkedIn', icon: Linkedin },
-    ],
   };
 
   return (
