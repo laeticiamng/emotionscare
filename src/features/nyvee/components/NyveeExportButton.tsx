@@ -1,5 +1,5 @@
 /**
- * NyveeExportButton - Bouton d'export des données Nyvee
+ * NyveeExportButton - Bouton d'export des données Cocon Respiration
  */
 
 import { memo, useState, useCallback } from 'react';
