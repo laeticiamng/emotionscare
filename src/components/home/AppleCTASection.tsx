@@ -56,9 +56,9 @@ const AppleCTASection: React.FC = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-12"
           >
-            Gratuit pour commencer. Sans engagement.
+            Créez votre compte en 30 secondes.
             <br className="hidden sm:block" />
-            Annulez quand vous voulez.
+            Aucune carte bancaire demandée.
           </motion.p>
 
           {/* CTA Buttons */}
