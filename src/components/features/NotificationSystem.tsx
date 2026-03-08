@@ -72,7 +72,7 @@ const NotificationSystem: React.FC = () => {
       id: '4',
       type: 'social',
       title: 'Nouveau message de votre coach',
-      message: 'Nyvée a partagé de nouveaux conseils personnalisés basés sur vos progrès.',
+      message: 'Votre Coach IA a partagé de nouveaux conseils personnalisés basés sur vos progrès.',
       timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000),
       read: false,
       priority: 'low'

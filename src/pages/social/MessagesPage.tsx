@@ -255,7 +255,7 @@ const MessagesPage: React.FC = () => {
                 </Button>
                 <div className="flex-1 flex gap-2">
                   <Input
-                    placeholder="Tapez votre message à Nyvée..."
+                    placeholder="Tapez votre message au Coach IA..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}

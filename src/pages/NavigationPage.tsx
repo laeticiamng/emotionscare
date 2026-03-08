@@ -188,7 +188,7 @@ const allRoutes: RouteItem[] = [
   { path: '/app/coach/sessions', label: 'Sessions Coach', description: 'Historique coaching', category: 'Coaching', icon: MessageCircle, requiresAuth: true },
   { path: '/app/coach/analytics', label: 'Analytics Coach', description: 'Statistiques coaching', category: 'Coaching', icon: BarChart3, requiresAuth: true },
   { path: '/app/coach-micro', label: 'Coach Micro', description: 'Micro-décisions', category: 'Coaching', icon: Zap, requiresAuth: true },
-  { path: '/app/nyvee', label: 'Nyvee Cocon', description: 'Compagnon virtuel', category: 'Coaching', icon: Heart, requiresAuth: true },
+  { path: '/app/nyvee', label: 'Cocon Respiration', description: 'Compagnon virtuel', category: 'Coaching', icon: Heart, requiresAuth: true },
   { path: '/app/how-it-adapts', label: 'Comment ça marche', description: 'L\'adaptation IA', category: 'Coaching', icon: Brain, requiresAuth: true },
   { path: '/app/support/chatbot', label: 'Support Chatbot', description: 'Assistance IA', category: 'Coaching', icon: MessageCircle, requiresAuth: true },
   

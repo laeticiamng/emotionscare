@@ -66,7 +66,7 @@ const VirtualCoach: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const coach: CoachPersonality = {
-    name: 'Nyvée',
+    name: 'Coach IA',
     role: 'Coach Émotionnel IA',
     approach: 'Bienveillant & Personnalisé',
     avatar: '🤖',

@@ -274,7 +274,7 @@ const HOW_IT_WORKS = [
 const FeaturesPage: React.FC = () => {
   usePageSEO({
     title: 'Fonctionnalités - EmotionsCare | 37 modules intégrés',
-    description: 'Découvrez les 37 modules EmotionsCare : scanner émotionnel IA, coach Nyvée, musicothérapie, réalité virtuelle, gamification, journal émotionnel et plus.',
+    description: 'Découvrez les 37 modules EmotionsCare : scanner émotionnel IA, coach IA, musicothérapie, réalité virtuelle, gamification, journal émotionnel et plus.',
     keywords: 'gestion du stress, bien-être au travail, santé mentale soignants, scanner émotionnel, respiration guidée, journal émotionnel, musicothérapie, réalité virtuelle, coach IA, gamification',
   });
 
