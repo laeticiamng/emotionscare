@@ -160,7 +160,7 @@ const MessagesPage: React.FC = () => {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <MessageSquare className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold tracking-tight">Messages avec Nyvée</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Messages avec le Coach IA</h1>
           <Badge variant="outline" className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-400">
             <Bot className="h-3 w-3 mr-1" />
             IA Active
