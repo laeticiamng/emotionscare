@@ -44,8 +44,8 @@ const GeoSummarySection: React.FC = () => {
             <Brain className="h-8 w-8 text-primary mx-auto" aria-hidden="true" />
             <h3 className="font-semibold text-foreground text-lg">Comment ça marche ?</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Exercices guidés de 2 à 5 minutes : respiration, scan émotionnel,
-              musicothérapie et coach IA disponible 24/7. Utilisable entre deux gardes.
+              Exercices guidés de 2 à 5 minutes : respiration animée, auto-évaluation,
+              musique apaisante et coaching IA disponible 24/7. Utilisable entre deux gardes.
             </p>
           </div>
 
