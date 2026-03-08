@@ -204,8 +204,8 @@ const SECTIONS: {
         description: 'Tableau de bord manager avec KPIs agrégés, indicateurs de charge et de récupération, alertes anonymisées et rapports mensuels conformes RGPD.',
         icon: Activity,
         highlights: ['KPIs anonymisés', 'Alertes bien-être', 'Rapports conformes RGPD'],
-        gradient: 'from-slate-500 to-gray-600',
-        iconBg: 'bg-slate-500/20 text-slate-400',
+        gradient: 'from-primary/70 to-primary',
+        iconBg: 'bg-primary/20 text-primary',
       },
       {
         id: 'community',
