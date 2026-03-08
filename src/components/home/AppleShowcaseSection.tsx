@@ -1,20 +1,15 @@
 /**
- * AppleShowcaseSection - Section showcase avec vidéo/démo style Apple
- * Grande image/vidéo centrée avec texte minimal
+ * AppleShowcaseSection - Section showcase avec démo immersive style Apple
+ * CTA retiré pour réduire la fatigue — seuls Hero et CTA finale
  */
 
 import React, { memo, useRef } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
 
 const AppleShowcaseSection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(contentRef, { once: true, amount: 0.3 });
-  const navigate = useNavigate();
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -88,7 +83,7 @@ const AppleShowcaseSection: React.FC = () => {
                       />
                     ))}
                     
-                    {/* Main breathing circle - premium size */}
+                    {/* Main breathing circle */}
                     <motion.div
                       animate={{
                         scale: [1, 1.25, 1],
@@ -110,8 +105,6 @@ const AppleShowcaseSection: React.FC = () => {
                       </motion.span>
                     </motion.div>
                   </div>
-
-                  {/* Removed non-functional play button */}
                 </div>
               </div>
             </div>
@@ -134,23 +127,6 @@ const AppleShowcaseSection: React.FC = () => {
                 <p className="text-background/60">{item.desc}</p>
               </div>
             ))}
-          </motion.div>
-
-          {/* Micro-CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.8 }}
-            className="text-center mt-12"
-          >
-            <Button
-              size="lg"
-              className="rounded-full px-8 py-6 text-base font-semibold bg-background text-foreground hover:bg-background/90"
-              onClick={() => navigate('/signup')}
-            >
-              Essayer gratuitement
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
           </motion.div>
         </div>
       </div>
