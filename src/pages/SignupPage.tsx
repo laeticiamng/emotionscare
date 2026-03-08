@@ -16,10 +16,10 @@ import {
   Lock,
   Eye,
   EyeOff,
-  ArrowLeft,
   UserPlus,
   AlertCircle,
 } from 'lucide-react';
+import SharedHeader from '@/components/layout/SharedHeader';
 import { toast } from '@/hooks/use-toast';
 import { usePageSEO } from '@/hooks/usePageSEO';
 
