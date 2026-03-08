@@ -49,8 +49,8 @@ const AppleHomePage: React.FC = () => {
       <main id="main-content" role="main" className="pt-16">
         {/* Announcement pill */}
         <div className="pt-6 pb-2">
-          <AnnouncementBanner
-            message="Nouveau : Coach IA Nyvée disponible"
+        <AnnouncementBanner
+            message="Nouveau : Coach IA disponible 24h/24"
             href="/features"
             linkLabel="Découvrir"
             variant="pill"
