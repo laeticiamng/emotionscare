@@ -149,7 +149,7 @@ const NavigationHub: React.FC = () => {
     // Coaching & Communication
     {
       id: 'coach',
-      title: 'Coach IA Nyvée',
+      title: 'Coach IA',
       description: 'Assistant personnel intelligent 24/7',
       icon: MessageSquare,
       path: '/app/coach',
