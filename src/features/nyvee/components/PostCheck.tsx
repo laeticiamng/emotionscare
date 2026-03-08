@@ -31,7 +31,7 @@ export const PostCheck: FC<PostCheckProps> = memo(({
   useEffect(() => {
     if (visible && !dismissed) {
       logger.info('stai6:post:shown', undefined, 'STAI6');
-      setAnnouncement('Préparer un retour doux sur le ressenti après Nyvée.');
+      setAnnouncement('Préparer un retour doux sur le ressenti après la session.');
     }
   }, [visible, dismissed]);
 

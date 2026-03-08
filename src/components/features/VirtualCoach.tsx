@@ -366,7 +366,7 @@ const VirtualCoach: React.FC = () => {
         <CardContent className="p-4">
           <div className="flex gap-3">
             <Textarea
-              placeholder="Exprimez-vous librement... Nyvée vous écoute avec bienveillance."
+              placeholder="Exprimez-vous librement... Votre coach vous écoute avec bienveillance."
               value={currentMessage}
               onChange={(e) => setCurrentMessage(e.target.value)}
               className="min-h-[60px] resize-none"

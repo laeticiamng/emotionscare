@@ -37,7 +37,7 @@ const modules: ModuleHighlight[] = [
     gradient: 'from-accent/15 to-primary/10',
   },
   {
-    title: "Coach IA Nyvée",
+    title: "Coach IA",
     description: "Accompagnement bienveillant 24/7, adapté aux professionnels de santé.",
     icon: Sparkles,
     highlight: '24/7',

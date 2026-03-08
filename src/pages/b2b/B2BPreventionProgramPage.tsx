@@ -50,7 +50,7 @@ const SAMPLE_PROGRAMS: PreventionProgram[] = [
     description: 'Programme de 12 semaines pour identifier et prévenir le burn-out chez les soignants. Exercices quotidiens, suivi d\'indicateurs et accompagnement personnalisé.',
     duration: '12 semaines',
     targetAudience: 'Soignants en première ligne',
-    modules: ['Scan émotionnel hebdomadaire', 'Protocole Stop quotidien', 'Protocole Respirez', 'Coaching IA Nyvée'],
+    modules: ['Scan émotionnel hebdomadaire', 'Protocole Stop quotidien', 'Protocole Respirez', 'Coach IA'],
     objectives: ['Réduire le stress perçu de 30%', 'Améliorer la qualité du sommeil', 'Développer des réflexes de décompression'],
     status: 'active',
     progress: 65,

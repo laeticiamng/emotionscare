@@ -298,7 +298,7 @@ const NyveeChat: React.FC = () => {
                   <Heart className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="font-semibold text-sm">Nyvée</p>
+                  <p className="font-semibold text-sm">Coach IA</p>
                   <p className="text-xs text-white/80">Coach IA EmotionsCare</p>
                 </div>
               </div>

@@ -92,7 +92,7 @@ const GlobalSearchCommand: React.FC<GlobalSearchCommandProps> = ({
     },
     {
       id: 'coach',
-      title: 'Coach IA Nyvée',
+      title: 'Coach IA',
       description: 'Assistant personnel intelligent 24/7',
       category: 'Coaching',
       path: '/app/coach',
