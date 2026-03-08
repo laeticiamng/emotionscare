@@ -147,7 +147,7 @@ export async function persistNyveeSession(
   module: 'nyvee',
   payload: NyveePersistPayload
 ): Promise<void> {
-  logger.info('nyvee:session:persist', { module, next: payload.next }, 'SESSION');
+  logger.info('cocoon:session:persist', { module, next: payload.next }, 'SESSION');
 
   try {
     await createSession({
