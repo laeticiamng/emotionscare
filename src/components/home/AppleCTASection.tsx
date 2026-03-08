@@ -58,9 +58,9 @@ const AppleCTASection: React.FC = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-12"
           >
-            {isAuthenticated ? 'Reprenez votre session en quelques secondes.' : 'Créez votre compte en 30 secondes.'}
+            {isAuthenticated ? 'Reprenez là où vous en étiez.' : 'Créez votre compte en 30 secondes.'}
             <br className="hidden sm:block" />
-            {isAuthenticated ? 'Vos protocoles vous attendent.' : 'Aucune carte bancaire demandée.'}
+            {isAuthenticated ? 'Vos exercices vous attendent.' : 'Aucune carte bancaire demandée.'}
           </motion.p>
 
           {/* CTA Buttons */}
