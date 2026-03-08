@@ -109,18 +109,37 @@ const AppleCTASection: React.FC = () => {
             transition={{ duration: 1, delay: 0.8 }}
             className="flex flex-wrap justify-center gap-6 mt-16 text-sm text-muted-foreground"
           >
-            <span className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-primary/70 rounded-full" />
-              Aucune carte bancaire requise
-            </span>
-            <span className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-primary rounded-full" />
-              Résiliation en 1 clic
-            </span>
-            <span className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-accent rounded-full" />
-              Accès immédiat aux protocoles
-            </span>
+            {isAuthenticated ? (
+              <>
+                <span className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-primary/70 rounded-full" />
+                  Accès direct à votre dashboard
+                </span>
+                <span className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-primary rounded-full" />
+                  Protocoles déjà personnalisés
+                </span>
+                <span className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-accent rounded-full" />
+                  Reprenez où vous vous étiez arrêté
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-primary/70 rounded-full" />
+                  Aucune carte bancaire requise
+                </span>
+                <span className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-primary rounded-full" />
+                  Résiliation en 1 clic
+                </span>
+                <span className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-accent rounded-full" />
+                  Accès immédiat aux protocoles
+                </span>
+              </>
+            )}
           </motion.div>
         </div>
       </div>
