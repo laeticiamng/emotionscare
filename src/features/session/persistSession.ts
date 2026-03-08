@@ -135,7 +135,7 @@ export const persistBreathSession = async (module: 'breath', payload: PersistBre
   }
 };
 
-// Nyvee session types and function
+// Cocon Respiration session types and function
 export type NyveePersistPayload = {
   profile: string;
   next: 'anchor' | '54321';
