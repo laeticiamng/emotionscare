@@ -150,8 +150,8 @@ const SECTIONS: {
         description: 'Galaxie VR pour la méditation, respiration guidée 3D, filtres AR émotionnels et environnements adaptatifs pour une relaxation profonde.',
         icon: Headphones,
         highlights: ['Galaxie VR', 'Filtres AR', 'Environnements 3D adaptatifs'],
-        gradient: 'from-fuchsia-500 to-pink-700',
-        iconBg: 'bg-fuchsia-500/20 text-fuchsia-400',
+        gradient: 'from-primary/80 to-accent',
+        iconBg: 'bg-primary/20 text-primary',
       },
       {
         id: 'park',
