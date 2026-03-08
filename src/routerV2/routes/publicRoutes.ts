@@ -15,6 +15,7 @@ const DemoPage = lazy(() => import('@/pages/DemoPage'));
 const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 const FeaturesPage = lazy(() => import('@/pages/features/FeaturesPage'));
 const SignupPage = lazy(() => import('@/pages/SignupPage'));
+const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage'));
 const ExamModePage = lazy(() => import('@/pages/ExamModePage'));
 const PricingPageWorking = lazy(() => import('@/pages/PricingPageWorking'));
 const FAQPage = lazy(() => import('@/pages/FAQPage'));
