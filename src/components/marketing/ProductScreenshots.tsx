@@ -1,16 +1,13 @@
 /**
- * ProductScreenshots - Showcase des captures d'écran du produit
- * Preuve visuelle pour les prospects avant inscription
+ * ProductScreenshots - Aperçu visuel des fonctionnalités
+ * Utilise des illustrations stylisées au lieu d'images statiques
+ * qui risquent d'être cassées ou obsolètes
  */
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-
-const screenshotDashboard = '/images/screenshots/screenshot-dashboard.jpg';
-const screenshotScanner = '/images/screenshots/screenshot-scanner.jpg';
-const screenshotCoach = '/images/screenshots/screenshot-coach.jpg';
-const screenshotJournal = '/images/screenshots/screenshot-journal.jpg';
+import { Brain, Sparkles, BookOpen, BarChart3, Heart, Shield, Zap } from 'lucide-react';
 
 const SCREENS = [
   {
@@ -18,39 +15,47 @@ const SCREENS = [
     label: 'Dashboard',
     title: 'Suivi émotionnel complet',
     description: 'Visualisez vos tendances, votre score bien-être et vos activités récentes en un coup d\'œil.',
-    image: screenshotDashboard,
+    icon: BarChart3,
+    color: 'from-primary to-accent',
+    features: ['Score bien-être', 'Historique', 'Recommandations'],
   },
   {
     id: 'scanner',
     label: 'Scanner IA',
     title: 'Analyse émotionnelle instantanée',
     description: 'Notre IA détecte votre état émotionnel et vous recommande les exercices adaptés.',
-    image: screenshotScanner,
+    icon: Brain,
+    color: 'from-accent to-primary',
+    features: ['Détection IA', 'Recommandations', 'Suivi'],
   },
   {
     id: 'coach',
     label: 'Coach IA',
     title: 'Accompagnement IA personnalisé',
     description: 'Un coach IA empathique qui vous guide avec des techniques adaptées à votre situation.',
-    image: screenshotCoach,
+    icon: Sparkles,
+    color: 'from-primary/80 to-accent/80',
+    features: ['Chat 24/7', 'Techniques guidées', 'Suivi personnalisé'],
   },
   {
     id: 'journal',
     label: 'Journal',
     title: 'Journal émotionnel enrichi',
     description: 'Documentez vos émotions avec des tags, un éditeur riche et un suivi d\'humeur quotidien.',
-    image: screenshotJournal,
+    icon: BookOpen,
+    color: 'from-accent/80 to-primary/80',
+    features: ['Tags émotions', 'Éditeur riche', 'Historique'],
   },
 ] as const;
 
 interface ProductScreenshotsProps {
-  /** Compact mode for embedding in other sections */
   compact?: boolean;
 }
 
 const ProductScreenshots: React.FC<ProductScreenshotsProps> = ({ compact = false }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const active = SCREENS[activeIndex];
+  const Icon = active.icon;
 
   return (
     <section className={cn('py-16 md:py-24', !compact && 'bg-muted/20')}>
@@ -71,7 +76,7 @@ const ProductScreenshots: React.FC<ProductScreenshotsProps> = ({ compact = false
         )}
 
         {/* Tab selector */}
-        <div className="flex justify-center gap-2 mb-8 flex-wrap" role="tablist" aria-label="Captures d'écran du produit">
+        <div className="flex justify-center gap-2 mb-8 flex-wrap" role="tablist" aria-label="Fonctionnalités du produit">
           {SCREENS.map((screen, i) => (
             <button
               key={screen.id}
@@ -91,7 +96,7 @@ const ProductScreenshots: React.FC<ProductScreenshotsProps> = ({ compact = false
           ))}
         </div>
 
-        {/* Screenshot display */}
+        {/* Feature display */}
         <div className="relative">
           <AnimatePresence mode="wait">
             <motion.div
@@ -104,14 +109,14 @@ const ProductScreenshots: React.FC<ProductScreenshotsProps> = ({ compact = false
               transition={{ duration: 0.4, ease: 'easeOut' }}
               className="flex flex-col items-center"
             >
-              {/* Browser chrome mockup */}
+              {/* Stylized mockup */}
               <div className="w-full max-w-5xl rounded-xl overflow-hidden border border-border/50 shadow-2xl shadow-primary/5 bg-card">
                 {/* Browser bar */}
                 <div className="flex items-center gap-2 px-4 py-2.5 bg-muted/50 border-b border-border/50">
                   <div className="flex gap-1.5">
                     <div className="w-3 h-3 rounded-full bg-destructive/60" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                    <div className="w-3 h-3 rounded-full bg-green-500/60" />
+                    <div className="w-3 h-3 rounded-full bg-muted-foreground/40" />
+                    <div className="w-3 h-3 rounded-full bg-primary/40" />
                   </div>
                   <div className="flex-1 mx-4">
                     <div className="bg-background/80 rounded-md px-3 py-1 text-xs text-muted-foreground text-center max-w-xs mx-auto">
@@ -120,18 +125,32 @@ const ProductScreenshots: React.FC<ProductScreenshotsProps> = ({ compact = false
                   </div>
                 </div>
 
-                {/* Screenshot */}
-                <img
-                  src={active.image}
-                  alt={active.title}
-                  className="w-full h-auto"
-                  loading="lazy"
-                />
+                {/* Illustrated content instead of static image */}
+                <div className={cn(
+                  "aspect-[16/10] bg-gradient-to-br flex flex-col items-center justify-center p-8 md:p-16 relative overflow-hidden",
+                  active.color
+                )}>
+                  {/* Background pattern */}
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:24px_24px]" />
+                  
+                  <div className="relative z-10 text-center">
+                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto mb-6 shadow-xl">
+                      <Icon className="h-10 w-10 md:h-12 md:w-12 text-white" aria-hidden="true" />
+                    </div>
+                    <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">{active.title}</h3>
+                    <div className="flex flex-wrap justify-center gap-2 mt-4">
+                      {active.features.map((feat) => (
+                        <span key={feat} className="px-3 py-1 rounded-full bg-white/20 text-white text-sm font-medium backdrop-blur-sm">
+                          {feat}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Caption */}
               <div className="text-center mt-6 max-w-lg">
-                <h3 className="text-xl font-semibold mb-2">{active.title}</h3>
                 <p className="text-muted-foreground text-sm">{active.description}</p>
               </div>
             </motion.div>

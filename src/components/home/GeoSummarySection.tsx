@@ -1,6 +1,7 @@
 /**
  * GeoSummarySection - Bloc "En bref" optimisé pour les moteurs génératifs
  * Contenu factuel, structuré, citable par les IA
+ * CTA simplifié — un seul lien vers /signup
  */
 
 import React from 'react';
@@ -81,20 +82,13 @@ const GeoSummarySection: React.FC = () => {
           </ul>
         </div>
 
-        {/* CTA */}
+        {/* Single CTA */}
         <div className="text-center">
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/signup">
-              <Button size="lg" className="rounded-full px-8">
-                Commencer gratuitement
-              </Button>
-            </Link>
-            <Link to="/use-cases">
-              <Button variant="outline" size="lg" className="rounded-full px-8">
-                Voir les cas d'usage
-              </Button>
-            </Link>
-          </div>
+          <Link to="/signup">
+            <Button size="lg" className="rounded-full px-8">
+              Commencer gratuitement
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

@@ -1,6 +1,7 @@
 /**
- * AppleHomePage - Homepage révolutionnaire style Apple
- * Minimaliste, impactante, avec animations fluides et storytelling visuel
+ * AppleHomePage - Homepage style Apple
+ * Parcours simplifié : Hero > En bref > Features > Modules > Social Proof > CTA
+ * Réduit de 10 à 7 sections pour éviter la fatigue de scroll
  */
 
 import React, { lazy, Suspense } from 'react';
@@ -12,15 +13,12 @@ import XPBar from '@/components/gamification/XPBar';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Lazy load below-the-fold sections for better FCP/LCP
+const GeoSummarySection = lazy(() => import('@/components/home/GeoSummarySection'));
 const AppleFeatureSection = lazy(() => import('@/components/home/AppleFeatureSection'));
 const AppleShowcaseSection = lazy(() => import('@/components/home/AppleShowcaseSection'));
-const AppleStatsSection = lazy(() => import('@/components/home/AppleStatsSection'));
-const AppleCTASection = lazy(() => import('@/components/home/AppleCTASection'));
 const ModulesHighlightSection = lazy(() => import('@/components/home/ModulesHighlightSection'));
-const ComparisonSection = lazy(() => import('@/components/home/ComparisonSection'));
 const SocialProofSection = lazy(() => import('@/components/home/SocialProofSection'));
-const ProductScreenshots = lazy(() => import('@/components/marketing/ProductScreenshots'));
-const GeoSummarySection = lazy(() => import('@/components/home/GeoSummarySection'));
+const AppleCTASection = lazy(() => import('@/components/home/AppleCTASection'));
 const Footer = lazy(() => import('@/components/home/Footer'));
 
 const SectionSkeleton = () => (
@@ -70,19 +68,10 @@ const AppleHomePage: React.FC = () => {
           <AppleShowcaseSection />
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
-          <AppleStatsSection />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
-          <ProductScreenshots />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
           <ModulesHighlightSection />
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
           <SocialProofSection />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
-          <ComparisonSection />
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
           <AppleCTASection />

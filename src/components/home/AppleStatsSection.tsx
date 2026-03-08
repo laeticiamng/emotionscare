@@ -1,13 +1,10 @@
 /**
  * AppleStatsSection - Section statistiques avec compteurs animés
- * Style Apple avec grandes typographies et animations fluides
+ * CTA retiré pour réduire la fatigue — seuls Hero et CTA finale
  */
 
 import React, { memo, useRef, useEffect, useState, useCallback } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
 
 interface StatItem {
   value: number;
@@ -42,11 +39,7 @@ const AnimatedCounter: React.FC<{ value: number; suffix: string; shouldAnimate: 
     const animate = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-
-      // Easing function
       const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-
-      // Use Math.round and ensure final value is exact
       const current = progress >= 1 ? value : Math.round(easeOutQuart * value);
       setDisplayValue(current);
 
@@ -73,15 +66,11 @@ const AppleStatsSection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
   const [shouldAnimate, setShouldAnimate] = useState(false);
-  const navigate = useNavigate();
 
-  // Trigger animation when framer-motion detects visibility
   useEffect(() => {
     if (isInView) setShouldAnimate(true);
   }, [isInView]);
 
-  // Fallback: manually check visibility after mount for lazy-loaded components
-  // where IntersectionObserver may miss the initial intersection
   const checkVisibility = useCallback(() => {
     if (shouldAnimate || !sectionRef.current) return;
     const rect = sectionRef.current.getBoundingClientRect();
@@ -91,9 +80,7 @@ const AppleStatsSection: React.FC = () => {
   }, [shouldAnimate]);
 
   useEffect(() => {
-    // Check immediately after mount
     checkVisibility();
-    // And again after a short delay to handle lazy load timing
     const t1 = setTimeout(checkVisibility, 300);
     const t2 = setTimeout(checkVisibility, 1000);
     return () => { clearTimeout(t1); clearTimeout(t2); };
@@ -149,23 +136,6 @@ const AppleStatsSection: React.FC = () => {
             </motion.div>
           ))}
         </div>
-
-        {/* Micro-CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={shouldAnimate ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="text-center mt-16"
-        >
-          <Button
-            size="lg"
-            className="rounded-full px-8 py-6 text-base font-semibold bg-foreground text-background hover:bg-foreground/90"
-            onClick={() => navigate('/signup')}
-          >
-            Essayer gratuitement
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </motion.div>
       </div>
     </section>
   );

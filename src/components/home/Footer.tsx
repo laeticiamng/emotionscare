@@ -1,6 +1,7 @@
 /**
  * Footer - Pied de page EmotionsCare
- * Enrichi avec liens accessibilité et réseaux sociaux
+ * Liens vérifiés vers routes publiques uniquement
+ * Email unique, pas de duplication
  */
 
 import React from 'react';
@@ -15,20 +16,17 @@ const Footer: React.FC = () => {
     platform: [
       { label: 'Accueil', href: '/' },
       { label: 'Fonctionnalités', href: '/features' },
-      { label: 'Scanner émotionnel', href: '/scanner' },
       { label: 'Tarifs', href: '/pricing' },
     ],
     resources: [
       { label: 'FAQ', href: '/faq' },
       { label: 'Contact', href: '/contact' },
-      { label: 'Cas d\'usage', href: '/use-cases' },
       { label: 'Aide & Support', href: '/help' },
     ],
     company: [
       { label: 'À propos', href: '/about' },
       { label: 'Sécurité', href: '/security' },
       { label: 'Entreprise B2B', href: '/b2b' },
-      { label: 'Licences', href: '/legal/licenses' },
     ],
     legal: [
       { label: 'Mentions légales', href: '/legal/mentions' },
@@ -69,16 +67,6 @@ const Footer: React.FC = () => {
                 <Accessibility className="h-3 w-3 mr-1" aria-hidden="true" />
                 WCAG 2.1 AA
               </Badge>
-            </div>
-
-            {/* Contact email */}
-            <div className="pt-2">
-              <a 
-                href="mailto:contact@emotionscare.com" 
-                className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                contact@emotionscare.com
-              </a>
             </div>
           </div>
 
@@ -171,16 +159,14 @@ const Footer: React.FC = () => {
               © {currentYear} EmotionsCare — EMOTIONSCARE SASU. Tous droits réservés.
             </p>
 
-            {/* Contact & Status */}
-            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-              <a 
-                href="mailto:contact@emotionscare.com" 
-                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                <Mail className="h-4 w-4" aria-hidden="true" />
-                contact@emotionscare.com
-              </a>
-            </div>
+            {/* Contact */}
+            <a 
+              href="mailto:contact@emotionscare.com" 
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              <Mail className="h-4 w-4" aria-hidden="true" />
+              contact@emotionscare.com
+            </a>
           </div>
         </div>
       </div>
