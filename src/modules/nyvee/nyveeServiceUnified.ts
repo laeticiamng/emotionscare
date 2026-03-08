@@ -137,7 +137,7 @@ export const nyveeService = {
   },
 
   /**
-   * Compléter une session Nyvee avec persistance DB
+   * Compléter une session Cocon Respiration avec persistance DB
    */
   async completeSession(data: CompleteNyveeSession): Promise<NyveeSession> {
     try {
