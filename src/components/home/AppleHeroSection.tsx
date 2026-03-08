@@ -6,13 +6,12 @@
 import React, { memo, useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Play, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 
 const AppleHeroSection: React.FC = () => {
-  const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);

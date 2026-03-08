@@ -11,6 +11,7 @@ import { ArrowRight, Heart } from 'lucide-react';
 
 const AppleCTASection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const { isAuthenticated } = useAuth();
   const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
 
   return (

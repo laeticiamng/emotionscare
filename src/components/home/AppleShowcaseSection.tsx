@@ -7,6 +7,7 @@ import React, { memo, useRef } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const AppleShowcaseSection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
