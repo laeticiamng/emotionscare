@@ -56,7 +56,7 @@ const softExitCopy = {
 const DEFAULT_ANCHOR_DURATION = 60_000;
 
 /**
- * Persiste une session Nyvee dans la base de données
+ * Persiste une session Cocon Respiration dans la base de données
  */
 const persistNyveeSession = async (
   moduleName: string,
