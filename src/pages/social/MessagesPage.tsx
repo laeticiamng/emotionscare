@@ -61,7 +61,7 @@ const MessagesPage: React.FC = () => {
     {
       id: 1,
       sender: 'ai',
-      content: 'Bonjour ! Je suis Nyvée, votre assistant IA émotionnel. Comment vous sentez-vous aujourd\'hui ?',
+      content: 'Bonjour ! Je suis votre assistant Coach IA émotionnel. Comment vous sentez-vous aujourd\'hui ?',
       timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
     },
   ];
