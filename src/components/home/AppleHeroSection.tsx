@@ -3,7 +3,7 @@
  * Design minimaliste, typographie impactante, animations fluides
  */
 
-import React, { memo, useState, useEffect, useRef } from 'react';
+import React, { memo, useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
