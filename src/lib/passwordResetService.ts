@@ -8,7 +8,7 @@ import { logger } from '@/lib/logger';
 export const requestPasswordReset = async (email: string): Promise<{ success: boolean }> => {
   try {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
+      redirectTo: `${window.location.origin}/reset-password`,
     });
 
     if (error) {
