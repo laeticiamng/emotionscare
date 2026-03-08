@@ -36,7 +36,7 @@ export const useCocoonStore = create<CocoonState>()(
       reset: () => set({ unlockedCocoons: ['crystal'] }),
     }),
     {
-      name: 'nyvee-cocoons',
+      name: 'cocoon-respiration-store',
     }
   )
 );
