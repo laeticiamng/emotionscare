@@ -52,7 +52,7 @@ const SubscribePage: React.FC = () => {
       price: billingPeriod === 'monthly' ? '9.99€' : '7.99€',
       period: billingPeriod === 'monthly' ? '/mois' : '/mois (facturé annuellement)',
       description: 'Expérience complète pour votre bien-être quotidien',
-      badge: 'Populaire',
+      badge: 'Recommandé',
       highlighted: true,
       icon: <Crown className="h-6 w-6" />,
       features: [

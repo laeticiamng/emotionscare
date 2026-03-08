@@ -116,7 +116,7 @@ const PlanCard: React.FC<{
         <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
           <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-gradient-to-r from-primary to-accent text-white shadow-lg">
             <Sparkles className="h-3.5 w-3.5" />
-            Populaire
+            Recommandé
           </span>
         </div>
       )}
