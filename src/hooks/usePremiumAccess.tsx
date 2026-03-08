@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
@@ -125,9 +126,9 @@ export const PremiumGate: React.FC<PremiumGateProps> = ({
         <p className="text-muted-foreground mb-4">
           Cette fonctionnalité nécessite un abonnement Pro actif.
         </p>
-        <a href="/pricing" className="inline-flex items-center justify-center rounded-full bg-foreground text-background px-6 py-3 text-sm font-semibold hover:bg-foreground/90 transition-colors">
+        <Link to="/pricing" className="inline-flex items-center justify-center rounded-full bg-foreground text-background px-6 py-3 text-sm font-semibold hover:bg-foreground/90 transition-colors">
           Découvrir les plans
-        </a>
+        </Link>
       </div>
     );
   }
