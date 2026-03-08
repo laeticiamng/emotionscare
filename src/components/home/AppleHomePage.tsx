@@ -13,6 +13,7 @@ import XPBar from '@/components/gamification/XPBar';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Lazy load below-the-fold sections for better FCP/LCP
+const HowItWorksSection = lazy(() => import('@/components/home/HowItWorksSection'));
 const GeoSummarySection = lazy(() => import('@/components/home/GeoSummarySection'));
 const AppleFeatureSection = lazy(() => import('@/components/home/AppleFeatureSection'));
 const AppleShowcaseSection = lazy(() => import('@/components/home/AppleShowcaseSection'));
