@@ -12,6 +12,8 @@ import { useAuth } from '@/contexts/AuthContext';
 const AppleShowcaseSection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const { isAuthenticated } = useAuth();
+  const ctaPath = isAuthenticated ? '/app/home' : '/signup';
   const isInView = useInView(contentRef, { once: true, amount: 0.3 });
 
   const { scrollYProgress } = useScroll({
