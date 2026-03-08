@@ -219,7 +219,7 @@ const B2CNyveeCoconPage: FC = () => {
           {/* Header */}
           <div className="text-center">
             <h1 className="text-4xl font-bold text-foreground">Protocole Night</h1>
-            <p className="text-sm font-medium text-primary mt-1">Nyvée - Ta bulle respirante</p>
+            <p className="text-sm font-medium text-primary mt-1">Cocon Respiration - Ta bulle respirante</p>
             <p className="mt-2 text-lg text-muted-foreground max-w-xl mx-auto">
               Sas d'apaisement avant le sommeil. Respiration immersive, suivi de l'humeur et collection de cocons pour un endormissement serein.
             </p>
