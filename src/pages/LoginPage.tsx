@@ -129,22 +129,11 @@ const LoginPage: React.FC = () => {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        {/* Navigation Header */}
+        {/* Logo */}
         <div className="text-center mb-8">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6 group"
-          >
-            <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Retour à l'accueil</span>
-          </Link>
-
-          {/* Logo */}
           <div className="flex items-center justify-center gap-3 mb-2">
-            <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center shadow-lg">
-                <Heart className="h-6 w-6 text-primary-foreground" />
-              </div>
+            <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center shadow-lg">
+              <Heart className="h-6 w-6 text-primary-foreground" />
             </div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
               EmotionsCare
