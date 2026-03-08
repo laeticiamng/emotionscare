@@ -35,6 +35,29 @@
   mix-blend-mode: overlay;
 }
 
+/* Animated gradient border glow for premium cards */
+@keyframes border-rotate {
+  0% { --border-angle: 0deg; }
+  100% { --border-angle: 360deg; }
+}
+
+.animated-border-glow {
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    transparent 40%,
+    hsl(var(--primary) / 0.15) 50%,
+    hsl(var(--accent) / 0.15) 60%,
+    transparent 70%
+  );
+  animation: border-rotate 4s linear infinite;
+}
+
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
 /* Accessibility styles */
 .reduced-motion * {
   animation-duration: 0.01ms !important;
