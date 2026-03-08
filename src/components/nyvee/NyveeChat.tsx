@@ -185,8 +185,11 @@ const NyveeChat: React.FC = () => {
       } else if (step === 2) {
         if (reply.value === 'start') {
           addCoachMessage(
-            'Parfait ! Rendez-vous dans la section protocoles pour démarrer votre séance. Prenez soin de vous. 💙',
-            [{ label: 'Nouvelle conversation', value: 'restart' }]
+            'Parfait ! Créez votre compte gratuit pour accéder aux protocoles et démarrer votre première séance. 💙',
+            [
+              { label: 'Créer mon compte', value: 'signup' },
+              { label: 'Nouvelle conversation', value: 'restart' },
+            ]
           );
         } else if (reply.value === 'other') {
           addCoachMessage(
@@ -200,6 +203,8 @@ const NyveeChat: React.FC = () => {
           );
         }
         setStep(3);
+      } else if (reply.value === 'signup') {
+        window.location.href = '/signup';
       } else if (reply.value === 'restart') {
         setMessages([]);
         setStep(0);
