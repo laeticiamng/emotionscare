@@ -9,7 +9,7 @@ export function bubbleBeatOrchestrator({ pssLevel }: BubbleBeatOrchestratorInput
     return [
       { action: 'set_path_variant', key: CALM_VARIANT_KEY },
       { action: 'set_path_duration', ms: CALM_DURATION_MS },
-      { action: 'post_cta', key: 'nyvee' },
+      { action: 'post_cta', key: 'cocoon' },
     ];
   }
 
