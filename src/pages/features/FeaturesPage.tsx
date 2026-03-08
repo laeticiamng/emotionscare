@@ -177,8 +177,8 @@ const SECTIONS: {
         description: 'Système XP, niveaux, badges, défis quotidiens et classement communautaire anonymisé. Restez motivé avec des streaks et des récompenses.',
         icon: Gamepad2,
         highlights: ['Système XP & niveaux', 'Défis quotidiens', 'Classement anonymisé'],
-        gradient: 'from-orange-500 to-red-600',
-        iconBg: 'bg-orange-500/20 text-orange-400',
+        gradient: 'from-primary to-accent',
+        iconBg: 'bg-primary/20 text-primary',
       },
       {
         id: 'analytics',
