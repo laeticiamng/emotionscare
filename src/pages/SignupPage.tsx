@@ -16,10 +16,10 @@ import {
   Lock,
   Eye,
   EyeOff,
-  ArrowLeft,
   UserPlus,
   AlertCircle,
 } from 'lucide-react';
+import SharedHeader from '@/components/layout/SharedHeader';
 import { toast } from '@/hooks/use-toast';
 import { usePageSEO } from '@/hooks/usePageSEO';
 
@@ -115,20 +115,9 @@ const SignupPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-background to-primary/5 flex flex-col items-center justify-start p-4 pt-20 pb-40">
-      {/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="absolute top-4 left-4"
-      >
-        <Link to="/">
-          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Retour
-          </Button>
-        </Link>
-      </motion.div>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col">
+      <SharedHeader />
+      <div className="flex-1 flex items-center justify-center p-4 pt-24 pb-20">
 
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -374,6 +363,7 @@ const SignupPage: React.FC = () => {
           </CardContent>
         </Card>
       </motion.div>
+      </div>
     </div>
   );
 };

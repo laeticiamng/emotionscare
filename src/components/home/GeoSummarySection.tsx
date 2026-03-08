@@ -82,14 +82,6 @@ const GeoSummarySection: React.FC = () => {
           </ul>
         </div>
 
-        {/* Single CTA */}
-        <div className="text-center">
-          <Link to="/signup">
-            <Button size="lg" className="rounded-full px-8">
-              Commencer gratuitement
-            </Button>
-          </Link>
-        </div>
       </div>
     </section>
   );

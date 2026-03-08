@@ -49,8 +49,7 @@ const AppleHomePage: React.FC = () => {
         <div className="pt-6 pb-2">
         <AnnouncementBanner
             message="Nouveau : Coach IA disponible 24h/24"
-            href="/features"
-            linkLabel="Découvrir"
+            linkLabel="Essayer"
             variant="pill"
             storageKey="home-announcement-v1"
           />

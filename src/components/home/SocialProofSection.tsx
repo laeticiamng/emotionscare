@@ -29,10 +29,10 @@ const principles = [
 ];
 
 const trustBadges = [
-  { icon: Shield, label: 'RGPD Conforme' },
+  { icon: Shield, label: 'Chiffrement AES-256' },
   { icon: Award, label: 'Hébergement UE' },
-  { icon: GraduationCap, label: 'Protocoles neurosciences' },
-  { icon: Heart, label: 'Made in France' },
+  { icon: GraduationCap, label: 'Théorie polyvagale' },
+  { icon: Heart, label: 'Créée par une soignante' },
 ];
 
 const SocialProofSection: React.FC = () => {
