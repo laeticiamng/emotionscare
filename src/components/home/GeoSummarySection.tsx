@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { Heart, Zap, Shield, Users, Clock, Brain, ArrowRight } from 'lucide-react';
+import { Heart, Shield, Users, Brain, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
