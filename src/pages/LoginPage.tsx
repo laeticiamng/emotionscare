@@ -315,6 +315,7 @@ const LoginPage: React.FC = () => {
         onOpenChange={setForgotPasswordOpen}
         email={formData.email}
       />
+      </div>
     </div>
   );
 };

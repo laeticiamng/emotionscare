@@ -363,6 +363,7 @@ const SignupPage: React.FC = () => {
           </CardContent>
         </Card>
       </motion.div>
+      </div>
     </div>
   );
 };
