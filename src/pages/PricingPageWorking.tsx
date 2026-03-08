@@ -72,7 +72,7 @@ const PLANS = [
     period: '',
     description: 'Pour les hôpitaux, cliniques et établissements de santé',
     features: [
-      'Tout le plan Premium pour chaque utilisateur',
+      'Tout le plan Pro pour chaque utilisateur',
       'Dashboard B2B RH anonymisé',
       'Analytics bien-être des équipes',
       'Rapports hebdomadaires automatisés',
