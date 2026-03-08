@@ -144,7 +144,7 @@ export class AuthenticityDetector {
 
   private async checkFacialVoiceAlignment(userId: string): Promise<number> {
     try {
-      // Récupérer les dernières analyses Nyvee (5 dernières heures)
+      // Récupérer les dernières analyses émotionnelles (5 dernières heures)
       const { data: scans } = await supabase
         .from('emotion_scans')
         .select('scan_result')
