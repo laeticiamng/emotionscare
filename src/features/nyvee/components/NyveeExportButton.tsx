@@ -79,7 +79,7 @@ export const NyveeExportButton = memo(({ className }: NyveeExportButtonProps) =>
       
       const link = document.createElement('a');
       link.href = url;
-      link.download = `nyvee-sessions-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+      link.download = `cocoon-sessions-${format(new Date(), 'yyyy-MM-dd')}.csv`;
       link.click();
       
       URL.revokeObjectURL(url);
