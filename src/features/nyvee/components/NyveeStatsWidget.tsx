@@ -60,7 +60,7 @@ export const NyveeStatsWidget = memo(({ className, compact = false }: NyveeStats
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center gap-2 text-foreground">
             <Sparkles className="h-5 w-5 text-primary" />
-            Statistiques Nyvee
+            Statistiques Respiration
           </CardTitle>
         </CardHeader>
         <CardContent>
