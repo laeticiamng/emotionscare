@@ -14,7 +14,7 @@ export interface Who5Orchestration {
   start: () => Promise<void>;
   apply: () => void;
   tone: Who5Tone;
-  primaryCta: 'breath_soft' | 'nyvee_calm' | 'journal_light' | 'music_soft' | 'scan' | 'coach_micro';
+  primaryCta: 'breath_soft' | 'coach_ia_calm' | 'journal_light' | 'music_soft' | 'scan' | 'coach_micro';
   cardOrder: string[];
   summaryLabel: string;
   snooze: (durationHours?: number) => void;
