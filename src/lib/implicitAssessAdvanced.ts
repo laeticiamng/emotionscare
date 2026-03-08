@@ -395,7 +395,7 @@ export class CrossModuleIntelligence {
         };
       } else if (avgValence > 70) {
         return {
-          source_module: 'nyvee',
+          source_module: 'cocoon',
           target_module: 'story_synth',
           correlation: 0.7,
           recommendation: 'Humeur positive. Proposer contes aventureux ou créatifs.',
