@@ -55,6 +55,8 @@ const AnnouncementBanner: React.FC<AnnouncementBannerProps> = ({
     }
   };
 
+  const isInternalLink = Boolean(href?.startsWith('/') && !href.startsWith('//'));
+
   if (dismissed) return null;
 
   const content = (
