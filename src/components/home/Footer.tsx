@@ -65,7 +65,7 @@ const Footer: React.FC = () => {
               </Badge>
               <Badge variant="secondary" className="text-xs">
                 <Accessibility className="h-3 w-3 mr-1" aria-hidden="true" />
-                WCAG 2.1 AA
+                Accessible à tous
               </Badge>
             </div>
           </div>

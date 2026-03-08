@@ -183,10 +183,10 @@ const AppleHeroSection: React.FC = () => {
           >
             <div className="flex flex-wrap justify-center gap-4 items-center">
               <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
-                Exercices de 2 à 5 minutes
+                100% gratuit pour commencer
               </span>
               <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
-                Aucune carte bancaire requise
+                Compte créé en 30 secondes
               </span>
               <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
                 Créé par une médecin 🇫🇷

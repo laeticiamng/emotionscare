@@ -128,11 +128,11 @@ const AppleCTASection: React.FC = () => {
               <>
                 <span className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-primary/70 rounded-full" />
-                  Aucune carte bancaire requise
+                  Compte créé en 30 secondes
                 </span>
                 <span className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-primary rounded-full" />
-                  Annulation libre, sans justification
+                  Aucune carte bancaire requise
                 </span>
                 <span className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-accent rounded-full" />

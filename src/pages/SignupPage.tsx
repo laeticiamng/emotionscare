@@ -155,8 +155,7 @@ const SignupPage: React.FC = () => {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="h-11 border-2 focus:border-primary"
-                    placeholder="Votre nom complet"
-                    required
+                    placeholder="Votre nom (facultatif)"
                     disabled={isLoading}
                     autoComplete="name"
                   />

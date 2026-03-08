@@ -48,11 +48,11 @@ const AppleHomePage: React.FC = () => {
         {/* Announcement pill — opens Coach Chat on click */}
         <div className="pt-6 pb-2">
           <AnnouncementBanner
-            message="Nouveau : Coach IA disponible 24h/24"
-            href={isAuthenticated ? '/app/coach' : '/signup'}
-            linkLabel={isAuthenticated ? 'Ouvrir' : 'Essayer'}
+            message="Nouveau : Essayez un exercice de respiration en 2 minutes"
+            href={isAuthenticated ? '/app/breathing' : '/signup'}
+            linkLabel={isAuthenticated ? 'Commencer' : 'Essayer'}
             variant="pill"
-            storageKey="home-announcement-v1"
+            storageKey="home-announcement-v2"
             dismissible
           />
         </div>
