@@ -112,12 +112,13 @@ const BurnoutAssessmentPage: React.FC = () => {
                 })}
               </div>
 
-              {/* Ethical disclaimer */}
+              {/* Ethical disclaimer with 3114 */}
               <div className="p-4 rounded-lg bg-muted/50 text-sm text-muted-foreground flex gap-3">
                 <Shield className="h-5 w-5 shrink-0 mt-0.5 text-primary" />
                 <div>
-                  <p className="font-medium text-foreground mb-1">Note importante</p>
-                  <p>Ce questionnaire est un outil de dépistage, pas un diagnostic. Si vos scores indiquent un risque élevé, nous vous recommandons de consulter un professionnel de santé mentale. Vos données restent anonymisées et confidentielles.</p>
+                  <p className="font-medium text-foreground mb-1">Note importante — Outil de dépistage, non de diagnostic</p>
+                  <p className="mb-2">Ce questionnaire est un outil de dépistage standardisé (MBI-HSS, Maslach &amp; Jackson). Il ne remplace pas une évaluation clinique. Si vos scores indiquent un risque élevé, nous vous recommandons de consulter un professionnel de santé mentale.</p>
+                  <p className="font-medium text-foreground">En cas de détresse psychologique grave : <a href="tel:3114" className="text-primary underline font-bold">3114</a> — Numéro national de prévention du suicide (24h/24, 7j/7)</p>
                 </div>
               </div>
 
