@@ -2,7 +2,7 @@
 import type { Who5Tone } from '@/features/orchestration/useWho5Orchestration';
 
 export type DashboardCardId =
-  | 'card-nyvee'
+  | 'card-coach-ia'
   | 'card-breath'
   | 'card-music'
   | 'card-journal'
@@ -28,7 +28,7 @@ export const toneMessages: ToneDictionary = {
     },
     en: {
       headline: 'We stay gentle',
-      helper: 'Let’s breathe together and welcome whatever shows up.',
+      helper: "Let's breathe together and welcome whatever shows up.",
     },
   },
   low: {
@@ -74,26 +74,26 @@ export const toneMessages: ToneDictionary = {
 };
 
 export const cardNudges: CardToneCopy = {
-  'card-nyvee': {
+  'card-coach-ia': {
     very_low: {
-      fr: 'Nyvée écoute tout en douceur, sans pression.',
-      en: 'Nyvée listens softly, with zero pressure.',
+      fr: 'Le Coach IA écoute tout en douceur, sans pression.',
+      en: 'The AI Coach listens softly, with zero pressure.',
     },
     low: {
-      fr: 'Un mot à Nyvée peut alléger le coeur.',
-      en: 'A note to Nyvée can lighten the heart.',
+      fr: 'Un mot au Coach IA peut alléger le cœur.',
+      en: 'A note to the AI Coach can lighten the heart.',
     },
     neutral: {
-      fr: 'Nyvée reste disponible pour un point d’étape.',
-      en: 'Nyvée is ready for a quick check-in.',
+      fr: "Le Coach IA reste disponible pour un point d'étape.",
+      en: 'The AI Coach is ready for a quick check-in.',
     },
     high: {
-      fr: 'Partagez cette énergie avec Nyvée pour la canaliser.',
-      en: 'Share the momentum with Nyvée to help channel it.',
+      fr: 'Partagez cette énergie avec le Coach IA pour la canaliser.',
+      en: 'Share the momentum with the AI Coach to help channel it.',
     },
     very_high: {
-      fr: 'Nyvée transforme l’élan en inspiration concrète.',
-      en: 'Nyvée turns momentum into tangible inspiration.',
+      fr: "Le Coach IA transforme l'élan en inspiration concrète.",
+      en: 'The AI Coach turns momentum into tangible inspiration.',
     },
   },
   'card-breath': {
@@ -110,11 +110,11 @@ export const cardNudges: CardToneCopy = {
       en: 'Steady breathing to stay grounded.',
     },
     high: {
-      fr: 'Respirer aide à garder l’élan en douceur.',
+      fr: "Respirer aide à garder l'élan en douceur.",
       en: 'Breathing helps keep momentum gentle.',
     },
     very_high: {
-      fr: 'Un souffle ample pour accompagner l’énergie.',
+      fr: "Un souffle ample pour accompagner l'énergie.",
       en: 'Wide breathing to accompany the energy.',
     },
   },
@@ -128,15 +128,15 @@ export const cardNudges: CardToneCopy = {
       en: 'Let the music cradle your day.',
     },
     neutral: {
-      fr: 'Une atmosphère adaptée pour garder l’équilibre.',
+      fr: "Une atmosphère adaptée pour garder l'équilibre.",
       en: 'A tailored atmosphere to sustain balance.',
     },
     high: {
-      fr: 'Un rythme vivant pour nourrir l’élan.',
+      fr: "Un rythme vivant pour nourrir l'élan.",
       en: 'A lively rhythm to feed the momentum.',
     },
     very_high: {
-      fr: 'Des textures sonores pour canaliser l’énergie.',
+      fr: "Des textures sonores pour canaliser l'énergie.",
       en: 'Sound textures to channel the energy.',
     },
   },
@@ -146,7 +146,7 @@ export const cardNudges: CardToneCopy = {
       en: 'A few words to lay down the feeling.',
     },
     low: {
-      fr: 'Noter une sensation aide à clarifier l’instant.',
+      fr: "Noter une sensation aide à clarifier l'instant.",
       en: 'Writing a sensation can clarify the moment.',
     },
     neutral: {
@@ -154,11 +154,11 @@ export const cardNudges: CardToneCopy = {
       en: 'A short note to stay on course.',
     },
     high: {
-      fr: 'Décrire l’énergie la rend plus concrète.',
+      fr: "Décrire l'énergie la rend plus concrète.",
       en: 'Describing the energy makes it tangible.',
     },
     very_high: {
-      fr: 'Une micro-note pour orienter l’élan.',
+      fr: "Une micro-note pour orienter l'élan.",
       en: 'A micro note to steer the momentum.',
     },
   },
@@ -168,19 +168,19 @@ export const cardNudges: CardToneCopy = {
       en: 'A gentle scan to observe without judging.',
     },
     low: {
-      fr: 'Observer l’émotion aide à mieux la comprendre.',
+      fr: "Observer l'émotion aide à mieux la comprendre.",
       en: 'Observing the emotion helps understand it.',
     },
     neutral: {
-      fr: 'Un point d’étape pour rester aligné.',
+      fr: "Un point d'étape pour rester aligné.",
       en: 'A quick check to stay aligned.',
     },
     high: {
-      fr: 'Un scan transforme l’énergie en données utiles.',
+      fr: "Un scan transforme l'énergie en données utiles.",
       en: 'A scan turns energy into helpful insights.',
     },
     very_high: {
-      fr: 'Observer l’élan permet de le guider finement.',
+      fr: "Observer l'élan permet de le guider finement.",
       en: 'Watching the momentum lets you guide it with care.',
     },
   },
@@ -190,19 +190,19 @@ export const cardNudges: CardToneCopy = {
       en: 'A micro move to restart softly.',
     },
     low: {
-      fr: 'Un geste léger pour réveiller l’envie.',
+      fr: "Un geste léger pour réveiller l'envie.",
       en: 'A light move to awaken motivation.',
     },
     neutral: {
-      fr: 'Une petite action entretient l’équilibre.',
+      fr: "Une petite action entretient l'équilibre.",
       en: 'A small action maintains balance.',
     },
     high: {
-      fr: 'Le coach propose une action vive pour prolonger l’élan.',
+      fr: "Le coach propose une action vive pour prolonger l'élan.",
       en: 'The coach suggests a spirited action to sustain momentum.',
     },
     very_high: {
-      fr: 'Canalisez l’énergie dans une micro-action tonique.',
+      fr: "Canalisez l'énergie dans une micro-action tonique.",
       en: 'Channel the energy into a vibrant micro action.',
     },
   },

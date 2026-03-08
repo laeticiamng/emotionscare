@@ -11,7 +11,7 @@ describe('computeMusicActions', () => {
     expect(result).toContainEqual({ action: 'set_intensity', key: 'very_low' });
     expect(result).toContainEqual({ action: 'set_bpm_profile', key: 'slow' });
     expect(result).toContainEqual({ action: 'set_crossfade', ms: 18000 });
-    expect(result).toContainEqual({ action: 'post_cta', key: 'nyvee' });
+    expect(result).toContainEqual({ action: 'post_cta', key: 'cocoon' });
   });
 
   it('chooses warm texture and encore CTA when tension is very low', () => {

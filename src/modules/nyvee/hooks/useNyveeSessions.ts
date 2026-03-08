@@ -1,5 +1,5 @@
 /**
- * useNyveeSessions - Hook React Query pour les sessions Nyvee
+ * useNyveeSessions - Hook React Query pour les sessions Cocon Respiration
  * Gère la persistance et le fetching des sessions
  * Synchronise avec le système d'interconnexion des modules
  */
@@ -85,7 +85,7 @@ export const useNyveeSessions = () => {
         .limit(50);
 
       if (error) {
-        logger.error('Error fetching nyvee sessions:', error as Error, 'NYVEE');
+        logger.error('Error fetching cocoon sessions:', error as Error, 'COACH');
         return [];
       }
 
@@ -126,7 +126,7 @@ export const useNyveeSessions = () => {
         .limit(100);
 
       if (error) {
-        logger.error('Error fetching stats:', error as Error, 'NYVEE');
+        logger.error('Error fetching stats:', error as Error, 'COACH');
         return null;
       }
 
@@ -290,7 +290,7 @@ export const useNyveeSessions = () => {
           duration: params.durationSeconds
         });
       } catch (syncError) {
-        logger.warn('Module sync failed:', syncError, 'NYVEE');
+        logger.warn('Module sync failed:', syncError, 'COACH');
       }
       
       return { success: true };

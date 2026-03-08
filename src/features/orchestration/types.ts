@@ -41,8 +41,8 @@ export interface SetPathDurationAction {
 }
 
 export type PostCtaAction =
-  | { action: 'post_cta'; key: 'nyvee' }
-  | { action: 'post_cta'; key: 'nyvee_suggest' }
+  | { action: 'post_cta'; key: 'cocoon' }
+  | { action: 'post_cta'; key: 'cocoon_suggest' }
   | { action: 'post_cta'; key: 'screen_silk' }
   | { action: 'post_cta'; key: 'flash_glow' };
 

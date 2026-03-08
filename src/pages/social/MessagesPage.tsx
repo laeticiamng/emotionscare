@@ -28,7 +28,7 @@ interface Message {
   emotion?: string;
 }
 
-const STORAGE_KEY = 'nyvee-chat-messages';
+const STORAGE_KEY = 'coach-ia-chat-messages';
 
 const aiResponses = [
   "Je comprends ce que vous ressentez. Avez-vous essayé de prendre quelques respirations profondes ?",
@@ -131,7 +131,7 @@ const MessagesPage: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `conversation-nyvee-${new Date().toISOString().split('T')[0]}.txt`;
+    a.download = `conversation-coach-ia-${new Date().toISOString().split('T')[0]}.txt`;
     a.click();
     URL.revokeObjectURL(url);
     toast({ title: 'Exporté', description: 'Conversation téléchargée.' });

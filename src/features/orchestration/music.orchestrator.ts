@@ -8,7 +8,7 @@ export type MusicAction =
   | { action: 'set_intensity'; key: MusicIntensityKey }
   | { action: 'set_bpm_profile'; key: MusicBpmProfile }
   | { action: 'set_crossfade'; ms: number }
-  | { action: 'post_cta'; key: 'nyvee' | 'encore_2min' | 'none' }
+  | { action: 'post_cta'; key: 'cocoon' | 'encore_2min' | 'none' }
   | { action: 'visualizer_mode'; key: 'reduced' | 'standard' };
 
 export interface MusicOrchestrationInputs {
@@ -78,7 +78,7 @@ export function computeMusicActions(inputs: MusicOrchestrationInputs): MusicActi
   }
 
   if (highTension) {
-    actions.push({ action: 'set_crossfade', ms: 18000 }, { action: 'post_cta', key: 'nyvee' });
+    actions.push({ action: 'set_crossfade', ms: 18000 }, { action: 'post_cta', key: 'cocoon' });
   } else if (lowTension) {
     actions.push({ action: 'set_crossfade', ms: 12000 }, { action: 'post_cta', key: 'encore_2min' });
   } else {

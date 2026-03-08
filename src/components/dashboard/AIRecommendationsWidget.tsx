@@ -260,7 +260,7 @@ function getLocalFallback(valence: number, arousal: number): AIResponse {
     );
   } else if (valence < 0.3) {
     recommendations.push(
-      { module: 'coach', priority: 1, reason: 'Support émotionnel avec Nyvée', confidence: 0.8, urgency: 'immediate' },
+      { module: 'coach', priority: 1, reason: 'Support émotionnel avec le Coach IA', confidence: 0.8, urgency: 'immediate' },
       { module: 'music', priority: 2, reason: 'Musique énergisante', confidence: 0.7, urgency: 'suggested' },
     );
   } else if (valence > 0.6) {

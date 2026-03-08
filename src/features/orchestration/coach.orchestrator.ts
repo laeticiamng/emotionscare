@@ -3,7 +3,7 @@ export type CoachAction =
   | { action: 'set_response_mode'; key: 'micro' | 'brief' }
   | { action: 'queue_microcards'; keys: string[] }
   | { action: 'set_tone'; key: 'soft' | 'neutral' }
-  | { action: 'suggest_next'; key: 'breath_1min' | 'walk_2min' | 'note_thought' | 'nyvee' | 'none' }
+  | { action: 'suggest_next'; key: 'breath_1min' | 'walk_2min' | 'note_thought' | 'cocoon' | 'none' }
   | { action: 'llm_guardrails'; enabled: boolean };
 
 export interface ComputeCoachActionsInputs {
@@ -21,7 +21,7 @@ export function computeCoachActions({ aaqLevel, distressHint }: ComputeCoachActi
     acts.push(
       { action: 'set_response_mode', key: 'micro' },
       { action: 'queue_microcards', keys: ['defusion_observe', 'label_thought', 'ground_body'] },
-      { action: 'suggest_next', key: distressHint === 'high' ? 'nyvee' : 'breath_1min' },
+      { action: 'suggest_next', key: distressHint === 'high' ? 'cocoon' : 'breath_1min' },
     );
   } else if (aaqLevel === 2) {
     acts.push(

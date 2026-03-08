@@ -1,5 +1,5 @@
 /**
- * useNyveeMachine - State machine pour sessions Nyvee
+ * useNyveeMachine - State machine pour sessions Cocon Respiration
  */
 
 import { useCallback, useState } from 'react';

@@ -126,7 +126,7 @@ const CommunityPage = lazy(() => import('@/pages/social/CommunityPage'));
 const ExchangeHubPage = lazy(() => import('@/pages/ExchangeHubPage'));
 const EntraidePage = lazy(() => import('@/pages/EntraidePage'));
 
-// Nyvée AI Avatar
+// Cocon Respiration
 const B2CNyveeCoconPage = lazy(() => import('@/pages/b2c/B2CNyveeCoconPage'));
 const NyveeTestPage = lazy(() => import('@/pages/NyveeTestPage'));
 const ValidationPage = lazy(() => import('@/pages/ValidationPage'));
@@ -338,7 +338,7 @@ export const b2cComponentMap = {
   ExchangeHubPage,
   EntraidePage,
 
-  // Nyvée
+  // Cocon Respiration
   B2CNyveeCoconPage,
   NyveeTestPage,
   ValidationPage,

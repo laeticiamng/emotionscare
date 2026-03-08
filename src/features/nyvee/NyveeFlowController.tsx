@@ -1,5 +1,5 @@
 /**
- * NyveeFlowController - Contrôleur de flux post-session avec transitions douces
+ * NyveeFlowController - Contrôleur de flux post-session Cocon Respiration avec transitions douces
  */
 
 import { useState, useRef, useMemo, useEffect, useCallback, type ReactNode } from 'react';
@@ -56,7 +56,7 @@ const softExitCopy = {
 const DEFAULT_ANCHOR_DURATION = 60_000;
 
 /**
- * Persiste une session Nyvee dans la base de données
+ * Persiste une session Cocon Respiration dans la base de données
  */
 const persistNyveeSession = async (
   moduleName: string,
@@ -112,7 +112,7 @@ const NyveeFlowController = ({
     const step: NyveeNextStep = decision === 'down' ? 'repeat_soft_anchor' : 'offer_54321';
     setNextStep(step);
 
-    logger.info(step === 'repeat_soft_anchor' ? 'nyvee:next:anchor' : 'nyvee:next:54321', undefined, 'NYVEE');
+    logger.info(step === 'repeat_soft_anchor' ? 'cocoon:next:anchor' : 'cocoon:next:54321', undefined, 'COACH');
 
     setPhase(step === 'repeat_soft_anchor' ? 'anchor_prompt' : 'grounding');
   }, [decision, decisionReady, nextStep]);
@@ -134,7 +134,7 @@ const NyveeFlowController = ({
       setSoftExitTriggered(true);
       setPhase('soft_exit');
 
-      logger.info('nyvee:exit:soft', undefined, 'NYVEE');
+      logger.info('cocoon:exit:soft', undefined, 'COACH');
 
       toast({
         title: softExitCopy.title,

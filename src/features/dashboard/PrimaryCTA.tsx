@@ -27,7 +27,7 @@ const CTA_COPY: Record<Who5Orchestration['primaryCta'], CtaConfig> = {
     to: '/app/breath',
     icon: Wind,
   },
-  nyvee_calm: {
+  coach_ia_calm: {
     label: 'Parler au Coach IA',
     description: 'Une écoute immédiate pour déposer ce qui pèse.',
     to: '/app/coach',

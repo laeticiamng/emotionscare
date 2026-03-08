@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
@@ -68,7 +68,7 @@ export function ensureI18n(locale: AppLocale = 'fr') {
     }
 
     if (typeof window !== 'undefined') {
-      (window as Record<string, unknown>).i18n = i18n;
+      (window as unknown as Record<string, unknown>).i18n = i18n;
     }
 
     initialized = true;

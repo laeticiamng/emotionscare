@@ -23,7 +23,7 @@ type CardConfig = {
 };
 
 const CARD_CATALOG: Record<DashboardCardId, CardConfig> = {
-  'card-nyvee': {
+  'card-coach-ia': {
     title: 'Coach IA',
     description: 'Un échange chaleureux avec l’IA compagnon.',
     to: '/app/coach',
@@ -68,7 +68,7 @@ const CARD_CATALOG: Record<DashboardCardId, CardConfig> = {
 };
 
 const DEFAULT_ORDER: DashboardCardId[] = [
-  'card-nyvee',
+  'card-coach-ia',
   'card-breath',
   'card-music',
   'card-journal',

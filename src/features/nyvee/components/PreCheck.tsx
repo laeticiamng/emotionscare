@@ -1,5 +1,5 @@
 /**
- * PreCheck - Composant de pré-vérification avant session Nyvee
+ * PreCheck - Composant de pré-vérification avant session Cocon Respiration
  */
 
 import type { FC } from 'react';

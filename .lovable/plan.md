@@ -1,142 +1,64 @@
 
 
-# Audit complet pré-production — EmotionsCare
+## Plan : Ajouter les traductions allemandes et compléter FR/EN/DE sur toute la plateforme
 
----
+### Constat actuel
 
-## A. RÉSUMÉ EXÉCUTIF
+L'application dispose de deux systèmes i18n parallèles :
+1. **Système principal** (`src/lib/i18n/locales/{fr,en}/`) — 11 namespaces (common, navigation, dashboard, settings, modules, auth, consent, errors, legal, journal, coach) avec FR et EN complets
+2. **Système secondaire** (`src/i18n/locales/{fr,en,de}.ts`) — squelettique, utilisé par `src/i18n/config.ts`
+3. **Fichiers JSON** (`public/locales/{fr,en}/`) — partiels (common, errors, breath)
 
-| Domaine | Score | Verdict |
-|---------|-------|---------|
-| Sécurité | 7.5/10 | ⚠️ Corrections P0 requises |
-| Branding | 5/10 | ❌ 1715 occurrences "Nyvée" résiduelles |
-| Qualité du code | 4/10 | ❌ 1864 fichiers @ts-nocheck |
-| SEO / Meta | 9/10 | ✅ Solide |
-| Performance | 8.5/10 | ✅ Bon (chunking, lazy, cache) |
-| Accessibilité | 8/10 | ✅ Bonne base (skip links, providers) |
-| Infrastructure | 7/10 | ⚠️ Doublons headers, bun.lock résiduel |
-| RGPD / Conformité | 8/10 | ✅ CookieBanner, ConsentProvider, DSAR |
+Le **DE (allemand)** existe uniquement dans `src/i18n/locales/de.ts` avec un contenu riche mais n'est **pas branché** dans le système principal (`src/providers/i18n/resources.ts` ne charge que `fr` et `en`).
 
-**Verdict global : NON PRÊT pour la production.** 3 bloquants P0 à résoudre.
+De plus, de nombreuses pages (100+) contiennent encore des **chaînes hardcodées en français** non internationalisées.
 
----
+### Plan d'implémentation
 
-## B. DÉTAIL PAR DOMAINE
+#### 1. Creer les fichiers de traduction DE (11 fichiers)
 
-### 1. BRANDING — P0 BLOQUANT
+Creer `src/lib/i18n/locales/de/` avec les 11 fichiers miroirs de FR/EN :
+- `common.ts`, `navigation.ts`, `dashboard.ts`, `settings.ts`, `modules.ts`, `auth.ts`, `consent.ts`, `errors.ts`, `legal.ts`, `journal.ts`, `coach.ts`
 
-**1715 occurrences "Nyvée/Nyvee"** dans 93 fichiers. La purge précédente n'a couvert qu'une fraction.
+Chaque fichier sera la traduction allemande complète des clés existantes en FR/EN.
 
-Fichiers critiques non nettoyés :
-- `src/features/dashboard/nudges.ts` — Textes utilisateur : "Nyvée écoute tout en douceur", "Un mot à Nyvée"…
-- `src/pages/social/MessagesPage.tsx` — `STORAGE_KEY = 'nyvee-chat-messages'`, nom de fichier export
-- `src/modules/nyvee/hooks/useNyvee.ts` — Query keys `nyvee-stats`, `nyvee-sessions`
-- `src/features/orchestration/` — Références `nyvee_calm`, `card-nyvee`, log catégorie `'NYVEE'`
-- `src/lib/validation/schemas.ts`, orchestrators, spec files…
+#### 2. Brancher DE dans le système principal
 
-**Action** : Recherche exhaustive `grep -ri "nyv[ée]e" src/` et remplacement systématique dans les 93 fichiers. Les textes user-facing deviennent "Coach IA" ou "Cocon Respiration". Les clés internes (query keys, storage keys) doivent aussi migrer pour éviter la confusion en maintenance.
+Modifier `src/providers/i18n/resources.ts` pour :
+- Importer les 11 modules DE
+- Ajouter la locale `de` dans l'objet `resources`
 
-### 2. QUALITÉ DU CODE — P0 BLOQUANT
+#### 3. Mettre à jour la configuration i18n
 
-- **1864 fichiers avec `@ts-nocheck` ou `@ts-ignore`** — TypeScript strict est de facto désactivé sur la quasi-totalité du projet. Cela inclut des fichiers critiques : `AuthContext`, services, hooks, pages.
-- **691 `console.log`** dans 28 fichiers (tests inclus). Vite `drop_console` en production atténue le risque, mais les fichiers de test devraient utiliser le logger.
-- **180 TODO/FIXME** dans 26 fichiers — dette technique non résolue.
-- **Estimation réaliste** : le retrait de tous les `@ts-nocheck` est un chantier de plusieurs semaines. Pour la mise en production, prioriser le retrait sur les fichiers critiques (auth, services, providers, routing).
+- `src/lib/i18n.ts` : ajouter `'de'` dans `supportedLngs`
+- `src/lib/i18n/i18n.tsx` : ajouter le type `'de'` au type `Lang`
+- `src/i18n/locales/fr.ts` et `src/i18n/locales/en.ts` : ajouter `de: 'Allemand'` / `de: 'German'` dans `languageNames`
 
-**Action immédiate** : Retirer `@ts-nocheck` des 15 fichiers les plus critiques (AuthContext, api.ts, env.ts, providers, routerV2). Documenter le reste en dette technique avec timeline.
+#### 4. Mettre à jour le sélecteur de langue
 
-### 3. SÉCURITÉ
+- `src/ui/NavBar.tsx` : supporter le cycle FR → EN → DE → FR
+- `src/i18n/LanguageSwitcher.tsx` : s'assurer que DE est dans les options (il utilise `SUPPORTED_LOCALES` qui inclut déjà `de`)
 
-**Points positifs :**
-- `TEST_MODE.BYPASS_AUTH = false` ✅
-- `service_role` jamais côté front, tests de détection en place ✅
-- CSP configurée (vercel.json + _headers) ✅
-- Headers OWASP complets (HSTS, X-Frame-Options, COOP, CORP) ✅
-- XSS : `SafeHtml` + DOMPurify + trigger DB ✅
-- Sentry scrubbing des secrets ✅
+#### 5. Ajouter les fichiers JSON DE dans public/locales
 
-**Points à corriger :**
-- **`unsafe-inline` dans `style-src`** — La CSP dans `_headers` (root) et `csp.ts` inclut `'unsafe-inline'` pour les styles. Le scorecard admin affirme "CSP strict (no unsafe-inline)" ce qui est **faux**. Requis par Tailwind/Radix, mais le scorecard doit refléter la réalité.
-- **3 fichiers `_headers`** (root `_headers`, `public/_headers`, `vercel.json`) avec des CSP **divergentes**. En production, une seule source doit prévaloir selon l'hébergeur (Vercel → `vercel.json`).
-- **277 fichiers utilisent `localStorage`** — Beaucoup stockent des données non sensibles (préférences, historique UI), mais il faut vérifier qu'aucun JWT ou token n'y transite (memory note indique sessionStorage prioritaire).
+Creer `public/locales/de/` avec `common.json`, `errors.json`, `breath.json`
 
-**Action** : Unifier les headers en un seul fichier selon l'hébergeur cible. Corriger le scorecard admin. Auditer les 277 usages localStorage pour tout token/secret.
+#### 6. Internationaliser les composants avec chaînes hardcodees
 
-### 4. SEO / META
+Migrer progressivement les composants critiques contenant du texte FR hardcode :
+- `GroupHeader.tsx` : remplacer "Aujourd'hui"/"Hier" par `t('common.today')`/`t('common.yesterday')` et utiliser la locale dynamique pour `Intl.DateTimeFormat`
+- `NavBar.tsx` : utiliser les clés de traduction pour les liens
+- `Footer.tsx` : utiliser les clés de traduction pour les liens legaux
 
-- `index.html` : JSON-LD riche (Organization, WebApplication, HowTo) ✅
-- OG image 1200×630 avec cache-bust ✅
-- `robots.txt` : GEO-optimisé (GPTBot, PerplexityBot, ClaudeBot autorisés) ✅
-- `sitemap.xml` présent ✅
-- `llms.txt` présent ✅
-- `<noscript>` fallback ✅
-- hreflang manquant dans `index.html` (mentionné dans les memories mais non visible)
+### Details techniques
 
-**Action** : Ajouter `<link rel="alternate" hreflang="fr" href="https://emotionscare.com" />` et `hreflang="x-default"`.
+- Les 11 fichiers DE suivront exactement la structure des fichiers EN existants
+- Le type `Lang` sera etendu a `'fr' | 'en' | 'de'`
+- Le `fallbackLng` reste `'fr'`
+- Environ **15-20 fichiers** seront modifies ou crees
 
-### 5. PERFORMANCE
+### Limites
 
-- Vite `manualChunks` bien structuré (15+ chunks isolés) ✅
-- `terser` avec `drop_console` en prod ✅
-- Sourcemaps désactivées en prod ✅
-- PWA complète (manifest, service worker, workbox caching) ✅
-- Polices Inter en `preload` + `display=swap` ✅
-- Preconnect Supabase/Google Fonts ✅
-- `chunkSizeWarningLimit: 300` (strict) ✅
-
-**Point d'attention** : `bun.lock` existe à la racine du projet malgré la règle "jamais bun". Le supprimer.
-
-### 6. INFRASTRUCTURE / DÉPLOIEMENT
-
-- **3 fichiers de headers dupliqués** : `_headers` (root, Netlify), `public/_headers` (Netlify copie), `vercel.json` (Vercel). Si le déploiement est Vercel, seul `vercel.json` compte. Les autres sont du bruit.
-- **~280 Edge Functions** déployées — consolidation en 8 super-routers documentée mais les fonctions individuelles sont toujours présentes. Elles consomment des ressources et augmentent la surface d'attaque.
-- **`flyway.conf`** a `flyway.url` défini deux fois (lignes 1 et 3) — conflit de configuration.
-
-### 7. RGPD / CONFORMITÉ
-
-- `CookieBanner` global dans `RootProvider` ✅
-- `ConsentProvider` ✅
-- `PolicyAcceptanceModal` ✅
-- Edge functions GDPR dédiées (export, deletion, DSAR) ✅
-- Documentation HDS dans `docs/compliance/` ✅
-
----
-
-## C. PLAN D'ACTION PRIORISÉ
-
-### P0 — Bloquants production (à faire AVANT mise en ligne)
-
-| # | Ticket | Estimation |
-|---|--------|-----------|
-| 1 | **Purge complète Nyvée** — 93 fichiers, textes user-facing + clés internes | 3h |
-| 2 | **Retirer @ts-nocheck des 15 fichiers critiques** (auth, api, providers, router) | 2h |
-| 3 | **Unifier les headers de sécurité** — Supprimer doublons, garder uniquement le fichier correspondant à l'hébergeur cible | 0.5h |
-| 4 | **Ajouter hreflang** dans `index.html` | 0.25h |
-| 5 | **Supprimer `bun.lock`** de la racine | 0.1h |
-| 6 | **Corriger `flyway.conf`** — double `flyway.url` | 0.1h |
-
-### P1 — Important post-lancement
-
-| # | Ticket | Estimation |
-|---|--------|-----------|
-| 7 | Auditer les 277 fichiers `localStorage` pour tokens/secrets | 1h |
-| 8 | Corriger le scorecard admin (unsafe-inline réalité vs affichage) | 0.25h |
-| 9 | Nettoyer les 180 TODO/FIXME restants | 2h |
-| 10 | Plan de retrait progressif des @ts-nocheck (1849 fichiers restants) | Planifier |
-
-### P2 — Maintenance continue
-
-| # | Ticket |
-|---|--------|
-| 11 | Supprimer les Edge Functions individuelles remplacées par les super-routers |
-| 12 | Atteindre 90% couverture de tests (objectif custom knowledge) |
-| 13 | Supprimer les 691 console.log des fichiers de test |
-
----
-
-## D. RECOMMANDATION
-
-**Ne pas publier en l'état.** Les 1715 occurrences Nyvée dans l'UI et les 1864 `@ts-nocheck` représentent des risques de confusion utilisateur et de dette technique critique. Les tickets P0 (1–6) totalisent ~6h de travail et sont nécessaires avant toute mise en production.
-
-Souhaitez-vous que j'implémente les tickets P0 ?
+- Les 100+ pages avec texte FR hardcode ne seront pas toutes migrées dans cette iteration — seuls les composants partagés (NavBar, Footer, GroupHeader) et la configuration seront traités
+- Les pages individuelles (ModulesDashboard, UnifiedHomePage, etc.) necessiteront des passes supplementaires
 

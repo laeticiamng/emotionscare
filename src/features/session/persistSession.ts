@@ -11,7 +11,7 @@ interface MusicSessionMetadata {
   intensity: 'very_low' | 'low' | 'medium';
   bpm_profile: 'slow' | 'neutral';
   crossfade_ms: number;
-  post_cta: 'nyvee' | 'encore_2min' | 'none';
+  post_cta: 'cocoon' | 'encore_2min' | 'none';
 }
 
 interface PersistMusicSessionInput {
@@ -135,7 +135,7 @@ export const persistBreathSession = async (module: 'breath', payload: PersistBre
   }
 };
 
-// Nyvee session types and function
+// Cocon Respiration session types and function
 export type NyveePersistPayload = {
   profile: string;
   next: 'anchor' | '54321';
@@ -147,7 +147,7 @@ export async function persistNyveeSession(
   module: 'nyvee',
   payload: NyveePersistPayload
 ): Promise<void> {
-  logger.info('nyvee:session:persist', { module, next: payload.next }, 'SESSION');
+  logger.info('cocoon:session:persist', { module, next: payload.next }, 'SESSION');
 
   try {
     await createSession({
@@ -160,7 +160,7 @@ export async function persistNyveeSession(
       },
     });
   } catch (error) {
-    logger.error('[Nyvee] persist session failed', error as Error, 'SYSTEM');
+    logger.error('[Cocoon] persist session failed', error as Error, 'SYSTEM');
     Sentry.captureException(error);
   }
 }
