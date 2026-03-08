@@ -297,13 +297,13 @@ const FeaturesPage: React.FC = () => {
           >
             <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
               <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-              37 modules intégrés
+              Plateforme complète
             </span>
 
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.05] mb-6">
-              37 modules.{' '}
+              Tout ce qu'il faut.{' '}
               <span className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] bg-clip-text text-transparent">
-                3 minutes.
+                En 3 minutes.
               </span>
             </h1>
 

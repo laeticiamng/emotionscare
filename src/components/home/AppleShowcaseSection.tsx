@@ -118,13 +118,14 @@ const AppleShowcaseSection: React.FC = () => {
             className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 md:mt-24"
           >
             {[
-              { title: "Stop", desc: "Interrompez le cycle de stress avec une pause guidée de 3 min" },
-              { title: "Reset", desc: "Rechargez votre énergie entre deux gardes ou consultations" },
-              { title: "Night", desc: "Apaisez votre mental avant le sommeil avec un sas de décompression" },
+              { title: "Stop", desc: "Pause d'urgence — interrompez le cycle de stress entre deux consultations", badge: "3 min" },
+              { title: "Reset", desc: "Rechargez votre énergie mentale après un moment difficile ou une garde", badge: "5 min" },
+              { title: "Night", desc: "Sas de décompression avant le sommeil avec respiration et sons apaisants", badge: "Sommeil" },
             ].map((item, i) => (
-              <div key={i} className="text-center">
+              <div key={i} className="text-center p-4 rounded-2xl border border-background/10 hover:border-background/20 transition-colors">
+                <span className="inline-block text-xs font-medium text-primary bg-primary/20 rounded-full px-3 py-1 mb-3">{item.badge}</span>
                 <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
-                <p className="text-background/60">{item.desc}</p>
+                <p className="text-background/60 text-sm">{item.desc}</p>
               </div>
             ))}
           </motion.div>
