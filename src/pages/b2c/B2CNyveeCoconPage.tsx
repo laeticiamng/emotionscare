@@ -95,7 +95,7 @@ const B2CNyveeCoconPage: FC = () => {
       });
       setCurrentSessionId(result.id);
     } catch (error) {
-      logger.error('Failed to create session', error, 'NYVEE');
+      logger.error('Failed to create session', error, 'COACH');
     }
     
     setSessionPhase('breathing');
