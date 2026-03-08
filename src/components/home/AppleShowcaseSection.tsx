@@ -114,12 +114,12 @@ const AppleShowcaseSection: React.FC = () => {
               </div>
 
               {/* CTA below animation */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
+              <div className="mt-6 flex justify-center">
                 <Link
-                  to="/signup"
+                  to={ctaPath}
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/30 hover:scale-105"
                 >
-                  Essayer cet exercice
+                  {isAuthenticated ? 'Retourner à mon espace' : 'Essayer cet exercice'}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
