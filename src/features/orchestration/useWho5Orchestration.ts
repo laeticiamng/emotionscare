@@ -28,11 +28,11 @@ type CardOrderMapping = Record<Who5Tone, string[]>;
 type PrimaryCtaMapping = Record<Who5Tone, Who5Orchestration['primaryCta']>;
 
 const CARD_ORDER: CardOrderMapping = {
-  very_low: ['card-nyvee', 'card-breath', 'card-music', 'card-journal', 'card-scan', 'card-coach'],
-  low: ['card-nyvee', 'card-breath', 'card-journal', 'card-music', 'card-scan', 'card-coach'],
-  neutral: ['card-scan', 'card-journal', 'card-music', 'card-nyvee', 'card-breath', 'card-coach'],
-  high: ['card-music', 'card-journal', 'card-scan', 'card-nyvee', 'card-coach', 'card-breath'],
-  very_high: ['card-coach', 'card-music', 'card-scan', 'card-journal', 'card-nyvee', 'card-breath'],
+  very_low: ['card-coach-ia', 'card-breath', 'card-music', 'card-journal', 'card-scan', 'card-coach'],
+  low: ['card-coach-ia', 'card-breath', 'card-journal', 'card-music', 'card-scan', 'card-coach'],
+  neutral: ['card-scan', 'card-journal', 'card-music', 'card-coach-ia', 'card-breath', 'card-coach'],
+  high: ['card-music', 'card-journal', 'card-scan', 'card-coach-ia', 'card-coach', 'card-breath'],
+  very_high: ['card-coach', 'card-music', 'card-scan', 'card-journal', 'card-coach-ia', 'card-breath'],
 };
 
 const PRIMARY_CTA: PrimaryCtaMapping = {
