@@ -126,7 +126,7 @@ const MessagesPage: React.FC = () => {
   };
 
   const exportConversation = () => {
-    const text = messages.map(m => `[${m.timestamp}] ${m.sender === 'user' ? 'Vous' : 'Nyvée'}: ${m.content}`).join('\n');
+    const text = messages.map(m => `[${m.timestamp}] ${m.sender === 'user' ? 'Vous' : 'Coach IA'}: ${m.content}`).join('\n');
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
