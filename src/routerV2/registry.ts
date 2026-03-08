@@ -1936,6 +1936,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'BlockchainBackupsPage',
     guard: true,
     requireAuth: true,
+    hidden: true,
   },
 
   

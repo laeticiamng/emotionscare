@@ -33,7 +33,7 @@ serve(async (req) => {
     }
 
     const body = await req.text();
-    const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
+    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
     // Vérifier la signature du webhook
     let event: Stripe.Event;
