@@ -237,7 +237,7 @@ const OnboardingPage: React.FC = () => {
                     <p className="text-muted-foreground leading-relaxed">
                       EmotionsCare est conçu spécifiquement pour les professionnels et étudiants en santé. 
                       Gérez votre stress en 3 minutes grâce au scan émotionnel IA, à la respiration guidée, 
-                      au coaching Nyvée et au journal émotionnel.
+                      au coaching IA et au journal émotionnel.
                     </p>
                   </div>
                   

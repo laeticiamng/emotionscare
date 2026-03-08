@@ -28,7 +28,7 @@ interface Message {
   emotion?: string;
 }
 
-const STORAGE_KEY = 'nyvee-chat-messages';
+const STORAGE_KEY = 'coach-ia-chat-messages';
 
 const aiResponses = [
   "Je comprends ce que vous ressentez. Avez-vous essayé de prendre quelques respirations profondes ?",
