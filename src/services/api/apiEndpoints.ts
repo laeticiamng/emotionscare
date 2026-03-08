@@ -559,7 +559,7 @@ export const BUBBLE_BEAT_ENDPOINTS = {
   GET_STATS: '/bubble-beat/stats',
 } as const;
 
-export const NYVEE_ENDPOINTS = {
+export const COCOON_ENDPOINTS = {
   LIST_CONVERSATIONS: '/nyvee/conversations',
   SEND_MESSAGE: '/nyvee/message',
 } as const;
