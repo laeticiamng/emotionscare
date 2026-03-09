@@ -292,29 +292,85 @@ export function useCoachHandlers() {
   const [favorites, setFavorites] = useState<string[]>([]);
   
   const { toast } = useToast();
+  const { user } = useAuth();
+  const isLoaded = useRef(false);
+  const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Load persisted data on mount
+  // Load persisted data on mount (Supabase first, localStorage fallback)
   useEffect(() => {
-    const storedMessages = loadFromStorage<CoachChatMessage[]>('coachMessages', []);
-    const storedHistory = loadFromStorage<EmotionAnalysis[]>(EMOTION_HISTORY_KEY, []);
-    const storedFavorites = loadFromStorage<string[]>(FAVORITES_KEY, []);
-    const storedStats = loadFromStorage<CoachStats>(STORAGE_KEY, stats);
-    
-    setMessages(storedMessages);
-    setEmotionHistory(storedHistory);
-    setFavorites(storedFavorites);
-    setStats(storedStats);
-    
-    // Start a new session
-    startNewSession();
-  }, []);
+    const load = async () => {
+      if (isLoaded.current) return;
 
-  // Persist messages when they change
+      let storedMessages: CoachChatMessage[] = [];
+      let storedHistory: EmotionAnalysis[] = [];
+      let storedFavorites: string[] = [];
+      let storedStats: CoachStats = stats;
+
+      if (user) {
+        // Try Supabase first
+        const [sbMessages, sbHistory, sbFavorites, sbStats] = await Promise.all([
+          loadFromSupabase<CoachChatMessage[]>('coachMessages', user.id),
+          loadFromSupabase<EmotionAnalysis[]>(EMOTION_HISTORY_KEY, user.id),
+          loadFromSupabase<string[]>(FAVORITES_KEY, user.id),
+          loadFromSupabase<CoachStats>(STORAGE_KEY, user.id),
+        ]);
+
+        storedMessages = sbMessages ?? loadFromStorage('coachMessages', []);
+        storedHistory = sbHistory ?? loadFromStorage(EMOTION_HISTORY_KEY, []);
+        storedFavorites = sbFavorites ?? loadFromStorage(FAVORITES_KEY, []);
+        storedStats = sbStats ?? loadFromStorage(STORAGE_KEY, stats);
+
+        // Migrate localStorage to Supabase if data was only in localStorage
+        if (!sbMessages && storedMessages.length > 0) {
+          void saveToSupabase('coachMessages', storedMessages.slice(-100), user.id);
+        }
+        if (!sbHistory && storedHistory.length > 0) {
+          void saveToSupabase(EMOTION_HISTORY_KEY, storedHistory.slice(-50), user.id);
+        }
+        if (!sbFavorites && storedFavorites.length > 0) {
+          void saveToSupabase(FAVORITES_KEY, storedFavorites, user.id);
+        }
+        if (!sbStats) {
+          void saveToSupabase(STORAGE_KEY, storedStats, user.id);
+        }
+      } else {
+        storedMessages = loadFromStorage('coachMessages', []);
+        storedHistory = loadFromStorage(EMOTION_HISTORY_KEY, []);
+        storedFavorites = loadFromStorage(FAVORITES_KEY, []);
+        storedStats = loadFromStorage(STORAGE_KEY, stats);
+      }
+
+      setMessages(storedMessages);
+      setEmotionHistory(storedHistory);
+      setFavorites(storedFavorites);
+      setStats(storedStats);
+      isLoaded.current = true;
+
+      startNewSession();
+    };
+
+    load();
+  }, [user?.id]);
+
+  // Persist messages with debounced Supabase sync
   useEffect(() => {
-    if (messages.length > 0) {
-      saveToStorage('coachMessages', messages);
-    }
-  }, [messages]);
+    if (!isLoaded.current || messages.length === 0) return;
+
+    // Always save to localStorage as fallback
+    saveToStorage('coachMessages', messages.slice(-100));
+
+    // Debounce Supabase save
+    if (saveTimeout.current) clearTimeout(saveTimeout.current);
+    saveTimeout.current = setTimeout(() => {
+      if (user) {
+        void saveToSupabase('coachMessages', messages.slice(-100), user.id);
+      }
+    }, 1000);
+
+    return () => {
+      if (saveTimeout.current) clearTimeout(saveTimeout.current);
+    };
+  }, [messages, user?.id]);
 
   // ─────────────────────────────────────────────────────────────
   // Session Management
