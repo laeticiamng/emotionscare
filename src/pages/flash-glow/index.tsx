@@ -1007,7 +1007,7 @@ const FlashGlowView: React.FC = () => {
             </Button>
             {flashHints?.exitMode === 'soft' && flashHints.companionPath && (
               <Button asChild variant="ghost" type="button">
-                <Link to={flashHints.companionPath}>Screen Silk</Link>
+                <Link to={flashHints.companionPath!}>Screen Silk</Link>
               </Button>
             )}
           </div>
