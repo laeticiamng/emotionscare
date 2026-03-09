@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { useAuth } from './AuthContext';
 import { MoodEvent, Prediction, PredictionRecommendation, EmotionalLocation, SanctuaryWidget } from '@/types/orchestration';
 import { EmotionResult } from '@/types/emotion';
-import { MoodData } from '@/types/audio';
+import { MoodData } from '@/types/other';
 
 // Define the type for OrchestrationEvent
 interface OrchestrationEventData {
