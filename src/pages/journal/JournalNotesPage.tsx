@@ -114,11 +114,11 @@ const JournalNotesPage = memo(() => {
                                 variant="ghost"
                                 size="icon"
                                 className="h-7 w-7"
-                                onClick={() => handleToggleFavorite(note.id)}
-                                aria-label={isFavorite(note.id) ? "Retirer des favoris" : "Ajouter aux favoris"}
+                                onClick={() => handleToggleFavorite(note.id!)}
+                                aria-label={isFavorite(note.id!) ? "Retirer des favoris" : "Ajouter aux favoris"}
                               >
                                 <Heart 
-                                  className={`h-4 w-4 ${isFavorite(note.id) ? 'text-destructive fill-destructive' : 'text-muted-foreground'}`} 
+                                  className={`h-4 w-4 ${isFavorite(note.id!) ? 'text-destructive fill-destructive' : 'text-muted-foreground'}`}
                                 />
                               </Button>
                               <Button
