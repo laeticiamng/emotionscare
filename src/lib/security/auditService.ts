@@ -118,7 +118,7 @@ class SecurityAuditService {
   /**
    * Détecte les tentatives d'attaque
    */
-  detectSuspiciousActivity(userId: string | null): boolean {
+  detectSuspiciousActivity(userId: string | undefined): boolean {
     const recentLogs = this.logs.filter(
       log => log.timestamp.getTime() > Date.now() - 60 * 60 * 1000 // Dernière heure
     );
