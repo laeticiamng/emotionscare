@@ -207,8 +207,9 @@ const SmartNotificationSystem: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  return (
+   return (
     <div className="space-y-6">
+      <DemoBanner message="Les notifications affichées sont simulées à des fins de démonstration. Le système réel est en cours de développement." />
       
       {/* En-tête avec statistiques */}
       <div className="flex items-center justify-between">
