@@ -139,17 +139,20 @@ const OptimizationPageEnhanced = () => {
     }
   };
 
-  const implementRecommendation = async (recId) => {
+  const implementRecommendation = async (recId: number) => {
     try {
-      setOptimizationData(prev => ({
-        ...prev,
-        ai: {
-          ...prev.ai,
-          recommendations: prev.ai.recommendations.map(rec => 
-            rec.id === recId ? { ...rec, status: 'in-progress' } : rec
-          )
-        }
-      }));
+      setOptimizationData(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          ai: {
+            ...prev.ai,
+            recommendations: prev.ai.recommendations.map(rec => 
+              rec.id === recId ? { ...rec, status: 'in-progress' } : rec
+            )
+          }
+        };
+      });
       
       toast({
         title: "Recommandation en cours",
