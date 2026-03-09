@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useRef, useEffect } from 'react';
 
 interface AudioState {
