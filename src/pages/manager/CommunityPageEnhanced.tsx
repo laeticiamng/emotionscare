@@ -124,8 +124,8 @@ const CommunityPageEnhanced = () => {
     }
   };
 
-  const getBadgeColor = (badge) => {
-    const colors = {
+  const getBadgeColor = (badge: string) => {
+    const colors: Record<string, string> = {
       'Expert': 'bg-purple-500',
       'Mentor': 'bg-blue-500',
       'Inspirateur': 'bg-green-500',
