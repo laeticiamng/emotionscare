@@ -159,7 +159,7 @@ const EventsPageEnhanced = () => {
     }
   };
 
-  const deleteEvent = async (eventId) => {
+  const deleteEvent = async (eventId: number) => {
     try {
       setEvents(prev => prev.filter(event => event.id !== eventId));
       toast({
