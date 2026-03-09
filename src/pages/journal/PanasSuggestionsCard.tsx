@@ -27,7 +27,7 @@ const orientationBadges: Record<string, { label: string; variant: 'default' | 's
 const sanitizeDescription = (value: string) =>
   DOMPurify.sanitize(value, {
     ALLOWED_TAGS: ['strong', 'em'],
-    ALLOWED_ATTR: {},
+    ALLOWED_ATTR: [] as string[],
   })
 
 const suggestionToPlainText = (suggestion: PanasSuggestion) => suggestion.prompt
