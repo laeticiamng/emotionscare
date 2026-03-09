@@ -1,12 +1,12 @@
 /**
  * Footer - Pied de page EmotionsCare
  * Liens vérifiés vers routes publiques uniquement
- * Email unique, pas de duplication
+ * Infos légales EMOTIONSCARE SASU — SIREN 944 505 445
  */
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Mail, Shield, BookOpen, Accessibility, LockKeyhole, Building2 } from 'lucide-react';
+import { Heart, Mail, Shield, BookOpen, Accessibility, LockKeyhole, Building2, MapPin, Linkedin, ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const Footer: React.FC = () => {
@@ -68,6 +68,45 @@ const Footer: React.FC = () => {
                 Accessible à tous
               </Badge>
             </div>
+
+            {/* Coordonnées */}
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
+                <span>80000 Amiens, France</span>
+              </div>
+              <a 
+                href="mailto:contact@emotionscare.com"
+                className="flex items-center gap-2 hover:text-primary transition-colors"
+              >
+                <Mail className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
+                contact@emotionscare.com
+              </a>
+            </div>
+
+            {/* LinkedIn */}
+            <div className="flex items-center gap-3">
+              <a
+                href="https://www.linkedin.com/company/emotionscare/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+                aria-label="Page LinkedIn EMOTIONSCARE SASU"
+              >
+                <Linkedin className="h-4 w-4" aria-hidden="true" />
+                EMOTIONSCARE
+              </a>
+              <a
+                href="https://www.linkedin.com/in/laeticiamotongane/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+                aria-label="Profil LinkedIn de Laeticia Motongane"
+              >
+                <Linkedin className="h-4 w-4" aria-hidden="true" />
+                Fondatrice
+              </a>
+            </div>
           </div>
 
           {/* Platform Links */}
@@ -127,6 +166,17 @@ const Footer: React.FC = () => {
                   </Link>
                 </li>
               ))}
+              <li>
+                <a
+                  href="https://president-cockpit-hq.lovable.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+                >
+                  Écosystème
+                  <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -156,17 +206,13 @@ const Footer: React.FC = () => {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
             {/* Copyright */}
             <p className="text-sm text-muted-foreground">
-              © {currentYear} EmotionsCare — EMOTIONSCARE SASU. Tous droits réservés.
+              © {currentYear} EmotionsCare — EMOTIONSCARE SASU — SIREN 944 505 445 — Amiens, France
             </p>
 
-            {/* Contact */}
-            <a 
-              href="mailto:contact@emotionscare.com" 
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              <Mail className="h-4 w-4" aria-hidden="true" />
-              contact@emotionscare.com
-            </a>
+            {/* Horaires */}
+            <p className="text-xs text-muted-foreground">
+              Lun – Ven : 9h00 – 18h00 · Réponse sous 24-48h ouvrées
+            </p>
           </div>
         </div>
       </div>

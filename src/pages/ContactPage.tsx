@@ -336,13 +336,46 @@ const ContactPage: React.FC = () => {
                         <div>
                           <h3 className="font-semibold mb-1">Siège social</h3>
                           <address className="text-muted-foreground not-italic">
-                            EmotionsCare SASU<br />
-                            5 rue Caudron<br />
+                            EMOTIONSCARE SASU<br />
+                            SIREN : 944 505 445<br />
                             80000 Amiens, France
                           </address>
-                          <p className="text-sm text-muted-foreground mt-2">
-                            Contact uniquement par email
-                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-4">
+                        <Phone className="w-6 h-6 text-primary mt-1 flex-shrink-0" aria-hidden="true" />
+                        <div>
+                          <h3 className="font-semibold mb-1">Horaires</h3>
+                          <p className="text-muted-foreground">Lun – Ven : 9h00 – 18h00</p>
+                          <p className="text-sm text-muted-foreground mt-1">Réponse sous 24-48h ouvrées</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-4">
+                        <div className="w-6 h-6 text-primary mt-1 flex-shrink-0 flex items-center justify-center" aria-hidden="true">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+                        </div>
+                        <div>
+                          <h3 className="font-semibold mb-1">Retrouvez-nous</h3>
+                          <div className="space-y-1">
+                            <a
+                              href="https://www.linkedin.com/in/laeticiamotongane/"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block text-muted-foreground hover:text-primary transition-colors"
+                            >
+                              Laeticia Motongane — Médecin · Fondatrice
+                            </a>
+                            <a
+                              href="https://www.linkedin.com/company/emotionscare/"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block text-muted-foreground hover:text-primary transition-colors"
+                            >
+                              EMOTIONSCARE SASU
+                            </a>
+                          </div>
                         </div>
                       </div>
                     </CardContent>
