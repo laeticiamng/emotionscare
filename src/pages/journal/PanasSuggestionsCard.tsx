@@ -63,10 +63,8 @@ export function PanasSuggestionsCard({ composer }: PanasSuggestionsCardProps) {
 
   const handleUseSuggestion = (suggestion: PanasSuggestion) => {
     const plain = suggestionToPlainText(suggestion)
-    composer.setText(prev => {
-      if (!prev.trim()) return plain
-      return `${prev.trim()}\n\n${plain}`
-    })
+    const current = composer.text
+    composer.setText(current.trim() ? `${current.trim()}\n\n${plain}` : plain)
     toast({
       title: 'Inspiration ajoutée',
       description: 'Le thème choisi a été ajouté à ta note.',

@@ -215,8 +215,10 @@ const FlashGlowView: React.FC = () => {
   const motion = useMotionPrefs();
   const currentMood = useCurrentMood();
   const clinicalHints = useClinicalHints('flash_glow');
-  const flashHints = {
+  const flashHints: { extendDuration: boolean; exitMode?: string; companionPath?: string } = {
     extendDuration: clinicalHints.hints.includes('extend_duration'),
+    exitMode: clinicalHints.hints.includes('soft_exit') ? 'soft' : undefined,
+    companionPath: clinicalHints.hints.includes('soft_exit') ? '/app/screen-silk' : undefined,
   };
   const consent = useConsent();
   const { start: startSudsStage, submit: submitSudsStage } = useAssessment('SUDS');
