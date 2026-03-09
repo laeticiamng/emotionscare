@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { DemoBanner } from '@/components/ui/DemoBanner';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
