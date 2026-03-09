@@ -2681,7 +2681,7 @@ export const ROUTES_REGISTRY: readonly RouteMeta[] = ([
     guard: true,
     requireAuth: true,
     aliases: ['/assess/burnout', '/burnout'],
-    status: 'stable',
+    status: 'demo',
   },
   // ═══════════════════════════════════════════════════════════
   // MODULE 39 - Team Wellbeing Dashboard
