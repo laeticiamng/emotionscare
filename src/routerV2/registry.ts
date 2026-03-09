@@ -2741,7 +2741,7 @@ export const ROUTES_REGISTRY: readonly RouteMeta[] = ([
     guard: true,
     requireAuth: true,
     aliases: ['/b2b/admin/institutional-report', '/b2b/qvt-report'],
-    status: 'stable',
+    status: 'demo',
   },
 
   // 404 FALLBACK ROUTE - Le fallback '*' est géré directement dans router.tsx
