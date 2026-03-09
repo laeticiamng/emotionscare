@@ -21,7 +21,7 @@ import {
   EyeOff,
   ArrowLeft,
   Shield,
-  Zap
+  ArrowRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
