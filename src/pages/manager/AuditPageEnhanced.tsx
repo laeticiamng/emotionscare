@@ -293,9 +293,10 @@ const AuditPageEnhanced: React.FC = () => {
             <Calendar
               mode="range"
               selected={dateRange}
-              onSelect={setDateRange}
+              onSelect={(range) => setDateRange(range ?? { from: undefined })}
               numberOfMonths={2}
               locale={fr}
+              required={false}
             />
           </PopoverContent>
         </Popover>
