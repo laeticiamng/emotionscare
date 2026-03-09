@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import DemoBanner from '@/components/ui/DemoBanner';
 import { Helmet } from 'react-helmet-async';
 import { 
   CheckCircle, XCircle, AlertTriangle, Activity, 
