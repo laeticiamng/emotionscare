@@ -53,7 +53,7 @@ const features: InstitutionalFeature[] = [
   {
     title: "Bibliothèque d'interventions",
     description:
-      'Pratiques basées sur les preuves : respiration, soutien par les pairs, débriefing post-traumatique. Niveaux d'évidence et planification équipe.',
+      "Pratiques basées sur les preuves : respiration, soutien par les pairs, débriefing post-traumatique. Niveaux d'évidence et planification équipe.",
     icon: BookOpen,
     badge: 'Evidence-based',
     badgeVariant: 'secondary',
