@@ -341,7 +341,7 @@ const FlashGlowView: React.FC = () => {
         message: 'orch:flash_glow:pre_shown',
       });
     }
-  }, [sudsEnabled, showSudsCard, consent.clinicalAccepted]);
+  }, [sudsEnabled, showSudsCard, clinicalAccepted]);
 
   useEffect(() => {
     if (postDialogOpen && sudsEnabled && sudsOptIn && consent.clinicalAccepted) {
