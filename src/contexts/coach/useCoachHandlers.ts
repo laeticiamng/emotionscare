@@ -471,7 +471,7 @@ export function useCoachHandlers() {
         if (filtered.length > 0) activities = filtered;
       }
       
-      if (options?.maxDuration) {
+      if (options?.maxDuration != null) {
         const filtered = activities.filter(a => a.duration <= options.maxDuration);
         if (filtered.length > 0) activities = filtered;
       }
