@@ -12,7 +12,7 @@ const MusicPage: React.FC = () => {
   usePageSEO({
     title: 'Musicothérapie - EmotionsCare',
     description: 'Harmonisez votre humeur avec des sons adaptatifs et de la musicothérapie personnalisée.',
-    keywords: ['musique', 'thérapie', 'bien-être', 'relaxation', 'EmotionsCare'],
+    keywords: 'musique, thérapie, bien-être, relaxation, EmotionsCare',
   });
 
   const { runAudit } = useAccessibilityAudit();

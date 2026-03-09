@@ -11,7 +11,7 @@ const DashboardPage: React.FC = () => {
   usePageSEO({
     title: 'Dashboard RH - EmotionsCare B2B',
     description: 'Tableau de bord RH pour le suivi anonymisé du bien-être de vos équipes. Visualisez les KPIs, alertes et tendances.',
-    keywords: ['RH', 'bien-être', 'équipe', 'dashboard', 'B2B', 'EmotionsCare'],
+    keywords: 'RH, bien-être, équipe, dashboard, B2B, EmotionsCare',
   });
 
   const { runAudit } = useAccessibilityAudit();

@@ -16,7 +16,7 @@ import {
 
 type Section = {
   id: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   title: string;
   content: React.ReactNode;
 };

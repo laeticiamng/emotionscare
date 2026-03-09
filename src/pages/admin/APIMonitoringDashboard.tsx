@@ -286,7 +286,7 @@ export default function APIMonitoringDashboard() {
                       legend: { position: 'top' },
                       tooltip: {
                         callbacks: {
-                          label: (ctx) => `Coût: $${ctx.parsed.y.toFixed(2)}`
+                          label: (ctx) => `Coût: $${ctx.parsed?.y?.toFixed(2) ?? '0.00'}`
                         }
                       }
                     }

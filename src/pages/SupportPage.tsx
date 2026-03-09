@@ -29,7 +29,7 @@ export default function SupportPage() {
   usePageSEO({
     title: 'Support Client - EmotionsCare',
     description: 'Contactez notre équipe support. Chat en direct, email ou formulaire. Réponse garantie sous 24h.',
-    keywords: ['support', 'aide', 'contact', 'EmotionsCare', 'assistance'],
+    keywords: 'support, aide, contact, EmotionsCare, assistance',
   });
 
   const { runAudit } = useAccessibilityAudit();

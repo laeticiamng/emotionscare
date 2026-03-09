@@ -47,7 +47,7 @@ export default function AppDispatcher() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center" data-testid="page-root">
       <div className="text-center space-y-4">
-        <AsyncState.Loading message="Redirection en cours..." />
+        <LoadingSpinner size="lg" />
         <p className="text-sm text-muted-foreground">
           Nous vous dirigeons vers votre espace personnel...
         </p>

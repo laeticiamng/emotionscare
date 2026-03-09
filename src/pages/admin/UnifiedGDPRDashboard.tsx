@@ -197,7 +197,7 @@ export default function UnifiedGDPRDashboard() {
                       {complianceData?.score || 0}/100
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {latestAudit?.status || 'En attente'}
+                      {(latestAudit as any)?.status || 'En attente'}
                     </p>
                   </>
                 )}
