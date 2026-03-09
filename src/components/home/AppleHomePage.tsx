@@ -1,7 +1,7 @@
 /**
  * AppleHomePage - Homepage style Apple
- * Parcours simplifié : Hero > En bref > Features > Modules > Social Proof > CTA
- * Réduit de 10 à 7 sections pour éviter la fatigue de scroll
+ * Parcours simplifié : Hero > Comment ça marche > Features > Showcase > Modules > Social Proof > CTA
+ * 6 sections + footer pour éviter la fatigue de scroll
  */
 
 import React, { lazy, Suspense } from 'react';
