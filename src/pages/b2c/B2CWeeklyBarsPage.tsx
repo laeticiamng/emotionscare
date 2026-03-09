@@ -424,6 +424,7 @@ const B2CWeeklyBarsPage: React.FC = () => {
   return (
     <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-background">
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        <DemoBanner message="Cette page affiche des données de démonstration. Les statistiques hebdomadaires présentées sont simulées." />
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

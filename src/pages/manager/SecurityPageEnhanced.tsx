@@ -100,6 +100,7 @@ const SecurityPageEnhanced: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      <DemoBanner message="Cette page affiche des données de démonstration. Les scores de sécurité et alertes présentés sont simulés." />
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

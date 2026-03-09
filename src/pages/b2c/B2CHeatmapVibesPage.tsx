@@ -515,6 +515,7 @@ const B2CHeatmapVibesPage: React.FC = () => {
   return (
     <PageRoot>
       <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-muted/10">
+        <div className="container mx-auto px-4 pt-4"><DemoBanner message="Cette page affiche des données de démonstration. Les patterns émotionnels présentés sont simulés." /></div>
         {/* Header */}
         <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm border-b">
           <div className="container mx-auto px-4">

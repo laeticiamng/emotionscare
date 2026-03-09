@@ -619,6 +619,7 @@ const B2CVoiceJournalPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4 md:p-6" data-testid="page-root">
+      <DemoBanner message="Cette page affiche des données de démonstration. La transcription vocale et l'analyse IA sont simulées." />
       <div className="max-w-6xl mx-auto">
         {/* Back button */}
         <Link to="/app/home" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">

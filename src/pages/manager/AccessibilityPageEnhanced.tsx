@@ -181,6 +181,7 @@ const AccessibilityPageEnhanced: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      <DemoBanner message="Cette page affiche des données de démonstration. Les résultats d'audit d'accessibilité sont simulés." />
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

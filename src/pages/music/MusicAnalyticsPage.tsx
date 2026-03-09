@@ -330,6 +330,7 @@ const MusicAnalyticsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-background">
+      <div className="container mx-auto px-4 pt-4"><DemoBanner message="Cette page affiche des données de démonstration. Les analytics musicales présentées sont simulées." /></div>
       {/* Header */}
       <div className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
