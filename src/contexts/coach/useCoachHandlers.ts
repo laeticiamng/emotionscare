@@ -589,7 +589,7 @@ export function useCoachHandlers() {
 
   const sendMessage = useCallback(
     (text: string, sender: 'user' | 'assistant' | 'system' | 'coach') => {
-      const newMessage: ChatMessage = {
+      const newMessage: CoachChatMessage = {
         id: uuidv4(),
         content: text,
         sender,
