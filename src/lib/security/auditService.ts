@@ -84,7 +84,7 @@ class SecurityAuditService {
   /**
    * Enregistre une violation de sécurité
    */
-  logSecurityViolation(userId: string | null, violation: string, details?: any) {
+  logSecurityViolation(userId: string | undefined, violation: string, details?: any) {
     this.log({
       userId,
       action: 'SECURITY_VIOLATION',
