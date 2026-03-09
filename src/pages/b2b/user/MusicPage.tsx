@@ -6,7 +6,7 @@ import { usePageSEO } from '@/hooks/usePageSEO';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
 
 // Lazy load pour performance
-const MusicTherapyPage = React.lazy(() => import('@/pages/MusicTherapyPage'));
+const MusicTherapyPage = React.lazy(() => import('@/pages/music/MusicTherapyPage'));
 
 const MusicPage: React.FC = () => {
   usePageSEO({
