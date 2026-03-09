@@ -472,7 +472,7 @@ export function useCoachHandlers() {
       }
       
       if (options?.maxDuration != null) {
-        const filtered = activities.filter(a => a.duration <= options.maxDuration);
+        const filtered = activities.filter(a => a.duration <= (options.maxDuration ?? Infinity));
         if (filtered.length > 0) activities = filtered;
       }
       
