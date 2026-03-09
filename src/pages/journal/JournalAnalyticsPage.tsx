@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * JournalAnalyticsPage - Dashboard Analytics enrichi
  */

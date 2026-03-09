@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * JournalFavoritesPage - Affichage des notes favorites enrichi
  */

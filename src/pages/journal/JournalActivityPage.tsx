@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * JournalActivityPage - Activité et streaks enrichis
  */
