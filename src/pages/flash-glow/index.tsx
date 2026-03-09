@@ -331,7 +331,7 @@ const FlashGlowView: React.FC = () => {
     }
 
     setShowSudsCard(true);
-  }, [sudsEnabled, consent.clinicalAccepted]);
+  }, [sudsEnabled, clinicalAccepted]);
 
   useEffect(() => {
     if (sudsEnabled && showSudsCard && consent.clinicalAccepted) {
