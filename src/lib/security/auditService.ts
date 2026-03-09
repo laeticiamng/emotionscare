@@ -127,7 +127,7 @@ class SecurityAuditService {
     const failedLogins = recentLogs.filter(
       log => log.action === 'LOGIN_ATTEMPT' && !log.success
     );
-    if (failedLogins.length > SECURITY_CONFIG.limits.maxLoginAttempts) {
+    if (failedLogins.length > (SECURITY_CONFIG.RATE_LIMITS?.LOGIN_ATTEMPTS ?? 5)) {
       this.logSecurityViolation(userId, 'EXCESSIVE_FAILED_LOGINS', {
         count: failedLogins.length
       });
