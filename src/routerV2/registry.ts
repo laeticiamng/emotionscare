@@ -2696,7 +2696,7 @@ export const ROUTES_REGISTRY: readonly RouteMeta[] = ([
     guard: true,
     requireAuth: true,
     aliases: ['/b2b/admin/team-wellbeing'],
-    status: 'stable',
+    status: 'demo',
   },
   // ═══════════════════════════════════════════════════════════
   // MODULE 40 - Interventions Library
