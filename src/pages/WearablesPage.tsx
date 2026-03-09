@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { DemoBanner } from '@/components/ui/DemoBanner';
 import { Link, Navigate } from 'react-router-dom';
 import { logger } from '@/lib/logger';
 import { Watch, Activity, Heart, Moon, Footprints, RefreshCw, Check, X, TrendingUp, TrendingDown, Minus, History, Settings, ArrowLeft } from 'lucide-react';
