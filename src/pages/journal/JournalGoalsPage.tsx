@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * JournalGoalsPage - Objectifs d'écriture enrichis
  */

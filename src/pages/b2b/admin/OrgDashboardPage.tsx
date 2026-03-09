@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Page du tableau de bord organisation B2B
  * Vue macro avec données agrégées anonymisées
@@ -31,7 +30,7 @@ const OrgDashboardPage: React.FC = () => {
   usePageSEO({
     title: `Dashboard - ${orgName} | EmotionsCare B2B`,
     description: 'Tableau de bord institutionnel pour le suivi anonymisé du bien-être collectif.',
-    keywords: ['B2B', 'bien-être', 'institution', 'dashboard', 'EmotionsCare'],
+    keywords: 'B2B, bien-être, institution, dashboard, EmotionsCare',
   });
 
   const { runAudit } = useAccessibilityAudit();

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * B2BAnalyticsPage - Analytics avancées B2B
  * Tableau de bord analytique pour les équipes

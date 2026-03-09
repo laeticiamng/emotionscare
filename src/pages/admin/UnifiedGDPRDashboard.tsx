@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Shield, Activity, AlertTriangle, Bell } from 'lucide-react';
@@ -198,7 +197,7 @@ export default function UnifiedGDPRDashboard() {
                       {complianceData?.score || 0}/100
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {latestAudit?.status || 'En attente'}
+                      {(latestAudit as any)?.status || 'En attente'}
                     </p>
                   </>
                 )}

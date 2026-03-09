@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Page de paramètres B2B pour les organisations
  */

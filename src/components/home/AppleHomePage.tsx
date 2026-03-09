@@ -7,14 +7,14 @@
 import React, { lazy, Suspense } from 'react';
 import SharedHeader from '@/components/layout/SharedHeader';
 import AppleHeroSection from '@/components/home/AppleHeroSection';
+import HowItWorksSection from '@/components/home/HowItWorksSection';
+import GeoSummarySection from '@/components/home/GeoSummarySection';
 import AnnouncementBanner from '@/components/ui/announcement-banner';
 import NyveeChat from '@/components/nyvee/NyveeChat';
 import XPBar from '@/components/gamification/XPBar';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Lazy load below-the-fold sections for better FCP/LCP
-const HowItWorksSection = lazy(() => import('@/components/home/HowItWorksSection'));
-const GeoSummarySection = lazy(() => import('@/components/home/GeoSummarySection'));
 const AppleFeatureSection = lazy(() => import('@/components/home/AppleFeatureSection'));
 const AppleShowcaseSection = lazy(() => import('@/components/home/AppleShowcaseSection'));
 const ModulesHighlightSection = lazy(() => import('@/components/home/ModulesHighlightSection'));
@@ -61,12 +61,8 @@ const AppleHomePage: React.FC = () => {
 
         <AppleHeroSection />
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <HowItWorksSection />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
-          <GeoSummarySection />
-        </Suspense>
+        <HowItWorksSection />
+        <GeoSummarySection />
         <Suspense fallback={<SectionSkeleton />}>
           <AppleFeatureSection />
         </Suspense>

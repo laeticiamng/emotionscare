@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Export des pages B2B reports
  */

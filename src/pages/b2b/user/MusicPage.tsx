@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * B2B User Music Page - Musicothérapie avec SEO
  */
@@ -7,13 +6,13 @@ import { usePageSEO } from '@/hooks/usePageSEO';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
 
 // Lazy load pour performance
-const MusicTherapyPage = React.lazy(() => import('@/pages/MusicTherapyPage'));
+const MusicTherapyPage = React.lazy(() => import('@/pages/music/MusicTherapyPage'));
 
 const MusicPage: React.FC = () => {
   usePageSEO({
     title: 'Musicothérapie - EmotionsCare',
     description: 'Harmonisez votre humeur avec des sons adaptatifs et de la musicothérapie personnalisée.',
-    keywords: ['musique', 'thérapie', 'bien-être', 'relaxation', 'EmotionsCare'],
+    keywords: 'musique, thérapie, bien-être, relaxation, EmotionsCare',
   });
 
   const { runAudit } = useAccessibilityAudit();

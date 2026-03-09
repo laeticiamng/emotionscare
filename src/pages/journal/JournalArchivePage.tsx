@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * JournalArchivePage - Archive & Export enrichi avec notes archivées
  */
@@ -172,7 +171,7 @@ const JournalArchivePage = memo(() => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => unarchiveMutation.mutate(note.id)}
+                    onClick={() => unarchiveMutation.mutate(note.id!)}
                     disabled={unarchiveMutation.isPending}
                   >
                     <RotateCcw className="h-4 w-4 mr-1" />

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * JournalSearchPage - Recherche avancée enrichie
  */

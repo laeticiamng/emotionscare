@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * B2BDashboardPage - Dashboard principal B2B
  * Vue d'ensemble avec stats temps réel, navigation et actions rapides
@@ -346,7 +345,7 @@ const B2BDashboardPage: React.FC = () => {
               ) : (
                 <div className="text-center py-4">
                   <p className="text-sm text-muted-foreground mb-2">Aucun rapport disponible</p>
-                  <Button size="sm" onClick={() => reportsData.generateReport()}>
+                  <Button size="sm" onClick={() => reportsData.generateReport(undefined)}>
                     Générer
                   </Button>
                 </div>
