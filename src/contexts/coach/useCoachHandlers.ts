@@ -628,7 +628,10 @@ export function useCoachHandlers() {
             const formatted = history.map(m => ({
               id: m.id,
               text: m.content,
-              sender: m.sender === 'coach' ? 'assistant' : 'user'
+              content: m.content,
+              conversationId: '',
+              sender: (m.sender === 'coach' ? 'assistant' : m.sender) as 'user' | 'assistant' | 'system',
+              timestamp: m.timestamp,
             }));
 
             const aiText = await chatCompletion(formatted, {
@@ -636,7 +639,7 @@ export function useCoachHandlers() {
               temperature: 0.7
             });
 
-            const responseMessage: ChatMessage = {
+            const responseMessage: CoachChatMessage = {
               id: uuidv4(),
               content: aiText,
               sender: 'coach',
