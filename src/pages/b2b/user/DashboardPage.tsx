@@ -11,7 +11,7 @@ const DashboardPage: React.FC = () => {
   usePageSEO({
     title: 'Mon Espace Bien-être - EmotionsCare',
     description: 'Votre espace personnel de bien-être émotionnel. Suivez vos progrès, accédez aux activités et gérez votre équilibre.',
-    keywords: ['bien-être', 'émotions', 'personnel', 'collaborateur', 'EmotionsCare'],
+    keywords: 'bien-être, émotions, personnel, collaborateur, EmotionsCare',
   });
 
   const { runAudit } = useAccessibilityAudit();

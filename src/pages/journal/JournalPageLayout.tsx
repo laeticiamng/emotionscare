@@ -42,7 +42,7 @@ const JournalPageLayout = memo(() => {
   usePageSEO({
     title: 'Journal Émotionnel - EmotionsCare',
     description: 'Tenez votre journal émotionnel vocal et textuel. Analysez vos émotions, suivez vos progrès et développez votre bien-être mental.',
-    keywords: ['journal', 'émotions', 'bien-être', 'écriture', 'vocal', 'EmotionsCare'],
+    keywords: 'journal, émotions, bien-être, écriture, vocal, EmotionsCare',
   });
 
   const { runAudit } = useAccessibilityAudit();
