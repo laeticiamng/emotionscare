@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { DemoBanner } from '@/components/ui/DemoBanner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, TrendingUp, Users, Calendar, Filter, BarChart3,
