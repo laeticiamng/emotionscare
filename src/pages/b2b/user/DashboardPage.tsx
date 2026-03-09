@@ -1,18 +1,17 @@
-// @ts-nocheck
 /**
  * B2B User Dashboard Page avec SEO et enrichissements
  */
 import React, { useEffect } from 'react';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
-import B2BCollabDashboard from '@/pages/B2BCollabDashboard';
+import B2BCollabDashboard from '@/pages/b2b/B2BCollabDashboard';
 
 const DashboardPage: React.FC = () => {
   // SEO
   usePageSEO({
     title: 'Mon Espace Bien-être - EmotionsCare',
     description: 'Votre espace personnel de bien-être émotionnel. Suivez vos progrès, accédez aux activités et gérez votre équilibre.',
-    keywords: ['bien-être', 'émotions', 'personnel', 'collaborateur', 'EmotionsCare'],
+    keywords: 'bien-être, émotions, personnel, collaborateur, EmotionsCare',
   });
 
   const { runAudit } = useAccessibilityAudit();

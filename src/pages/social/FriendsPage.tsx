@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -352,7 +350,7 @@ export default function FriendsPage() {
               </div>
               
               <div className="flex gap-2 flex-wrap">
-                <Select value={filter} onValueChange={(v: any) => setFilter(v)}>
+                <Select value={filter} onValueChange={(v) => setFilter(v as 'all' | 'online' | 'favorites')}>
                   <SelectTrigger className="w-32">
                     <Filter className="h-4 w-4 mr-2" />
                     <SelectValue />

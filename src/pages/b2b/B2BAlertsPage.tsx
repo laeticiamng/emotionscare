@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * B2BAlertsPage - Gestion des alertes RH B2B
  * Alertes anonymisées pour le bien-être des équipes

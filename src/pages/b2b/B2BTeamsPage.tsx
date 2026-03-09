@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * B2BTeamsPage - Gestion d'équipes B2B
  * Enrichi avec données dynamiques, navigation sticky, accessibilité
