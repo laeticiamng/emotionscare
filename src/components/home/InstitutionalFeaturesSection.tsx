@@ -110,7 +110,7 @@ const FeatureCard: React.FC<{
           <div className="flex flex-col h-full">
             <div className="flex items-start justify-between mb-4">
               <div className="inline-flex items-center justify-center rounded-2xl w-12 h-12 bg-background/80 shadow-sm">
-                <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
+                <Icon className="h-5 w-5 text-primary" />
               </div>
               <Badge variant={feature.badgeVariant} className="text-[10px] font-semibold uppercase tracking-wide">
                 {feature.badge}
