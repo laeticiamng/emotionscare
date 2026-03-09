@@ -157,7 +157,7 @@ const SharedHeader: React.FC<SharedHeaderProps> = ({ extraDesktopCTA }) => {
                       <Button variant="outline" className="w-full">Se connecter</Button>
                     </Link>
                     <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full">Commencer</Button>
+                      <Button className="w-full">Essai gratuit</Button>
                     </Link>
                   </>
                 )}
