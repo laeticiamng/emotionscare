@@ -79,7 +79,7 @@ const ReportsPageEnhanced = () => {
     ]
   };
 
-  const generateReport = async (type, period) => {
+  const generateReport = async (type: string, period: string) => {
     setIsGenerating(true);
     try {
       // Simulation de génération de rapport
