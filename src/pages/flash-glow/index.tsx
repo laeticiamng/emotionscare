@@ -310,7 +310,7 @@ const FlashGlowView: React.FC = () => {
       return;
     }
 
-    if (!consent.clinicalAccepted) {
+    if (!clinicalAccepted) {
       setShowSudsCard(false);
       setSudsOptIn(false);
       return;
