@@ -7,7 +7,7 @@
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
-import { Brain, Heart, Music, Shield, Clock, Sparkles, ArrowRight } from 'lucide-react';
+import { Brain, Heart, Music, Shield, Clock, Sparkles, ArrowRight, ClipboardCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -77,11 +77,21 @@ const modules: ModuleHighlight[] = [
     anonHref: '/signup',
   },
   {
+    title: "Évaluation Burnout",
+    description: "Questionnaire MBI-HSS validé : 22 items, 3 sous-échelles, radar chart et comparaison aux normes soignantes.",
+    icon: ClipboardCheck,
+    highlight: 'MBI-HSS',
+    span: 'md:col-span-1 md:row-span-1',
+    gradient: 'from-primary/10 to-accent/10',
+    authHref: '/app/assess/burnout',
+    anonHref: '/signup',
+  },
+  {
     title: "Données sécurisées",
     description: "Vos données restent les vôtres. Conforme RGPD, hébergé en France, aucune revente.",
     icon: Shield,
     highlight: 'RGPD',
-    span: 'md:col-span-2 md:row-span-1',
+    span: 'md:col-span-1 md:row-span-1',
     gradient: 'from-muted/50 to-muted/30',
     authHref: '/legal/privacy',
     anonHref: '/legal/privacy',
