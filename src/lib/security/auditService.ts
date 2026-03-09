@@ -54,7 +54,7 @@ class SecurityAuditService {
   /**
    * Enregistre une tentative de connexion
    */
-  logLoginAttempt(userId: string | null, email: string, success: boolean, details?: any) {
+  logLoginAttempt(userId: string | undefined, email: string, success: boolean, details?: any) {
     this.log({
       userId,
       action: 'LOGIN_ATTEMPT',
