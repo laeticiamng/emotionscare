@@ -138,6 +138,7 @@ const BurnoutAssessmentPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-2xl">
+        <DemoBanner message="Les résultats de cette évaluation ne sont pas sauvegardés. Mode démonstration." />
         <div className="mb-6">
           <Button variant="ghost" size="sm" asChild>
             <Link to="/app/assess"><ArrowLeft className="h-4 w-4 mr-2" />Retour</Link>
