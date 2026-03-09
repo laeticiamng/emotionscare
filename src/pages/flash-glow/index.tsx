@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -216,10 +215,13 @@ const FlashGlowView: React.FC = () => {
   const motion = useMotionPrefs();
   const currentMood = useCurrentMood();
   const clinicalHints = useClinicalHints('flash_glow');
-  const flashHints = {
+  const flashHints: { extendDuration: boolean; exitMode?: string; companionPath?: string } = {
     extendDuration: clinicalHints.hints.includes('extend_duration'),
+    exitMode: clinicalHints.hints.includes('soft_exit') ? 'soft' : undefined,
+    companionPath: clinicalHints.hints.includes('soft_exit') ? '/app/screen-silk' : undefined,
   };
   const consent = useConsent();
+  const clinicalAccepted = consent.status === 'accepted';
   const { start: startSudsStage, submit: submitSudsStage } = useAssessment('SUDS');
   const [softEffects, setSoftEffects] = useState(motion.prefersReducedMotion);
 
@@ -308,7 +310,7 @@ const FlashGlowView: React.FC = () => {
       return;
     }
 
-    if (!consent.clinicalAccepted) {
+    if (!clinicalAccepted) {
       setShowSudsCard(false);
       setSudsOptIn(false);
       return;
@@ -329,20 +331,20 @@ const FlashGlowView: React.FC = () => {
     }
 
     setShowSudsCard(true);
-  }, [sudsEnabled, consent.clinicalAccepted]);
+  }, [sudsEnabled, clinicalAccepted]);
 
   useEffect(() => {
-    if (sudsEnabled && showSudsCard && consent.clinicalAccepted) {
+    if (sudsEnabled && showSudsCard && clinicalAccepted) {
       Sentry.addBreadcrumb({
         category: 'orchestration',
         level: 'info',
         message: 'orch:flash_glow:pre_shown',
       });
     }
-  }, [sudsEnabled, showSudsCard, consent.clinicalAccepted]);
+  }, [sudsEnabled, showSudsCard, clinicalAccepted]);
 
   useEffect(() => {
-    if (postDialogOpen && sudsEnabled && sudsOptIn && consent.clinicalAccepted) {
+    if (postDialogOpen && sudsEnabled && sudsOptIn && clinicalAccepted) {
       Sentry.addBreadcrumb({
         category: 'orchestration',
         level: 'info',
@@ -350,7 +352,7 @@ const FlashGlowView: React.FC = () => {
       });
       void startSudsStage('post');
     }
-  }, [postDialogOpen, sudsEnabled, sudsOptIn, consent.clinicalAccepted, startSudsStage]);
+  }, [postDialogOpen, sudsEnabled, sudsOptIn, clinicalAccepted, startSudsStage]);
 
   const submitSudsMeasurement = async (
     stage: SudsStage,
@@ -358,7 +360,7 @@ const FlashGlowView: React.FC = () => {
     levelIndex: number,
     decision?: 'extend' | 'complete',
   ) => {
-    if (!sudsEnabled || !sudsOptIn || !consent.clinicalAccepted) {
+    if (!sudsEnabled || !sudsOptIn || !clinicalAccepted) {
       return true;
     }
 
@@ -420,7 +422,7 @@ const FlashGlowView: React.FC = () => {
       preLevel: preSudsRecordRef.current?.levelIndex ?? null,
       postLevel: postLevelIndex,
       prefersReducedMotion: motion.prefersReducedMotion,
-      optedIn: sudsOptIn && consent.clinicalAccepted,
+      optedIn: sudsOptIn && clinicalAccepted,
     });
 
     if (actions.extend_session) {
@@ -471,7 +473,7 @@ const FlashGlowView: React.FC = () => {
     update(0);
     session.start();
 
-    if (sudsEnabled && sudsOptIn && consent.clinicalAccepted) {
+    if (sudsEnabled && sudsOptIn && clinicalAccepted) {
       const entry = getSudsEntry(preSudsLevel);
       void submitSudsMeasurement('pre', entry, preSudsLevel).then((success) => {
         if (success) {
@@ -557,15 +559,13 @@ const FlashGlowView: React.FC = () => {
         type: 'flash_glow',
         duration_sec: Math.max(1, Math.round(finalElapsed / 1000)),
         mood_delta: delta,
-        journalText: `Micro-séance Flash Glow. ${moodDeltaText}`,
-        moodBefore,
-        moodAfter,
-        metadata: {
+        meta: {
+          journalText: `Micro-séance Flash Glow. ${moodDeltaText}`,
           timestamp: new Date().toISOString(),
           narrative: moodDeltaText,
           completion_mode: action === 'extend_session' ? 'prolongée' : 'sortie_douce',
           extension_used: hasExtended,
-          phase_focus: snapshot.phase.key,
+          phase_focus: snapshot.phase.id,
           suds: sudsOptIn
             ? {
                 opt_in: true,
@@ -796,12 +796,12 @@ const FlashGlowView: React.FC = () => {
     </ConsentGate>
   );
 
-  const appearance = PHASE_APPEARANCE[snapshot.phase.key] ?? PHASE_APPEARANCE.warmup;
+  const appearance = PHASE_APPEARANCE[snapshot.phase.id] ?? PHASE_APPEARANCE.warmup;
 
   const phaseSurface = (
     <WallOfLights
-      phase={snapshot.phase.key as 'warmup' | 'glow' | 'settle'}
-      progress={snapshot.progress ?? 0}
+      phase={snapshot.phase.id as 'warmup' | 'glow' | 'settle'}
+      progress={snapshot.progressInPhase ?? 0}
       theme={appearance.theme}
       intensity={appearance.intensity}
     />
@@ -898,7 +898,7 @@ const FlashGlowView: React.FC = () => {
             <p className="text-muted-foreground">{phaseNarrative}</p>
           </section>
 
-          {sudsEnabled && consent.clinicalAccepted && (showSudsCard || sudsOptIn) && (
+          {sudsEnabled && clinicalAccepted && (showSudsCard || sudsOptIn) && (
             <section className="rounded-lg border border-border/50 p-4 space-y-4" aria-live="polite">
               <div>
                 <p className="text-sm font-medium">Partager mon ressenti intérieur</p>
@@ -943,7 +943,7 @@ const FlashGlowView: React.FC = () => {
             </section>
           )}
 
-          {sudsEnabled && consent.clinicalAccepted && !sudsOptIn && !showSudsCard && (
+          {sudsEnabled && clinicalAccepted && !sudsOptIn && !showSudsCard && (
             <div className="flex justify-end">
               <Button
                 variant="outline"
@@ -1005,9 +1005,9 @@ const FlashGlowView: React.FC = () => {
             >
               Effets doux
             </Button>
-            {flashHints?.exitMode === 'soft' && (
+            {flashHints?.exitMode === 'soft' && flashHints.companionPath && (
               <Button asChild variant="ghost" type="button">
-                <Link to={flashHints.companionPath}>Screen Silk</Link>
+                <Link to={flashHints.companionPath!}>Screen Silk</Link>
               </Button>
             )}
           </div>

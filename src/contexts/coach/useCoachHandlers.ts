@@ -1,8 +1,10 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/hooks/use-toast';
 import { chatCompletion } from '@/services/openai';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 /** Local chat message shape used only within coach handlers */
 interface CoachChatMessage {
@@ -234,6 +236,38 @@ const saveToStorage = (key: string, data: unknown): void => {
   }
 };
 
+async function saveToSupabase(key: string, value: unknown, userId: string) {
+  try {
+    await supabase
+      .from('user_settings')
+      .upsert({
+        user_id: userId,
+        key,
+        value: JSON.stringify(value),
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id,key' });
+  } catch (error) {
+    logger.error(`Failed to save ${key} to Supabase`, error as Error, 'Coach');
+  }
+}
+
+async function loadFromSupabase<T>(key: string, userId: string): Promise<T | null> {
+  try {
+    const { data } = await supabase
+      .from('user_settings')
+      .select('value')
+      .eq('user_id', userId)
+      .eq('key', key)
+      .maybeSingle();
+    if (data?.value) {
+      return typeof data.value === 'string' ? JSON.parse(data.value) : data.value as T;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 // ============================================================================
 // MAIN HOOK
 // ============================================================================
@@ -258,29 +292,85 @@ export function useCoachHandlers() {
   const [favorites, setFavorites] = useState<string[]>([]);
   
   const { toast } = useToast();
+  const { user } = useAuth();
+  const isLoaded = useRef(false);
+  const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Load persisted data on mount
+  // Load persisted data on mount (Supabase first, localStorage fallback)
   useEffect(() => {
-    const storedMessages = loadFromStorage<CoachChatMessage[]>('coachMessages', []);
-    const storedHistory = loadFromStorage<EmotionAnalysis[]>(EMOTION_HISTORY_KEY, []);
-    const storedFavorites = loadFromStorage<string[]>(FAVORITES_KEY, []);
-    const storedStats = loadFromStorage<CoachStats>(STORAGE_KEY, stats);
-    
-    setMessages(storedMessages);
-    setEmotionHistory(storedHistory);
-    setFavorites(storedFavorites);
-    setStats(storedStats);
-    
-    // Start a new session
-    startNewSession();
-  }, []);
+    const load = async () => {
+      if (isLoaded.current) return;
 
-  // Persist messages when they change
+      let storedMessages: CoachChatMessage[] = [];
+      let storedHistory: EmotionAnalysis[] = [];
+      let storedFavorites: string[] = [];
+      let storedStats: CoachStats = stats;
+
+      if (user) {
+        // Try Supabase first
+        const [sbMessages, sbHistory, sbFavorites, sbStats] = await Promise.all([
+          loadFromSupabase<CoachChatMessage[]>('coachMessages', user.id),
+          loadFromSupabase<EmotionAnalysis[]>(EMOTION_HISTORY_KEY, user.id),
+          loadFromSupabase<string[]>(FAVORITES_KEY, user.id),
+          loadFromSupabase<CoachStats>(STORAGE_KEY, user.id),
+        ]);
+
+        storedMessages = sbMessages ?? loadFromStorage('coachMessages', []);
+        storedHistory = sbHistory ?? loadFromStorage(EMOTION_HISTORY_KEY, []);
+        storedFavorites = sbFavorites ?? loadFromStorage(FAVORITES_KEY, []);
+        storedStats = sbStats ?? loadFromStorage(STORAGE_KEY, stats);
+
+        // Migrate localStorage to Supabase if data was only in localStorage
+        if (!sbMessages && storedMessages.length > 0) {
+          void saveToSupabase('coachMessages', storedMessages.slice(-100), user.id);
+        }
+        if (!sbHistory && storedHistory.length > 0) {
+          void saveToSupabase(EMOTION_HISTORY_KEY, storedHistory.slice(-50), user.id);
+        }
+        if (!sbFavorites && storedFavorites.length > 0) {
+          void saveToSupabase(FAVORITES_KEY, storedFavorites, user.id);
+        }
+        if (!sbStats) {
+          void saveToSupabase(STORAGE_KEY, storedStats, user.id);
+        }
+      } else {
+        storedMessages = loadFromStorage('coachMessages', []);
+        storedHistory = loadFromStorage(EMOTION_HISTORY_KEY, []);
+        storedFavorites = loadFromStorage(FAVORITES_KEY, []);
+        storedStats = loadFromStorage(STORAGE_KEY, stats);
+      }
+
+      setMessages(storedMessages);
+      setEmotionHistory(storedHistory);
+      setFavorites(storedFavorites);
+      setStats(storedStats);
+      isLoaded.current = true;
+
+      startNewSession();
+    };
+
+    load();
+  }, [user?.id]);
+
+  // Persist messages with debounced Supabase sync
   useEffect(() => {
-    if (messages.length > 0) {
-      saveToStorage('coachMessages', messages);
-    }
-  }, [messages]);
+    if (!isLoaded.current || messages.length === 0) return;
+
+    // Always save to localStorage as fallback
+    saveToStorage('coachMessages', messages.slice(-100));
+
+    // Debounce Supabase save
+    if (saveTimeout.current) clearTimeout(saveTimeout.current);
+    saveTimeout.current = setTimeout(() => {
+      if (user) {
+        void saveToSupabase('coachMessages', messages.slice(-100), user.id);
+      }
+    }, 1000);
+
+    return () => {
+      if (saveTimeout.current) clearTimeout(saveTimeout.current);
+    };
+  }, [messages, user?.id]);
 
   // ─────────────────────────────────────────────────────────────
   // Session Management
@@ -319,6 +409,7 @@ export function useCoachHandlers() {
         }
         
         saveToStorage(STORAGE_KEY, newStats);
+        if (user) void saveToSupabase(STORAGE_KEY, newStats, user.id);
         return newStats;
       });
     }
@@ -432,6 +523,7 @@ export function useCoachHandlers() {
     const newHistory = [...emotionHistory, analysis].slice(-50);
     setEmotionHistory(newHistory);
     saveToStorage(EMOTION_HISTORY_KEY, newHistory);
+    if (user) void saveToSupabase(EMOTION_HISTORY_KEY, newHistory, user.id);
     
     // Update stats
     setStats(prev => {
@@ -509,6 +601,7 @@ export function useCoachHandlers() {
     const newFavorites = [...favorites, activity];
     setFavorites(newFavorites);
     saveToStorage(FAVORITES_KEY, newFavorites);
+    if (user) void saveToSupabase(FAVORITES_KEY, newFavorites, user.id);
     toast({
       title: 'Ajouté aux favoris',
       description: 'Cette activité a été sauvegardée.'
@@ -519,6 +612,7 @@ export function useCoachHandlers() {
     const newFavorites = favorites.filter(f => f !== activity);
     setFavorites(newFavorites);
     saveToStorage(FAVORITES_KEY, newFavorites);
+    if (user) void saveToSupabase(FAVORITES_KEY, newFavorites, user.id);
   }, [favorites]);
 
   // ─────────────────────────────────────────────────────────────
@@ -679,9 +773,10 @@ export function useCoachHandlers() {
   const clearMessages = useCallback(() => {
     setMessages([]);
     localStorage.removeItem('coachMessages');
+    if (user) void saveToSupabase('coachMessages', [], user.id);
     endSession();
     startNewSession();
-  }, [endSession, startNewSession]);
+  }, [endSession, startNewSession, user]);
   
   // Mark all messages as read
   const markAllAsRead = useCallback(() => {

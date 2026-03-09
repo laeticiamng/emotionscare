@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useMemo } from 'react'
 import DOMPurify from 'dompurify'
 import { AlertCircle, Brain, Sparkles } from 'lucide-react'
@@ -28,7 +27,7 @@ const orientationBadges: Record<string, { label: string; variant: 'default' | 's
 const sanitizeDescription = (value: string) =>
   DOMPurify.sanitize(value, {
     ALLOWED_TAGS: ['strong', 'em'],
-    ALLOWED_ATTR: {},
+    ALLOWED_ATTR: [] as string[],
   })
 
 const suggestionToPlainText = (suggestion: PanasSuggestion) => suggestion.prompt
@@ -64,10 +63,8 @@ export function PanasSuggestionsCard({ composer }: PanasSuggestionsCardProps) {
 
   const handleUseSuggestion = (suggestion: PanasSuggestion) => {
     const plain = suggestionToPlainText(suggestion)
-    composer.setText(prev => {
-      if (!prev.trim()) return plain
-      return `${prev.trim()}\n\n${plain}`
-    })
+    const current = composer.text
+    composer.setText(current.trim() ? `${current.trim()}\n\n${plain}` : plain)
     toast({
       title: 'Inspiration ajoutée',
       description: 'Le thème choisi a été ajouté à ta note.',

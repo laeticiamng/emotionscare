@@ -1,77 +1,64 @@
 
 
-# Plan : Finalisation de l'audit V3 — Derniers fichiers `@ts-nocheck` + coach migration
+## Plan : Ajouter les traductions allemandes et compléter FR/EN/DE sur toute la plateforme
 
----
+### Constat actuel
 
-## Contexte
+L'application dispose de deux systèmes i18n parallèles :
+1. **Système principal** (`src/lib/i18n/locales/{fr,en}/`) — 11 namespaces (common, navigation, dashboard, settings, modules, auth, consent, errors, legal, journal, coach) avec FR et EN complets
+2. **Système secondaire** (`src/i18n/locales/{fr,en,de}.ts`) — squelettique, utilisé par `src/i18n/config.ts`
+3. **Fichiers JSON** (`public/locales/{fr,en}/`) — partiels (common, errors, breath)
 
-Il reste **3 fichiers pages** avec `@ts-nocheck` et **~757 fichiers composants** (dette historique massive). Le scope réaliste pour cette itération couvre les 3 pages restantes + la préparation de la migration coach localStorage → Supabase.
+Le **DE (allemand)** existe uniquement dans `src/i18n/locales/de.ts` avec un contenu riche mais n'est **pas branché** dans le système principal (`src/providers/i18n/resources.ts` ne charge que `fr` et `en`).
 
----
+De plus, de nombreuses pages (100+) contiennent encore des **chaînes hardcodées en français** non internationalisées.
 
-## Corrections à appliquer
+### Plan d'implémentation
 
-### 1. `src/pages/journal/PanasSuggestionsCard.tsx` — Retirer `@ts-nocheck`
+#### 1. Creer les fichiers de traduction DE (11 fichiers)
 
-**Problème** : `composer.setText(prev => ...)` passe une fonction alors que le type `setText` est `(value: string) => void`.
+Creer `src/lib/i18n/locales/de/` avec les 11 fichiers miroirs de FR/EN :
+- `common.ts`, `navigation.ts`, `dashboard.ts`, `settings.ts`, `modules.ts`, `auth.ts`, `consent.ts`, `errors.ts`, `legal.ts`, `journal.ts`, `coach.ts`
 
-**Fix** : Remplacer l'appel par une lecture directe du texte courant via `composer.text`, puis passer une string :
-```ts
-const current = composer.text
-const plain = suggestionToPlainText(suggestion)
-composer.setText(current.trim() ? `${current.trim()}\n\n${plain}` : plain)
-```
+Chaque fichier sera la traduction allemande complète des clés existantes en FR/EN.
 
-### 2. `src/pages/flash-glow/index.tsx` — Retirer `@ts-nocheck` + fix dead code
+#### 2. Brancher DE dans le système principal
 
-**Problèmes identifiés** :
-- **Dead code** : lignes 799-1081 sont après un `return` (ligne 797). Le composant retourne toujours le message "indisponible" et jamais l'UI réelle.
-- **Type mismatch** : `flashHints` est `{ extendDuration: boolean }` mais le code accède à `flashHints?.exitMode` et `flashHints.companionPath` (propriétés inexistantes).
+Modifier `src/providers/i18n/resources.ts` pour :
+- Importer les 11 modules DE
+- Ajouter la locale `de` dans l'objet `resources`
 
-**Fix** :
-- Supprimer le premier `return` prématuré (lignes 775-797) qui bloque l'affichage de l'UI fonctionnelle. L'UI "indisponible" est déjà gérée par le guard `if (!flashEnabled)` au-dessus.
-- Typer `flashHints` correctement avec une interface locale :
-  ```ts
-  interface FlashHints {
-    extendDuration: boolean;
-    exitMode?: string;
-    companionPath?: string;
-  }
-  ```
-- Extraire les propriétés depuis `clinicalHints.hints` avec un parsing sûr, ou garder le guard conditionnel `flashHints?.exitMode` inchangé puisque la propriété sera `undefined` et le bouton ne s'affichera simplement pas.
+#### 3. Mettre à jour la configuration i18n
 
-### 3. `src/pages/index.ts` — Conserver `@ts-nocheck`
+- `src/lib/i18n.ts` : ajouter `'de'` dans `supportedLngs`
+- `src/lib/i18n/i18n.tsx` : ajouter le type `'de'` au type `Lang`
+- `src/i18n/locales/fr.ts` et `src/i18n/locales/en.ts` : ajouter `de: 'Allemand'` / `de: 'German'` dans `languageNames`
 
-Ce fichier est un barrel d'exports qui référence des modules potentiellement manquants. Le retrait nécessiterait un audit de chaque export — hors scope. On le documente comme dette technique acceptée.
+#### 4. Mettre à jour le sélecteur de langue
 
-### 4. Coach localStorage → Supabase (préparation)
+- `src/ui/NavBar.tsx` : supporter le cycle FR → EN → DE → FR
+- `src/i18n/LanguageSwitcher.tsx` : s'assurer que DE est dans les options (il utilise `SUPPORTED_LOCALES` qui inclut déjà `de`)
 
-**`src/contexts/coach/useCoachHandlers.ts`** utilise 3 clés localStorage : `coachMessages`, `coach-emotion-history`, `coach-favorites`.
+#### 5. Ajouter les fichiers JSON DE dans public/locales
 
-**Étape 1 (cette itération)** : Créer une migration SQL pour une table `coach_sessions` et `coach_favorites` dans Supabase.
+Creer `public/locales/de/` avec `common.json`, `errors.json`, `breath.json`
 
-**Étape 2 (différée)** : Refactorer le hook pour utiliser `useCoachLocalStorage` pattern déjà existant dans `src/contexts/coach/useLocalStorage.ts` qui gère déjà la migration localStorage → Supabase via `user_settings`.
+#### 6. Internationaliser les composants avec chaînes hardcodees
 
-**Plan SQL** :
-- Pas de nouvelle table nécessaire — le pattern `user_settings` (clé/valeur par user) est déjà en place.
-- Adapter `useCoachHandlers` pour utiliser le même pattern que `useCoachLocalStorage` : sauvegarder `emotionHistory` et `favorites` dans `user_settings` avec des clés dédiées.
+Migrer progressivement les composants critiques contenant du texte FR hardcode :
+- `GroupHeader.tsx` : remplacer "Aujourd'hui"/"Hier" par `t('common.today')`/`t('common.yesterday')` et utiliser la locale dynamique pour `Intl.DateTimeFormat`
+- `NavBar.tsx` : utiliser les clés de traduction pour les liens
+- `Footer.tsx` : utiliser les clés de traduction pour les liens legaux
 
----
+### Details techniques
 
-## Fichiers modifiés
+- Les 11 fichiers DE suivront exactement la structure des fichiers EN existants
+- Le type `Lang` sera etendu a `'fr' | 'en' | 'de'`
+- Le `fallbackLng` reste `'fr'`
+- Environ **15-20 fichiers** seront modifies ou crees
 
-| Fichier | Action |
-|---------|--------|
-| `src/pages/journal/PanasSuggestionsCard.tsx` | Retirer `@ts-nocheck`, fix `setText` |
-| `src/pages/flash-glow/index.tsx` | Retirer `@ts-nocheck`, supprimer dead code, typer `flashHints` |
-| `src/contexts/coach/useCoachHandlers.ts` | Migrer 3 clés localStorage vers `user_settings` Supabase |
+### Limites
 
----
-
-## Hors scope (dette restante)
-
-- ~757 fichiers composants avec `@ts-nocheck` — migration progressive sur plusieurs semaines
-- `src/pages/index.ts` — barrel file, conservé avec `@ts-nocheck`
-- Extraction i18n des pages institutional
+- Les 100+ pages avec texte FR hardcode ne seront pas toutes migrées dans cette iteration — seuls les composants partagés (NavBar, Footer, GroupHeader) et la configuration seront traités
+- Les pages individuelles (ModulesDashboard, UnifiedHomePage, etc.) necessiteront des passes supplementaires
 
