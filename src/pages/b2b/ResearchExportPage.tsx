@@ -19,6 +19,7 @@ import {
   Users, Calendar, CheckCircle2, AlertTriangle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { DemoBanner } from '@/components/ui/DemoBanner';
 
 const DATASETS = [
   { id: 'burnout', label: 'Scores MBI-HSS agrégés', records: 847, period: '2025-2026', consented: 623 },

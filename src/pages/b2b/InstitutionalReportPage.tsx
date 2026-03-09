@@ -17,6 +17,7 @@ import {
   TrendingDown, CheckCircle2, AlertTriangle, BarChart3, Users, Calendar
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { DemoBanner } from '@/components/ui/DemoBanner';
 
 const REPORT_SECTIONS = [
   { id: 'executive', label: 'Synthèse Exécutive', icon: BarChart3 },

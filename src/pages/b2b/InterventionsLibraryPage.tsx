@@ -17,6 +17,7 @@ import {
   MessageCircle, BookOpen, Zap, Shield, Flower2, Brain
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { DemoBanner } from '@/components/ui/DemoBanner';
 
 interface Intervention {
   id: string;

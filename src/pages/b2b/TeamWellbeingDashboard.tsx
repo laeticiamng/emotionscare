@@ -15,6 +15,7 @@ import {
   BarChart3, Activity, Bell, Shield
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { DemoBanner } from '@/components/ui/DemoBanner';
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   AreaChart, Area
