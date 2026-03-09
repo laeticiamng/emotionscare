@@ -23,6 +23,10 @@ export interface RouteMeta {
   guard?: boolean;           // nécessite une protection
   requireAuth?: boolean;     // nécessite authentification
   redirectTo?: string;       // cible de redirection pour routes deprecated
+  meta?: {                   // métadonnées SEO optionnelles
+    title?: string;
+    description?: string;
+  };
 }
 
 export interface RouteRegistry {
