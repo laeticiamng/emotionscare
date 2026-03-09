@@ -334,7 +334,7 @@ const FlashGlowView: React.FC = () => {
   }, [sudsEnabled, clinicalAccepted]);
 
   useEffect(() => {
-    if (sudsEnabled && showSudsCard && consent.clinicalAccepted) {
+    if (sudsEnabled && showSudsCard && clinicalAccepted) {
       Sentry.addBreadcrumb({
         category: 'orchestration',
         level: 'info',
