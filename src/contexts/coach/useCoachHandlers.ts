@@ -409,6 +409,7 @@ export function useCoachHandlers() {
         }
         
         saveToStorage(STORAGE_KEY, newStats);
+        if (user) void saveToSupabase(STORAGE_KEY, newStats, user.id);
         return newStats;
       });
     }
