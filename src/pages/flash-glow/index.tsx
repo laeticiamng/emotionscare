@@ -360,7 +360,7 @@ const FlashGlowView: React.FC = () => {
     levelIndex: number,
     decision?: 'extend' | 'complete',
   ) => {
-    if (!sudsEnabled || !sudsOptIn || !consent.clinicalAccepted) {
+    if (!sudsEnabled || !sudsOptIn || !clinicalAccepted) {
       return true;
     }
 
