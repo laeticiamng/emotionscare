@@ -1966,7 +1966,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // DEV-ONLY ROUTES (Masquées en production)
   // ═══════════════════════════════════════════════════════════
   // Routes de développement masquées en production
-  ...(import.meta.env.DEV ? [
+  ...(import.meta.env.DEV ? ([
     {
       name: 'comprehensive-system-audit',
       path: '/dev/system-audit',
@@ -2000,6 +2000,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       guard: false,
     },
     {
+      name: 'error-boundary-test',
       path: '/dev/error-boundary',
       segment: 'public',
       layout: 'marketing',
@@ -2010,7 +2011,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // - DiagnosticPage (supprimée)
   // - SystemValidationPage (supprimée) 
   // - SystemRepairPage (supprimée)
-  ] : []),
+  ] as RouteMeta[]) : []),
 
   // ═══════════════════════════════════════════════════════════
   // PAGES SYSTÈME
