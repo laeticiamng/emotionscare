@@ -239,7 +239,7 @@ const saveToStorage = (key: string, data: unknown): void => {
 // ============================================================================
 
 export function useCoachHandlers() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<CoachChatMessage[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
