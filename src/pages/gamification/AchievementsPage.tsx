@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import DemoBanner from '@/components/ui/DemoBanner';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
