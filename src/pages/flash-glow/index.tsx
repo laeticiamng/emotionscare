@@ -352,7 +352,7 @@ const FlashGlowView: React.FC = () => {
       });
       void startSudsStage('post');
     }
-  }, [postDialogOpen, sudsEnabled, sudsOptIn, consent.clinicalAccepted, startSudsStage]);
+  }, [postDialogOpen, sudsEnabled, sudsOptIn, clinicalAccepted, startSudsStage]);
 
   const submitSudsMeasurement = async (
     stage: SudsStage,
