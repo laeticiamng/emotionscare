@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * Service OpenAI - VERSION SÉCURISÉE
  * 
