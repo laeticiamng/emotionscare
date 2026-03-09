@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { DemoBanner } from '@/components/ui/DemoBanner';
 import { logger } from '@/lib/logger';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
