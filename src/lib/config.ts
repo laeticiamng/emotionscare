@@ -15,8 +15,8 @@ export const TEST_MODE: {
 export const CONFIG = {
   // APIs Configuration — clés via variables d'environnement uniquement (pas de fallback en dur)
   SUPABASE: {
-    URL: import.meta.env.VITE_SUPABASE_URL || 'https://yaincoxihiqdksxgrsrk.supabase.co',
-    ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhaW5jb3hpaGlxZGtzeGdyc3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTE4MjcsImV4cCI6MjA1ODM4NzgyN30.HBfwymB2F9VBvb3uyeTtHBMZFZYXzL0wQmS5fqd65yU',
+    URL: import.meta.env.VITE_SUPABASE_URL || '',
+    ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '',
   },
   
   // Edge Functions - Utilisant les vraies edge functions existantes
