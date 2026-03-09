@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { DemoBanner } from '@/components/ui/DemoBanner';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
