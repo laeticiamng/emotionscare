@@ -8,8 +8,6 @@ import React, { lazy, Suspense } from 'react';
 import SharedHeader from '@/components/layout/SharedHeader';
 import AppleHeroSection from '@/components/home/AppleHeroSection';
 import HowItWorksSection from '@/components/home/HowItWorksSection';
-import GeoSummarySection from '@/components/home/GeoSummarySection';
-import AnnouncementBanner from '@/components/ui/announcement-banner';
 import NyveeChat from '@/components/nyvee/NyveeChat';
 import XPBar from '@/components/gamification/XPBar';
 import { useAuth } from '@/contexts/AuthContext';
