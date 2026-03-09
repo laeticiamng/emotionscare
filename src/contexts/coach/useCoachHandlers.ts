@@ -1,8 +1,10 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/hooks/use-toast';
 import { chatCompletion } from '@/services/openai';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 /** Local chat message shape used only within coach handlers */
 interface CoachChatMessage {
