@@ -29,6 +29,14 @@ const BurnoutAssessmentPage: React.FC = () => {
   usePageSEO({
     title: 'Évaluation Burnout MBI-HSS | EmotionsCare',
     description: 'Évaluation scientifiquement validée du burnout pour les professionnels de santé — Maslach Burnout Inventory.',
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebApplication',
+      name: 'Évaluation Burnout MBI-HSS',
+      applicationCategory: 'HealthApplication',
+      operatingSystem: 'Web',
+      description: 'Questionnaire MBI-HSS validé — 22 items, 3 sous-échelles, radar chart avec zones colorées et comparaison aux normes soignantes.',
+    },
   });
 
   const [answers, setAnswers] = useState<Record<number, number>>({});

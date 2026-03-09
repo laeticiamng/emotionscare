@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Institutional Report Generator
  * CHSCT-ready QVT reports with improvement actions
@@ -48,6 +47,14 @@ const InstitutionalReportPage: React.FC = () => {
   usePageSEO({
     title: 'Rapport Institutionnel QVT | EmotionsCare B2B',
     description: 'Générateur de rapports CHSCT/CSE conformes avec indicateurs QVT et actions d\'amélioration.',
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebApplication',
+      name: 'Rapports Institutionnels QVT',
+      applicationCategory: 'HealthApplication',
+      operatingSystem: 'Web',
+      description: 'Générateur de rapports Qualité de Vie au Travail conformes CHSCT/CSE avec indicateurs et recommandations.',
+    },
   });
 
   const [period, setPeriod] = useState('t1-2026');

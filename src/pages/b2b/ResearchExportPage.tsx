@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Research Export Panel
  * Anonymized dataset summaries with GDPR consent management
@@ -32,6 +31,14 @@ const ResearchExportPage: React.FC = () => {
   usePageSEO({
     title: 'Export Recherche | EmotionsCare B2B',
     description: 'Exportation de données anonymisées pour la recherche académique avec gestion du consentement RGPD.',
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebApplication',
+      name: 'Export Recherche',
+      applicationCategory: 'HealthApplication',
+      operatingSystem: 'Web',
+      description: 'Exportation de données anonymisées avec k-anonymité pour partenaires académiques, conforme RGPD.',
+    },
   });
 
   const [selectedDatasets, setSelectedDatasets] = useState<string[]>([]);

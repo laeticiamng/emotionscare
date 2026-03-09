@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Evidence-Based Interventions Library
  * Searchable cards with scheduling capability
@@ -142,6 +141,14 @@ const InterventionsLibraryPage: React.FC = () => {
   usePageSEO({
     title: 'Bibliothèque d\'interventions | EmotionsCare B2B',
     description: 'Pratiques de bien-être fondées sur les preuves pour les équipes soignantes.',
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebApplication',
+      name: 'Bibliothèque d\'Interventions',
+      applicationCategory: 'HealthApplication',
+      operatingSystem: 'Web',
+      description: 'Bibliothèque d\'interventions evidence-based : respiration, soutien par les pairs, débriefing post-traumatique.',
+    },
   });
 
   const [search, setSearch] = useState('');
@@ -206,7 +213,7 @@ const InterventionsLibraryPage: React.FC = () => {
         {/* Grid */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((intervention) => {
-            const Icon = intervention.icon;
+            const Icon = intervention.icon as React.ComponentType<{ className?: string }>;
             const evidence = EVIDENCE_LABELS[intervention.evidenceLevel];
             return (
               <Card
@@ -259,7 +266,7 @@ const InterventionsLibraryPage: React.FC = () => {
               <DialogHeader>
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-primary/10">
-                    {React.createElement(selectedIntervention.icon, { className: 'h-5 w-5 text-primary' })}
+                    {React.createElement(selectedIntervention.icon as React.ComponentType<{ className?: string }>, { className: 'h-5 w-5 text-primary' })}
                   </div>
                   <div>
                     <DialogTitle>{selectedIntervention.title}</DialogTitle>
