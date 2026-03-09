@@ -205,7 +205,7 @@ const InterventionsLibraryPage: React.FC = () => {
         {/* Grid */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((intervention) => {
-            const Icon = intervention.icon;
+            const Icon = intervention.icon as React.ComponentType<{ className?: string }>;
             const evidence = EVIDENCE_LABELS[intervention.evidenceLevel];
             return (
               <Card
