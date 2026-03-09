@@ -2711,7 +2711,7 @@ export const ROUTES_REGISTRY: readonly RouteMeta[] = ([
     guard: true,
     requireAuth: true,
     aliases: ['/b2b/admin/interventions'],
-    status: 'stable',
+    status: 'demo',
   },
   // ═══════════════════════════════════════════════════════════
   // MODULE 41 - Research Export
