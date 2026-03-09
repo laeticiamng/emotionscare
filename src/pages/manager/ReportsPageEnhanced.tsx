@@ -28,10 +28,10 @@ import { toast } from '@/hooks/use-toast';
 const ReportsPageEnhanced = () => {
   const [activeTab, setActiveTab] = useState('wellbeing');
   const [selectedPeriod, setSelectedPeriod] = useState('month');
-  const [reportData, setReportData] = useState(null);
+  const [reportData, setReportData] = useState<typeof mockReportData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Données simulées pour les rapports
+  // Données simulées (hoisted for type inference)
   const mockReportData = {
     wellbeing: {
       averageScore: 78,
