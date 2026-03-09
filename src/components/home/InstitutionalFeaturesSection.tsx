@@ -87,8 +87,10 @@ const FeatureCard: React.FC<{
   index: number;
   isAuthenticated: boolean;
 }> = memo(({ feature, index, isAuthenticated }) => {
-  const Icon = feature.icon as React.FC<{ className?: string; 'aria-hidden'?: boolean }>;
+  const Icon = feature.icon as React.ComponentType<{ className?: string }>;
   const href = isAuthenticated ? feature.authHref : feature.anonHref;
+
+  const cardId = `institutional-card-${index}`;
 
   return (
     <motion.div
@@ -97,7 +99,7 @@ const FeatureCard: React.FC<{
       viewport={{ once: true, amount: 0.15 }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
     >
-      <Link to={href} className="group block h-full" aria-label={feature.title}>
+      <Link to={href} className="group block h-full" aria-labelledby={cardId}>
         <div
           className={cn(
             'relative h-full rounded-3xl border border-border/50 p-6 md:p-8 overflow-hidden',
@@ -108,14 +110,14 @@ const FeatureCard: React.FC<{
           <div className="flex flex-col h-full">
             <div className="flex items-start justify-between mb-4">
               <div className="inline-flex items-center justify-center rounded-2xl w-12 h-12 bg-background/80 shadow-sm">
-                <Icon className="h-5 w-5 text-primary" aria-hidden />
+                <Icon className="h-5 w-5 text-primary" />
               </div>
               <Badge variant={feature.badgeVariant} className="text-[10px] font-semibold uppercase tracking-wide">
                 {feature.badge}
               </Badge>
             </div>
 
-            <h3 className="text-lg font-bold text-foreground mb-2">{feature.title}</h3>
+            <h3 id={cardId} className="text-lg font-bold text-foreground mb-2">{feature.title}</h3>
 
             <p className="text-sm text-muted-foreground leading-relaxed flex-1">
               {feature.description}
@@ -123,7 +125,7 @@ const FeatureCard: React.FC<{
 
             <div className="mt-5 flex items-center gap-1 text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">
               {isAuthenticated ? 'Ouvrir' : 'Découvrir'}
-              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" aria-hidden />
+              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
             </div>
           </div>
         </div>
