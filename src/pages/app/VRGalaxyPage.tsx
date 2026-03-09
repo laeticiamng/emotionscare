@@ -173,7 +173,7 @@ function useVRSessions() {
           });
         }
       } catch (error) {
-        console.error('Error fetching VR sessions:', error);
+        // Error handled silently — loading state already set
       } finally {
         setLoading(false);
       }
@@ -255,7 +255,7 @@ const VRGalaxyPage: React.FC = () => {
           description: `Bravo pour ${Math.round(elapsed / 60)} minutes d'immersion.`
         });
       } catch (error) {
-        console.error('Error saving VR session:', error);
+        // Error handled silently — toast not shown on save failure
       }
     }
 

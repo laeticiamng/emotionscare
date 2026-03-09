@@ -278,7 +278,8 @@ export const ROUTES_REGISTRY: readonly RouteMeta[] = ([
     segment: 'public',
     layout: 'app',
     component: 'WellnessHubPage',
-    guard: false,
+    guard: true,
+    requireAuth: true,
   },
   {
     name: 'b2b-module-wrapper',
@@ -2614,8 +2615,8 @@ export const ROUTES_REGISTRY: readonly RouteMeta[] = ([
   {
     name: 'platform-audit',
     path: '/admin/platform-audit',
-    segment: 'consumer',
-    role: 'consumer',
+    segment: 'manager',
+    role: 'manager',
     layout: 'app-sidebar',
     component: 'PlatformAuditPage',
     guard: true,
@@ -2680,7 +2681,7 @@ export const ROUTES_REGISTRY: readonly RouteMeta[] = ([
     guard: true,
     requireAuth: true,
     aliases: ['/assess/burnout', '/burnout'],
-    status: 'stable',
+    status: 'demo',
   },
   // ═══════════════════════════════════════════════════════════
   // MODULE 39 - Team Wellbeing Dashboard
@@ -2695,7 +2696,7 @@ export const ROUTES_REGISTRY: readonly RouteMeta[] = ([
     guard: true,
     requireAuth: true,
     aliases: ['/b2b/admin/team-wellbeing'],
-    status: 'stable',
+    status: 'demo',
   },
   // ═══════════════════════════════════════════════════════════
   // MODULE 40 - Interventions Library
@@ -2710,7 +2711,7 @@ export const ROUTES_REGISTRY: readonly RouteMeta[] = ([
     guard: true,
     requireAuth: true,
     aliases: ['/b2b/admin/interventions'],
-    status: 'stable',
+    status: 'demo',
   },
   // ═══════════════════════════════════════════════════════════
   // MODULE 41 - Research Export
@@ -2725,7 +2726,7 @@ export const ROUTES_REGISTRY: readonly RouteMeta[] = ([
     guard: true,
     requireAuth: true,
     aliases: ['/b2b/admin/research-export'],
-    status: 'stable',
+    status: 'demo',
   },
   // ═══════════════════════════════════════════════════════════
   // MODULE 42 - Institutional QVT Reports
@@ -2740,7 +2741,7 @@ export const ROUTES_REGISTRY: readonly RouteMeta[] = ([
     guard: true,
     requireAuth: true,
     aliases: ['/b2b/admin/institutional-report', '/b2b/qvt-report'],
-    status: 'stable',
+    status: 'demo',
   },
 
   // 404 FALLBACK ROUTE - Le fallback '*' est géré directement dans router.tsx
