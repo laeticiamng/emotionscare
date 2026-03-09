@@ -134,7 +134,7 @@ const JournalNotesPage = memo(() => {
                                 variant="ghost"
                                 size="icon"
                                 className="h-7 w-7"
-                                onClick={() => handleDelete(note.id)}
+                                onClick={() => handleDelete(note.id!)}
                                 aria-label="Supprimer"
                               >
                                 <Trash2 className="h-4 w-4 text-destructive" />

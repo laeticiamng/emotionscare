@@ -171,7 +171,7 @@ const JournalFavoritesPage = memo(() => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleToggleFavorite(note.id)}
+                    onClick={() => handleToggleFavorite(note.id!)}
                     disabled={isTogglingFavorite}
                     aria-label="Retirer des favoris"
                   >
