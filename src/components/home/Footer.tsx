@@ -166,17 +166,6 @@ const Footer: React.FC = () => {
                   </Link>
                 </li>
               ))}
-              <li>
-                <a
-                  href="https://president-cockpit-hq.lovable.app"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
-                >
-                  Écosystème
-                  <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                </a>
-              </li>
             </ul>
           </div>
 

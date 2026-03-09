@@ -53,13 +53,13 @@ const SocialProofSection: React.FC = () => {
             Pourquoi nous faire confiance
           </span>
           <h2 id="social-proof-heading" className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-4">
-            Construite avec{' '}
+            Pourquoi{' '}
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              exigence
+              EmotionsCare
             </span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Pas de promesses vides. Une plateforme pensée pour le terrain, par une professionnelle de santé.
+            Une plateforme pensée pour le terrain, par une professionnelle de santé. En cours de lancement — rejoignez les premiers utilisateurs.
           </p>
         </motion.div>
 
