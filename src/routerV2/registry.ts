@@ -2614,8 +2614,8 @@ export const ROUTES_REGISTRY: readonly RouteMeta[] = ([
   {
     name: 'platform-audit',
     path: '/admin/platform-audit',
-    segment: 'consumer',
-    role: 'consumer',
+    segment: 'manager',
+    role: 'manager',
     layout: 'app-sidebar',
     component: 'PlatformAuditPage',
     guard: true,
