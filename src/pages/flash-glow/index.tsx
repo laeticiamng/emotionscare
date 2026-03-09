@@ -943,7 +943,7 @@ const FlashGlowView: React.FC = () => {
             </section>
           )}
 
-          {sudsEnabled && consent.clinicalAccepted && !sudsOptIn && !showSudsCard && (
+          {sudsEnabled && clinicalAccepted && !sudsOptIn && !showSudsCard && (
             <div className="flex justify-end">
               <Button
                 variant="outline"
