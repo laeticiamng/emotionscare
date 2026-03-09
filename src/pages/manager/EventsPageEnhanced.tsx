@@ -179,8 +179,8 @@ const EventsPageEnhanced = () => {
     return eventTypes.find(t => t.value === type)?.color || 'bg-gray-500';
   };
 
-  const getStatusBadge = (status) => {
-    const statusConfig = {
+  const getStatusBadge = (status: string) => {
+    const statusConfig: Record<string, { label: string; color: string }> = {
       upcoming: { label: 'À venir', color: 'bg-blue-500' },
       ongoing: { label: 'En cours', color: 'bg-green-500' },
       completed: { label: 'Terminé', color: 'bg-gray-500' },

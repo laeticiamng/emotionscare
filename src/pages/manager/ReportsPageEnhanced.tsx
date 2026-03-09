@@ -115,7 +115,7 @@ const ReportsPageEnhanced = () => {
     }
   };
 
-  const getAlertIcon = (type) => {
+  const getAlertIcon = (type: string) => {
     switch (type) {
       case 'warning': return <AlertTriangle className="h-4 w-4 text-orange-500" />;
       case 'success': return <CheckCircle className="h-4 w-4 text-green-500" />;
@@ -123,8 +123,8 @@ const ReportsPageEnhanced = () => {
     }
   };
 
-  const getAlertBadge = (priority) => {
-    const colors = {
+  const getAlertBadge = (priority: string) => {
+    const colors: Record<string, string> = {
       'high': 'bg-red-500',
       'medium': 'bg-orange-500',
       'low': 'bg-blue-500'
