@@ -601,6 +601,7 @@ export function useCoachHandlers() {
     const newFavorites = [...favorites, activity];
     setFavorites(newFavorites);
     saveToStorage(FAVORITES_KEY, newFavorites);
+    if (user) void saveToSupabase(FAVORITES_KEY, newFavorites, user.id);
     toast({
       title: 'Ajouté aux favoris',
       description: 'Cette activité a été sauvegardée.'
