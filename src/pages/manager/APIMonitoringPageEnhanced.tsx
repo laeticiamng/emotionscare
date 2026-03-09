@@ -488,7 +488,7 @@ const APIMonitoringPageEnhanced: React.FC = () => {
               Alertes Actives ({alerts.filter(a => !a.resolved).length})
             </h3>
             <Button variant="outline" size="sm">
-              <Settings className="h-4 w-4 mr-2" />
+              <Zap className="h-4 w-4 mr-2" />
               Configurer
             </Button>
           </div>
