@@ -108,7 +108,7 @@ const CommunityPageEnhanced = () => {
     { name: 'Lucas M.', points: 720, posts: 24, avatar: '', badge: 'Contributeur' }
   ];
 
-  const createEvent = async (eventData) => {
+  const createEvent = async (_eventData: Partial<CommunityEvent>) => {
     try {
       // Simulation de création d'événement
       toast({
