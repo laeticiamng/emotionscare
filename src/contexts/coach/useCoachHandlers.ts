@@ -612,6 +612,7 @@ export function useCoachHandlers() {
     const newFavorites = favorites.filter(f => f !== activity);
     setFavorites(newFavorites);
     saveToStorage(FAVORITES_KEY, newFavorites);
+    if (user) void saveToSupabase(FAVORITES_KEY, newFavorites, user.id);
   }, [favorites]);
 
   // ─────────────────────────────────────────────────────────────
