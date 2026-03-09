@@ -15,6 +15,7 @@ import {
   BarChart3, Activity, Bell, Shield
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { DemoBanner } from '@/components/ui/DemoBanner';
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   AreaChart, Area
@@ -78,6 +79,7 @@ const TeamWellbeingDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <DemoBanner message="Ce dashboard affiche des données de démonstration générées aléatoirement. Les données réelles nécessitent l'intégration backend." />
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" asChild>

@@ -17,6 +17,7 @@ import {
   TrendingDown, CheckCircle2, AlertTriangle, BarChart3, Users, Calendar
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { DemoBanner } from '@/components/ui/DemoBanner';
 
 const REPORT_SECTIONS = [
   { id: 'executive', label: 'Synthèse Exécutive', icon: BarChart3 },
@@ -64,6 +65,7 @@ const InstitutionalReportPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-5xl">
+        <DemoBanner message="Ce rapport contient des indicateurs fictifs à titre de démonstration." />
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" asChild>
