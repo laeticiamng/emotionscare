@@ -128,7 +128,7 @@ export class CoachService {
       const payload = { emotion };
       const data = await invokeSupabaseEdge<typeof payload, unknown>('get-coach-recommendations', {
         payload,
-        schema: RecommendationsPayloadSchema,
+        schema: RecommendationsPayloadSchema as any,
         accessToken: session?.access_token,
         timeoutMs: 8_000,
         retries: 1,
