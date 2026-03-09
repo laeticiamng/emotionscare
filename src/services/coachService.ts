@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeSupabaseEdge } from '@/lib/network/supabaseEdge';
@@ -41,7 +41,7 @@ export class CoachService {
       const payload = { message, emotion };
       const data = await invokeSupabaseEdge<typeof payload, unknown>('ai-coach', {
         payload,
-        schema: CoachMessagePayloadSchema,
+        schema: CoachMessagePayloadSchema as any,
         accessToken: session?.access_token,
         timeoutMs: 15_000,
         retries: 2,
@@ -128,7 +128,7 @@ export class CoachService {
       const payload = { emotion };
       const data = await invokeSupabaseEdge<typeof payload, unknown>('get-coach-recommendations', {
         payload,
-        schema: RecommendationsPayloadSchema,
+        schema: RecommendationsPayloadSchema as any,
         accessToken: session?.access_token,
         timeoutMs: 8_000,
         retries: 1,

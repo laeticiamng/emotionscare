@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * Service OpenAI - VERSION SÉCURISÉE
  * 
@@ -79,7 +77,7 @@ export async function chatCompletion(
 ): Promise<string> {
   // Conversion des messages au format attendu
   const formattedMessages = messages.map(msg => ({
-    role: msg.role as 'system' | 'user' | 'assistant',
+    role: (msg.sender === 'assistant' ? 'assistant' : msg.sender === 'system' ? 'system' : 'user') as 'system' | 'user' | 'assistant',
     content: msg.content || msg.text || ''
   }));
 

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { ChatConversation } from '@/types/chat';
 
 export interface ConversationState {
