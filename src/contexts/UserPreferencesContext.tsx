@@ -29,8 +29,8 @@ export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = (
       setPreferences(updated);
       
       // Sync with Supabase when user is authenticated
-      if (preferences.userId) {
-        logger.info('Syncing preferences with Supabase', { userId: preferences.userId }, 'SYSTEM');
+      if ((preferences as any).userId) {
+        logger.info('Syncing preferences with Supabase', { userId: (preferences as any).userId }, 'SYSTEM');
         // API call will be implemented when backend is ready
       }
       logger.info('Preferences updated', updated, 'SYSTEM');
