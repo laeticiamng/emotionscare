@@ -1,4 +1,4 @@
-// @ts-nocheck — TODO: fix 2662-line registry strict types (P1 debt)
+// TODO: audit all 2700+ entries for correctness (P2 debt)
 /**
  * RouterV2 Registry - Toutes les routes canoniques
  * TICKET: FE/BE-Router-Cleanup-01
@@ -6,7 +6,7 @@
 
 import { RouteMeta } from './schema';
 
-export const ROUTES_REGISTRY: RouteMeta[] = [
+export const ROUTES_REGISTRY: readonly RouteMeta[] = ([
   // ═══════════════════════════════════════════════════════════
   // ROUTES PUBLIQUES
   // ═══════════════════════════════════════════════════════════
@@ -1951,7 +1951,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // ═══════════════════════════════════════════════════════════
   // DÉVELOPPEMENT (UNIQUEMENT SI DEBUG)
   // ═══════════════════════════════════════════════════════════
-  ...(import.meta.env.MODE === 'development' ? [
+  ...(import.meta.env.MODE === 'development' ? ([
     {
       name: 'validation',
       path: '/validation',
@@ -1960,13 +1960,13 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       component: 'ValidationPage',
       guard: false,
     }
-  ] : []),
+  ] as RouteMeta[]) : []),
 
   // ═══════════════════════════════════════════════════════════
   // DEV-ONLY ROUTES (Masquées en production)
   // ═══════════════════════════════════════════════════════════
   // Routes de développement masquées en production
-  ...(import.meta.env.DEV ? [
+  ...(import.meta.env.DEV ? ([
     {
       name: 'comprehensive-system-audit',
       path: '/dev/system-audit',
@@ -2000,6 +2000,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       guard: false,
     },
     {
+      name: 'error-boundary-test',
       path: '/dev/error-boundary',
       segment: 'public',
       layout: 'marketing',
@@ -2010,7 +2011,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // - DiagnosticPage (supprimée)
   // - SystemValidationPage (supprimée) 
   // - SystemRepairPage (supprimée)
-  ] : []),
+  ] as RouteMeta[]) : []),
 
   // ═══════════════════════════════════════════════════════════
   // PAGES SYSTÈME
@@ -2745,4 +2746,4 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // 404 FALLBACK ROUTE - Le fallback '*' est géré directement dans router.tsx
   // Cette entrée est gardée pour documentation mais n'est pas utilisée
   // car router.tsx a déjà un catch-all '*' à la fin
-];
+] as RouteMeta[]);

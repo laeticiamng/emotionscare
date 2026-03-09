@@ -32504,7 +32504,13 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user" | "b2c"
+      app_role:
+        | "admin"
+        | "moderator"
+        | "user"
+        | "b2c"
+        | "b2b_user"
+        | "b2b_admin"
       app_user_role: "user_b2c" | "user_b2b" | "manager_b2b" | "admin"
       b2b_role: "b2b_admin" | "b2b_manager" | "b2b_member" | "b2b_viewer"
       invitation_status: "pending" | "accepted" | "expired"
@@ -32647,7 +32653,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user", "b2c"],
+      app_role: ["admin", "moderator", "user", "b2c", "b2b_user", "b2b_admin"],
       app_user_role: ["user_b2c", "user_b2b", "manager_b2b", "admin"],
       b2b_role: ["b2b_admin", "b2b_manager", "b2b_member", "b2b_viewer"],
       invitation_status: ["pending", "accepted", "expired"],

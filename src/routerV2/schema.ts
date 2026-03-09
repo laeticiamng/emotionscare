@@ -4,7 +4,7 @@
  * TICKET: FE/BE-Router-Cleanup-01
  */
 
-export type Segment = 'public' | 'consumer' | 'employee' | 'manager';
+export type Segment = 'public' | 'consumer' | 'employee' | 'manager' | 'b2c';
 export type Role = 'consumer' | 'employee' | 'manager' | 'admin';
 export type LayoutType = 'marketing' | 'app' | 'simple' | 'app-sidebar';
 
@@ -23,6 +23,10 @@ export interface RouteMeta {
   guard?: boolean;           // nécessite une protection
   requireAuth?: boolean;     // nécessite authentification
   redirectTo?: string;       // cible de redirection pour routes deprecated
+  meta?: {                   // métadonnées SEO optionnelles
+    title?: string;
+    description?: string;
+  };
 }
 
 export interface RouteRegistry {
