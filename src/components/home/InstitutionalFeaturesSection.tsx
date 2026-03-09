@@ -73,7 +73,7 @@ const features: InstitutionalFeature[] = [
   {
     title: 'Rapports institutionnels',
     description:
-      'Rapports QVT prêts pour le CHSCT avec indicateurs clés et recommandations d'amélioration.',
+      "Rapports QVT prêts pour le CHSCT avec indicateurs clés et recommandations d'amélioration.",
     icon: FileText,
     badge: 'CHSCT-ready',
     badgeVariant: 'outline',
