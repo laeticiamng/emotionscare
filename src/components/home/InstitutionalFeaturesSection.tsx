@@ -125,7 +125,7 @@ const FeatureCard: React.FC<{
 
             <div className="mt-5 flex items-center gap-1 text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">
               {isAuthenticated ? 'Ouvrir' : 'Découvrir'}
-              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" aria-hidden />
+              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
             </div>
           </div>
         </div>
