@@ -796,12 +796,12 @@ const FlashGlowView: React.FC = () => {
     </ConsentGate>
   );
 
-  const appearance = PHASE_APPEARANCE[snapshot.phase.key] ?? PHASE_APPEARANCE.warmup;
+  const appearance = PHASE_APPEARANCE[snapshot.phase.id] ?? PHASE_APPEARANCE.warmup;
 
   const phaseSurface = (
     <WallOfLights
-      phase={snapshot.phase.key as 'warmup' | 'glow' | 'settle'}
-      progress={snapshot.progress ?? 0}
+      phase={snapshot.phase.id as 'warmup' | 'glow' | 'settle'}
+      progress={snapshot.progressInPhase ?? 0}
       theme={appearance.theme}
       intensity={appearance.intensity}
     />
