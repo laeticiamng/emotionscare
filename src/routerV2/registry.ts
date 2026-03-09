@@ -6,7 +6,7 @@
 
 import { RouteMeta } from './schema';
 
-export const ROUTES_REGISTRY: RouteMeta[] = [
+export const ROUTES_REGISTRY: readonly RouteMeta[] = ([
   // ═══════════════════════════════════════════════════════════
   // ROUTES PUBLIQUES
   // ═══════════════════════════════════════════════════════════
