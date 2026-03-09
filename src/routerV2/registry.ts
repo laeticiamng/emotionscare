@@ -2746,4 +2746,4 @@ export const ROUTES_REGISTRY: readonly RouteMeta[] = ([
   // 404 FALLBACK ROUTE - Le fallback '*' est géré directement dans router.tsx
   // Cette entrée est gardée pour documentation mais n'est pas utilisée
   // car router.tsx a déjà un catch-all '*' à la fin
-];
+] as RouteMeta[]);
