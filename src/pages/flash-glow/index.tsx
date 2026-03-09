@@ -422,7 +422,7 @@ const FlashGlowView: React.FC = () => {
       preLevel: preSudsRecordRef.current?.levelIndex ?? null,
       postLevel: postLevelIndex,
       prefersReducedMotion: motion.prefersReducedMotion,
-      optedIn: sudsOptIn && consent.clinicalAccepted,
+      optedIn: sudsOptIn && clinicalAccepted,
     });
 
     if (actions.extend_session) {
