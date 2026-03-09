@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { AsyncState } from "@/components/transverse";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 /**
  * AppDispatcher - Redirects users to appropriate dashboard based on role
