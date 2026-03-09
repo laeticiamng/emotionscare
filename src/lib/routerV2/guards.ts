@@ -56,7 +56,7 @@ export function useRouteAllowed(guards?: Guard[]) {
       signOut: async () => {},
       resetPassword: async () => {},
       register: async () => {},
-    } as ReturnType<typeof useAuth>;
+    } as unknown as ReturnType<typeof useAuth>;
   }
 
   try {
