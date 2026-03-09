@@ -258,7 +258,7 @@ const InterventionsLibraryPage: React.FC = () => {
               <DialogHeader>
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-primary/10">
-                    {React.createElement(selectedIntervention.icon, { className: 'h-5 w-5 text-primary' })}
+                    {React.createElement(selectedIntervention.icon as React.ComponentType<{ className?: string }>, { className: 'h-5 w-5 text-primary' })}
                   </div>
                   <div>
                     <DialogTitle>{selectedIntervention.title}</DialogTitle>
