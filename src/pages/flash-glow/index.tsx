@@ -898,7 +898,7 @@ const FlashGlowView: React.FC = () => {
             <p className="text-muted-foreground">{phaseNarrative}</p>
           </section>
 
-          {sudsEnabled && consent.clinicalAccepted && (showSudsCard || sudsOptIn) && (
+          {sudsEnabled && clinicalAccepted && (showSudsCard || sudsOptIn) && (
             <section className="rounded-lg border border-border/50 p-4 space-y-4" aria-live="polite">
               <div>
                 <p className="text-sm font-medium">Partager mon ressenti intérieur</p>
