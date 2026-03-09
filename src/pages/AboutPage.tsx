@@ -125,7 +125,7 @@ const AboutPage: React.FC = () => {
                   <Button
                     size="lg"
                     onClick={() => navigate('/signup')}
-                    className="rounded-full py-6 px-8 text-base font-semibold bg-foreground text-background hover:bg-foreground/90 shadow-lg hover:scale-[1.02] transition-all"
+                    className="rounded-full py-5 sm:py-6 px-6 sm:px-8 text-base font-semibold bg-foreground text-background hover:bg-foreground/90 shadow-lg hover:scale-[1.02] transition-all w-full sm:w-auto"
                     aria-label="Créer un compte EmotionsCare gratuitement"
                   >
                     Découvrir EmotionsCare
@@ -135,7 +135,7 @@ const AboutPage: React.FC = () => {
                     size="lg"
                     variant="outline"
                     onClick={() => navigate('/contact')}
-                    className="rounded-full py-6 px-8 text-base"
+                    className="rounded-full py-5 sm:py-6 px-6 sm:px-8 text-base w-full sm:w-auto"
                     aria-label="Contacter l'équipe EmotionsCare"
                   >
                     Nous contacter
@@ -411,7 +411,7 @@ const AboutPage: React.FC = () => {
                     <Button
                       size="lg"
                       onClick={() => navigate('/signup')}
-                      className="rounded-full py-6 px-8 text-base font-semibold bg-foreground text-background hover:bg-foreground/90 shadow-lg hover:scale-[1.02] transition-all"
+                      className="rounded-full py-5 sm:py-6 px-6 sm:px-8 text-base font-semibold bg-foreground text-background hover:bg-foreground/90 shadow-lg hover:scale-[1.02] transition-all w-full sm:w-auto"
                     >
                       Essayer gratuitement
                       <ArrowRight className="ml-2 h-4 w-4" />
@@ -420,7 +420,7 @@ const AboutPage: React.FC = () => {
                       size="lg"
                       variant="outline"
                       onClick={() => navigate('/pricing')}
-                      className="rounded-full py-6 px-8 text-base"
+                      className="rounded-full py-5 sm:py-6 px-6 sm:px-8 text-base w-full sm:w-auto"
                     >
                       Voir les tarifs
                     </Button>

@@ -1,0 +1,536 @@
+/**
+ * Mobile & Tablet Responsive Overrides
+ * Premium mobile experience for EmotionsCare
+ * Targets: 320px, 375px, 390px, 414px, 430px, 768px, 820px, 1024px
+ * @version 2.0.0
+ */
+
+/* ============================================
+   GLOBAL MOBILE FOUNDATIONS
+   ============================================ */
+
+/* Prevent horizontal overflow globally */
+html {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  /* Use dvh for proper mobile viewport */
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Fix iOS Safari viewport height */
+@supports (height: 100dvh) {
+  .min-h-screen {
+    min-height: 100dvh;
+  }
+  .h-screen {
+    height: 100dvh;
+  }
+}
+
+/* ============================================
+   SMALL MOBILE (320px - 374px) — iPhone SE, small devices
+   ============================================ */
+@media (max-width: 374px) {
+  /* Reduce base font size for very small screens */
+  html {
+    font-size: 14px;
+  }
+
+  /* Tighter container padding */
+  .container {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  /* Smaller heading sizes */
+  h1, .text-4xl, .text-5xl {
+    font-size: clamp(1.5rem, 8vw, 2rem) !important;
+  }
+  h2, .text-3xl {
+    font-size: clamp(1.25rem, 6vw, 1.75rem) !important;
+  }
+  h3, .text-2xl {
+    font-size: clamp(1.1rem, 5vw, 1.5rem) !important;
+  }
+
+  /* Reduce oversized padding */
+  .p-8 { padding: 1rem !important; }
+  .p-10 { padding: 1.25rem !important; }
+  .p-12 { padding: 1.5rem !important; }
+  .px-8 { padding-left: 1rem !important; padding-right: 1rem !important; }
+  .px-10 { padding-left: 1.25rem !important; padding-right: 1.25rem !important; }
+  .px-12 { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
+  .py-8 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+  .py-12 { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
+  .py-16 { padding-top: 2rem !important; padding-bottom: 2rem !important; }
+  .py-20 { padding-top: 2.5rem !important; padding-bottom: 2.5rem !important; }
+  .py-24 { padding-top: 3rem !important; padding-bottom: 3rem !important; }
+
+  /* Fix font sizes that are too large */
+  .text-5xl { font-size: 1.75rem !important; }
+  .text-6xl { font-size: 2rem !important; }
+  .text-7xl { font-size: 2.25rem !important; }
+  .text-8xl { font-size: 2.5rem !important; }
+
+  /* Stack grid-cols-2 on very small screens */
+  .grid-cols-2:not(.xxs\:grid-cols-2) {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Ensure buttons are full-width and touchable */
+  .btn-cta-premium {
+    padding: 0.75rem 1.25rem !important;
+  }
+}
+
+/* ============================================
+   STANDARD MOBILE (375px - 639px) — iPhone, most smartphones
+   ============================================ */
+@media (max-width: 639px) {
+  /* Container with breathing room */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* ---- Typography ---- */
+  .text-5xl { font-size: clamp(1.75rem, 8vw, 2.5rem); }
+  .text-6xl { font-size: clamp(2rem, 9vw, 3rem); }
+  .text-7xl { font-size: clamp(2.25rem, 10vw, 3.5rem); }
+  .text-8xl { font-size: clamp(2.5rem, 11vw, 4rem); }
+
+  /* ---- Touch targets ---- */
+  button:not(.min-h-auto),
+  [role="button"]:not(.min-h-auto),
+  a:not(.min-h-auto):not(.inline) {
+    min-height: 44px;
+  }
+
+  /* ---- Cards and content ---- */
+  .rounded-3xl {
+    border-radius: 1rem;
+  }
+
+  /* ---- Pricing card fix ---- */
+  .scale-\[1\.02\] {
+    transform: none !important;
+  }
+
+  /* ---- Navigation mobile improvements ---- */
+  nav a, nav button {
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
+  }
+
+  /* ---- Dialog/Modal mobile optimization ---- */
+  [role="dialog"],
+  .modal-harmony {
+    width: calc(100vw - 1.5rem) !important;
+    max-width: calc(100vw - 1.5rem) !important;
+    max-height: calc(100dvh - 2rem) !important;
+    margin: 0.75rem !important;
+    border-radius: 1rem !important;
+  }
+
+  /* ---- Tables on mobile: horizontal scroll with indicator ---- */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  table {
+    font-size: 0.875rem;
+  }
+
+  table th,
+  table td {
+    padding: 0.5rem 0.625rem;
+    white-space: nowrap;
+  }
+
+  /* ---- Sticky bottom CTA for mobile ---- */
+  .mobile-sticky-cta {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    padding: 0.75rem 1rem;
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+    background: hsl(var(--background) / 0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid hsl(var(--border) / 0.5);
+  }
+
+  /* ---- Fix min-width causing horizontal scroll ---- */
+  [class*="min-w-\[600px\]"],
+  [class*="min-w-\[700px\]"],
+  [class*="min-w-\[800px\]"] {
+    min-width: 100% !important;
+  }
+
+  /* ---- Prevent gap overflow ---- */
+  .gap-8 { gap: 1.25rem; }
+  .gap-10 { gap: 1.5rem; }
+  .gap-12 { gap: 2rem; }
+
+  /* ---- Fix flex items overflow ---- */
+  .flex {
+    min-width: 0;
+  }
+
+  .flex > * {
+    min-width: 0;
+  }
+
+  /* ---- Improve form inputs ---- */
+  input, select, textarea {
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+  }
+
+  /* ---- Tabs scrollable on mobile ---- */
+  /* Override grid layout on TabsList to enable horizontal scrolling */
+  [role="tablist"] {
+    display: flex !important;
+    grid-template-columns: none !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex-wrap: nowrap !important;
+    white-space: nowrap;
+  }
+
+  [role="tablist"]::-webkit-scrollbar {
+    display: none;
+  }
+
+  [role="tab"] {
+    flex-shrink: 0;
+    flex: 0 0 auto;
+    min-width: max-content;
+  }
+
+  /* ---- Fix hardcoded grids that overflow mobile ---- */
+  /* grid-cols-4+ without responsive prefix → 2 columns */
+  .grid-cols-4:not([role="tablist"]),
+  .grid-cols-5:not([role="tablist"]),
+  .grid-cols-6:not([role="tablist"]) {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* grid-cols-7 (calendars) stay but gap reduces */
+  .grid-cols-7 {
+    gap: 0.125rem !important;
+  }
+
+  /* ---- Fix large p-12, p-10, p-8 on mobile ---- */
+  .p-12 { padding: 1.25rem !important; }
+  .p-10 { padding: 1rem !important; }
+  .p-8 { padding: 0.875rem !important; }
+  .px-8, .px-10, .px-12 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* ---- Reduce large margins on mobile ---- */
+  .mb-8 { margin-bottom: 1.5rem; }
+  .mb-10 { margin-bottom: 2rem; }
+  .mb-12 { margin-bottom: 2.5rem; }
+  .mt-12 { margin-top: 2.5rem; }
+  .mt-16 { margin-top: 3rem; }
+
+  /* ---- Badge sizes ---- */
+  .badge-premium {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.7rem;
+  }
+
+  /* ---- Dropdown/Popover mobile ---- */
+  [data-radix-popper-content-wrapper] {
+    max-width: calc(100vw - 1rem) !important;
+  }
+
+  /* ---- Image and embed responsive ---- */
+  img, video, iframe, embed, object {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* ---- Footer mobile optimization ---- */
+  footer .grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+
+  footer .col-span-2 {
+    grid-column: span 1 !important;
+  }
+}
+
+/* ============================================
+   TABLET PORTRAIT (640px - 767px) — Small tablets
+   ============================================ */
+@media (min-width: 640px) and (max-width: 767px) {
+  .container {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  /* 2-column grid for cards */
+  footer .grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* ============================================
+   TABLET (768px - 1023px) — iPad, tablets
+   ============================================ */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  /* Tablet: TabsList can use grid but max 4 cols */
+  [role="tablist"] {
+    display: flex !important;
+    grid-template-columns: none !important;
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+  }
+
+  /* Tablet-specific grid adjustments */
+  .grid-cols-5:not([role="tablist"]),
+  .grid-cols-6:not([role="tablist"]) {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  /* Large padding reduction for tablet */
+  .p-12 { padding: 1.75rem !important; }
+  .p-10 { padding: 1.5rem !important; }
+}
+
+/* ============================================
+   LANDSCAPE MODE FIXES
+   ============================================ */
+@media (orientation: landscape) and (max-height: 500px) {
+  /* Reduce header height in landscape */
+  header {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+  }
+
+  /* Reduce hero section height */
+  .min-h-\[80vh\] {
+    min-height: 60vh !important;
+  }
+
+  /* Reduce vertical spacing */
+  .py-16 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+  .py-20 { padding-top: 2rem; padding-bottom: 2rem; }
+  .py-24 { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+
+  /* Fix dialogs in landscape */
+  [role="dialog"] {
+    max-height: 90vh !important;
+  }
+}
+
+/* ============================================
+   IOS SAFARI SPECIFIC FIXES
+   ============================================ */
+
+/* Prevent double-tap zoom on interactive elements */
+button, a, input, select, textarea, [role="button"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Fix iOS Safari sticky positioning with keyboard */
+@supports (-webkit-touch-callout: none) {
+  /* iOS-specific viewport handling */
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
+
+  /* Fix iOS bounce scroll on fixed elements */
+  .fixed {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  /* Fix iOS input zoom */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="search"],
+  select,
+  textarea {
+    font-size: max(16px, 1rem) !important;
+  }
+}
+
+/* ============================================
+   SAFE AREA INSETS (Notch, Dynamic Island, Home bar)
+   ============================================ */
+@supports (padding: env(safe-area-inset-top)) {
+  /* Header safe area */
+  header.fixed,
+  header.sticky {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* Bottom navigation and sticky CTAs */
+  .mobile-sticky-cta,
+  .fixed-bottom-mobile,
+  nav.fixed[class*="bottom"] {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  /* Full-screen modals */
+  [role="dialog"] {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* ============================================
+   KEYBOARD AVOIDANCE
+   ============================================ */
+@media (max-width: 639px) {
+  /* When virtual keyboard is open, ensure form elements are visible */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    scroll-margin-bottom: 150px;
+    scroll-padding-bottom: 150px;
+  }
+
+  /* Disable autofocus on mobile to prevent keyboard popup */
+  [autofocus] {
+    autofocus: false;
+  }
+}
+
+/* ============================================
+   RESPONSIVE DATA TABLES → CARD VIEW
+   ============================================ */
+@media (max-width: 639px) {
+  .responsive-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Scroll indicator shadow */
+  .responsive-table-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 2rem;
+    background: linear-gradient(to right, transparent, hsl(var(--background) / 0.8));
+    pointer-events: none;
+    z-index: 1;
+  }
+}
+
+/* ============================================
+   MOBILE-OPTIMIZED CHARTS & ANALYTICS
+   ============================================ */
+@media (max-width: 639px) {
+  /* Make Recharts responsive */
+  .recharts-responsive-container {
+    min-height: 200px !important;
+    max-height: 300px !important;
+  }
+
+  /* Reduce chart label sizes */
+  .recharts-text {
+    font-size: 0.625rem !important;
+  }
+
+  .recharts-legend-item-text {
+    font-size: 0.75rem !important;
+  }
+}
+
+/* ============================================
+   MOBILE BOTTOM SHEET PATTERN
+   ============================================ */
+.mobile-bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: hsl(var(--background));
+  border-top-left-radius: 1.25rem;
+  border-top-right-radius: 1.25rem;
+  box-shadow: 0 -4px 20px hsl(var(--foreground) / 0.1);
+  max-height: 85vh;
+  max-height: 85dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  transform: translateY(0);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-bottom-sheet-handle {
+  width: 2.5rem;
+  height: 0.25rem;
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 9999px;
+  margin: 0.75rem auto 0.5rem;
+}
+
+/* ============================================
+   IMPROVED FOCUS STATES FOR TOUCH
+   ============================================ */
+@media (pointer: coarse) {
+  /* Larger focus rings for touch */
+  :focus-visible {
+    outline-width: 3px;
+    outline-offset: 3px;
+  }
+
+  /* Remove hover effects on touch devices */
+  .premium-card:hover,
+  .card-premium:hover,
+  .card-harmony:hover,
+  .protocol-card:hover {
+    transform: none;
+  }
+
+  /* Active states instead of hover */
+  .premium-card:active,
+  .card-premium:active,
+  .card-harmony:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* ============================================
+   PRINT-SAFE MOBILE STYLES
+   ============================================ */
+@media print {
+  .mobile-sticky-cta,
+  .mobile-bottom-sheet,
+  .fixed-bottom-mobile {
+    display: none !important;
+  }
+}

@@ -44,11 +44,11 @@ const EnhancedFooter: React.FC = () => {
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-primary/[0.02] via-transparent to-accent/[0.02] pointer-events-none" />
       
-      <div className="container relative mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+      <div className="container relative mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
         {/* Main footer content */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-5 gap-6 sm:gap-8 lg:gap-12">
           {/* Brand column */}
-          <div className="col-span-2">
+          <div className="col-span-1 xs:col-span-2">
             <Link to="/" className="inline-block">
               <span className="text-xl font-bold tracking-tight">EmotionsCare</span>
             </Link>

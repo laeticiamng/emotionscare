@@ -31,8 +31,8 @@ const SharedHeader: React.FC<SharedHeaderProps> = ({ extraDesktopCTA }) => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50 safe-area-top">
+      <div className="container mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link
@@ -115,9 +115,10 @@ const SharedHeader: React.FC<SharedHeaderProps> = ({ extraDesktopCTA }) => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-background border-t border-border"
+            className="md:hidden bg-background border-t border-border overflow-y-auto"
+            style={{ maxHeight: 'calc(100dvh - 4rem)' }}
           >
-            <nav className="container px-4 py-6 space-y-4">
+            <nav className="container px-4 py-6 space-y-4 safe-area-bottom">
               {NAV_LINKS.map(({ to, label }) => (
                 <Link
                   key={to}

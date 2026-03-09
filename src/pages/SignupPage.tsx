@@ -117,7 +117,7 @@ const SignupPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col">
       <SharedHeader />
-      <div className="flex-1 flex items-center justify-center p-4 pt-24 pb-20">
+      <div className="flex-1 flex items-center justify-center p-3 sm:p-4 pt-20 sm:pt-24 pb-16 sm:pb-20">
 
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}

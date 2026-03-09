@@ -458,7 +458,7 @@ const B2CSettingsPage = () => {
 
           {/* Main Content */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5 max-w-3xl">
+            <TabsList className="flex w-full max-w-3xl overflow-x-auto sm:grid sm:grid-cols-5">
               <TabsTrigger value="general" className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
                 <span className="hidden sm:inline">Général</span>

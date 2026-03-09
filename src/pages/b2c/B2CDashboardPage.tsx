@@ -282,16 +282,16 @@ export default function B2CDashboardPage() {
       </a>
 
       {/* Navigation principale */}
-      <nav role="navigation" aria-label="Navigation du tableau de bord" className="bg-card border-b sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-3">
+      <nav role="navigation" aria-label="Navigation du tableau de bord" className="bg-card border-b sticky top-0 z-40 safe-area-top">
+        <div className="container mx-auto px-3 sm:px-4 py-2 sm:py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <h2 className="text-lg font-semibold">EmotionsCare</h2>
+            <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
+              <h2 className="text-base sm:text-lg font-semibold truncate">EmotionsCare</h2>
               <Badge variant="secondary" aria-label="Mode utilisateur particulier">
                 Particulier
               </Badge>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -358,12 +358,12 @@ export default function B2CDashboardPage() {
       </nav>
 
       {/* Contenu principal */}
-      <main id="main-content" role="main" className="container mx-auto px-4 py-8">
+      <main id="main-content" role="main" className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* En-tête de bienvenue avec date */}
-        <header className="mb-8">
+        <header className="mb-4 sm:mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
             <div>
-              <h1 className="text-3xl font-bold mb-1">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-1">
                 Bonjour{user?.user_metadata?.first_name ? ` ${user.user_metadata.first_name}` : ''} 👋
               </h1>
               <p className="text-muted-foreground text-lg">
@@ -377,7 +377,7 @@ export default function B2CDashboardPage() {
         </header>
 
         {/* Section Humeur du jour + Accès rapide */}
-        <section className="mb-8 grid md:grid-cols-2 gap-6">
+        <section className="mb-4 sm:mb-8 grid md:grid-cols-2 gap-4 sm:gap-6">
           <Suspense fallback={<DashboardWidgetSkeleton lines={3} />}>
             <MoodQuickLog />
           </Suspense>
@@ -485,7 +485,7 @@ export default function B2CDashboardPage() {
               Actualiser
             </Button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             <Card className="relative">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">

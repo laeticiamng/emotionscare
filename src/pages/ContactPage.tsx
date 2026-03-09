@@ -113,7 +113,7 @@ const ContactPage: React.FC = () => {
               </p>
             </motion.header>
 
-            <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 max-w-6xl mx-auto">
               {/* Contact Form */}
               <section aria-labelledby="contact-form-title">
                 <motion.div
