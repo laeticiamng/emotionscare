@@ -136,7 +136,7 @@ class SecurityAuditService {
 
     // Trop de requêtes
     const requestCount = recentLogs.filter(log => log.userId === userId).length;
-    if (requestCount > securityConfig.limits.maxRequestsPerMinute) {
+    if (requestCount > SECURITY_CONFIG.limits.maxRequestsPerMinute) {
       this.logSecurityViolation(userId, 'RATE_LIMIT_EXCEEDED', {
         count: requestCount
       });
