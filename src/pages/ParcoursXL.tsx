@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useEffect } from 'react';
 import { AVAILABLE_PRESETS } from '@/services/parcours-orchestrator';
 import { useParcoursGeneration } from '@/hooks/useParcoursGeneration';

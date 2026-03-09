@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * B2B User Dashboard Page avec SEO et enrichissements
  */
