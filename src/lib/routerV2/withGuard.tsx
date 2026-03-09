@@ -40,7 +40,7 @@ export function withGuard<T>(
       return null;
     }
 
-    return <Component {...props} />;
+    return <Component {...(props as any)} />;
   }
 
   GuardedComponent.displayName = `WithGuard(${Component.displayName || Component.name || 'Component'})`;

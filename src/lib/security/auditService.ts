@@ -214,7 +214,7 @@ class SecurityAuditService {
 
   private async sendCriticalAlert(log: AuditLog) {
     // En production, envoyer une alerte (email, Slack, etc.)
-    logger.critical('🚨 CRITICAL SECURITY ALERT', new Error(log.action), 'SYSTEM');
+    logger.error('🚨 CRITICAL SECURITY ALERT', new Error(log.action), 'SYSTEM');
   }
 }
 

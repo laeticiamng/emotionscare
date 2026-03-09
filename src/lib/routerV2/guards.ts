@@ -66,7 +66,7 @@ export function useRouteAllowed(guards?: Guard[]) {
       userMode: null,
       setUserMode: () => {},
       isLoading: false,
-    } as ReturnType<typeof useUserMode>;
+    } as unknown as ReturnType<typeof useUserMode>;
   }
 
   try {

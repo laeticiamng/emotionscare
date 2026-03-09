@@ -32,7 +32,7 @@ class DeviceCompatibilityChecker {
       webBluetooth: 'bluetooth' in navigator && !isIOS,
       
       // WebXR souvent indispo
-      webXR: 'xr' in navigator && 'isSessionSupported' in navigator.xr,
+      webXR: 'xr' in navigator && !!navigator.xr && 'isSessionSupported' in navigator.xr,
       
       // Autoplay policy restrictions
       audioAutoplay: await this.testAudioAutoplay(),
