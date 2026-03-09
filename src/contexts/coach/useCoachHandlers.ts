@@ -261,7 +261,7 @@ export function useCoachHandlers() {
 
   // Load persisted data on mount
   useEffect(() => {
-    const storedMessages = loadFromStorage<ChatMessage[]>('coachMessages', []);
+    const storedMessages = loadFromStorage<CoachChatMessage[]>('coachMessages', []);
     const storedHistory = loadFromStorage<EmotionAnalysis[]>(EMOTION_HISTORY_KEY, []);
     const storedFavorites = loadFromStorage<string[]>(FAVORITES_KEY, []);
     const storedStats = loadFromStorage<CoachStats>(STORAGE_KEY, stats);
