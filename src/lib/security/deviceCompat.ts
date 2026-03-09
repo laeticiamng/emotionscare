@@ -1,8 +1,8 @@
-// @ts-nocheck
 /**
  * Détection des compatibilités navigateur et iOS - Garde-fous techniques
  */
 
+import { useState, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 
 export interface DeviceCapabilities {
