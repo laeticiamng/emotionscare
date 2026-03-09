@@ -1951,7 +1951,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // ═══════════════════════════════════════════════════════════
   // DÉVELOPPEMENT (UNIQUEMENT SI DEBUG)
   // ═══════════════════════════════════════════════════════════
-  ...(import.meta.env.MODE === 'development' ? [
+  ...(import.meta.env.MODE === 'development' ? ([
     {
       name: 'validation',
       path: '/validation',
@@ -1960,7 +1960,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       component: 'ValidationPage',
       guard: false,
     }
-  ] : []),
+  ] as const satisfies readonly RouteMeta[]) : []),
 
   // ═══════════════════════════════════════════════════════════
   // DEV-ONLY ROUTES (Masquées en production)

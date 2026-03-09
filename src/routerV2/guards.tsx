@@ -17,6 +17,7 @@ type UserModeValue = UserModeType;
 const SEGMENT_TO_MODE: Record<Segment, UserModeValue> = {
   public: null,
   consumer: 'b2c',
+  b2c: 'b2c',
   employee: 'b2b_user',
   manager: 'b2b_admin',
 };
