@@ -100,7 +100,7 @@ const ReportsPageEnhanced = () => {
     }
   };
 
-  const exportReport = async (format) => {
+  const exportReport = async (format: string) => {
     try {
       toast({
         title: "Export en cours",
