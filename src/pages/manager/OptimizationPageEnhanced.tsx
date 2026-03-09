@@ -167,8 +167,8 @@ const OptimizationPageEnhanced = () => {
     }
   };
 
-  const getImpactColor = (impact) => {
-    const colors = {
+  const getImpactColor = (impact: string) => {
+    const colors: Record<string, string> = {
       'high': 'bg-red-500',
       'medium': 'bg-orange-500',
       'low': 'bg-yellow-500'
@@ -176,7 +176,7 @@ const OptimizationPageEnhanced = () => {
     return colors[impact] || 'bg-gray-500';
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed': return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'in-progress': return <Clock className="h-4 w-4 text-blue-500" />;
