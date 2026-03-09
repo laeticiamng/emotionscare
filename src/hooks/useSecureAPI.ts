@@ -33,7 +33,12 @@ export const useSecureApi = () => {
    * Vérification du statut de session
    */
   const checkSession = useCallback(async (): Promise<boolean> => {
-    return GlobalInterceptor.checkSessionStatus();
+    try {
+      const response = await GlobalInterceptor.secureFetch('/api/health');
+      return response !== null && response.ok;
+    } catch {
+      return false;
+    }
   }, []);
 
   /**
