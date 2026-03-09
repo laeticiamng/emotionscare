@@ -175,7 +175,7 @@ const EventsPageEnhanced = () => {
     }
   };
 
-  const getEventTypeColor = (type) => {
+  const getEventTypeColor = (type: string) => {
     return eventTypes.find(t => t.value === type)?.color || 'bg-gray-500';
   };
 
