@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { DemoBanner } from '@/components/ui/DemoBanner';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -312,6 +313,7 @@ const B2CBubbleBeatPage: React.FC = () => {
     <PageRoot>
       <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
         <div className="container mx-auto px-4 py-8 space-y-6">
+          <DemoBanner message="Cette page affiche des données de démonstration. Les données biométriques et le rythme cardiaque sont simulés." />
 
       {/* Back button */}
       <Link to="/app/home" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">

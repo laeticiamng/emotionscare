@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
+import { DemoBanner } from '@/components/ui/DemoBanner';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -180,6 +181,7 @@ const AccessibilityPageEnhanced: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      <DemoBanner message="Cette page affiche des données de démonstration. Les résultats d'audit d'accessibilité sont simulés." />
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

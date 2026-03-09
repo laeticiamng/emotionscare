@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { DemoBanner } from '@/components/ui/DemoBanner';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -254,6 +255,7 @@ const B2CDataPrivacyPage: React.FC = () => {
   return (
     <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       <div className="max-w-6xl mx-auto p-6 space-y-6">
+        <DemoBanner message="Cette page affiche des données de démonstration. L'export de données RGPD est simulé et ne produit pas de vrai fichier." />
         {/* Header */}
         <div className="flex items-center justify-between text-primary-foreground">
           <div className="flex items-center gap-4">
