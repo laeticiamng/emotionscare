@@ -217,6 +217,7 @@ const WorldMapView: React.FC = () => {
         )}
       </CardContent>
     </Card>
+    </div>
   );
 };
 
