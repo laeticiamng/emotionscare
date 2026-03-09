@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { Link } from 'react-router-dom';

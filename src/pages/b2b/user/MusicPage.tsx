@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * B2B User Music Page - Musicothérapie avec SEO
  */

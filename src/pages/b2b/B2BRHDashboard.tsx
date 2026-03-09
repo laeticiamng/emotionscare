@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * B2B RH Dashboard - Tableau de bord pour managers RH
  * Vue agrégée et anonymisée du bien-être des équipes

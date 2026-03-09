@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Page du tableau de bord organisation B2B
  * Vue macro avec données agrégées anonymisées

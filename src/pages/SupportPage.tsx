@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SupportPage - Support Client EmotionsCare
  * SEO, accessibilité, navigation, formulaire enrichi

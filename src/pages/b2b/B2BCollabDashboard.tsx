@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * B2B Collaborateur Dashboard - Espace personnel du collaborateur
  * Données individuelles confidentielles, non accessibles aux RH
