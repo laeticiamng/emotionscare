@@ -41,7 +41,7 @@ export class CoachService {
       const payload = { message, emotion };
       const data = await invokeSupabaseEdge<typeof payload, unknown>('ai-coach', {
         payload,
-        schema: CoachMessagePayloadSchema,
+        schema: CoachMessagePayloadSchema as any,
         accessToken: session?.access_token,
         timeoutMs: 15_000,
         retries: 2,
