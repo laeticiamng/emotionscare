@@ -13,6 +13,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, ArrowRight, Brain, Shield, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { DemoBanner } from '@/components/ui/DemoBanner';
 import { MBI_ITEMS, MBI_FREQUENCY_OPTIONS, scoreMBI, MBIResult } from '@/components/assess/burnout/MBIQuestions';
 import { BurnoutRadarChart } from '@/components/assess/burnout/BurnoutRadarChart';
 
