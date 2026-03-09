@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useMemo } from 'react';
+import { DemoBanner } from '@/components/ui/DemoBanner';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
