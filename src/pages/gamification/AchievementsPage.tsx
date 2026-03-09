@@ -187,6 +187,7 @@ export default function AchievementsPage() {
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5">
       <div className="sticky top-0 z-10 backdrop-blur-xl bg-background/90 border-b border-border/50">
         <div className="container mx-auto px-4 py-6">
+          <DemoBanner message="Les statistiques hebdomadaires affichées sont générées aléatoirement à des fins de démonstration." />
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button

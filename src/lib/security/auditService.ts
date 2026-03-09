@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import { securityConfig } from './securityConfig';
 import { logger } from '@/lib/logger';
 

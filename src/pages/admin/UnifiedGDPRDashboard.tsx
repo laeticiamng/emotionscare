@@ -143,6 +143,7 @@ export default function UnifiedGDPRDashboard() {
 
   return (
     <div className="container mx-auto py-8 px-4">
+      <DemoBanner message="Ce tableau de bord RGPD affiche des métriques simulées. Les données de conformité réelles seront disponibles prochainement." />
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">

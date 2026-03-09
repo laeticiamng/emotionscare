@@ -191,6 +191,3 @@ export const useDeviceCapabilities = () => {
     messages: capabilities ? deviceCompatChecker.getCompatibilityMessages() : []
   };
 };
-
-// Nécessaire pour le hook
-import { useState, useEffect } from 'react';

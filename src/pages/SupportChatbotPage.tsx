@@ -178,7 +178,8 @@ export default function SupportChatbotPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8">
+          <DemoBanner message="Ce chatbot de support est une démonstration. Les réponses sont scriptées et ne reflètent pas un vrai service d'assistance." />
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">

@@ -222,8 +222,9 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
     };
   }, [stopCamera]);
 
-  return (
+   return (
     <div className="space-y-6">
+      <DemoBanner message="Les résultats de scan émotionnel sont simulés (Math.random). L'analyse réelle nécessite une intégration backend." />
       {/* Mode Selection */}
       <div className="flex flex-wrap gap-3">
         <Button

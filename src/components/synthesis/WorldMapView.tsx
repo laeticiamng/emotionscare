@@ -86,7 +86,9 @@ const WorldMapView: React.FC = () => {
     });
   };
 
-  return (
+   return (
+    <div>
+      <DemoBanner message="La carte émotionnelle mondiale affiche des clusters factices générés aléatoirement." />
     <Card className="w-full overflow-hidden">
       <CardHeader className="bg-gradient-to-r from-blue-800 to-indigo-700 text-white dark:from-blue-900 dark:to-indigo-900">
         <div className="flex justify-between items-center">
