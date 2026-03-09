@@ -522,6 +522,7 @@ export function useCoachHandlers() {
     const newHistory = [...emotionHistory, analysis].slice(-50);
     setEmotionHistory(newHistory);
     saveToStorage(EMOTION_HISTORY_KEY, newHistory);
+    if (user) void saveToSupabase(EMOTION_HISTORY_KEY, newHistory, user.id);
     
     // Update stats
     setStats(prev => {
