@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ChatResponse } from '@/types/chat';

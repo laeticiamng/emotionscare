@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useEffect, useCallback } from 'react';
 import emotionRecommendationService, { EmotionRecommendation } from '@/services/coach/emotion-recommendation-service';
 import { logger } from '@/lib/logger';
