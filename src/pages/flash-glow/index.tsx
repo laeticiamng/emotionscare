@@ -473,7 +473,7 @@ const FlashGlowView: React.FC = () => {
     update(0);
     session.start();
 
-    if (sudsEnabled && sudsOptIn && consent.clinicalAccepted) {
+    if (sudsEnabled && sudsOptIn && clinicalAccepted) {
       const entry = getSudsEntry(preSudsLevel);
       void submitSudsMeasurement('pre', entry, preSudsLevel).then((success) => {
         if (success) {
