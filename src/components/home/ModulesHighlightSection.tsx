@@ -7,7 +7,7 @@
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
-import { Brain, Heart, Music, Shield, Clock, Sparkles, ArrowRight } from 'lucide-react';
+import { Brain, Heart, Music, Shield, Clock, Sparkles, ArrowRight, ClipboardCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';

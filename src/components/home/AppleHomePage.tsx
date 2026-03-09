@@ -77,6 +77,9 @@ const AppleHomePage: React.FC = () => {
           <ModulesHighlightSection />
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
+          <InstitutionalFeaturesSection />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
           <SocialProofSection />
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
