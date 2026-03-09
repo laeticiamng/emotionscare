@@ -277,9 +277,10 @@ class HelpService {
         .single();
 
       if (article) {
+        const currentValue = (article as Record<string, number>)[column] || 0;
         await supabase
           .from('help_articles')
-          .update({ [column]: (article[column] || 0) + 1 })
+          .update({ [column]: currentValue + 1 })
           .eq('id', articleId);
       }
 
