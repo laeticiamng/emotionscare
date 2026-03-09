@@ -26,7 +26,7 @@ const generateWeeklyData = () => {
   for (let i = 12; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i * 7);
-    const weekLabel = `S${d.getWeek?.() || Math.ceil(d.getDate() / 7)}`;
+    const weekLabel = `S${Math.ceil(d.getDate() / 7)}`;
     weeks.push({
       week: `${d.toLocaleDateString('fr-FR', { month: 'short' })} ${weekLabel}`,
       score: Math.round(55 + Math.random() * 30),

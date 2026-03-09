@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Research Export Panel
  * Anonymized dataset summaries with GDPR consent management
