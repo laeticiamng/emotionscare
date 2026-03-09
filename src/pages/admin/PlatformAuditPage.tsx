@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import DemoBanner from '@/components/ui/DemoBanner';
 import { Helmet } from 'react-helmet-async';
 import { 
   CheckCircle, XCircle, AlertTriangle, Activity, 
@@ -274,6 +275,7 @@ export default function PlatformAuditPage() {
       </Helmet>
 
       <div className="container py-8 space-y-6">
+        <DemoBanner message="Ce rapport d'audit est une démonstration. Les scores, tests et statuts de modules sont simulés." />
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">

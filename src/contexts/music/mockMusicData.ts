@@ -1,6 +1,4 @@
-// @ts-nocheck
-
-// @ts-nocheck
+// @ts-nocheck — mock data has array/string mismatches with MusicTrack type
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 // Define mock tracks

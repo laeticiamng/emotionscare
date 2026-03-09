@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
 import { AuditLog, ConsentRecord, DataRequest, PrivacySettings } from '@/types/privacy';

@@ -1,6 +1,3 @@
-// @ts-nocheck
-
-// @ts-nocheck
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { UserPreferences, UserPreferencesContextType, DEFAULT_PREFERENCES } from '@/types/preferences';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -32,8 +29,8 @@ export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = (
       setPreferences(updated);
       
       // Sync with Supabase when user is authenticated
-      if (preferences.userId) {
-        logger.info('Syncing preferences with Supabase', { userId: preferences.userId }, 'SYSTEM');
+      if ((preferences as any).userId) {
+        logger.info('Syncing preferences with Supabase', { userId: (preferences as any).userId }, 'SYSTEM');
         // API call will be implemented when backend is ready
       }
       logger.info('Preferences updated', updated, 'SYSTEM');
