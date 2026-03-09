@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { createContext, useContext, useState, useEffect } from 'react';
 
 export interface BrandingContextType {
