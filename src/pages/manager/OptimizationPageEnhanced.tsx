@@ -40,7 +40,7 @@ const OptimizationPageEnhanced = () => {
   });
   const [isOptimizing, setIsOptimizing] = useState(false);
 
-  // Données simulées pour l'optimisation
+  // Données simulées pour l'optimisation (hoisted for type inference)
   const mockOptimizationData = {
     performance: {
       overallScore: 78,
