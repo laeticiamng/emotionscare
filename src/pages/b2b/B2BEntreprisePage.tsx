@@ -479,7 +479,7 @@ const B2BEntreprisePage: React.FC = () => {
                 transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
                 className="group relative"
               >
-                <div className="relative bg-card/50 backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-border/50 hover:border-border transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5">
+                <div className="relative bg-card/50 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-12 border border-border/50 hover:border-border transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5">
                   <div
                     className={cn(
                       'inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6',
@@ -743,7 +743,7 @@ const B2BEntreprisePage: React.FC = () => {
               <a href="#lead-form">
                 <Button
                   size="lg"
-                  className="group px-12 py-8 text-xl font-semibold bg-foreground text-background hover:bg-foreground/90 rounded-full shadow-2xl shadow-foreground/20 transition-all duration-500 hover:scale-105"
+                  className="group px-6 sm:px-12 py-5 sm:py-8 text-base sm:text-xl font-semibold bg-foreground text-background hover:bg-foreground/90 rounded-full shadow-2xl shadow-foreground/20 transition-all duration-500 hover:scale-105 w-full sm:w-auto"
                 >
                   <Users className="h-6 w-6 mr-3 group-hover:scale-110 transition-transform" />
                   Être recontacté

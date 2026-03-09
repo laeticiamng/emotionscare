@@ -110,10 +110,10 @@ const AppleStyleShell: React.FC<AppleStyleShellProps> = memo(({
               : "bg-transparent"
           )}
         >
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
+          <div className="container mx-auto px-3 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-14 sm:h-16">
               {/* Left: Back button or Logo */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                 {showBackButton && !isHomePage && (
                   <Button 
                     variant="ghost" 
@@ -125,9 +125,9 @@ const AppleStyleShell: React.FC<AppleStyleShellProps> = memo(({
                     <span className="hidden sm:inline">Retour</span>
                   </Button>
                 )}
-                <Link 
-                  to={isAuthenticated ? "/app/home" : "/"} 
-                  className="font-bold text-xl tracking-tight hover:opacity-80 transition-opacity"
+                <Link
+                  to={isAuthenticated ? "/app/home" : "/"}
+                  className="font-bold text-lg sm:text-xl tracking-tight hover:opacity-80 transition-opacity truncate"
                 >
                   EmotionsCare
                 </Link>
@@ -280,9 +280,10 @@ const AppleStyleShell: React.FC<AppleStyleShellProps> = memo(({
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.2 }}
-                className="md:hidden bg-background/95 backdrop-blur-xl border-t border-border"
+                className="md:hidden bg-background/95 backdrop-blur-xl border-t border-border overflow-y-auto"
+                style={{ maxHeight: 'calc(100dvh - 4rem)' }}
               >
-                <nav className="container px-4 py-6 space-y-4">
+                <nav className="container px-4 py-6 space-y-4 safe-area-bottom">
                   {isAuthenticated ? (
                     <>
                       <Link 
@@ -374,7 +375,7 @@ const AppleStyleShell: React.FC<AppleStyleShellProps> = memo(({
         id="main-content" 
         role="main"
         className={cn(
-          "flex-1 w-full pt-16",
+          "flex-1 w-full pt-14 sm:pt-16",
           !reduceMotion && "animate-in fade-in duration-300"
         )}
       >

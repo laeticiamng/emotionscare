@@ -143,9 +143,9 @@ const AppleHeroSection: React.FC = () => {
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
             <Link to={isAuthenticated ? '/app/home' : '/signup'}>
-              <Button 
-                size="lg" 
-                className="group relative overflow-hidden px-8 py-7 text-lg font-semibold bg-foreground text-background hover:bg-foreground/90 rounded-full shadow-2xl shadow-foreground/20 transition-all duration-500 hover:scale-105 hover:shadow-foreground/30"
+              <Button
+                size="lg"
+                className="group relative overflow-hidden px-6 sm:px-8 py-5 sm:py-7 text-base sm:text-lg font-semibold bg-foreground text-background hover:bg-foreground/90 rounded-full shadow-2xl shadow-foreground/20 transition-all duration-500 hover:scale-105 hover:shadow-foreground/30 w-full sm:w-auto"
               >
                 <span className="relative z-10 flex items-center gap-2">
                   {isAuthenticated ? 'Accéder à mon espace' : 'Commencer gratuitement'}
@@ -167,7 +167,7 @@ const AppleHeroSection: React.FC = () => {
                 const el = document.getElementById('how-it-works-heading');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="group px-8 py-7 text-lg font-medium text-muted-foreground hover:text-foreground rounded-full"
+              className="group px-6 sm:px-8 py-5 sm:py-7 text-base sm:text-lg font-medium text-muted-foreground hover:text-foreground rounded-full w-full sm:w-auto"
             >
               <Sparkles className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
               Comment ça marche
@@ -179,16 +179,16 @@ const AppleHeroSection: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
             transition={{ duration: 1, delay: 1.2 }}
-            className="mt-16 pt-16 border-t border-border/50"
+            className="mt-8 sm:mt-16 pt-8 sm:pt-16 border-t border-border/50"
           >
-            <div className="flex flex-wrap justify-center gap-4 items-center">
-              <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-4 items-center">
+              <span className="text-xs sm:text-sm font-medium text-muted-foreground tracking-wide px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-muted/50">
                 100% gratuit pour commencer
               </span>
-              <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
+              <span className="text-xs sm:text-sm font-medium text-muted-foreground tracking-wide px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-muted/50">
                 Compte créé en 30 secondes
               </span>
-              <span className="text-sm font-medium text-muted-foreground tracking-wide px-4 py-2 rounded-full bg-muted/50">
+              <span className="text-xs sm:text-sm font-medium text-muted-foreground tracking-wide px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-muted/50">
                 Créé par une médecin 🇫🇷
               </span>
             </div>

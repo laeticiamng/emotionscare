@@ -30,13 +30,13 @@ const steps = [
 
 const HowItWorksSection: React.FC = () => {
   return (
-    <section className="py-20 md:py-28 bg-background" aria-labelledby="how-it-works-heading">
+    <section className="py-12 sm:py-20 md:py-28 bg-background" aria-labelledby="how-it-works-heading">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-8 sm:mb-16"
         >
           <h2
             id="how-it-works-heading"
@@ -49,7 +49,7 @@ const HowItWorksSection: React.FC = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 md:gap-12">
           {steps.map((step, index) => (
             <motion.div
               key={step.number}

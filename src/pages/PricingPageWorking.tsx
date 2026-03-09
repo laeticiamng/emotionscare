@@ -121,21 +121,21 @@ const PlanCard: React.FC<{
         </div>
       )}
 
-      <div className="p-8 md:p-10">
+      <div className="p-5 sm:p-8 md:p-10">
         <div className="mb-8">
           <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
           <p className="text-sm text-muted-foreground">{plan.description}</p>
 
           <div className="mt-6">
             {plan.price === 0 ? (
-              <span className="text-5xl font-bold">Gratuit</span>
+              <span className="text-3xl sm:text-5xl font-bold">Gratuit</span>
             ) : typeof plan.price === 'number' ? (
               <div className="flex items-baseline gap-1">
-                <span className="text-5xl font-bold">{plan.price}€</span>
+                <span className="text-3xl sm:text-5xl font-bold">{plan.price}€</span>
                 <span className="text-muted-foreground">{plan.period}</span>
               </div>
             ) : (
-              <span className="text-3xl font-bold">{plan.price}</span>
+              <span className="text-2xl sm:text-3xl font-bold">{plan.price}</span>
             )}
           </div>
         </div>
@@ -256,7 +256,7 @@ const PricingPageWorking: React.FC = () => {
   return (
     <div className="min-h-screen bg-background pt-16">
       {/* ═══════════════════ HERO ═══════════════════ */}
-      <section className="relative py-16 md:py-24 overflow-hidden">
+      <section className="relative py-10 sm:py-16 md:py-24 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-gradient-radial from-primary/8 via-primary/3 to-transparent rounded-full blur-3xl" />
         </div>
@@ -297,9 +297,9 @@ const PricingPageWorking: React.FC = () => {
       </section>
 
       {/* ═══════════════════ PLANS ═══════════════════ */}
-      <section className="pb-28 md:pb-36">
-        <div className="container px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
+      <section className="pb-16 sm:pb-28 md:pb-36">
+        <div className="container px-3 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto items-start">
             {PLANS.map((plan, index) => (
               <PlanCard
                 key={plan.id}
@@ -316,7 +316,7 @@ const PricingPageWorking: React.FC = () => {
       {/* ═══════════════════ TRUST ═══════════════════ */}
       <section className="py-16 bg-muted/30 border-y border-border/50">
         <div className="container px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 max-w-4xl mx-auto text-center">
             {[
               { icon: Shield, label: 'Conforme RGPD' },
               { icon: Lock, label: 'Paiement sécurisé Stripe' },
@@ -340,7 +340,7 @@ const PricingPageWorking: React.FC = () => {
       </section>
 
       {/* ═══════════════════ FAQ ═══════════════════ */}
-      <section className="py-28 md:py-36">
+      <section className="py-16 sm:py-28 md:py-36">
         <div className="container px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto">
             <motion.h2
