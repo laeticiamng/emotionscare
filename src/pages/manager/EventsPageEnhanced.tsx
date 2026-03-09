@@ -25,11 +25,13 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
+interface EventItem { id: number; title: string; description: string; date: string; time: string; duration: number; location: string; type: string; maxParticipants: number; currentParticipants: number; status: string; organizer: string; isPublic: boolean; tags: string[]; }
+
 const EventsPageEnhanced = () => {
   const [activeTab, setActiveTab] = useState('calendar');
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState<EventItem[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const [eventForm, setEventForm] = useState({
     title: '',
     description: '',
