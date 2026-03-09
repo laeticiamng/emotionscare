@@ -87,7 +87,7 @@ const FeatureCard: React.FC<{
   index: number;
   isAuthenticated: boolean;
 }> = memo(({ feature, index, isAuthenticated }) => {
-  const Icon = feature.icon;
+  const Icon = feature.icon as React.FC<{ className?: string; 'aria-hidden'?: boolean }>;
   const href = isAuthenticated ? feature.authHref : feature.anonHref;
 
   return (
