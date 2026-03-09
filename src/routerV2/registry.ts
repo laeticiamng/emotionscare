@@ -2726,7 +2726,7 @@ export const ROUTES_REGISTRY: readonly RouteMeta[] = ([
     guard: true,
     requireAuth: true,
     aliases: ['/b2b/admin/research-export'],
-    status: 'stable',
+    status: 'demo',
   },
   // ═══════════════════════════════════════════════════════════
   // MODULE 42 - Institutional QVT Reports
