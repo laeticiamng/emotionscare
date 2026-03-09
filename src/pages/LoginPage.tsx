@@ -21,7 +21,7 @@ import {
   EyeOff,
   ArrowLeft,
   Shield,
-  Zap
+  ArrowRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
@@ -267,7 +267,7 @@ const LoginPage: React.FC = () => {
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <Zap className="w-4 h-4" />
+                    <ArrowRight className="w-4 h-4" />
                     Se connecter
                   </div>
                 )}

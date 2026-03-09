@@ -8,8 +8,6 @@ import React, { lazy, Suspense } from 'react';
 import SharedHeader from '@/components/layout/SharedHeader';
 import AppleHeroSection from '@/components/home/AppleHeroSection';
 import HowItWorksSection from '@/components/home/HowItWorksSection';
-import GeoSummarySection from '@/components/home/GeoSummarySection';
-import AnnouncementBanner from '@/components/ui/announcement-banner';
 import NyveeChat from '@/components/nyvee/NyveeChat';
 import XPBar from '@/components/gamification/XPBar';
 import { useAuth } from '@/contexts/AuthContext';
@@ -18,7 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 const AppleFeatureSection = lazy(() => import('@/components/home/AppleFeatureSection'));
 const AppleShowcaseSection = lazy(() => import('@/components/home/AppleShowcaseSection'));
 const ModulesHighlightSection = lazy(() => import('@/components/home/ModulesHighlightSection'));
-const InstitutionalFeaturesSection = lazy(() => import('@/components/home/InstitutionalFeaturesSection'));
+
 const SocialProofSection = lazy(() => import('@/components/home/SocialProofSection'));
 const AppleCTASection = lazy(() => import('@/components/home/AppleCTASection'));
 const Footer = lazy(() => import('@/components/home/Footer'));
@@ -47,22 +45,9 @@ const AppleHomePage: React.FC = () => {
       <SharedHeader extraDesktopCTA={isAuthenticated ? <XPBar /> : undefined} />
 
       <main id="main-content" role="main" className="pt-16">
-        {/* Announcement pill — opens Coach Chat on click */}
-        <div className="pt-6 pb-2">
-          <AnnouncementBanner
-            message="Nouveau : Essayez un exercice de respiration en 2 minutes"
-            href={isAuthenticated ? '/app/breathing' : '/signup'}
-            linkLabel={isAuthenticated ? 'Commencer' : 'Essayer'}
-            variant="pill"
-            storageKey="home-announcement-v2"
-            dismissible
-          />
-        </div>
-
         <AppleHeroSection />
 
         <HowItWorksSection />
-        <GeoSummarySection />
         <Suspense fallback={<SectionSkeleton />}>
           <AppleFeatureSection />
         </Suspense>
@@ -71,9 +56,6 @@ const AppleHomePage: React.FC = () => {
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
           <ModulesHighlightSection />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
-          <InstitutionalFeaturesSection />
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
           <SocialProofSection />

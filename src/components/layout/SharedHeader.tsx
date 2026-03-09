@@ -91,7 +91,7 @@ const SharedHeader: React.FC<SharedHeaderProps> = ({ extraDesktopCTA }) => {
                   <Button variant="ghost" size="sm">Se connecter</Button>
                 </Link>
                 <Link to="/signup">
-                  <Button size="sm" className="rounded-full px-6">Commencer</Button>
+                  <Button size="sm" className="rounded-full px-6">Essai gratuit</Button>
                 </Link>
               </>
             )}
