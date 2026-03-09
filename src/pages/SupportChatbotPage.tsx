@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import DemoBanner from '@/components/ui/DemoBanner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
