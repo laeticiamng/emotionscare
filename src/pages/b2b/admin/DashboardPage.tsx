@@ -4,7 +4,7 @@
 import React, { useEffect } from 'react';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
-import B2BRHDashboard from '@/pages/B2BRHDashboard';
+import B2BRHDashboard from '@/pages/b2b/B2BRHDashboard';
 
 const DashboardPage: React.FC = () => {
   // SEO
