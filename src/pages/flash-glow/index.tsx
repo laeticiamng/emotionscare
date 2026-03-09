@@ -559,15 +559,13 @@ const FlashGlowView: React.FC = () => {
         type: 'flash_glow',
         duration_sec: Math.max(1, Math.round(finalElapsed / 1000)),
         mood_delta: delta,
-        journalText: `Micro-séance Flash Glow. ${moodDeltaText}`,
-        moodBefore,
-        moodAfter,
-        metadata: {
+        meta: {
+          journalText: `Micro-séance Flash Glow. ${moodDeltaText}`,
           timestamp: new Date().toISOString(),
           narrative: moodDeltaText,
           completion_mode: action === 'extend_session' ? 'prolongée' : 'sortie_douce',
           extension_used: hasExtended,
-          phase_focus: snapshot.phase.key,
+          phase_focus: snapshot.phase.id,
           suds: sudsOptIn
             ? {
                 opt_in: true,
