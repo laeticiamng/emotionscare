@@ -30,7 +30,7 @@ import { toast } from '@/hooks/use-toast';
 
 const OptimizationPageEnhanced = () => {
   const [activeTab, setActiveTab] = useState('performance');
-  const [optimizationData, setOptimizationData] = useState(null);
+  const [optimizationData, setOptimizationData] = useState<typeof mockOptimizationData | null>(null);
   const [settings, setSettings] = useState({
     autoOptimization: true,
     aiRecommendations: true,
