@@ -16,7 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 const AppleFeatureSection = lazy(() => import('@/components/home/AppleFeatureSection'));
 const AppleShowcaseSection = lazy(() => import('@/components/home/AppleShowcaseSection'));
 const ModulesHighlightSection = lazy(() => import('@/components/home/ModulesHighlightSection'));
-const InstitutionalFeaturesSection = lazy(() => import('@/components/home/InstitutionalFeaturesSection'));
+
 const SocialProofSection = lazy(() => import('@/components/home/SocialProofSection'));
 const AppleCTASection = lazy(() => import('@/components/home/AppleCTASection'));
 const Footer = lazy(() => import('@/components/home/Footer'));
