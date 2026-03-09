@@ -278,7 +278,8 @@ export const ROUTES_REGISTRY: readonly RouteMeta[] = ([
     segment: 'public',
     layout: 'app',
     component: 'WellnessHubPage',
-    guard: false,
+    guard: true,
+    requireAuth: true,
   },
   {
     name: 'b2b-module-wrapper',
