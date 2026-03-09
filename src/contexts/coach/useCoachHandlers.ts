@@ -1,11 +1,16 @@
-// @ts-nocheck
-
 import { useState, useCallback, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ChatMessage } from '@/types/chat';
 import { useToast } from '@/hooks/use-toast';
-import { chatCompletion, analyzeEmotion } from '@/services/openai';
+import { chatCompletion } from '@/services/openai';
 import { logger } from '@/lib/logger';
+
+/** Local chat message shape used only within coach handlers */
+interface CoachChatMessage {
+  id: string;
+  content: string;
+  sender: 'user' | 'assistant' | 'system' | 'coach';
+  timestamp: string;
+}
 
 // ============================================================================
 // CONSTANTS & CONFIGURATION
@@ -234,7 +239,7 @@ const saveToStorage = (key: string, data: unknown): void => {
 // ============================================================================
 
 export function useCoachHandlers() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<CoachChatMessage[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
@@ -256,7 +261,7 @@ export function useCoachHandlers() {
 
   // Load persisted data on mount
   useEffect(() => {
-    const storedMessages = loadFromStorage<ChatMessage[]>('coachMessages', []);
+    const storedMessages = loadFromStorage<CoachChatMessage[]>('coachMessages', []);
     const storedHistory = loadFromStorage<EmotionAnalysis[]>(EMOTION_HISTORY_KEY, []);
     const storedFavorites = loadFromStorage<string[]>(FAVORITES_KEY, []);
     const storedStats = loadFromStorage<CoachStats>(STORAGE_KEY, stats);
@@ -466,8 +471,8 @@ export function useCoachHandlers() {
         if (filtered.length > 0) activities = filtered;
       }
       
-      if (options?.maxDuration) {
-        const filtered = activities.filter(a => a.duration <= options.maxDuration);
+      if (options?.maxDuration != null) {
+        const filtered = activities.filter(a => a.duration <= (options.maxDuration ?? Infinity));
         if (filtered.length > 0) activities = filtered;
       }
       
@@ -584,7 +589,7 @@ export function useCoachHandlers() {
 
   const sendMessage = useCallback(
     (text: string, sender: 'user' | 'assistant' | 'system' | 'coach') => {
-      const newMessage: ChatMessage = {
+      const newMessage: CoachChatMessage = {
         id: uuidv4(),
         content: text,
         sender,
@@ -623,7 +628,10 @@ export function useCoachHandlers() {
             const formatted = history.map(m => ({
               id: m.id,
               text: m.content,
-              sender: m.sender === 'coach' ? 'assistant' : 'user'
+              content: m.content,
+              conversationId: '',
+              sender: (m.sender === 'coach' ? 'assistant' : m.sender) as 'user' | 'assistant' | 'system',
+              timestamp: m.timestamp,
             }));
 
             const aiText = await chatCompletion(formatted, {
@@ -631,7 +639,7 @@ export function useCoachHandlers() {
               temperature: 0.7
             });
 
-            const responseMessage: ChatMessage = {
+            const responseMessage: CoachChatMessage = {
               id: uuidv4(),
               content: aiText,
               sender: 'coach',

@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
+import DemoBanner from '@/components/ui/DemoBanner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -85,7 +86,9 @@ const WorldMapView: React.FC = () => {
     });
   };
 
-  return (
+   return (
+    <div>
+      <DemoBanner message="La carte émotionnelle mondiale affiche des clusters factices générés aléatoirement." />
     <Card className="w-full overflow-hidden">
       <CardHeader className="bg-gradient-to-r from-blue-800 to-indigo-700 text-white dark:from-blue-900 dark:to-indigo-900">
         <div className="flex justify-between items-center">
@@ -214,6 +217,7 @@ const WorldMapView: React.FC = () => {
         )}
       </CardContent>
     </Card>
+    </div>
   );
 };
 

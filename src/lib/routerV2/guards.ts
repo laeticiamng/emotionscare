@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import { useMemo } from 'react';
 import type { Guard, Role } from './types';
 import { useAuth } from '@/contexts/AuthContext';
@@ -56,7 +56,7 @@ export function useRouteAllowed(guards?: Guard[]) {
       signOut: async () => {},
       resetPassword: async () => {},
       register: async () => {},
-    } as ReturnType<typeof useAuth>;
+    } as unknown as ReturnType<typeof useAuth>;
   }
 
   try {
@@ -66,7 +66,7 @@ export function useRouteAllowed(guards?: Guard[]) {
       userMode: null,
       setUserMode: () => {},
       isLoading: false,
-    } as ReturnType<typeof useUserMode>;
+    } as unknown as ReturnType<typeof useUserMode>;
   }
 
   try {

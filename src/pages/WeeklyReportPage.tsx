@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import DemoBanner from '@/components/ui/DemoBanner';
 import { logger } from '@/lib/logger';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -266,6 +267,7 @@ export default function WeeklyReportPage() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      <DemoBanner message="Ce rapport hebdomadaire affiche des données simulées (scores, sessions). Les données réelles seront disponibles prochainement." />
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold">Rapport Hebdomadaire</h1>

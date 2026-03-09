@@ -29,6 +29,7 @@ import { useComplianceAudit } from '@/hooks/useComplianceAudit';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import DemoBanner from '@/components/ui/DemoBanner';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
@@ -142,6 +143,7 @@ export default function UnifiedGDPRDashboard() {
 
   return (
     <div className="container mx-auto py-8 px-4">
+      <DemoBanner message="Ce tableau de bord RGPD affiche des métriques simulées. Les données de conformité réelles seront disponibles prochainement." />
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">

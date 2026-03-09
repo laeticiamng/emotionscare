@@ -1,5 +1,5 @@
-// @ts-nocheck
-import { securityConfig } from './securityConfig';
+
+import { SECURITY_CONFIG } from './securityConfig';
 import { logger } from '@/lib/logger';
 
 interface AuditLog {
@@ -54,7 +54,7 @@ class SecurityAuditService {
   /**
    * Enregistre une tentative de connexion
    */
-  logLoginAttempt(userId: string | null, email: string, success: boolean, details?: any) {
+  logLoginAttempt(userId: string | undefined, email: string, success: boolean, details?: any) {
     this.log({
       userId,
       action: 'LOGIN_ATTEMPT',
@@ -84,7 +84,7 @@ class SecurityAuditService {
   /**
    * Enregistre une violation de sécurité
    */
-  logSecurityViolation(userId: string | null, violation: string, details?: any) {
+  logSecurityViolation(userId: string | undefined, violation: string, details?: any) {
     this.log({
       userId,
       action: 'SECURITY_VIOLATION',
@@ -118,7 +118,7 @@ class SecurityAuditService {
   /**
    * Détecte les tentatives d'attaque
    */
-  detectSuspiciousActivity(userId: string | null): boolean {
+  detectSuspiciousActivity(userId: string | undefined): boolean {
     const recentLogs = this.logs.filter(
       log => log.timestamp.getTime() > Date.now() - 60 * 60 * 1000 // Dernière heure
     );
@@ -127,7 +127,7 @@ class SecurityAuditService {
     const failedLogins = recentLogs.filter(
       log => log.action === 'LOGIN_ATTEMPT' && !log.success
     );
-    if (failedLogins.length > securityConfig.limits.maxLoginAttempts) {
+    if (failedLogins.length > (SECURITY_CONFIG.RATE_LIMITS?.LOGIN_ATTEMPTS ?? 5)) {
       this.logSecurityViolation(userId, 'EXCESSIVE_FAILED_LOGINS', {
         count: failedLogins.length
       });
@@ -136,7 +136,7 @@ class SecurityAuditService {
 
     // Trop de requêtes
     const requestCount = recentLogs.filter(log => log.userId === userId).length;
-    if (requestCount > securityConfig.limits.maxRequestsPerMinute) {
+    if (requestCount > (SECURITY_CONFIG.RATE_LIMITS?.API_CALLS_PER_MINUTE ?? 100)) {
       this.logSecurityViolation(userId, 'RATE_LIMIT_EXCEEDED', {
         count: requestCount
       });
@@ -214,7 +214,7 @@ class SecurityAuditService {
 
   private async sendCriticalAlert(log: AuditLog) {
     // En production, envoyer une alerte (email, Slack, etc.)
-    logger.critical('🚨 CRITICAL SECURITY ALERT', new Error(log.action), 'SYSTEM');
+    logger.error('🚨 CRITICAL SECURITY ALERT', new Error(log.action), 'SYSTEM');
   }
 }
 

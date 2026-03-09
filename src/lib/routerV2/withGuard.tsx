@@ -1,4 +1,4 @@
-// @ts-nocheck -- TODO: typer les generics withGuard<T>
+
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useRouteAllowed } from './guards';
@@ -40,7 +40,7 @@ export function withGuard<T>(
       return null;
     }
 
-    return <Component {...props} />;
+    return <Component {...(props as any)} />;
   }
 
   GuardedComponent.displayName = `WithGuard(${Component.displayName || Component.name || 'Component'})`;

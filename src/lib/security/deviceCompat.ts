@@ -1,8 +1,8 @@
-// @ts-nocheck
 /**
  * Détection des compatibilités navigateur et iOS - Garde-fous techniques
  */
 
+import { useState, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 
 export interface DeviceCapabilities {
@@ -32,7 +32,7 @@ class DeviceCompatibilityChecker {
       webBluetooth: 'bluetooth' in navigator && !isIOS,
       
       // WebXR souvent indispo
-      webXR: 'xr' in navigator && 'isSessionSupported' in navigator.xr,
+      webXR: 'xr' in navigator && !!navigator.xr && 'isSessionSupported' in navigator.xr,
       
       // Autoplay policy restrictions
       audioAutoplay: await this.testAudioAutoplay(),
@@ -191,6 +191,3 @@ export const useDeviceCapabilities = () => {
     messages: capabilities ? deviceCompatChecker.getCompatibilityMessages() : []
   };
 };
-
-// Nécessaire pour le hook
-import { useState, useEffect } from 'react';
