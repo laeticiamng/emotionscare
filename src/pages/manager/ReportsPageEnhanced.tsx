@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { DemoBanner } from '@/components/ui/DemoBanner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -29,10 +28,10 @@ import { toast } from '@/hooks/use-toast';
 const ReportsPageEnhanced = () => {
   const [activeTab, setActiveTab] = useState('wellbeing');
   const [selectedPeriod, setSelectedPeriod] = useState('month');
-  const [reportData, setReportData] = useState(null);
+  const [reportData, setReportData] = useState<typeof mockReportData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Données simulées pour les rapports
+  // Données simulées (hoisted for type inference)
   const mockReportData = {
     wellbeing: {
       averageScore: 78,
@@ -80,7 +79,7 @@ const ReportsPageEnhanced = () => {
     ]
   };
 
-  const generateReport = async (type, period) => {
+  const generateReport = async (type: string, period: string) => {
     setIsGenerating(true);
     try {
       // Simulation de génération de rapport
@@ -101,7 +100,7 @@ const ReportsPageEnhanced = () => {
     }
   };
 
-  const exportReport = async (format) => {
+  const exportReport = async (format: string) => {
     try {
       toast({
         title: "Export en cours",
@@ -116,7 +115,7 @@ const ReportsPageEnhanced = () => {
     }
   };
 
-  const getAlertIcon = (type) => {
+  const getAlertIcon = (type: string) => {
     switch (type) {
       case 'warning': return <AlertTriangle className="h-4 w-4 text-orange-500" />;
       case 'success': return <CheckCircle className="h-4 w-4 text-green-500" />;
@@ -124,8 +123,8 @@ const ReportsPageEnhanced = () => {
     }
   };
 
-  const getAlertBadge = (priority) => {
-    const colors = {
+  const getAlertBadge = (priority: string) => {
+    const colors: Record<string, string> = {
       'high': 'bg-red-500',
       'medium': 'bg-orange-500',
       'low': 'bg-blue-500'

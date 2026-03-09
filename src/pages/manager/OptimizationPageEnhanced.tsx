@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { DemoBanner } from '@/components/ui/DemoBanner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -31,7 +30,7 @@ import { toast } from '@/hooks/use-toast';
 
 const OptimizationPageEnhanced = () => {
   const [activeTab, setActiveTab] = useState('performance');
-  const [optimizationData, setOptimizationData] = useState(null);
+  const [optimizationData, setOptimizationData] = useState<typeof mockOptimizationData | null>(null);
   const [settings, setSettings] = useState({
     autoOptimization: true,
     aiRecommendations: true,
@@ -41,7 +40,7 @@ const OptimizationPageEnhanced = () => {
   });
   const [isOptimizing, setIsOptimizing] = useState(false);
 
-  // Données simulées pour l'optimisation
+  // Données simulées pour l'optimisation (hoisted for type inference)
   const mockOptimizationData = {
     performance: {
       overallScore: 78,
@@ -119,13 +118,16 @@ const OptimizationPageEnhanced = () => {
       });
       
       // Mise à jour simulée des données
-      setOptimizationData(prev => ({
-        ...prev,
-        performance: {
-          ...prev.performance,
-          overallScore: prev.performance.overallScore + 5
-        }
-      }));
+      setOptimizationData(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          performance: {
+            ...prev.performance,
+            overallScore: prev.performance.overallScore + 5
+          }
+        };
+      });
     } catch (error) {
       toast({
         title: "Erreur d'optimisation",
@@ -137,17 +139,20 @@ const OptimizationPageEnhanced = () => {
     }
   };
 
-  const implementRecommendation = async (recId) => {
+  const implementRecommendation = async (recId: number) => {
     try {
-      setOptimizationData(prev => ({
-        ...prev,
-        ai: {
-          ...prev.ai,
-          recommendations: prev.ai.recommendations.map(rec => 
-            rec.id === recId ? { ...rec, status: 'in-progress' } : rec
-          )
-        }
-      }));
+      setOptimizationData(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          ai: {
+            ...prev.ai,
+            recommendations: prev.ai.recommendations.map(rec => 
+              rec.id === recId ? { ...rec, status: 'in-progress' } : rec
+            )
+          }
+        };
+      });
       
       toast({
         title: "Recommandation en cours",
@@ -162,8 +167,8 @@ const OptimizationPageEnhanced = () => {
     }
   };
 
-  const getImpactColor = (impact) => {
-    const colors = {
+  const getImpactColor = (impact: string) => {
+    const colors: Record<string, string> = {
       'high': 'bg-red-500',
       'medium': 'bg-orange-500',
       'low': 'bg-yellow-500'
@@ -171,7 +176,7 @@ const OptimizationPageEnhanced = () => {
     return colors[impact] || 'bg-gray-500';
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed': return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'in-progress': return <Clock className="h-4 w-4 text-blue-500" />;

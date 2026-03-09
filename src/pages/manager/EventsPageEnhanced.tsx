@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
@@ -26,11 +25,13 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
+interface EventItem { id: number; title: string; description: string; date: string; time: string; duration: number; location: string; type: string; maxParticipants: number; currentParticipants: number; status: string; organizer: string; isPublic: boolean; tags: string[]; }
+
 const EventsPageEnhanced = () => {
   const [activeTab, setActiveTab] = useState('calendar');
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState<EventItem[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const [eventForm, setEventForm] = useState({
     title: '',
     description: '',
@@ -158,7 +159,7 @@ const EventsPageEnhanced = () => {
     }
   };
 
-  const deleteEvent = async (eventId) => {
+  const deleteEvent = async (eventId: number) => {
     try {
       setEvents(prev => prev.filter(event => event.id !== eventId));
       toast({
@@ -174,12 +175,12 @@ const EventsPageEnhanced = () => {
     }
   };
 
-  const getEventTypeColor = (type) => {
+  const getEventTypeColor = (type: string) => {
     return eventTypes.find(t => t.value === type)?.color || 'bg-gray-500';
   };
 
-  const getStatusBadge = (status) => {
-    const statusConfig = {
+  const getStatusBadge = (status: string) => {
+    const statusConfig: Record<string, { label: string; color: string }> = {
       upcoming: { label: 'À venir', color: 'bg-blue-500' },
       ongoing: { label: 'En cours', color: 'bg-green-500' },
       completed: { label: 'Terminé', color: 'bg-gray-500' },

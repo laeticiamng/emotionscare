@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,7 +49,7 @@ const AuditPageEnhanced: React.FC = () => {
   const [activeTab, setActiveTab] = useState('logs');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
-  const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({});
+  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to?: Date }>({ from: undefined });
   const [isLoading, setIsLoading] = useState(false);
 
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([
@@ -294,9 +293,10 @@ const AuditPageEnhanced: React.FC = () => {
             <Calendar
               mode="range"
               selected={dateRange}
-              onSelect={setDateRange}
+              onSelect={(range) => setDateRange(range ?? { from: undefined })}
               numberOfMonths={2}
               locale={fr}
+              required={false}
             />
           </PopoverContent>
         </Popover>

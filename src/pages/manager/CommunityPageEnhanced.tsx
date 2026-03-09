@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
@@ -24,12 +23,17 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
+interface CommunityStats { totalMembers: number; activeToday: number; monthlyPosts: number; engagement: number; wellbeingScore: number; }
+interface Discussion { id: number; title: string; author: string; replies: number; likes: number; lastActivity: string; category: string; isHot: boolean; }
+interface CommunityEvent { id: number; title: string; date: string; time: string; participants: number; maxParticipants: number; type: string; status: string; }
+interface Contributor { name: string; points: number; posts: number; avatar: string; badge: string; }
+
 const CommunityPageEnhanced = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [communityStats, setCommunityStats] = useState(null);
-  const [discussions, setDiscussions] = useState([]);
-  const [events, setEvents] = useState([]);
-  const [topContributors, setTopContributors] = useState([]);
+  const [communityStats, setCommunityStats] = useState<CommunityStats | null>(null);
+  const [discussions, setDiscussions] = useState<Discussion[]>([]);
+  const [events, setEvents] = useState<CommunityEvent[]>([]);
+  const [topContributors, setTopContributors] = useState<Contributor[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
   // Données simulées pour la communauté
@@ -104,7 +108,7 @@ const CommunityPageEnhanced = () => {
     { name: 'Lucas M.', points: 720, posts: 24, avatar: '', badge: 'Contributeur' }
   ];
 
-  const createEvent = async (eventData) => {
+  const createEvent = async (_eventData: Partial<CommunityEvent>) => {
     try {
       // Simulation de création d'événement
       toast({
@@ -120,8 +124,8 @@ const CommunityPageEnhanced = () => {
     }
   };
 
-  const getBadgeColor = (badge) => {
-    const colors = {
+  const getBadgeColor = (badge: string) => {
+    const colors: Record<string, string> = {
       'Expert': 'bg-purple-500',
       'Mentor': 'bg-blue-500',
       'Inspirateur': 'bg-green-500',
