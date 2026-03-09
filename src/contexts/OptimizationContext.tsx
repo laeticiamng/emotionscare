@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { usePerformanceMonitor } from '@/hooks/usePerformanceMonitor';
 import { cacheManager } from '@/utils/cacheManager';
