@@ -87,7 +87,7 @@ const FeatureCard: React.FC<{
   index: number;
   isAuthenticated: boolean;
 }> = memo(({ feature, index, isAuthenticated }) => {
-  const Icon = feature.icon;
+  const Icon = feature.icon as React.ComponentType<{ className?: string }>;
   const href = isAuthenticated ? feature.authHref : feature.anonHref;
 
   const cardId = `institutional-card-${index}`;
