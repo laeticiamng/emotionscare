@@ -118,13 +118,16 @@ const OptimizationPageEnhanced = () => {
       });
       
       // Mise à jour simulée des données
-      setOptimizationData(prev => ({
-        ...prev,
-        performance: {
-          ...prev.performance,
-          overallScore: prev.performance.overallScore + 5
-        }
-      }));
+      setOptimizationData(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          performance: {
+            ...prev.performance,
+            overallScore: prev.performance.overallScore + 5
+          }
+        };
+      });
     } catch (error) {
       toast({
         title: "Erreur d'optimisation",
