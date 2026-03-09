@@ -221,6 +221,7 @@ const FlashGlowView: React.FC = () => {
     companionPath: clinicalHints.hints.includes('soft_exit') ? '/app/screen-silk' : undefined,
   };
   const consent = useConsent();
+  const clinicalAccepted = consent.status === 'accepted';
   const { start: startSudsStage, submit: submitSudsStage } = useAssessment('SUDS');
   const [softEffects, setSoftEffects] = useState(motion.prefersReducedMotion);
 
