@@ -236,6 +236,38 @@ const saveToStorage = (key: string, data: unknown): void => {
   }
 };
 
+async function saveToSupabase(key: string, value: unknown, userId: string) {
+  try {
+    await supabase
+      .from('user_settings')
+      .upsert({
+        user_id: userId,
+        key,
+        value: JSON.stringify(value),
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id,key' });
+  } catch (error) {
+    logger.error(`Failed to save ${key} to Supabase`, error as Error, 'Coach');
+  }
+}
+
+async function loadFromSupabase<T>(key: string, userId: string): Promise<T | null> {
+  try {
+    const { data } = await supabase
+      .from('user_settings')
+      .select('value')
+      .eq('user_id', userId)
+      .eq('key', key)
+      .maybeSingle();
+    if (data?.value) {
+      return typeof data.value === 'string' ? JSON.parse(data.value) : data.value as T;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 // ============================================================================
 // MAIN HOOK
 // ============================================================================
