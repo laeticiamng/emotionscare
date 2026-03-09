@@ -173,7 +173,7 @@ function useVRSessions() {
           });
         }
       } catch (error) {
-        console.error('Error fetching VR sessions:', error);
+        // Error handled silently — loading state already set
       } finally {
         setLoading(false);
       }
