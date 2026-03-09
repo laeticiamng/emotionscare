@@ -773,9 +773,10 @@ export function useCoachHandlers() {
   const clearMessages = useCallback(() => {
     setMessages([]);
     localStorage.removeItem('coachMessages');
+    if (user) void saveToSupabase('coachMessages', [], user.id);
     endSession();
     startNewSession();
-  }, [endSession, startNewSession]);
+  }, [endSession, startNewSession, user]);
   
   // Mark all messages as read
   const markAllAsRead = useCallback(() => {
