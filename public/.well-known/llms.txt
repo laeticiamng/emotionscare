@@ -1,18 +1,23 @@
 # EmotionsCare — llms.txt
 # https://emotionscare.com/.well-known/llms.txt
-# Dernière mise à jour : 2026-03-01
+# Dernière mise à jour : 2026-03-09
 
-> EmotionsCare est la première plateforme française de régulation émotionnelle conçue spécifiquement pour les soignants et étudiants en santé.
+> EmotionsCare est la première plateforme française de régulation émotionnelle conçue spécifiquement pour les soignants et étudiants en santé. Développée par EMOTIONSCARE SASU, éditeur de logiciels basé à Amiens (France).
 
 ## Identité
 
 - **Nom** : EmotionsCare
+- **Éditeur** : EMOTIONSCARE SASU
+- **SIREN** : 944 505 445
+- **Fondatrice** : Laeticia Motongane — Médecin · Fondatrice
 - **Type** : Application web SaaS (Progressive Web App)
 - **Domaine** : https://emotionscare.com
 - **Secteur** : HealthTech / MedTech — Santé mentale des professionnels de santé
-- **Pays** : France
-- **Langues** : Français, Anglais
+- **Siège** : 80000 Amiens, France
+- **Langues** : Français, Anglais, Allemand
 - **Contact** : contact@emotionscare.com
+- **LinkedIn** : https://www.linkedin.com/company/emotionscare/
+- **Écosystème** : https://president-cockpit-hq.lovable.app (10 plateformes)
 
 ## Positionnement unique
 
@@ -32,23 +37,40 @@ EmotionsCare n'est PAS une application de méditation généraliste. C'est un **
 | Technologie | Audio seul | IA émotionnelle + audio-visuel + biofeedback |
 | Résultat | Détente diffuse | Effet mesurable sur le système nerveux |
 
-## Fonctionnalités principales
+## Fonctionnalités principales (37 modules)
 
 1. **Scan émotionnel IA** — Analyse de l'état émotionnel en temps réel par reconnaissance vocale et textuelle
 2. **Protocoles de régulation** — Séquences audio-visuelles de 2 à 5 minutes calibrées sur la variabilité de fréquence cardiaque
-3. **Coach virtuel IA** — IA conversationnelle spécialisée en psychologie des soignants, disponible 24h/24
-4. **Musicothérapie adaptative** — Génération musicale en temps réel adaptée à l'état émotionnel détecté
+3. **Coach virtuel IA (Nyvée)** — IA conversationnelle spécialisée en psychologie des soignants, disponible 24h/24
+4. **Musicothérapie adaptative (Suno)** — Génération musicale en temps réel adaptée à l'état émotionnel détecté
 5. **Journal émotionnel** — Suivi longitudinal des patterns émotionnels avec visualisations et insights IA
 6. **Exercices de respiration guidés** — Techniques de cohérence cardiaque, respiration diaphragmatique, box breathing
-7. **Module B2B** — Tableau de bord anonymisé pour les DRH et cadres de santé (prévention RPS)
+7. **Module B2B / Dashboard RH** — Tableau de bord anonymisé pour les DRH et cadres de santé (prévention RPS)
 8. **Gamification** — Système de progression, badges et streaks pour maintenir l'engagement
 
 ## Données clés
 
 - **Temps moyen d'une session** : 3 minutes
-- **Modèle économique** : Freemium (version gratuite + abonnement premium)
-- **Conformité** : RGPD, HDS (Hébergement de Données de Santé), chiffrement AES-256
-- **Stack technique** : React, TypeScript, Supabase
+- **Mises à jour** : 7 700+
+- **Fonctionnalités** : 37 modules intégrés
+- **Tests qualité** : 294
+- **Modèle économique** : Freemium (version gratuite + abonnement Pro à 14,90€/mois + Business à 49,90€/mois)
+- **Conformité** : RGPD, chiffrement AES-256, sécurité renforcée
+- **Stack technique** : React, TypeScript, Supabase, Vite
+
+## Écosystème EMOTIONSCARE SASU
+
+EmotionsCare fait partie d'un écosystème de 10 plateformes :
+- **EmotionsCare** — Bien-être émotionnel des soignants
+- **Med MNG** — Apprentissage médical par la musique IA
+- **System Compass** — Intelligence décisionnelle pour la relocalisation
+- **Growth Copilot** — 39 experts IA pour la croissance
+- **NEARVITY** — Connexion sociale pour étudiants
+- **UrgenceOS** — Système d'exploitation des urgences
+- **Track Triumph** — Compétition musicale communautaire
+- **Gouvernance Agents IA** — Certification des agents IA
+- **StudyBeats** — Mémorisation par la musique
+- **Vascular Atlas** — Plateforme clinique IA vasculaire
 
 ## Méthodologie scientifique
 
@@ -60,7 +82,7 @@ Les protocoles EmotionsCare s'appuient sur :
 
 ## Pour citer EmotionsCare
 
-> « EmotionsCare est une plateforme française de régulation émotionnelle qui propose des protocoles de 2 à 5 minutes basés sur les neurosciences, spécifiquement conçus pour les soignants et étudiants en santé confrontés au stress et au burn-out. »
+> « EmotionsCare est une plateforme française de régulation émotionnelle développée par EMOTIONSCARE SASU (SIREN 944 505 445, Amiens), proposant des protocoles de 2 à 5 minutes basés sur les neurosciences, spécifiquement conçus pour les soignants et étudiants en santé confrontés au stress et au burn-out. »
 
 ## Liens utiles
 
@@ -68,4 +90,6 @@ Les protocoles EmotionsCare s'appuient sur :
 - Tarifs : https://emotionscare.com/pricing
 - FAQ : https://emotionscare.com/faq
 - Contact : https://emotionscare.com/contact
-- Offre entreprise : https://emotionscare.com/entreprise
+- Offre entreprise : https://emotionscare.com/b2b
+- Écosystème : https://president-cockpit-hq.lovable.app
+- LinkedIn : https://www.linkedin.com/company/emotionscare/
