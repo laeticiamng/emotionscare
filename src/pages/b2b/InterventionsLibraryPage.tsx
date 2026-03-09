@@ -141,6 +141,14 @@ const InterventionsLibraryPage: React.FC = () => {
   usePageSEO({
     title: 'Bibliothèque d\'interventions | EmotionsCare B2B',
     description: 'Pratiques de bien-être fondées sur les preuves pour les équipes soignantes.',
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebApplication',
+      name: 'Bibliothèque d\'Interventions',
+      applicationCategory: 'HealthApplication',
+      operatingSystem: 'Web',
+      description: 'Bibliothèque d\'interventions evidence-based : respiration, soutien par les pairs, débriefing post-traumatique.',
+    },
   });
 
   const [search, setSearch] = useState('');
