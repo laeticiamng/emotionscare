@@ -129,6 +129,7 @@ const mockSecurityEvents: SecurityEvent[] = [
 ];
 
 export default function ActivityLogsPage() {
+  // NOTE: Données de démonstration — à remplacer par les vrais logs Supabase
   const [logs, setLogs] = useState<ActivityLog[]>(mockActivityLogs);
   const [securityEvents, setSecurityEvents] = useState<SecurityEvent[]>(mockSecurityEvents);
   const [searchTerm, setSearchTerm] = useState('');

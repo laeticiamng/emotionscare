@@ -15,10 +15,33 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+/**
+ * @deprecated Utiliser getCorsHeadersForRequest(req) a la place pour restreindre l'origin.
+ * Conserve pour compatibilite avec les fonctions existantes.
+ */
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+/**
+ * CORS headers securises - restreints aux origins autorisees
+ */
+export function getCorsHeadersForRequest(req: Request) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 /**
  * Crée un client Supabase authentifié
