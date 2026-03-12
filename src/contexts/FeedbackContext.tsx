@@ -55,109 +55,25 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [feedbacks, setFeedbacks] = useState<FeedbackEntry[]>([]);
   const [suggestions, setSuggestions] = useState<ImprovementSuggestion[]>([]);
   const [metrics, setMetrics] = useState<FeedbackMetrics>({
-    overallSatisfaction: 8.2,
-    moduleRatings: {
-      scan: 8.5,
-      music: 9.1,
-      coach: 8.8,
-      journal: 8.3,
-      vr: 7.9,
-      gamification: 8.6,
-      socialCocon: 8.4
-    },
-    improvementScore: 85,
-    userEngagement: 78,
-    feedbackVolume: 245,
-    resolutionRate: 92,
-    averageResponseTime: 2.5
+    overallSatisfaction: 0,
+    moduleRatings: {},
+    improvementScore: 0,
+    userEngagement: 0,
+    feedbackVolume: 0,
+    resolutionRate: 0,
+    averageResponseTime: 0
   });
   const [loading, setLoading] = useState(false);
 
   // Charger les feedbacks existants
   useEffect(() => {
     loadFeedbacks();
-    generateMockSuggestions();
   }, [user]);
 
   const loadFeedbacks = () => {
-    // Simulation de données de feedback existantes
-    const mockFeedbacks: FeedbackEntry[] = [
-      {
-        id: '1',
-        userId: user?.id || 'demo',
-        module: 'scan',
-        rating: 9,
-        comment: 'Interface très intuitive et résultats précis',
-        category: 'praise',
-        timestamp: new Date(Date.now() - 86400000).toISOString(),
-        status: 'processed',
-        aiSuggestion: 'Considérer ajouter plus d\'options de personnalisation'
-      },
-      {
-        id: '2',
-        userId: user?.id || 'demo',
-        module: 'music',
-        rating: 8,
-        comment: 'Bonne sélection mais manque de variété dans certains genres',
-        category: 'improvement',
-        timestamp: new Date(Date.now() - 172800000).toISOString(),
-        status: 'pending'
-      },
-      {
-        id: '3',
-        userId: user?.id || 'demo',
-        module: 'coach',
-        rating: 10,
-        comment: 'Conseils très pertinents et adaptés à mes besoins',
-        category: 'praise',
-        timestamp: new Date(Date.now() - 259200000).toISOString(),
-        status: 'processed',
-        aiSuggestion: 'Augmenter la fréquence des interactions proactives'
-      }
-    ];
-    setFeedbacks(mockFeedbacks);
-  };
-
-  const generateMockSuggestions = () => {
-    const mockSuggestions: ImprovementSuggestion[] = [
-      {
-        id: '1',
-        module: 'scan',
-        suggestion: 'Ajouter une fonction de comparaison historique des scans émotionnels',
-        priority: 'high',
-        impact: 8.5,
-        implementationTime: '2-3 semaines',
-        category: 'feature'
-      },
-      {
-        id: '2',
-        module: 'music',
-        suggestion: 'Intégrer des playlists personnalisées basées sur l\'état émotionnel',
-        priority: 'medium',
-        impact: 7.8,
-        implementationTime: '1-2 semaines',
-        category: 'ux'
-      },
-      {
-        id: '3',
-        module: 'coach',
-        suggestion: 'Optimiser les temps de réponse du chat IA',
-        priority: 'high',
-        impact: 9.2,
-        implementationTime: '1 semaine',
-        category: 'performance'
-      },
-      {
-        id: '4',
-        module: 'accessibility',
-        suggestion: 'Améliorer la navigation au clavier pour les utilisateurs malvoyants',
-        priority: 'high',
-        impact: 9.5,
-        implementationTime: '2-3 semaines',
-        category: 'accessibility'
-      }
-    ];
-    setSuggestions(mockSuggestions);
+    // TODO: Query feedbacks from Supabase when backend table is available
+    setFeedbacks([]);
+    setSuggestions([]);
   };
 
   const submitFeedback = async (feedback: Omit<FeedbackEntry, 'id' | 'userId' | 'timestamp' | 'status'>) => {
@@ -172,11 +88,6 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       };
 
       setFeedbacks(prev => [newFeedback, ...prev]);
-      
-      // Simulation de traitement IA
-      setTimeout(() => {
-        processAISuggestions();
-      }, 2000);
 
       logger.info('Feedback soumis avec succès', newFeedback, 'UI');
     } catch (error) {
@@ -187,34 +98,9 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const processAISuggestions = async () => {
-    setLoading(true);
-    try {
-      // Simulation de traitement IA pour générer des suggestions
-      const newSuggestion: ImprovementSuggestion = {
-        id: Date.now().toString(),
-        module: 'general',
-        suggestion: 'Améliorer l\'onboarding utilisateur basé sur les feedbacks récents',
-        priority: 'medium',
-        impact: 8.0,
-        implementationTime: '1-2 semaines',
-        category: 'ux'
-      };
-
-      setSuggestions(prev => [newSuggestion, ...prev]);
-      
-      // Mettre à jour les métriques
-      setMetrics(prev => ({
-        ...prev,
-        improvementScore: Math.min(prev.improvementScore + 2, 100),
-        feedbackVolume: prev.feedbackVolume + 1
-      }));
-
-      logger.info('Suggestion IA générée', newSuggestion, 'UI');
-    } catch (error) {
-      logger.error('Erreur lors du traitement IA', error as Error, 'UI');
-    } finally {
-      setLoading(false);
-    }
+    // TODO: Integrate real AI suggestion engine when backend is available
+    // For now, this is a no-op since we don't have a real AI processing pipeline
+    logger.info('processAISuggestions called — no-op until backend integration', undefined, 'UI');
   };
 
   const generateImprovementReport = async (): Promise<string> => {

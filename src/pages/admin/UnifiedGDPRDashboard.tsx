@@ -65,10 +65,10 @@ export default function UnifiedGDPRDashboard() {
   // Generate Edge Function metrics
   React.useEffect(() => {
     const metricsData: FunctionMetrics[] = rgpdFunctions.map((funcName) => {
-      const errorRate = Math.random() * 5;
-      const latencyP95 = 100 + Math.random() * 400;
-      const latencyP99 = latencyP95 + Math.random() * 200;
-      const totalCalls = Math.floor(Math.random() * 1000);
+      const errorRate = 0;
+      const latencyP95 = 0;
+      const latencyP99 = 0;
+      const totalCalls = 0;
 
       return {
         name: funcName,

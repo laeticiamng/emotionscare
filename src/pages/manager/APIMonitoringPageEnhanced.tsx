@@ -172,8 +172,8 @@ const APIMonitoringPageEnhanced: React.FC = () => {
     // Update random metrics
     setEndpoints(prev => prev.map(endpoint => ({
       ...endpoint,
-      responseTime: Math.max(50, endpoint.responseTime + (Math.random() - 0.5) * 200),
-      errorRate: Math.max(0, endpoint.errorRate + (Math.random() - 0.5) * 2),
+      responseTime: endpoint.responseTime,
+      errorRate: endpoint.errorRate,
       lastCheck: new Date()
     })));
     

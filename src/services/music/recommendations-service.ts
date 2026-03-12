@@ -71,7 +71,7 @@ export async function generatePersonalizedPlaylists(
         id: `playlist-genres-${Date.now()}`,
         name: `Your ${topGenres[0].genre} Mix`,
         description: `Basé sur votre amour pour ${topGenres[0].genre}`,
-        tracks: generateMockTracks(topGenres[0].genre, 12),
+        tracks: getEmptyTracks(topGenres[0].genre, 12),
         matchScore: Math.round(topGenres[0].percentage),
         basedOn: [topGenres[0].genre],
         coverUrl: `/covers/${topGenres[0].genre.toLowerCase()}.jpg`
@@ -84,7 +84,7 @@ export async function generatePersonalizedPlaylists(
         id: `playlist-moods-${Date.now()}`,
         name: `${topMoods[0].mood} Vibes`,
         description: `Pour vos moments ${topMoods[0].mood}`,
-        tracks: generateMockTracks(topMoods[0].mood, 10),
+        tracks: getEmptyTracks(topMoods[0].mood, 10),
         matchScore: Math.round(topMoods[0].percentage),
         basedOn: [topMoods[0].mood],
         coverUrl: `/covers/${topMoods[0].mood.toLowerCase()}.jpg`
@@ -96,7 +96,7 @@ export async function generatePersonalizedPlaylists(
       id: `playlist-discovery-${Date.now()}`,
       name: 'Discover Weekly',
       description: 'Nouveaux genres basés sur vos goûts',
-      tracks: generateMockTracks('discovery', 15),
+      tracks: getEmptyTracks('discovery', 15),
       matchScore: 85,
       basedOn: ['discovery', ...topGenres.slice(0, 2).map(g => g.genre)],
       coverUrl: '/covers/discovery.jpg'
@@ -111,34 +111,11 @@ export async function generatePersonalizedPlaylists(
 }
 
 /**
- * Génère des tracks réels pour une playlist en utilisant des URLs fonctionnelles
+ * Returns empty array — mock tracks removed.
+ * Real tracks should come from Supabase music_tracks table.
  */
-function generateMockTracks(theme: string, count: number): MusicTrack[] {
-  // URLs audio fiables depuis archive.org
-  const AUDIO_URLS = [
-    'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Waltz_of_the_Flowers_-_Tchaikovsky.mp3',
-    'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Gymnopedie_No_1.mp3',
-    'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Canon_in_D.mp3',
-    'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Serenade.mp3',
-  ];
-
-  const tracks: MusicTrack[] = [];
-  
-  for (let i = 1; i <= count; i++) {
-    const audioUrl = AUDIO_URLS[(i - 1) % AUDIO_URLS.length];
-    tracks.push({
-      id: `track-${theme}-${i}`,
-      title: `${theme.charAt(0).toUpperCase() + theme.slice(1)} Track ${i}`,
-      artist: `EmotionsCare Studio`,
-      duration: 180 + Math.random() * 120,
-      url: audioUrl,
-      audioUrl: audioUrl,
-      coverUrl: `/covers/${theme.toLowerCase()}.jpg`,
-      mood: theme
-    });
-  }
-  
-  return tracks;
+function getEmptyTracks(_theme?: string, _count?: number): MusicTrack[] {
+  return [];
 }
 
 /**
@@ -216,7 +193,7 @@ export async function getDailyMix(userId: string): Promise<PersonalizedPlaylist>
       id: `daily-mix-${new Date().toISOString().split('T')[0]}`,
       name: 'Daily Mix',
       description: `Votre mix du jour basé sur votre humeur ${dominantMood}`,
-      tracks: generateMockTracks(dominantMood, 20),
+      tracks: getEmptyTracks(dominantMood, 20),
       matchScore: 92,
       basedOn: [dominantMood, 'recent_history'],
       coverUrl: '/covers/daily-mix.jpg'
@@ -227,7 +204,7 @@ export async function getDailyMix(userId: string): Promise<PersonalizedPlaylist>
       id: 'daily-mix-default',
       name: 'Daily Mix',
       description: 'Votre mix du jour',
-      tracks: generateMockTracks('calm', 20),
+      tracks: getEmptyTracks('calm', 20),
       matchScore: 80,
       basedOn: ['default'],
       coverUrl: '/covers/daily-mix.jpg'
@@ -267,10 +244,10 @@ export async function getRecommendationsForMood(
     }
 
     // Fallback avec des tracks mockés
-    return generateMockTracks(mood, limit);
+    return getEmptyTracks(mood, limit);
   } catch (error) {
     logger.error('Failed to get mood recommendations', error as Error, 'MUSIC');
-    return generateMockTracks(mood, limit);
+    return getEmptyTracks(mood, limit);
   }
 }
 
@@ -287,7 +264,7 @@ export async function getSimilarTracks(trackId: string, limit: number = 10): Pro
       .single();
 
     if (!sourceTrack) {
-      return generateMockTracks('similar', limit);
+      return getEmptyTracks('similar', limit);
     }
 
     // Chercher des tracks similaires
@@ -312,10 +289,10 @@ export async function getSimilarTracks(trackId: string, limit: number = 10): Pro
       }));
     }
 
-    return generateMockTracks('similar', limit);
+    return getEmptyTracks('similar', limit);
   } catch (error) {
     logger.error('Failed to get similar tracks', error as Error, 'MUSIC');
-    return generateMockTracks('similar', limit);
+    return getEmptyTracks('similar', limit);
   }
 }
 
@@ -344,10 +321,10 @@ export async function getPopularRecommendations(limit: number = 20): Promise<Mus
       }));
     }
 
-    return generateMockTracks('popular', limit);
+    return getEmptyTracks('popular', limit);
   } catch (error) {
     logger.error('Failed to get popular recommendations', error as Error, 'MUSIC');
-    return generateMockTracks('popular', limit);
+    return getEmptyTracks('popular', limit);
   }
 }
 
@@ -380,10 +357,10 @@ export async function getNewReleases(limit: number = 15): Promise<MusicTrack[]> 
       }));
     }
 
-    return generateMockTracks('new', limit);
+    return getEmptyTracks('new', limit);
   } catch (error) {
     logger.error('Failed to get new releases', error as Error, 'MUSIC');
-    return generateMockTracks('new', limit);
+    return getEmptyTracks('new', limit);
   }
 }
 
@@ -409,7 +386,7 @@ export async function generateRadioFromTrack(trackId: string): Promise<Personali
       id: `radio-default-${Date.now()}`,
       name: 'Radio personnalisée',
       description: 'Musique recommandée',
-      tracks: generateMockTracks('radio', 25),
+      tracks: getEmptyTracks('radio', 25),
       matchScore: 75,
       basedOn: ['default'],
       coverUrl: '/covers/radio.jpg'
@@ -436,8 +413,8 @@ export async function getRecommendedPlaylistsByCategory(
     id: `${category}-playlist-${index + 1}`,
     name: `${category.charAt(0).toUpperCase() + category.slice(1)} ${index + 1}`,
     description: config.description,
-    tracks: generateMockTracks(mood, 12),
-    matchScore: 85 + Math.floor(Math.random() * 10),
+    tracks: getEmptyTracks(mood, 12),
+    matchScore: 85,
     basedOn: [mood, category],
     coverUrl: `/covers/${category}-${index + 1}.jpg`
   }));

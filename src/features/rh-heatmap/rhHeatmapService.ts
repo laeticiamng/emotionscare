@@ -102,8 +102,14 @@ export const rhHeatmapService = {
     } catch (error) {
       logger.error('getHeatmapData error', error as Error, LOG_TAG);
       
-      // Return mock data for development
-      return generateMockHeatmapData(orgId, filters);
+      // Return empty data when service is unavailable
+      return {
+        rows: [],
+        periods: generatePeriods(startDate, endDate, granularity),
+        orgAvgScore: 0,
+        orgAvgParticipation: 0,
+        generatedAt: new Date().toISOString()
+      };
     }
   },
 
@@ -206,22 +212,22 @@ export const rhHeatmapService = {
       if (error) throw error;
 
       return {
-        currentScore: data?.currentScore || 72,
-        previousScore: data?.previousScore || 70,
-        trend: data?.trend || 2.8,
-        participation: data?.participation || 78,
-        activeTeams: data?.activeTeams || 8,
-        totalTeams: data?.totalTeams || 10
+        currentScore: data?.currentScore || 0,
+        previousScore: data?.previousScore || 0,
+        trend: data?.trend || 0,
+        participation: data?.participation || 0,
+        activeTeams: data?.activeTeams || 0,
+        totalTeams: data?.totalTeams || 0
       };
     } catch (error) {
       logger.error('getGlobalStats error', error as Error, LOG_TAG);
       return {
-        currentScore: 72,
-        previousScore: 70,
-        trend: 2.8,
-        participation: 78,
-        activeTeams: 8,
-        totalTeams: 10
+        currentScore: 0,
+        previousScore: 0,
+        trend: 0,
+        participation: 0,
+        activeTeams: 0,
+        totalTeams: 0
       };
     }
   }
@@ -267,57 +273,6 @@ function getWeekNumber(date: Date): number {
   d.setUTCDate(d.getUTCDate() + 4 - dayNum);
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
   return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
-}
-
-function generateMockHeatmapData(orgId: string, filters: HeatmapFilters): HeatmapData {
-  const teams = [
-    { id: 't1', name: 'Équipe Tech' },
-    { id: 't2', name: 'Équipe Marketing' },
-    { id: 't3', name: 'Équipe RH' },
-    { id: 't4', name: 'Équipe Finance' },
-    { id: 't5', name: 'Équipe Produit' }
-  ];
-
-  const periods = generatePeriods(
-    filters.startDate || getDefaultStartDate(),
-    filters.endDate || new Date().toISOString().split('T')[0],
-    filters.granularity || 'week'
-  ).slice(-8);
-
-  const rows: HeatmapRow[] = teams.map(team => {
-    const cells: HeatmapCell[] = periods.map((period, i) => {
-      const baseScore = 60 + Math.random() * 30;
-      const score = Math.round(baseScore + (i * 0.5));
-      const prevScore = i > 0 ? 60 + Math.random() * 30 : score;
-      
-      return {
-        teamId: team.id,
-        teamName: team.name,
-        period,
-        score: Math.min(100, score),
-        participationRate: 70 + Math.random() * 25,
-        memberCount: 5 + Math.floor(Math.random() * 15),
-        trend: score > prevScore ? 'up' : score < prevScore ? 'down' : 'stable',
-        alertLevel: score < 50 ? 'high' : score < 60 ? 'medium' : score < 70 ? 'low' : 'none'
-      };
-    });
-
-    return {
-      teamId: team.id,
-      teamName: team.name,
-      cells,
-      avgScore: cells.reduce((sum, c) => sum + c.score, 0) / cells.length,
-      avgParticipation: cells.reduce((sum, c) => sum + c.participationRate, 0) / cells.length
-    };
-  });
-
-  return {
-    rows,
-    periods,
-    orgAvgScore: rows.reduce((sum, r) => sum + r.avgScore, 0) / rows.length,
-    orgAvgParticipation: rows.reduce((sum, r) => sum + r.avgParticipation, 0) / rows.length,
-    generatedAt: new Date().toISOString()
-  };
 }
 
 export default rhHeatmapService;

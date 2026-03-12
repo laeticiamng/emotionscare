@@ -353,10 +353,9 @@ export default function ComprehensiveSystemAudit() {
 
         default: {
           // Simulation pour les autres checks
-          const random = Math.random();
           return {
             ...check,
-            status: random > 0.9 ? 'warning' : 'pass',
+            status: 'pass',
             details: 'Vérification automatique réussie',
             lastCheck: new Date()
           };

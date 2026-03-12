@@ -70,7 +70,7 @@ const SecurityPageEnhanced: React.FC = () => {
     setIsLoading(true);
     // Simulate security scan
     await new Promise(resolve => setTimeout(resolve, 2000));
-    setSecurityScore(Math.floor(Math.random() * 20) + 80);
+    setSecurityScore(0);
     setIsLoading(false);
   };
 

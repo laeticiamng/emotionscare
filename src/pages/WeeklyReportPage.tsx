@@ -105,7 +105,7 @@ export default function WeeklyReportPage() {
         }),
         sessions: Math.floor(1 + (seed % 3)),
         duration: Math.floor(15 + (seed % 30)),
-        wellnessScore: 6 + (seed % 4) + Math.random(),
+        wellnessScore: 6 + (seed % 4),
       };
     });
   }, [weekDates]);

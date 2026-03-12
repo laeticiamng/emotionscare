@@ -134,7 +134,7 @@ const B2CDataPrivacyPage: React.FC = () => {
             clearInterval(progressInterval);
             return 95;
           }
-          return prev + Math.random() * 15;
+          return prev + 15;
         });
       }, 300);
 
@@ -152,7 +152,7 @@ const B2CDataPrivacyPage: React.FC = () => {
           activity: 'Historique d\'activité',
           analytics: 'Données analytiques'
         }[exportType],
-        size: `${(Math.random() * 5 + 1).toFixed(1)} MB`,
+        size: '0 MB',
         date: new Date().toISOString().split('T')[0],
         status: 'processing'
       };

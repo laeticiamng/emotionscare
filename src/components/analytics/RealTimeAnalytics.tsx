@@ -146,51 +146,9 @@ export const RealTimeAnalytics: React.FC = () => {
 
     } catch (error) {
       logger.error('Failed to connect WebSocket', { error }, 'ANALYTICS');
-      // Fallback sur des données simulées
-      startMockData();
+      // No fallback mock data - show empty state
     }
   }, [toast]);
-
-  // Simulation de données pour développement
-  const startMockData = useCallback(() => {
-    const interval = setInterval(() => {
-      const mockData = generateMockData();
-      updateAnalyticsData(mockData);
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const generateMockData = (): Partial<AnalyticsData> => {
-    const now = new Date();
-    
-    return {
-      activeUsers: Math.floor(Math.random() * 500) + 100,
-      pageViews: Math.floor(Math.random() * 1000) + 500,
-      sessionDuration: Math.floor(Math.random() * 300) + 120,
-      bounceRate: Math.random() * 40 + 20,
-      conversionRate: Math.random() * 10 + 2,
-      errorRate: Math.random() * 8,
-      performanceScore: Math.random() * 40 + 60,
-      userSatisfaction: Math.random() * 30 + 70,
-      realTimeEvents: [
-        {
-          id: Math.random().toString(36),
-          type: 'user_action',
-          message: 'Nouvel utilisateur connecté',
-          timestamp: now,
-          severity: 'low'
-        }
-      ],
-      trends: {
-        activeUsers: {
-          value: Math.floor(Math.random() * 500) + 100,
-          change: (Math.random() - 0.5) * 20,
-          trend: Math.random() > 0.5 ? 'up' : 'down'
-        }
-      }
-    };
-  };
 
   const updateAnalyticsData = useCallback((newData: Partial<AnalyticsData>) => {
     setAnalyticsData(prev => ({
@@ -323,6 +281,17 @@ export const RealTimeAnalytics: React.FC = () => {
           </Button>
         </div>
       </div>
+
+      {/* Message d'état vide quand non connecté */}
+      {!isConnected && analyticsData.realTimeEvents.length === 0 && (
+        <Card className="border-muted">
+          <CardContent className="p-6">
+            <div className="text-center text-muted-foreground py-4">
+              Données temps réel non disponibles — connectez une source de données
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Alertes critiques */}
       {alerts.length > 0 && (

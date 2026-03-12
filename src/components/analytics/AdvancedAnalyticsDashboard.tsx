@@ -101,7 +101,7 @@ export const AdvancedAnalyticsDashboard: React.FC = () => {
           const dateStr = new Date(a.created_at).toISOString().split('T')[0];
           const day = dailyData.get(dateStr);
           if (day) {
-            const score = a.score_json?.score || a.score_json?.total || Math.random() * 100;
+            const score = a.score_json?.score || a.score_json?.total || 0;
             day.points.push(score);
           }
         });
@@ -114,33 +114,34 @@ export const AdvancedAnalyticsDashboard: React.FC = () => {
         });
 
         // Construire les tableaux
-        let basePoints = 100;
         dailyData.forEach((day, _) => {
-          const avgPoints = day.points.length > 0 
-            ? day.points.reduce((a, b) => a + b, 0) / day.points.length 
-            : basePoints + Math.random() * 20;
-          
+          const avgPoints = day.points.length > 0
+            ? day.points.reduce((a, b) => a + b, 0) / day.points.length
+            : 0;
+
           userPoints.push(Math.round(avgPoints));
-          averagePoints.push(Math.round(avgPoints * (0.7 + Math.random() * 0.3)));
-          sessions.push(day.sessions || Math.floor(Math.random() * 3) + 1);
-          streaks.push(Math.floor(Math.random() * 3) + 1);
-          basePoints = avgPoints;
+          averagePoints.push(0); // No average comparison data available
+          sessions.push(day.sessions);
+          streaks.push(0);
         });
 
-        // Prédictions IA pour les 3 prochains jours
-        let lastPoint = userPoints[userPoints.length - 1] || 100;
-        const trend = userPoints.length > 1 ? (userPoints[userPoints.length - 1] - userPoints[0]) / days : 5;
-        for (let i = 1; i <= 3; i++) {
-          labels.push(`J+${i}`);
-          lastPoint += trend + (Math.random() - 0.5) * 20;
-          predictions.push(Math.round(lastPoint));
+        // Prédictions - only if we have real data points
+        const nonZeroPoints = userPoints.filter(p => p > 0);
+        if (nonZeroPoints.length > 1) {
+          let lastPoint = userPoints[userPoints.length - 1] || 0;
+          const trend = (userPoints[userPoints.length - 1] - userPoints[0]) / days;
+          for (let i = 1; i <= 3; i++) {
+            labels.push(`J+${i}`);
+            lastPoint += trend;
+            predictions.push(Math.round(Math.max(0, lastPoint)));
+          }
         }
 
         setAnalyticsData({ labels, userPoints, averagePoints, predictions, sessions, streaks });
       } catch (error) {
         logger.error('Analytics fetch error:', error, 'ANALYTICS');
-        // Fallback vers données simulées
-        setAnalyticsData(generateFallbackData(days));
+        // No fallback data - show empty state
+        setAnalyticsData(null);
       } finally {
         setLoading(false);
       }
@@ -149,39 +150,20 @@ export const AdvancedAnalyticsDashboard: React.FC = () => {
     fetchRealData();
   }, [period, user]);
 
-  const generateFallbackData = (days: number): AnalyticsData => {
-    const labels: string[] = [];
-    const userPoints: number[] = [];
-    const averagePoints: number[] = [];
-    const predictions: number[] = [];
-    const sessions: number[] = [];
-    const streaks: number[] = [];
-
-    let basePoints = 100;
-    for (let i = days - 1; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      labels.push(date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }));
-      basePoints += Math.random() * 50 + 10;
-      userPoints.push(Math.round(basePoints));
-      averagePoints.push(Math.round(basePoints * (0.7 + Math.random() * 0.4)));
-      sessions.push(Math.floor(Math.random() * 5) + 1);
-      streaks.push(Math.floor(Math.random() * 3) + 1);
-    }
-
-    let lastPoint = userPoints[userPoints.length - 1];
-    const trend = (userPoints[userPoints.length - 1] - userPoints[0]) / days;
-    for (let i = 1; i <= 3; i++) {
-      labels.push(`J+${i}`);
-      lastPoint += trend + (Math.random() - 0.5) * 20;
-      predictions.push(Math.round(lastPoint));
-    }
-
-    return { labels, userPoints, averagePoints, predictions, sessions, streaks };
-  };
-
-  if (loading || !analyticsData) {
+  if (loading) {
     return <div className="animate-pulse">Chargement des analytics...</div>;
+  }
+
+  if (!analyticsData) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="text-center text-muted-foreground py-12">
+            Aucune donnée disponible
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   // Configuration des graphiques
@@ -234,7 +216,7 @@ export const AdvancedAnalyticsDashboard: React.FC = () => {
     labels: ['Musique', 'Scan émotions', 'Coach IA', 'Journal', 'Autres'],
     datasets: [
       {
-        data: [35, 25, 20, 15, 5],
+        data: [0, 0, 0, 0, 0],
         backgroundColor: [
           'rgba(59, 130, 246, 0.8)',
           'rgba(34, 197, 94, 0.8)',

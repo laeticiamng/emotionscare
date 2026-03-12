@@ -87,7 +87,7 @@ const AdvancedReportExporter: React.FC = () => {
   // Récupérer les données réelles depuis Supabase
   const fetchRealData = async () => {
     if (!user) {
-      return generateFallbackData();
+      return getEmptyData();
     }
 
     try {
@@ -108,15 +108,15 @@ const AdvancedReportExporter: React.FC = () => {
       ]);
 
       const totalEntries = (assessmentsRes.data?.length || 0) + (journalRes.data?.length || 0);
-      
+
       // Calculer score moyen
       const scores = assessmentsRes.data?.map(a => {
         const json = a.score_json as any;
-        return json?.score || json?.total || 5;
+        return json?.score || json?.total || 0;
       }) || [];
-      const averageScore = scores.length > 0 
-        ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) 
-        : '7.3';
+      const averageScore = scores.length > 0
+        ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)
+        : '0';
 
       // Analyser les émotions
       const moodCounts: Record<string, number> = {};
@@ -124,65 +124,69 @@ const AdvancedReportExporter: React.FC = () => {
         const mood = j.mood || 'neutral';
         moodCounts[mood] = (moodCounts[mood] || 0) + 1;
       });
-      const topEmotion = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'Calme';
+      const topEmotion = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'Aucune';
 
-      // Construire données émotions par jour
-      const emotions = assessmentsRes.data?.map((a: any) => ({
-        date: new Date(a.created_at).toISOString().split('T')[0],
-        joy: Math.random() * 10,
-        calm: (a.score_json?.score || 5) / 10 * 10,
-        energy: Math.random() * 10,
-        stress: 10 - (a.score_json?.score || 5) / 10 * 10,
-      })) || [];
+      // Construire données émotions par jour from real assessment data
+      const emotions = assessmentsRes.data?.map((a: any) => {
+        const score = a.score_json?.score || a.score_json?.total || 0;
+        return {
+          date: new Date(a.created_at).toISOString().split('T')[0],
+          joy: 0,
+          calm: score / 10 * 10,
+          energy: 0,
+          stress: Math.max(0, 10 - score / 10 * 10),
+        };
+      }) || [];
+
+      // Calculate improvement from real data
+      let improvement = '0%';
+      if (scores.length > 1) {
+        const diff = ((scores[scores.length - 1] - scores[0]) / scores[0]) * 100;
+        improvement = `${diff >= 0 ? '+' : ''}${diff.toFixed(0)}%`;
+      }
 
       return {
         overview: {
           totalEntries,
           averageScore: parseFloat(averageScore as string),
           topEmotion,
-          improvement: scores.length > 1 && scores[scores.length - 1] > scores[0] ? '+15%' : '-5%'
+          improvement
         },
         emotions,
         trends: {
           weeklyAverage: parseFloat(averageScore as string),
-          monthlyTrend: 'positive',
-          seasonalPattern: 'stable'
+          monthlyTrend: totalEntries > 0 ? 'positive' : 'unknown',
+          seasonalPattern: 'unknown'
         },
         predictions: {
-          nextWeekScore: parseFloat(averageScore as string) + 0.5,
-          riskFactors: ['Surcharge de travail', 'Manque de sommeil'],
-          recommendations: ['Pauses régulières', 'Exercices de respiration']
+          nextWeekScore: parseFloat(averageScore as string),
+          riskFactors: [] as string[],
+          recommendations: [] as string[]
         }
       };
     } catch (error) {
       console.error('Report data fetch error:', error);
-      return generateFallbackData();
+      return getEmptyData();
     }
   };
 
-  const generateFallbackData = () => ({
+  const getEmptyData = () => ({
     overview: {
-      totalEntries: 245,
-      averageScore: 7.3,
-      topEmotion: 'Calme',
-      improvement: '+15%'
+      totalEntries: 0,
+      averageScore: 0,
+      topEmotion: 'Aucune',
+      improvement: '0%'
     },
-    emotions: Array.from({ length: 30 }, (_, i) => ({
-      date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      joy: Math.random() * 10,
-      calm: Math.random() * 10,
-      energy: Math.random() * 10,
-      stress: Math.random() * 10,
-    })),
+    emotions: [] as { date: string; joy: number; calm: number; energy: number; stress: number }[],
     trends: {
-      weeklyAverage: 7.2,
-      monthlyTrend: 'positive',
-      seasonalPattern: 'stable'
+      weeklyAverage: 0,
+      monthlyTrend: 'unknown',
+      seasonalPattern: 'unknown'
     },
     predictions: {
-      nextWeekScore: 7.8,
-      riskFactors: ['Surcharge de travail', 'Manque de sommeil'],
-      recommendations: ['Pauses régulières', 'Exercices de respiration']
+      nextWeekScore: 0,
+      riskFactors: [] as string[],
+      recommendations: [] as string[]
     }
   });
 
