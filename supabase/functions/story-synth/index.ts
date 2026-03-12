@@ -2,10 +2,21 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 // Templates de génération d'histoires basées sur les intentions
 const generateStoryContent = (intentions: string[], style: string = 'relaxation') => {
@@ -57,7 +68,7 @@ Ici, dans cet espace sacré, vous êtes complet. Vous êtes en paix. Vous êtes 
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -73,7 +84,7 @@ serve(async (req) => {
           error: 'Au moins une intention est requise' 
         }), {
           status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       }
 
@@ -102,7 +113,7 @@ serve(async (req) => {
       console.log('Generated story:', { id: storyId, intentions: validIntentions, style });
 
       return new Response(JSON.stringify(story), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -119,7 +130,7 @@ serve(async (req) => {
         cover_url: coverUrl,
         sse_url: sseUrl
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -127,7 +138,7 @@ serve(async (req) => {
       const sessionId = path.split('/')[3];
       
       const headers = {
-        ...corsHeaders,
+        ...getCorsHeaders(req),
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
@@ -180,7 +191,7 @@ serve(async (req) => {
       console.log('Choice made:', { session_id, choice_id });
       
       return new Response(JSON.stringify({ ack: true }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -194,17 +205,17 @@ serve(async (req) => {
         download_url: downloadUrl,
         transcript_url: transcriptUrl
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
-    return new Response('Not Found', { status: 404, headers: corsHeaders });
+    return new Response('Not Found', { status: 404, headers: getCorsHeaders(req) });
 
   } catch (error) {
     console.error('Error in story-synth function:', error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 });

@@ -3,10 +3,21 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { withMonitoring } from '../_shared/monitoring-wrapper.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 interface ExportRequest {
   export_type: 'analytics' | 'vr_sessions' | 'breath_sessions' | 'music_history' | 'emotional_logs' | 'custom';
@@ -23,7 +34,7 @@ interface ExportRequest {
  */
 const handler = withMonitoring('generate_export', async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -37,7 +48,7 @@ const handler = withMonitoring('generate_export', async (req) => {
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Authorization required' }), {
         status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -48,7 +59,7 @@ const handler = withMonitoring('generate_export', async (req) => {
     if (authError || !user) {
       return new Response(JSON.stringify({ error: 'Invalid token' }), {
         status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -197,7 +208,7 @@ const handler = withMonitoring('generate_export', async (req) => {
           allowed_types: ['analytics', 'vr_sessions', 'breath_sessions', 'music_history', 'emotional_logs', 'custom']
         }), {
           status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
     }
 
@@ -233,7 +244,7 @@ const handler = withMonitoring('generate_export', async (req) => {
         data: exportData,
         note: 'Storage upload failed, returning data directly',
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -264,7 +275,7 @@ const handler = withMonitoring('generate_export', async (req) => {
       record_count: exportData.sessions?.length || exportData.logs?.length || exportData.preferences?.length || 0,
       generated_at: exportData.generated_at,
     }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
@@ -273,7 +284,7 @@ const handler = withMonitoring('generate_export', async (req) => {
       error: error.message || 'Export generation failed'
     }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 });

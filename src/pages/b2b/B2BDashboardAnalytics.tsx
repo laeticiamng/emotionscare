@@ -200,6 +200,13 @@ const B2BDashboardAnalytics: React.FC = () => {
   return (
     <div className="min-h-screen bg-background py-8 md:py-12">
       <div className="container px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        {/* Bannière démo */}
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+          <p className="text-amber-800 text-sm font-medium">
+            ⚠️ Page de démonstration — Les données affichées sont simulées et ne reflètent pas de vraies données utilisateur.
+          </p>
+        </div>
+
         {/* Header */}
         <div className="mb-10">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">

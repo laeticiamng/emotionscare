@@ -2,10 +2,21 @@
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 interface ExportRequest {
   format: 'csv' | 'json';
@@ -19,7 +30,7 @@ interface ExportRequest {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -31,7 +42,7 @@ serve(async (req) => {
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Missing authorization' }), {
         status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -41,7 +52,7 @@ serve(async (req) => {
     if (userError || !user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -55,7 +66,7 @@ serve(async (req) => {
     if (!userRole || userRole.role !== 'admin') {
       return new Response(JSON.stringify({ error: 'Forbidden: Admin access required' }), {
         status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -181,7 +192,7 @@ serve(async (req) => {
       return new Response(csv, {
         status: 200,
         headers: {
-          ...corsHeaders,
+          ...getCorsHeaders(req),
           'Content-Type': 'text/csv',
           'Content-Disposition': `attachment; filename="gdpr-report-${new Date().toISOString().split('T')[0]}.csv"`,
         },
@@ -193,7 +204,7 @@ serve(async (req) => {
     
     return new Response(JSON.stringify(reportData), {
       status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
     logger.error('Failed to generate GDPR report', error, context);

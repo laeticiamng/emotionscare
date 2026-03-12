@@ -10,14 +10,25 @@ const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -49,7 +60,7 @@ serve(async (req) => {
 
         return new Response(
           JSON.stringify({ ok: true }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -76,7 +87,7 @@ serve(async (req) => {
 
         return new Response(
           JSON.stringify({ ok: true }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -98,7 +109,7 @@ serve(async (req) => {
 
         return new Response(
           JSON.stringify({ ok: true }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -107,7 +118,7 @@ serve(async (req) => {
           JSON.stringify({ error: 'Invalid metrics endpoint' }),
           {
             status: 404,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
           }
         );
     }
@@ -119,7 +130,7 @@ serve(async (req) => {
       JSON.stringify({ error: errorMessage }),
       {
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       }
     );
   }

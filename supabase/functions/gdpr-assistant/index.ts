@@ -2,12 +2,21 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { authorizeRole } from '../_shared/auth.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
 
-const gdprArticles = [
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}const gdprArticles = [
   { id: "art13", title: "Informations lors de la collecte de données" },
   { id: "art15", title: "Droit d'accès" },
   { id: "art16", title: "Droit de rectification" },
@@ -23,14 +32,14 @@ const gdprArticles = [
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   const { user, status } = await authorizeRole(req, ['b2b_admin', 'admin']);
   if (!user) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 
@@ -136,7 +145,7 @@ serve(async (req) => {
         answer,
         relatedArticles: relatedArticles.length > 0 ? relatedArticles : undefined
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
@@ -145,7 +154,7 @@ serve(async (req) => {
       JSON.stringify({ error: error.message }),
       { 
         status: 400, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } 
       }
     );
   }

@@ -1,14 +1,25 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -42,7 +53,7 @@ serve(async (req) => {
         text: data.choices?.[0]?.message?.content || "[Transcription en cours...]",
         language: 'fr'
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -77,11 +88,11 @@ serve(async (req) => {
           score: result.score || 0,
           confidence: result.confidence || 0.5,
         }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       } catch {
         return new Response(JSON.stringify({ tone: 'neutral', score: 0, confidence: 0.5 }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       }
     }
@@ -113,11 +124,11 @@ serve(async (req) => {
         const jsonMatch = content.match(/\{[\s\S]*\}/);
         const result = JSON.parse(jsonMatch ? jsonMatch[0] : '{}');
         return new Response(JSON.stringify(result), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       } catch {
         return new Response(JSON.stringify({ tone: 'neutral', emotions: {}, dominantEmotion: null }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       }
     }
@@ -143,7 +154,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({
         summary: data.choices?.[0]?.message?.content || text.substring(0, 100)
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -167,20 +178,20 @@ serve(async (req) => {
       const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
       
       return new Response(JSON.stringify({ imageUrl }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
     return new Response(JSON.stringify({ error: 'Invalid action' }), {
       status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
     console.error('AI Analysis error:', error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 });

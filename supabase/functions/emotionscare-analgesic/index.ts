@@ -24,10 +24,21 @@ interface HumeEmotionScore {
 }
 
 // CORS headers
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 // Routeur antalgique
 const ANALGESIC_ROUTER = (emo: EmotionInput): AnalgesicPreset => {
@@ -89,7 +100,7 @@ const THERAPEUTIC_PATHS: Record<string, string[]> = {
 // Fonction principale
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -117,7 +128,7 @@ serve(async (req) => {
       JSON.stringify({ error: error.message }),
       { 
         status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } 
       }
     );
   }
@@ -158,7 +169,7 @@ async function generateAnalgesicTrack(text: string, language: string) {
       preset: analgesicPreset,
       emotions: [mainEmotion]
     }),
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
   );
 }
 
@@ -200,7 +211,7 @@ async function generateTherapeuticSequence(text: string, language: string) {
   
   return new Response(
     JSON.stringify({ taskId, sequence }),
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
   );
 }
 
@@ -295,6 +306,6 @@ async function getTrackStatus(taskId: string) {
   const data = await response.json();
   return new Response(
     JSON.stringify(data),
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
   );
 }

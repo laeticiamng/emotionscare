@@ -7,11 +7,21 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 // Configuration des parcours émotionnels
 const EMOTION_PARCOURS_CONFIG: Record<string, {
@@ -149,7 +159,7 @@ interface EmotionPattern {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -189,7 +199,7 @@ serve(async (req) => {
           pregenerationTasks,
           message: `Analyzed ${patterns.length} patterns, triggered ${pregenerationTasks.length} pregenerations`
         }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       }
 
@@ -210,7 +220,7 @@ serve(async (req) => {
           results,
           message: `Pre-generated ${results.length} tracks`
         }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       }
 
@@ -222,7 +232,7 @@ serve(async (req) => {
           success: true,
           cache: cacheStatus
         }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       }
 
@@ -237,7 +247,7 @@ serve(async (req) => {
             track: cachedTrack,
             fromCache: true
           }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
           });
         }
 
@@ -247,7 +257,7 @@ serve(async (req) => {
           fromCache: false,
           message: 'No cached track available, generation needed'
         }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       }
 
@@ -260,7 +270,7 @@ serve(async (req) => {
           cleanedCount,
           message: `Cleaned ${cleanedCount} old cache entries`
         }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       }
 
@@ -274,7 +284,7 @@ serve(async (req) => {
       error: error?.message || 'Unknown error'
     }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 });

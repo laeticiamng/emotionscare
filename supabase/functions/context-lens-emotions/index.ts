@@ -6,14 +6,25 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -21,7 +32,7 @@ Deno.serve(async (req) => {
     if (!authHeader) {
       return new Response(
         JSON.stringify({ error: 'Authorization required' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 401, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -35,7 +46,7 @@ Deno.serve(async (req) => {
     if (userError || !user) {
       return new Response(
         JSON.stringify({ error: 'Invalid token' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 401, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -65,7 +76,7 @@ Deno.serve(async (req) => {
                 timestamp: latest.created_at,
               },
             }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
           );
         }
 
@@ -82,7 +93,7 @@ Deno.serve(async (req) => {
               timestamp: new Date().toISOString(),
             },
           }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -101,7 +112,7 @@ Deno.serve(async (req) => {
           console.log('[Context Lens Emotions] Using mock history:', error.message);
           return new Response(
             JSON.stringify({ history: generateMockHistory(user.id, from, to, interval) }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
           );
         }
 
@@ -116,7 +127,7 @@ Deno.serve(async (req) => {
               patient_id: user.id,
             },
           }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -138,27 +149,27 @@ Deno.serve(async (req) => {
           console.error('[Context Lens] Failed to record emotions:', error);
           return new Response(
             JSON.stringify({ success: false, error: error.message }),
-            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
           );
         }
 
         return new Response(
           JSON.stringify({ success: true, data }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
       default:
         return new Response(
           JSON.stringify({ error: 'Invalid action' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 400, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         );
     }
   } catch (error) {
     console.error('[Context Lens Emotions] Error:', error);
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });

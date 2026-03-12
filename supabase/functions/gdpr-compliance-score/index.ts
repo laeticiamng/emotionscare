@@ -2,12 +2,21 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { withMonitoring, logger } from '../_shared/monitoring-wrapper.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
 
-interface ComplianceMetrics {
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}interface ComplianceMetrics {
   consentRate: number;
   exportProcessingSpeed: number;
   deletionProcessingSpeed: number;
@@ -173,7 +182,7 @@ const handler = withMonitoring('gdpr-compliance-score', async (req, context) => 
       console.error('Authentication failed:', authError);
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 401, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 

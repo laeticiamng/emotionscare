@@ -12,11 +12,21 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
@@ -187,7 +197,7 @@ const DEFAULT_LANDMARKS = [
 Deno.serve(async (req) => {
   // CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -200,7 +210,7 @@ Deno.serve(async (req) => {
     if (!authHeader?.startsWith('Bearer ')) {
       return new Response(
         JSON.stringify({ error: 'unauthorized', message: 'Token requis' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 401, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -213,14 +223,14 @@ Deno.serve(async (req) => {
     if (authError || !claims?.user) {
       return new Response(
         JSON.stringify({ error: 'unauthorized', message: 'Token invalide' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 401, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
     if (!scanId) {
       return new Response(
         JSON.stringify({ error: 'bad_request', message: 'scan_id requis' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -234,7 +244,7 @@ Deno.serve(async (req) => {
     if (scanError || !scan) {
       return new Response(
         JSON.stringify({ error: 'not_found', message: 'Scan non trouvé' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 404, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -262,7 +272,7 @@ Deno.serve(async (req) => {
           console.error('[ANATOMY] Erreur structures:', structError);
           return new Response(
             JSON.stringify({ error: 'db_error', message: structError.message }),
-            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
           );
         }
 
@@ -284,13 +294,13 @@ Deno.serve(async (req) => {
 
           return new Response(
             JSON.stringify({ structures: defaultStructures, source: 'registry' }),
-            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { status: 200, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
           );
         }
 
         return new Response(
           JSON.stringify({ structures, source: 'database' }),
-          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 200, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -323,7 +333,7 @@ Deno.serve(async (req) => {
 
         return new Response(
           JSON.stringify(bundle),
-          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 200, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -344,7 +354,7 @@ Deno.serve(async (req) => {
 
         return new Response(
           JSON.stringify({ landmarks: result }),
-          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 200, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -367,21 +377,21 @@ Deno.serve(async (req) => {
             depth,
             zones: visibleZones,
           }),
-          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 200, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
       default:
         return new Response(
           JSON.stringify({ error: 'bad_request', message: `Action inconnue: ${action}` }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 400, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         );
     }
   } catch (error) {
     console.error('[ANATOMY] Erreur:', error);
     return new Response(
       JSON.stringify({ error: 'server_error', message: 'Erreur interne' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });

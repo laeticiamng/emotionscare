@@ -7,11 +7,21 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-context-lens-version',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
@@ -47,7 +57,7 @@ interface ReportRequest {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -55,7 +65,7 @@ Deno.serve(async (req) => {
     if (!user) {
       return new Response(
         JSON.stringify({ error: 'unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 401, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -75,7 +85,7 @@ Deno.serve(async (req) => {
       if (patientIdIndex < 0) {
         return new Response(
           JSON.stringify({ error: 'invalid_request', message: 'Patient ID required' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 400, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -121,7 +131,7 @@ Deno.serve(async (req) => {
         console.error('[REPORTS] Insert error:', insertError);
         return new Response(
           JSON.stringify({ error: 'create_failed', message: insertError.message }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -220,7 +230,7 @@ Deno.serve(async (req) => {
           message: 'Report generation started',
           estimated_time_seconds: 30,
         }),
-        { status: 202, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 202, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -233,7 +243,7 @@ Deno.serve(async (req) => {
       if (reportIdIndex < 0) {
         return new Response(
           JSON.stringify({ error: 'invalid_request', message: 'Report ID required' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 400, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -248,7 +258,7 @@ Deno.serve(async (req) => {
       if (error || !report) {
         return new Response(
           JSON.stringify({ error: 'not_found', message: 'Report not found' }),
-          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 404, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -271,20 +281,20 @@ Deno.serve(async (req) => {
           download_url: downloadUrl,
           error_message: report.error_message,
         }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 200, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
     return new Response(
       JSON.stringify({ error: 'method_not_allowed' }),
-      { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 405, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('[REPORTS] Error:', error);
     return new Response(
       JSON.stringify({ error: 'server_error', message: 'Internal server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });

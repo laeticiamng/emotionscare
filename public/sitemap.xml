@@ -1,141 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Pages publiques principales -->
   <url>
     <loc>https://emotionscare.com/</loc>
-    <lastmod>2026-03-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://emotionscare.com/features</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
     <loc>https://emotionscare.com/pricing</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://emotionscare.com/about</loc>
-    <lastmod>2026-03-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://emotionscare.com/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://emotionscare.com/contact</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://emotionscare.com/faq</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://emotionscare.com/help</loc>
-    <lastmod>2026-03-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://emotionscare.com/install</loc>
-    <lastmod>2026-03-07</lastmod>
+    <loc>https://emotionscare.com/faq</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://emotionscare.com/support</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://emotionscare.com/demo</loc>
-    <lastmod>2026-03-07</lastmod>
+    <loc>https://emotionscare.com/legal/privacy</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://emotionscare.com/scanner</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://emotionscare.com/store</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://emotionscare.com/use-cases</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://emotionscare.com/security</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Pages B2B / B2C -->
-  <url>
-    <loc>https://emotionscare.com/entreprise</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://emotionscare.com/b2c</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Pages légales -->
-  <url>
-    <loc>https://emotionscare.com/legal/mentions</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://emotionscare.com/legal/terms</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>https://emotionscare.com/legal/privacy</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>yearly</changefreq>
+    <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://emotionscare.com/legal/cookies</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>yearly</changefreq>
+    <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://emotionscare.com/legal/sales</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>yearly</changefreq>
+    <loc>https://emotionscare.com/legal/mentions</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
-  <url>
-    <loc>https://emotionscare.com/legal/licenses</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>https://emotionscare.com/privacy</loc>
-    <lastmod>2026-03-07</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-
 </urlset>

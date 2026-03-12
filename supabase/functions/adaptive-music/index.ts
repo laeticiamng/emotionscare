@@ -3,10 +3,21 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 // @ts-ignore
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 interface MusicTrack {
   id: string;
@@ -47,7 +58,7 @@ const MUSIC_LIBRARY: MusicTrack[] = [
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -82,7 +93,7 @@ serve(async (req) => {
         status: 'ok',
         timestamp: new Date().toISOString()
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -119,7 +130,7 @@ serve(async (req) => {
         description: `Playlist ${playlist_type || 'therapeutic'} générée`,
         total_duration: totalDuration
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -148,7 +159,7 @@ serve(async (req) => {
           `Arrivée vers ${target_emotion || 'calme'}`
         ]
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -173,7 +184,7 @@ serve(async (req) => {
           'Ajuster le volume selon votre confort'
         ]
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -197,7 +208,7 @@ serve(async (req) => {
           'Variez les genres musicaux'
         ]
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -205,7 +216,7 @@ serve(async (req) => {
     if (!user) {
       return new Response(JSON.stringify({ error: 'Non autorisé' }), {
         status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -242,7 +253,7 @@ serve(async (req) => {
 
       return new Response(
         JSON.stringify({ recommendations, emotion, intensity }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -257,7 +268,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify({ playlists }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -279,7 +290,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify({ playlist }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -302,7 +313,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify({ session }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -351,19 +362,19 @@ serve(async (req) => {
           averageImprovement: Math.round(averageImprovement * 10) / 10,
           recentSessions: sessions.slice(0, 10),
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
     return new Response(JSON.stringify({ error: 'Route non trouvée' }), {
       status: 404,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
     console.error('Erreur:', error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 });

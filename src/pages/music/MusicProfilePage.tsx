@@ -159,6 +159,13 @@ const MusicProfilePage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-6">
+      {/* Bannière démo */}
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+        <p className="text-amber-800 text-sm font-medium">
+          ⚠️ Page de démonstration — Les données affichées sont simulées et ne reflètent pas de vraies données utilisateur.
+        </p>
+      </div>
+
       {/* Header avec retour */}
       <Button
         variant="ghost"

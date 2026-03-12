@@ -6,10 +6,21 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.43.4";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 // Groupes prédéfinis par thématique
 const DEFAULT_GROUPS = [
@@ -23,7 +34,7 @@ const DEFAULT_GROUPS = [
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -37,7 +48,7 @@ serve(async (req) => {
     if (!user) {
       return new Response(JSON.stringify({ error: 'Non autorisé' }), {
         status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -79,7 +90,7 @@ serve(async (req) => {
           { id: 'family', name: 'Famille', icon: '👨‍👩‍👧' }
         ]
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -99,7 +110,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify({ success: true, message: 'Vous avez rejoint le groupe!' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -116,7 +127,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify({ success: true }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -135,7 +146,7 @@ serve(async (req) => {
       if (!membership) {
         return new Response(JSON.stringify({ error: 'Vous devez être membre pour voir les messages' }), {
           status: 403,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       }
 
@@ -147,7 +158,7 @@ serve(async (req) => {
         .limit(limit);
 
       return new Response(JSON.stringify({ messages: messages || [] }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -166,7 +177,7 @@ serve(async (req) => {
       if (!membership) {
         return new Response(JSON.stringify({ error: 'Vous devez être membre pour poster' }), {
           status: 403,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       }
 
@@ -174,7 +185,7 @@ serve(async (req) => {
       if (content.length > 2000) {
         return new Response(JSON.stringify({ error: 'Message trop long (max 2000 caractères)' }), {
           status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       }
 
@@ -193,7 +204,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify({ success: true, message }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -205,7 +216,7 @@ serve(async (req) => {
       if (!allowedEmojis.includes(emoji)) {
         return new Response(JSON.stringify({ error: 'Emoji non autorisé' }), {
           status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       }
 
@@ -221,20 +232,20 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify({ success: true }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
     return new Response(JSON.stringify({ error: 'Action non reconnue' }), {
       status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
     console.error('[community-groups] Error:', error);
     return new Response(JSON.stringify({ error: 'Erreur serveur' }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 });

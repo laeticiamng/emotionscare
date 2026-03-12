@@ -23,10 +23,21 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 interface ScanData {
   scan_type: 'text' | 'voice' | 'facial' | 'emoji';
@@ -44,7 +55,7 @@ interface ScanData {
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -65,7 +76,7 @@ serve(async (req) => {
     if (!user) {
       return new Response(JSON.stringify({ error: 'Non autorisé' }), {
         status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -96,7 +107,7 @@ serve(async (req) => {
 
       return new Response(JSON.stringify(scan), {
         status: 201,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -141,7 +152,7 @@ serve(async (req) => {
           page,
           limit,
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -159,7 +170,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify(scan), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -177,7 +188,7 @@ serve(async (req) => {
 
       return new Response(null, {
         status: 204,
-        headers: corsHeaders,
+        headers: getCorsHeaders(req),
       });
     }
 
@@ -227,7 +238,7 @@ serve(async (req) => {
           average_mood_score: Math.round(averageMoodScore * 10) / 10,
           emotions_distribution: emotionsDistribution,
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -298,7 +309,7 @@ serve(async (req) => {
           period,
           data_points: dataPoints,
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -356,7 +367,7 @@ serve(async (req) => {
           mood_patterns: moodPatterns,
           triggers: [], // Could be enhanced with metadata analysis
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -377,7 +388,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify(scans), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -396,7 +407,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify(scans), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -415,7 +426,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify(scans), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -434,7 +445,7 @@ serve(async (req) => {
       if (format === 'json') {
         return new Response(JSON.stringify(scans, null, 2), {
           headers: {
-            ...corsHeaders,
+            ...getCorsHeaders(req),
             'Content-Type': 'application/json',
             'Content-Disposition': 'attachment; filename="emotion_scans.json"',
           },
@@ -454,7 +465,7 @@ serve(async (req) => {
 
         return new Response(csv, {
           headers: {
-            ...corsHeaders,
+            ...getCorsHeaders(req),
             'Content-Type': 'text/csv',
             'Content-Disposition': 'attachment; filename="emotion_scans.csv"',
           },
@@ -502,13 +513,13 @@ serve(async (req) => {
 
       return new Response(JSON.stringify(results), {
         status: 201,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
     return new Response(JSON.stringify({ error: 'Route non trouvée' }), {
       status: 404,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
     console.error('❌ Scans API Error:', error);
@@ -516,7 +527,7 @@ serve(async (req) => {
       JSON.stringify({ error: error.message }),
       {
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       }
     );
   }

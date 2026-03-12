@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { routes } from '@/routerV2';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
@@ -25,7 +26,14 @@ const ProtectedLayout: React.FC = () => {
     return <Navigate to={routes.special.chooseMode()} replace />;
   }
 
-  return <Outlet />;
+  return (
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <Outlet />
+    </>
+  );
 };
 
 export default ProtectedLayout;

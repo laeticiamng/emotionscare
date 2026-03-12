@@ -7,10 +7,21 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY') ?? '';
 const AI_GATEWAY_URL = 'https://ai.gateway.lovable.dev/v1/chat/completions';
@@ -39,7 +50,7 @@ interface RouterRequest {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: getCorsHeaders(req) });
   }
 
   const startTime = Date.now();
@@ -49,7 +60,7 @@ Deno.serve(async (req) => {
     if (!authHeader) {
       return new Response(
         JSON.stringify({ error: 'Authorization required' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 401, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -63,7 +74,7 @@ Deno.serve(async (req) => {
     if (userError || !user) {
       return new Response(
         JSON.stringify({ error: 'Invalid token' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 401, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -73,7 +84,7 @@ Deno.serve(async (req) => {
     if (!prompt) {
       return new Response(
         JSON.stringify({ error: 'Prompt is required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -103,7 +114,7 @@ Deno.serve(async (req) => {
 
       if (stream) {
         return new Response(response.body, {
-          headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'text/event-stream' },
         });
       }
 
@@ -114,7 +125,7 @@ Deno.serve(async (req) => {
           model,
           latency,
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -139,7 +150,7 @@ Deno.serve(async (req) => {
 
       if (stream) {
         return new Response(fallbackResponse.body, {
-          headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'text/event-stream' },
         });
       }
 
@@ -151,7 +162,7 @@ Deno.serve(async (req) => {
           latency,
           fallback: true,
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -163,7 +174,7 @@ Deno.serve(async (req) => {
     if (response.status === 429 || fallbackResponse.status === 429) {
       return new Response(
         JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
-        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Retry-After': '60' } }
+        { status: 429, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json', 'Retry-After': '60' } }
       );
     }
 
@@ -171,19 +182,19 @@ Deno.serve(async (req) => {
     if (response.status === 402 || fallbackResponse.status === 402) {
       return new Response(
         JSON.stringify({ error: 'AI credits exhausted. Please add funds to continue.' }),
-        { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 402, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
     return new Response(
       JSON.stringify({ error: 'AI service temporarily unavailable' }),
-      { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 503, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     console.error('[AI Router] Error:', error);
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });

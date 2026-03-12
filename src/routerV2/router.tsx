@@ -32,8 +32,10 @@ import FloatingActionMenu from '@/components/layout/FloatingActionMenu';
 // ═══════════════════════════════════════════════════════════
 import { componentMap } from './routes/index';
 
-// Pages DEV-only (Nyvée test)
-const NyveeTestPage = lazy(() => import('@/pages/NyveeTestPage'));
+// Pages DEV-only (Nyvée test) - guarded so the module is not bundled in production
+const NyveeTestPage = import.meta.env.DEV
+  ? lazy(() => import('@/pages/NyveeTestPage'))
+  : undefined;
 
 // ═══════════════════════════════════════════════════════════
 // WRAPPER COMPONENTS
@@ -150,7 +152,7 @@ logger.debug('Creating router', {
 
 export const router = createBrowserRouter([
   // Route de test Nyvée - DEV uniquement
-  ...(import.meta.env.DEV ? [{
+  ...(import.meta.env.DEV && NyveeTestPage ? [{
     path: '/test-nyvee',
     element: (
       <SuspenseWrapper>

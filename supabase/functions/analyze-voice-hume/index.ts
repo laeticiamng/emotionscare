@@ -5,10 +5,21 @@ import { authenticateRequest } from '../_shared/auth-middleware.ts';
 import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 import { validateRequest, createErrorResponse, VoiceAnalysisSchema } from '../_shared/validation.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 // Process base64 in chunks to prevent memory issues
 function processBase64Chunks(base64String: string, chunkSize = 32768): Uint8Array {
@@ -42,7 +53,7 @@ function processBase64Chunks(base64String: string, chunkSize = 32768): Uint8Arra
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -144,7 +155,7 @@ serve(async (req) => {
           latency_ms: Date.now() - startTime,
           note: 'Transcription audio non détectée. Veuillez parler plus clairement ou plus longtemps.'
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -269,7 +280,7 @@ Ne réponds JAMAIS "neutre" si la personne exprime clairement une émotion. Éco
 
     return new Response(
       JSON.stringify(result),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
@@ -281,7 +292,7 @@ Ne réponds JAMAIS "neutre" si la personne exprime clairement une émotion. Éco
       }),
       { 
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
       }
     );
   }

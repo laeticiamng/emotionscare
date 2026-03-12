@@ -1,14 +1,25 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -32,7 +43,7 @@ serve(async (req) => {
         const featured = (presets || []).filter((p: any) => p.is_featured).slice(0, 6);
         
         return new Response(JSON.stringify({ presets, featured }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
         });
       }
 
@@ -45,7 +56,7 @@ serve(async (req) => {
         
         if (error) throw error;
         return new Response(JSON.stringify({ presets }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
         });
       }
 
@@ -70,7 +81,7 @@ serve(async (req) => {
         if (error) throw error;
         
         return new Response(JSON.stringify({ preset }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
         });
       }
 
@@ -93,7 +104,7 @@ serve(async (req) => {
           await supabase.rpc("decrement_preset_likes", { p_preset_id: presetId });
           
           return new Response(JSON.stringify({ liked: false }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
           });
         } else {
           // Like
@@ -104,7 +115,7 @@ serve(async (req) => {
           await supabase.rpc("increment_preset_likes", { p_preset_id: presetId });
           
           return new Response(JSON.stringify({ liked: true }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
           });
         }
       }
@@ -113,7 +124,7 @@ serve(async (req) => {
         await supabase.rpc("increment_preset_uses", { p_preset_id: presetId });
         
         return new Response(JSON.stringify({ success: true }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
         });
       }
 
@@ -127,7 +138,7 @@ serve(async (req) => {
         if (error) throw error;
         
         return new Response(JSON.stringify({ success: true }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
         });
       }
 
@@ -151,7 +162,7 @@ serve(async (req) => {
         if (error) throw error;
         
         return new Response(JSON.stringify({ presets }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
         });
       }
 
@@ -166,14 +177,14 @@ serve(async (req) => {
         return new Response(JSON.stringify({ 
           likedIds: (likes || []).map((l: any) => l.preset_id) 
         }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
         });
       }
 
       default:
         return new Response(JSON.stringify({ error: "Unknown action" }), {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
         });
     }
   } catch (error: unknown) {
@@ -181,7 +192,7 @@ serve(async (req) => {
     console.error("mood-mixer-presets error:", error);
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
     });
   }
 });

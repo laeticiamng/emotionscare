@@ -91,11 +91,13 @@ export class APIError extends Error {
 
 /**
  * Créer une réponse JSON formatée
+ * @param req - optionnel, si fourni utilise CORS securise
  */
-export function jsonResponse(data: any, status: number = 200) {
+export function jsonResponse(data: any, status: number = 200, req?: Request) {
+  const cors = req ? getCorsHeadersForRequest(req) : corsHeaders;
   return new Response(JSON.stringify(data), {
     status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    headers: { ...cors, 'Content-Type': 'application/json' },
   });
 }
 
@@ -119,11 +121,11 @@ export function errorResponse(error: any, status: number = 500) {
 }
 
 /**
- * Gérer CORS preflight
+ * Gérer CORS preflight avec origins securisees
  */
 export function handleCORS(req: Request) {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeadersForRequest(req) });
   }
   return null;
 }

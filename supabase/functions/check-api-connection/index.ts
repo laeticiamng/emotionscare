@@ -4,21 +4,32 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { authorizeRole } from '../_shared/auth.ts';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   const { user, status } = await authorizeRole(req, ['admin', 'b2b_admin']);
   if (!user) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 
@@ -53,7 +64,7 @@ serve(async (req: Request) => {
       models: data.data?.length || 0,
       hasRequiredModels
     }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   } catch (error) {
     console.error('Error checking OpenAI API connection:', error);
@@ -62,7 +73,7 @@ serve(async (req: Request) => {
       error: error.message
     }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 });

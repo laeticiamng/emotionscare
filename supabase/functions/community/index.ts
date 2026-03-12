@@ -3,14 +3,23 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 // @ts-ignore
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
 
-serve(async (req: Request) => {
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { headers: getCorsHeaders(req) })
   }
 
   try {
@@ -46,7 +55,7 @@ serve(async (req: Request) => {
       if (error) throw error
 
       return new Response(JSON.stringify({ posts }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       })
     }
 
@@ -68,7 +77,7 @@ serve(async (req: Request) => {
       if (error) throw error
 
       return new Response(JSON.stringify({ post }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       })
     }
 
@@ -93,7 +102,7 @@ serve(async (req: Request) => {
           .eq('user_id', user.id)
 
         return new Response(JSON.stringify({ liked: false }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         })
       } else {
         // Like
@@ -105,7 +114,7 @@ serve(async (req: Request) => {
           })
 
         return new Response(JSON.stringify({ liked: true }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         })
       }
     }
@@ -123,7 +132,7 @@ serve(async (req: Request) => {
       if (error) throw error
 
       return new Response(JSON.stringify({ comments }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       })
     }
 
@@ -146,7 +155,7 @@ serve(async (req: Request) => {
       if (error) throw error
 
       return new Response(JSON.stringify({ comment }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       })
     }
 
@@ -163,7 +172,7 @@ serve(async (req: Request) => {
       if (error) throw error
 
       return new Response(JSON.stringify({ success: true }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       })
     }
 
@@ -189,20 +198,20 @@ serve(async (req: Request) => {
         totalComments: comments?.length || 0,
         totalLikes: likes?.length || 0,
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       })
     }
 
     return new Response(JSON.stringify({ error: 'Not found' }), {
       status: 404,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     })
 
   } catch (error: any) {
     console.error('Community function error:', error)
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     })
   }
 })

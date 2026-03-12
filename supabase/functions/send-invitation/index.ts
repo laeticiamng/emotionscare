@@ -259,13 +259,13 @@ async function sendEmail(
 
 serve(async (req) => {
   const corsHeaders = {
-    'Access-Control-Allow-Origin': req.headers.get('Origin') || '*',
+    'Access-Control-Allow-Origin': (() => { const o = req.headers.get('Origin') ?? ''; return ['https://emotionscare.com','https://www.emotionscare.com','https://emotions-care.lovable.app','http://localhost:5173'].includes(o) ? o : 'https://emotionscare.com'; })(),
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
   };
 
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -279,7 +279,7 @@ serve(async (req) => {
     if (!user) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: corsHeaders }
+        { status: 401, headers: getCorsHeaders(req) }
       );
     }
 
@@ -292,7 +292,7 @@ serve(async (req) => {
       if (!email || !emailRegex.test(email)) {
         return new Response(
           JSON.stringify({ error: 'Email invalide' }),
-          { status: 400, headers: corsHeaders }
+          { status: 400, headers: getCorsHeaders(req) }
         );
       }
 
@@ -338,13 +338,13 @@ serve(async (req) => {
         console.error(`[Invitation] Failed to send collab email to ${email}:`, emailResult.error);
         return new Response(
           JSON.stringify({ error: 'Email non envoyé', details: emailResult.error }),
-          { status: 500, headers: corsHeaders }
+          { status: 500, headers: getCorsHeaders(req) }
         );
       }
 
       return new Response(
         JSON.stringify({ success: true, message: 'Invitation envoyée' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
     
@@ -353,14 +353,14 @@ serve(async (req) => {
     if (!email || !emailRegex.test(email)) {
       return new Response(
         JSON.stringify({ error: 'Email invalide' }),
-        { status: 400, headers: corsHeaders }
+        { status: 400, headers: getCorsHeaders(req) }
       );
     }
 
     if (!role || !['b2b_user', 'b2b_admin', 'member', 'manager'].includes(role)) {
       return new Response(
         JSON.stringify({ error: 'Rôle invalide' }),
-        { status: 400, headers: corsHeaders }
+        { status: 400, headers: getCorsHeaders(req) }
       );
     }
 
@@ -379,7 +379,7 @@ serve(async (req) => {
     if (existingUser) {
       return new Response(
         JSON.stringify({ error: 'Cet utilisateur a déjà un compte. Ajoutez-le directement à l\'organisation.' }),
-        { status: 409, headers: corsHeaders }
+        { status: 409, headers: getCorsHeaders(req) }
       );
     }
 
@@ -401,7 +401,7 @@ serve(async (req) => {
             error: 'Une invitation a déjà été envoyée à cet email récemment. Attendez 24h avant de renvoyer.',
             invitationId: existingInvitation.id 
           }),
-          { status: 409, headers: corsHeaders }
+          { status: 409, headers: getCorsHeaders(req) }
         );
       }
       
@@ -434,7 +434,7 @@ serve(async (req) => {
       console.error('[Invitation] Erreur création:', error);
       return new Response(
         JSON.stringify({ error: 'Erreur lors de la création de l\'invitation' }),
-        { status: 500, headers: corsHeaders }
+        { status: 500, headers: getCorsHeaders(req) }
       );
     }
 
@@ -497,7 +497,7 @@ serve(async (req) => {
           details: emailResult.error,
           invitationId: invitation.id
         }),
-        { status: 500, headers: corsHeaders }
+        { status: 500, headers: getCorsHeaders(req) }
       );
     }
 
@@ -519,14 +519,14 @@ serve(async (req) => {
         invitationId: invitation.id,
         expiresAt,
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('[Invitation] Error:', error);
     return new Response(
       JSON.stringify({ error: 'Erreur lors de l\'envoi de l\'invitation' }),
-      { status: 500, headers: corsHeaders }
+      { status: 500, headers: getCorsHeaders(req) }
     );
   }
 });

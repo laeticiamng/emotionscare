@@ -6,14 +6,25 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { authorizeRole } from '../_shared/auth.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -21,7 +32,7 @@ serve(async (req) => {
     if (!user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -30,7 +41,7 @@ serve(async (req) => {
     if (!goal || typeof goal !== 'string' || goal.trim().length < 3) {
       return new Response(JSON.stringify({ error: 'Goal is required (min 3 characters)' }), {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -102,7 +113,7 @@ Inclus 5 badges motivants pour célébrer les accomplissements.`;
         gameStructure: getDefaultStructure(goal, difficulty)
       }), {
         status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -112,7 +123,7 @@ Inclus 5 badges motivants pour célébrer les accomplissements.`;
         gameStructure: getDefaultStructure(goal, difficulty)
       }), {
         status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -122,7 +133,7 @@ Inclus 5 badges motivants pour célébrer les accomplissements.`;
         gameStructure: getDefaultStructure(goal, difficulty)
       }), {
         status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -165,14 +176,14 @@ Inclus 5 badges motivants pour célébrer les accomplissements.`;
       gameStructure.badges = Array.isArray(gameStructure.badges) ? gameStructure.badges : ['Débutant', 'Persévérant', 'Champion'];
 
       return new Response(JSON.stringify({ gameStructure }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     } catch (parseError) {
       console.error('Parse error, using default structure:', parseError);
       return new Response(JSON.stringify({
         gameStructure: getDefaultStructure(goal, difficulty)
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -181,7 +192,7 @@ Inclus 5 badges motivants pour célébrer les accomplissements.`;
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 });

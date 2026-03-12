@@ -56,12 +56,23 @@ export const logger = {
 };
 
 /**
- * Wrapper CORS standard
+ * Wrapper CORS securise
  */
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 /**
  * Wrapper de fonction Edge Function avec monitoring complet
@@ -76,7 +87,7 @@ export function withMonitoring<T = any>(
     
     // Handle CORS preflight
     if (req.method === 'OPTIONS') {
-      return new Response(null, { headers: corsHeaders });
+      return new Response(null, { headers: getCorsHeaders(req) });
     }
     
     // Générer un ID de requête unique
@@ -143,7 +154,7 @@ export function withMonitoring<T = any>(
       return new Response(JSON.stringify(result), {
         status: 200,
         headers: {
-          ...corsHeaders,
+          ...getCorsHeaders(req),
           'Content-Type': 'application/json',
           'X-Request-Id': requestId,
           'X-Function-Name': functionName,
@@ -178,7 +189,7 @@ export function withMonitoring<T = any>(
         {
           status: 500,
           headers: {
-            ...corsHeaders,
+            ...getCorsHeaders(req),
             'Content-Type': 'application/json',
             'X-Request-Id': requestId,
             'X-Response-Time': `${duration}ms`,

@@ -3,12 +3,21 @@ import { authenticateRequest } from '../_shared/auth-middleware.ts';
 import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 import { validateRequest, createErrorResponse, AICoachRequestSchema } from '../_shared/validation.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
 
-interface CoachResponse {
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}interface CoachResponse {
   response: string;
   emotion: string;
   techniques: string[];
@@ -41,7 +50,7 @@ const PERSONALITIES: Record<string, { style: string; approach: string }> = {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { headers: getCorsHeaders(req) })
   }
 
   try {
@@ -159,7 +168,7 @@ Génère ta réponse JSON:`;
           error: "Rate limits exceeded, please try again later." 
         }), {
           status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
         });
       }
       if (aiResponse.status === 402) {
@@ -167,7 +176,7 @@ Génère ta réponse JSON:`;
           error: "Payment required, please add funds to your Lovable AI workspace." 
         }), {
           status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
         });
       }
       throw new Error('AI gateway error');
@@ -240,7 +249,7 @@ Génère ta réponse JSON:`;
     });
 
     return new Response(JSON.stringify(coachResponse), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
@@ -275,7 +284,7 @@ Génère ta réponse JSON:`;
     
     return new Response(JSON.stringify(fallbackResponse), {
       status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 });

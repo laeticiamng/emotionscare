@@ -7,7 +7,7 @@ import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-li
 
 serve(async (req) => {
   const corsHeaders = {
-    'Access-Control-Allow-Origin': req.headers.get('Origin') || '*',
+    'Access-Control-Allow-Origin': (() => { const o = req.headers.get('Origin') ?? ''; return ['https://emotionscare.com','https://www.emotionscare.com','https://emotions-care.lovable.app','http://localhost:5173'].includes(o) ? o : 'https://emotionscare.com'; })(),
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Security-Policy': "default-src 'self'",
@@ -16,7 +16,7 @@ serve(async (req) => {
   };
 
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -25,7 +25,7 @@ serve(async (req) => {
       await logUnauthorizedAccess(req, authResult.error || 'Authentication failed');
       return new Response(
         JSON.stringify({ error: authResult.error }),
-        { status: authResult.status, headers: corsHeaders }
+        { status: authResult.status, headers: getCorsHeaders(req) }
       );
     }
 
@@ -48,7 +48,7 @@ serve(async (req) => {
     if (!['json', 'csv', 'pdf'].includes(format)) {
       return new Response(
         JSON.stringify({ error: 'Format non supporté' }),
-        { status: 400, headers: corsHeaders }
+        { status: 400, headers: getCorsHeaders(req) }
       );
     }
 
@@ -168,7 +168,7 @@ serve(async (req) => {
       console.error('Erreur création export:', error);
       return new Response(
         JSON.stringify({ error: 'Erreur lors de la création de l\'export' }),
-        { status: 500, headers: corsHeaders }
+        { status: 500, headers: getCorsHeaders(req) }
       );
     }
 
@@ -189,14 +189,14 @@ serve(async (req) => {
         exportId: exportRequest.id,
         expiresAt: exportRequest.expires_at
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('Erreur dans gdpr-data-export:', error);
     return new Response(
       JSON.stringify({ error: 'Erreur lors de l\'export des données' }),
-      { status: 500, headers: corsHeaders }
+      { status: 500, headers: getCorsHeaders(req) }
     );
   }
 });

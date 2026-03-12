@@ -40,14 +40,25 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -68,7 +79,7 @@ serve(async (req) => {
     if (!user) {
       return new Response(JSON.stringify({ error: 'Non autorisé' }), {
         status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -104,7 +115,7 @@ serve(async (req) => {
 
       return new Response(JSON.stringify(session), {
         status: 201,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -132,7 +143,7 @@ serve(async (req) => {
 
       return new Response(
         JSON.stringify({ sessions, total: count || 0 }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -148,7 +159,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify(session), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -171,7 +182,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify(session), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -208,7 +219,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify(session), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -224,7 +235,7 @@ serve(async (req) => {
 
       return new Response(null, {
         status: 204,
-        headers: corsHeaders,
+        headers: getCorsHeaders(req),
       });
     }
 
@@ -261,7 +272,7 @@ serve(async (req) => {
           progress_made: 'Évolution positive observée',
           next_steps: ['Continuer les exercices de respiration', 'Pratiquer la gratitude quotidienne'],
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -367,7 +378,7 @@ serve(async (req) => {
 
       return new Response(JSON.stringify(assistantMessage), {
         status: 201,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -391,7 +402,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify(messages), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -408,7 +419,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify(messages), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -423,7 +434,7 @@ serve(async (req) => {
 
       return new Response(null, {
         status: 204,
-        headers: corsHeaders,
+        headers: getCorsHeaders(req),
       });
     }
 
@@ -439,7 +450,7 @@ serve(async (req) => {
       };
 
       return new Response(JSON.stringify(response), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -466,7 +477,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify(programs), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -481,7 +492,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify(program), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -507,7 +518,7 @@ serve(async (req) => {
 
       return new Response(JSON.stringify(enrollment), {
         status: 201,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -525,7 +536,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify(enrollment), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -554,7 +565,7 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify(insights), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -582,7 +593,7 @@ serve(async (req) => {
       };
 
       return new Response(JSON.stringify(recommendations), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -608,7 +619,7 @@ serve(async (req) => {
 
       return new Response(JSON.stringify(feedback), {
         status: 201,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -652,13 +663,13 @@ serve(async (req) => {
           programs_completed: enrollments?.filter(e => e.is_completed).length || 0,
           insights_generated: 0,
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
     return new Response(JSON.stringify({ error: 'Route non trouvée' }), {
       status: 404,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
     console.error('❌ Coach API Error:', error);
@@ -666,7 +677,7 @@ serve(async (req) => {
       JSON.stringify({ error: error.message }),
       {
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       }
     );
   }

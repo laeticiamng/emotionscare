@@ -2,10 +2,21 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from '../_shared/supabase.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 // Fonction retry avec backoff exponentiel pour gérer les erreurs temporaires
 async function fetchWithRetry(url: string, options: RequestInit, maxRetries = 3): Promise<Response> {
@@ -85,14 +96,14 @@ function estimateEnergyLevel(tags: string, style: string, bpm?: number): number 
 }
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
+  if (req.method === 'OPTIONS') return new Response(null, { headers: getCorsHeaders(req) });
 
   try {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -106,7 +117,7 @@ serve(async (req) => {
     if (userError || !user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -149,7 +160,7 @@ serve(async (req) => {
           message: 'Demande ajoutée à la file d\'attente',
           estimatedWaitMinutes: 2,
         }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       }
     }
@@ -205,7 +216,7 @@ serve(async (req) => {
           tags: [dominant, 'therapeutic', 'ai-generated'],
           description: profile.desc
         }
-      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }), { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } });
     }
 
     // Générer musique
@@ -247,7 +258,7 @@ serve(async (req) => {
             status: sunoRes.status
           }), {
             status: 503,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
           });
         }
         
@@ -258,7 +269,7 @@ serve(async (req) => {
             message: 'Erreur d\'authentification avec le service de génération musicale.'
           }), {
             status: 401,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
           });
         }
         
@@ -268,7 +279,7 @@ serve(async (req) => {
           message: `Erreur du service de génération musicale: ${sunoRes.status}`
         }), {
           status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
         });
       }
       
@@ -298,7 +309,7 @@ serve(async (req) => {
           details: sunoData
         }), {
           status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
         });
       }
       console.log(`[emotion-music-ai] Suno generation started with taskId:`, taskId);
@@ -331,7 +342,7 @@ serve(async (req) => {
         emotion,
         profile,
         status: 'generating'
-      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }), { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } });
     }
 
     // Check status - Documentation: https://docs.sunoapi.org/suno-api/quickstart#step-2-check-task-status
@@ -342,7 +353,7 @@ serve(async (req) => {
           message: 'TaskId manquant pour vérifier le statut'
         }), {
           status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
         });
       }
       
@@ -403,7 +414,7 @@ serve(async (req) => {
         status: statusData.status,
         audio_url: statusData.audio_url,
         image_url: statusData.image_url
-      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }), { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } });
     }
 
     // Recommendations
@@ -501,12 +512,12 @@ serve(async (req) => {
         personalizedRecommendations,
         sessions: sessions.data || [],
         totalGenerated: tracks.data?.length || 0
-      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }), { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } });
     }
 
     return new Response(JSON.stringify({ error: 'Invalid action' }), {
       status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
     });
 
   } catch (error) {
@@ -538,7 +549,7 @@ serve(async (req) => {
       details: process.env.NODE_ENV === 'development' ? err.stack : undefined
     }), {
       status: statusCode,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
     });
   }
 });
