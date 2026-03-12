@@ -2,15 +2,14 @@
  * Configuration centralisée pour EmotionsCare Production
  */
 
-// ⚠️ MODE TEST - PRODUCTION: BYPASS_AUTH doit être false!
-// Ce flag ne doit JAMAIS être true en production - cause des erreurs RLS 403
-export const TEST_MODE: {
-  BYPASS_AUTH: boolean;
-  MOCK_USER: { id: string; email: string; user_metadata: { full_name: string; avatar_url: null } } | null;
-} = {
-  BYPASS_AUTH: false, // ← PRODUCTION: false obligatoire
-  MOCK_USER: null, // Pas d'utilisateur mock en production
-};
+/**
+ * TEST_MODE — verrouille en production via Object.freeze.
+ * BYPASS_AUTH ne doit JAMAIS etre true en production (cause erreurs RLS 403).
+ */
+export const TEST_MODE = Object.freeze({
+  BYPASS_AUTH: false,
+  MOCK_USER: null,
+} as const);
 
 export const CONFIG = {
   // APIs Configuration — clés via variables d'environnement uniquement (pas de fallback en dur)

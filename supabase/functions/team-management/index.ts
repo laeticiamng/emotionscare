@@ -9,10 +9,21 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 async function listTeams() {
   const { data, error } = await supabase.from('teams').select('*');
@@ -47,14 +58,14 @@ async function logAction(userId: string, action: string, details: string) {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   const { user, status } = await authorizeRole(req, ['b2b_admin', 'admin']);
   if (!user) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 
@@ -65,7 +76,7 @@ serve(async (req) => {
       case 'list':
         const teams = await listTeams();
         return new Response(JSON.stringify({ teams }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       case 'create':
         if (!payload?.name) throw new Error('Name required');
@@ -73,26 +84,26 @@ serve(async (req) => {
         await logAction(user.id, 'create_team', newTeam.id);
         return new Response(JSON.stringify({ team: newTeam }), {
           status: 201,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       case 'update':
         if (!payload?.id) throw new Error('ID required');
         const updated = await updateTeam(payload.id, payload.fields || {});
         await logAction(user.id, 'update_team', payload.id);
         return new Response(JSON.stringify({ team: updated }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       case 'delete':
         if (!payload?.id) throw new Error('ID required');
         await deleteTeam(payload.id);
         await logAction(user.id, 'delete_team', payload.id);
         return new Response(JSON.stringify({ success: true }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       default:
         return new Response(JSON.stringify({ error: 'Unknown action' }), {
           status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
     }
   } catch (error: unknown) {
@@ -100,7 +111,7 @@ serve(async (req) => {
     console.error('team-management error:', error)
     return new Response(JSON.stringify({ error: 'Server error', message: errorMessage }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 });

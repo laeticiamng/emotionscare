@@ -84,36 +84,46 @@ export default function AnalyticsPage() {
             streakDays: streaks?.current_streak || 0
           });
 
-          // Generate weekly moods
+          // Group sessions by day of week
           const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-          const weekData = days.map(day => ({
-            day,
-            mood: Math.round((5 + Math.random() * 4) * 10) / 10,
-            energy: Math.round((5 + Math.random() * 4) * 10) / 10
-          }));
+          const dayMap = new Map<string, { moods: number[], energies: number[] }>();
+          days.forEach(d => dayMap.set(d, { moods: [], energies: [] }));
+
+          const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+          sessions.forEach(s => {
+            const dayName = dayNames[new Date(s.started_at).getDay()];
+            const entry = dayMap.get(dayName);
+            if (entry) {
+              entry.moods.push(s.mood_after || 0);
+              entry.energies.push(s.mood_after || 0);
+            }
+          });
+
+          const weekData = days.map(day => {
+            const entry = dayMap.get(day)!;
+            return {
+              day,
+              mood: entry.moods.length > 0 ? Math.round((entry.moods.reduce((a, b) => a + b, 0) / entry.moods.length) * 10) / 10 : 0,
+              energy: entry.energies.length > 0 ? Math.round((entry.energies.reduce((a, b) => a + b, 0) / entry.energies.length) * 10) / 10 : 0
+            };
+          });
           setWeeklyMoods(weekData);
         } else {
-          // Default data if no sessions
-          setMoodData({ average: 7.2, trend: '+5%', sessions: 0, streakDays: 0 });
+          // No sessions available
+          setMoodData({ average: 0, trend: '+0%', sessions: 0, streakDays: 0 });
           setWeeklyMoods([
-            { day: 'Lun', mood: 6.5, energy: 7.0 },
-            { day: 'Mar', mood: 7.2, energy: 6.8 },
-            { day: 'Mer', mood: 8.1, energy: 8.2 },
-            { day: 'Jeu', mood: 7.8, energy: 7.5 },
-            { day: 'Ven', mood: 6.9, energy: 6.2 },
-            { day: 'Sam', mood: 8.5, energy: 8.8 },
-            { day: 'Dim', mood: 7.6, energy: 7.9 }
+            { day: 'Lun', mood: 0, energy: 0 },
+            { day: 'Mar', mood: 0, energy: 0 },
+            { day: 'Mer', mood: 0, energy: 0 },
+            { day: 'Jeu', mood: 0, energy: 0 },
+            { day: 'Ven', mood: 0, energy: 0 },
+            { day: 'Sam', mood: 0, energy: 0 },
+            { day: 'Dim', mood: 0, energy: 0 }
           ]);
         }
 
-        // Module stats from activities
-        setModuleStats([
-          { name: 'Scan Émotionnel', usage: 85, sessions: 15, avgDuration: '3m' },
-          { name: 'Musique Thérapeutique', usage: 72, sessions: 12, avgDuration: '15m' },
-          { name: 'Coach IA', usage: 68, sessions: 8, avgDuration: '8m' },
-          { name: 'Respiration VR', usage: 54, sessions: 6, avgDuration: '12m' },
-          { name: 'Journal', usage: 45, sessions: 10, avgDuration: '5m' }
-        ]);
+        // Module stats - empty when no real data
+        setModuleStats([]);
 
       } catch (error) {
         logger.error('Error fetching analytics:', error, 'ANALYTICS');
@@ -255,26 +265,8 @@ export default function AnalyticsPage() {
                     <CardDescription>Cette semaine</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex justify-between">
-                        <span className="text-sm">Méditation</span>
-                        <span className="font-medium">2h 30m</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm">Musique thérapeutique</span>
-                        <span className="font-medium">1h 45m</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm">Journal</span>
-                        <span className="font-medium">45m</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm">Coaching IA</span>
-                        <span className="font-medium">1h 20m</span>
-                      </div>
-                      <div className="text-sm text-muted-foreground pt-2 border-t">
-                        Total: 6h 20m
-                      </div>
+                    <div className="text-center text-muted-foreground py-8">
+                      Aucune donnée disponible
                     </div>
                   </CardContent>
                 </Card>
@@ -288,6 +280,11 @@ export default function AnalyticsPage() {
                   <CardDescription>Performance et engagement par module</CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {moduleStats.length === 0 ? (
+                    <div className="text-center text-muted-foreground py-8">
+                      Aucune donnée disponible
+                    </div>
+                  ) : (
                   <div className="space-y-4">
                     {moduleStats.map((module, index) => (
                       <div key={index} className="space-y-2">
@@ -305,6 +302,7 @@ export default function AnalyticsPage() {
                       </div>
                     ))}
                   </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -317,25 +315,8 @@ export default function AnalyticsPage() {
                     <CardDescription>Évolution sur les 30 derniers jours</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-3 bg-success/10 rounded-lg border border-success/20">
-                        <div className="flex items-center gap-2">
-                          <TrendingUp className="h-4 w-4 text-success" />
-                          <span className="font-medium">Amélioration générale</span>
-                        </div>
-                        <span className="text-success font-semibold">+18%</span>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <div className="text-sm text-muted-foreground">Meilleur jour</div>
-                          <div className="font-medium">Samedi (8.5/10)</div>
-                        </div>
-                        <div>
-                          <div className="text-sm text-muted-foreground">Heure préférée</div>
-                          <div className="font-medium">18h-20h</div>
-                        </div>
-                      </div>
+                    <div className="text-center text-muted-foreground py-8">
+                      Aucune donnée disponible
                     </div>
                   </CardContent>
                 </Card>

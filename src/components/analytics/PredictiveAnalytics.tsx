@@ -47,92 +47,14 @@ const PredictiveAnalytics: React.FC = () => {
   }, []);
 
   const generatePredictions = () => {
-    const mockPredictions: Prediction[] = [
-      {
-        id: '1',
-        type: 'mood',
-        value: 75,
-        trend: 'up',
-        confidence: 89,
-        timeframe: '7 prochains jours',
-        factors: ['Météo favorable', 'Weekend approchant', 'Projet terminé'],
-        recommendations: [
-          'Planifiez des activités en extérieur',
-          'Maintenez votre routine de sommeil',
-          'Profitez de cette période positive'
-        ]
-      },
-      {
-        id: '2',
-        type: 'stress',
-        value: 65,
-        trend: 'down',
-        confidence: 92,
-        timeframe: '3 prochains jours',
-        factors: ['Charge de travail élevée', 'Manque de sommeil', 'Réunions importantes'],
-        recommendations: [
-          'Pratiquez la respiration profonde',
-          'Priorisez vos tâches importantes',
-          'Prenez des pauses régulières'
-        ]
-      },
-      {
-        id: '3',
-        type: 'energy',
-        value: 80,
-        trend: 'stable',
-        confidence: 76,
-        timeframe: '5 prochains jours',
-        factors: ['Routine sportive', 'Alimentation équilibrée', 'Sommeil régulier'],
-        recommendations: [
-          'Continuez vos bonnes habitudes',
-          'Ajoutez une activité énergisante le matin',
-          'Hydratez-vous davantage'
-        ]
-      }
-    ];
-
-    setPredictions(mockPredictions);
+    // No mock predictions - empty state when no real data
+    setPredictions([]);
     setIsLoading(false);
   };
 
   const generateTrendData = () => {
-    const data: TrendData[] = [];
-    const baseDate = new Date();
-    
-    // Données historiques (30 derniers jours)
-    for (let i = -30; i <= 0; i++) {
-      const date = new Date(baseDate);
-      date.setDate(date.getDate() + i);
-      
-      data.push({
-        date: date.toISOString().split('T')[0],
-        mood: Math.round(60 + Math.random() * 30 + Math.sin(i / 7) * 10),
-        stress: Math.round(40 + Math.random() * 40 + Math.cos(i / 5) * 15),
-        energy: Math.round(50 + Math.random() * 35 + Math.sin(i / 3) * 12),
-        predicted: 0
-      });
-    }
-    
-    // Prédictions futures (7 prochains jours)
-    for (let i = 1; i <= 7; i++) {
-      const date = new Date(baseDate);
-      date.setDate(date.getDate() + i);
-      
-      const lastValue = data[data.length - 1][selectedMetric];
-      const trend = Math.random() > 0.5 ? 1 : -1;
-      const predicted = Math.max(0, Math.min(100, lastValue + (Math.random() * 10 * trend)));
-      
-      data.push({
-        date: date.toISOString().split('T')[0],
-        mood: 0,
-        stress: 0,
-        energy: 0,
-        predicted: Math.round(predicted)
-      });
-    }
-    
-    setTrendData(data);
+    // No mock trend data - empty state when no real data
+    setTrendData([]);
   };
 
   const getMetricColor = (type: string) => {
@@ -183,13 +105,18 @@ const PredictiveAnalytics: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
+          {trendData.length === 0 ? (
+            <div className="text-center text-muted-foreground py-12">
+              Prédictions non disponibles — historique insuffisant
+            </div>
+          ) : (
           <Tabs value={selectedMetric} onValueChange={(value) => setSelectedMetric(value as any)}>
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="mood">Humeur</TabsTrigger>
               <TabsTrigger value="stress">Stress</TabsTrigger>
               <TabsTrigger value="energy">Énergie</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value={selectedMetric} className="mt-6">
               <div className="h-64 mb-6">
                 <ResponsiveContainer width="100%" height="100%">
@@ -238,9 +165,19 @@ const PredictiveAnalytics: React.FC = () => {
               </div>
             </TabsContent>
           </Tabs>
+          )}
         </CardContent>
       </Card>
 
+      {predictions.length === 0 ? (
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center text-muted-foreground py-8">
+              Aucune prédiction disponible — historique insuffisant
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {predictions.map((prediction) => (
           <Card key={prediction.id} className="relative overflow-hidden">
@@ -306,6 +243,7 @@ const PredictiveAnalytics: React.FC = () => {
           </Card>
         ))}
       </div>
+      )}
 
       <Card>
         <CardHeader>

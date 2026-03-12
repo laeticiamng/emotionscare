@@ -58,13 +58,17 @@ const ChallengesDashboard = lazy(() => import('@/pages/admin/ChallengesDashboard
 const CronMonitoring = lazy(() => import('@/pages/CronMonitoring'));
 const BlockchainBackups = lazy(() => import('@/pages/BlockchainBackups'));
 
-// Dev-only
+// Dev-only (guarded: not loaded in production)
 const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
 const SecurityAuditScorecard = lazy(() => import('@/pages/admin/SecurityAuditScorecard'));
 const SecurityDossierB2B = lazy(() => import('@/pages/admin/SecurityDossierB2B'));
 const ErrorBoundaryTestPage = lazy(() => import('@/pages/dev/ErrorBoundaryTestPage'));
-const TestAccountsPage = lazy(() => import('@/pages/TestAccountsPage'));
-const TestPage = lazy(() => import('@/pages/TestPage'));
+const TestAccountsPage = import.meta.env.DEV
+  ? lazy(() => import('@/pages/TestAccountsPage'))
+  : undefined;
+const TestPage = import.meta.env.DEV
+  ? lazy(() => import('@/pages/TestPage'))
+  : undefined;
 
 export const adminComponentMap = {
   // GDPR
@@ -152,6 +156,7 @@ export const adminComponentMap = {
   SecurityDossierB2B,
   SecurityDossierB2BPage: SecurityDossierB2B,
   ErrorBoundaryTestPage,
-  TestAccountsPage,
-  TestPage,
+  // Test/dev pages: only included in development builds
+  ...(import.meta.env.DEV && TestAccountsPage ? { TestAccountsPage } : {}),
+  ...(import.meta.env.DEV && TestPage ? { TestPage } : {}),
 } as const;

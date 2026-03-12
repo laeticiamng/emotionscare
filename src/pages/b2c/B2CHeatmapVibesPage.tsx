@@ -4,7 +4,6 @@
  */
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { DemoBanner } from '@/components/ui/DemoBanner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, TrendingUp, Users, Calendar, Filter, BarChart3,
@@ -88,59 +87,7 @@ const MOOD_FILTERS = [
   { name: 'joyeux', emoji: '😊', label: 'Joyeux' },
 ];
 
-// Helper functions
-const generateMockData = (weekOffset: number = 0): HeatmapCell[] => {
-  const data: HeatmapCell[] = [];
-  const moods = Object.keys(MOOD_COLORS);
-  const activities = ['méditation', 'respiration', 'journal', 'musique', 'exercice', 'lecture'];
-  
-  const today = new Date();
-  const weekStart = startOfWeek(subDays(today, weekOffset * 7), { weekStartsOn: 1 });
-  const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
-  const daysInWeek = eachDayOfInterval({ start: weekStart, end: weekEnd });
-  
-  daysInWeek.forEach((date, dayIndex) => {
-    HOURS.forEach((hour) => {
-      // Generate realistic patterns
-      const isWorkHour = hour >= 9 && hour <= 18 && dayIndex < 5;
-      const isMorning = hour >= 6 && hour <= 9;
-      const isEvening = hour >= 19 && hour <= 22;
-      
-      // Higher intensity during work hours on weekdays
-      let baseIntensity = Math.random() * 40 + 20;
-      if (isWorkHour) baseIntensity += 30;
-      if (isMorning) baseIntensity += 15;
-      if (isEvening) baseIntensity += 10;
-      
-      // Add some randomness but keep patterns
-      const intensity = Math.min(100, Math.max(0, baseIntensity + (Math.random() - 0.5) * 20));
-      
-      // Determine mood based on time of day
-      let moodIndex: number;
-      if (isMorning) moodIndex = Math.random() > 0.5 ? 0 : 4; // énergique or motivé
-      else if (isEvening) moodIndex = Math.random() > 0.5 ? 1 : 7; // serein or joyeux
-      else moodIndex = Math.floor(Math.random() * moods.length);
-      
-      const selectedMood = moods[moodIndex];
-      const hasData = intensity > 30 || Math.random() > 0.6;
-      
-      if (hasData) {
-        data.push({
-          hour,
-          day: DAYS_FR[dayIndex],
-          date,
-          intensity,
-          mood: selectedMood,
-          moodScore: Math.round(intensity / 20) + 1, // 1-5 scale
-          activities: activities.filter(() => Math.random() > 0.7),
-          count: Math.floor(Math.random() * 5) + 1,
-        });
-      }
-    });
-  });
-  
-  return data;
-};
+// Data — real data will come from Supabase queries
 
 const generateInsights = (data: HeatmapCell[]): AIInsight[] => {
   const insights: AIInsight[] = [];
@@ -450,8 +397,8 @@ const B2CHeatmapVibesPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'heatmap' | 'insights' | 'trends'>('heatmap');
   
-  // Generate data
-  const heatmapData = useMemo(() => generateMockData(weekOffset), [weekOffset]);
+  // Data — empty until real Supabase integration
+  const heatmapData: HeatmapCell[] = useMemo(() => [], [weekOffset]);
   const insights = useMemo(() => generateInsights(heatmapData), [heatmapData]);
   
   // Week label
@@ -515,7 +462,6 @@ const B2CHeatmapVibesPage: React.FC = () => {
   return (
     <PageRoot>
       <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-muted/10">
-        <div className="container mx-auto px-4 pt-4"><DemoBanner message="Cette page affiche des données de démonstration. Les patterns émotionnels présentés sont simulés." /></div>
         {/* Header */}
         <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm border-b">
           <div className="container mx-auto px-4">

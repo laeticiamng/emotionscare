@@ -29,6 +29,7 @@ import { SocialFriendsPanel } from '@/components/music/SocialFriendsPanel';
 import { useToast } from '@/hooks/use-toast';
 import { getUserListeningHistory } from '@/services/music/user-service';
 import { getUserMusicBadges } from '@/services/music/badges-service';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface UserProfile {
   id: string;
@@ -46,6 +47,7 @@ interface UserProfile {
 const MusicProfilePage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [listeningHistory, setListeningHistory] = useState<any[]>([]);
   const [badges, setBadges] = useState<any[]>([]);
@@ -53,27 +55,30 @@ const MusicProfilePage = () => {
 
   useEffect(() => {
     loadProfile();
-  }, []);
+  }, [user]);
 
   const loadProfile = async () => {
+    if (!user) {
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
     try {
-      // Mock profile data
       const profileData: UserProfile = {
-        id: 'user-123',
-        displayName: 'Music Lover',
-        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=MusicLover',
-        level: 7,
-        currentXP: 800,
+        id: user.id,
+        displayName: user.user_metadata?.display_name || user.email?.split('@')[0] || 'Utilisateur',
+        avatarUrl: user.user_metadata?.avatar_url || '',
+        level: 1,
+        currentXP: 0,
         xpToNextLevel: 1000,
-        totalXP: 3800,
-        totalListeningTime: 1250,
-        totalTracks: 342,
-        joinedAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString()
+        totalXP: 0,
+        totalListeningTime: 0,
+        totalTracks: 0,
+        joinedAt: user.created_at || new Date().toISOString()
       };
 
-      const history = await getUserListeningHistory('user-123');
-      const userBadges = await getUserMusicBadges('user-123');
+      const history = await getUserListeningHistory(user.id);
+      const userBadges = await getUserMusicBadges(user.id);
 
       setProfile(profileData);
       setListeningHistory(history);

@@ -6,22 +6,33 @@ import { authorizeRole } from '../_shared/auth.ts';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   const { user, status } = await authorizeRole(req, ['b2c', 'b2b_user', 'b2b_admin', 'admin']);
   if (!user) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 
@@ -54,7 +65,7 @@ serve(async (req) => {
         
         const assistant = await createAssistantResponse.json();
         return new Response(JSON.stringify({ assistant }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
 
       case 'create_thread':
@@ -71,7 +82,7 @@ serve(async (req) => {
         
         const thread = await createThreadResponse.json();
         return new Response(JSON.stringify({ thread }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
 
       case 'create_message':
@@ -93,7 +104,7 @@ serve(async (req) => {
         
         const message = await createMessageResponse.json();
         return new Response(JSON.stringify({ message }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
 
       case 'run_assistant':
@@ -114,7 +125,7 @@ serve(async (req) => {
         
         const run = await runResponse.json();
         return new Response(JSON.stringify({ run }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
 
       case 'get_messages':
@@ -132,7 +143,7 @@ serve(async (req) => {
         
         const messages = await getMessagesResponse.json();
         return new Response(JSON.stringify({ messages }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
 
       case 'check_run':
@@ -151,7 +162,7 @@ serve(async (req) => {
         
         const runStatus = await checkRunResponse.json();
         return new Response(JSON.stringify({ run: runStatus }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
 
       default:
@@ -164,7 +175,7 @@ serve(async (req) => {
       error: error.message,
     }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 });

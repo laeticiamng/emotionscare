@@ -340,51 +340,10 @@ const EmotionalPredictionEngine: React.FC = () => {
 
   const mlEngine = useMemo(() => new EmotionalPredictionML(), []);
 
-  // Génération de données historiques factices
-  const generateHistoricalData = (): EmotionalDataPoint[] => {
-    const data: EmotionalDataPoint[] = [];
-    const now = new Date();
-    
-    for (let i = 90; i >= 0; i--) {
-      const date = new Date(now);
-      date.setDate(date.getDate() - i);
-      
-      // Simulation de patterns réalistes
-      const weekday = date.getDay();
-      const dayOfMonth = date.getDate();
-      
-      // Pattern hebdomadaire (lundi difficile, vendredi meilleur)
-      let baseScore = 6 + Math.sin((weekday + 1) * Math.PI / 7) * 1.5;
-      
-      // Pattern mensuel (milieu de mois plus stable)
-      baseScore += Math.sin((dayOfMonth / 30) * Math.PI) * 0.5;
-      
-      // Bruit aléatoire
-      baseScore += (Math.random() - 0.5) * 2;
-      
-      // Tendance générale légèrement positive
-      baseScore += (90 - i) * 0.01;
-      
-      const stress = Math.max(0, Math.min(10, 5 + (Math.random() - 0.5) * 4));
-      const joy = Math.max(0, Math.min(10, baseScore + (Math.random() - 0.5) * 2));
-      const calm = Math.max(0, Math.min(10, baseScore - stress * 0.3 + (Math.random() - 0.5) * 1));
-      const energy = Math.max(0, Math.min(10, baseScore + joy * 0.2 + (Math.random() - 0.5) * 1.5));
-      
-      data.push({
-        timestamp: date.toISOString(),
-        overallScore: (joy + calm + energy - stress * 0.5) / 3,
-        emotions: {
-          joy,
-          calm,
-          energy,
-          stress,
-          anxiety: stress * 0.8 + (Math.random() - 0.5) * 1
-        },
-        context: i % 7 === 0 ? 'weekend' : 'workday'
-      });
-    }
-    
-    return data;
+  // Returns empty data - no mock/fake data generation
+  const getHistoricalData = (): EmotionalDataPoint[] => {
+    // No historical data available without a real data source
+    return [];
   };
 
   const runPredictionAnalysis = async () => {
@@ -393,53 +352,64 @@ const EmotionalPredictionEngine: React.FC = () => {
     // Simulation d'un délai de calcul
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    const historicalData = generateHistoricalData();
-    
+    const historicalData = getHistoricalData();
+
+    if (historicalData.length < 7) {
+      // Insufficient data for predictions
+      setPredictions(null);
+      setIsAnalyzing(false);
+      return;
+    }
+
     // Prédictions
     const nextWeekScores = mlEngine.polynomialRegression(
       historicalData.map(d => d.overallScore),
       2
     );
-    
+
     // Analyse des tendances
     const recentTrend = mlEngine.polynomialRegression(
       historicalData.slice(-14).map(d => d.overallScore),
       1
     );
-    
+
     const longTermTrend = mlEngine.polynomialRegression(
       historicalData.slice(-30).map(d => d.overallScore),
       2
     );
-    
+
     const shortTrendDirection = recentTrend[0] > historicalData[historicalData.length - 1].overallScore ? 'positive' : 'negative';
     const longTrendDirection = longTermTrend[longTermTrend.length - 1] > historicalData[historicalData.length - 1].overallScore ? 'positive' : 'negative';
-    
+
     // Patterns saisonniers
     const seasonalPatterns = mlEngine.analyzeSeasonalPatterns(historicalData);
-    
+
     // Détection d'anomalies
     const anomalies = mlEngine.detectAnomalies(historicalData);
-    
+
     // Prédiction de risques
     const risks = mlEngine.predictRisks(historicalData);
-    
+
     // Recommandations basées sur l'analyse
     const recommendations = generateRecommendations(risks, seasonalPatterns, shortTrendDirection);
-    
+
+    // Calculate confidence based on data size
+    const dataSize = historicalData.length;
+    const confidence = Math.min(0.95, 0.5 + (dataSize / 180));
+
     const result: PredictionResult = {
       nextWeekPrediction: nextWeekScores,
       trends: {
         shortTerm: shortTrendDirection as any,
         longTerm: longTrendDirection as any,
-        confidence: 0.75 + Math.random() * 0.2
+        confidence
       },
       seasonalPatterns,
       anomalies: anomalies.slice(-5), // 5 dernières anomalies
       risks,
       recommendations
     };
-    
+
     setPredictions(result);
     setIsAnalyzing(false);
   };
@@ -547,6 +517,16 @@ const EmotionalPredictionEngine: React.FC = () => {
           )}
         </CardContent>
       </Card>
+
+      {!predictions && !isAnalyzing && (
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center text-muted-foreground py-12">
+              Prédictions non disponibles — historique insuffisant
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {predictions && (
         <>

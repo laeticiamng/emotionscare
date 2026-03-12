@@ -4,10 +4,21 @@
  */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 // API Base URL - https://docs.sunoapi.org/#api-base-url
 const SUNO_API_BASE = 'https://api.sunoapi.org';
@@ -58,7 +69,7 @@ function getFallbackTrack(mood: string): { id: string; url: string; duration: nu
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -83,7 +94,7 @@ serve(async (req) => {
         isFallback: true,
         sessionId
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -105,7 +116,7 @@ serve(async (req) => {
             error: 'Unable to fetch credits info',
             credits: { remaining: -1, total: -1 }
           }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
           });
         }
         
@@ -123,7 +134,7 @@ serve(async (req) => {
             plan: 'standard'
           }
         }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       } catch (error) {
         console.error('[suno-music] Credits check error:', error);
@@ -132,7 +143,7 @@ serve(async (req) => {
           error: 'Credits check failed',
           credits: { remaining: -1, total: -1 }
         }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
         });
       }
     }
@@ -146,7 +157,7 @@ serve(async (req) => {
         hasApiKey: !!sunoApiKey,
         timestamp: new Date().toISOString()
       }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
       });
     }
 
@@ -379,7 +390,7 @@ serve(async (req) => {
       data: result,
       sessionId
     }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
 
   } catch (err) {
@@ -401,7 +412,7 @@ serve(async (req) => {
       isFallback: true,
       error: errorMessage,
     }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
     });
   }
 });

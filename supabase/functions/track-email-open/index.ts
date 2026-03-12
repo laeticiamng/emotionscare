@@ -4,10 +4,21 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 // Pixel transparent 1x1
 const TRACKING_PIXEL = Uint8Array.from([
@@ -19,7 +30,7 @@ const TRACKING_PIXEL = Uint8Array.from([
 
 serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -45,7 +56,7 @@ serve(async (req: Request) => {
     return new Response(TRACKING_PIXEL, {
       status: 200,
       headers: {
-        ...corsHeaders,
+        ...getCorsHeaders(req),
         "Content-Type": "image/gif",
         "Cache-Control": "no-cache, no-store, must-revalidate",
         "Pragma": "no-cache",
@@ -59,7 +70,7 @@ serve(async (req: Request) => {
     return new Response(TRACKING_PIXEL, {
       status: 200,
       headers: {
-        ...corsHeaders,
+        ...getCorsHeaders(req),
         "Content-Type": "image/gif",
       },
     });

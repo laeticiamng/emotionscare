@@ -112,20 +112,20 @@ const B2CActivitePage: React.FC = () => {
           const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
           const data = days.map(day => ({
             date: day,
-            count: statsData.byDay[day] || Math.floor(Math.random() * 5),
-            minutes: (statsData.byDay[day] || Math.floor(Math.random() * 5)) * 15
+            count: statsData.byDay[day] || 0,
+            minutes: (statsData.byDay[day] || 0) * 15
           }));
           setWeeklyData(data);
         } else {
           // Sample data if no real data
           setWeeklyData([
-            { date: 'Lun', count: 2, minutes: 30 },
-            { date: 'Mar', count: 3, minutes: 45 },
-            { date: 'Mer', count: 1, minutes: 15 },
-            { date: 'Jeu', count: 4, minutes: 60 },
-            { date: 'Ven', count: 2, minutes: 30 },
-            { date: 'Sam', count: 5, minutes: 75 },
-            { date: 'Dim', count: 3, minutes: 45 }
+            { date: 'Lun', count: 0, minutes: 0 },
+            { date: 'Mar', count: 0, minutes: 0 },
+            { date: 'Mer', count: 0, minutes: 0 },
+            { date: 'Jeu', count: 0, minutes: 0 },
+            { date: 'Ven', count: 0, minutes: 0 },
+            { date: 'Sam', count: 0, minutes: 0 },
+            { date: 'Dim', count: 0, minutes: 0 }
           ]);
         }
       } catch (error) {

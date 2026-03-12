@@ -6,10 +6,21 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 interface FixSuggestion {
   id: string;
@@ -31,7 +42,7 @@ interface AnalysisResult {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   try {
@@ -55,7 +66,7 @@ serve(async (req) => {
       if (!fix) {
         return new Response(
           JSON.stringify({ error: 'Fix non trouvé', fixId }),
-          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 404, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -73,7 +84,7 @@ serve(async (req) => {
           message: `Fix "${fix.title}" enregistré comme appliqué`,
           nextSteps: ['Vérifier que le problème est résolu', 'Monitorer les métriques']
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -81,7 +92,7 @@ serve(async (req) => {
     if (!question || typeof question !== 'string') {
       return new Response(
         JSON.stringify({ error: 'Question requise' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -158,7 +169,7 @@ Réponds en français, de manière professionnelle, concise et actionnable.`;
       const fallbackAnalysis = generateFallbackAnalysis(context, suggestedFixes, question);
       return new Response(
         JSON.stringify(fallbackAnalysis),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -185,7 +196,7 @@ Réponds en français, de manière professionnelle, concise et actionnable.`;
         const fallbackAnalysis = generateFallbackAnalysis(context, suggestedFixes, question);
         return new Response(
           JSON.stringify(fallbackAnalysis),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         );
       }
       throw new Error(`AI API error: ${aiResponse.status}`);
@@ -227,14 +238,14 @@ Réponds en français, de manière professionnelle, concise et actionnable.`;
           pending_alerts: context.pending_alerts.length,
         }
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('[monitoring-chatbot] Error:', error);
     return new Response(
       JSON.stringify({ error: error.message || 'Erreur interne du chatbot' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });

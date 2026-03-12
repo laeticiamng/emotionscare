@@ -45,43 +45,11 @@ export interface HeatmapConfig {
 }
 
 // ============================================================================
-// MOCK DATA
+// CONSTANTS
 // ============================================================================
 
 const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
-const TEAMS = ['Développement', 'Marketing', 'Support', 'RH', 'Finance'];
-
-function generateMockData(): HeatmapDataPoint[] {
-  const data: HeatmapDataPoint[] = [];
-  
-  TEAMS.forEach((teamName, teamIdx) => {
-    for (let day = 0; day < 5; day++) { // Lun-Ven seulement
-      for (let hour = 8; hour <= 18; hour++) { // Heures de travail
-        // Simulate realistic patterns
-        const morningBoost = hour >= 9 && hour <= 11 ? 0.2 : 0;
-        const afternoonDip = hour >= 14 && hour <= 15 ? -0.15 : 0;
-        const fridayEffect = day === 4 ? 0.1 : 0;
-        const mondayBlues = day === 0 ? -0.1 : 0;
-        
-        const baseValence = 0.3 + (Math.random() * 0.4) + morningBoost + afternoonDip + fridayEffect + mondayBlues;
-        const baseArousal = 0.4 + (Math.random() * 0.3);
-        
-        data.push({
-          teamId: `team-${teamIdx}`,
-          teamName,
-          dayOfWeek: day,
-          hour,
-          avgValence: Math.max(-1, Math.min(1, baseValence)),
-          avgArousal: Math.max(0, Math.min(1, baseArousal)),
-          sampleCount: Math.floor(Math.random() * 20) + 5,
-        });
-      }
-    }
-  });
-  
-  return data;
-}
 
 // ============================================================================
 // UTILS
@@ -105,12 +73,17 @@ function getArousalOpacity(arousal: number): number {
 // COMPONENT
 // ============================================================================
 
-export function EmotionalHeatmap() {
+interface EmotionalHeatmapProps {
+  data?: HeatmapDataPoint[];
+  teams?: { id: string; name: string }[];
+}
+
+export function EmotionalHeatmap({ data: externalData, teams = [] }: EmotionalHeatmapProps) {
   const [selectedTeam, setSelectedTeam] = useState<string>('all');
   const [selectedMetric, setSelectedMetric] = useState<'valence' | 'arousal'>('valence');
-  
-  const data = useMemo(() => generateMockData(), []);
-  
+
+  const data = externalData ?? [];
+
   const filteredData = useMemo(() => {
     if (selectedTeam === 'all') return data;
     return data.filter(d => d.teamId === selectedTeam);
@@ -154,8 +127,8 @@ export function EmotionalHeatmap() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Toutes les équipes</SelectItem>
-                {TEAMS.map((team, idx) => (
-                  <SelectItem key={idx} value={`team-${idx}`}>{team}</SelectItem>
+                {teams.map((team) => (
+                  <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -278,14 +251,14 @@ export function EmotionalHeatmap() {
         </div>
 
         {/* Insights */}
-        <div className="mt-6 p-4 rounded-lg bg-muted/30 border border-border/50">
-          <h4 className="font-medium text-foreground mb-2">💡 Insights</h4>
-          <ul className="text-sm text-muted-foreground space-y-1">
-            <li>• Meilleur moment: <span className="text-foreground">Mardi-Mercredi 10h-11h</span></li>
-            <li>• Période à risque: <span className="text-foreground">Lundi matin, Vendredi 15h</span></li>
-            <li>• Tendance: <span className="text-green-500">↑ Amélioration de 5% cette semaine</span></li>
-          </ul>
-        </div>
+        {data.length === 0 && (
+          <div className="mt-6 p-8 rounded-lg bg-muted/30 border border-border/50 text-center">
+            <Grid className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30" />
+            <p className="text-sm text-muted-foreground">
+              Aucune donnée disponible. Les insights apparaitront une fois les premières mesures collectées.
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

@@ -114,7 +114,7 @@ export function useSubscription(): UseSubscriptionReturn {
   useEffect(() => {
     if (!user) return;
 
-    const interval = setInterval(checkSubscription, 60000);
+    const interval = setInterval(checkSubscription, 300_000); // 5 minutes — avoid Stripe rate limits
     return () => clearInterval(interval);
   }, [user, checkSubscription]);
 

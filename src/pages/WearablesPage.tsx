@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { DemoBanner } from '@/components/ui/DemoBanner';
 import { Link, Navigate } from 'react-router-dom';
 import { logger } from '@/lib/logger';
 import { Watch, Activity, Heart, Moon, Footprints, RefreshCw, Check, X, TrendingUp, TrendingDown, Minus, History, Settings, ArrowLeft } from 'lucide-react';
@@ -74,12 +73,7 @@ export default function WearablesPage() {
         body: { action: 'providers' }
       });
       if (!error && data?.providers) {
-        // Add last sync times for connected providers
-        const enrichedProviders = data.providers.map((p: Provider) => ({
-          ...p,
-          lastSync: p.connected ? new Date(Date.now() - Math.random() * 3600000).toISOString() : undefined
-        }));
-        setProviders(enrichedProviders);
+        setProviders(data.providers);
       }
     } catch (err) {
       logger.error('Failed to load providers:', err, 'SYSTEM');
@@ -103,28 +97,13 @@ export default function WearablesPage() {
   };
 
   const loadTrends = async () => {
-    // Generate mock trend data for visualization
-    const mockTrends: HealthTrend[] = [];
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
-      mockTrends.push({
-        date: date.toLocaleDateString('fr-FR', { weekday: 'short' }),
-        heartRate: 65 + Math.floor(Math.random() * 20),
-        steps: 5000 + Math.floor(Math.random() * 8000),
-        sleep: 6 + Math.random() * 3,
-        hrv: 40 + Math.floor(Math.random() * 30)
-      });
-    }
-    setTrends(mockTrends);
+    // Trends will be populated from real wearable data when available
+    setTrends([]);
   };
 
   const loadSyncLogs = () => {
-    // Mock sync logs
-    setSyncLogs([
-      { id: '1', provider: 'Apple Health', timestamp: new Date(Date.now() - 1800000).toISOString(), dataPoints: 156, status: 'success' },
-      { id: '2', provider: 'Google Fit', timestamp: new Date(Date.now() - 7200000).toISOString(), dataPoints: 89, status: 'success' },
-      { id: '3', provider: 'Apple Health', timestamp: new Date(Date.now() - 86400000).toISOString(), dataPoints: 142, status: 'partial', message: 'Données de sommeil manquantes' },
-    ]);
+    // Sync logs will be populated from real sync history when available
+    setSyncLogs([]);
   };
 
   const handleConnect = async (providerId: string) => {
@@ -165,11 +144,19 @@ export default function WearablesPage() {
   const handleSyncNow = async (providerId: string) => {
     setSyncing(providerId);
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate sync
-      toast({ title: 'Synchronisation terminée', description: 'Vos données ont été mises à jour.' });
-      loadHealthData();
-      loadTrends();
-      loadSyncLogs();
+      const { data, error } = await supabase.functions.invoke('wearables-sync', {
+        body: { action: 'sync', provider: providerId }
+      });
+      if (!error) {
+        toast({ title: 'Synchronisation terminée', description: 'Vos données ont été mises à jour.' });
+        loadHealthData();
+        loadTrends();
+        loadSyncLogs();
+      } else {
+        toast({ title: 'Erreur', description: 'Synchronisation impossible.', variant: 'destructive' });
+      }
+    } catch (err) {
+      toast({ title: 'Erreur', description: 'Synchronisation impossible.', variant: 'destructive' });
     } finally {
       setSyncing(null);
     }
@@ -188,7 +175,6 @@ export default function WearablesPage() {
 
   return (
     <div className="container max-w-4xl mx-auto py-8 px-4">
-      <DemoBanner message="Cette page affiche des données de démonstration. La synchronisation avec les appareils connectés est simulée." />
       <Link to="/app/home" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-4">
         <ArrowLeft className="h-4 w-4" />
         Retour au dashboard
@@ -368,9 +354,9 @@ export default function WearablesPage() {
             <Card className="text-center py-12">
               <CardContent>
                 <Watch className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold mb-2">Aucune donnée</h3>
+                <h3 className="text-lg font-semibold mb-2">Aucun appareil connecté</h3>
                 <p className="text-muted-foreground mb-4">
-                  Connectez un appareil pour voir vos données de santé.
+                  Aucun appareil connecté — connectez un appareil pour voir vos données
                 </p>
                 <Button onClick={() => setActiveTab('devices')}>
                   Connecter un appareil
@@ -382,6 +368,17 @@ export default function WearablesPage() {
 
         {/* Tendances */}
         <TabsContent value="trends" className="space-y-6">
+          {trends.length === 0 ? (
+            <Card className="text-center py-12">
+              <CardContent>
+                <Activity className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-lg font-semibold mb-2">Aucune tendance disponible</h3>
+                <p className="text-muted-foreground">
+                  Aucun appareil connecté — connectez un appareil pour voir vos données
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
           <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
@@ -427,6 +424,7 @@ export default function WearablesPage() {
               </CardContent>
             </Card>
           </div>
+          )}
         </TabsContent>
 
         {/* Appareils */}
@@ -515,6 +513,14 @@ export default function WearablesPage() {
           </h2>
 
           <div className="space-y-2">
+            {syncLogs.length === 0 ? (
+              <Card className="text-center py-12">
+                <CardContent>
+                  <History className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-muted-foreground">Aucun historique de synchronisation</p>
+                </CardContent>
+              </Card>
+            ) : null}
             {syncLogs.map(log => (
               <Card key={log.id}>
                 <CardContent className="flex items-center justify-between py-3">

@@ -1,10 +1,21 @@
 // @ts-nocheck
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 interface ChallengeTemplate {
   type: string;
@@ -89,7 +100,7 @@ const CHALLENGE_TEMPLATES: ChallengeTemplate[] = [
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   const startTime = Date.now();
@@ -122,7 +133,7 @@ Deno.serve(async (req: Request) => {
       console.log(`[generate-daily-challenges] ${timestamp} - Action: SKIP - Result: Challenges exist (${existingChallenges.length}) - Duration: ${duration}ms`);
       return new Response(
         JSON.stringify({ message: 'Challenges already exist for today', count: existingChallenges.length }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+        { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }, status: 200 }
       );
     }
 
@@ -170,7 +181,7 @@ Deno.serve(async (req: Request) => {
         challenges: insertedChallenges,
         count: count
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }, status: 200 }
     );
 
   } catch (error: any) {
@@ -179,7 +190,7 @@ Deno.serve(async (req: Request) => {
     console.error(`[generate-daily-challenges] ${errorTimestamp} - Action: ERROR - Error: ${error.message} - Duration: ${duration}ms - Stack: ${error.stack}`);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }, status: 500 }
     );
   }
 });

@@ -129,7 +129,9 @@ const EntraidePage = lazy(() => import('@/pages/EntraidePage'));
 // Cocon Respiration
 const B2CNyveeCoconPage = lazy(() => import('@/pages/b2c/B2CNyveeCoconPage'));
 const NyveeTestPage = lazy(() => import('@/pages/NyveeTestPage'));
-const ValidationPage = lazy(() => import('@/pages/ValidationPage'));
+const ValidationPage = import.meta.env.DEV
+  ? lazy(() => import('@/pages/ValidationPage'))
+  : undefined;
 
 // Settings & Profile
 const B2CSettingsPage = lazy(() => import('@/pages/b2c/B2CSettingsPage'));
@@ -341,7 +343,8 @@ export const b2cComponentMap = {
   // Cocon Respiration
   B2CNyveeCoconPage,
   NyveeTestPage,
-  ValidationPage,
+  // ValidationPage: only included in development builds
+  ...(import.meta.env.DEV && ValidationPage ? { ValidationPage } : {}),
 
   // Settings
   B2CSettingsPage,

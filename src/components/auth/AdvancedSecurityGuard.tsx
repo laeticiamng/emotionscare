@@ -26,6 +26,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 
 // Types pour la sécurité
 interface SecurityCheck {
@@ -91,13 +92,10 @@ const useSecurityAnalysis = () => {
 
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Simuler l'analyse géographique
-      const isNormalLocation = Math.random() > 0.1; // 90% de chance d'être normal
-      locationCheck.status = isNormalLocation ? 'passed' : 'warning';
-      locationCheck.message = isNormalLocation 
-        ? 'Localisation habituelle' 
-        : 'Connexion depuis une nouvelle région';
-      locationCheck.score = isNormalLocation ? 100 : 70;
+      // Client-side location check: always pass (real geo-fencing should be server-side)
+      locationCheck.status = 'passed';
+      locationCheck.message = 'Localisation habituelle';
+      locationCheck.score = 100;
       newChecks.push(locationCheck);
 
       // Analyse comportementale
@@ -110,12 +108,10 @@ const useSecurityAnalysis = () => {
 
       await new Promise(resolve => setTimeout(resolve, 400));
       
-      const normalBehavior = Math.random() > 0.05; // 95% de chance d'être normal
-      behaviorCheck.status = normalBehavior ? 'passed' : 'warning';
-      behaviorCheck.message = normalBehavior 
-        ? 'Modèle de navigation habituel' 
-        : 'Comportement inhabituel détecté';
-      behaviorCheck.score = normalBehavior ? 100 : 50;
+      // Client-side behavior check: always pass (real anomaly detection should be server-side)
+      behaviorCheck.status = 'passed';
+      behaviorCheck.message = 'Modèle de navigation habituel';
+      behaviorCheck.score = 100;
       newChecks.push(behaviorCheck);
 
       // Vérification temporelle
@@ -177,18 +173,39 @@ const MFAChallenge: React.FC<{
     setError('');
 
     try {
-      // Simuler la vérification MFA
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Simuler une validation (en production, cela ferait appel à l'API)
-      if (mfaCode === '123456' || Math.random() > 0.3) {
+      // Verify MFA code via Supabase Auth TOTP
+      const { data: factors } = await supabase.auth.mfa.listFactors();
+      const totpFactor = factors?.totp?.[0];
+
+      if (totpFactor) {
+        const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({
+          factorId: totpFactor.id,
+        });
+
+        if (challengeError) {
+          setError('Erreur lors de la création du challenge MFA');
+          return;
+        }
+
+        const { error: verifyError } = await supabase.auth.mfa.verify({
+          factorId: totpFactor.id,
+          challengeId: challenge.id,
+          code: mfaCode,
+        });
+
+        if (verifyError) {
+          setError('Code MFA invalide');
+          return;
+        }
+
         onSuccess();
         toast({
           title: "MFA validé",
           description: "Authentification à deux facteurs réussie"
         });
       } else {
-        setError('Code MFA invalide');
+        // No MFA factor enrolled — reject the attempt
+        setError('Aucun facteur MFA configuré. Veuillez configurer l\'authentification à deux facteurs.');
       }
     } catch (error) {
       setError('Erreur de vérification MFA');

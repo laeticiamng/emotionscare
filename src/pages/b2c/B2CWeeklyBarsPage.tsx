@@ -114,25 +114,20 @@ const generateWeeklyData = (weekOffset: number = 0): DailyData[] => {
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
 
   return days.map((date) => {
-    const dayOfWeek = date.getDay();
-    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-    const baseMultiplier = isWeekend ? 1.1 : 1;
-    const randomVariation = () => Math.random() * 20 - 10;
-
     return {
       date,
       day: format(date, 'EEEE', { locale: fr }),
       shortDay: format(date, 'EEE', { locale: fr }),
-      mood: Math.min(100, Math.max(40, Math.round((75 + randomVariation()) * baseMultiplier))),
-      energy: Math.min(100, Math.max(30, Math.round((70 + randomVariation()) * baseMultiplier))),
-      stress: Math.min(80, Math.max(10, Math.round((35 - randomVariation() * 0.5) / baseMultiplier))),
-      sleep: Math.min(100, Math.max(50, Math.round((72 + randomVariation()) * baseMultiplier))),
-      focus: Math.min(100, Math.max(40, Math.round((68 + randomVariation()) * baseMultiplier))),
-      activities: Math.floor(Math.random() * 5) + 1,
-      meditationMinutes: Math.floor(Math.random() * 20) + (isWeekend ? 10 : 5),
-      breathworkSessions: Math.floor(Math.random() * 3) + 1,
-      journalEntries: Math.floor(Math.random() * 2),
-      scansDone: Math.floor(Math.random() * 3) + 1,
+      mood: 0,
+      energy: 0,
+      stress: 0,
+      sleep: 0,
+      focus: 0,
+      activities: 0,
+      meditationMinutes: 0,
+      breathworkSessions: 0,
+      journalEntries: 0,
+      scansDone: 0,
     };
   });
 };

@@ -63,7 +63,7 @@ export default function AchievementsPage() {
       date.setDate(date.getDate() - (6 - i));
       return {
         date: date.toLocaleDateString('fr-FR', { weekday: 'short' }),
-        visits: Math.floor(Math.random() * 5) + (i * 2)
+        visits: 0
       };
     });
 

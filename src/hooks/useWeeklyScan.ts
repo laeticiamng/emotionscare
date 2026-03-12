@@ -25,7 +25,7 @@ export const useWeeklyScan = (
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
           logger.warn('No authenticated user for weekly scan', {}, 'SCAN');
-          return generateMockData(since);
+          return [];
         }
 
         // Récupérer les données d'émotions depuis emotion_scans
@@ -38,12 +38,12 @@ export const useWeeklyScan = (
 
         if (error) {
           logger.error('Failed to fetch emotion scans', error, 'SCAN');
-          return generateMockData(since);
+          return [];
         }
 
         if (!scans || scans.length === 0) {
-          logger.info('No scans found, returning mock data', {}, 'SCAN');
-          return generateMockData(since);
+          logger.info('No scans found, returning empty data', {}, 'SCAN');
+          return [];
         }
 
         // Grouper par semaine
@@ -107,32 +107,10 @@ export const useWeeklyScan = (
         return result.sort((a, b) => a.week.localeCompare(b.week));
       } catch (error) {
         logger.error('Error in useWeeklyScan', error as Error, 'SCAN');
-        return generateMockData(since);
+        return [];
       }
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
-/**
- * Génère des données de démonstration
- */
-function generateMockData(since: Date): WeeklyScanRow[] {
-  const weeks: WeeklyScanRow[] = [];
-  let currentDate = startOfWeek(since, { weekStartsOn: 1 });
-  const now = new Date();
-
-  while (currentDate <= now) {
-    weeks.push({
-      week: format(currentDate, 'yyyy-MM-dd'),
-      valence_face_avg: 0.5 + Math.random() * 0.3,
-      joy_face_avg: 0.4 + Math.random() * 0.4,
-      valence_voice_avg: 0.45 + Math.random() * 0.35,
-      lexical_sentiment_avg: 0.5 + Math.random() * 0.3,
-      arousal_sd_face: 0.1 + Math.random() * 0.2,
-    });
-    currentDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
-  }
-
-  return weeks;
-}

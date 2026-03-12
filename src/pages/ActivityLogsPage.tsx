@@ -5,17 +5,14 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  FileText, 
-  Search, 
-  Filter, 
-  Download, 
+import {
+  FileText,
+  Download,
   AlertTriangle,
   CheckCircle,
   Info,
   Shield,
   Clock,
-  User,
   Monitor,
   Smartphone,
   Globe
@@ -49,88 +46,9 @@ interface SecurityEvent {
   location?: string;
 }
 
-const mockActivityLogs: ActivityLog[] = [
-  {
-    id: '1',
-    timestamp: '2024-01-20T15:30:00Z',
-    userId: 'user_123',
-    userName: 'Marie Dupont',
-    action: 'LOGIN',
-    resource: 'Application',
-    details: 'Connexion utilisateur réussie',
-    ipAddress: '192.168.1.100',
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-    success: true,
-    severity: 'success'
-  },
-  {
-    id: '2',
-    timestamp: '2024-01-20T15:25:00Z',
-    userId: 'user_456',
-    userName: 'Jean Martin',
-    action: 'DATA_EXPORT',
-    resource: 'Données personnelles',
-    details: 'Export RGPD des données utilisateur demandé',
-    ipAddress: '192.168.1.101',
-    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
-    success: true,
-    severity: 'info'
-  },
-  {
-    id: '3',
-    timestamp: '2024-01-20T15:20:00Z',
-    userId: 'user_789',
-    userName: 'Sophie Leblanc',
-    action: 'LOGIN_FAILED',
-    resource: 'Application',
-    details: 'Tentative de connexion échouée - mot de passe incorrect',
-    ipAddress: '192.168.1.102',
-    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X)',
-    success: false,
-    severity: 'warning'
-  },
-  {
-    id: '4',
-    timestamp: '2024-01-20T15:15:00Z',
-    userId: 'admin_001',
-    userName: 'Administrateur',
-    action: 'USER_DELETE',
-    resource: 'Compte utilisateur',
-    details: 'Suppression compte utilisateur sur demande RGPD',
-    ipAddress: '192.168.1.200',
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-    success: true,
-    severity: 'warning'
-  }
-];
-
-const mockSecurityEvents: SecurityEvent[] = [
-  {
-    id: '1',
-    timestamp: '2024-01-20T16:00:00Z',
-    type: 'suspicious_activity',
-    userId: 'user_unknown',
-    ipAddress: '45.123.456.789',
-    severity: 'high',
-    description: 'Tentatives de connexion multiples depuis une IP suspecte',
-    status: 'investigating',
-    location: 'Inconnu'
-  },
-  {
-    id: '2',
-    timestamp: '2024-01-20T14:30:00Z',
-    type: 'login_failure',
-    ipAddress: '192.168.1.150',
-    severity: 'medium',
-    description: '5 tentatives de connexion échouées consécutives',
-    status: 'resolved',
-    location: 'France'
-  }
-];
-
 export default function ActivityLogsPage() {
-  const [logs, setLogs] = useState<ActivityLog[]>(mockActivityLogs);
-  const [securityEvents, setSecurityEvents] = useState<SecurityEvent[]>(mockSecurityEvents);
+  const [logs, setLogs] = useState<ActivityLog[]>([]);
+  const [securityEvents, setSecurityEvents] = useState<SecurityEvent[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterAction, setFilterAction] = useState('all');
   const [filterSeverity, setFilterSeverity] = useState('all');
@@ -283,6 +201,9 @@ export default function ActivityLogsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                {filteredLogs.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-8">Aucun log d'activité disponible</p>
+                ) : (
                 <div className="space-y-3">
                   {filteredLogs.map((log) => (
                     <div key={log.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
@@ -313,6 +234,7 @@ export default function ActivityLogsPage() {
                     </div>
                   ))}
                 </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -330,6 +252,9 @@ export default function ActivityLogsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                {securityEvents.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-8">Aucun événement de sécurité</p>
+                ) : (
                 <div className="space-y-4">
                   {securityEvents.map((event) => (
                     <div key={event.id} className="border rounded-lg p-4">
@@ -376,6 +301,7 @@ export default function ActivityLogsPage() {
                     </div>
                   ))}
                 </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -388,8 +314,7 @@ export default function ActivityLogsPage() {
                   <CardTitle className="text-sm">Connexions Aujourd'hui</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">247</div>
-                  <div className="text-xs text-muted-foreground">+12% vs hier</div>
+                  <div className="text-2xl font-bold text-muted-foreground">—</div>
                 </CardContent>
               </Card>
 
@@ -398,8 +323,7 @@ export default function ActivityLogsPage() {
                   <CardTitle className="text-sm">Exports RGPD</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">23</div>
-                  <div className="text-xs text-muted-foreground">Ce mois</div>
+                  <div className="text-2xl font-bold text-muted-foreground">—</div>
                 </CardContent>
               </Card>
 
@@ -408,8 +332,7 @@ export default function ActivityLogsPage() {
                   <CardTitle className="text-sm">Événements Sécurité</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-yellow-600">5</div>
-                  <div className="text-xs text-muted-foreground">Dernières 24h</div>
+                  <div className="text-2xl font-bold text-muted-foreground">—</div>
                 </CardContent>
               </Card>
 
@@ -418,8 +341,7 @@ export default function ActivityLogsPage() {
                   <CardTitle className="text-sm">Taux de Conformité</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-green-600">98.2%</div>
-                  <div className="text-xs text-muted-foreground">RGPD</div>
+                  <div className="text-2xl font-bold text-muted-foreground">—</div>
                 </CardContent>
               </Card>
             </div>
@@ -429,28 +351,9 @@ export default function ActivityLogsPage() {
                 <CardTitle>Top Actions Utilisateurs</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {[
-                    { action: 'Connexion', count: 1247, percentage: 45 },
-                    { action: 'Analyse émotionnelle', count: 892, percentage: 32 },
-                    { action: 'Export données', count: 234, percentage: 8 },
-                    { action: 'Modification profil', count: 156, percentage: 6 },
-                    { action: 'Déconnexion', count: 145, percentage: 5 }
-                  ].map((item, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <span className="text-sm">{item.action}</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-20 bg-muted rounded-full h-2">
-                          <div 
-                            className="bg-primary h-2 rounded-full"
-                            style={{ width: `${item.percentage}%` }}
-                          />
-                        </div>
-                        <span className="text-sm font-medium">{item.count}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  Aucune donnée analytique disponible
+                </p>
               </CardContent>
             </Card>
           </TabsContent>

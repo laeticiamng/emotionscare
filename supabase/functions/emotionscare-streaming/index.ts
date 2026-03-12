@@ -2,18 +2,27 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://emotions-care.lovable.app',
+  'http://localhost:5173',
+];
 
-const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+function getCorsHeaders(req) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { headers: getCorsHeaders(req) })
   }
 
   try {
@@ -26,7 +35,7 @@ serve(async (req) => {
         // GET /stream/:songId - Proxy streaming sécurisé
         const songId = pathParts[2]
         if (!songId) {
-          return new Response('Song ID required', { status: 400, headers: corsHeaders })
+          return new Response('Song ID required', { status: 400, headers: getCorsHeaders(req) })
         }
 
         // Récupérer les infos de la chanson
@@ -37,7 +46,7 @@ serve(async (req) => {
           .single()
 
         if (error || !song) {
-          return new Response('Song not found', { status: 404, headers: corsHeaders })
+          return new Response('Song not found', { status: 404, headers: getCorsHeaders(req) })
         }
 
         // Pour l'instant, on retourne une URL de streaming mock
@@ -47,7 +56,7 @@ serve(async (req) => {
         return new Response(null, {
           status: 302,
           headers: {
-            ...corsHeaders,
+            ...getCorsHeaders(req),
             'Location': mockAudioUrl,
             'Content-Disposition': 'inline',
             'Cache-Control': 'private, max-age=300'
@@ -58,12 +67,12 @@ serve(async (req) => {
       case 'create': {
         // POST /create - Créer une chanson depuis un taskId Suno
         if (req.method !== 'POST') {
-          return new Response('Method not allowed', { status: 405, headers: corsHeaders })
+          return new Response('Method not allowed', { status: 405, headers: getCorsHeaders(req) })
         }
 
         const { taskId } = await req.json()
         if (!taskId) {
-          return new Response('Task ID required', { status: 400, headers: corsHeaders })
+          return new Response('Task ID required', { status: 400, headers: getCorsHeaders(req) })
         }
 
         // Mock: créer une chanson directement
@@ -89,11 +98,11 @@ serve(async (req) => {
 
         if (error) {
           console.error('Erreur création chanson:', error)
-          return new Response('Failed to create song', { status: 500, headers: corsHeaders })
+          return new Response('Failed to create song', { status: 500, headers: getCorsHeaders(req) })
         }
 
         return new Response(JSON.stringify(newSong), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
         })
       }
 
@@ -102,7 +111,7 @@ serve(async (req) => {
         if (req.method === 'GET') {
           const authHeader = req.headers.get('Authorization')
           if (!authHeader) {
-            return new Response('Authorization required', { status: 401, headers: corsHeaders })
+            return new Response('Authorization required', { status: 401, headers: getCorsHeaders(req) })
           }
 
           const { data: { user }, error: authError } = await supabase.auth.getUser(
@@ -110,7 +119,7 @@ serve(async (req) => {
           )
 
           if (authError || !user) {
-            return new Response('Unauthorized', { status: 401, headers: corsHeaders })
+            return new Response('Unauthorized', { status: 401, headers: getCorsHeaders(req) })
           }
 
           const { data: library, error } = await supabase
@@ -130,11 +139,11 @@ serve(async (req) => {
             .order('created_at', { ascending: false })
 
           if (error) {
-            return new Response('Failed to fetch library', { status: 500, headers: corsHeaders })
+            return new Response('Failed to fetch library', { status: 500, headers: getCorsHeaders(req) })
           }
 
           return new Response(JSON.stringify(library), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
           })
         }
 
@@ -142,7 +151,7 @@ serve(async (req) => {
         if (req.method === 'POST') {
           const authHeader = req.headers.get('Authorization')
           if (!authHeader) {
-            return new Response('Authorization required', { status: 401, headers: corsHeaders })
+            return new Response('Authorization required', { status: 401, headers: getCorsHeaders(req) })
           }
 
           const { data: { user }, error: authError } = await supabase.auth.getUser(
@@ -150,12 +159,12 @@ serve(async (req) => {
           )
 
           if (authError || !user) {
-            return new Response('Unauthorized', { status: 401, headers: corsHeaders })
+            return new Response('Unauthorized', { status: 401, headers: getCorsHeaders(req) })
           }
 
           const { songId } = await req.json()
           if (!songId) {
-            return new Response('Song ID required', { status: 400, headers: corsHeaders })
+            return new Response('Song ID required', { status: 400, headers: getCorsHeaders(req) })
           }
 
           const { error } = await supabase
@@ -166,29 +175,29 @@ serve(async (req) => {
             })
 
           if (error) {
-            return new Response('Failed to add to library', { status: 500, headers: corsHeaders })
+            return new Response('Failed to add to library', { status: 500, headers: getCorsHeaders(req) })
           }
 
-          return new Response('OK', { headers: corsHeaders })
+          return new Response('OK', { headers: getCorsHeaders(req) })
         }
 
-        return new Response('Method not allowed', { status: 405, headers: corsHeaders })
+        return new Response('Method not allowed', { status: 405, headers: getCorsHeaders(req) })
       }
 
       case 'like': {
         // POST /like/:songId - Toggle like
         if (req.method !== 'POST') {
-          return new Response('Method not allowed', { status: 405, headers: corsHeaders })
+          return new Response('Method not allowed', { status: 405, headers: getCorsHeaders(req) })
         }
 
         const songId = pathParts[2]
         if (!songId) {
-          return new Response('Song ID required', { status: 400, headers: corsHeaders })
+          return new Response('Song ID required', { status: 400, headers: getCorsHeaders(req) })
         }
 
         const authHeader = req.headers.get('Authorization')
         if (!authHeader) {
-          return new Response('Authorization required', { status: 401, headers: corsHeaders })
+          return new Response('Authorization required', { status: 401, headers: getCorsHeaders(req) })
         }
 
         const { data: { user }, error: authError } = await supabase.auth.getUser(
@@ -196,7 +205,7 @@ serve(async (req) => {
         )
 
         if (authError || !user) {
-          return new Response('Unauthorized', { status: 401, headers: corsHeaders })
+          return new Response('Unauthorized', { status: 401, headers: getCorsHeaders(req) })
         }
 
         // Check if already liked
@@ -216,7 +225,7 @@ serve(async (req) => {
             .eq('song_id', songId)
           
           return new Response(JSON.stringify({ liked: false }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
           })
         } else {
           // Like
@@ -228,16 +237,16 @@ serve(async (req) => {
             })
           
           return new Response(JSON.stringify({ liked: true }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
           })
         }
       }
 
       default:
-        return new Response('Not found', { status: 404, headers: corsHeaders })
+        return new Response('Not found', { status: 404, headers: getCorsHeaders(req) })
     }
   } catch (error) {
     console.error('Error in emotionscare-streaming:', error)
-    return new Response('Internal server error', { status: 500, headers: corsHeaders })
+    return new Response('Internal server error', { status: 500, headers: getCorsHeaders(req) })
   }
 })

@@ -166,12 +166,9 @@ export const PredictiveAnalyticsProvider: React.FC<{ children: React.ReactNode }
       
       // Sample emotional states
       const emotions = ['calm', 'focused', 'stressed', 'tired', 'energetic', 'creative'];
-      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-      const randomConfidence = Math.random() * 0.5 + 0.5; // 0.5-1.0
-      
       const prediction: Prediction = {
-        emotion: randomEmotion,
-        confidence: parseFloat(randomConfidence.toFixed(2)),
+        emotion: 'calm',
+        confidence: 0,
         timestamp: new Date().toISOString(),
         source: 'pattern-analysis',
         context: 'user-activity'
