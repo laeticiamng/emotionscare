@@ -7,4 +7,13 @@ Disallow: /auth/
 Disallow: /b2b/
 Disallow: /dev/
 Disallow: /test
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /billing
+Disallow: /profile
+Disallow: /login
+Disallow: /signup
+Disallow: /register
+Disallow: /reset-password
+Disallow: /payment-success
 Sitemap: https://emotionscare.com/sitemap.xml

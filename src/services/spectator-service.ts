@@ -143,7 +143,7 @@ class SpectatorService {
       return data || [];
     } catch (error) {
       logger.error('Error fetching chat messages', error as Error, 'SpectatorService');
-      return [];
+      throw error;
     }
   }
 
@@ -283,7 +283,7 @@ class SpectatorService {
       }));
     } catch (error) {
       logger.error('Error fetching spectator list', error as Error, 'SpectatorService');
-      return [];
+      throw error;
     }
   }
 
@@ -347,7 +347,7 @@ class SpectatorService {
       }));
     } catch (error) {
       logger.error('Error fetching prediction history', error as Error, 'SpectatorService');
-      return [];
+      throw error;
     }
   }
 
@@ -480,7 +480,7 @@ class SpectatorService {
       return matchesWithSpectators;
     } catch (error) {
       logger.error('Error fetching live matches', error as Error, 'SpectatorService');
-      return [];
+      throw error;
     }
   }
 

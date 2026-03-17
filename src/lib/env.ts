@@ -94,13 +94,18 @@ if (!parsedEnv.success) {
 
 const fallbackResult = envSchema.safeParse({
   MODE: rawEnv.MODE,
-  VITE_SUPABASE_URL: rawEnv.VITE_SUPABASE_URL || CONFIG.SUPABASE.URL || 'https://placeholder.supabase.co',
-  VITE_SUPABASE_ANON_KEY: rawEnv.VITE_SUPABASE_ANON_KEY || CONFIG.SUPABASE.ANON_KEY || 'placeholder',
+  VITE_SUPABASE_URL: rawEnv.VITE_SUPABASE_URL || CONFIG.SUPABASE.URL,
+  VITE_SUPABASE_ANON_KEY: rawEnv.VITE_SUPABASE_ANON_KEY || CONFIG.SUPABASE.ANON_KEY,
 });
+
+if (!parsedEnv.success && !fallbackResult.success) {
+  console.error('[SYSTEM] CRITICAL: Supabase environment variables are not configured. The application will not function correctly.');
+}
+
 const env = parsedEnv.data ?? fallbackResult.data ?? {
   MODE: 'development' as const,
-  VITE_SUPABASE_URL: 'https://placeholder.supabase.co',
-  VITE_SUPABASE_ANON_KEY: 'placeholder',
+  VITE_SUPABASE_URL: '',
+  VITE_SUPABASE_ANON_KEY: '',
 };
 
 export const NODE_ENV = env.MODE;

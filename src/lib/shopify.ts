@@ -7,9 +7,13 @@ import type { CartItem } from '@/store';
 import { logger } from '@/lib/logger';
 
 const SHOPIFY_API_VERSION = '2025-07';
-const SHOPIFY_STORE_PERMANENT_DOMAIN = 'emotions-care-fie94.myshopify.com';
+const SHOPIFY_STORE_PERMANENT_DOMAIN = import.meta.env.VITE_SHOPIFY_STORE_DOMAIN || 'emotions-care-fie94.myshopify.com';
 const SHOPIFY_STOREFRONT_URL = `https://${SHOPIFY_STORE_PERMANENT_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;
-const SHOPIFY_STOREFRONT_TOKEN = '6406b03d31d8714e59f5fda69a1ee568';
+const SHOPIFY_STOREFRONT_TOKEN = import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN || '';
+
+if (!SHOPIFY_STOREFRONT_TOKEN) {
+  console.warn('[SHOPIFY] VITE_SHOPIFY_STOREFRONT_TOKEN is not set. Shopify API calls will fail.');
+}
 
 // GraphQL query pour récupérer les produits
 export const STOREFRONT_QUERY = `

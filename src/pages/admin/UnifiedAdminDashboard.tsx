@@ -29,7 +29,7 @@ const UnifiedAdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
 
   // Fetch executive metrics
-  const { data: executiveMetrics } = useQuery({
+  const { data: executiveMetrics, isError: executiveError, error: executiveErr } = useQuery({
     queryKey: ['executive-metrics-overview'],
     queryFn: async () => {
       const startDate = startOfMonth(subMonths(new Date(), 3));
@@ -45,7 +45,7 @@ const UnifiedAdminDashboard: React.FC = () => {
   });
 
   // Fetch system health metrics
-  const { data: healthMetrics } = useQuery({
+  const { data: healthMetrics, isError: healthError } = useQuery({
     queryKey: ['health-metrics-overview'],
     queryFn: async () => {
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
@@ -62,7 +62,7 @@ const UnifiedAdminDashboard: React.FC = () => {
   });
 
   // Fetch incidents
-  const { data: incidents } = useQuery({
+  const { data: incidents, isError: incidentsError } = useQuery({
     queryKey: ['incidents-overview'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -77,7 +77,7 @@ const UnifiedAdminDashboard: React.FC = () => {
   });
 
   // Fetch active escalations
-  const { data: activeEscalations } = useQuery({
+  const { data: activeEscalations, isError: escalationsError } = useQuery({
     queryKey: ['active-escalations-overview'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -175,6 +175,22 @@ const UnifiedAdminDashboard: React.FC = () => {
           <RefreshCw className="h-4 w-4" />
         </Button>
       </div>
+
+      {/* Data Loading Errors */}
+      {(executiveError || healthError || incidentsError || escalationsError) && (
+        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 flex items-center gap-3">
+          <AlertTriangle className="h-5 w-5 text-destructive shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-destructive">Certaines données n'ont pas pu être chargées</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {executiveError && 'Métriques business • '}
+              {healthError && 'Santé système • '}
+              {incidentsError && 'Incidents • '}
+              {escalationsError && 'Escalades'}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Unified KPIs Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

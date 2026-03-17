@@ -11,16 +11,7 @@ export interface DALLEOptions {
   responseFormat?: 'url' | 'b64_json';
 }
 
-// Images de fallback par émotion
-const FALLBACK_IMAGES: Record<string, string> = {
-  joy: 'https://images.unsplash.com/photo-1489710437720-ebb67ec84dd2?w=512&h=512&fit=crop',
-  calm: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=512&h=512&fit=crop',
-  sad: 'https://images.unsplash.com/photo-1534088568595-a066f410bcda?w=512&h=512&fit=crop',
-  anxious: 'https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?w=512&h=512&fit=crop',
-  energetic: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=512&h=512&fit=crop',
-  peaceful: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=512&h=512&fit=crop',
-  default: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=512&h=512&fit=crop',
-};
+// NOTE: Fallback images removed. API failures must surface real errors to the user.
 
 /**
  * Génère une image via l'Edge Function analyze-image/generate
@@ -38,55 +29,42 @@ const generateImage = async (prompt: string, options: DALLEOptions = {}): Promis
     });
 
     if (error) {
-      logger.warn('Image generation via Edge Function failed, using fallback', { error: error.message }, 'DALLE');
-      return getFallbackImage(prompt);
+      logger.error('Image generation via Edge Function failed', { error: error.message }, 'DALLE');
+      throw new Error(`Image generation failed: ${error.message}`);
     }
 
-    return data?.imageUrl || getFallbackImage(prompt);
+    if (!data?.imageUrl) {
+      throw new Error('Image generation returned no image URL');
+    }
+
+    return data.imageUrl;
   } catch (error) {
-    logger.error('DALL-E generation error', error as Error, 'DALLE');
-    return getFallbackImage(prompt);
+    logger.error('DALL-E generation error', error instanceof Error ? error : new Error(String(error)), 'DALLE');
+    throw error instanceof Error ? error : new Error(String(error));
   }
 };
 
-/**
- * Retourne une image de fallback basée sur le prompt
- */
-const getFallbackImage = (prompt: string): string => {
-  const lowerPrompt = prompt.toLowerCase();
-  
-  if (lowerPrompt.includes('joy') || lowerPrompt.includes('happy') || lowerPrompt.includes('joie')) {
-    return FALLBACK_IMAGES.joy;
-  }
-  if (lowerPrompt.includes('calm') || lowerPrompt.includes('peaceful') || lowerPrompt.includes('calme')) {
-    return FALLBACK_IMAGES.calm;
-  }
-  if (lowerPrompt.includes('sad') || lowerPrompt.includes('triste')) {
-    return FALLBACK_IMAGES.sad;
-  }
-  if (lowerPrompt.includes('anxious') || lowerPrompt.includes('stress') || lowerPrompt.includes('anxieux')) {
-    return FALLBACK_IMAGES.anxious;
-  }
-  if (lowerPrompt.includes('energetic') || lowerPrompt.includes('energy') || lowerPrompt.includes('énergie')) {
-    return FALLBACK_IMAGES.energetic;
-  }
-  if (lowerPrompt.includes('peace') || lowerPrompt.includes('paix')) {
-    return FALLBACK_IMAGES.peaceful;
-  }
-  
-  return FALLBACK_IMAGES.default;
-};
 
 /**
  * Génère des variations d'une image
  */
-const generateVariations = async (imageUrl: string, options: DALLEOptions = {}): Promise<string[]> => {
+const generateVariations = async (imageUrl: string, _options: DALLEOptions = {}): Promise<string[]> => {
   try {
-    // Pour les variations, retourner l'image originale avec des fallbacks
-    return [imageUrl, getFallbackImage('variation')];
+    const { data, error } = await supabase.functions.invoke('analyze-image', {
+      body: {
+        action: 'variations',
+        imageUrl,
+      },
+    });
+
+    if (error) {
+      throw new Error(`Image variations failed: ${error.message}`);
+    }
+
+    return data?.imageUrls || [imageUrl];
   } catch (error) {
-    logger.error('DALL-E variations error', error as Error, 'DALLE');
-    return [imageUrl];
+    logger.error('DALL-E variations error', error instanceof Error ? error : new Error(String(error)), 'DALLE');
+    throw error instanceof Error ? error : new Error(String(error));
   }
 };
 
