@@ -16,6 +16,7 @@ import { GalaxyStatsPanel } from './GalaxyStatsPanel';
 import { GalaxySessionHistoryPanel } from './GalaxySessionHistoryPanel';
 import { GalaxyAchievementsPanel } from './GalaxyAchievementsPanel';
 import { GalaxySettingsPanel } from './GalaxySettingsPanel';
+import { GalaxyScene3D } from './GalaxyScene3D';
 import { cn } from '@/lib/utils';
 
 interface VRGalaxyMainProps {
