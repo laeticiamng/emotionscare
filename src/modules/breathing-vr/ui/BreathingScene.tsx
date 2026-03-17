@@ -9,6 +9,7 @@ import { OrbitControls, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { BreathingSphere } from './BreathingSphere';
 import { BreathingParticles } from './BreathingParticles';
+import { ImmersivePostProcessing } from '@/components/3d/ImmersivePostProcessing';
 import type { BreathingPhase } from '../types';
 
 interface BreathingSceneProps {
