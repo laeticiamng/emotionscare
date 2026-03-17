@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import { BreathingSphere } from './BreathingSphere';
 import { BreathingParticles } from './BreathingParticles';
 import { ImmersivePostProcessing } from '@/components/3d/ImmersivePostProcessing';
+import { InteractiveParticles } from '@/components/3d/InteractiveParticles';
 import type { BreathingPhase } from '../types';
 
 interface BreathingSceneProps {
@@ -126,6 +127,9 @@ export const BreathingScene = ({ phase, progress, fullscreen = false }: Breathin
 
         {/* Particle field */}
         <BreathingParticles phase={phase} progress={progress} count={250} />
+
+        {/* Interactive cursor-reactive particles */}
+        <InteractiveParticles count={150} radius={4} color="#a78bfa" repelStrength={0.6} repelRadius={1.8} />
 
         {/* Breathing camera movement */}
         <BreathingCamera phase={phase} progress={progress} />
