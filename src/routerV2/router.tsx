@@ -18,6 +18,7 @@ declare global {
 
 import React, { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import AnimatedPage from '@/components/layout/AnimatedPage';
 import { ROUTES_REGISTRY } from './registry';
 import { LegacyRedirect, ROUTE_ALIAS_ENTRIES } from './aliases';
 import { AuthGuard, ModeGuard, RoleGuard } from './guards';
@@ -63,21 +64,23 @@ const LayoutWrapper: React.FC<{
   children: React.ReactNode;
   layout?: 'marketing' | 'app' | 'simple' | 'app-sidebar'
 }> = ({ children, layout = 'app' }) => {
+  const animated = <AnimatedPage>{children}</AnimatedPage>;
+
   if (layout === 'simple') {
-    return <>{children}</>;
+    return animated;
   }
 
   if (layout === 'marketing') {
     return (
       <Suspense fallback={<div className="min-h-screen bg-background" />}>
-        <MarketingLayout>{children}</MarketingLayout>
+        <MarketingLayout>{animated}</MarketingLayout>
       </Suspense>
     );
   }
 
   return (
     <EnhancedShell>
-      {children}
+      {animated}
       <FloatingActionMenu />
     </EnhancedShell>
   );

@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
 import { motion, useReducedMotion } from 'framer-motion';
+import { staggerContainer, staggerItem, dashboardCard, STAGGER } from '@/lib/motion';
 import { orderQuickActions } from '@/features/dashboard/orchestration/weeklyPlanMapper';
 import { useDashboardStore } from '@/store/dashboard.store';
 import { useFlags } from '@/core/flags';
@@ -358,24 +359,29 @@ export default function B2CDashboardPage() {
         </div>
       </nav>
 
-      {/* Contenu principal */}
+      {/* Contenu principal — ACTE 5: ANCRER — Salle de contrôle élégante */}
       <main id="main-content" role="main" className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
-        {/* En-tête de bienvenue avec date */}
-        <header className="mb-4 sm:mb-8">
+        {/* En-tête de bienvenue avec date — entrée cinématique */}
+        <motion.header
+          className="mb-4 sm:mb-8"
+          variants={staggerContainer(STAGGER.fast)}
+          initial={shouldReduceMotion ? undefined : 'hidden'}
+          animate="visible"
+        >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-            <div>
+            <motion.div variants={staggerItem}>
               <h1 className="text-2xl sm:text-3xl font-bold mb-1">
                 Bonjour{user?.user_metadata?.first_name ? ` ${user.user_metadata.first_name}` : ''} 👋
               </h1>
               <p className="text-muted-foreground text-lg">
                 Prends soin de toi aujourd'hui
               </p>
-            </div>
-            <div className="text-right text-muted-foreground">
+            </motion.div>
+            <motion.div variants={staggerItem} className="text-right text-muted-foreground">
               <p className="text-sm capitalize">{format(new Date(), 'EEEE d MMMM yyyy', { locale: fr })}</p>
-            </div>
+            </motion.div>
           </div>
-        </header>
+        </motion.header>
 
         {/* Section Humeur du jour + Accès rapide */}
         <section className="mb-4 sm:mb-8 grid md:grid-cols-2 gap-4 sm:gap-6">

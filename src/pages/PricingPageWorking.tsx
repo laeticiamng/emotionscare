@@ -8,6 +8,7 @@ import { motion, useInView } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { DURATION, EASE, STAGGER } from '@/lib/motion';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -98,18 +99,18 @@ const PlanCard: React.FC<{
   return (
     <motion.div
       key={plan.id}
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
-        duration: 0.6,
-        delay: index * 0.1,
-        ease: [0.16, 1, 0.3, 1],
+        duration: DURATION.slow,
+        delay: index * STAGGER.normal,
+        ease: EASE.cinema,
       }}
       className={cn(
-        'group relative rounded-3xl border transition-all duration-500',
+        'group relative rounded-3xl border transition-all duration-300',
         plan.popular
           ? 'border-primary shadow-2xl shadow-primary/10 scale-[1.02]'
-          : 'border-border/50 hover:border-border hover:shadow-xl hover:shadow-primary/5'
+          : 'border-border/50 hover:border-border hover:shadow-xl hover:shadow-primary/5 hover:scale-[1.01]'
       )}
     >
       {plan.popular && (

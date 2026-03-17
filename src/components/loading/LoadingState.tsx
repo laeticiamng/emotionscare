@@ -1,7 +1,9 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import PremiumLoader from '@/components/ui/PremiumLoader';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { DURATION, EASE } from '@/lib/motion';
 
 type LoadingStateVariant = 'page' | 'section' | 'inline';
 
@@ -41,10 +43,13 @@ const LoadingState: React.FC<LoadingStateProps> = ({
   const config = variantConfig[variant];
 
   return (
-    <div
+    <motion.div
       role="status"
       aria-live="polite"
       className={cn(config.container, className)}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: DURATION.normal, ease: EASE.smooth }}
     >
       <PremiumLoader
         size={config.loaderSize}
@@ -61,11 +66,18 @@ const LoadingState: React.FC<LoadingStateProps> = ({
           )}
         >
           {Array.from({ length: skeletonCount }).map((_, index) => (
-            <Skeleton key={index} className={cn(config.skeletonHeight, 'w-full rounded-md skeleton-calm')} />
+            <motion.div
+              key={index}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: DURATION.fast, delay: index * 0.08 }}
+            >
+              <Skeleton className={cn(config.skeletonHeight, 'w-full rounded-md skeleton-calm')} />
+            </motion.div>
           ))}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

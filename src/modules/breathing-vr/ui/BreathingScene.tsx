@@ -163,7 +163,8 @@ const BreathingCamera = ({ phase, progress }: { phase: BreathingPhase; progress:
   return null;
 };
 
-const BreathingReducedMotionFallback = ({ phase, height }: { phase: BreathingPhase; height: string }) => {
+const BreathingReducedMotionFallback = ({ phase }: { phase: BreathingPhase }) => {
+  const height = 'h-[300px] sm:h-[400px] md:h-[500px]';
   const colors: Record<BreathingPhase, string> = {
     inhale: PALETTE.breathing.inhale,
     hold: PALETTE.breathing.hold,
@@ -189,10 +190,10 @@ const BreathingReducedMotionFallback = ({ phase, height }: { phase: BreathingPha
 };
 
 export const BreathingScene = ({ phase, progress, fullscreen = false }: BreathingSceneProps) => {
-  const height = fullscreen ? 'h-[600px]' : 'h-[500px]';
+  const height = fullscreen ? 'h-[400px] sm:h-[500px] md:h-[600px]' : 'h-[300px] sm:h-[400px] md:h-[500px]';
 
   if (prefersReducedMotion()) {
-    return <BreathingReducedMotionFallback phase={phase} height={height} />;
+    return <BreathingReducedMotionFallback phase={phase} />;
   }
   const fog = FOG.breathing;
   const cam = CAMERA.breathing;

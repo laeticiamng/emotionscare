@@ -107,7 +107,7 @@ const HomeB2CPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
       {/* Hero Section — ACTE 1: CAPTER — Ouverture cinématique */}
-      <section className="relative overflow-hidden min-h-[90vh] flex items-center">
+      <section className="relative overflow-hidden min-h-[70vh] md:min-h-[90vh] flex items-center">
         {/* 3D background — the opening shot */}
         <Suspense fallback={null}>
           <HeroScene3D />
