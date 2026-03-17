@@ -5,7 +5,7 @@
 
 import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Stars } from '@react-three/drei';
+import { Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { BreathingSphere } from './BreathingSphere';
 import { BreathingParticles } from './BreathingParticles';
@@ -20,6 +20,7 @@ import {
   getGLConfig,
   getDPR,
   getParticleCount,
+  prefersReducedMotion,
 } from '@/components/3d/visualDirection';
 import type { BreathingPhase } from '../types';
 
@@ -44,6 +45,7 @@ const DynamicLights = ({ phase, progress }: { phase: BreathingPhase; progress: n
 
   const color1 = useRef(new THREE.Color(PALETTE.breathing.inhale));
   const color2 = useRef(new THREE.Color(PALETTE.breathing.hold));
+  const complementaryTemp = useMemo(() => new THREE.Color(), []);
 
   useFrame((state) => {
     const t = state.clock.elapsedTime;
@@ -51,9 +53,9 @@ const DynamicLights = ({ phase, progress }: { phase: BreathingPhase; progress: n
     const target = phaseColors[phase];
     color1.current.lerp(target, 0.03);
 
-    const complementary = target.clone();
-    complementary.offsetHSL(0.15, 0, -0.1);
-    color2.current.lerp(complementary, 0.03);
+    complementaryTemp.copy(target);
+    complementaryTemp.offsetHSL(0.15, 0, -0.1);
+    color2.current.lerp(complementaryTemp, 0.03);
 
     // Phase-driven intensity: brighter during inhale peak, dimmer during rest
     const phaseIntensity = phase === 'inhale'
@@ -161,8 +163,37 @@ const BreathingCamera = ({ phase, progress }: { phase: BreathingPhase; progress:
   return null;
 };
 
+const BreathingReducedMotionFallback = ({ phase, height }: { phase: BreathingPhase; height: string }) => {
+  const colors: Record<BreathingPhase, string> = {
+    inhale: PALETTE.breathing.inhale,
+    hold: PALETTE.breathing.hold,
+    exhale: PALETTE.breathing.exhale,
+    rest: PALETTE.breathing.rest,
+  };
+  const color = colors[phase];
+  return (
+    <div
+      className={`w-full ${height} rounded-2xl overflow-hidden relative flex items-center justify-center`}
+      style={{ background: PALETTE.darkVoid }}
+    >
+      <div
+        className="w-24 h-24 rounded-full transition-all duration-[2000ms] ease-in-out"
+        style={{
+          background: `radial-gradient(circle, ${color}, transparent)`,
+          boxShadow: `0 0 60px ${color}40`,
+          transform: phase === 'inhale' || phase === 'hold' ? 'scale(1.5)' : 'scale(1)',
+        }}
+      />
+    </div>
+  );
+};
+
 export const BreathingScene = ({ phase, progress, fullscreen = false }: BreathingSceneProps) => {
   const height = fullscreen ? 'h-[600px]' : 'h-[500px]';
+
+  if (prefersReducedMotion()) {
+    return <BreathingReducedMotionFallback phase={phase} height={height} />;
+  }
   const fog = FOG.breathing;
   const cam = CAMERA.breathing;
   const pp = POST_PROCESSING.breathing;
@@ -205,18 +236,8 @@ export const BreathingScene = ({ phase, progress, fullscreen = false }: Breathin
         {/* Interactive cursor-reactive particles */}
         <InteractiveParticles count={interactiveCount} radius={4} color={PALETTE.accent} repelStrength={0.6} repelRadius={1.8} />
 
-        {/* Cinematic breathing camera */}
+        {/* Cinematic breathing camera — directed experience, no user orbit */}
         <BreathingCamera phase={phase} progress={progress} />
-
-        {/* Restricted orbit */}
-        <OrbitControls
-          enableZoom={false}
-          enablePan={false}
-          autoRotate
-          autoRotateSpeed={0.2}
-          maxPolarAngle={Math.PI * 0.65}
-          minPolarAngle={Math.PI * 0.35}
-        />
 
         {/* Post-processing */}
         <ImmersivePostProcessing

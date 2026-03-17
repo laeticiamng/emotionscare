@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, Suspense } from 'react';
+import React, { useRef, useEffect, useState, useMemo, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { MusicTrack } from '@/types/music';
 import * as THREE from 'three';
@@ -10,7 +10,8 @@ interface AnimatedSphereProps {
 
 const AnimatedSphere: React.FC<AnimatedSphereProps> = ({ isPlaying, audioData }) => {
   const meshRef = useRef<THREE.Mesh>(null);
-  
+  const targetVec = useMemo(() => new THREE.Vector3(), []);
+
   // Calculate audio-reactive values
   const bassLevel = audioData.slice(0, 4).reduce((a, b) => a + b, 0) / 4 / 255;
   const midLevel = audioData.slice(4, 12).reduce((a, b) => a + b, 0) / 8 / 255;
@@ -22,22 +23,24 @@ const AnimatedSphere: React.FC<AnimatedSphereProps> = ({ isPlaying, audioData })
         // Audio-reactive rotation
         meshRef.current.rotation.x = state.clock.elapsedTime * 0.5 + bassLevel * 0.5;
         meshRef.current.rotation.y = state.clock.elapsedTime * 0.3 + midLevel * 0.3;
-        
+
         // Audio-reactive scale based on bass
         const targetScale = 1 + bassLevel * 0.4;
-        meshRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
+        targetVec.set(targetScale, targetScale, targetScale);
+        meshRef.current.scale.lerp(targetVec, 0.1);
       } else {
         // Slow idle animation
         meshRef.current.rotation.x += 0.002;
         meshRef.current.rotation.y += 0.001;
-        meshRef.current.scale.lerp(new THREE.Vector3(1, 1, 1), 0.05);
+        targetVec.set(1, 1, 1);
+        meshRef.current.scale.lerp(targetVec, 0.05);
       }
     }
   });
 
   // Dynamic color based on audio
   const hue = 0.65 + highLevel * 0.2; // Purple to blue range
-  const color = new THREE.Color().setHSL(hue, 0.7, 0.5 + midLevel * 0.2);
+  const color = useMemo(() => new THREE.Color(), []).setHSL(hue, 0.7, 0.5 + midLevel * 0.2);
 
   return (
     <mesh ref={meshRef}>

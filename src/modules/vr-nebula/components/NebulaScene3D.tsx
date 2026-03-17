@@ -17,6 +17,7 @@ import {
   POST_PROCESSING,
   MOTION,
   getParticleCount,
+  prefersReducedMotion,
 } from '@/components/3d/visualDirection';
 import type { NebulaScene } from '../types';
 
@@ -39,7 +40,9 @@ const AuroraRibbon = ({ index, color, secondaryColor }: { index: number; color: 
 
   const basePositions = useMemo(() => {
     const geo = new THREE.PlaneGeometry(14, 2, 100, 8);
-    return new Float32Array(geo.attributes.position.array);
+    const positions = new Float32Array(geo.attributes.position.array);
+    geo.dispose();
+    return positions;
   }, []);
 
   useFrame(({ clock }) => {
@@ -280,6 +283,18 @@ interface NebulaScene3DProps {
   className?: string;
 }
 
+const NebulaReducedMotionFallback = ({ height, className, palette }: { height: string; className?: string; palette: typeof PALETTES.cosmos }) => (
+  <div
+    className={`w-full ${height} rounded-2xl overflow-hidden relative ${className || ''}`}
+    style={{
+      background: `radial-gradient(ellipse at 50% 40%, ${palette.primary}25 0%, transparent 55%),
+                   radial-gradient(ellipse at 40% 60%, ${palette.secondary}18 0%, transparent 45%),
+                   radial-gradient(ellipse at 60% 30%, ${palette.accent}12 0%, transparent 40%),
+                   ${palette.fog}`,
+    }}
+  />
+);
+
 export const NebulaScene3D = ({
   scene = 'cosmos',
   breathProgress = 0,
@@ -287,6 +302,11 @@ export const NebulaScene3D = ({
   className,
 }: NebulaScene3DProps) => {
   const palette = PALETTES[scene] || PALETTES.cosmos;
+
+  if (prefersReducedMotion()) {
+    return <NebulaReducedMotionFallback height={height} className={className} palette={palette} />;
+  }
+
   const normalizedBreath = breathProgress / 100;
   const fog = FOG.nebula;
   const pp = POST_PROCESSING.nebula;

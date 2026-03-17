@@ -18,6 +18,7 @@ import {
   CAMERA,
   MOTION,
   getParticleCount,
+  prefersReducedMotion,
 } from '@/components/3d/visualDirection';
 
 /* ── Spiral galaxy core — 4 arms, Fibonacci distribution ───── */
@@ -254,7 +255,30 @@ interface GalaxyScene3DProps {
   className?: string;
 }
 
+const GalaxyReducedMotionFallback = ({ height, className }: { height: string; className?: string }) => (
+  <div
+    className={`w-full ${height} rounded-2xl overflow-hidden relative ${className || ''}`}
+    style={{
+      background: `radial-gradient(ellipse at 50% 50%, ${PALETTE.primary}20 0%, transparent 50%),
+                   radial-gradient(ellipse at 30% 40%, ${PALETTE.accent}15 0%, transparent 40%),
+                   radial-gradient(ellipse at 70% 60%, ${PALETTE.gold}10 0%, transparent 35%),
+                   ${PALETTE.deepSpace}`,
+    }}
+  >
+    <div className="absolute inset-0 flex items-center justify-center">
+      <div
+        className="w-4 h-4 rounded-full"
+        style={{ background: `radial-gradient(circle, ${PALETTE.gold}, ${PALETTE.primary})`, boxShadow: `0 0 40px ${PALETTE.gold}40` }}
+      />
+    </div>
+  </div>
+);
+
 export const GalaxyScene3D = ({ height = 'h-[500px]', className }: GalaxyScene3DProps) => {
+  if (prefersReducedMotion()) {
+    return <GalaxyReducedMotionFallback height={height} className={className} />;
+  }
+
   const fog = FOG.galaxy;
   const cam = CAMERA.galaxy;
   const pp = POST_PROCESSING.galaxy;
