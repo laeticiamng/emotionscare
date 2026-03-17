@@ -2,6 +2,12 @@
  * Unified Visual Direction System for all 3D scenes
  * Ensures consistent color pipeline, fog, tone mapping, bloom, motion,
  * and particle behavior across Hero, Breathing, Galaxy, and Nebula.
+ *
+ * Scene intentions (T5):
+ *   Hero     — Promise / Inspiration / Aspiration
+ *   Breathing — Calm / Centering / Rhythm
+ *   Galaxy   — Exploration / Discovery / Majesty
+ *   Nebula   — Introspection / Envelopment / Presence
  */
 
 import * as THREE from 'three';
@@ -32,6 +38,43 @@ export const PALETTE = {
   oceanDeep: '#050d18',
 } as const;
 
+/* ── Scene Intentions ──────────────────────────────────────── */
+
+export const SCENE_INTENTIONS = {
+  hero: {
+    mood: 'aspiration',
+    description: 'Promise / Inspiration / Aspiration',
+    cameraMovement: 'gentle-sway',     // Minimal, inviting
+    particleDensity: 'sparse',          // Clean, premium
+    glowIntensity: 'subtle',            // Not overwhelming
+    lightingMood: 'warm-cool-balance',
+  },
+  breathing: {
+    mood: 'calm',
+    description: 'Calm / Centering / Rhythm',
+    cameraMovement: 'breath-sync',      // Follows breathing cycle
+    particleDensity: 'moderate',         // Supportive
+    glowIntensity: 'phase-driven',       // Pulses with phase
+    lightingMood: 'phase-color-shift',
+  },
+  galaxy: {
+    mood: 'majesty',
+    description: 'Exploration / Discovery / Majesty',
+    cameraMovement: 'orbital-flythrough', // Slow, majestic orbit
+    particleDensity: 'dense',             // Starfield richness
+    glowIntensity: 'moderate',            // Core glow without wash
+    lightingMood: 'cool-with-warm-core',
+  },
+  nebula: {
+    mood: 'introspection',
+    description: 'Introspection / Envelopment / Presence',
+    cameraMovement: 'gentle-drift',      // Slow, cocooning
+    particleDensity: 'moderate',          // Enveloping but not busy
+    glowIntensity: 'warm-enveloping',    // Soft, immersive
+    lightingMood: 'palette-driven',
+  },
+} as const;
+
 /* ── Fog Strategy ───────────────────────────────────────────── */
 
 export interface FogConfig {
@@ -41,20 +84,21 @@ export interface FogConfig {
 }
 
 export const FOG: Record<string, FogConfig> = {
-  hero:     { color: PALETTE.darkVoid,   near: 5,  far: 22 },
-  breathing:{ color: PALETTE.darkVoid,   near: 4,  far: 20 },
-  galaxy:   { color: PALETTE.deepSpace,  near: 6,  far: 30 },
-  nebula:   { color: PALETTE.nebulaDark, near: 4,  far: 22 },
+  hero:     { color: PALETTE.darkVoid,   near: 6,  far: 24 },
+  breathing:{ color: PALETTE.darkVoid,   near: 5,  far: 22 },
+  galaxy:   { color: PALETTE.deepSpace,  near: 8,  far: 35 },
+  nebula:   { color: PALETTE.nebulaDark, near: 5,  far: 24 },
 };
 
 /* ── Tone Mapping ───────────────────────────────────────────── */
 
 export const TONE_MAPPING = {
   mapping: THREE.ACESFilmicToneMapping,
-  exposure: 1.15,
+  exposure: 1.3,
 } as const;
 
 /* ── Post-Processing Presets ────────────────────────────────── */
+/* Recalibrated: bloom enhances without washing out. Vignette adds depth. */
 
 export interface PostProcessingPreset {
   bloomIntensity: number;
@@ -68,40 +112,40 @@ export interface PostProcessingPreset {
 
 export const POST_PROCESSING: Record<string, PostProcessingPreset> = {
   hero: {
-    bloomIntensity: 1.4,
-    bloomThreshold: 0.2,
-    bloomRadius: 0.75,
-    vignetteOffset: 0.25,
-    vignetteDarkness: 0.6,
+    bloomIntensity: 1.0,
+    bloomThreshold: 0.35,
+    bloomRadius: 0.6,
+    vignetteOffset: 0.3,
+    vignetteDarkness: 0.5,
+    chromaticAberration: true,
+    chromaticOffset: 0.0003,
+  },
+  breathing: {
+    bloomIntensity: 1.2,
+    bloomThreshold: 0.28,
+    bloomRadius: 0.65,
+    vignetteOffset: 0.35,
+    vignetteDarkness: 0.55,
     chromaticAberration: true,
     chromaticOffset: 0.0004,
   },
-  breathing: {
-    bloomIntensity: 1.6,
-    bloomThreshold: 0.18,
-    bloomRadius: 0.8,
+  galaxy: {
+    bloomIntensity: 1.4,
+    bloomThreshold: 0.22,
+    bloomRadius: 0.7,
     vignetteOffset: 0.3,
     vignetteDarkness: 0.65,
     chromaticAberration: true,
-    chromaticOffset: 0.0005,
-  },
-  galaxy: {
-    bloomIntensity: 2.0,
-    bloomThreshold: 0.12,
-    bloomRadius: 0.9,
-    vignetteOffset: 0.3,
-    vignetteDarkness: 0.8,
-    chromaticAberration: true,
-    chromaticOffset: 0.0005,
+    chromaticOffset: 0.0004,
   },
   nebula: {
-    bloomIntensity: 1.8,
-    bloomThreshold: 0.15,
-    bloomRadius: 0.85,
-    vignetteOffset: 0.28,
-    vignetteDarkness: 0.75,
+    bloomIntensity: 1.3,
+    bloomThreshold: 0.25,
+    bloomRadius: 0.7,
+    vignetteOffset: 0.3,
+    vignetteDarkness: 0.6,
     chromaticAberration: true,
-    chromaticOffset: 0.0005,
+    chromaticOffset: 0.0004,
   },
 };
 
@@ -118,9 +162,9 @@ export const CAMERA = {
 
 export const MOTION = {
   // Camera sway amplitude and speed
-  cameraSway: { amplitude: 0.25, speed: 0.08 },
+  cameraSway: { amplitude: 0.2, speed: 0.06 },
   // Particle rotation speeds
-  particleRotation: { slow: 0.01, normal: 0.02, fast: 0.04 },
+  particleRotation: { slow: 0.008, normal: 0.015, fast: 0.03 },
   // Breathing easing (sine-based for organic feel)
   breathEase: (t: number) => Math.sin(t * Math.PI * 0.5),
   // Cinematic ease-in-out
@@ -130,12 +174,26 @@ export const MOTION = {
 /* ── Particle Budgets ───────────────────────────────────────── */
 
 export const PARTICLE_BUDGETS = {
-  hero:      { desktop: 200, mobile: 80 },
-  breathing: { desktop: 300, mobile: 120 },
-  galaxy:    { desktop: 5000, mobile: 2000 },
-  nebula:    { desktop: 400, mobile: 150 },
-  interactive: { desktop: 180, mobile: 60 },
+  hero:      { desktop: 160, mobile: 60 },
+  breathing: { desktop: 250, mobile: 100 },
+  galaxy:    { desktop: 4000, mobile: 1500 },
+  nebula:    { desktop: 350, mobile: 120 },
+  interactive: { desktop: 140, mobile: 40 },
 } as const;
+
+/* ── Stars Budget (scaled by device tier) ─────────────────── */
+
+export const STARS_BUDGETS = {
+  hero:      { high: 1000, medium: 600, low: 300 },
+  breathing: { high: 1500, medium: 900, low: 400 },
+  galaxy:    { high: 2200, medium: 1400, low: 600 },
+  nebula:    { high: 1600, medium: 1000, low: 400 },
+} as const;
+
+export const getStarsCount = (scene: keyof typeof STARS_BUDGETS): number => {
+  const tier = getDeviceTier();
+  return STARS_BUDGETS[scene][tier];
+};
 
 /* ── Device Detection & Performance ─────────────────────────── */
 
@@ -143,18 +201,18 @@ export const getDeviceTier = (): 'high' | 'medium' | 'low' => {
   if (typeof window === 'undefined') return 'medium';
 
   // Check reduced motion preference
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (prefersReducedMotion) return 'low';
+  if (prefersReducedMotion()) return 'low';
 
-  // Check device pixel ratio and screen size
   const dpr = window.devicePixelRatio || 1;
   const width = window.innerWidth;
 
-  // Mobile or low-DPR → low tier
+  // Mobile or low-DPR -> low tier
   if (width < 768 || dpr < 1.5) return 'low';
-  // Tablet or moderate → medium
+  // Check hardware concurrency if available
+  if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2) return 'low';
+  // Tablet or moderate -> medium
   if (width < 1200) return 'medium';
-  // Desktop with good display → high
+  // Desktop with good display -> high
   return 'high';
 };
 
@@ -177,19 +235,37 @@ export const getParticleCount = (scene: keyof typeof PARTICLE_BUDGETS): number =
   }
 };
 
+/** Whether postprocessing should be enabled for this device */
+export const shouldEnablePostProcessing = (): boolean => {
+  const tier = getDeviceTier();
+  return tier !== 'low';
+};
+
 /* ── Shared GL Config ───────────────────────────────────────── */
 
 export const getGLConfig = () => ({
-  antialias: true,
+  antialias: getDeviceTier() !== 'low',
   alpha: true,
   toneMapping: TONE_MAPPING.mapping,
   toneMappingExposure: TONE_MAPPING.exposure,
-  powerPreference: 'high-performance' as const,
+  powerPreference: getDeviceTier() === 'low' ? 'low-power' as const : 'high-performance' as const,
+  failIfMajorPerformanceCaveat: false,
 });
 
 /* ── Reduced Motion Check ───────────────────────────────────── */
 
 export const prefersReducedMotion = (): boolean => {
   if (typeof window === 'undefined') return false;
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  try {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch {
+    return false;
+  }
+};
+
+/* ── Tab Visibility ─────────────────────────────────────────── */
+
+export const isTabVisible = (): boolean => {
+  if (typeof document === 'undefined') return true;
+  return document.visibilityState === 'visible';
 };

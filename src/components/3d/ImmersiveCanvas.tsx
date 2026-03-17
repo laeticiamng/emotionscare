@@ -1,12 +1,13 @@
 /**
  * Wrapper Canvas 3D réutilisable — fog, tone mapping, vignette overlay
- * Now uses unified visual direction system
+ * Now includes: error boundary, context-loss handling, tab-inactive pause, WebGL gate.
  */
 
-import React, { type ReactNode } from 'react';
+import React, { useEffect, useRef, useCallback, useState, type ReactNode } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { cn } from '@/lib/utils';
-import { getGLConfig, getDPR } from './visualDirection';
+import { getGLConfig, getDPR, shouldEnablePostProcessing } from './visualDirection';
+import { WebGLGate } from './Scene3DErrorBoundary';
 
 interface ImmersiveCanvasProps {
   children: ReactNode;
@@ -17,6 +18,9 @@ interface ImmersiveCanvasProps {
   className?: string;
   cameraPosition?: [number, number, number];
   fov?: number;
+  scene?: 'hero' | 'breathing' | 'galaxy' | 'nebula';
+  /** frameloop: 'always' (default) or 'demand' for static scenes */
+  frameloop?: 'always' | 'demand' | 'never';
 }
 
 export const ImmersiveCanvas: React.FC<ImmersiveCanvasProps> = ({
@@ -28,26 +32,72 @@ export const ImmersiveCanvas: React.FC<ImmersiveCanvasProps> = ({
   className,
   cameraPosition = [0, 0, 5],
   fov = 50,
-}) => (
-  <div className={cn(`w-full ${height} rounded-2xl overflow-hidden relative`, className)}>
-    {/* Radial vignette overlay — enhanced for depth */}
-    <div
-      className="absolute inset-0 pointer-events-none z-10"
-      style={{
-        background:
-          'radial-gradient(ellipse at 50% 45%, transparent 25%, hsl(var(--background)) 95%)',
-      }}
-    />
+  scene = 'hero',
+  frameloop = 'always',
+}) => {
+  const [contextLost, setContextLost] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-    <Canvas
-      camera={{ position: cameraPosition, fov }}
-      gl={getGLConfig()}
-      style={{ background: 'transparent' }}
-      dpr={getDPR()}
-    >
-      <fog attach="fog" args={[fogColor, fogNear, fogFar]} />
-      <ambientLight intensity={0.1} />
-      {children}
-    </Canvas>
-  </div>
-);
+  const handleCreated = useCallback((state: { gl: { domElement: HTMLCanvasElement } }) => {
+    const canvas = state.gl.domElement;
+    canvasRef.current = canvas;
+
+    const onLost = (e: Event) => {
+      e.preventDefault();
+      setContextLost(true);
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('[ImmersiveCanvas] WebGL context lost');
+      }
+    };
+    const onRestored = () => {
+      setContextLost(false);
+      if (process.env.NODE_ENV !== 'production') {
+        console.info('[ImmersiveCanvas] WebGL context restored');
+      }
+    };
+
+    canvas.addEventListener('webglcontextlost', onLost);
+    canvas.addEventListener('webglcontextrestored', onRestored);
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      canvasRef.current = null;
+    };
+  }, []);
+
+  return (
+    <WebGLGate scene={scene} height={height} className={className}>
+      <div className={cn(`w-full ${height} rounded-2xl overflow-hidden relative`, className)}>
+        {/* Radial vignette overlay — enhanced for depth */}
+        <div
+          className="absolute inset-0 pointer-events-none z-10"
+          style={{
+            background:
+              'radial-gradient(ellipse at 50% 45%, transparent 25%, hsl(var(--background)) 95%)',
+          }}
+        />
+
+        {contextLost && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <p className="text-white/60 text-sm">Rechargement de la scène...</p>
+          </div>
+        )}
+
+        <Canvas
+          camera={{ position: cameraPosition, fov }}
+          gl={getGLConfig()}
+          style={{ background: 'transparent' }}
+          dpr={getDPR()}
+          frameloop={frameloop}
+          onCreated={handleCreated}
+        >
+          <fog attach="fog" args={[fogColor, fogNear, fogFar]} />
+          <ambientLight intensity={0.12} />
+          {children}
+        </Canvas>
+      </div>
+    </WebGLGate>
+  );
+};

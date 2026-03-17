@@ -1,12 +1,18 @@
 /**
  * Sphère 3D immersive avec vertex shader Simplex noise
  * Déformation organique en temps réel — l'orbe "respire" comme un organisme vivant
+ *
+ * T3 improvements:
+ * - Safe shader injection with try/catch guard
+ * - Enhanced material properties for premium organic feel
+ * - Better depth separation with inner layers
+ * - Reduced ring count for cleaner reads
  */
 
 import { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { PALETTE } from '@/components/3d/visualDirection';
+import { PALETTE, isTabVisible } from '@/components/3d/visualDirection';
 import type { BreathingPhase } from '../types';
 
 /* ── Simplex noise GLSL (injecté via onBeforeCompile) ────────── */
@@ -85,7 +91,6 @@ export const BreathingSphere = ({ phase, progress }: BreathingSphereProps) => {
   const innerRef = useRef<THREE.Mesh>(null);
   const ring1Ref = useRef<THREE.Mesh>(null);
   const ring2Ref = useRef<THREE.Mesh>(null);
-  const ring3Ref = useRef<THREE.Mesh>(null);
 
   const phaseColors = useMemo(() => ({
     inhale: new THREE.Color(PALETTE.breathing.inhale),
@@ -106,32 +111,46 @@ export const BreathingSphere = ({ phase, progress }: BreathingSphereProps) => {
 
   const targetScale = phase === 'inhale' ? 2.2 : phase === 'hold' ? 2.2 : phase === 'exhale' ? 1 : 1;
 
-  // Inject Simplex noise vertex shader into the outer sphere material
+  // Inject Simplex noise vertex shader — with safe try/catch guard
   useEffect(() => {
     if (!outerRef.current) return;
     const mat = outerRef.current.material as THREE.MeshPhysicalMaterial;
-    mat.onBeforeCompile = (shader) => {
-      shader.uniforms.uTime = noiseUniforms.current.uTime;
-      shader.uniforms.uNoiseAmp = noiseUniforms.current.uNoiseAmp;
-      shader.uniforms.uNoiseFreq = noiseUniforms.current.uNoiseFreq;
+    try {
+      mat.onBeforeCompile = (shader) => {
+        shader.uniforms.uTime = noiseUniforms.current.uTime;
+        shader.uniforms.uNoiseAmp = noiseUniforms.current.uNoiseAmp;
+        shader.uniforms.uNoiseFreq = noiseUniforms.current.uNoiseFreq;
 
-      shader.vertexShader = SIMPLEX_NOISE_GLSL + VERTEX_HEADER + shader.vertexShader;
-      shader.vertexShader = shader.vertexShader.replace(
-        '#include <begin_vertex>',
-        '#include <begin_vertex>\n' + VERTEX_TRANSFORM
-      );
-    };
-    mat.needsUpdate = true;
+        // Guard: verify the injection point exists
+        if (!shader.vertexShader.includes('#include <begin_vertex>')) {
+          if (process.env.NODE_ENV !== 'production') {
+            console.warn('[BreathingSphere] Shader injection point not found, skipping deformation');
+          }
+          return;
+        }
+
+        shader.vertexShader = SIMPLEX_NOISE_GLSL + VERTEX_HEADER + shader.vertexShader;
+        shader.vertexShader = shader.vertexShader.replace(
+          '#include <begin_vertex>',
+          '#include <begin_vertex>\n' + VERTEX_TRANSFORM
+        );
+      };
+      mat.needsUpdate = true;
+    } catch (err) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('[BreathingSphere] Shader injection failed, falling back to static mesh:', err);
+      }
+    }
   }, []);
 
   useFrame((state) => {
+    if (!isTabVisible()) return;
     const time = state.clock.elapsedTime;
     const normalizedProgress = progress / 100;
     const scale = 1 + (targetScale - 1) * normalizedProgress;
 
     // Update noise uniforms
     noiseUniforms.current.uTime.value = time;
-    // Noise amplitude pulses with breathing phase
     const breathAmp = phase === 'inhale'
       ? 0.08 + normalizedProgress * 0.15
       : phase === 'hold'
@@ -146,42 +165,42 @@ export const BreathingSphere = ({ phase, progress }: BreathingSphereProps) => {
     currentColor.current.lerp(targetColor, 0.04);
     currentEmissive.current.lerp(targetColor, 0.04);
 
-    // === Outer sphere (translucent shell with organic deformation) ===
+    // === Outer sphere (translucent shell with organic Simplex deformation) ===
     if (outerRef.current) {
       outerRef.current.scale.setScalar(scale);
-      outerRef.current.rotation.y = time * 0.15;
-      outerRef.current.rotation.x = Math.sin(time * 0.3) * 0.15;
+      outerRef.current.rotation.y = time * 0.12;
+      outerRef.current.rotation.x = Math.sin(time * 0.25) * 0.12;
       const outerMat = outerRef.current.material as THREE.MeshPhysicalMaterial;
       outerMat.color.copy(currentColor.current);
       outerMat.emissive.copy(currentEmissive.current);
-      outerMat.emissiveIntensity = 0.4 + Math.sin(time * 1.5) * 0.15;
+      outerMat.emissiveIntensity = 0.35 + Math.sin(time * 1.2) * 0.12;
     }
 
     // === Inner glow sphere ===
     if (innerRef.current) {
-      const innerScale = scale * 0.6;
+      const innerScale = scale * 0.55;
       innerRef.current.scale.setScalar(innerScale);
-      innerRef.current.rotation.y = -time * 0.2;
+      innerRef.current.rotation.y = -time * 0.18;
       const innerMat = innerRef.current.material as THREE.MeshStandardMaterial;
       innerMat.color.copy(currentColor.current);
       innerMat.emissive.copy(currentEmissive.current);
-      innerMat.emissiveIntensity = 1.2 + Math.sin(time * 2) * 0.4;
+      innerMat.emissiveIntensity = 1.0 + Math.sin(time * 1.8) * 0.35;
     }
 
-    // === Ripple rings ===
-    const rings = [ring1Ref, ring2Ref, ring3Ref];
+    // === Ripple rings (reduced to 2 for cleaner read) ===
+    const rings = [ring1Ref, ring2Ref];
     rings.forEach((ref, i) => {
       if (!ref.current) return;
-      const offset = i * 0.8;
-      const ringScale = scale * (1.3 + i * 0.3) + Math.sin(time * 1.2 + offset) * 0.15;
+      const offset = i * 1.0;
+      const ringScale = scale * (1.4 + i * 0.35) + Math.sin(time * 1.0 + offset) * 0.12;
       ref.current.scale.setScalar(ringScale);
-      ref.current.rotation.x = Math.PI / 2 + Math.sin(time * 0.5 + offset) * 0.3;
-      ref.current.rotation.z = time * (0.1 + i * 0.05);
+      ref.current.rotation.x = Math.PI / 2 + Math.sin(time * 0.4 + offset) * 0.25;
+      ref.current.rotation.z = time * (0.08 + i * 0.04);
       const ringMat = ref.current.material as THREE.MeshStandardMaterial;
       ringMat.color.copy(currentColor.current);
       ringMat.emissive.copy(currentEmissive.current);
-      ringMat.emissiveIntensity = 0.6 + Math.sin(time * 1.5 + offset) * 0.3;
-      ringMat.opacity = 0.15 + Math.sin(time + offset) * 0.1;
+      ringMat.emissiveIntensity = 0.5 + Math.sin(time * 1.2 + offset) * 0.25;
+      ringMat.opacity = 0.12 + Math.sin(time + offset) * 0.08;
     });
   });
 
@@ -193,27 +212,28 @@ export const BreathingSphere = ({ phase, progress }: BreathingSphereProps) => {
         <meshPhysicalMaterial
           color="#4f9eff"
           emissive="#4f9eff"
-          emissiveIntensity={0.4}
+          emissiveIntensity={0.35}
           transparent
-          opacity={0.35}
-          roughness={0.1}
-          metalness={0.1}
-          transmission={0.6}
-          thickness={0.5}
+          opacity={0.32}
+          roughness={0.08}
+          metalness={0.05}
+          transmission={0.65}
+          thickness={0.6}
           clearcoat={1}
-          clearcoatRoughness={0.1}
+          clearcoatRoughness={0.08}
+          ior={1.4}
         />
       </mesh>
 
-      {/* Inner glow core */}
+      {/* Inner glow core — warmer, more alive */}
       <mesh ref={innerRef}>
         <sphereGeometry args={[1, 32, 32]} />
         <meshStandardMaterial
           color="#4f9eff"
           emissive="#4f9eff"
-          emissiveIntensity={1.2}
+          emissiveIntensity={1.0}
           transparent
-          opacity={0.8}
+          opacity={0.75}
           roughness={0}
           metalness={0}
         />
@@ -221,35 +241,23 @@ export const BreathingSphere = ({ phase, progress }: BreathingSphereProps) => {
 
       {/* Ripple ring 1 */}
       <mesh ref={ring1Ref}>
-        <torusGeometry args={[1, 0.015, 16, 100]} />
+        <torusGeometry args={[1, 0.012, 16, 100]} />
         <meshStandardMaterial
           color="#4f9eff"
           emissive="#4f9eff"
-          emissiveIntensity={0.6}
-          transparent
-          opacity={0.25}
-        />
-      </mesh>
-
-      {/* Ripple ring 2 */}
-      <mesh ref={ring2Ref}>
-        <torusGeometry args={[1, 0.01, 16, 100]} />
-        <meshStandardMaterial
-          color="#4f9eff"
-          emissive="#4f9eff"
-          emissiveIntensity={0.6}
+          emissiveIntensity={0.5}
           transparent
           opacity={0.2}
         />
       </mesh>
 
-      {/* Ripple ring 3 */}
-      <mesh ref={ring3Ref}>
+      {/* Ripple ring 2 */}
+      <mesh ref={ring2Ref}>
         <torusGeometry args={[1, 0.008, 16, 100]} />
         <meshStandardMaterial
           color="#4f9eff"
           emissive="#4f9eff"
-          emissiveIntensity={0.6}
+          emissiveIntensity={0.5}
           transparent
           opacity={0.15}
         />

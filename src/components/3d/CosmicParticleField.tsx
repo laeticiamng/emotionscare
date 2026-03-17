@@ -1,12 +1,13 @@
 /**
  * Champ de particules cosmiques paramétrable et réutilisable
  * Uses unified visual direction defaults
+ * T4: tab-inactive pause, reduced-motion aware
  */
 
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { PALETTE, MOTION } from './visualDirection';
+import { PALETTE, MOTION, isTabVisible } from './visualDirection';
 
 interface CosmicParticleFieldProps {
   count?: number;
@@ -41,14 +42,14 @@ export const CosmicParticleField = ({
   }, [count, radius]);
 
   useFrame((state) => {
-    if (!ref.current) return;
+    if (!ref.current || !isTabVisible()) return;
     const t = state.clock.elapsedTime;
     ref.current.rotation.y = t * speed;
-    ref.current.rotation.x = Math.sin(t * speed * 0.5) * 0.1;
+    ref.current.rotation.x = Math.sin(t * speed * 0.5) * 0.08;
     ref.current.scale.setScalar(breathFactor);
 
     const mat = ref.current.material as THREE.PointsMaterial;
-    mat.opacity = 0.5 + Math.sin(t * 1.5) * 0.15;
+    mat.opacity = 0.45 + Math.sin(t * 1.2) * 0.12;
   });
 
   return (
@@ -60,7 +61,7 @@ export const CosmicParticleField = ({
         color={color}
         size={size}
         transparent
-        opacity={0.6}
+        opacity={0.5}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
         sizeAttenuation

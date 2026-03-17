@@ -6,6 +6,7 @@
 import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { isTabVisible } from '@/components/3d/visualDirection';
 import { type VRBreathPhase } from '@/store/vr.store';
 
 interface BreathPacerSphereProps {
@@ -33,6 +34,7 @@ export const BreathPacerSphere: React.FC<BreathPacerSphereProps> = ({
   const currentColor = useRef(new THREE.Color('#4f9eff'));
 
   useFrame((state, delta) => {
+    if (!isTabVisible()) return;
     const t = state.clock.elapsedTime;
     const targetColor = PHASE_COLORS[phase] || PHASE_COLORS.pause;
     const lerpSpeed = reducedMotion ? 1 : 0.04;

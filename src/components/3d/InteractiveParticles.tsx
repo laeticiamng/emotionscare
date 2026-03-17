@@ -1,13 +1,13 @@
 /**
  * Particules interactives réagissant au curseur/touch
  * Effet "champ de force" — les particules s'écartent au passage de la souris
- * Uses unified visual direction defaults
+ * T4: tab-inactive pause, reduced-motion aware, proper cleanup
  */
 
 import { useRef, useMemo, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { PALETTE, MOTION } from './visualDirection';
+import { PALETTE, isTabVisible } from './visualDirection';
 
 interface InteractiveParticlesProps {
   count?: number;
@@ -31,7 +31,6 @@ export const InteractiveParticles = ({
   const raycaster = useMemo(() => new THREE.Raycaster(), []);
   const mouseNDC = useRef(new THREE.Vector2(9999, 9999));
 
-  // Track mouse/touch in NDC
   useEffect(() => {
     const canvas = gl.domElement;
     const handleMove = (clientX: number, clientY: number) => {
@@ -56,7 +55,6 @@ export const InteractiveParticles = ({
     };
   }, [gl]);
 
-  // Generate initial positions
   const { basePositions, currentPositions } = useMemo(() => {
     const base = new Float32Array(count * 3);
     const current = new Float32Array(count * 3);
@@ -81,10 +79,9 @@ export const InteractiveParticles = ({
   const intersectPlane = useMemo(() => new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), []);
 
   useFrame((state) => {
-    if (!pointsRef.current) return;
+    if (!pointsRef.current || !isTabVisible()) return;
     const time = state.clock.elapsedTime;
 
-    // Project mouse into 3D world at z=0
     raycaster.setFromCamera(mouseNDC.current, camera);
     raycaster.ray.intersectPlane(intersectPlane, mousePos.current);
 
@@ -92,12 +89,10 @@ export const InteractiveParticles = ({
 
     for (let i = 0; i < count; i++) {
       const ix = i * 3;
-      // Base with gentle drift
-      const bx = basePositions[ix] + Math.sin(time * 0.2 + i * 0.1) * 0.05;
-      const by = basePositions[ix + 1] + Math.cos(time * 0.15 + i * 0.15) * 0.05;
-      const bz = basePositions[ix + 2] + Math.sin(time * 0.25 + i * 0.05) * 0.05;
+      const bx = basePositions[ix] + Math.sin(time * 0.18 + i * 0.1) * 0.04;
+      const by = basePositions[ix + 1] + Math.cos(time * 0.13 + i * 0.15) * 0.04;
+      const bz = basePositions[ix + 2] + Math.sin(time * 0.2 + i * 0.05) * 0.04;
 
-      // Repulsion from cursor
       tempVec.set(bx, by, bz);
       const dist = tempVec.distanceTo(mousePos.current);
       let rx = 0, ry = 0, rz = 0;
@@ -112,19 +107,18 @@ export const InteractiveParticles = ({
         rz = (dz / len) * force;
       }
 
-      // Smooth interpolation toward target
       const tx = bx + rx;
       const ty = by + ry;
       const tz = bz + rz;
-      currentPositions[ix] += (tx - currentPositions[ix]) * 0.08;
-      currentPositions[ix + 1] += (ty - currentPositions[ix + 1]) * 0.08;
-      currentPositions[ix + 2] += (tz - currentPositions[ix + 2]) * 0.08;
+      currentPositions[ix] += (tx - currentPositions[ix]) * 0.07;
+      currentPositions[ix + 1] += (ty - currentPositions[ix + 1]) * 0.07;
+      currentPositions[ix + 2] += (tz - currentPositions[ix + 2]) * 0.07;
 
       posAttr.setXYZ(i, currentPositions[ix], currentPositions[ix + 1], currentPositions[ix + 2]);
     }
 
     posAttr.needsUpdate = true;
-    pointsRef.current.rotation.y = time * 0.02;
+    pointsRef.current.rotation.y = time * 0.015;
   });
 
   return (
@@ -139,9 +133,9 @@ export const InteractiveParticles = ({
       </bufferGeometry>
       <pointsMaterial
         color={color}
-        size={0.05}
+        size={0.045}
         transparent
-        opacity={0.6}
+        opacity={0.55}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
         sizeAttenuation
