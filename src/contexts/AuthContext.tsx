@@ -38,11 +38,13 @@ interface AuthProviderProps {
 // Créer un faux utilisateur pour le mode test (uniquement si mock disponible)
 const createMockUser = (): User | null => {
   if (!TEST_MODE.BYPASS_AUTH || !TEST_MODE.MOCK_USER) return null;
+  const mockData = TEST_MODE.MOCK_USER as { id: string; email: string; user_metadata?: Record<string, unknown> } | null;
+  if (!mockData) return null;
   return {
-    id: TEST_MODE.MOCK_USER.id,
-    email: TEST_MODE.MOCK_USER.email,
+    id: mockData.id,
+    email: mockData.email,
     app_metadata: {},
-    user_metadata: TEST_MODE.MOCK_USER.user_metadata,
+    user_metadata: mockData.user_metadata ?? {},
     aud: 'authenticated',
     created_at: new Date().toISOString(),
   } as User;
