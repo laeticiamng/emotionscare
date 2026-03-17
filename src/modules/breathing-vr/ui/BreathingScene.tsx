@@ -1,6 +1,8 @@
 /**
- * Scène 3D immersive pour la respiration — upgraded with unified visual direction
+ * Scène 3D immersive pour la respiration — unified visual direction
+ * Intention: Calm / Centering / Rhythm
  * Enhanced: light-driven phase reading, deeper atmosphere, cinematic camera
+ * Includes: WebGL gate, error boundary, graceful postprocessing degradation
  */
 
 import { useRef, useMemo } from 'react';
@@ -11,6 +13,7 @@ import { BreathingSphere } from './BreathingSphere';
 import { BreathingParticles } from './BreathingParticles';
 import { ImmersivePostProcessing } from '@/components/3d/ImmersivePostProcessing';
 import { InteractiveParticles } from '@/components/3d/InteractiveParticles';
+import { WebGLGate } from '@/components/3d/Scene3DErrorBoundary';
 import {
   PALETTE,
   FOG,
@@ -20,7 +23,10 @@ import {
   getGLConfig,
   getDPR,
   getParticleCount,
+  getStarsCount,
   prefersReducedMotion,
+  shouldEnablePostProcessing,
+  isTabVisible,
 } from '@/components/3d/visualDirection';
 import type { BreathingPhase } from '../types';
 
@@ -48,6 +54,7 @@ const DynamicLights = ({ phase, progress }: { phase: BreathingPhase; progress: n
   const complementaryTemp = useMemo(() => new THREE.Color(), []);
 
   useFrame((state) => {
+    if (!isTabVisible()) return;
     const t = state.clock.elapsedTime;
     const normalizedProgress = progress / 100;
     const target = phaseColors[phase];
@@ -57,40 +64,40 @@ const DynamicLights = ({ phase, progress }: { phase: BreathingPhase; progress: n
     complementaryTemp.offsetHSL(0.15, 0, -0.1);
     color2.current.lerp(complementaryTemp, 0.03);
 
-    // Phase-driven intensity: brighter during inhale peak, dimmer during rest
+    // Phase-driven intensity: calmer overall, clearer phase distinction
     const phaseIntensity = phase === 'inhale'
-      ? 2.2 + normalizedProgress * 1.0
+      ? 1.8 + normalizedProgress * 0.8
       : phase === 'hold'
-        ? 3.0 + Math.sin(t * 2) * 0.3
+        ? 2.4 + Math.sin(t * 2) * 0.2
         : phase === 'exhale'
-          ? 3.0 - normalizedProgress * 1.0
-          : 1.8 + Math.sin(t * 1.5) * 0.3;
+          ? 2.4 - normalizedProgress * 0.8
+          : 1.5 + Math.sin(t * 1.5) * 0.2;
 
     if (light1Ref.current) {
       light1Ref.current.color.copy(color1.current);
-      light1Ref.current.intensity = phaseIntensity + Math.sin(t * 1.5) * 0.3;
-      light1Ref.current.position.x = Math.sin(t * 0.25) * 6;
-      light1Ref.current.position.y = Math.cos(t * 0.18) * 4;
+      light1Ref.current.intensity = phaseIntensity + Math.sin(t * 1.5) * 0.2;
+      light1Ref.current.position.x = Math.sin(t * 0.2) * 5;
+      light1Ref.current.position.y = Math.cos(t * 0.15) * 3.5;
     }
 
     if (light2Ref.current) {
       light2Ref.current.color.copy(color2.current);
-      light2Ref.current.intensity = (phaseIntensity * 0.7) + Math.cos(t * 1.2) * 0.2;
-      light2Ref.current.position.x = Math.cos(t * 0.2) * -5;
-      light2Ref.current.position.z = Math.sin(t * 0.12) * 5;
+      light2Ref.current.intensity = (phaseIntensity * 0.6) + Math.cos(t * 1.2) * 0.15;
+      light2Ref.current.position.x = Math.cos(t * 0.18) * -4.5;
+      light2Ref.current.position.z = Math.sin(t * 0.1) * 4;
     }
 
     // Rim light for depth
     if (light3Ref.current) {
-      light3Ref.current.intensity = 0.5 + Math.sin(t * 0.4) * 0.2;
+      light3Ref.current.intensity = 0.4 + Math.sin(t * 0.35) * 0.15;
     }
   });
 
   return (
     <>
       <pointLight ref={light1Ref} position={[5, 5, 5]} intensity={2} distance={22} />
-      <pointLight ref={light2Ref} position={[-5, -3, 3]} intensity={1.5} distance={22} />
-      <pointLight ref={light3Ref} position={[0, -4, -5]} color={PALETTE.primary} intensity={0.5} distance={15} />
+      <pointLight ref={light2Ref} position={[-5, -3, 3]} intensity={1.2} distance={22} />
+      <pointLight ref={light3Ref} position={[0, -4, -5]} color={PALETTE.primary} intensity={0.4} distance={15} />
     </>
   );
 };
@@ -108,7 +115,7 @@ const BreathingAtmosphere = ({ phase, progress }: { phase: BreathingPhase; progr
   }), []);
 
   useFrame(({ clock }) => {
-    if (!ref.current) return;
+    if (!ref.current || !isTabVisible()) return;
     const t = clock.elapsedTime;
     const normalizedProgress = progress / 100;
     const breathScale = phase === 'inhale'
@@ -123,7 +130,7 @@ const BreathingAtmosphere = ({ phase, progress }: { phase: BreathingPhase; progr
     colorRef.current.lerp(phaseColors[phase], 0.03);
     const mat = ref.current.material as THREE.MeshBasicMaterial;
     mat.color.copy(colorRef.current);
-    mat.opacity = 0.04 + Math.sin(t * 0.6) * 0.015;
+    mat.opacity = 0.05 + Math.sin(t * 0.5) * 0.015;
   });
 
   return (
@@ -132,7 +139,7 @@ const BreathingAtmosphere = ({ phase, progress }: { phase: BreathingPhase; progr
       <meshBasicMaterial
         color={PALETTE.breathing.inhale}
         transparent
-        opacity={0.04}
+        opacity={0.05}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
       />
@@ -140,24 +147,24 @@ const BreathingAtmosphere = ({ phase, progress }: { phase: BreathingPhase; progr
   );
 };
 
-/** Cinematic camera that breathes with the user — enhanced with depth shift */
+/** Cinematic camera that breathes with the user */
 const BreathingCamera = ({ phase, progress }: { phase: BreathingPhase; progress: number }) => {
   useFrame((state) => {
+    if (!isTabVisible()) return;
     const time = state.clock.elapsedTime;
     const normalizedProgress = progress / 100;
 
-    // Deeper breath offset with cinematic easing
     const breathOffset = phase === 'inhale'
-      ? MOTION.breathEase(normalizedProgress) * 0.4
+      ? MOTION.breathEase(normalizedProgress) * 0.35
       : phase === 'exhale'
-        ? -MOTION.breathEase(normalizedProgress) * 0.4
+        ? -MOTION.breathEase(normalizedProgress) * 0.35
         : phase === 'hold'
-          ? Math.sin(time * 2) * 0.05
+          ? Math.sin(time * 2) * 0.04
           : 0;
 
-    state.camera.position.z = 5 + breathOffset + Math.sin(time * 0.4) * 0.08;
-    state.camera.position.y = Math.sin(time * 0.25) * 0.12;
-    state.camera.position.x = Math.cos(time * 0.18) * 0.08;
+    state.camera.position.z = 5 + breathOffset + Math.sin(time * 0.35) * 0.06;
+    state.camera.position.y = Math.sin(time * 0.2) * 0.1;
+    state.camera.position.x = Math.cos(time * 0.15) * 0.06;
   });
 
   return null;
@@ -176,6 +183,8 @@ const BreathingReducedMotionFallback = ({ phase }: { phase: BreathingPhase }) =>
     <div
       className={`w-full ${height} rounded-2xl overflow-hidden relative flex items-center justify-center`}
       style={{ background: PALETTE.darkVoid }}
+      role="img"
+      aria-label={`Exercice de respiration - phase: ${phase}`}
     >
       <div
         className="w-24 h-24 rounded-full transition-all duration-[2000ms] ease-in-out"
@@ -195,62 +204,68 @@ export const BreathingScene = ({ phase, progress, fullscreen = false }: Breathin
   if (prefersReducedMotion()) {
     return <BreathingReducedMotionFallback phase={phase} />;
   }
+
   const fog = FOG.breathing;
   const cam = CAMERA.breathing;
   const pp = POST_PROCESSING.breathing;
   const particleCount = getParticleCount('breathing');
   const interactiveCount = getParticleCount('interactive');
+  const starsCount = getStarsCount('breathing');
+  const ppEnabled = shouldEnablePostProcessing();
 
   return (
-    <div className={`w-full ${height} rounded-2xl overflow-hidden relative`}>
-      {/* Vignette overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none z-10"
-        style={{
-          background: 'radial-gradient(ellipse at 50% 45%, transparent 25%, hsl(var(--background)) 95%)',
-        }}
-      />
-
-      <Canvas
-        camera={{ position: cam.position, fov: cam.fov }}
-        gl={getGLConfig()}
-        style={{ background: 'transparent' }}
-        dpr={getDPR()}
-      >
-        <fog attach="fog" args={[fog.color, fog.near, fog.far]} />
-        <ambientLight intensity={0.1} />
-
-        <DynamicLights phase={phase} progress={progress} />
-
-        {/* Deep starfield */}
-        <Stars radius={90} depth={70} count={1800} factor={3} saturation={0.4} fade speed={0.3} />
-
-        {/* Volumetric atmosphere behind orb */}
-        <BreathingAtmosphere phase={phase} progress={progress} />
-
-        {/* Main organic breathing orb */}
-        <BreathingSphere phase={phase} progress={progress} />
-
-        {/* Breathing-reactive particle field */}
-        <BreathingParticles phase={phase} progress={progress} count={particleCount} />
-
-        {/* Interactive cursor-reactive particles */}
-        <InteractiveParticles count={interactiveCount} radius={4} color={PALETTE.accent} repelStrength={0.6} repelRadius={1.8} />
-
-        {/* Cinematic breathing camera — directed experience, no user orbit */}
-        <BreathingCamera phase={phase} progress={progress} />
-
-        {/* Post-processing */}
-        <ImmersivePostProcessing
-          bloomIntensity={pp.bloomIntensity}
-          bloomThreshold={pp.bloomThreshold}
-          bloomRadius={pp.bloomRadius}
-          vignetteOffset={pp.vignetteOffset}
-          vignetteDarkness={pp.vignetteDarkness}
-          chromaticAberration={pp.chromaticAberration}
-          chromaticOffset={pp.chromaticOffset}
+    <WebGLGate scene="breathing" height={height}>
+      <div className={`w-full ${height} rounded-2xl overflow-hidden relative`}>
+        {/* Vignette overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none z-10"
+          style={{
+            background: 'radial-gradient(ellipse at 50% 45%, transparent 30%, hsl(var(--background)) 92%)',
+          }}
         />
-      </Canvas>
-    </div>
+
+        <Canvas
+          camera={{ position: cam.position, fov: cam.fov }}
+          gl={getGLConfig()}
+          style={{ background: 'transparent' }}
+          dpr={getDPR()}
+        >
+          <fog attach="fog" args={[fog.color, fog.near, fog.far]} />
+          <ambientLight intensity={0.12} />
+
+          <DynamicLights phase={phase} progress={progress} />
+
+          {/* Deep starfield */}
+          <Stars radius={90} depth={70} count={starsCount} factor={3} saturation={0.4} fade speed={0.2} />
+
+          {/* Volumetric atmosphere behind orb */}
+          <BreathingAtmosphere phase={phase} progress={progress} />
+
+          {/* Main organic breathing orb */}
+          <BreathingSphere phase={phase} progress={progress} />
+
+          {/* Breathing-reactive particle field */}
+          <BreathingParticles phase={phase} progress={progress} count={particleCount} />
+
+          {/* Interactive cursor-reactive particles */}
+          <InteractiveParticles count={interactiveCount} radius={4} color={PALETTE.accent} repelStrength={0.5} repelRadius={1.5} />
+
+          {/* Cinematic breathing camera */}
+          <BreathingCamera phase={phase} progress={progress} />
+
+          {/* Post-processing — gracefully degrades */}
+          <ImmersivePostProcessing
+            bloomIntensity={pp.bloomIntensity}
+            bloomThreshold={pp.bloomThreshold}
+            bloomRadius={pp.bloomRadius}
+            vignetteOffset={pp.vignetteOffset}
+            vignetteDarkness={pp.vignetteDarkness}
+            chromaticAberration={pp.chromaticAberration}
+            chromaticOffset={pp.chromaticOffset}
+            enabled={ppEnabled}
+          />
+        </Canvas>
+      </div>
+    </WebGLGate>
   );
 };

@@ -6,7 +6,7 @@
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { PALETTE } from '@/components/3d/visualDirection';
+import { PALETTE, isTabVisible } from '@/components/3d/visualDirection';
 import type { BreathingPhase } from '../types';
 
 interface BreathingParticlesProps {
@@ -53,7 +53,7 @@ export const BreathingParticles = ({ phase, progress, count = 300 }: BreathingPa
   const currentColor = useRef(new THREE.Color('#4f9eff'));
 
   useFrame((state) => {
-    if (!pointsRef.current) return;
+    if (!pointsRef.current || !isTabVisible()) return;
 
     const geo = pointsRef.current.geometry;
     const posAttr = geo.getAttribute('position') as THREE.BufferAttribute;

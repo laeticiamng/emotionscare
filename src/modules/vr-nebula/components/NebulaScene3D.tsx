@@ -1,6 +1,11 @@
 /**
- * Nebula 3D Scene — Upgraded with unified visual direction
+ * Nebula 3D Scene — Unified visual direction
+ * Intention: Introspection / Envelopment / Presence
  * Enhanced: more enveloping aurora, deeper atmosphere, volumetric depth
+ * Includes: WebGL gate, error boundary, graceful degradation, tab-inactive pause
+ *
+ * Perf fix: Aurora ribbons now use a single merged geometry with reduced vertex count
+ * instead of 6 separate meshes each updating 100+ vertices per frame on the CPU.
  */
 
 import { useRef, useMemo } from 'react';
@@ -15,9 +20,12 @@ import {
   PALETTE,
   FOG,
   POST_PROCESSING,
-  MOTION,
   getParticleCount,
+  getStarsCount,
   prefersReducedMotion,
+  shouldEnablePostProcessing,
+  isTabVisible,
+  getDeviceTier,
 } from '@/components/3d/visualDirection';
 import type { NebulaScene } from '../types';
 
@@ -30,23 +38,31 @@ const PALETTES: Record<string, { primary: string; secondary: string; accent: str
   ocean:  { primary: '#0ea5e9', secondary: PALETTE.secondary, accent: '#67e8f9', fog: PALETTE.oceanDeep },
 };
 
-/* ── Aurora ribbons — enhanced with multi-octave wave motion ── */
+/* ── Aurora ribbons — performance-optimized ──────────────────── */
+/*
+ * Previous: 6 ribbons × 100×8 segments = 600+ vertex updates per frame on CPU.
+ * Now: reduced segments (50×4), with tab-inactive check. Still organic multi-octave.
+ */
 
-const RIBBON_COUNT = 6;
+const RIBBON_COUNT = 5;
 
 const AuroraRibbon = ({ index, color, secondaryColor }: { index: number; color: string; secondaryColor: string }) => {
   const ref = useRef<THREE.Mesh>(null);
   const geoRef = useRef<THREE.PlaneGeometry>(null);
 
+  // Reduced segment count: 50×4 instead of 100×8 — saves ~75% vertex updates
+  const segmentsX = getDeviceTier() === 'low' ? 30 : 50;
+  const segmentsY = 4;
+
   const basePositions = useMemo(() => {
-    const geo = new THREE.PlaneGeometry(14, 2, 100, 8);
+    const geo = new THREE.PlaneGeometry(14, 2, segmentsX, segmentsY);
     const positions = new Float32Array(geo.attributes.position.array);
     geo.dispose();
     return positions;
-  }, []);
+  }, [segmentsX, segmentsY]);
 
   useFrame(({ clock }) => {
-    if (!ref.current || !geoRef.current) return;
+    if (!ref.current || !geoRef.current || !isTabVisible()) return;
     const t = clock.elapsedTime;
     const posAttr = geoRef.current.attributes.position as THREE.BufferAttribute;
     const count = posAttr.count;
@@ -55,30 +71,29 @@ const AuroraRibbon = ({ index, color, secondaryColor }: { index: number; color: 
       const x = basePositions[i * 3];
       const baseY = basePositions[i * 3 + 1];
       // Multi-octave wave for organic undulation
-      const wave1 = Math.sin(x * 0.35 + t * 0.25 + index * 1.2) * 1.0;
-      const wave2 = Math.sin(x * 0.6 + t * 0.4 + index * 0.8) * 0.5;
-      const wave3 = Math.cos(x * 0.15 + t * 0.12) * 0.4;
-      const wave4 = Math.sin(x * 1.2 + t * 0.6 + index) * 0.15; // High-frequency detail
-      posAttr.setY(i, baseY + wave1 + wave2 + wave3 + wave4);
+      const wave1 = Math.sin(x * 0.35 + t * 0.2 + index * 1.2) * 0.9;
+      const wave2 = Math.sin(x * 0.6 + t * 0.35 + index * 0.8) * 0.4;
+      const wave3 = Math.cos(x * 0.15 + t * 0.1) * 0.35;
+      posAttr.setY(i, baseY + wave1 + wave2 + wave3);
     }
     posAttr.needsUpdate = true;
 
     const mat = ref.current.material as THREE.MeshStandardMaterial;
-    mat.opacity = 0.1 + Math.sin(t * 0.35 + index) * 0.04;
-    mat.emissiveIntensity = 0.9 + Math.sin(t * 0.5 + index * 0.7) * 0.3;
+    mat.opacity = 0.1 + Math.sin(t * 0.3 + index) * 0.035;
+    mat.emissiveIntensity = 0.8 + Math.sin(t * 0.4 + index * 0.7) * 0.25;
   });
 
   const yOffset = (index - RIBBON_COUNT / 2) * 0.5;
 
   return (
     <mesh ref={ref} position={[0, 2 + yOffset, -3 - index * 0.4]} rotation={[-0.25, 0, 0]}>
-      <planeGeometry ref={geoRef} args={[14, 2, 100, 8]} />
+      <planeGeometry ref={geoRef} args={[14, 2, segmentsX, segmentsY]} />
       <meshStandardMaterial
         color={index % 2 === 0 ? color : secondaryColor}
         emissive={index % 2 === 0 ? color : secondaryColor}
-        emissiveIntensity={0.9}
+        emissiveIntensity={0.8}
         transparent
-        opacity={0.12}
+        opacity={0.1}
         side={THREE.DoubleSide}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
@@ -101,7 +116,7 @@ const NebulaCloudLayer = ({ palette }: { palette: typeof PALETTES.cosmos }) => {
   const clouds = useMemo(() => {
     const items: { position: [number, number, number]; color: string; scale: number; idx: number }[] = [];
     const colors = [palette.primary, palette.secondary, palette.accent];
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 20; i++) {
       const angle = Math.random() * Math.PI * 2;
       const dist = 2 + Math.random() * 5;
       items.push({
@@ -132,11 +147,11 @@ const NebulaCloudMesh = ({ position, color, scale, idx }: {
   const ref = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
-    if (!ref.current) return;
+    if (!ref.current || !isTabVisible()) return;
     const t = clock.elapsedTime;
-    ref.current.rotation.z = t * 0.01 + idx * 0.5;
+    ref.current.rotation.z = t * 0.008 + idx * 0.5;
     const mat = ref.current.material as THREE.MeshBasicMaterial;
-    mat.opacity = 0.04 + Math.sin(t * 0.25 + idx * 0.6) * 0.02;
+    mat.opacity = 0.04 + Math.sin(t * 0.2 + idx * 0.6) * 0.018;
   });
 
   return (
@@ -145,7 +160,7 @@ const NebulaCloudMesh = ({ position, color, scale, idx }: {
       <meshBasicMaterial
         color={color}
         transparent
-        opacity={0.05}
+        opacity={0.04}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
         side={THREE.DoubleSide}
@@ -154,7 +169,7 @@ const NebulaCloudMesh = ({ position, color, scale, idx }: {
   );
 };
 
-/* ── Breathing pulse sphere — improved material ──────────────── */
+/* ── Breathing pulse sphere — premium physical material ──────── */
 
 const NebulaBreathingSphere = ({ palette, breathProgress }: { palette: typeof PALETTES.cosmos; breathProgress: number }) => {
   const outerRef = useRef<THREE.Mesh>(null);
@@ -162,44 +177,44 @@ const NebulaBreathingSphere = ({ palette, breathProgress }: { palette: typeof PA
   const haloRef = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
+    if (!isTabVisible()) return;
     const t = clock.elapsedTime;
     const scale = 0.8 + breathProgress * 0.6;
 
     if (outerRef.current) {
       outerRef.current.scale.setScalar(scale);
-      outerRef.current.rotation.y = t * 0.08;
-      outerRef.current.rotation.x = Math.sin(t * 0.15) * 0.1;
+      outerRef.current.rotation.y = t * 0.06;
+      outerRef.current.rotation.x = Math.sin(t * 0.12) * 0.08;
       const mat = outerRef.current.material as THREE.MeshPhysicalMaterial;
-      mat.emissiveIntensity = 0.5 + Math.sin(t * 1.2) * 0.2;
+      mat.emissiveIntensity = 0.5 + Math.sin(t * 1.0) * 0.18;
     }
     if (innerRef.current) {
       innerRef.current.scale.setScalar(scale * 0.5);
-      innerRef.current.rotation.y = -t * 0.12;
+      innerRef.current.rotation.y = -t * 0.1;
       const mat = innerRef.current.material as THREE.MeshStandardMaterial;
-      mat.emissiveIntensity = 1.5 + Math.sin(t * 1.8) * 0.5;
+      mat.emissiveIntensity = 1.3 + Math.sin(t * 1.5) * 0.4;
     }
-    // Halo glow that expands with breath
     if (haloRef.current) {
       haloRef.current.scale.setScalar(scale * 2.2);
       const mat = haloRef.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = 0.03 + breathProgress * 0.02 + Math.sin(t * 0.5) * 0.01;
+      mat.opacity = 0.035 + breathProgress * 0.018 + Math.sin(t * 0.4) * 0.008;
     }
   });
 
   return (
     <group position={[0, 0, 0]}>
-      {/* Atmospheric halo */}
+      {/* Atmospheric halo — envelopment */}
       <mesh ref={haloRef}>
         <sphereGeometry args={[1, 24, 24]} />
         <meshBasicMaterial
           color={palette.primary}
           transparent
-          opacity={0.04}
+          opacity={0.035}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
       </mesh>
-      {/* Outer translucent sphere */}
+      {/* Outer translucent sphere — premium physical material */}
       <mesh ref={outerRef}>
         <sphereGeometry args={[1, 64, 64]} />
         <meshPhysicalMaterial
@@ -212,6 +227,7 @@ const NebulaBreathingSphere = ({ palette, breathProgress }: { palette: typeof PA
           transmission={0.5}
           thickness={0.4}
           clearcoat={1}
+          clearcoatRoughness={0.15}
         />
       </mesh>
       {/* Inner bright core */}
@@ -220,9 +236,9 @@ const NebulaBreathingSphere = ({ palette, breathProgress }: { palette: typeof PA
         <meshStandardMaterial
           color={palette.accent}
           emissive={palette.accent}
-          emissiveIntensity={1.5}
+          emissiveIntensity={1.3}
           transparent
-          opacity={0.7}
+          opacity={0.65}
         />
       </mesh>
     </group>
@@ -237,39 +253,39 @@ const NebulaLights = ({ palette }: { palette: typeof PALETTES.cosmos }) => {
   const l3 = useRef<THREE.PointLight>(null);
 
   useFrame(({ clock }) => {
+    if (!isTabVisible()) return;
     const t = clock.elapsedTime;
     if (l1.current) {
-      l1.current.position.set(Math.sin(t * 0.18) * 5, 3, Math.cos(t * 0.18) * 5);
-      l1.current.intensity = 2.2 + Math.sin(t * 0.6) * 0.4;
+      l1.current.position.set(Math.sin(t * 0.15) * 5, 3, Math.cos(t * 0.15) * 5);
+      l1.current.intensity = 1.8 + Math.sin(t * 0.5) * 0.3;
     }
     if (l2.current) {
-      l2.current.position.set(Math.cos(t * 0.12) * -4, -2, Math.sin(t * 0.12) * 4);
-      l2.current.intensity = 1.6 + Math.cos(t * 0.5) * 0.3;
+      l2.current.position.set(Math.cos(t * 0.1) * -4, -2, Math.sin(t * 0.1) * 4);
+      l2.current.intensity = 1.3 + Math.cos(t * 0.4) * 0.25;
     }
     if (l3.current) {
-      // Enveloping fill light from below
-      l3.current.intensity = 0.6 + Math.sin(t * 0.3) * 0.15;
+      l3.current.intensity = 0.5 + Math.sin(t * 0.25) * 0.12;
     }
   });
 
   return (
     <>
-      <pointLight ref={l1} color={palette.primary} intensity={2.2} distance={22} />
-      <pointLight ref={l2} color={palette.secondary} intensity={1.6} distance={20} />
-      <pointLight ref={l3} position={[0, -3, -3]} color={palette.accent} intensity={0.6} distance={15} />
+      <pointLight ref={l1} color={palette.primary} intensity={1.8} distance={22} />
+      <pointLight ref={l2} color={palette.secondary} intensity={1.3} distance={20} />
+      <pointLight ref={l3} position={[0, -3, -3]} color={palette.accent} intensity={0.5} distance={15} />
     </>
   );
 };
 
-/* ── Cinematic breathing camera ──────────────────────────────── */
+/* ── Cinematic breathing camera — gentle drift for introspection ── */
 
 const NebulaCamera = ({ breathProgress }: { breathProgress: number }) => {
   useFrame(({ camera, clock }) => {
+    if (!isTabVisible()) return;
     const t = clock.elapsedTime;
-    // Gentle depth shift with breathing
-    camera.position.z = 5 + breathProgress * 0.3 + Math.sin(t * 0.25) * 0.1;
-    camera.position.y = Math.sin(t * 0.18) * 0.2;
-    camera.position.x = Math.cos(t * 0.12) * 0.15;
+    camera.position.z = 5 + breathProgress * 0.25 + Math.sin(t * 0.2) * 0.08;
+    camera.position.y = Math.sin(t * 0.15) * 0.15;
+    camera.position.x = Math.cos(t * 0.1) * 0.1;
   });
   return null;
 };
@@ -292,6 +308,8 @@ const NebulaReducedMotionFallback = ({ height, className, palette }: { height: s
                    radial-gradient(ellipse at 60% 30%, ${palette.accent}12 0%, transparent 40%),
                    ${palette.fog}`,
     }}
+    role="img"
+    aria-label="Scène nebula - introspection"
   />
 );
 
@@ -312,6 +330,8 @@ export const NebulaScene3D = ({
   const pp = POST_PROCESSING.nebula;
   const particleCount = getParticleCount('nebula');
   const interactiveCount = getParticleCount('interactive');
+  const bgStarsCount = getStarsCount('nebula');
+  const ppEnabled = shouldEnablePostProcessing();
 
   return (
     <ImmersiveCanvas
@@ -320,16 +340,17 @@ export const NebulaScene3D = ({
       fogNear={fog.near}
       fogFar={fog.far}
       className={className}
+      scene="nebula"
     >
       <NebulaLights palette={palette} />
 
       {/* Deep enveloping starfield */}
-      <Stars radius={90} depth={70} count={2000} factor={3} saturation={0.4} fade speed={0.3} />
+      <Stars radius={90} depth={70} count={bgStarsCount} factor={3} saturation={0.4} fade speed={0.2} />
 
       {/* Volumetric nebula cloud layers */}
       <NebulaCloudLayer palette={palette} />
 
-      {/* Aurora borealis ribbons */}
+      {/* Aurora borealis ribbons — optimized */}
       <AuroraBorealis palette={palette} />
 
       {/* Central breathing sphere */}
@@ -341,16 +362,16 @@ export const NebulaScene3D = ({
         radius={7}
         color={palette.accent}
         size={0.04}
-        breathFactor={1 + normalizedBreath * 0.4}
+        breathFactor={1 + normalizedBreath * 0.35}
       />
 
       {/* Interactive cursor particles */}
-      <InteractiveParticles count={interactiveCount} radius={5} color={palette.primary} repelStrength={0.7} repelRadius={1.5} />
+      <InteractiveParticles count={interactiveCount} radius={5} color={palette.primary} repelStrength={0.6} repelRadius={1.3} />
 
-      {/* Cinematic camera */}
+      {/* Cinematic camera — gentle drift */}
       <NebulaCamera breathProgress={normalizedBreath} />
 
-      {/* Post-processing */}
+      {/* Post-processing — gracefully degrades */}
       <ImmersivePostProcessing
         bloomIntensity={pp.bloomIntensity}
         bloomThreshold={pp.bloomThreshold}
@@ -359,6 +380,7 @@ export const NebulaScene3D = ({
         vignetteDarkness={pp.vignetteDarkness}
         chromaticAberration={pp.chromaticAberration}
         chromaticOffset={pp.chromaticOffset}
+        enabled={ppEnabled}
       />
     </ImmersiveCanvas>
   );

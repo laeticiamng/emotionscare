@@ -137,3 +137,30 @@ export const dashboardCard = {
     },
   }),
 };
+
+/* ── Scene Transition Presets (T5 — emotional coherence) ────── */
+
+/** Scene entry — immersive 3D module entrance */
+export const sceneEntry = {
+  initial: { opacity: 0, scale: 0.97 },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: DURATION.slow, ease: EASE.cinema },
+  },
+  exit: {
+    opacity: 0,
+    scale: 1.02,
+    transition: { duration: DURATION.fast, ease: EASE.out },
+  },
+};
+
+/** Section reveal within an immersive page */
+export const sectionReveal = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (delay = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: DURATION.slow, delay, ease: EASE.cinema },
+  }),
+};

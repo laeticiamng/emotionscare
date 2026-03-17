@@ -1,6 +1,8 @@
 /**
- * Galaxy 3D Scene — Upgraded with unified visual direction
+ * Galaxy 3D Scene — Unified visual direction
+ * Intention: Exploration / Discovery / Majesty
  * Enhanced: deeper volume, majestic fly-through, dust lanes, core luminosity
+ * Includes: WebGL gate, error boundary, graceful degradation, tab-inactive pause
  */
 
 import { useRef, useMemo } from 'react';
@@ -16,9 +18,11 @@ import {
   FOG,
   POST_PROCESSING,
   CAMERA,
-  MOTION,
   getParticleCount,
+  getStarsCount,
   prefersReducedMotion,
+  shouldEnablePostProcessing,
+  isTabVisible,
 } from '@/components/3d/visualDirection';
 
 /* ── Spiral galaxy core — 4 arms, Fibonacci distribution ───── */
@@ -49,12 +53,10 @@ const SpiralGalaxy = ({ starCount }: { starCount: number }) => {
       const scatter = (1 - dist / 11) * 0.9;
 
       pos[i * 3] = Math.cos(spiralAngle) * dist + (Math.random() - 0.5) * scatter;
-      // Thinner disk with slight vertical spread near center
       pos[i * 3 + 1] = (Math.random() - 0.5) * 0.25 * (1 + scatter * 0.5);
       pos[i * 3 + 2] = Math.sin(spiralAngle) * dist + (Math.random() - 0.5) * scatter;
 
       const c = palette[Math.floor(Math.random() * palette.length)];
-      // Stars closer to center are warmer/brighter
       const warmth = 1 - dist / 10;
       col[i * 3] = c.r + warmth * 0.2;
       col[i * 3 + 1] = c.g + warmth * 0.1;
@@ -64,8 +66,8 @@ const SpiralGalaxy = ({ starCount }: { starCount: number }) => {
   }, [starCount]);
 
   useFrame(({ clock }) => {
-    if (!starsRef.current) return;
-    starsRef.current.rotation.y = clock.elapsedTime * 0.012;
+    if (!starsRef.current || !isTabVisible()) return;
+    starsRef.current.rotation.y = clock.elapsedTime * 0.01;
   });
 
   return (
@@ -78,7 +80,7 @@ const SpiralGalaxy = ({ starCount }: { starCount: number }) => {
         size={0.06}
         vertexColors
         transparent
-        opacity={0.9}
+        opacity={0.85}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
         sizeAttenuation
@@ -89,7 +91,7 @@ const SpiralGalaxy = ({ starCount }: { starCount: number }) => {
 
 /* ── Dust lanes (volumetric planes for depth) ────────────────── */
 
-const DUST_COUNT = 40;
+const DUST_COUNT = 30;
 
 const DustLane = ({ position, color, scale, index }: {
   position: [number, number, number];
@@ -100,11 +102,11 @@ const DustLane = ({ position, color, scale, index }: {
   const ref = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
-    if (!ref.current) return;
+    if (!ref.current || !isTabVisible()) return;
     const t = clock.elapsedTime;
-    ref.current.rotation.z = t * 0.015 + index * 0.5;
+    ref.current.rotation.z = t * 0.012 + index * 0.5;
     const mat = ref.current.material as THREE.MeshBasicMaterial;
-    mat.opacity = 0.06 + Math.sin(t * 0.3 + index * 0.8) * 0.025;
+    mat.opacity = 0.05 + Math.sin(t * 0.25 + index * 0.8) * 0.02;
   });
 
   return (
@@ -113,7 +115,7 @@ const DustLane = ({ position, color, scale, index }: {
       <meshBasicMaterial
         color={color}
         transparent
-        opacity={0.07}
+        opacity={0.06}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
         side={THREE.DoubleSide}
@@ -152,36 +154,59 @@ const DustLanes = () => {
   );
 };
 
-/* ── Galaxy core — multi-layered glow ────────────────────────── */
+/* ── Galaxy core — multi-layered glow with MeshPhysicalMaterial ── */
 
 const GalaxyCore = () => {
   const outerRef = useRef<THREE.Mesh>(null);
   const innerRef = useRef<THREE.Mesh>(null);
+  const haloRef = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
+    if (!isTabVisible()) return;
     const t = clock.elapsedTime;
     if (outerRef.current) {
-      const mat = outerRef.current.material as THREE.MeshStandardMaterial;
-      mat.emissiveIntensity = 1.8 + Math.sin(t * 0.8) * 0.4;
-      outerRef.current.scale.setScalar(1 + Math.sin(t * 0.5) * 0.05);
+      const mat = outerRef.current.material as THREE.MeshPhysicalMaterial;
+      mat.emissiveIntensity = 1.5 + Math.sin(t * 0.6) * 0.3;
+      outerRef.current.scale.setScalar(1 + Math.sin(t * 0.4) * 0.04);
+      outerRef.current.rotation.y = t * 0.05;
     }
     if (innerRef.current) {
       const mat = innerRef.current.material as THREE.MeshStandardMaterial;
-      mat.emissiveIntensity = 3 + Math.sin(t * 1.2) * 0.6;
+      mat.emissiveIntensity = 2.5 + Math.sin(t * 1.0) * 0.5;
+    }
+    if (haloRef.current) {
+      haloRef.current.scale.setScalar(2.5 + Math.sin(t * 0.3) * 0.2);
+      const mat = haloRef.current.material as THREE.MeshBasicMaterial;
+      mat.opacity = 0.04 + Math.sin(t * 0.4) * 0.015;
     }
   });
 
   return (
     <group>
-      {/* Outer halo */}
+      {/* Atmospheric halo — depth and majesty */}
+      <mesh ref={haloRef}>
+        <sphereGeometry args={[1, 24, 24]} />
+        <meshBasicMaterial
+          color={PALETTE.gold}
+          transparent
+          opacity={0.04}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </mesh>
+      {/* Outer shell — translucent physical material */}
       <mesh ref={outerRef}>
         <sphereGeometry args={[0.6, 32, 32]} />
-        <meshStandardMaterial
+        <meshPhysicalMaterial
           color="#fde68a"
           emissive="#fbbf24"
-          emissiveIntensity={1.8}
+          emissiveIntensity={1.5}
           transparent
-          opacity={0.3}
+          opacity={0.35}
+          roughness={0.15}
+          transmission={0.3}
+          thickness={0.3}
+          clearcoat={0.8}
         />
       </mesh>
       {/* Inner bright core */}
@@ -190,7 +215,7 @@ const GalaxyCore = () => {
         <meshStandardMaterial
           color="#ffffff"
           emissive="#fde68a"
-          emissiveIntensity={3}
+          emissiveIntensity={2.5}
           transparent
           opacity={0.9}
         />
@@ -203,14 +228,13 @@ const GalaxyCore = () => {
 
 const FlyCamera = () => {
   useFrame(({ camera, clock }) => {
+    if (!isTabVisible()) return;
     const t = clock.elapsedTime;
-    // Smooth elliptical orbit with cinematic vertical motion
-    const r = 11 + Math.sin(t * 0.04) * 2.5;
-    const orbitalSpeed = 0.03;
+    const r = 11 + Math.sin(t * 0.035) * 2;
+    const orbitalSpeed = 0.025;
     camera.position.x = Math.cos(t * orbitalSpeed) * r;
     camera.position.z = Math.sin(t * orbitalSpeed) * r;
-    // Gentle vertical oscillation for majesty
-    camera.position.y = 3.5 + Math.sin(t * 0.06) * 2;
+    camera.position.y = 3.5 + Math.sin(t * 0.05) * 1.8;
     camera.lookAt(0, 0, 0);
   });
   return null;
@@ -224,26 +248,26 @@ const GalaxyLights = () => {
   const l3 = useRef<THREE.PointLight>(null);
 
   useFrame(({ clock }) => {
+    if (!isTabVisible()) return;
     const t = clock.elapsedTime;
     if (l1.current) {
-      l1.current.position.set(Math.sin(t * 0.15) * 6, 3, Math.cos(t * 0.15) * 6);
-      l1.current.intensity = 2.2 + Math.sin(t * 0.6) * 0.4;
+      l1.current.position.set(Math.sin(t * 0.12) * 6, 3, Math.cos(t * 0.12) * 6);
+      l1.current.intensity = 1.8 + Math.sin(t * 0.5) * 0.3;
     }
     if (l2.current) {
-      l2.current.position.set(Math.cos(t * 0.12) * -5, -2, Math.sin(t * 0.12) * 5);
-      l2.current.intensity = 1.6 + Math.cos(t * 0.5) * 0.3;
+      l2.current.position.set(Math.cos(t * 0.1) * -5, -2, Math.sin(t * 0.1) * 5);
+      l2.current.intensity = 1.3 + Math.cos(t * 0.4) * 0.25;
     }
     if (l3.current) {
-      // Warm core light
-      l3.current.intensity = 1.2 + Math.sin(t * 0.8) * 0.3;
+      l3.current.intensity = 1.0 + Math.sin(t * 0.6) * 0.2;
     }
   });
 
   return (
     <>
-      <pointLight ref={l1} color="#6cb4ee" intensity={2.2} distance={28} />
-      <pointLight ref={l2} color={PALETTE.accent} intensity={1.6} distance={22} />
-      <pointLight ref={l3} position={[0, 0.5, 0]} color={PALETTE.gold} intensity={1.2} distance={12} />
+      <pointLight ref={l1} color="#6cb4ee" intensity={1.8} distance={28} />
+      <pointLight ref={l2} color={PALETTE.accent} intensity={1.3} distance={22} />
+      <pointLight ref={l3} position={[0, 0.5, 0]} color={PALETTE.gold} intensity={1.0} distance={14} />
     </>
   );
 };
@@ -264,6 +288,8 @@ const GalaxyReducedMotionFallback = ({ height, className }: { height: string; cl
                    radial-gradient(ellipse at 70% 60%, ${PALETTE.gold}10 0%, transparent 35%),
                    ${PALETTE.deepSpace}`,
     }}
+    role="img"
+    aria-label="Exploration galaxie"
   >
     <div className="absolute inset-0 flex items-center justify-center">
       <div
@@ -284,6 +310,8 @@ export const GalaxyScene3D = ({ height = 'h-[500px]', className }: GalaxyScene3D
   const pp = POST_PROCESSING.galaxy;
   const starCount = getParticleCount('galaxy');
   const interactiveCount = getParticleCount('interactive');
+  const bgStarsCount = getStarsCount('galaxy');
+  const ppEnabled = shouldEnablePostProcessing();
 
   return (
     <ImmersiveCanvas
@@ -294,11 +322,12 @@ export const GalaxyScene3D = ({ height = 'h-[500px]', className }: GalaxyScene3D
       cameraPosition={cam.position}
       fov={cam.fov}
       className={className}
+      scene="galaxy"
     >
       <GalaxyLights />
 
       {/* Deep starfield background */}
-      <Stars radius={120} depth={90} count={2500} factor={4} saturation={0.5} fade speed={0.2} />
+      <Stars radius={120} depth={90} count={bgStarsCount} factor={4} saturation={0.5} fade speed={0.15} />
 
       {/* Galaxy structure */}
       <SpiralGalaxy starCount={starCount} />
@@ -306,13 +335,13 @@ export const GalaxyScene3D = ({ height = 'h-[500px]', className }: GalaxyScene3D
       <GalaxyCore />
 
       {/* Ambient cosmic particles */}
-      <CosmicParticleField count={350} radius={12} color={PALETTE.accent} size={0.03} speed={0.008} />
-      <InteractiveParticles count={interactiveCount} radius={9} color="#6cb4ee" repelStrength={0.4} repelRadius={2.5} />
+      <CosmicParticleField count={280} radius={12} color={PALETTE.accent} size={0.03} speed={0.006} />
+      <InteractiveParticles count={interactiveCount} radius={9} color="#6cb4ee" repelStrength={0.35} repelRadius={2} />
 
       {/* Cinematic camera */}
       <FlyCamera />
 
-      {/* Post-processing */}
+      {/* Post-processing — gracefully degrades */}
       <ImmersivePostProcessing
         bloomIntensity={pp.bloomIntensity}
         bloomThreshold={pp.bloomThreshold}
@@ -321,6 +350,7 @@ export const GalaxyScene3D = ({ height = 'h-[500px]', className }: GalaxyScene3D
         vignetteDarkness={pp.vignetteDarkness}
         chromaticAberration={pp.chromaticAberration}
         chromaticOffset={pp.chromaticOffset}
+        enabled={ppEnabled}
       />
     </ImmersiveCanvas>
   );
