@@ -16,6 +16,30 @@ interface ImmersivePostProcessingProps {
   chromaticOffset?: number;
 }
 
+const PostProcessingWithCA = ({
+  bloomIntensity, bloomThreshold, bloomRadius, vignetteOffset, vignetteDarkness, chromaticOffset,
+}: Omit<ImmersivePostProcessingProps, 'chromaticAberration'>) => (
+  <EffectComposer>
+    <Bloom intensity={bloomIntensity} luminanceThreshold={bloomThreshold} luminanceSmoothing={0.9} radius={bloomRadius} />
+    <Vignette offset={vignetteOffset} darkness={vignetteDarkness} />
+    <ChromaticAberration
+      blendFunction={BlendFunction.NORMAL}
+      offset={new THREE.Vector2(chromaticOffset, chromaticOffset)}
+      radialModulation={true}
+      modulationOffset={0.5}
+    />
+  </EffectComposer>
+);
+
+const PostProcessingWithoutCA = ({
+  bloomIntensity, bloomThreshold, bloomRadius, vignetteOffset, vignetteDarkness,
+}: Omit<ImmersivePostProcessingProps, 'chromaticAberration' | 'chromaticOffset'>) => (
+  <EffectComposer>
+    <Bloom intensity={bloomIntensity} luminanceThreshold={bloomThreshold} luminanceSmoothing={0.9} radius={bloomRadius} />
+    <Vignette offset={vignetteOffset} darkness={vignetteDarkness} />
+  </EffectComposer>
+);
+
 export const ImmersivePostProcessing = ({
   bloomIntensity = 1.5,
   bloomThreshold = 0.2,
@@ -24,22 +48,15 @@ export const ImmersivePostProcessing = ({
   vignetteDarkness = 0.7,
   chromaticAberration = true,
   chromaticOffset = 0.0006,
-}: ImmersivePostProcessingProps) => (
-  <EffectComposer>
-    <Bloom
-      intensity={bloomIntensity}
-      luminanceThreshold={bloomThreshold}
-      luminanceSmoothing={0.9}
-      radius={bloomRadius}
+}: ImmersivePostProcessingProps) =>
+  chromaticAberration ? (
+    <PostProcessingWithCA
+      bloomIntensity={bloomIntensity} bloomThreshold={bloomThreshold} bloomRadius={bloomRadius}
+      vignetteOffset={vignetteOffset} vignetteDarkness={vignetteDarkness} chromaticOffset={chromaticOffset}
     />
-    <Vignette offset={vignetteOffset} darkness={vignetteDarkness} />
-    {chromaticAberration ? (
-      <ChromaticAberration
-        blendFunction={BlendFunction.NORMAL}
-        offset={new THREE.Vector2(chromaticOffset, chromaticOffset)}
-        radialModulation={true}
-        modulationOffset={0.5}
-      />
-    ) : null}
-  </EffectComposer>
-);
+  ) : (
+    <PostProcessingWithoutCA
+      bloomIntensity={bloomIntensity} bloomThreshold={bloomThreshold} bloomRadius={bloomRadius}
+      vignetteOffset={vignetteOffset} vignetteDarkness={vignetteDarkness}
+    />
+  );
