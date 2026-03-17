@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import PremiumLoader from '@/components/ui/PremiumLoader';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -576,7 +577,7 @@ const B2CHeatmapVibesPage: React.FC = () => {
                 <CardContent>
                   {isLoading ? (
                     <div className="flex items-center justify-center h-64">
-                      <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                      <PremiumLoader size="lg" />
                     </div>
                   ) : (
                     <HeatmapGrid 

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import Card3D from '@/components/ui/Card3D';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
@@ -179,7 +180,7 @@ const AIGeneratorSection: React.FC<{
   };
 
   return (
-    <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
+    <Card3D className="border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5" hoverLift>
       <CardHeader>
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-gradient-to-br from-primary to-accent">
@@ -257,7 +258,7 @@ const AIGeneratorSection: React.FC<{
           )}
         </Button>
       </CardContent>
-    </Card>
+    </Card3D>
   );
 };
 
@@ -357,7 +358,7 @@ const SessionCard: React.FC<{
   const Icon = session.icon;
   
   return (
-    <Card className="group cursor-pointer hover:shadow-lg transition-all overflow-hidden" onClick={onStart}>
+    <Card3D className="group cursor-pointer overflow-hidden" hoverLift onClick={onStart}>
       <div className={cn("h-2 bg-gradient-to-r", session.color)} />
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
@@ -377,7 +378,7 @@ const SessionCard: React.FC<{
           <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
         </div>
       </CardContent>
-    </Card>
+    </Card3D>
   );
 };
 
@@ -508,7 +509,7 @@ const B2CMusicTherapyPremiumPage: React.FC = () => {
               <div className="lg:col-span-2 space-y-6">
                 
                 {/* Visualizer & Now Playing */}
-                <Card className="overflow-hidden border-primary/20">
+                <Card3D className="overflow-hidden border-primary/20">
                   <div className="h-[300px] md:h-[350px] relative">
                     <SoundForestVisualizer isPlaying={isPlaying} />
                     
@@ -555,7 +556,7 @@ const B2CMusicTherapyPremiumPage: React.FC = () => {
                       </div>
                     )}
                   </div>
-                </Card>
+                </Card3D>
 
                 {/* Equalizer (conditional) */}
                 <AnimatePresence>
@@ -660,7 +661,7 @@ const B2CMusicTherapyPremiumPage: React.FC = () => {
                 <SunoCreditsDisplay />
                 
                 {/* Quick Stats */}
-                <Card>
+                <Card3D hoverLift>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium flex items-center gap-2">
                       <Star className="h-4 w-4 text-warning" />
@@ -687,7 +688,7 @@ const B2CMusicTherapyPremiumPage: React.FC = () => {
                       </span>
                     </div>
                   </CardContent>
-                </Card>
+                </Card3D>
               </div>
             </div>
           </div>

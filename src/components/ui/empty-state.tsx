@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import Card3D from '@/components/ui/Card3D';
 import { cn } from '@/lib/utils';
 import { Sparkles } from 'lucide-react';
 
@@ -33,16 +33,14 @@ const EmptyState: React.FC<EmptyStateProps> = ({
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       className={cn('flex items-center justify-center p-8', className)}
     >
-      <Card className={cn(
+      <Card3D className={cn(
         "max-w-md w-full overflow-hidden",
-        "bg-gradient-to-br from-card via-card to-muted/30",
-        "border-border/50 shadow-lg shadow-primary/5",
-        "hover:shadow-xl hover:shadow-primary/10 transition-all duration-500"
-      )}>
+        "bg-gradient-to-br from-card via-card to-muted/30"
+      )} hoverLift>
         {/* Decoration top */}
         <div className="h-1 w-full bg-gradient-to-r from-primary via-accent to-primary" />
-        
-        <CardContent className="text-center p-10 relative">
+
+        <div className="text-center p-10 relative">
           {/* Background sparkles */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
             <div className="absolute top-4 left-4 text-primary/10">
@@ -111,8 +109,8 @@ const EmptyState: React.FC<EmptyStateProps> = ({
               </Button>
             </motion.div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </Card3D>
     </motion.div>
   );
 };

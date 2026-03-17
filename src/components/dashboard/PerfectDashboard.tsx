@@ -10,6 +10,8 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePerfectDashboardData } from '@/hooks/usePerfectDashboardData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import Card3D from '@/components/ui/Card3D';
+import PremiumLoader from '@/components/ui/PremiumLoader';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -153,12 +155,7 @@ const PerfectDashboard: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          >
-            <Brain className="w-12 h-12 text-primary mx-auto" />
-          </motion.div>
+          <PremiumLoader size="lg" />
           <p className="text-lg text-muted-foreground">Personnalisation de votre expérience...</p>
         </div>
       </div>
@@ -210,9 +207,9 @@ const PerfectDashboard: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.6 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 stagger-in"
         >
-          <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+          <Card3D className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent" hoverLift animate={false}>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Heart className="w-5 h-5 text-primary" />
@@ -223,13 +220,13 @@ const PerfectDashboard: React.FC = () => {
               <div className="text-3xl font-bold mb-2">{dashboardData.wellnessScore}/100</div>
               <Progress value={dashboardData.wellnessScore} className="mb-2" />
               <p className="text-sm text-muted-foreground">
-                {dashboardData.wellnessScore >= 80 ? 'Excellent' : 
+                {dashboardData.wellnessScore >= 80 ? 'Excellent' :
                  dashboardData.wellnessScore >= 60 ? 'Bon' : 'À améliorer'}
               </p>
             </CardContent>
-          </Card>
+          </Card3D>
 
-          <Card className="border-2 border-secondary/20 bg-gradient-to-br from-secondary/5 to-transparent">
+          <Card3D className="border-2 border-secondary/20 bg-gradient-to-br from-secondary/5 to-transparent" hoverLift animate={false}>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Calendar className="w-5 h-5 text-secondary" />
@@ -244,9 +241,9 @@ const PerfectDashboard: React.FC = () => {
                 Programmer une session
               </Button>
             </CardContent>
-          </Card>
+          </Card3D>
 
-          <Card className="border-2 border-warning/20 bg-gradient-to-br from-warning/5 to-transparent">
+          <Card3D className="border-2 border-warning/20 bg-gradient-to-br from-warning/5 to-transparent" hoverLift animate={false}>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Award className="w-5 h-5 text-warning" />
@@ -267,7 +264,7 @@ const PerfectDashboard: React.FC = () => {
                 ))}
               </div>
             </CardContent>
-          </Card>
+          </Card3D>
         </motion.div>
 
         {/* Recommandations intelligentes */}
@@ -290,7 +287,7 @@ const PerfectDashboard: React.FC = () => {
                 transition={{ delay: 0.5 + index * 0.1, duration: 0.4 }}
               >
                 <Link to={rec.path}>
-                  <Card className="h-full hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer border-2 border-transparent hover:border-primary/20">
+                  <Card3D className="h-full cursor-pointer" hoverLift animate={false}>
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2">
@@ -309,7 +306,7 @@ const PerfectDashboard: React.FC = () => {
                         {rec.action}
                       </Button>
                     </CardContent>
-                  </Card>
+                  </Card3D>
                 </Link>
               </motion.div>
             ))}
@@ -324,7 +321,7 @@ const PerfectDashboard: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.6, duration: 0.6 }}
           >
-            <Card>
+            <Card3D hoverLift>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-primary" />
@@ -341,7 +338,7 @@ const PerfectDashboard: React.FC = () => {
                     <Badge variant="outline">{activity.score}%</Badge>
                   </div>
                 ))}
-                
+
                 <Link to="/app/activity">
                   <Button variant="outline" className="w-full mt-4">
                     Voir tout l'historique
@@ -349,7 +346,7 @@ const PerfectDashboard: React.FC = () => {
                   </Button>
                 </Link>
               </CardContent>
-            </Card>
+            </Card3D>
           </motion.div>
 
           {/* Achievements */}
@@ -358,7 +355,7 @@ const PerfectDashboard: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.8, duration: 0.6 }}
           >
-            <Card>
+            <Card3D hoverLift>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Award className="w-5 h-5 text-warning" />
@@ -381,7 +378,7 @@ const PerfectDashboard: React.FC = () => {
                     <p className="text-xs text-muted-foreground">{achievement.progress}% complété</p>
                   </div>
                 ))}
-                
+
                 <Link to="/app/leaderboard">
                   <Button variant="outline" className="w-full mt-4">
                     Voir tous les achievements
@@ -389,7 +386,7 @@ const PerfectDashboard: React.FC = () => {
                   </Button>
                 </Link>
               </CardContent>
-            </Card>
+            </Card3D>
           </motion.div>
         </div>
       </div>

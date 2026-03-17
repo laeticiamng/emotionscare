@@ -1,5 +1,6 @@
 import { useState, lazy, Suspense } from 'react';
 import PageRoot from '@/components/common/PageRoot';
+import PremiumLoader from '@/components/ui/PremiumLoader';
 import JournalView from '@/pages/journal/JournalView';
 import { Sparkles, Mic, PenLine } from 'lucide-react';
 import { useFlags } from '@/core/flags';
@@ -76,7 +77,7 @@ export default function B2CJournalPage() {
               <TabsContent value="voice">
                 <Suspense fallback={
                   <div className="flex items-center justify-center py-12">
-                    <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+                    <PremiumLoader size="md" />
                   </div>
                 }>
                   <VoiceJournalEntry />
