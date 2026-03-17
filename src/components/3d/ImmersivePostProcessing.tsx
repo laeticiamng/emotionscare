@@ -9,7 +9,7 @@
  * - Error boundary for safe degradation
  */
 
-import React, { Component, useMemo, type ReactNode } from 'react';
+import React, { Component, useRef, type ReactNode } from 'react';
 import { EffectComposer, Bloom, Vignette, ChromaticAberration } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
@@ -61,33 +61,38 @@ class PostProcessingErrorBoundary extends Component<{ children: ReactNode }, PPE
 const getAdaptivePreset = (base: PostProcessingPreset, tier: 'high' | 'medium' | 'low'): PostProcessingPreset => {
   if (tier === 'high') return base;
   if (tier === 'medium') {
+    // Moderate reduction: keep bloom perceptible, disable CA only
     return {
       ...base,
-      bloomIntensity: base.bloomIntensity * 0.7,
-      bloomRadius: base.bloomRadius * 0.8,
-      chromaticAberration: false, // Disable CA on medium to save GPU
+      bloomIntensity: base.bloomIntensity * 0.85,
+      bloomRadius: base.bloomRadius * 0.9,
+      chromaticAberration: false,
       chromaticOffset: 0,
     };
   }
-  // low — should not reach here as enabled=false, but safety
+  // low — should not reach here as enabled=false, but safety net
   return {
     ...base,
-    bloomIntensity: base.bloomIntensity * 0.4,
-    bloomRadius: base.bloomRadius * 0.5,
+    bloomIntensity: base.bloomIntensity * 0.5,
+    bloomRadius: base.bloomRadius * 0.6,
     chromaticAberration: false,
     chromaticOffset: 0,
-    vignetteDarkness: base.vignetteDarkness * 0.6,
+    vignetteDarkness: base.vignetteDarkness * 0.7,
   };
 };
 
-/* ── Memoized chromatic offset vector ─────────────────────────── */
+/* ── Stable chromatic offset vector — mutates in place, no realloc ── */
 
 const ChromaticOffsetVector = ({ offset }: { offset: number }) => {
-  const vec = useMemo(() => new THREE.Vector2(offset, offset), [offset]);
+  const vecRef = useRef(new THREE.Vector2(offset, offset));
+  // Mutate in place to avoid creating a new Vector2 per render
+  // while still reflecting prop changes
+  vecRef.current.set(offset, offset);
+
   return (
     <ChromaticAberration
       blendFunction={BlendFunction.NORMAL}
-      offset={vec}
+      offset={vecRef.current}
       radialModulation
       modulationOffset={0.5}
     />

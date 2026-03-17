@@ -93,19 +93,27 @@ export const FOG: Record<string, FogConfig> = {
 /**
  * Device-adaptive fog: on low-tier devices, push fog far plane further
  * to avoid washing out content that's already dimmer due to reduced effects.
+ * Also enforces a minimum far/near spread to prevent fog from collapsing
+ * all depth cues.
  */
 export const getAdaptiveFog = (scene: keyof typeof FOG): FogConfig => {
   const base = FOG[scene];
   if (!base) return FOG.hero;
   const tier = getDeviceTier();
+  let near = base.near;
+  let far = base.far;
   if (tier === 'low') {
-    // Low-tier: push fog back to preserve clarity with simpler rendering
-    return { ...base, near: base.near + 2, far: base.far + 6 };
+    near += 2;
+    far += 6;
+  } else if (tier === 'medium') {
+    near += 1;
+    far += 3;
   }
-  if (tier === 'medium') {
-    return { ...base, near: base.near + 1, far: base.far + 3 };
+  // Safety: ensure minimum spread of 15 units so fog never flattens the scene
+  if (far - near < 15) {
+    far = near + 15;
   }
-  return base;
+  return { color: base.color, near, far };
 };
 
 /* ── Tone Mapping ───────────────────────────────────────────── */
@@ -261,14 +269,17 @@ export const shouldEnablePostProcessing = (): boolean => {
 
 /* ── Shared GL Config ───────────────────────────────────────── */
 
-export const getGLConfig = () => ({
-  antialias: getDeviceTier() !== 'low',
-  alpha: true,
-  toneMapping: TONE_MAPPING.mapping,
-  toneMappingExposure: TONE_MAPPING.exposure,
-  powerPreference: getDeviceTier() === 'low' ? 'low-power' as const : 'high-performance' as const,
-  failIfMajorPerformanceCaveat: false,
-});
+export const getGLConfig = () => {
+  const tier = getDeviceTier();
+  return {
+    antialias: tier !== 'low',
+    alpha: true,
+    toneMapping: TONE_MAPPING.mapping,
+    toneMappingExposure: TONE_MAPPING.exposure,
+    powerPreference: tier === 'low' ? 'low-power' as const : 'high-performance' as const,
+    failIfMajorPerformanceCaveat: false,
+  };
+};
 
 /* ── Reduced Motion Check ───────────────────────────────────── */
 

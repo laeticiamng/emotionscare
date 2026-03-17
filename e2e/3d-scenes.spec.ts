@@ -104,18 +104,21 @@ test.describe('3D Scenes — Stability & Fallback', () => {
   });
 });
 
+// Helper: WebGL-blocking init script as a string (runs in browser, no TS)
+const WEBGL_BLOCK_SCRIPT = `
+  var origGetContext = HTMLCanvasElement.prototype.getContext;
+  HTMLCanvasElement.prototype.getContext = function(type) {
+    if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') {
+      return null;
+    }
+    return origGetContext.apply(this, arguments);
+  };
+`;
+
 test.describe('3D Scenes — WebGL Fallback', () => {
   test('Fallback renders premium gradient when WebGL context fails', async ({ page }) => {
-    // Simulate WebGL failure by overriding getContext before navigation
-    await page.addInitScript(() => {
-      const origGetContext = HTMLCanvasElement.prototype.getContext;
-      HTMLCanvasElement.prototype.getContext = function (type: string, ...args: unknown[]) {
-        if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') {
-          return null;
-        }
-        return origGetContext.apply(this, [type, ...args] as Parameters<typeof origGetContext>);
-      };
-    });
+    // Inject script as string to avoid TS-in-browser issues on all CI runners
+    await page.addInitScript(WEBGL_BLOCK_SCRIPT);
 
     await page.goto('/');
     await page.waitForTimeout(3000);
@@ -128,6 +131,20 @@ test.describe('3D Scenes — WebGL Fallback', () => {
     const fallback = page.locator('[role="img"]');
     const count = await fallback.count();
     expect(count).toBeGreaterThanOrEqual(1);
+  });
+
+  test('Fallback has accessible aria-label', async ({ page }) => {
+    await page.addInitScript(WEBGL_BLOCK_SCRIPT);
+
+    await page.goto('/');
+    await page.waitForTimeout(3000);
+
+    const fallback = page.locator('[role="img"]').first();
+    if (await fallback.isVisible()) {
+      const label = await fallback.getAttribute('aria-label');
+      expect(label).toBeTruthy();
+      expect(label!.length).toBeGreaterThan(3);
+    }
   });
 });
 

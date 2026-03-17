@@ -4,7 +4,7 @@
  * and context loss recovery. Used by all 3D scenes to adapt or fallback gracefully.
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { getDeviceTier, prefersReducedMotion, getDPR, shouldEnablePostProcessing } from './visualDirection';
 import { detectWebGL, type WebGLStatus } from './Scene3DErrorBoundary';
 
