@@ -1,11 +1,13 @@
 /**
  * Particules interactives réagissant au curseur/touch
  * Effet "champ de force" — les particules s'écartent au passage de la souris
+ * Uses unified visual direction defaults
  */
 
 import { useRef, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { PALETTE, MOTION } from './visualDirection';
 
 interface InteractiveParticlesProps {
   count?: number;
@@ -18,7 +20,7 @@ interface InteractiveParticlesProps {
 export const InteractiveParticles = ({
   count = 200,
   radius = 5,
-  color = '#a78bfa',
+  color = PALETTE.accent,
   repelStrength = 0.8,
   repelRadius = 2,
 }: InteractiveParticlesProps) => {

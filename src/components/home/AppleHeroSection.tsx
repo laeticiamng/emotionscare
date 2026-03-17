@@ -3,13 +3,15 @@
  * Design minimaliste, typographie impactante, animations fluides
  */
 
-import React, { memo, useRef } from 'react';
+import React, { memo, useRef, lazy, Suspense } from 'react';
 import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+
+const HeroScene3D = lazy(() => import('@/components/3d/HeroScene3D'));
 
 const AppleHeroSection: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -41,36 +43,15 @@ const AppleHeroSection: React.FC = () => {
       ref={containerRef}
       className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-background noise-texture"
     >
-      {/* Gradient orbs - subtle and premium, responsive sizes */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <motion.div 
-          className="absolute top-1/4 left-1/4 w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] lg:w-[600px] lg:h-[600px] bg-gradient-radial from-primary/20 via-primary/5 to-transparent rounded-full blur-3xl"
-          animate={{ 
-            scale: [1, 1.2, 1],
-            x: [0, 50, 0],
-            y: [0, -30, 0],
-          }}
-          transition={{ 
-            duration: 20, 
-            repeat: Infinity, 
-            ease: "linear" 
-          }}
-        />
-        <motion.div 
-          className="absolute bottom-1/4 right-1/4 w-[250px] h-[250px] sm:w-[350px] sm:h-[350px] lg:w-[500px] lg:h-[500px] bg-gradient-radial from-accent/15 via-accent/5 to-transparent rounded-full blur-3xl"
-          animate={{ 
-            scale: [1, 1.1, 1],
-            x: [0, -40, 0],
-            y: [0, 40, 0],
-          }}
-          transition={{ 
-            duration: 15, 
-            repeat: Infinity, 
-            ease: "linear",
-            delay: 2 
-          }}
-        />
-      </div>
+      {/* Immersive 3D background — replaces flat gradient orbs */}
+      <Suspense fallback={
+        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+          <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] lg:w-[600px] lg:h-[600px] bg-gradient-radial from-primary/20 via-primary/5 to-transparent rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-[250px] h-[250px] sm:w-[350px] sm:h-[350px] lg:w-[500px] lg:h-[500px] bg-gradient-radial from-accent/15 via-accent/5 to-transparent rounded-full blur-3xl" />
+        </div>
+      }>
+        <HeroScene3D />
+      </Suspense>
 
       <motion.div 
         ref={heroRef}

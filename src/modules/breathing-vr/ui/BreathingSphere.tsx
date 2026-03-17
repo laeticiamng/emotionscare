@@ -6,6 +6,7 @@
 import { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { PALETTE } from '@/components/3d/visualDirection';
 import type { BreathingPhase } from '../types';
 
 /* ── Simplex noise GLSL (injecté via onBeforeCompile) ────────── */
@@ -87,10 +88,10 @@ export const BreathingSphere = ({ phase, progress }: BreathingSphereProps) => {
   const ring3Ref = useRef<THREE.Mesh>(null);
 
   const phaseColors = useMemo(() => ({
-    inhale: new THREE.Color('#4f9eff'),
-    hold: new THREE.Color('#a78bfa'),
-    exhale: new THREE.Color('#34d399'),
-    rest: new THREE.Color('#fbbf24'),
+    inhale: new THREE.Color(PALETTE.breathing.inhale),
+    hold: new THREE.Color(PALETTE.breathing.hold),
+    exhale: new THREE.Color(PALETTE.breathing.exhale),
+    rest: new THREE.Color(PALETTE.breathing.rest),
   }), []);
 
   const currentColor = useRef(new THREE.Color('#4f9eff'));

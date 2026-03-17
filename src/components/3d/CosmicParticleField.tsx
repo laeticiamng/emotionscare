@@ -1,10 +1,12 @@
 /**
  * Champ de particules cosmiques paramétrable et réutilisable
+ * Uses unified visual direction defaults
  */
 
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { PALETTE, MOTION } from './visualDirection';
 
 interface CosmicParticleFieldProps {
   count?: number;
@@ -18,8 +20,8 @@ interface CosmicParticleFieldProps {
 export const CosmicParticleField = ({
   count = 400,
   radius = 5,
-  color = '#4f9eff',
-  speed = 0.02,
+  color = PALETTE.accent,
+  speed = MOTION.particleRotation.normal,
   size = 0.04,
   breathFactor = 1,
 }: CosmicParticleFieldProps) => {
