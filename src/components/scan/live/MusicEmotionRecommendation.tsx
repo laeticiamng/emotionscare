@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Music, Play } from 'lucide-react';
 import { EmotionResult } from '@/types/emotion';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
-import PremiumMusicPlayer from '@/components/music/player/PremiumMusicPlayer';
+import GlassMusicPlayer from '@/components/music/player/GlassMusicPlayer';
 
 interface MusicEmotionRecommendationProps {
   emotionResult: EmotionResult;
@@ -87,7 +87,7 @@ const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({
             <span className="sr-only">Fermer</span>
             ×
           </Button>
-          <PremiumMusicPlayer className="pt-8" />
+          <GlassMusicPlayer className="pt-8" />
         </div>
       )}
     </>

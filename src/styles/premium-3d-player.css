@@ -843,3 +843,243 @@
   contain: layout style;
   transform: translateZ(0);
 }
+
+/* ============================================
+   PREMIUM MICRO-INTERACTIONS
+   Hover, focus, and active states for all
+   interactive elements across the platform
+   ============================================ */
+
+/* --- Premium Focus Ring --- */
+.premium-focus:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.25);
+  border-color: hsl(var(--primary) / 0.5);
+  transform: scale(1.01);
+  transition: all 200ms var(--ease-apple);
+}
+
+/* --- Glass Button Hover --- */
+.btn-glass {
+  position: relative;
+  overflow: hidden;
+  background: var(--glass-medium);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-xl);
+  transition: all 250ms var(--ease-apple);
+}
+
+.btn-glass:hover {
+  background: var(--glass-heavy);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-glass:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: var(--shadow-xs);
+}
+
+.dark .btn-glass {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark .btn-glass:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* --- Premium CTA glow pulse --- */
+.btn-cta-glow {
+  position: relative;
+}
+
+.btn-cta-glow::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent-warm)));
+  opacity: 0;
+  filter: blur(12px);
+  z-index: -1;
+  transition: opacity 400ms var(--ease-apple);
+}
+
+.btn-cta-glow:hover::after {
+  opacity: 0.3;
+}
+
+/* --- Interactive card press effect --- */
+.card-pressable {
+  cursor: pointer;
+  transition: all 300ms var(--ease-apple);
+}
+
+.card-pressable:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-xs);
+}
+
+/* --- Tab active indicator glow --- */
+.tab-premium[data-state="active"] {
+  position: relative;
+}
+
+.tab-premium[data-state="active"]::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, hsl(var(--primary)), transparent);
+  border-radius: 2px;
+}
+
+/* --- Smooth list item stagger animation --- */
+.stagger-in > * {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: stagger-fade-in 400ms var(--ease-gentle) forwards;
+}
+
+.stagger-in > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-in > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-in > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-in > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-in > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-in > *:nth-child(6) { animation-delay: 300ms; }
+.stagger-in > *:nth-child(7) { animation-delay: 360ms; }
+.stagger-in > *:nth-child(8) { animation-delay: 420ms; }
+.stagger-in > *:nth-child(n+9) { animation-delay: 480ms; }
+
+@keyframes stagger-fade-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Modal glass backdrop --- */
+.modal-glass-backdrop {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+}
+
+.modal-glass-content {
+  background: var(--glass-heavy);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-2xl);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 24px 80px rgba(0, 0, 0, 0.08);
+}
+
+.dark .modal-glass-content {
+  background: rgba(15, 15, 25, 0.85);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 24px 80px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Tooltip premium --- */
+.tooltip-premium {
+  background: rgba(10, 10, 20, 0.9);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Scroll fade edges --- */
+.scroll-fade-edges {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 3%,
+    black 97%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 3%,
+    black 97%,
+    transparent 100%
+  );
+}
+
+.scroll-fade-edges-y {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 3%,
+    black 97%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 3%,
+    black 97%,
+    transparent 100%
+  );
+}
+
+/* --- Empty state premium --- */
+.empty-state-premium {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  border-radius: var(--radius-2xl);
+  background: linear-gradient(
+    135deg,
+    hsl(var(--surface-muted) / 0.5),
+    hsl(var(--surface-secondary) / 0.3)
+  );
+  border: 1px dashed hsl(var(--border-subtle));
+}
+
+.empty-state-premium .empty-icon {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 16px;
+  color: hsl(var(--text-subtle));
+  opacity: 0.5;
+  animation: float-gentle 6s var(--ease-calm) infinite;
+}
+
+/* --- Reduced motion — disable all custom animations --- */
+@media (prefers-reduced-motion: reduce) {
+  .stagger-in > *,
+  .card-3d-elevated,
+  .music-player-glass,
+  .player-glass-frame,
+  .btn-glass,
+  .btn-cta-glow,
+  .card-pressable {
+    animation: none !important;
+    transition: opacity 0.01ms !important;
+    transform: none !important;
+  }
+
+  .player-ambient-glow {
+    display: none !important;
+  }
+}

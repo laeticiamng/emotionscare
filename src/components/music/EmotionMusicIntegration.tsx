@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAdaptiveMusic } from '@/hooks/useAdaptiveMusic';
-import PremiumMusicPlayer from './player/PremiumMusicPlayer';
+import GlassMusicPlayer from './player/GlassMusicPlayer';
 import { EmotionResult } from '@/types';
 import { Music2, Heart } from 'lucide-react';
 
@@ -74,7 +74,7 @@ const EmotionMusicIntegration: React.FC<EmotionMusicIntegrationProps> = ({
         </Card>
       )}
 
-      <PremiumMusicPlayer
+      <GlassMusicPlayer
         className="adaptive-mode"
       />
 

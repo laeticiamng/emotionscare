@@ -5,6 +5,7 @@ export { default as EmotionMusicIntegration } from './EmotionMusicIntegration';
 // Player components - exports par défaut réexportés
 export { default as MusicPlayer } from './player/MusicPlayer';
 export { default as PremiumMusicPlayer } from './player/PremiumMusicPlayer';
+export { default as GlassMusicPlayer } from './player/GlassMusicPlayer';
 export { default as PlayerControls } from './player/PlayerControls';
 export { default as TrackInfo } from './player/TrackInfo';
 export { default as ProgressBar } from './player/ProgressBar';

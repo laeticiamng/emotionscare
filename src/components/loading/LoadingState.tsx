@@ -1,6 +1,5 @@
-// @ts-nocheck
 import React from 'react';
-import LoadingAnimation from '@/components/ui/loading-animation';
+import PremiumLoader from '@/components/ui/PremiumLoader';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
@@ -14,21 +13,21 @@ interface LoadingStateProps {
   className?: string;
 }
 
-const variantConfig: Record<LoadingStateVariant, { container: string; skeletonHeight: string; animationSize: 'sm' | 'md' | 'lg' }> = {
+const variantConfig: Record<LoadingStateVariant, { container: string; skeletonHeight: string; loaderSize: 'sm' | 'md' | 'lg' }> = {
   page: {
     container: 'min-h-[320px] w-full flex flex-col items-center justify-center gap-6',
     skeletonHeight: 'h-6',
-    animationSize: 'lg',
+    loaderSize: 'lg',
   },
   section: {
     container: 'w-full flex flex-col items-center justify-center gap-4 py-8',
     skeletonHeight: 'h-4',
-    animationSize: 'md',
+    loaderSize: 'md',
   },
   inline: {
     container: 'flex items-center gap-3 text-sm',
     skeletonHeight: 'h-3',
-    animationSize: 'sm',
+    loaderSize: 'sm',
   },
 };
 
@@ -47,7 +46,13 @@ const LoadingState: React.FC<LoadingStateProps> = ({
       aria-live="polite"
       className={cn(config.container, className)}
     >
-      <LoadingAnimation text={text} size={config.animationSize} variant={variant === 'inline' ? 'minimal' : 'default'} />
+      <PremiumLoader
+        size={config.loaderSize}
+        label={variant !== 'inline' ? text : undefined}
+      />
+      {variant === 'inline' && (
+        <span className="text-muted-foreground">{text}</span>
+      )}
       {showSkeleton && (
         <div
           className={cn(
@@ -56,7 +61,7 @@ const LoadingState: React.FC<LoadingStateProps> = ({
           )}
         >
           {Array.from({ length: skeletonCount }).map((_, index) => (
-            <Skeleton key={index} className={cn(config.skeletonHeight, 'w-full rounded-md')} />
+            <Skeleton key={index} className={cn(config.skeletonHeight, 'w-full rounded-md skeleton-calm')} />
           ))}
         </div>
       )}
