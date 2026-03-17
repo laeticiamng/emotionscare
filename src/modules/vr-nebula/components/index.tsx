@@ -99,6 +99,14 @@ export const VRNebulaSessionPanel: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* Scène 3D immersive Nebula */}
+          <NebulaScene3D
+            scene={currentSession?.scene || selectedScene}
+            breathProgress={((elapsedSeconds % 10) / 10) * 100}
+            height="h-[280px]"
+            className="rounded-xl -mx-2"
+          />
+
           <div className="flex justify-center">
             <div className="text-5xl font-mono font-bold text-primary">
               {formatTime(elapsedSeconds)}

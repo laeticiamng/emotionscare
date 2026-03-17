@@ -139,6 +139,14 @@ export const BreathingScene = ({ phase, progress, fullscreen = false }: Breathin
           maxPolarAngle={Math.PI * 0.65}
           minPolarAngle={Math.PI * 0.35}
         />
+
+        {/* HDR Bloom + Vignette */}
+        <ImmersivePostProcessing
+          bloomIntensity={1.5}
+          bloomThreshold={0.2}
+          bloomRadius={0.8}
+          vignetteDarkness={0.6}
+        />
       </Canvas>
     </div>
   );
