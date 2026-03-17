@@ -13,6 +13,7 @@ import { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { PALETTE, isTabVisible } from '@/components/3d/visualDirection';
+import { OUTER_SHELL_PRESET, INNER_CORE_PRESET, RING_PRESET } from '@/components/3d/materialPresets';
 import type { BreathingPhase } from '../types';
 
 /* ── Simplex noise GLSL (injecté via onBeforeCompile) ────────── */
@@ -212,16 +213,7 @@ export const BreathingSphere = ({ phase, progress }: BreathingSphereProps) => {
         <meshPhysicalMaterial
           color="#4f9eff"
           emissive="#4f9eff"
-          emissiveIntensity={0.35}
-          transparent
-          opacity={0.32}
-          roughness={0.08}
-          metalness={0.05}
-          transmission={0.65}
-          thickness={0.6}
-          clearcoat={1}
-          clearcoatRoughness={0.08}
-          ior={1.4}
+          {...OUTER_SHELL_PRESET}
         />
       </mesh>
 
@@ -231,11 +223,7 @@ export const BreathingSphere = ({ phase, progress }: BreathingSphereProps) => {
         <meshStandardMaterial
           color="#4f9eff"
           emissive="#4f9eff"
-          emissiveIntensity={1.0}
-          transparent
-          opacity={0.75}
-          roughness={0}
-          metalness={0}
+          {...INNER_CORE_PRESET}
         />
       </mesh>
 
@@ -245,9 +233,7 @@ export const BreathingSphere = ({ phase, progress }: BreathingSphereProps) => {
         <meshStandardMaterial
           color="#4f9eff"
           emissive="#4f9eff"
-          emissiveIntensity={0.5}
-          transparent
-          opacity={0.2}
+          {...RING_PRESET}
         />
       </mesh>
 
@@ -257,9 +243,8 @@ export const BreathingSphere = ({ phase, progress }: BreathingSphereProps) => {
         <meshStandardMaterial
           color="#4f9eff"
           emissive="#4f9eff"
-          emissiveIntensity={0.5}
-          transparent
-          opacity={0.15}
+          {...RING_PRESET}
+          opacity={0.14}
         />
       </mesh>
     </group>

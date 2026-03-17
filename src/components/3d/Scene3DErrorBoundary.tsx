@@ -5,7 +5,7 @@
  */
 
 import React, { Component, type ReactNode, useEffect, useState } from 'react';
-import { PALETTE } from './visualDirection';
+import { PALETTE, getDeviceTier } from './visualDirection';
 
 /* ── WebGL Detection ──────────────────────────────────────── */
 
@@ -209,8 +209,7 @@ export const WebGLDiagnosticBadge: React.FC = () => {
       }
     } catch { /* ignore */ }
 
-    const width = window.innerWidth;
-    const tier = width < 768 ? 'low' : width < 1200 ? 'medium' : 'high';
+    const tier = getDeviceTier();
 
     setInfo({ webgl, tier, dpr, gpu });
   }, []);

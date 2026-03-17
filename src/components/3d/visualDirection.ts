@@ -84,17 +84,43 @@ export interface FogConfig {
 }
 
 export const FOG: Record<string, FogConfig> = {
-  hero:     { color: PALETTE.darkVoid,   near: 6,  far: 24 },
-  breathing:{ color: PALETTE.darkVoid,   near: 5,  far: 22 },
-  galaxy:   { color: PALETTE.deepSpace,  near: 8,  far: 35 },
-  nebula:   { color: PALETTE.nebulaDark, near: 5,  far: 24 },
+  hero:     { color: PALETTE.darkVoid,   near: 8,  far: 28 },
+  breathing:{ color: PALETTE.darkVoid,   near: 7,  far: 26 },
+  galaxy:   { color: PALETTE.deepSpace,  near: 10, far: 40 },
+  nebula:   { color: PALETTE.nebulaDark, near: 7,  far: 28 },
+};
+
+/**
+ * Device-adaptive fog: on low-tier devices, push fog far plane further
+ * to avoid washing out content that's already dimmer due to reduced effects.
+ * Also enforces a minimum far/near spread to prevent fog from collapsing
+ * all depth cues.
+ */
+export const getAdaptiveFog = (scene: keyof typeof FOG): FogConfig => {
+  const base = FOG[scene];
+  if (!base) return FOG.hero;
+  const tier = getDeviceTier();
+  let near = base.near;
+  let far = base.far;
+  if (tier === 'low') {
+    near += 2;
+    far += 6;
+  } else if (tier === 'medium') {
+    near += 1;
+    far += 3;
+  }
+  // Safety: ensure minimum spread of 15 units so fog never flattens the scene
+  if (far - near < 15) {
+    far = near + 15;
+  }
+  return { color: base.color, near, far };
 };
 
 /* ── Tone Mapping ───────────────────────────────────────────── */
 
 export const TONE_MAPPING = {
   mapping: THREE.ACESFilmicToneMapping,
-  exposure: 1.3,
+  exposure: 1.5,
 } as const;
 
 /* ── Post-Processing Presets ────────────────────────────────── */
@@ -112,40 +138,40 @@ export interface PostProcessingPreset {
 
 export const POST_PROCESSING: Record<string, PostProcessingPreset> = {
   hero: {
-    bloomIntensity: 1.0,
+    bloomIntensity: 0.8,
+    bloomThreshold: 0.4,
+    bloomRadius: 0.55,
+    vignetteOffset: 0.3,
+    vignetteDarkness: 0.45,
+    chromaticAberration: true,
+    chromaticOffset: 0.0002,
+  },
+  breathing: {
+    bloomIntensity: 0.9,
     bloomThreshold: 0.35,
     bloomRadius: 0.6,
     vignetteOffset: 0.3,
+    vignetteDarkness: 0.45,
+    chromaticAberration: true,
+    chromaticOffset: 0.0003,
+  },
+  galaxy: {
+    bloomIntensity: 1.1,
+    bloomThreshold: 0.3,
+    bloomRadius: 0.65,
+    vignetteOffset: 0.25,
     vignetteDarkness: 0.5,
     chromaticAberration: true,
     chromaticOffset: 0.0003,
   },
-  breathing: {
-    bloomIntensity: 1.2,
-    bloomThreshold: 0.28,
-    bloomRadius: 0.65,
-    vignetteOffset: 0.35,
-    vignetteDarkness: 0.55,
-    chromaticAberration: true,
-    chromaticOffset: 0.0004,
-  },
-  galaxy: {
-    bloomIntensity: 1.4,
-    bloomThreshold: 0.22,
-    bloomRadius: 0.7,
-    vignetteOffset: 0.3,
-    vignetteDarkness: 0.65,
-    chromaticAberration: true,
-    chromaticOffset: 0.0004,
-  },
   nebula: {
-    bloomIntensity: 1.3,
-    bloomThreshold: 0.25,
-    bloomRadius: 0.7,
-    vignetteOffset: 0.3,
-    vignetteDarkness: 0.6,
+    bloomIntensity: 1.0,
+    bloomThreshold: 0.32,
+    bloomRadius: 0.6,
+    vignetteOffset: 0.25,
+    vignetteDarkness: 0.5,
     chromaticAberration: true,
-    chromaticOffset: 0.0004,
+    chromaticOffset: 0.0003,
   },
 };
 
@@ -243,14 +269,17 @@ export const shouldEnablePostProcessing = (): boolean => {
 
 /* ── Shared GL Config ───────────────────────────────────────── */
 
-export const getGLConfig = () => ({
-  antialias: getDeviceTier() !== 'low',
-  alpha: true,
-  toneMapping: TONE_MAPPING.mapping,
-  toneMappingExposure: TONE_MAPPING.exposure,
-  powerPreference: getDeviceTier() === 'low' ? 'low-power' as const : 'high-performance' as const,
-  failIfMajorPerformanceCaveat: false,
-});
+export const getGLConfig = () => {
+  const tier = getDeviceTier();
+  return {
+    antialias: tier !== 'low',
+    alpha: true,
+    toneMapping: TONE_MAPPING.mapping,
+    toneMappingExposure: TONE_MAPPING.exposure,
+    powerPreference: tier === 'low' ? 'low-power' as const : 'high-performance' as const,
+    failIfMajorPerformanceCaveat: false,
+  };
+};
 
 /* ── Reduced Motion Check ───────────────────────────────────── */
 

@@ -7,6 +7,7 @@ import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { isTabVisible } from '@/components/3d/visualDirection';
+import { OUTER_SHELL_PRESET, INNER_CORE_PRESET, RING_PRESET } from '@/components/3d/materialPresets';
 import { type VRBreathPhase } from '@/store/vr.store';
 
 interface BreathPacerSphereProps {
@@ -103,15 +104,7 @@ export const BreathPacerSphere: React.FC<BreathPacerSphereProps> = ({
         <meshPhysicalMaterial
           color="#4f9eff"
           emissive="#4f9eff"
-          emissiveIntensity={0.4}
-          transparent
-          opacity={0.3}
-          roughness={0.1}
-          metalness={0.1}
-          transmission={0.5}
-          thickness={0.4}
-          clearcoat={1}
-          clearcoatRoughness={0.1}
+          {...OUTER_SHELL_PRESET}
         />
       </mesh>
 
@@ -121,10 +114,7 @@ export const BreathPacerSphere: React.FC<BreathPacerSphereProps> = ({
         <meshStandardMaterial
           color="#4f9eff"
           emissive="#4f9eff"
-          emissiveIntensity={1.2}
-          transparent
-          opacity={0.7}
-          roughness={0}
+          {...INNER_CORE_PRESET}
         />
       </mesh>
 
@@ -133,11 +123,11 @@ export const BreathPacerSphere: React.FC<BreathPacerSphereProps> = ({
         <>
           <mesh ref={ring1Ref}>
             <torusGeometry args={[1, 0.012, 16, 80]} />
-            <meshStandardMaterial color="#4f9eff" emissive="#4f9eff" emissiveIntensity={0.5} transparent opacity={0.2} />
+            <meshStandardMaterial color="#4f9eff" emissive="#4f9eff" {...RING_PRESET} />
           </mesh>
           <mesh ref={ring2Ref}>
             <torusGeometry args={[1, 0.008, 16, 80]} />
-            <meshStandardMaterial color="#4f9eff" emissive="#4f9eff" emissiveIntensity={0.5} transparent opacity={0.15} />
+            <meshStandardMaterial color="#4f9eff" emissive="#4f9eff" {...RING_PRESET} opacity={0.14} />
           </mesh>
         </>
       )}

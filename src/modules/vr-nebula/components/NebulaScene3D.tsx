@@ -18,15 +18,15 @@ import { CosmicParticleField } from '@/components/3d/CosmicParticleField';
 import { InteractiveParticles } from '@/components/3d/InteractiveParticles';
 import {
   PALETTE,
-  FOG,
-  POST_PROCESSING,
   getParticleCount,
   getStarsCount,
   prefersReducedMotion,
   shouldEnablePostProcessing,
   isTabVisible,
   getDeviceTier,
+  getAdaptiveFog,
 } from '@/components/3d/visualDirection';
+import { OUTER_SHELL_PRESET, INNER_CORE_PRESET, HALO_PRESET } from '@/components/3d/materialPresets';
 import type { NebulaScene } from '../types';
 
 /* ── Scene palettes ──────────────────────────────────────────── */
@@ -208,10 +208,8 @@ const NebulaBreathingSphere = ({ palette, breathProgress }: { palette: typeof PA
         <sphereGeometry args={[1, 24, 24]} />
         <meshBasicMaterial
           color={palette.primary}
-          transparent
-          opacity={0.035}
+          {...HALO_PRESET}
           blending={THREE.AdditiveBlending}
-          depthWrite={false}
         />
       </mesh>
       {/* Outer translucent sphere — premium physical material */}
@@ -220,14 +218,7 @@ const NebulaBreathingSphere = ({ palette, breathProgress }: { palette: typeof PA
         <meshPhysicalMaterial
           color={palette.primary}
           emissive={palette.primary}
-          emissiveIntensity={0.5}
-          transparent
-          opacity={0.25}
-          roughness={0.1}
-          transmission={0.5}
-          thickness={0.4}
-          clearcoat={1}
-          clearcoatRoughness={0.15}
+          {...OUTER_SHELL_PRESET}
         />
       </mesh>
       {/* Inner bright core */}
@@ -236,9 +227,7 @@ const NebulaBreathingSphere = ({ palette, breathProgress }: { palette: typeof PA
         <meshStandardMaterial
           color={palette.accent}
           emissive={palette.accent}
-          emissiveIntensity={1.3}
-          transparent
-          opacity={0.65}
+          {...INNER_CORE_PRESET}
         />
       </mesh>
     </group>
@@ -326,8 +315,7 @@ export const NebulaScene3D = ({
   }
 
   const normalizedBreath = breathProgress / 100;
-  const fog = FOG.nebula;
-  const pp = POST_PROCESSING.nebula;
+  const fog = getAdaptiveFog('nebula');
   const particleCount = getParticleCount('nebula');
   const interactiveCount = getParticleCount('interactive');
   const bgStarsCount = getStarsCount('nebula');
@@ -371,17 +359,8 @@ export const NebulaScene3D = ({
       {/* Cinematic camera — gentle drift */}
       <NebulaCamera breathProgress={normalizedBreath} />
 
-      {/* Post-processing — gracefully degrades */}
-      <ImmersivePostProcessing
-        bloomIntensity={pp.bloomIntensity}
-        bloomThreshold={pp.bloomThreshold}
-        bloomRadius={pp.bloomRadius}
-        vignetteOffset={pp.vignetteOffset}
-        vignetteDarkness={pp.vignetteDarkness}
-        chromaticAberration={pp.chromaticAberration}
-        chromaticOffset={pp.chromaticOffset}
-        enabled={ppEnabled}
-      />
+      {/* Post-processing — scene-adaptive, gracefully degrades */}
+      <ImmersivePostProcessing scene="nebula" enabled={ppEnabled} />
     </ImmersiveCanvas>
   );
 };
