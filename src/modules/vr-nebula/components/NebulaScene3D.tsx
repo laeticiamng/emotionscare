@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import { ImmersiveCanvas } from '@/components/3d/ImmersiveCanvas';
 import { ImmersivePostProcessing } from '@/components/3d/ImmersivePostProcessing';
 import { CosmicParticleField } from '@/components/3d/CosmicParticleField';
+import { InteractiveParticles } from '@/components/3d/InteractiveParticles';
 import type { NebulaScene } from '../types';
 
 /* ── Scene palettes ──────────────────────────────────────────── */
