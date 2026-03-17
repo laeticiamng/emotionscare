@@ -224,6 +224,7 @@ export const GalaxyScene3D = ({ height = 'h-[500px]', className }: GalaxyScene3D
     <NebulaClouds />
     <GalaxyCore />
     <CosmicParticleField count={300} radius={10} color="#a78bfa" size={0.03} speed={0.01} />
+    <InteractiveParticles count={180} radius={8} color="#6cb4ee" repelStrength={0.5} repelRadius={2} />
 
     <FlyCamera />
     <ImmersivePostProcessing bloomIntensity={2} bloomThreshold={0.15} bloomRadius={0.9} vignetteDarkness={0.8} />

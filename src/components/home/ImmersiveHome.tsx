@@ -17,7 +17,7 @@ export const ImmersiveHome: React.FC = () => {
     <div className="min-h-screen relative overflow-hidden">
       {/* Hero Section */}
       <div className="immersive-bg">
-        <AnimatedBackground />
+        <AnimatedBackground3D />
         
         <div className="relative z-10 flex flex-col items-center justify-center min-h-screen container-mobile py-4 sm:py-8">
           <motion.div

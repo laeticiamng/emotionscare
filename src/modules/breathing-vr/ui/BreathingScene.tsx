@@ -128,6 +128,9 @@ export const BreathingScene = ({ phase, progress, fullscreen = false }: Breathin
         {/* Particle field */}
         <BreathingParticles phase={phase} progress={progress} count={250} />
 
+        {/* Interactive cursor-reactive particles */}
+        <InteractiveParticles count={150} radius={4} color="#a78bfa" repelStrength={0.6} repelRadius={1.8} />
+
         {/* Breathing camera movement */}
         <BreathingCamera phase={phase} progress={progress} />
 

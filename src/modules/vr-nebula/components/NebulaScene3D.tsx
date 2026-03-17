@@ -206,6 +206,7 @@ export const NebulaScene3D = ({
       <AuroraBorealis palette={palette} />
       <NebulaBreathingSphere palette={palette} breathProgress={normalizedBreath} />
       <CosmicParticleField count={350} radius={6} color={palette.accent} size={0.04} breathFactor={1 + normalizedBreath * 0.4} />
+      <InteractiveParticles count={120} radius={5} color={palette.primary} repelStrength={0.7} repelRadius={1.5} />
       <NebulaCamera breathProgress={normalizedBreath} />
       <ImmersivePostProcessing bloomIntensity={1.8} bloomThreshold={0.18} bloomRadius={0.85} vignetteDarkness={0.75} />
     </ImmersiveCanvas>

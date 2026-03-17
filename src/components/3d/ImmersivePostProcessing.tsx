@@ -1,8 +1,10 @@
 /**
- * Post-processing HDR Bloom + Vignette réutilisable
+ * Post-processing cinématique : HDR Bloom + Vignette + ChromaticAberration
  */
 
-import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
+import { EffectComposer, Bloom, Vignette, ChromaticAberration } from '@react-three/postprocessing';
+import { BlendFunction } from 'postprocessing';
+import * as THREE from 'three';
 
 interface ImmersivePostProcessingProps {
   bloomIntensity?: number;
@@ -10,6 +12,8 @@ interface ImmersivePostProcessingProps {
   bloomRadius?: number;
   vignetteOffset?: number;
   vignetteDarkness?: number;
+  chromaticAberration?: boolean;
+  chromaticOffset?: number;
 }
 
 export const ImmersivePostProcessing = ({
@@ -18,6 +22,8 @@ export const ImmersivePostProcessing = ({
   bloomRadius = 0.8,
   vignetteOffset = 0.3,
   vignetteDarkness = 0.7,
+  chromaticAberration = true,
+  chromaticOffset = 0.0006,
 }: ImmersivePostProcessingProps) => (
   <EffectComposer>
     <Bloom
@@ -27,5 +33,13 @@ export const ImmersivePostProcessing = ({
       radius={bloomRadius}
     />
     <Vignette offset={vignetteOffset} darkness={vignetteDarkness} />
+    {chromaticAberration && (
+      <ChromaticAberration
+        blendFunction={BlendFunction.NORMAL}
+        offset={new THREE.Vector2(chromaticOffset, chromaticOffset)}
+        radialModulation={true}
+        modulationOffset={0.5}
+      />
+    )}
   </EffectComposer>
 );
