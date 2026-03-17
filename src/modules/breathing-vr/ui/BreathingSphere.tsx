@@ -189,7 +189,7 @@ export const BreathingSphere = ({ phase, progress }: BreathingSphereProps) => {
     <group>
       {/* Outer translucent sphere with organic Simplex noise deformation */}
       <mesh ref={outerRef}>
-        <sphereGeometry args={[1, 128, 128]} />
+        <sphereGeometry args={[1, 64, 64]} />
         <meshPhysicalMaterial
           color="#4f9eff"
           emissive="#4f9eff"

@@ -36,6 +36,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useB2BTeamStats } from '@/hooks/useB2BTeamStats';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
+import { staggerContainer, staggerItem, STAGGER } from '@/lib/motion';
 
 const B2BHeatmapLazy = React.lazy(() => import('@/pages/b2b/reports'));
 
@@ -148,21 +150,28 @@ export default function B2BRHDashboard() {
 
       {/* Main Content */}
       <main id="main-content" role="main" className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <header className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
+        {/* Header — salle de contrôle élégante */}
+        <motion.header
+          className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+          variants={staggerContainer(STAGGER.fast)}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div variants={staggerItem}>
             <h1 className="text-3xl font-bold">Tableau de bord RH</h1>
             <p className="text-muted-foreground">{orgName} — Vue d'ensemble du bien-être collectif</p>
-          </div>
-          <Button variant="outline" onClick={handleRefresh} disabled={loading || isRefreshing}>
-            {isRefreshing ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <RefreshCw className="h-4 w-4 mr-2" />
-            )}
-            Actualiser
-          </Button>
-        </header>
+          </motion.div>
+          <motion.div variants={staggerItem}>
+            <Button variant="outline" onClick={handleRefresh} disabled={loading || isRefreshing}>
+              {isRefreshing ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4 mr-2" />
+              )}
+              Actualiser
+            </Button>
+          </motion.div>
+        </motion.header>
 
         {/* KPIs principaux */}
         <section aria-labelledby="kpi-title" className="mb-8">

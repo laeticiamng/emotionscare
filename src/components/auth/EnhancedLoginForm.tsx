@@ -13,6 +13,7 @@ import { usePreferredAccess } from '@/hooks/use-preferred-access';
 import LoadingAnimation from '@/components/ui/LoadingAnimation';
 import { logger } from '@/lib/logger';
 import { requestPasswordReset } from '@/lib/passwordResetService';
+import { DURATION, EASE, STAGGER } from '@/lib/motion';
 
 const EnhancedLoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -83,42 +84,55 @@ const EnhancedLoginForm: React.FC = () => {
     }
   };
   
-  // Animation variants
+  // Animation variants — cinematic auth entry
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { 
-        duration: 0.5,
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: DURATION.slow,
+        ease: EASE.cinema,
         when: "beforeChildren",
-        staggerChildren: 0.1
+        staggerChildren: STAGGER.normal,
       }
     },
-    exit: { 
-      opacity: 0, 
-      y: -20, 
-      transition: { duration: 0.3 }
+    exit: {
+      opacity: 0,
+      y: -12,
+      transition: { duration: DURATION.fast, ease: EASE.out }
     }
   };
-  
+
   const itemVariants = {
-    hidden: { opacity: 0, x: -10 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.5 } }
+    hidden: { opacity: 0, y: 8 },
+    visible: { opacity: 1, y: 0, transition: { duration: DURATION.normal, ease: EASE.smooth } }
   };
 
   return (
     <AnimatePresence mode="sync">{/* Fixed multiple children warning */}
       <motion.div
         key="login-form"
-        className="flex min-h-screen items-center justify-center p-4"
+        className="relative flex min-h-screen items-center justify-center p-4"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
         exit="exit"
       >
-        <Card className="w-full max-w-md overflow-hidden">
-          <CardHeader className="space-y-1 text-center bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 p-6">
+        {/* Atmospheric background — passage de seuil */}
+        <div
+          className="fixed inset-0 -z-10"
+          style={{
+            background: `
+              radial-gradient(ellipse at 30% 20%, hsl(var(--primary) / 0.06) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 80%, hsl(var(--primary) / 0.04) 0%, transparent 40%),
+              radial-gradient(ellipse at 50% 50%, hsl(var(--primary) / 0.02) 0%, transparent 60%),
+              hsl(var(--background))
+            `,
+          }}
+        />
+        <Card className="w-full max-w-md overflow-hidden shadow-xl border-border/50 backdrop-blur-sm">
+          <CardHeader className="space-y-1 text-center bg-gradient-to-br from-primary/5 via-primary/3 to-transparent p-6">
             <motion.div 
               className="flex justify-center mb-4"
               variants={itemVariants}
@@ -307,7 +321,7 @@ const EnhancedLoginForm: React.FC = () => {
             </form>
           </CardContent>
           
-          <CardFooter className="flex flex-col gap-4 p-6 pt-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30">
+          <CardFooter className="flex flex-col gap-4 p-6 pt-2 bg-gradient-to-br from-primary/5 via-transparent to-transparent">
             <motion.div 
               className="text-sm text-center w-full"
               variants={itemVariants}

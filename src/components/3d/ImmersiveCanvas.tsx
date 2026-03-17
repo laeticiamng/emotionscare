@@ -21,7 +21,7 @@ interface ImmersiveCanvasProps {
 
 export const ImmersiveCanvas: React.FC<ImmersiveCanvasProps> = ({
   children,
-  height = 'h-[500px]',
+  height = 'h-[300px] sm:h-[400px] md:h-[500px]',
   fogColor = '#0a0a1a',
   fogNear = 6,
   fogFar = 18,

@@ -142,6 +142,7 @@ const HeroParticles = ({ count }: { count: number }) => {
   }, [count]);
 
   const tempVec = useMemo(() => new THREE.Vector3(), []);
+  const intersectPlane = useMemo(() => new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), []);
 
   useFrame(({ clock }) => {
     if (!pointsRef.current) return;
@@ -149,8 +150,7 @@ const HeroParticles = ({ count }: { count: number }) => {
 
     // Project mouse into 3D
     raycaster.setFromCamera(mouseNDC.current, camera);
-    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-    raycaster.ray.intersectPlane(plane, mousePos.current);
+    raycaster.ray.intersectPlane(intersectPlane, mousePos.current);
 
     const posAttr = pointsRef.current.geometry.getAttribute('position') as THREE.BufferAttribute;
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -27,6 +27,8 @@ import {
 } from 'lucide-react';
 import { routes } from '@/routerV2';
 import { usePageSEO } from '@/hooks/usePageSEO';
+
+const HeroScene3D = lazy(() => import('@/components/3d/HeroScene3D'));
 
 const HomeB2CPage: React.FC = () => {
   usePageSEO({
@@ -104,51 +106,75 @@ const HomeB2CPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] -z-10" />
+      {/* Hero Section — ACTE 1: CAPTER — Ouverture cinématique */}
+      <section className="relative overflow-hidden min-h-[70vh] md:min-h-[90vh] flex items-center">
+        {/* 3D background — the opening shot */}
+        <Suspense fallback={null}>
+          <HeroScene3D />
+        </Suspense>
 
-        <div className="container mx-auto px-4 py-20 md:py-32">
+        <div className="container mx-auto px-4 py-20 md:py-32 relative z-20">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Column - Text Content */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
               className="space-y-8"
             >
-              <Badge className="bg-primary/10 text-primary border-primary/20 px-4 py-1.5">
-                <Sparkles className="w-3 h-3 mr-1.5 inline" />
-                Intelligence Artificielle & Bien-Être
-              </Badge>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <Badge className="bg-primary/10 text-primary border-primary/20 px-4 py-1.5 backdrop-blur-sm">
+                  <Sparkles className="w-3 h-3 mr-1.5 inline" />
+                  Intelligence Artificielle & Bien-Être
+                </Badge>
+              </motion.div>
 
-              <h1 className="text-4xl md:text-6xl font-bold leading-tight">
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="text-4xl md:text-6xl font-bold leading-tight"
+              >
                 Votre Compagnon de{' '}
                 <span className="bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
                   Bien-Être Émotionnel
                 </span>
-              </h1>
+              </motion.h1>
 
-              <p className="text-xl text-muted-foreground leading-relaxed">
+              <motion.p
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, delay: 0.75, ease: [0.22, 1, 0.36, 1] }}
+                className="text-xl text-muted-foreground leading-relaxed"
+              >
                 Transformez votre santé mentale avec EmotionsCare.
                 Notre IA analyse vos émotions, vous accompagne et vous guide vers
                 une vie plus équilibrée et épanouie.
-              </p>
+              </motion.p>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button asChild size="lg" className="text-lg h-14 px-8 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl">
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 1.0, ease: [0.22, 1, 0.36, 1] }}
+                className="flex flex-col sm:flex-row gap-4"
+              >
+                <Button asChild size="lg" className="text-lg h-14 px-8 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
                   <Link to={routes.auth.signup()}>
                     <Sparkles className="w-5 h-5 mr-2" />
                     Commencer gratuitement
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="lg" className="text-lg h-14 px-8">
+                <Button asChild variant="outline" size="lg" className="text-lg h-14 px-8 backdrop-blur-sm">
                   <Link to="/about">
                     <Camera className="w-5 h-5 mr-2" />
                     Voir la démo
                   </Link>
                 </Button>
-              </div>
+              </motion.div>
 
               <div className="flex items-center gap-6 pt-4">
                 <div className="flex -space-x-2">
@@ -170,9 +196,9 @@ const HomeB2CPage: React.FC = () => {
 
             {/* Right Column - Visual */}
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1.2, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
               className="relative"
             >
               <div className="relative bg-gradient-to-br from-primary/20 via-purple-500/20 to-pink-500/20 rounded-3xl p-8 backdrop-blur-sm border border-primary/20 shadow-2xl">
@@ -217,8 +243,8 @@ const HomeB2CPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-12 bg-muted/30">
+      {/* Stats Section — ACTE 2: RASSURER — Respiration informative */}
+      <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => {
@@ -486,35 +512,57 @@ const HomeB2CPage: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary via-purple-600 to-pink-600">
-        <div className="container mx-auto px-4">
+      {/* CTA Section — ACTE 3: FAIRE ENTRER — Tension narrative vers l'action */}
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-purple-600 to-pink-600" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(255,255,255,0.08)_0%,transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_80%,rgba(255,255,255,0.05)_0%,transparent_40%)]" />
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
             className="text-center text-white"
           >
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">
+            <motion.h2
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+              className="text-3xl md:text-5xl font-bold mb-6"
+            >
               Prêt à transformer votre bien-être ?
-            </h2>
-            <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="text-xl mb-8 opacity-90 max-w-2xl mx-auto"
+            >
               Découvrez des outils concrets pour prendre soin de votre bien-être émotionnel
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" variant="secondary" className="text-lg h-14 px-8 shadow-xl hover:shadow-2xl">
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+            >
+              <Button asChild size="lg" variant="secondary" className="text-lg h-14 px-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
                 <Link to={routes.auth.signup()}>
                   <Sparkles className="w-5 h-5 mr-2" />
                   Commencer gratuitement
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="text-lg h-14 px-8 bg-white/10 hover:bg-white/20 border-white/30 text-white">
+              <Button asChild size="lg" variant="outline" className="text-lg h-14 px-8 bg-white/10 hover:bg-white/20 border-white/30 text-white backdrop-blur-sm transition-all duration-300">
                 <Link to="/about">
                   En savoir plus
                 </Link>
               </Button>
-            </div>
+            </motion.div>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm opacity-80">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4" />

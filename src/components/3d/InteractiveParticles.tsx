@@ -4,7 +4,7 @@
  * Uses unified visual direction defaults
  */
 
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { PALETTE, MOTION } from './visualDirection';
@@ -32,7 +32,7 @@ export const InteractiveParticles = ({
   const mouseNDC = useRef(new THREE.Vector2(9999, 9999));
 
   // Track mouse/touch in NDC
-  useMemo(() => {
+  useEffect(() => {
     const canvas = gl.domElement;
     const handleMove = (clientX: number, clientY: number) => {
       const rect = canvas.getBoundingClientRect();
@@ -78,6 +78,7 @@ export const InteractiveParticles = ({
   }, [count, radius]);
 
   const tempVec = useMemo(() => new THREE.Vector3(), []);
+  const intersectPlane = useMemo(() => new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), []);
 
   useFrame((state) => {
     if (!pointsRef.current) return;
@@ -85,8 +86,7 @@ export const InteractiveParticles = ({
 
     // Project mouse into 3D world at z=0
     raycaster.setFromCamera(mouseNDC.current, camera);
-    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-    raycaster.ray.intersectPlane(plane, mousePos.current);
+    raycaster.ray.intersectPlane(intersectPlane, mousePos.current);
 
     const posAttr = pointsRef.current.geometry.getAttribute('position') as THREE.BufferAttribute;
 
