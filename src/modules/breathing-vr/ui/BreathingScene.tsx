@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import { BreathingSphere } from './BreathingSphere';
 import { BreathingParticles } from './BreathingParticles';
 import { ImmersivePostProcessing } from '@/components/3d/ImmersivePostProcessing';
+import { InteractiveParticles } from '@/components/3d/InteractiveParticles';
 import type { BreathingPhase } from '../types';
 
 interface BreathingSceneProps {
