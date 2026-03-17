@@ -697,12 +697,14 @@ export default function B2CDashboardPage() {
           ) : (
             <div className="grid gap-3 stagger-in" role="list" aria-live="polite">
               {clinicalHintsList.slice(0, 3).map((hint: string, index: number) => (
-                <Card3D key={`hint-${index}-${hint.slice(0, 10)}`} className="bg-muted/50" elevation="low" hoverLift role="listitem">
-                  <CardContent className="py-3 px-4 flex items-center gap-3">
-                    <Heart className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />
-                    <p className="text-sm">{hint}</p>
-                  </CardContent>
-                </Card3D>
+                <div key={`hint-${index}-${hint.slice(0, 10)}`} role="listitem">
+                  <Card3D className="bg-muted/50" elevation="low" hoverLift>
+                    <CardContent className="py-3 px-4 flex items-center gap-3">
+                      <Heart className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />
+                      <p className="text-sm">{hint}</p>
+                    </CardContent>
+                  </Card3D>
+                </div>
               ))}
             </div>
           )}
