@@ -7,6 +7,7 @@ import { usePageSEO } from '@/hooks/usePageSEO';
 import { useOptimizedPage } from '@/hooks/useOptimizedPage';
 
 import PageRoot from '@/components/common/PageRoot';
+import PremiumLoader from '@/components/ui/PremiumLoader';
 import { Button } from '@/components/ui/button';
 import { ClinicalOptIn } from '@/components/consent/ClinicalOptIn';
 import { MedicalDisclaimerDialog, useMedicalDisclaimer } from '@/components/medical/MedicalDisclaimerDialog';
@@ -37,7 +38,7 @@ const ScanInsightsPanel = lazy(() => import('@/components/scan/ScanInsightsPanel
 // Loading fallback component
 const LoadingFallback = () => (
   <div className="flex items-center justify-center p-8 min-h-[200px]">
-    <Loader2 className="h-6 w-6 animate-spin text-primary/50" />
+    <PremiumLoader size="md" />
   </div>
 );
 

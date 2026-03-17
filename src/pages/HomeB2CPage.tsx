@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import Card3D from '@/components/ui/Card3D';
 import { Badge } from '@/components/ui/badge';
+import '@/styles/premium-3d-player.css';
 import {
   Brain,
   Heart,
@@ -366,15 +368,13 @@ const HomeB2CPage: React.FC = () => {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <Card className="h-full hover:shadow-lg transition-shadow border-2 hover:border-primary/20">
-                    <CardContent className="p-6">
+                  <Card3D className="h-full p-6" animate={false}>
                       <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4`}>
                         <Icon className="w-7 h-7 text-white" />
                       </div>
                       <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
                       <p className="text-muted-foreground">{feature.description}</p>
-                    </CardContent>
-                  </Card>
+                  </Card3D>
                 </motion.div>
               );
             })}
@@ -424,34 +424,26 @@ const HomeB2CPage: React.FC = () => {
               className="relative"
             >
               <div className="grid grid-cols-2 gap-4">
-                <Card className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20">
-                  <CardContent className="p-6 text-center">
+                <Card3D className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 !border-blue-500/20 p-6 text-center" animate={false}>
                     <Music className="w-8 h-8 mx-auto mb-3 text-blue-500" />
                     <div className="text-2xl font-bold mb-1">37</div>
                     <div className="text-sm text-muted-foreground">Modules disponibles</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20">
-                  <CardContent className="p-6 text-center">
+                </Card3D>
+                <Card3D className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 !border-purple-500/20 p-6 text-center" animate={false}>
                     <MessageCircle className="w-8 h-8 mx-auto mb-3 text-purple-500" />
                     <div className="text-2xl font-bold mb-1">24/7</div>
                     <div className="text-sm text-muted-foreground">Coach IA disponible</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border-emerald-500/20">
-                  <CardContent className="p-6 text-center">
+                </Card3D>
+                <Card3D className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 !border-emerald-500/20 p-6 text-center" animate={false}>
                     <Shield className="w-8 h-8 mx-auto mb-3 text-emerald-500" />
                     <div className="text-2xl font-bold mb-1">100%</div>
                     <div className="text-sm text-muted-foreground">Données sécurisées</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-gradient-to-br from-orange-500/10 to-red-500/10 border-orange-500/20">
-                  <CardContent className="p-6 text-center">
+                </Card3D>
+                <Card3D className="bg-gradient-to-br from-orange-500/10 to-red-500/10 !border-orange-500/20 p-6 text-center" animate={false}>
                     <TrendingUp className="w-8 h-8 mx-auto mb-3 text-orange-500" />
                     <div className="text-2xl font-bold mb-1">7 jours</div>
                     <div className="text-sm text-muted-foreground">Premiers résultats</div>
-                  </CardContent>
-                </Card>
+                </Card3D>
               </div>
             </motion.div>
           </div>
@@ -482,13 +474,11 @@ const HomeB2CPage: React.FC = () => {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <Card className="h-full hover:shadow-lg transition-shadow">
-                    <CardContent className="p-6">
+                  <Card3D className="h-full p-6" animate={false}>
                       <Icon className="w-8 h-8 text-primary mb-4" />
                       <h3 className="text-lg font-semibold mb-2">{module.title}</h3>
                       <p className="text-muted-foreground">{module.content}</p>
-                    </CardContent>
-                  </Card>
+                  </Card3D>
                 </motion.div>
               );
             })}

@@ -1,35 +1,39 @@
+/**
+ * HeroVideo — Premium video component for hero sections
+ * Uses PremiumVideoPlayer for cinematic background video,
+ * with reduced-motion fallback and error handling
+ */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
+import { PremiumVideoPlayer } from '@/components/video';
 import { logger } from '@/lib/logger';
 
 interface HeroVideoProps {
   className?: string;
+  /** If true, renders as a background video (no controls, ambient mode) */
+  ambient?: boolean;
+  /** Title overlay for the video */
+  title?: string;
+  subtitle?: string;
 }
 
-const HeroVideo: React.FC<HeroVideoProps> = ({ className = '' }) => {
+const HeroVideo: React.FC<HeroVideoProps> = ({
+  className = '',
+  ambient = true,
+  title,
+  subtitle,
+}) => {
   const [shouldShowVideo, setShouldShowVideo] = useState(true);
   const [videoError, setVideoError] = useState(false);
-  const [videoLoaded, setVideoLoaded] = useState(false);
 
   useEffect(() => {
-    // Vérifier les préférences d'animation réduites
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) {
       setShouldShowVideo(false);
     }
   }, []);
 
-  const handleVideoError = () => {
-    logger.warn('Video failed to load, falling back to image', {}, 'UI');
-    setVideoError(true);
-  };
-
-  const handleVideoLoaded = () => {
-    logger.debug('Video loaded successfully', {}, 'UI');
-    setVideoLoaded(true);
-  };
-
-  // Fallback vers l'image si vidéo désactivée, en erreur, ou pas encore chargée
+  // Fallback to image if video disabled or errored
   if (!shouldShowVideo || videoError) {
     return (
       <img
@@ -42,40 +46,48 @@ const HeroVideo: React.FC<HeroVideoProps> = ({ className = '' }) => {
     );
   }
 
+  if (ambient) {
+    // Ambient background mode — no controls, autoplay, muted, loop
+    return (
+      <div className={`relative w-full h-full overflow-hidden ${className}`}>
+        <div className="player-ambient-glow player-ambient-glow--active absolute -inset-[15%] z-0">
+          <img
+            src="/hero/hero-fallback.webp"
+            alt=""
+            className="w-full h-full object-cover"
+            aria-hidden="true"
+          />
+        </div>
+        <video
+          className="relative z-10 w-full h-full object-cover"
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/hero/hero-fallback.webp"
+          onError={() => setVideoError(true)}
+        >
+          <source src="/hero/hero.webm" type="video/webm" />
+          <source src="/hero/hero.mp4" type="video/mp4" />
+        </video>
+      </div>
+    );
+  }
+
+  // Interactive premium player mode
   return (
-    <div className={`relative w-full h-full ${className}`}>
-      {/* Afficher l'image en fallback pendant le chargement */}
-      {!videoLoaded && (
-        <img
-          src="/hero/hero-fallback.webp"
-          alt="EmotionsCare - Plateforme de bien-être émotionnel"
-          className="absolute inset-0 w-full h-full object-cover"
-          loading="lazy"
-        />
-      )}
-      
-      <video
-        className={`w-full h-full object-cover ${videoLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}
-        autoPlay
-        muted
-        loop
-        playsInline
-        onError={handleVideoError}
-        onLoadedData={handleVideoLoaded}
+    <div className={className}>
+      <PremiumVideoPlayer
+        src="/hero/hero.mp4"
         poster="/hero/hero-fallback.webp"
-      >
-        <source src="/hero/hero.webm" type="video/webm" />
-        <source src="/hero/hero.mp4" type="video/mp4" />
-        
-        {/* Fallback pour navigateurs non compatibles */}
-        <img
-          src="/hero/hero-fallback.webp"
-          alt="EmotionsCare - Plateforme de bien-être émotionnel"
-          className="w-full h-full object-cover"
-        />
-      </video>
+        title={title}
+        subtitle={subtitle}
+        autoPlay={false}
+        aspectRatio="cinema"
+        onEnded={() => logger.debug('Hero video ended', {}, 'UI')}
+      />
     </div>
   );
 };
 
-export default HeroVideo;
+export default memo(HeroVideo);

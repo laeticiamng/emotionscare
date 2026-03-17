@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { LucideIcon, Inbox } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import Card3D from '@/components/ui/Card3D';
 import { cn } from '@/lib/utils';
 
 const emptyStateVariants = cva(
@@ -130,11 +130,11 @@ const UnifiedEmptyState: React.FC<EmptyStateProps> = ({
 
   if (variant === "card") {
     const cardContent = (
-      <Card className="max-w-md w-full mx-auto">
-        <CardContent className="p-8">
+      <Card3D className="max-w-md w-full mx-auto" hoverLift>
+        <div className="p-8">
           {content}
-        </CardContent>
-      </Card>
+        </div>
+      </Card3D>
     );
 
     return animated ? (

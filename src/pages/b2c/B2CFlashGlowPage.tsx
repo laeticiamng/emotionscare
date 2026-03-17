@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Trophy, Flame, Clock, Share2, Settings, Loader2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import PremiumLoader from '@/components/ui/PremiumLoader';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
@@ -309,7 +310,7 @@ export default function B2CFlashGlowPage() {
                     <div className="divide-y">
                       {leaderboardLoading ? (
                         <div className="p-8 text-center">
-                          <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
+                          <PremiumLoader size="md" className="mx-auto" />
                         </div>
                       ) : leaderboardEntries.length > 0 ? (
                         leaderboardEntries.slice(0, 5).map((entry, index) => {

@@ -4,6 +4,7 @@ import { routes } from '@/lib/routes';
 import { useOptimizedPage } from '@/hooks/useOptimizedPage';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import Card3D from '@/components/ui/Card3D';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -121,36 +122,36 @@ const QUICK_ACTIONS: QuickAction[] = [
 ];
 
 const WeeklyPlanSkeleton: React.FC = () => (
-  <Card aria-hidden className="border-dashed">
-    <CardHeader className="space-y-2">
-      <Skeleton className="h-4 w-32" />
-      <Skeleton className="h-5 w-56" />
-    </CardHeader>
-    <CardContent className="space-y-3">
-      <Skeleton className="h-3 w-full" />
-      <Skeleton className="h-3 w-5/6" />
-      <Skeleton className="h-3 w-3/4" />
+  <div aria-hidden className="rounded-2xl border border-dashed border-border/50 p-6 space-y-4">
+    <div className="space-y-2">
+      <Skeleton className="h-4 w-32 skeleton-calm" />
+      <Skeleton className="h-5 w-56 skeleton-calm" />
+    </div>
+    <div className="space-y-3">
+      <Skeleton className="h-3 w-full skeleton-calm" />
+      <Skeleton className="h-3 w-5/6 skeleton-calm" />
+      <Skeleton className="h-3 w-3/4 skeleton-calm" />
       <div className="grid gap-3 sm:grid-cols-2">
         {Array.from({ length: 4 }).map((_, index) => (
-          <Skeleton key={index} className="h-16 w-full" />
+          <Skeleton key={index} className="h-16 w-full skeleton-calm rounded-xl" />
         ))}
       </div>
-    </CardContent>
-  </Card>
+    </div>
+  </div>
 );
 
 const DashboardWidgetSkeleton: React.FC<{ lines?: number }> = ({ lines = 4 }) => (
-  <Card aria-hidden className="border-dashed">
-    <CardHeader className="space-y-2">
-      <Skeleton className="h-4 w-40" />
-      <Skeleton className="h-3 w-1/2" />
-    </CardHeader>
-    <CardContent className="space-y-3">
+  <div aria-hidden className="rounded-2xl border border-dashed border-border/50 p-6 space-y-4">
+    <div className="space-y-2">
+      <Skeleton className="h-4 w-40 skeleton-calm" />
+      <Skeleton className="h-3 w-1/2 skeleton-calm" />
+    </div>
+    <div className="space-y-3">
       {Array.from({ length: lines }).map((_, index) => (
-        <Skeleton key={index} className="h-3 w-full" />
+        <Skeleton key={index} className="h-3 w-full skeleton-calm" />
       ))}
-    </CardContent>
-  </Card>
+    </div>
+  </div>
 );
 
 export default function B2CDashboardPage() {
@@ -414,7 +415,7 @@ export default function B2CDashboardPage() {
 
         {has('FF_MUSIC') && (
           <section aria-labelledby="music-reminder" className="mb-8">
-            <Card>
+            <Card3D hoverLift>
               <CardHeader>
                 <CardTitle id="music-reminder">Ta piste du moment</CardTitle>
                 <CardDescription>
@@ -429,7 +430,7 @@ export default function B2CDashboardPage() {
                   </Link>
                 </Button>
               </CardContent>
-            </Card>
+            </Card3D>
           </section>
         )}
 
@@ -485,8 +486,8 @@ export default function B2CDashboardPage() {
               Actualiser
             </Button>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-            <Card className="relative">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 stagger-in">
+            <Card3D className="p-0" hoverLift animate={false}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Sessions
@@ -498,7 +499,7 @@ export default function B2CDashboardPage() {
               <CardContent>
                 <div className="flex items-center justify-between">
                   {statsLoading ? (
-                    <Skeleton className="h-8 w-12" />
+                    <Skeleton className="h-8 w-12 skeleton-calm" />
                   ) : (
                     <div className="text-2xl font-bold">{userStats.completedSessions}</div>
                   )}
@@ -508,9 +509,9 @@ export default function B2CDashboardPage() {
                   Total de scans réalisés
                 </p>
               </CardContent>
-            </Card>
+            </Card3D>
 
-            <Card>
+            <Card3D className="p-0" hoverLift animate={false}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Série en cours
@@ -522,7 +523,7 @@ export default function B2CDashboardPage() {
               <CardContent>
                 <div className="flex items-center justify-between">
                   {statsLoading ? (
-                    <Skeleton className="h-8 w-12" />
+                    <Skeleton className="h-8 w-12 skeleton-calm" />
                   ) : (
                     <div className="text-2xl font-bold flex items-center gap-1">
                       {userStats.currentStreak}
@@ -535,9 +536,9 @@ export default function B2CDashboardPage() {
                   Continue ta série !
                 </p>
               </CardContent>
-            </Card>
+            </Card3D>
 
-            <Card>
+            <Card3D className="p-0" hoverLift animate={false}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Objectifs semaine
@@ -549,7 +550,7 @@ export default function B2CDashboardPage() {
               <CardContent>
                 <div className="flex items-center justify-between">
                   {statsLoading ? (
-                    <Skeleton className="h-8 w-12" />
+                    <Skeleton className="h-8 w-12 skeleton-calm" />
                   ) : (
                     <div className="text-2xl font-bold">{userStats.weeklyGoals}</div>
                   )}
@@ -559,9 +560,9 @@ export default function B2CDashboardPage() {
                   Complétés cette semaine
                 </p>
               </CardContent>
-            </Card>
+            </Card3D>
 
-            <Card>
+            <Card3D className="p-0" hoverLift animate={false}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Niveau & Rang
@@ -573,7 +574,7 @@ export default function B2CDashboardPage() {
               <CardContent>
                 <div className="flex items-center justify-between">
                   {statsLoading ? (
-                    <Skeleton className="h-8 w-20" />
+                    <Skeleton className="h-8 w-20 skeleton-calm" />
                   ) : (
                     <div className="text-xl font-bold">Niv. {userStats.level}</div>
                   )}
@@ -592,14 +593,14 @@ export default function B2CDashboardPage() {
                         const xpInLevel = userStats.totalPoints - currentLevelXP;
                         const xpNeeded = nextLevelXP - currentLevelXP;
                         const progress = Math.max(0, Math.min(100, (xpInLevel / xpNeeded) * 100));
-                        
+
                         return (
                           <>
                             <div className="flex justify-between text-xs text-muted-foreground mb-1">
                               <span>{userStats.totalPoints} XP</span>
                               <span>{nextLevelXP} XP</span>
                             </div>
-                            <Progress 
+                            <Progress
                               value={progress}
                               className="h-2"
                               aria-label={`Progression vers le niveau ${userStats.level + 1}`}
@@ -614,10 +615,10 @@ export default function B2CDashboardPage() {
                   </>
                 )}
               </CardContent>
-            </Card>
+            </Card3D>
 
             {/* Carte Score Bien-être - utilisant le hook useWellbeingScore */}
-            <Card className="md:col-span-2 lg:col-span-1 bg-gradient-to-br from-primary/5 to-accent/5">
+            <Card3D className="p-0 md:col-span-2 lg:col-span-1 bg-gradient-to-br from-primary/5 to-accent/5" hoverLift animate={false}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <Activity className="h-4 w-4" aria-hidden="true" />
@@ -628,7 +629,7 @@ export default function B2CDashboardPage() {
               </CardHeader>
               <CardContent>
                 {wellbeingLoading || statsLoading ? (
-                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full skeleton-calm" />
                 ) : (
                   <div className="flex items-center gap-4">
                     <div className="text-3xl font-bold text-primary">
@@ -636,7 +637,7 @@ export default function B2CDashboardPage() {
                       <span className="text-lg font-normal text-muted-foreground">/100</span>
                     </div>
                     <div className="flex-1">
-                      <Progress 
+                      <Progress
                         value={wellbeingScore}
                         className="h-3"
                         aria-label="Score de bien-être"
@@ -648,7 +649,7 @@ export default function B2CDashboardPage() {
                   </div>
                 )}
               </CardContent>
-            </Card>
+            </Card3D>
           </div>
           
           {/* Indicateur mise à jour en temps réel */}
@@ -665,17 +666,17 @@ export default function B2CDashboardPage() {
             Conseils personnalisés
           </h2>
           {hintsLoading ? (
-            <div className="grid gap-3" aria-busy="true" aria-live="polite">
+            <div className="grid gap-3 stagger-in" aria-busy="true" aria-live="polite">
               {[1, 2, 3].map((i) => (
-                <Card key={i} className="bg-muted/50">
+                <Card3D key={i} className="bg-muted/50" elevation="low" animate={false}>
                   <CardContent className="py-3 px-4">
-                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full skeleton-calm" />
                   </CardContent>
-                </Card>
+                </Card3D>
               ))}
             </div>
           ) : hintsError ? (
-            <Card className="bg-destructive/5 border-destructive/20">
+            <Card3D className="bg-destructive/5 border-destructive/20" elevation="low">
               <CardContent className="py-4 flex items-center gap-3">
                 <AlertCircle className="h-5 w-5 text-destructive shrink-0" aria-hidden="true" />
                 <div>
@@ -685,23 +686,23 @@ export default function B2CDashboardPage() {
                   </Button>
                 </div>
               </CardContent>
-            </Card>
+            </Card3D>
           ) : clinicalHintsList.length === 0 ? (
-            <Card className="bg-muted/30">
+            <Card3D className="bg-muted/30" elevation="low">
               <CardContent className="py-6 text-center">
                 <Activity className="h-8 w-8 text-muted-foreground mx-auto mb-2" aria-hidden="true" />
                 <p className="text-sm text-muted-foreground">Effectuez un scan pour recevoir des conseils personnalisés</p>
               </CardContent>
-            </Card>
+            </Card3D>
           ) : (
-            <div className="grid gap-3" role="list" aria-live="polite">
+            <div className="grid gap-3 stagger-in" role="list" aria-live="polite">
               {clinicalHintsList.slice(0, 3).map((hint: string, index: number) => (
-                <Card key={`hint-${index}-${hint.slice(0, 10)}`} className="bg-muted/50" role="listitem">
+                <Card3D key={`hint-${index}-${hint.slice(0, 10)}`} className="bg-muted/50" elevation="low" hoverLift role="listitem">
                   <CardContent className="py-3 px-4 flex items-center gap-3">
                     <Heart className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />
                     <p className="text-sm">{hint}</p>
                   </CardContent>
-                </Card>
+                </Card3D>
               ))}
             </div>
           )}
@@ -717,7 +718,7 @@ export default function B2CDashboardPage() {
               const ActionIcon = action.icon as React.ComponentType<{ className?: string }>;
               return (
                 <motion.div key={action.id} layout transition={quickActionTransition} className="h-full">
-                  <Card className="group hover:shadow-md transition-shadow cursor-pointer h-full">
+                  <Card3D className="group cursor-pointer h-full" hoverLift elevation="medium" animate={false}>
                     <Link to={action.to} className="block p-6 h-full" aria-describedby={`${action.id}-desc`}>
                       <div className="flex items-start space-x-3">
                         <div className={`p-2 rounded-lg ${action.accent}`}>
@@ -735,7 +736,7 @@ export default function B2CDashboardPage() {
                         />
                       </div>
                     </Link>
-                  </Card>
+                  </Card3D>
                 </motion.div>
               );
             })}
@@ -817,7 +818,7 @@ export default function B2CDashboardPage() {
             <Award className="h-5 w-5 text-warning" aria-hidden="true" />
             Vos récompenses
           </h2>
-          <Card className="bg-gradient-to-r from-warning/5 to-primary/5">
+          <Card3D className="bg-gradient-to-r from-warning/5 to-primary/5" hoverLift>
             <CardContent className="py-6">
               <div className="flex flex-wrap gap-3 justify-center md:justify-start">
                 <Badge variant="outline" className="px-3 py-1 text-sm border-warning/50">
@@ -837,7 +838,7 @@ export default function B2CDashboardPage() {
                 Continuez à utiliser l'application pour débloquer de nouvelles récompenses
               </p>
             </CardContent>
-          </Card>
+          </Card3D>
         </section>
 
         {/* Explorer tous les modules - Section enrichie avec navigation complète */}

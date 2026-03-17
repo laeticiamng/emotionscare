@@ -70,11 +70,11 @@ import {
   MusicLibrarySection,
 } from '@/components/music/page';
 
-// Skeleton de chargement ultra-léger
+// Skeleton de chargement premium — calm shimmer instead of pulse
 const SectionSkeleton = memo(() => (
-  <div className="p-4 rounded-lg border bg-card/50 animate-pulse">
-    <div className="h-4 w-32 bg-muted/50 rounded mb-3" />
-    <div className="h-20 bg-muted/30 rounded-lg" />
+  <div className="p-5 rounded-2xl border border-border/50 bg-card/30 backdrop-blur-sm">
+    <div className="h-4 w-32 skeleton-calm rounded-md mb-4" />
+    <div className="h-20 skeleton-calm rounded-xl" />
   </div>
 ));
 SectionSkeleton.displayName = 'SectionSkeleton';

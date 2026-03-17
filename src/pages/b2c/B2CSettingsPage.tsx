@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import PremiumLoader from '@/components/ui/PremiumLoader';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
@@ -397,8 +398,7 @@ const B2CSettingsPage = () => {
     return (
       <PageRoot>
         <div className="flex items-center justify-center min-h-screen">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2 sr-only">Chargement des paramètres...</span>
+          <PremiumLoader size="lg" label="Chargement des paramètres..." />
         </div>
       </PageRoot>
     );
@@ -953,7 +953,7 @@ const B2CSettingsPage = () => {
                   <CardContent className="space-y-4">
                     {loadingStorage ? (
                       <div className="flex items-center justify-center py-4">
-                        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                        <PremiumLoader size="sm" />
                       </div>
                     ) : (
                       <>

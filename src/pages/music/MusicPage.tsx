@@ -11,8 +11,10 @@ import { sampleTracks, samplePlaylists } from '@/data/sampleTracks';
 import { MusicPlaylist } from '@/types/music';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Card3D from '@/components/ui/Card3D';
 import { Button } from '@/components/ui/button';
 import { Music, ListMusic, Disc3, ArrowLeft } from 'lucide-react';
+import '@/styles/premium-3d-player.css';
 
 function MusicPageContent() {
   const [selectedPlaylist, setSelectedPlaylist] = useState<MusicPlaylist | null>(null);
@@ -44,11 +46,9 @@ function MusicPageContent() {
           </div>
 
           {/* Track List */}
-          <Card className="overflow-hidden">
-            <CardContent className="p-2 sm:p-3 md:p-4">
+          <Card3D className="overflow-hidden p-2 sm:p-3 md:p-4">
               <TrackList tracks={selectedPlaylist.tracks} />
-            </CardContent>
-          </Card>
+          </Card3D>
         </div>
         <MusicPlayer />
       </div>
@@ -101,17 +101,17 @@ function MusicPageContent() {
           </TabsContent>
 
           <TabsContent value="tracks">
-            <Card className="overflow-hidden">
-              <CardHeader className="p-3 sm:p-4 md:p-6">
-                <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
+            <Card3D className="overflow-hidden">
+              <div className="p-3 sm:p-4 md:p-6">
+                <h3 className="flex items-center gap-2 text-base sm:text-lg md:text-xl font-semibold">
                   <Music className="h-4 w-4 sm:h-5 sm:w-5" />
                   Bibliothèque complète
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-2 sm:p-3 md:p-4 pt-0 sm:pt-0 md:pt-0">
+                </h3>
+              </div>
+              <div className="p-2 sm:p-3 md:p-4 pt-0 sm:pt-0 md:pt-0">
                 <TrackList tracks={sampleTracks} />
-              </CardContent>
-            </Card>
+              </div>
+            </Card3D>
           </TabsContent>
         </Tabs>
       </div>
