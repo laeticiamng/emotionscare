@@ -181,7 +181,7 @@ export const PredictiveAnalyticsProvider: React.FC<{ children: React.ReactNode }
       
       toast({
         title: "Nouvelle prédiction",
-        description: `État émotionnel prédit : ${randomEmotion} (${(randomConfidence * 100).toFixed(0)}% de confiance)`,
+        description: `État émotionnel prédit : ${prediction.emotion} (${(prediction.confidence * 100).toFixed(0)}% de confiance)`,
       });
       
     } catch (err) {

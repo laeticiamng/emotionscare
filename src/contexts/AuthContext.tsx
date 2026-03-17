@@ -74,8 +74,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Log si mode test activé
   useEffect(() => {
     if (isTestMode && TEST_MODE.MOCK_USER) {
+      const mockData = TEST_MODE.MOCK_USER as { email?: string } | null;
       logger.warn('⚠️ MODE TEST ACTIVÉ - Authentification bypassée!', undefined, 'AUTH');
-      console.warn('🧪 MODE TEST: Authentification désactivée. Utilisateur mock:', TEST_MODE.MOCK_USER.email);
+      console.warn('🧪 MODE TEST: Authentification désactivée. Utilisateur mock:', mockData?.email);
     }
   }, [isTestMode]);
 
