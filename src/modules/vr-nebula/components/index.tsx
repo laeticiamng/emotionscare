@@ -12,6 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Play, Pause, RotateCcw, Glasses, Wind, Activity, Timer, Trophy } from 'lucide-react';
 import { useVRNebula } from '../useVRNebula';
+import { NebulaScene3D } from './NebulaScene3D';
 import type { NebulaScene, BreathingPattern, VRNebulaStats, VRNebulaSession } from '../types';
 
 const SCENE_OPTIONS: { value: NebulaScene; label: string; description: string }[] = [
