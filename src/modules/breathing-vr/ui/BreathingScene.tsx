@@ -16,8 +16,6 @@ import { InteractiveParticles } from '@/components/3d/InteractiveParticles';
 import { WebGLGate } from '@/components/3d/Scene3DErrorBoundary';
 import {
   PALETTE,
-  FOG,
-  POST_PROCESSING,
   CAMERA,
   MOTION,
   getGLConfig,
@@ -27,6 +25,7 @@ import {
   prefersReducedMotion,
   shouldEnablePostProcessing,
   isTabVisible,
+  getAdaptiveFog,
 } from '@/components/3d/visualDirection';
 import type { BreathingPhase } from '../types';
 
@@ -205,9 +204,8 @@ export const BreathingScene = ({ phase, progress, fullscreen = false }: Breathin
     return <BreathingReducedMotionFallback phase={phase} />;
   }
 
-  const fog = FOG.breathing;
+  const fog = getAdaptiveFog('breathing');
   const cam = CAMERA.breathing;
-  const pp = POST_PROCESSING.breathing;
   const particleCount = getParticleCount('breathing');
   const interactiveCount = getParticleCount('interactive');
   const starsCount = getStarsCount('breathing');
@@ -220,7 +218,7 @@ export const BreathingScene = ({ phase, progress, fullscreen = false }: Breathin
         <div
           className="absolute inset-0 pointer-events-none z-10"
           style={{
-            background: 'radial-gradient(ellipse at 50% 45%, transparent 30%, hsl(var(--background)) 92%)',
+            background: 'radial-gradient(ellipse at 50% 45%, transparent 40%, hsl(var(--background)) 95%)',
           }}
         />
 
@@ -231,7 +229,7 @@ export const BreathingScene = ({ phase, progress, fullscreen = false }: Breathin
           dpr={getDPR()}
         >
           <fog attach="fog" args={[fog.color, fog.near, fog.far]} />
-          <ambientLight intensity={0.12} />
+          <ambientLight intensity={0.18} />
 
           <DynamicLights phase={phase} progress={progress} />
 
@@ -253,17 +251,8 @@ export const BreathingScene = ({ phase, progress, fullscreen = false }: Breathin
           {/* Cinematic breathing camera */}
           <BreathingCamera phase={phase} progress={progress} />
 
-          {/* Post-processing — gracefully degrades */}
-          <ImmersivePostProcessing
-            bloomIntensity={pp.bloomIntensity}
-            bloomThreshold={pp.bloomThreshold}
-            bloomRadius={pp.bloomRadius}
-            vignetteOffset={pp.vignetteOffset}
-            vignetteDarkness={pp.vignetteDarkness}
-            chromaticAberration={pp.chromaticAberration}
-            chromaticOffset={pp.chromaticOffset}
-            enabled={ppEnabled}
-          />
+          {/* Post-processing — scene-adaptive, gracefully degrades */}
+          <ImmersivePostProcessing scene="breathing" enabled={ppEnabled} />
         </Canvas>
       </div>
     </WebGLGate>

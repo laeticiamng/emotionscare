@@ -38,6 +38,8 @@ export const ImmersiveCanvas: React.FC<ImmersiveCanvasProps> = ({
   const [contextLost, setContextLost] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
+  const listenersRef = useRef<{ onLost: (e: Event) => void; onRestored: () => void } | null>(null);
+
   const handleCreated = useCallback((state: { gl: { domElement: HTMLCanvasElement } }) => {
     const canvas = state.gl.domElement;
     canvasRef.current = canvas;
@@ -58,12 +60,20 @@ export const ImmersiveCanvas: React.FC<ImmersiveCanvasProps> = ({
 
     canvas.addEventListener('webglcontextlost', onLost);
     canvas.addEventListener('webglcontextrestored', onRestored);
+    listenersRef.current = { onLost, onRestored };
   }, []);
 
-  // Cleanup on unmount
+  // Cleanup listeners on unmount to prevent memory leaks
   useEffect(() => {
     return () => {
+      const canvas = canvasRef.current;
+      const listeners = listenersRef.current;
+      if (canvas && listeners) {
+        canvas.removeEventListener('webglcontextlost', listeners.onLost);
+        canvas.removeEventListener('webglcontextrestored', listeners.onRestored);
+      }
       canvasRef.current = null;
+      listenersRef.current = null;
     };
   }, []);
 
@@ -75,7 +85,7 @@ export const ImmersiveCanvas: React.FC<ImmersiveCanvasProps> = ({
           className="absolute inset-0 pointer-events-none z-10"
           style={{
             background:
-              'radial-gradient(ellipse at 50% 45%, transparent 25%, hsl(var(--background)) 95%)',
+              'radial-gradient(ellipse at 50% 45%, transparent 35%, hsl(var(--background)) 96%)',
           }}
         />
 
@@ -94,7 +104,7 @@ export const ImmersiveCanvas: React.FC<ImmersiveCanvasProps> = ({
           onCreated={handleCreated}
         >
           <fog attach="fog" args={[fogColor, fogNear, fogFar]} />
-          <ambientLight intensity={0.12} />
+          <ambientLight intensity={0.18} />
           {children}
         </Canvas>
       </div>

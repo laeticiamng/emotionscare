@@ -15,15 +15,15 @@ import { CosmicParticleField } from '@/components/3d/CosmicParticleField';
 import { InteractiveParticles } from '@/components/3d/InteractiveParticles';
 import {
   PALETTE,
-  FOG,
-  POST_PROCESSING,
   CAMERA,
   getParticleCount,
   getStarsCount,
   prefersReducedMotion,
   shouldEnablePostProcessing,
   isTabVisible,
+  getAdaptiveFog,
 } from '@/components/3d/visualDirection';
+import { GALAXY_CORE_PRESET, INNER_CORE_PRESET, HALO_PRESET } from '@/components/3d/materialPresets';
 
 /* ── Spiral galaxy core — 4 arms, Fibonacci distribution ───── */
 
@@ -188,10 +188,8 @@ const GalaxyCore = () => {
         <sphereGeometry args={[1, 24, 24]} />
         <meshBasicMaterial
           color={PALETTE.gold}
-          transparent
-          opacity={0.04}
+          {...HALO_PRESET}
           blending={THREE.AdditiveBlending}
-          depthWrite={false}
         />
       </mesh>
       {/* Outer shell — translucent physical material */}
@@ -200,13 +198,7 @@ const GalaxyCore = () => {
         <meshPhysicalMaterial
           color="#fde68a"
           emissive="#fbbf24"
-          emissiveIntensity={1.5}
-          transparent
-          opacity={0.35}
-          roughness={0.15}
-          transmission={0.3}
-          thickness={0.3}
-          clearcoat={0.8}
+          {...GALAXY_CORE_PRESET}
         />
       </mesh>
       {/* Inner bright core */}
@@ -215,8 +207,8 @@ const GalaxyCore = () => {
         <meshStandardMaterial
           color="#ffffff"
           emissive="#fde68a"
+          {...INNER_CORE_PRESET}
           emissiveIntensity={2.5}
-          transparent
           opacity={0.9}
         />
       </mesh>
@@ -305,9 +297,8 @@ export const GalaxyScene3D = ({ height = 'h-[500px]', className }: GalaxyScene3D
     return <GalaxyReducedMotionFallback height={height} className={className} />;
   }
 
-  const fog = FOG.galaxy;
+  const fog = getAdaptiveFog('galaxy');
   const cam = CAMERA.galaxy;
-  const pp = POST_PROCESSING.galaxy;
   const starCount = getParticleCount('galaxy');
   const interactiveCount = getParticleCount('interactive');
   const bgStarsCount = getStarsCount('galaxy');
@@ -341,17 +332,8 @@ export const GalaxyScene3D = ({ height = 'h-[500px]', className }: GalaxyScene3D
       {/* Cinematic camera */}
       <FlyCamera />
 
-      {/* Post-processing — gracefully degrades */}
-      <ImmersivePostProcessing
-        bloomIntensity={pp.bloomIntensity}
-        bloomThreshold={pp.bloomThreshold}
-        bloomRadius={pp.bloomRadius}
-        vignetteOffset={pp.vignetteOffset}
-        vignetteDarkness={pp.vignetteDarkness}
-        chromaticAberration={pp.chromaticAberration}
-        chromaticOffset={pp.chromaticOffset}
-        enabled={ppEnabled}
-      />
+      {/* Post-processing — scene-adaptive, gracefully degrades */}
+      <ImmersivePostProcessing scene="galaxy" enabled={ppEnabled} />
     </ImmersiveCanvas>
   );
 };

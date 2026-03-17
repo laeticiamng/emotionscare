@@ -84,17 +84,35 @@ export interface FogConfig {
 }
 
 export const FOG: Record<string, FogConfig> = {
-  hero:     { color: PALETTE.darkVoid,   near: 6,  far: 24 },
-  breathing:{ color: PALETTE.darkVoid,   near: 5,  far: 22 },
-  galaxy:   { color: PALETTE.deepSpace,  near: 8,  far: 35 },
-  nebula:   { color: PALETTE.nebulaDark, near: 5,  far: 24 },
+  hero:     { color: PALETTE.darkVoid,   near: 8,  far: 28 },
+  breathing:{ color: PALETTE.darkVoid,   near: 7,  far: 26 },
+  galaxy:   { color: PALETTE.deepSpace,  near: 10, far: 40 },
+  nebula:   { color: PALETTE.nebulaDark, near: 7,  far: 28 },
+};
+
+/**
+ * Device-adaptive fog: on low-tier devices, push fog far plane further
+ * to avoid washing out content that's already dimmer due to reduced effects.
+ */
+export const getAdaptiveFog = (scene: keyof typeof FOG): FogConfig => {
+  const base = FOG[scene];
+  if (!base) return FOG.hero;
+  const tier = getDeviceTier();
+  if (tier === 'low') {
+    // Low-tier: push fog back to preserve clarity with simpler rendering
+    return { ...base, near: base.near + 2, far: base.far + 6 };
+  }
+  if (tier === 'medium') {
+    return { ...base, near: base.near + 1, far: base.far + 3 };
+  }
+  return base;
 };
 
 /* ── Tone Mapping ───────────────────────────────────────────── */
 
 export const TONE_MAPPING = {
   mapping: THREE.ACESFilmicToneMapping,
-  exposure: 1.3,
+  exposure: 1.5,
 } as const;
 
 /* ── Post-Processing Presets ────────────────────────────────── */
@@ -112,40 +130,40 @@ export interface PostProcessingPreset {
 
 export const POST_PROCESSING: Record<string, PostProcessingPreset> = {
   hero: {
-    bloomIntensity: 1.0,
+    bloomIntensity: 0.8,
+    bloomThreshold: 0.4,
+    bloomRadius: 0.55,
+    vignetteOffset: 0.3,
+    vignetteDarkness: 0.45,
+    chromaticAberration: true,
+    chromaticOffset: 0.0002,
+  },
+  breathing: {
+    bloomIntensity: 0.9,
     bloomThreshold: 0.35,
     bloomRadius: 0.6,
     vignetteOffset: 0.3,
+    vignetteDarkness: 0.45,
+    chromaticAberration: true,
+    chromaticOffset: 0.0003,
+  },
+  galaxy: {
+    bloomIntensity: 1.1,
+    bloomThreshold: 0.3,
+    bloomRadius: 0.65,
+    vignetteOffset: 0.25,
     vignetteDarkness: 0.5,
     chromaticAberration: true,
     chromaticOffset: 0.0003,
   },
-  breathing: {
-    bloomIntensity: 1.2,
-    bloomThreshold: 0.28,
-    bloomRadius: 0.65,
-    vignetteOffset: 0.35,
-    vignetteDarkness: 0.55,
-    chromaticAberration: true,
-    chromaticOffset: 0.0004,
-  },
-  galaxy: {
-    bloomIntensity: 1.4,
-    bloomThreshold: 0.22,
-    bloomRadius: 0.7,
-    vignetteOffset: 0.3,
-    vignetteDarkness: 0.65,
-    chromaticAberration: true,
-    chromaticOffset: 0.0004,
-  },
   nebula: {
-    bloomIntensity: 1.3,
-    bloomThreshold: 0.25,
-    bloomRadius: 0.7,
-    vignetteOffset: 0.3,
-    vignetteDarkness: 0.6,
+    bloomIntensity: 1.0,
+    bloomThreshold: 0.32,
+    bloomRadius: 0.6,
+    vignetteOffset: 0.25,
+    vignetteDarkness: 0.5,
     chromaticAberration: true,
-    chromaticOffset: 0.0004,
+    chromaticOffset: 0.0003,
   },
 };
 

@@ -21,8 +21,6 @@ import { ImmersivePostProcessing } from './ImmersivePostProcessing';
 import { WebGLGate } from './Scene3DErrorBoundary';
 import {
   PALETTE,
-  FOG,
-  POST_PROCESSING,
   CAMERA,
   MOTION,
   getGLConfig,
@@ -32,6 +30,7 @@ import {
   prefersReducedMotion,
   shouldEnablePostProcessing,
   isTabVisible,
+  getAdaptiveFog,
 } from './visualDirection';
 
 /* ── Background: Deep atmospheric glow spheres ───────────────── */
@@ -242,10 +241,11 @@ const LuminousOrb = ({
       <meshStandardMaterial
         color={color}
         emissive={color}
-        emissiveIntensity={0.4}
+        emissiveIntensity={0.5}
         transparent
-        opacity={0.1}
-        roughness={0.3}
+        opacity={0.12}
+        roughness={0.2}
+        metalness={0}
       />
     </mesh>
   );
@@ -335,17 +335,16 @@ const CinematicCamera = () => {
 /* ── Scene content (inside Canvas) ──────────────────────────── */
 
 const HeroSceneContent = ({ particleCount, starsCount }: { particleCount: number; starsCount: number }) => {
-  const pp = POST_PROCESSING.hero;
-  const fog = FOG.hero;
+  const fog = getAdaptiveFog('hero');
   const ppEnabled = shouldEnablePostProcessing();
 
   return (
     <>
       <fog attach="fog" args={[fog.color, fog.near, fog.far]} />
-      <ambientLight intensity={0.1} />
-      <pointLight position={[5, 4, 5]} color={PALETTE.primary} intensity={1.5} distance={22} />
-      <pointLight position={[-4, -2, 3]} color={PALETTE.secondary} intensity={1.0} distance={20} />
-      <pointLight position={[0, 3, -5]} color={PALETTE.warm} intensity={0.5} distance={18} />
+      <ambientLight intensity={0.18} />
+      <pointLight position={[5, 4, 5]} color={PALETTE.primary} intensity={1.8} distance={24} />
+      <pointLight position={[-4, -2, 3]} color={PALETTE.secondary} intensity={1.2} distance={22} />
+      <pointLight position={[0, 3, -5]} color={PALETTE.warm} intensity={0.7} distance={20} />
 
       {/* Background layer */}
       <Stars radius={100} depth={70} count={starsCount} factor={3} saturation={0.4} fade speed={0.15} />
@@ -361,17 +360,8 @@ const HeroSceneContent = ({ particleCount, starsCount }: { particleCount: number
       {/* Camera */}
       <CinematicCamera />
 
-      {/* Post-processing — gracefully degrades */}
-      <ImmersivePostProcessing
-        bloomIntensity={pp.bloomIntensity}
-        bloomThreshold={pp.bloomThreshold}
-        bloomRadius={pp.bloomRadius}
-        vignetteOffset={pp.vignetteOffset}
-        vignetteDarkness={pp.vignetteDarkness}
-        chromaticAberration={pp.chromaticAberration}
-        chromaticOffset={pp.chromaticOffset}
-        enabled={ppEnabled}
-      />
+      {/* Post-processing — scene-adaptive, gracefully degrades */}
+      <ImmersivePostProcessing scene="hero" enabled={ppEnabled} />
     </>
   );
 };
@@ -423,7 +413,7 @@ const HeroScene3D = () => {
           className="absolute inset-0 pointer-events-none z-10"
           style={{
             background:
-              'radial-gradient(ellipse at 50% 45%, transparent 30%, hsl(var(--background)) 92%)',
+              'radial-gradient(ellipse at 50% 45%, transparent 40%, hsl(var(--background)) 95%)',
           }}
         />
 
