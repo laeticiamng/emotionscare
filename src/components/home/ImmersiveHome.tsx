@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Heart, Building2, Sparkles, Users, Target, Lightbulb } from 'lucide-react';
 import WelcomeMessage from './WelcomeMessage';
 import ActionButtons from './ActionButtons';
-import AnimatedBackground from './AnimatedBackground';
+import AnimatedBackground3D from './AnimatedBackground3D';
 import { routes } from '@/routerV2';
 import '@/components/home/immersive-home.css';
 
