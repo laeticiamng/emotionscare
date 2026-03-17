@@ -33,13 +33,13 @@ export const ImmersivePostProcessing = ({
       radius={bloomRadius}
     />
     <Vignette offset={vignetteOffset} darkness={vignetteDarkness} />
-    {chromaticAberration && (
+    {chromaticAberration ? (
       <ChromaticAberration
         blendFunction={BlendFunction.NORMAL}
         offset={new THREE.Vector2(chromaticOffset, chromaticOffset)}
         radialModulation={true}
         modulationOffset={0.5}
       />
-    )}
+    ) : null}
   </EffectComposer>
 );
