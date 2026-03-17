@@ -8,6 +8,7 @@
 @import './styles/base.css';
 @import './styles/responsive-harmony.css';
 @import './styles/mobile-responsive.css';
+@import './styles/premium-3d-player.css';
 @tailwind base;
 
 /* Animation pulse lente pour CTA */
