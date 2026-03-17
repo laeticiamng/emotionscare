@@ -6,6 +6,7 @@
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { PALETTE } from '@/components/3d/visualDirection';
 import type { BreathingPhase } from '../types';
 
 interface BreathingParticlesProps {
@@ -18,10 +19,10 @@ export const BreathingParticles = ({ phase, progress, count = 300 }: BreathingPa
   const pointsRef = useRef<THREE.Points>(null);
 
   const phaseColors: Record<BreathingPhase, THREE.Color> = useMemo(() => ({
-    inhale: new THREE.Color('#4f9eff'),
-    hold: new THREE.Color('#a78bfa'),
-    exhale: new THREE.Color('#34d399'),
-    rest: new THREE.Color('#fbbf24'),
+    inhale: new THREE.Color(PALETTE.breathing.inhale),
+    hold: new THREE.Color(PALETTE.breathing.hold),
+    exhale: new THREE.Color(PALETTE.breathing.exhale),
+    rest: new THREE.Color(PALETTE.breathing.rest),
   }), []);
 
   // Generate initial particle positions in a sphere distribution

@@ -1,10 +1,12 @@
 /**
  * Post-processing cinématique : HDR Bloom + Vignette + ChromaticAberration
+ * Defaults aligned with unified visual direction system
  */
 
 import { EffectComposer, Bloom, Vignette, ChromaticAberration } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
+import { POST_PROCESSING } from './visualDirection';
 
 interface ImmersivePostProcessingProps {
   bloomIntensity?: number;
@@ -40,14 +42,16 @@ const PostProcessingWithoutCA = ({
   </EffectComposer>
 );
 
+const defaults = POST_PROCESSING.hero;
+
 export const ImmersivePostProcessing = ({
-  bloomIntensity = 1.5,
-  bloomThreshold = 0.2,
-  bloomRadius = 0.8,
-  vignetteOffset = 0.3,
-  vignetteDarkness = 0.7,
-  chromaticAberration = true,
-  chromaticOffset = 0.0006,
+  bloomIntensity = defaults.bloomIntensity,
+  bloomThreshold = defaults.bloomThreshold,
+  bloomRadius = defaults.bloomRadius,
+  vignetteOffset = defaults.vignetteOffset,
+  vignetteDarkness = defaults.vignetteDarkness,
+  chromaticAberration = defaults.chromaticAberration,
+  chromaticOffset = defaults.chromaticOffset,
 }: ImmersivePostProcessingProps) =>
   chromaticAberration ? (
     <PostProcessingWithCA

@@ -1,11 +1,12 @@
 /**
- * Wrapper Canvas 3D réutilisable — fog, tone mapping, CSS bloom overlay
+ * Wrapper Canvas 3D réutilisable — fog, tone mapping, vignette overlay
+ * Now uses unified visual direction system
  */
 
 import React, { type ReactNode } from 'react';
 import { Canvas } from '@react-three/fiber';
-import * as THREE from 'three';
 import { cn } from '@/lib/utils';
+import { getGLConfig, getDPR } from './visualDirection';
 
 interface ImmersiveCanvasProps {
   children: ReactNode;
@@ -29,27 +30,23 @@ export const ImmersiveCanvas: React.FC<ImmersiveCanvasProps> = ({
   fov = 50,
 }) => (
   <div className={cn(`w-full ${height} rounded-2xl overflow-hidden relative`, className)}>
-    {/* Radial vignette overlay */}
+    {/* Radial vignette overlay — enhanced for depth */}
     <div
       className="absolute inset-0 pointer-events-none z-10"
       style={{
         background:
-          'radial-gradient(circle at 50% 50%, transparent 30%, hsl(var(--background)) 100%)',
+          'radial-gradient(ellipse at 50% 45%, transparent 25%, hsl(var(--background)) 95%)',
       }}
     />
 
     <Canvas
       camera={{ position: cameraPosition, fov }}
-      gl={{
-        antialias: true,
-        alpha: true,
-        toneMapping: THREE.ACESFilmicToneMapping,
-        toneMappingExposure: 1.2,
-      }}
+      gl={getGLConfig()}
       style={{ background: 'transparent' }}
+      dpr={getDPR()}
     >
       <fog attach="fog" args={[fogColor, fogNear, fogFar]} />
-      <ambientLight intensity={0.15} />
+      <ambientLight intensity={0.1} />
       {children}
     </Canvas>
   </div>
