@@ -16,6 +16,7 @@ import { GalaxyStatsPanel } from './GalaxyStatsPanel';
 import { GalaxySessionHistoryPanel } from './GalaxySessionHistoryPanel';
 import { GalaxyAchievementsPanel } from './GalaxyAchievementsPanel';
 import { GalaxySettingsPanel } from './GalaxySettingsPanel';
+import { GalaxyScene3D } from './GalaxyScene3D';
 import { cn } from '@/lib/utils';
 
 interface VRGalaxyMainProps {
@@ -123,28 +124,8 @@ export const VRGalaxyMain: React.FC<VRGalaxyMainProps> = ({ className = '' }) =>
                   />
                 </div>
 
-                {/* Constellations en cours */}
-                <div className="relative h-40 bg-slate-800/30 rounded-2xl overflow-hidden">
-                  {galaxy.constellations.map((constellation) => (
-                    <div key={constellation.id} className="absolute inset-0">
-                      {constellation.stars.map((star, idx) => (
-                        <motion.div
-                          key={idx}
-                          className={cn(
-                            'absolute w-2 h-2 rounded-full',
-                            constellation.unlocked ? 'bg-primary' : 'bg-muted/30'
-                          )}
-                          style={{ left: `${star.x}%`, top: `${star.y}%` }}
-                          animate={constellation.unlocked ? {
-                            scale: [1, 1.5, 1],
-                            opacity: [0.7, 1, 0.7]
-                          } : {}}
-                          transition={{ duration: 2, repeat: Infinity }}
-                        />
-                      ))}
-                    </div>
-                  ))}
-                </div>
+                {/* Scène 3D immersive Galaxy */}
+                <GalaxyScene3D height="h-[280px]" className="rounded-xl" />
 
                 {/* Contrôles */}
                 <div className="flex items-center justify-center gap-4">

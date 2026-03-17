@@ -1,77 +1,64 @@
 
 
-# Plan : Upgrade 3D immersif — Niveau 2026
+## Plan : Ajouter les traductions allemandes et compléter FR/EN/DE sur toute la plateforme
 
-## Diagnostic
+### Constat actuel
 
-| Module | Etat actuel | 3D réelle ? |
-|--------|------------|-------------|
-| **Breathing VR** | Sphère multi-couches + particules + stars + fog | Oui (upgrade récent) |
-| **VR Galaxy** | Divs 2D avec dots animés framer-motion | Non |
-| **VR Nebula** | Formulaire + stats, aucun visuel | Non |
+L'application dispose de deux systèmes i18n parallèles :
+1. **Système principal** (`src/lib/i18n/locales/{fr,en}/`) — 11 namespaces (common, navigation, dashboard, settings, modules, auth, consent, errors, legal, journal, coach) avec FR et EN complets
+2. **Système secondaire** (`src/i18n/locales/{fr,en,de}.ts`) — squelettique, utilisé par `src/i18n/config.ts`
+3. **Fichiers JSON** (`public/locales/{fr,en}/`) — partiels (common, errors, breath)
 
-Les deux modules Galaxy et Nebula n'ont **aucune scène 3D** — c'est le plus gros gap d'immersion sur la plateforme.
+Le **DE (allemand)** existe uniquement dans `src/i18n/locales/de.ts` avec un contenu riche mais n'est **pas branché** dans le système principal (`src/providers/i18n/resources.ts` ne charge que `fr` et `en`).
 
-## Plan en 5 étapes
+De plus, de nombreuses pages (100+) contiennent encore des **chaînes hardcodées en français** non internationalisées.
 
-### 1. Ajouter `@react-three/postprocessing` pour le bloom HDR
+### Plan d'implémentation
 
-Installer le package et créer un wrapper `<ImmersivePostProcessing>` réutilisable (Bloom, Vignette, ChromaticAberration) utilisable dans toutes les scènes 3D.
+#### 1. Creer les fichiers de traduction DE (11 fichiers)
 
-### 2. Améliorer le Breathing Sphere avec un vertex shader custom
+Creer `src/lib/i18n/locales/de/` avec les 11 fichiers miroirs de FR/EN :
+- `common.ts`, `navigation.ts`, `dashboard.ts`, `settings.ts`, `modules.ts`, `auth.ts`, `consent.ts`, `errors.ts`, `legal.ts`, `journal.ts`, `coach.ts`
 
-Remplacer la sphère statique par une sphère avec **déformation organique en temps réel** (bruit Simplex sur les vertices). L'orbe "respire" de manière fluide et vivante, pas juste un scale uniforme. Ajouter le post-processing Bloom à la scène breathing.
+Chaque fichier sera la traduction allemande complète des clés existantes en FR/EN.
 
-### 3. Créer une vraie scène 3D pour VR Galaxy
+#### 2. Brancher DE dans le système principal
 
-Nouveau composant `GalaxyScene3D.tsx` :
-- **Galaxie spirale** : 5000+ particules en distribution spirale (bras de Fibonacci)
-- **Nébuleuses** : Nuages volumétriques semi-transparents (sprites additifs)
-- **Constellations 3D** : Les constellations débloquées s'affichent en 3D avec des lignes lumineuses
-- **Camera fly-through** : Déplacement lent automatique dans la galaxie
-- **Post-processing** : Bloom + vignette
-- Intégrer dans `VRGalaxyMain.tsx` en remplacement du div 2D actuel (lignes 127-147)
+Modifier `src/providers/i18n/resources.ts` pour :
+- Importer les 11 modules DE
+- Ajouter la locale `de` dans l'objet `resources`
 
-### 4. Créer une vraie scène 3D pour VR Nebula
+#### 3. Mettre à jour la configuration i18n
 
-Nouveau composant `NebulaScene3D.tsx` :
-- **4 environnements** correspondant aux scènes existantes (cosmos, aurora, galaxy, ocean)
-- **Aurore boréale** : Rubans ondulants avec vertex shader
-- **Champ d'étoiles** profond avec parallaxe
-- **Sphère de respiration** intégrée qui pulse avec le timer
-- Intégrer dans `VRNebulaSessionPanel` quand la session est active
+- `src/lib/i18n.ts` : ajouter `'de'` dans `supportedLngs`
+- `src/lib/i18n/i18n.tsx` : ajouter le type `'de'` au type `Lang`
+- `src/i18n/locales/fr.ts` et `src/i18n/locales/en.ts` : ajouter `de: 'Allemand'` / `de: 'German'` dans `languageNames`
 
-### 5. Infrastructure partagée
+#### 4. Mettre à jour le sélecteur de langue
 
-- `src/components/3d/ImmersiveCanvas.tsx` : Wrapper Canvas réutilisable (fog, tone mapping, post-processing, CSS bloom overlay, responsive height)
-- `src/components/3d/ImmersivePostProcessing.tsx` : EffectComposer + Bloom + Vignette
-- `src/components/3d/CosmicParticleField.tsx` : Champ de particules paramétrable (couleur, densité, comportement)
+- `src/ui/NavBar.tsx` : supporter le cycle FR → EN → DE → FR
+- `src/i18n/LanguageSwitcher.tsx` : s'assurer que DE est dans les options (il utilise `SUPPORTED_LOCALES` qui inclut déjà `de`)
 
-## Fichiers à créer/modifier
+#### 5. Ajouter les fichiers JSON DE dans public/locales
 
-| Fichier | Action |
-|---------|--------|
-| `src/components/3d/ImmersiveCanvas.tsx` | Nouveau — wrapper Canvas partagé |
-| `src/components/3d/ImmersivePostProcessing.tsx` | Nouveau — Bloom + Vignette |
-| `src/components/3d/CosmicParticleField.tsx` | Nouveau — particules réutilisables |
-| `src/modules/breathing-vr/ui/BreathingSphere.tsx` | Upgrade — vertex shader organique |
-| `src/modules/breathing-vr/ui/BreathingScene.tsx` | Upgrade — ajouter post-processing |
-| `src/modules/vr-galaxy/components/GalaxyScene3D.tsx` | Nouveau — scène galaxie spirale 3D |
-| `src/modules/vr-galaxy/components/VRGalaxyMain.tsx` | Modifier — intégrer GalaxyScene3D |
-| `src/modules/vr-nebula/components/NebulaScene3D.tsx` | Nouveau — scène nébuleuse 3D |
-| `src/modules/vr-nebula/components/index.tsx` | Modifier — intégrer NebulaScene3D |
+Creer `public/locales/de/` avec `common.json`, `errors.json`, `breath.json`
 
-## Détails techniques
+#### 6. Internationaliser les composants avec chaînes hardcodees
 
-- **Post-processing** : `@react-three/postprocessing` (EffectComposer, Bloom avec luminanceThreshold, Vignette)
-- **Vertex shader** : Déformation Simplex noise via `onBeforeCompile` sur MeshPhysicalMaterial (pas besoin de package externe — noise intégré en GLSL)
-- **Galaxie spirale** : Distribution logarithmique en 4 bras, 5000 particules Points avec PointsMaterial AdditiveBlending
-- **Aurore** : Plane geometry avec vertex displacement sinusoïdal + gradient alpha
+Migrer progressivement les composants critiques contenant du texte FR hardcode :
+- `GroupHeader.tsx` : remplacer "Aujourd'hui"/"Hier" par `t('common.today')`/`t('common.yesterday')` et utiliser la locale dynamique pour `Intl.DateTimeFormat`
+- `NavBar.tsx` : utiliser les clés de traduction pour les liens
+- `Footer.tsx` : utiliser les clés de traduction pour les liens legaux
 
-## Impact visuel attendu
+### Details techniques
 
-- La sphère de respiration ondule organiquement comme un organisme vivant
-- La galaxie ressemble à une vraie photo Hubble avec bloom HDR
-- La nébuleuse crée un cocon immersif de lumière
-- Toutes les scènes ont un rendu cinématique cohérent (même tone mapping, même bloom)
+- Les 11 fichiers DE suivront exactement la structure des fichiers EN existants
+- Le type `Lang` sera etendu a `'fr' | 'en' | 'de'`
+- Le `fallbackLng` reste `'fr'`
+- Environ **15-20 fichiers** seront modifies ou crees
+
+### Limites
+
+- Les 100+ pages avec texte FR hardcode ne seront pas toutes migrées dans cette iteration — seuls les composants partagés (NavBar, Footer, GroupHeader) et la configuration seront traités
+- Les pages individuelles (ModulesDashboard, UnifiedHomePage, etc.) necessiteront des passes supplementaires
 

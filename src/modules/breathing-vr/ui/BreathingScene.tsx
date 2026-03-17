@@ -9,6 +9,7 @@ import { OrbitControls, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { BreathingSphere } from './BreathingSphere';
 import { BreathingParticles } from './BreathingParticles';
+import { ImmersivePostProcessing } from '@/components/3d/ImmersivePostProcessing';
 import type { BreathingPhase } from '../types';
 
 interface BreathingSceneProps {
@@ -137,6 +138,14 @@ export const BreathingScene = ({ phase, progress, fullscreen = false }: Breathin
           autoRotateSpeed={0.3}
           maxPolarAngle={Math.PI * 0.65}
           minPolarAngle={Math.PI * 0.35}
+        />
+
+        {/* HDR Bloom + Vignette */}
+        <ImmersivePostProcessing
+          bloomIntensity={1.5}
+          bloomThreshold={0.2}
+          bloomRadius={0.8}
+          vignetteDarkness={0.6}
         />
       </Canvas>
     </div>

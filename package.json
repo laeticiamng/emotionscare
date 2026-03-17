@@ -112,6 +112,7 @@
     "@radix-ui/react-tooltip": "^1.2.7",
     "@react-three/drei": "^9.59.0",
     "@react-three/fiber": "^8.13.5",
+    "@react-three/postprocessing": "^2.16",
     "@react-three/xr": "^6.6.25",
     "@sentry/react": "^7.120.3",
     "@sentry/replay": "^7.120.3",
