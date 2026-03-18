@@ -4,13 +4,15 @@
  * Affiche les alertes RH sans données individuelles
  */
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertTriangle, Shield, TrendingDown, Users, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useB2BTeamStats } from '@/hooks/useB2BTeamStats';
 
 interface Alert {
   id: string;
@@ -22,29 +24,39 @@ interface Alert {
   createdAt: string;
 }
 
-const MOCK_ALERTS: Alert[] = [
-  {
-    id: '1',
-    type: 'stress_increase',
-    severity: 'medium',
-    title: 'Hausse du stress détectée',
-    description: 'Une équipe présente des signaux de tension accrue cette semaine',
-    affectedCount: 5,
-    createdAt: '2025-01-15',
-  },
-  {
-    id: '2',
-    type: 'low_engagement',
-    severity: 'low',
-    title: 'Engagement en baisse',
-    description: 'Participation aux activités bien-être en recul',
-    affectedCount: 8,
-    createdAt: '2025-01-14',
-  },
-];
-
 export const TeamAlertsWidget: React.FC = () => {
-  const { stats, loading } = useB2BTeamStats();
+  const { user } = useAuth();
+
+  // Fetch team alerts from Supabase
+  const {
+    data: alerts = [],
+    isLoading,
+    error,
+  } = useQuery<Alert[]>({
+    queryKey: ['team_alerts', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+
+      const { data, error } = await supabase
+        .from('team_alerts')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+
+      return (data ?? []).map((row: any) => ({
+        id: row.id,
+        type: row.type ?? 'stress_increase',
+        severity: row.severity ?? 'medium',
+        title: row.title ?? '',
+        description: row.description ?? '',
+        affectedCount: row.affected_count ?? 0,
+        createdAt: row.created_at,
+      }));
+    },
+    enabled: !!user?.id,
+  });
 
   const getSeverityBadge = (severity: Alert['severity']) => {
     switch (severity) {
@@ -68,8 +80,6 @@ export const TeamAlertsWidget: React.FC = () => {
     }
   };
 
-  const alerts = stats.alertsCount > 0 ? MOCK_ALERTS : [];
-
   return (
     <Card className={alerts.length > 0 ? 'border-warning/30' : ''}>
       <CardHeader>
@@ -86,10 +96,15 @@ export const TeamAlertsWidget: React.FC = () => {
         </div>
       </CardHeader>
       <CardContent>
-        {loading ? (
+        {isLoading ? (
           <div className="space-y-4">
             <Skeleton className="h-20 w-full" />
             <Skeleton className="h-20 w-full" />
+          </div>
+        ) : error ? (
+          <div className="text-center py-6" role="alert">
+            <AlertTriangle className="h-8 w-8 mx-auto text-red-500 mb-2" />
+            <p className="text-sm text-red-500">Erreur lors du chargement des alertes</p>
           </div>
         ) : alerts.length === 0 ? (
           <div className="text-center py-6">
@@ -102,8 +117,8 @@ export const TeamAlertsWidget: React.FC = () => {
         ) : (
           <div className="space-y-4" role="list" aria-label="Liste des alertes">
             {alerts.map((alert) => (
-              <div 
-                key={alert.id} 
+              <div
+                key={alert.id}
                 className="p-4 bg-muted/50 rounded-lg space-y-2"
                 role="listitem"
               >

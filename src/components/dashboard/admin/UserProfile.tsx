@@ -1,6 +1,8 @@
 // @ts-nocheck
 
 import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -8,7 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
-import { 
+import { Skeleton } from '@/components/ui/skeleton';
+import {
   CalendarDays, Mail, Shield, AlertTriangle, CheckCircle, Clock,
   MessageSquare, Ban, UserCheck, Tag, Plus, X, History, Activity,
   TrendingUp, TrendingDown, MoreVertical, Edit, Trash2, Send
@@ -73,22 +76,12 @@ interface UserProfileProps {
   onSendMessage?: (message: string) => void;
 }
 
-const MOCK_ACTIVITIES: ActivityItem[] = [
-  { id: '1', type: 'session', title: 'Session de méditation', description: '15 minutes de méditation guidée', timestamp: new Date().toISOString() },
-  { id: '2', type: 'checkin', title: 'Check-in émotionnel', description: 'Humeur: Bien (4/5)', timestamp: new Date(Date.now() - 3600000).toISOString() },
-  { id: '3', type: 'achievement', title: 'Badge débloqué', description: '7 jours consécutifs', timestamp: new Date(Date.now() - 86400000).toISOString() },
-];
-
-const MOCK_NOTES: AdminNote[] = [
-  { id: '1', content: 'Utilisateur très engagé, candidat pour programme ambassadeur.', author: 'Admin', createdAt: new Date(Date.now() - 86400000).toISOString(), priority: 'medium' },
-];
-
 const SUGGESTED_TAGS = ['VIP', 'Beta Tester', 'Support', 'Ambassadeur', 'Nouveau', 'À surveiller'];
 
-export const UserProfile: React.FC<UserProfileProps> = ({ 
-  user, 
-  activities = MOCK_ACTIVITIES,
-  adminNotes = MOCK_NOTES,
+export const UserProfile: React.FC<UserProfileProps> = ({
+  user,
+  activities: propActivities,
+  adminNotes: propNotes,
   onAddNote,
   onDeleteNote,
   onAddTag,
@@ -104,10 +97,67 @@ export const UserProfile: React.FC<UserProfileProps> = ({
   const [message, setMessage] = useState('');
   const { toast } = useToast();
 
+  // Fetch activities from Supabase when not provided as props
+  const {
+    data: fetchedActivities = [],
+    isLoading: activitiesLoading,
+  } = useQuery<ActivityItem[]>({
+    queryKey: ['admin_user_activities', user.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('user_activity_log')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+
+      return (data ?? []).map((row: any) => ({
+        id: row.id,
+        type: row.type ?? 'session',
+        title: row.title ?? '',
+        description: row.description ?? '',
+        timestamp: row.created_at,
+        metadata: row.metadata,
+      }));
+    },
+    enabled: !propActivities,
+  });
+
+  // Fetch admin notes from Supabase when not provided as props
+  const {
+    data: fetchedNotes = [],
+    isLoading: notesLoading,
+  } = useQuery<AdminNote[]>({
+    queryKey: ['admin_user_notes', user.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('admin_notes')
+        .select('*')
+        .eq('target_user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return (data ?? []).map((row: any) => ({
+        id: row.id,
+        content: row.content ?? '',
+        author: row.author_name ?? 'Admin',
+        createdAt: row.created_at,
+        priority: row.priority ?? 'medium',
+      }));
+    },
+    enabled: !propNotes,
+  });
+
+  const activities = propActivities ?? fetchedActivities;
+  const adminNotes = propNotes ?? fetchedNotes;
+
   // Format dates
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'N/A';
-    
+
     const date = new Date(dateString);
     return date.toLocaleDateString('fr-FR', {
       day: 'numeric',
@@ -122,7 +172,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
     const diff = now.getTime() - date.getTime();
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
-    
+
     if (hours < 1) return 'À l\'instant';
     if (hours < 24) return `Il y a ${hours}h`;
     if (days < 7) return `Il y a ${days}j`;
@@ -141,7 +191,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
   // Determine emotional score color
   const getScoreColor = (score?: number) => {
     if (!score) return 'bg-gray-300';
-    
+
     if (score >= 80) return 'bg-emerald-500';
     if (score >= 60) return 'bg-green-500';
     if (score >= 40) return 'bg-yellow-500';
@@ -164,7 +214,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
     if (!newNote.trim()) return;
     onAddNote?.({ content: newNote, priority: notePriority });
     setNewNote('');
-    toast({ title: '📝 Note ajoutée', description: 'La note admin a été enregistrée.' });
+    toast({ title: 'Note ajoutée', description: 'La note admin a été enregistrée.' });
   };
 
   const handleAddTag = () => {
@@ -172,14 +222,14 @@ export const UserProfile: React.FC<UserProfileProps> = ({
     onAddTag?.(newTag);
     setNewTag('');
     setShowTagInput(false);
-    toast({ title: '🏷️ Tag ajouté', description: `Le tag "${newTag}" a été ajouté.` });
+    toast({ title: 'Tag ajouté', description: `Le tag "${newTag}" a été ajouté.` });
   };
 
   const handleSendMessage = () => {
     if (!message.trim()) return;
     onSendMessage?.(message);
     setMessage('');
-    toast({ title: '✉️ Message envoyé', description: 'Le message a été envoyé à l\'utilisateur.' });
+    toast({ title: 'Message envoyé', description: 'Le message a été envoyé à l\'utilisateur.' });
   };
 
   return (
@@ -223,7 +273,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
               <AvatarFallback className="text-xl">{getInitials(user.name)}</AvatarFallback>
             </Avatar>
             {user.status && (
-              <Badge 
+              <Badge
                 variant={user.status === 'active' ? 'default' : user.status === 'suspended' ? 'destructive' : 'secondary'}
                 className="absolute -bottom-1 left-1/2 transform -translate-x-1/2"
               >
@@ -233,12 +283,12 @@ export const UserProfile: React.FC<UserProfileProps> = ({
           </div>
 
           <h2 className="text-2xl font-bold mb-1">{user.name}</h2>
-          
+
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
             <Mail className="h-4 w-4" />
             <span>{user.email}</span>
           </div>
-          
+
           <div className="flex items-center gap-2 mb-4">
             <Badge>{user.role}</Badge>
             {user.role === 'admin' && <Shield className="h-4 w-4 text-primary" />}
@@ -279,14 +329,14 @@ export const UserProfile: React.FC<UserProfileProps> = ({
           {showTagInput && (
             <div className="flex flex-wrap gap-1 mb-4">
               {SUGGESTED_TAGS.filter(t => !user.tags?.includes(t)).map((tag) => (
-                <Button 
-                  key={tag} 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  key={tag}
+                  variant="ghost"
+                  size="sm"
                   className="h-5 text-xs"
                   onClick={() => {
                     onAddTag?.(tag);
-                    toast({ title: '🏷️ Tag ajouté', description: `Le tag "${tag}" a été ajouté.` });
+                    toast({ title: 'Tag ajouté', description: `Le tag "${tag}" a été ajouté.` });
                   }}
                 >
                   {tag}
@@ -294,7 +344,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
               ))}
             </div>
           )}
-          
+
           {user.emotional_score !== undefined && (
             <div className="mb-6 flex flex-col items-center">
               <div className="text-sm text-muted-foreground mb-2">Score émotionnel</div>
@@ -305,13 +355,13 @@ export const UserProfile: React.FC<UserProfileProps> = ({
               <Progress value={user.emotional_score} className="w-full mt-2 h-2" />
             </div>
           )}
-          
+
           <div className="w-full pt-4 border-t space-y-3">
             <div className="flex justify-between text-sm">
               <div className="text-muted-foreground">Code anonyme:</div>
               <div className="font-medium font-mono">{user.anonymity_code}</div>
             </div>
-            
+
             <div className="flex justify-between text-sm">
               <div className="text-muted-foreground flex items-center gap-1">
                 <CalendarDays className="h-4 w-4" />
@@ -319,7 +369,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
               </div>
               <div className="font-medium">{formatDate(user.joined_at)}</div>
             </div>
-            
+
             <div className="flex justify-between text-sm">
               <div className="text-muted-foreground">Dernière activité:</div>
               <div className="font-medium">{formatDate(user.last_active)}</div>
@@ -347,37 +397,56 @@ export const UserProfile: React.FC<UserProfileProps> = ({
               </TabsTrigger>
             </TabsList>
           </CardHeader>
-          
+
           <CardContent className="pt-4">
             {/* Activity Timeline */}
             <TabsContent value="activity" className="mt-0">
-              <div className="space-y-4 max-h-80 overflow-y-auto">
-                {activities.map((activity, index) => (
-                  <motion.div
-                    key={activity.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="flex gap-3 relative"
-                  >
-                    {index < activities.length - 1 && (
-                      <div className="absolute left-[11px] top-8 w-0.5 h-full bg-border" />
-                    )}
-                    <div className="p-1 bg-background rounded-full border z-10">
-                      {getActivityIcon(activity.type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="font-medium text-sm truncate">{activity.title}</p>
-                        <span className="text-xs text-muted-foreground shrink-0">
-                          {formatRelativeTime(activity.timestamp)}
-                        </span>
+              {activitiesLoading && !propActivities ? (
+                <div className="space-y-3">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="flex gap-3">
+                      <Skeleton className="h-6 w-6 rounded-full" />
+                      <div className="flex-1">
+                        <Skeleton className="h-4 w-40" />
+                        <Skeleton className="h-3 w-24 mt-1" />
                       </div>
-                      <p className="text-xs text-muted-foreground">{activity.description}</p>
                     </div>
-                  </motion.div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : activities.length === 0 ? (
+                <div className="text-center py-6 text-muted-foreground">
+                  <Activity className="h-8 w-8 mx-auto mb-2" />
+                  <p className="text-sm">Aucune activité enregistrée</p>
+                </div>
+              ) : (
+                <div className="space-y-4 max-h-80 overflow-y-auto">
+                  {activities.map((activity, index) => (
+                    <motion.div
+                      key={activity.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="flex gap-3 relative"
+                    >
+                      {index < activities.length - 1 && (
+                        <div className="absolute left-[11px] top-8 w-0.5 h-full bg-border" />
+                      )}
+                      <div className="p-1 bg-background rounded-full border z-10">
+                        {getActivityIcon(activity.type)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="font-medium text-sm truncate">{activity.title}</p>
+                          <span className="text-xs text-muted-foreground shrink-0">
+                            {formatRelativeTime(activity.timestamp)}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{activity.description}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             </TabsContent>
 
             {/* Admin Notes */}
@@ -399,8 +468,8 @@ export const UserProfile: React.FC<UserProfileProps> = ({
                         size="sm"
                         onClick={() => setNotePriority(p)}
                         className={`h-7 ${
-                          p === 'high' ? 'text-red-500' : 
-                          p === 'medium' ? 'text-yellow-500' : 
+                          p === 'high' ? 'text-red-500' :
+                          p === 'medium' ? 'text-yellow-500' :
                           'text-green-500'
                         }`}
                       >
@@ -416,40 +485,46 @@ export const UserProfile: React.FC<UserProfileProps> = ({
               </div>
 
               {/* Notes list */}
-              <div className="space-y-2 max-h-60 overflow-y-auto">
-                <AnimatePresence>
-                  {adminNotes.map((note) => (
-                    <motion.div
-                      key={note.id}
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, x: -100 }}
-                      className={`p-3 rounded-lg border-l-4 bg-muted/30 ${
-                        note.priority === 'high' ? 'border-l-red-500' :
-                        note.priority === 'medium' ? 'border-l-yellow-500' :
-                        'border-l-green-500'
-                      }`}
-                    >
-                      <div className="flex justify-between items-start gap-2">
-                        <p className="text-sm">{note.content}</p>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 shrink-0"
-                          onClick={() => onDeleteNote?.(note.id)}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                      <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                        <span>{note.author}</span>
-                        <span>•</span>
-                        <span>{formatRelativeTime(note.createdAt)}</span>
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
+              {notesLoading && !propNotes ? (
+                <div className="space-y-2">
+                  {[1, 2].map(i => <Skeleton key={i} className="h-16 w-full" />)}
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  <AnimatePresence>
+                    {adminNotes.map((note) => (
+                      <motion.div
+                        key={note.id}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, x: -100 }}
+                        className={`p-3 rounded-lg border-l-4 bg-muted/30 ${
+                          note.priority === 'high' ? 'border-l-red-500' :
+                          note.priority === 'medium' ? 'border-l-yellow-500' :
+                          'border-l-green-500'
+                        }`}
+                      >
+                        <div className="flex justify-between items-start gap-2">
+                          <p className="text-sm">{note.content}</p>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 shrink-0"
+                            onClick={() => onDeleteNote?.(note.id)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                          <span>{note.author}</span>
+                          <span>•</span>
+                          <span>{formatRelativeTime(note.createdAt)}</span>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              )}
             </TabsContent>
 
             {/* Send Message */}
