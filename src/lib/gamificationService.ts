@@ -1,159 +1,149 @@
-// @ts-nocheck - Mock service with flexible typing
+// @ts-nocheck
 import type { Badge } from '@/types/gamification';
+import { supabase } from '@/integrations/supabase/client';
 
-// Mock service for gamification features
+// Service for gamification features backed by Supabase
 const GamificationService = {
   // Get user badges
   getUserBadges: async (userId: string): Promise<Badge[]> => {
-    // This would fetch from an API in a real implementation
-    const mockBadges: Badge[] = [
-      {
-        id: 'badge1',
-        name: 'First Step',
-        description: 'Completed your first session',
-        category: 'achievement',
-        image: '/badges/first-step.png',
-        unlocked: true,
-        unlockedAt: new Date().toISOString()
-      },
-      {
-        id: 'badge2',
-        name: 'Emotion Explorer',
-        description: 'Discovered 5 different emotions',
-        category: 'emotion',
-        image: '/badges/emotion-explorer.png',
-        unlocked: true,
-        unlockedAt: new Date().toISOString()
-      },
-      {
-        id: 'badge3',
-        name: 'Consistency King',
-        description: 'Logged in for 7 consecutive days',
-        category: 'streak',
-        image: '/badges/consistency-king.png',
-        progress: 5,
-        threshold: 7,
-        unlocked: false
-      }
-    ];
-    
-    return mockBadges;
+    const { data, error } = await supabase
+      .from('user_achievements')
+      .select('*, achievements(*)')
+      .eq('user_id', userId);
+
+    if (error) throw error;
+
+    return (data ?? []).map((row: any) => ({
+      id: row.achievement_id || row.id,
+      name: row.achievements?.name || 'Badge',
+      description: row.achievements?.description || '',
+      category: row.achievements?.category || 'achievement',
+      image: row.achievements?.image_url || '',
+      imageUrl: row.achievements?.image_url || '',
+      unlocked: true,
+      unlockedAt: row.unlocked_at || row.created_at,
+    }));
   },
-  
+
   // Get user challenges
   getUserChallenges: async (userId: string): Promise<Challenge[]> => {
-    const mockBadges: Badge[] = [
-      {
-        id: 'badge4',
-        name: 'Meditation Master',
-        description: 'Complete 10 meditation sessions',
-        category: 'meditation',
-        image: '/badges/meditation-master.png',
-        unlocked: false,
-        progress: 7,
-        threshold: 10
-      },
-      {
-        id: 'badge5',
-        name: 'Mood Tracker',
-        description: 'Track your mood for 14 days',
-        category: 'tracking',
-        image: '/badges/mood-tracker.png',
-        unlocked: false,
-        progress: 10,
-        threshold: 14
-      }
-    ];
-    
-    // This would fetch from an API in a real implementation
-    const mockChallenges: Challenge[] = [
-      {
-        id: 'challenge1',
-        title: 'Daily Check-in',
-        name: 'Daily Check-in',
-        description: 'Check in every day for a week',
-        type: 'streak',
-        targetValue: 7,
-        currentValue: 5,
-        completed: false,
-        difficulty: 'easy',
-        category: 'daily',
-        reward: mockBadges[0],
-        deadline: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString()
-      },
-      {
-        id: 'challenge2',
-        title: 'Emotion Diversity',
-        name: 'Emotion Diversity',
-        description: 'Identify 10 different emotions',
-        type: 'collection',
-        targetValue: 10,
-        currentValue: 6,
-        completed: false,
-        difficulty: 'medium',
-        category: 'emotion',
-        reward: mockBadges[1]
-      }
-    ];
-    
-    return mockChallenges;
+    const { data, error } = await supabase
+      .from('challenges')
+      .select('*, user_challenges!left(progress, completed)')
+      .or(`status.eq.active,user_challenges.user_id.eq.${userId}`);
+
+    if (error) throw error;
+
+    return (data ?? []).map((row: any) => {
+      const userProgress = row.user_challenges?.[0];
+      return {
+        id: row.id,
+        title: row.title || row.name,
+        name: row.title || row.name,
+        description: row.description || '',
+        type: row.type || 'progress',
+        targetValue: row.target_value || 10,
+        currentValue: userProgress?.progress || 0,
+        completed: userProgress?.completed || false,
+        difficulty: row.difficulty || 'medium',
+        category: row.category || 'general',
+        deadline: row.deadline,
+      };
+    });
   },
-  
+
   // Get user gamification stats
   getUserStats: async (userId: string): Promise<GamificationStats> => {
-    // This would fetch from an API in a real implementation
     const badges = await GamificationService.getUserBadges(userId);
-    
-    const mockStats: GamificationStats = {
-      level: 4,
-      xp: 850,
-      xpToNextLevel: 1000,
-      consecutiveLogins: 5,
-      totalSessions: 23,
-      totalMoodEntries: 42,
-      totalMeditationMinutes: 180,
-      badges: badges,
-      achievements: ['first_login', 'first_scan', 'three_day_streak'],
-      streakDays: 5,
-      progressToNextLevel: 0.85
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('level, xp, streak_days')
+      .eq('id', userId)
+      .single();
+
+    const { count: totalMoodEntries } = await supabase
+      .from('mood_entries')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId);
+
+    const level = profile?.level || 1;
+    const xp = profile?.xp || 0;
+    const xpToNextLevel = level * 1000;
+
+    return {
+      level,
+      xp,
+      xpToNextLevel,
+      consecutiveLogins: profile?.streak_days || 0,
+      totalSessions: 0,
+      totalMoodEntries: totalMoodEntries || 0,
+      totalMeditationMinutes: 0,
+      badges,
+      achievements: badges.map((b: any) => b.id),
+      streakDays: profile?.streak_days || 0,
+      progressToNextLevel: xpToNextLevel > 0 ? xp / xpToNextLevel : 0,
     };
-    
-    return mockStats;
   },
-  
+
   // Award a badge to a user
   awardBadge: async (userId: string, badgeType: string): Promise<Badge> => {
-    // This would call an API to award the badge in a real implementation
-    const newBadge: Badge = {
-      id: `badge-${Date.now()}`,
-      name: 'New Achievement',
-      description: 'You earned a new achievement',
-      imageUrl: '/badges/new-achievement.png',
+    const { data, error } = await supabase
+      .from('user_achievements')
+      .insert({
+        user_id: userId,
+        achievement_id: badgeType,
+        unlocked_at: new Date().toISOString(),
+      })
+      .select('*, achievements(*)')
+      .single();
+
+    if (error) throw error;
+
+    return {
+      id: data.achievement_id || data.id,
+      name: data.achievements?.name || 'New Achievement',
+      description: data.achievements?.description || '',
+      imageUrl: data.achievements?.image_url || '',
+      image: data.achievements?.image_url || '',
       unlocked: true,
-      category: 'achievement',
-      image: '/badges/new-achievement.png'
+      category: data.achievements?.category || 'achievement',
     };
-    
-    return newBadge;
   },
-  
+
   // Update challenge progress
   updateChallengeProgress: async (userId: string, challengeId: string, progress: number): Promise<Challenge> => {
-    // This would call an API to update progress in a real implementation
-    const updatedChallenge: Challenge = {
+    const { data: challenge } = await supabase
+      .from('challenges')
+      .select('*')
+      .eq('id', challengeId)
+      .single();
+
+    const targetValue = challenge?.target_value || 10;
+    const completed = progress >= targetValue;
+
+    await supabase
+      .from('user_challenges')
+      .upsert({
+        user_id: userId,
+        challenge_id: challengeId,
+        progress,
+        completed,
+        updated_at: new Date().toISOString(),
+      });
+
+    return {
       id: challengeId,
-      title: 'Updated Challenge',
-      name: 'Updated Challenge',
-      description: 'This challenge was updated',
-      type: 'progress',
-      targetValue: 10,
+      title: challenge?.title || 'Challenge',
+      name: challenge?.title || 'Challenge',
+      description: challenge?.description || '',
+      type: challenge?.type || 'progress',
+      targetValue,
       currentValue: progress,
-      completed: progress >= 10,
-      difficulty: 'medium',
-      category: 'progress'
+      completed,
+      difficulty: challenge?.difficulty || 'medium',
+      category: challenge?.category || 'progress',
     };
-    
-    return updatedChallenge;
   }
 };
 

@@ -4,14 +4,18 @@
  */
 
 import { memo, useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Brain, 
-  TrendingUp, 
-  TrendingDown, 
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Brain,
+  TrendingUp,
+  TrendingDown,
   AlertTriangle,
   Lightbulb,
   Target,
@@ -47,69 +51,6 @@ interface PredictiveInsightsPanelProps {
   className?: string;
 }
 
-const MOCK_PREDICTIONS: Prediction[] = [
-  {
-    id: 'p1',
-    type: 'mood',
-    title: 'Amélioration de l\'humeur prévue',
-    description: 'Basé sur vos patterns récents, votre humeur devrait s\'améliorer dans les 3 prochains jours.',
-    confidence: 78,
-    trend: 'up',
-    timeframe: '3 jours',
-    impact: 'positive',
-    recommendation: 'Continuez vos séances de méditation matinales.',
-  },
-  {
-    id: 'p2',
-    type: 'stress',
-    title: 'Pic de stress potentiel',
-    description: 'Vos données suggèrent un niveau de stress élevé prévu en fin de semaine.',
-    confidence: 65,
-    trend: 'up',
-    timeframe: '5 jours',
-    impact: 'negative',
-    recommendation: 'Planifiez des pauses régulières et une activité relaxante.',
-  },
-  {
-    id: 'p3',
-    type: 'energy',
-    title: 'Énergie stable',
-    description: 'Votre niveau d\'énergie devrait rester constant cette semaine.',
-    confidence: 82,
-    trend: 'stable',
-    timeframe: '7 jours',
-    impact: 'neutral',
-  },
-];
-
-const MOCK_INSIGHTS: Insight[] = [
-  {
-    id: 'i1',
-    category: 'pattern',
-    title: 'Pattern du lundi détecté',
-    description: 'Vos lundis montrent systématiquement une baisse d\'humeur de 15%. C\'est un pattern récurrent depuis 4 semaines.',
-    importance: 'medium',
-    actionable: true,
-    suggestedAction: 'Essayez de démarrer le lundi avec une activité plaisante.',
-  },
-  {
-    id: 'i2',
-    category: 'opportunity',
-    title: 'Fenêtre de productivité identifiée',
-    description: 'Vous êtes le plus énergique entre 9h et 11h. Optimisez cette période pour vos tâches importantes.',
-    importance: 'high',
-    actionable: true,
-    suggestedAction: 'Bloquez ces créneaux pour le travail profond.',
-  },
-  {
-    id: 'i3',
-    category: 'anomaly',
-    title: 'Amélioration inhabituelle du sommeil',
-    description: 'Votre qualité de sommeil a augmenté de 25% cette semaine. Identifiez ce qui a changé.',
-    importance: 'medium',
-    actionable: false,
-  },
-];
 
 const TYPE_ICONS: Record<string, React.ReactNode> = {
   mood: <Sparkles className="h-4 w-4 text-purple-500" />,
@@ -145,15 +86,88 @@ const CATEGORY_CONFIG: Record<string, { label: string; color: string; icon: Reac
 export const PredictiveInsightsPanel = memo(function PredictiveInsightsPanel({
   className = '',
 }: PredictiveInsightsPanelProps) {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'predictions' | 'insights'>('predictions');
 
-  const sortedInsights = useMemo(() => 
-    [...MOCK_INSIGHTS].sort((a, b) => {
+  // Fetch predictions from Supabase
+  const {
+    data: predictions = [],
+    isLoading: predictionsLoading,
+    error: predictionsError,
+  } = useQuery<Prediction[]>({
+    queryKey: ['predictive_insights', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('predictive_insights')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return (data ?? []).map((row: any) => ({
+        id: row.id,
+        type: row.type ?? 'mood',
+        title: row.title ?? '',
+        description: row.description ?? '',
+        confidence: row.confidence ?? 0,
+        trend: row.trend ?? 'stable',
+        timeframe: row.timeframe ?? '',
+        impact: row.impact ?? 'neutral',
+        recommendation: row.recommendation,
+      }));
+    },
+    enabled: !!user?.id,
+  });
+
+  // Fetch insights from Supabase
+  const {
+    data: insights = [],
+    isLoading: insightsLoading,
+    error: insightsError,
+  } = useQuery<Insight[]>({
+    queryKey: ['ai_insights', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('ai_insights')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return (data ?? []).map((row: any) => ({
+        id: row.id,
+        category: row.category ?? 'pattern',
+        title: row.title ?? '',
+        description: row.description ?? '',
+        importance: row.importance ?? 'medium',
+        actionable: row.actionable ?? false,
+        suggestedAction: row.suggested_action,
+      }));
+    },
+    enabled: !!user?.id,
+  });
+
+  const isLoading = predictionsLoading || insightsLoading;
+  const error = predictionsError || insightsError;
+
+  const sortedInsights = useMemo(() =>
+    [...insights].sort((a, b) => {
       const order = { high: 0, medium: 1, low: 2 };
       return order[a.importance] - order[b.importance];
     }),
-    []
+    [insights]
   );
+
+  if (error) {
+    return (
+      <Card className={className}>
+        <CardContent className="p-6 text-center" role="alert">
+          <AlertTriangle className="h-8 w-8 mx-auto text-red-500 mb-2" />
+          <p className="text-sm text-red-500">Erreur lors du chargement des insights prédictifs</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className={className}>
@@ -183,89 +197,115 @@ export const PredictiveInsightsPanel = memo(function PredictiveInsightsPanel({
       </CardHeader>
       
       <CardContent className="space-y-4">
-        {activeTab === 'predictions' && (
+        {isLoading ? (
           <div className="space-y-4">
-            {MOCK_PREDICTIONS.map((prediction) => (
-              <div
-                key={prediction.id}
-                className="rounded-lg border p-4 space-y-3"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2">
-                    {TYPE_ICONS[prediction.type]}
-                    <h4 className="font-medium">{prediction.title}</h4>
-                  </div>
-                  <Badge
-                    variant={prediction.impact === 'positive' ? 'default' : 
-                             prediction.impact === 'negative' ? 'destructive' : 'secondary'}
-                  >
-                    {prediction.trend === 'up' && <TrendingUp className="h-3 w-3 mr-1" />}
-                    {prediction.trend === 'down' && <TrendingDown className="h-3 w-3 mr-1" />}
-                    {prediction.timeframe}
-                  </Badge>
-                </div>
-                
-                <p className="text-sm text-muted-foreground">
-                  {prediction.description}
-                </p>
-                
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">Confiance</span>
-                  <Progress value={prediction.confidence} className="flex-1 h-2" />
-                  <span className="text-xs font-medium">{prediction.confidence}%</span>
-                </div>
-                
-                {prediction.recommendation && (
-                  <div className="rounded-lg bg-muted/50 p-3">
-                    <p className="text-sm flex items-start gap-2">
-                      <Lightbulb className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
-                      {prediction.recommendation}
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-32 w-full" />
+          </div>
+        ) : (
+          <>
+            {activeTab === 'predictions' && (
+              <div className="space-y-4">
+                {predictions.length === 0 ? (
+                  <div className="text-center py-6">
+                    <Brain className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                    <p className="font-medium">Aucune prédiction disponible</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Les prédictions apparaîtront ici une fois vos données analysées.
                     </p>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {activeTab === 'insights' && (
-          <div className="space-y-4">
-            {sortedInsights.map((insight) => {
-              const config = CATEGORY_CONFIG[insight.category];
-              return (
-                <div
-                  key={insight.id}
-                  className="rounded-lg border p-4 space-y-3"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2">
-                      <Badge className={config.color}>
-                        {config.icon}
-                        <span className="ml-1">{config.label}</span>
+                ) : predictions.map((prediction) => (
+                  <div
+                    key={prediction.id}
+                    className="rounded-lg border p-4 space-y-3"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2">
+                        {TYPE_ICONS[prediction.type]}
+                        <h4 className="font-medium">{prediction.title}</h4>
+                      </div>
+                      <Badge
+                        variant={prediction.impact === 'positive' ? 'default' :
+                                 prediction.impact === 'negative' ? 'destructive' : 'secondary'}
+                      >
+                        {prediction.trend === 'up' && <TrendingUp className="h-3 w-3 mr-1" />}
+                        {prediction.trend === 'down' && <TrendingDown className="h-3 w-3 mr-1" />}
+                        {prediction.timeframe}
                       </Badge>
-                      {insight.importance === 'high' && (
-                        <Badge variant="destructive" className="text-xs">
-                          Important
-                        </Badge>
+                    </div>
+
+                    <p className="text-sm text-muted-foreground">
+                      {prediction.description}
+                    </p>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">Confiance</span>
+                      <Progress value={prediction.confidence} className="flex-1 h-2" />
+                      <span className="text-xs font-medium">{prediction.confidence}%</span>
+                    </div>
+
+                    {prediction.recommendation && (
+                      <div className="rounded-lg bg-muted/50 p-3">
+                        <p className="text-sm flex items-start gap-2">
+                          <Lightbulb className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
+                          {prediction.recommendation}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {activeTab === 'insights' && (
+              <div className="space-y-4">
+                {sortedInsights.length === 0 ? (
+                  <div className="text-center py-6">
+                    <Lightbulb className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                    <p className="font-medium">Aucun insight disponible</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Les insights apparaîtront ici une fois vos données analysées.
+                    </p>
+                  </div>
+                ) : sortedInsights.map((insight) => {
+                  const config = CATEGORY_CONFIG[insight.category];
+                  return (
+                    <div
+                      key={insight.id}
+                      className="rounded-lg border p-4 space-y-3"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <Badge className={config.color}>
+                            {config.icon}
+                            <span className="ml-1">{config.label}</span>
+                          </Badge>
+                          {insight.importance === 'high' && (
+                            <Badge variant="destructive" className="text-xs">
+                              Important
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+
+                      <h4 className="font-medium">{insight.title}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {insight.description}
+                      </p>
+
+                      {insight.actionable && insight.suggestedAction && (
+                        <Button variant="outline" size="sm" className="w-full justify-between">
+                          {insight.suggestedAction}
+                          <ArrowRight className="h-4 w-4" />
+                        </Button>
                       )}
                     </div>
-                  </div>
-                  
-                  <h4 className="font-medium">{insight.title}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {insight.description}
-                  </p>
-                  
-                  {insight.actionable && insight.suggestedAction && (
-                    <Button variant="outline" size="sm" className="w-full justify-between">
-                      {insight.suggestedAction}
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                  );
+                })}
+              </div>
+            )}
+          </>
         )}
 
         <div className="pt-2 border-t text-center">

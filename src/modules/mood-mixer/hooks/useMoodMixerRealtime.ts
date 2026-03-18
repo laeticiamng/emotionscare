@@ -71,7 +71,7 @@ export function useMoodMixerRealtime(userId?: string): UseMoodMixerRealtimeRetur
         },
         (payload) => {
           // New session created - could trigger achievements check
-          console.log('New session detected:', payload);
+          // Session detected via realtime subscription
         }
       )
       .subscribe((status) => {

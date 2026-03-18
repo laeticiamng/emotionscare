@@ -1,4 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, lazy, Suspense } from 'react';
+import Scene3DErrorBoundary from '@/components/3d/Scene3DErrorBoundary';
+
+const AchievementBadge3D = lazy(() => import('@/components/3d/AchievementBadge3D'));
+
 import {
   Trophy,
   RefreshCw,
@@ -110,6 +114,22 @@ const LeaderboardPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10">
       <div className="container mx-auto px-4 py-10 space-y-8">
+        {/* 3D Achievement Badge Hero */}
+        {topThree.length > 0 && (
+          <div className="flex justify-center">
+            <Scene3DErrorBoundary>
+              <Suspense fallback={null}>
+                <AchievementBadge3D
+                  rarity="legendary"
+                  name={topThree[0]?.displayName ?? 'Champion'}
+                  unlocked={true}
+                  className="w-48 h-48"
+                />
+              </Suspense>
+            </Scene3DErrorBoundary>
+          </div>
+        )}
+
         <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">

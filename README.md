@@ -13,7 +13,7 @@
 
 ## État Réel du Projet (Mars 2026)
 
-### Métriques Vérifiées (Audit v4.0 - Mars 2026)
+### Métriques Vérifiées (Audit v5.0 - Mars 2026)
 
 | Métrique | Valeur | Vérification |
 |----------|--------|--------------|
@@ -163,11 +163,14 @@ Security Definer Functions (is_authenticated, is_owner, has_role)
 ```
 9 micro-services Fastify (account, admin, api, breath, gam, journal, privacy, scan, vr)
 Zod validation sur tous les endpoints
-Rate limiting configurable
-JWT authentication
-CORS + Security headers
-Logging structuré
+Rate limiting configurable par user/IP
+JWT authentication (décorateur Fastify)
+CORS + Security headers (Helmet-style)
+Logging structuré (pino)
 404 handler global
+Error handler centralisé (plugins/error.ts)
+Env validation plugin (fail-fast au démarrage)
+Try/catch systématique sur tous les handlers
 ```
 
 ### Infrastructure & DevOps
@@ -618,9 +621,20 @@ Le dashboard utilisateur inclut des widgets temps réel :
 
 | Élément | Impact | Plan |
 |---------|--------|------|
-| **52 fichiers `@ts-nocheck`** dans `src/pages/` | Régression silencieuse possible | Retrait progressif par lot de 10 fichiers/sprint |
+| **`@ts-nocheck`** dans certains modules | Régression silencieuse possible | Retrait progressif par lot de 10 fichiers/sprint |
 | **Tests accessibilité** | Couverture partielle | Généralisation axe-core |
 | **Documentation Edge Functions** | À enrichir | Ajout exemples et schémas |
+
+### Résolu (Audit v5.0)
+
+| Élément | Résolution |
+|---------|------------|
+| **Mock data (30+ fichiers)** | Remplacé par requêtes Supabase réelles |
+| **15 fichiers mock (src/mocks/, src/data/mock*)** | Supprimés |
+| **Backend handlers sans error handling** | try/catch ajouté sur tous les handlers |
+| **Pages settings sans navigation retour** | Back buttons ajoutés vers /settings |
+| **console.log en production** | Supprimés ou conditionnés à DEV |
+| **Boutons sans handlers** | Handlers réels ajoutés |
 
 ---
 
@@ -651,6 +665,10 @@ Le dashboard utilisateur inclut des widgets temps réel :
 - [x] Wearables en beta (Apple Watch, Garmin)
 - [x] Analyse Hume AI multimodale (faciale, vocale, texte)
 - [x] Hub paramètres unifié
+- [x] 3D Premium (EmotionSphere, AchievementBadge, MeditationEnvironment, DashboardBackground)
+- [x] Suppression de 100% des données mockées (30+ fichiers)
+- [x] Backend error handling systématique (9 micro-services)
+- [x] Navigation ergonomique unifiée (back buttons, headers cohérents)
 
 ### Q2 2026 (En cours)
 - [ ] Application mobile React Native

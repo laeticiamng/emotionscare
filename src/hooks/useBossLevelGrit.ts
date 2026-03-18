@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { GritStats, GritChallenge, GritSession, BossLevelGritContextType } from '@/types/boss-level-grit';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useBossLevelGrit = (): BossLevelGritContextType => {
   const [stats, setStats] = useState<GritStats | null>(null);
@@ -56,66 +57,93 @@ export const useBossLevelGrit = (): BossLevelGritContextType => {
   const initializeData = async () => {
     setIsLoading(true);
     try {
-      // Simulation d'un appel API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock data
-      const mockStats: GritStats = {
-        totalXp: 2450,
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Fetch user profile for XP / level info
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('xp, level, streak_days')
+        .eq('id', user.id)
+        .single();
+
+      const totalXp = profile?.xp || 0;
+      const level = profile?.level || 1;
+
+      // Fetch completed challenges count
+      const { count: completedCount } = await supabase
+        .from('user_challenges')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('completed', true);
+
+      // Fetch user achievements
+      const { data: achievements } = await supabase
+        .from('user_achievements')
+        .select('achievement_id')
+        .eq('user_id', user.id);
+
+      const fetchedStats: GritStats = {
+        totalXp,
         currentLevel: {
-          id: 'warrior',
-          name: 'Guerrier Mental',
-          description: 'Vous maîtrisez les bases de la résilience',
-          minXp: 2000,
-          maxXp: 5000,
+          id: `level-${level}`,
+          name: `Niveau ${level}`,
+          description: '',
+          minXp: (level - 1) * 1000,
+          maxXp: level * 1000,
           color: 'hsl(var(--primary))',
           icon: '⚔️',
-          benefits: ['Défis avancés débloqués', 'Sessions personnalisées'],
-          unlockedFeatures: ['Challenges Master', 'Mindset Builder']
+          benefits: [],
+          unlockedFeatures: []
         },
         nextLevel: {
-          id: 'master',
-          name: 'Maître de la Résilience',
-          description: 'Expert en gestion du stress',
-          minXp: 5000,
-          maxXp: 10000,
+          id: `level-${level + 1}`,
+          name: `Niveau ${level + 1}`,
+          description: '',
+          minXp: level * 1000,
+          maxXp: (level + 1) * 1000,
           color: 'hsl(var(--accent))',
           icon: '🏆',
-          benefits: ['Défis légendaires', 'Coaching personnalisé'],
-          unlockedFeatures: ['Legend Challenges', 'Personal Coach']
+          benefits: [],
+          unlockedFeatures: []
         },
-        completedChallenges: 23,
-        currentStreak: 7,
-        longestStreak: 14,
-        averageScore: 87,
-        totalSessionTime: 1240,
+        completedChallenges: completedCount || 0,
+        currentStreak: profile?.streak_days || 0,
+        longestStreak: profile?.streak_days || 0,
+        averageScore: 0,
+        totalSessionTime: 0,
         categoriesProgress: {
-          mental: 85,
-          physical: 60,
-          emotional: 75,
-          spiritual: 45
+          mental: 0,
+          physical: 0,
+          emotional: 0,
+          spiritual: 0
         },
-        achievements: []
+        achievements: (achievements ?? []).map((a: any) => a.achievement_id)
       };
 
-      const mockChallenges: GritChallenge[] = [
-        {
-          id: 'mental-fortress',
-          title: 'Forteresse Mentale',
-          description: 'Développez votre résistance au stress',
-          difficulty: 'warrior',
-          category: 'mental',
-          duration: 15,
-          xpReward: 200,
-          completionRate: 78,
-          status: 'available',
-          tags: ['Visualisation', 'Stress'],
-          createdAt: new Date()
-        }
-      ];
+      // Fetch available challenges
+      const { data: challengesData } = await supabase
+        .from('challenges')
+        .select('*')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
 
-      setStats(mockStats);
-      setAvailableChallenges(mockChallenges);
+      const fetchedChallenges: GritChallenge[] = (challengesData ?? []).map((row: any) => ({
+        id: row.id,
+        title: row.title || row.name,
+        description: row.description || '',
+        difficulty: row.difficulty || 'warrior',
+        category: row.category || 'mental',
+        duration: row.duration || 15,
+        xpReward: row.xp_reward || 100,
+        completionRate: 0,
+        status: 'available',
+        tags: row.tags || [],
+        createdAt: new Date(row.created_at)
+      }));
+
+      setStats(fetchedStats);
+      setAvailableChallenges(fetchedChallenges);
     } catch (error) {
       logger.error('Erreur lors de l\'initialisation', error as Error, 'UI');
     } finally {

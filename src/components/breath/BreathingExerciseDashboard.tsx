@@ -193,7 +193,7 @@ export const BreathingExerciseDashboard: React.FC = () => {
 
   const playPhaseSound = () => {
     // Sound placeholder - would use Tone.js in real implementation
-    console.log('Playing phase sound');
+    // Phase sound playback triggered
   };
 
   const loadSettings = () => {

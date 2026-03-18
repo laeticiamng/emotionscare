@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { AnonymizedActivityLog, ActivityStats } from './activityTypes';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
@@ -91,12 +89,3 @@ export async function fetchActivityStats(): Promise<ActivityStats[]> {
   }
 }
 
-/**
- * @deprecated Use fetchAnonymizedLogs() instead. Kept for backward compatibility.
- */
-export const mockAnonymizedLogs: AnonymizedActivityLog[] = [];
-
-/**
- * @deprecated Use fetchActivityStats() instead. Kept for backward compatibility.
- */
-export const mockActivityStats: ActivityStats[] = [];

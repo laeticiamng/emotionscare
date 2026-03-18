@@ -3,7 +3,7 @@
  * /dashboard/breathing
  */
 
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -16,6 +16,9 @@ import { BreathingHistory } from '@/components/breathing/BreathingHistory';
 import { BreathingProtocol } from '@/components/breathing/BreathingProtocols';
 import { useBreathingHistory } from '@/hooks/useBreathingHistory';
 import { usePageSEO } from '@/hooks/usePageSEO';
+import Scene3DErrorBoundary from '@/components/3d/Scene3DErrorBoundary';
+
+const MeditationEnvironment3D = lazy(() => import('@/components/3d/MeditationEnvironment3D'));
 
 type ViewState = 'select' | 'session' | 'feedback' | 'history';
 
@@ -81,7 +84,16 @@ const BreathingPage: React.FC = () => {
   // Vue session active (plein écran)
   if (currentView === 'session' && selectedProtocol) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="relative min-h-screen bg-background flex items-center justify-center p-4">
+        <Scene3DErrorBoundary>
+          <Suspense fallback={null}>
+            <MeditationEnvironment3D
+              theme="ocean"
+              breathPhase="inhale"
+              className="absolute inset-0 -z-10 opacity-30 pointer-events-none"
+            />
+          </Suspense>
+        </Scene3DErrorBoundary>
         <div className="w-full max-w-md">
           <BreathingSessionView
             protocol={selectedProtocol}
@@ -110,7 +122,16 @@ const BreathingPage: React.FC = () => {
 
   // Vue principale (sélection + historique)
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background">
+      <Scene3DErrorBoundary>
+        <Suspense fallback={null}>
+          <MeditationEnvironment3D
+            theme="ocean"
+            breathPhase="inhale"
+            className="absolute inset-0 -z-10 opacity-30 pointer-events-none"
+          />
+        </Suspense>
+      </Scene3DErrorBoundary>
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         {/* Header */}
         <header className="mb-6">

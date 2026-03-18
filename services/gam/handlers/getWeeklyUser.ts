@@ -11,10 +11,15 @@ function parseSince(url: string | undefined): Date {
 }
 
 export async function getWeeklyUser(req: IncomingMessage, res: ServerResponse, user: any) {
-  const since = parseSince(req.url);
-  const userHash = hash(user.sub);
-  const rows = listWeekly(userHash, since);
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'application/json');
-  res.end(JSON.stringify(rows));
+  try {
+    const since = parseSince(req.url);
+    const userHash = hash(user.sub);
+    const rows = listWeekly(userHash, since);
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify(rows));
+  } catch (_err) {
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: { code: 'INTERNAL_ERROR', message: 'Erreur interne du serveur' } }));
+  }
 }

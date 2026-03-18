@@ -3,8 +3,11 @@
  * Vue d'ensemble avec stats temps réel, navigation et actions rapides
  */
 
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
+import Scene3DErrorBoundary from '@/components/3d/Scene3DErrorBoundary';
+
+const DashboardBackground3D = lazy(() => import('@/components/3d/DashboardBackground3D'));
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -113,7 +116,12 @@ const B2BDashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
+    <div className="relative p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
+      <Scene3DErrorBoundary>
+        <Suspense fallback={null}>
+          <DashboardBackground3D className="absolute inset-0 -z-10 opacity-15 pointer-events-none" />
+        </Suspense>
+      </Scene3DErrorBoundary>
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>

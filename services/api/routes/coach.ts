@@ -431,34 +431,23 @@ export function registerCoachRoutes(app: FastifyInstance, options: CoachRoutesOp
     const user = ensureUser(req, reply);
     if (!user) return;
 
-    // Pour l'instant, retourner des programmes hardcodés
-    // À terme, ils seront stockés en base de données
-    reply.send({
-      ok: true,
-      data: [
-        {
-          id: 'stress-management',
-          name: 'Gestion du stress',
-          description: 'Apprenez à gérer votre stress au quotidien',
-          duration_weeks: 4,
-          sessions_count: 8,
-        },
-        {
-          id: 'emotional-intelligence',
-          name: 'Intelligence émotionnelle',
-          description: 'Développez votre intelligence émotionnelle',
-          duration_weeks: 6,
-          sessions_count: 12,
-        },
-        {
-          id: 'resilience',
-          name: 'Résilience',
-          description: 'Renforcez votre résilience face aux défis',
-          duration_weeks: 8,
-          sessions_count: 16,
-        },
-      ],
-    });
+    try {
+      const supabase = getSupabaseClient();
+      const { data, error } = await supabase
+        .from('coach_programs')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      reply.send({ ok: true, data: data ?? [] });
+    } catch (error) {
+      app.log.error({ error }, 'Unexpected error fetching coach programs');
+      reply.code(500).send({
+        ok: false,
+        error: { code: 'internal_error', message: 'Internal server error' },
+      });
+    }
   });
 
   // GET /api/v1/coach/insights - Insights générés

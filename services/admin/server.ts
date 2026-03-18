@@ -1,5 +1,6 @@
 import { createServer } from '../lib/server';
 import { z } from 'zod';
+import { getSupabaseClient } from '../api/lib/supabase';
 
 const OrganizationUpdateSchema = z.object({
   name: z.string().min(1).max(100).optional(),
@@ -12,41 +13,50 @@ const OrganizationUpdateSchema = z.object({
 
 type OrgUpdate = z.infer<typeof OrganizationUpdateSchema>;
 
-// TODO: Replace mock organization data below with real DB queries.
-// This hardcoded data should be fetched from the database (e.g., via a
-// repository/service layer) in the route handlers instead of being kept
-// in module-level mutable state.
-let orgData = {
-  id: 'org1',
-  name: 'Demo Org',
-  settings: {
-    analytics_enabled: true,
-    retention_days: 365,
-    max_users: 100
-  },
-  created_at: '2024-01-01T00:00:00.000Z',
-  updated_at: new Date().toISOString()
-};
-
 export function createApp() {
   return createServer({
     registerRoutes(app) {
       // Admin role check middleware for this service
       app.addHook('preHandler', async (req, reply) => {
         if (!req.user.role || !req.user.role.includes('admin')) {
-          reply.code(403).send({ 
-            ok: false, 
-            error: { code: 'forbidden', message: 'Admin role required' } 
+          reply.code(403).send({
+            ok: false,
+            error: { code: 'forbidden', message: 'Admin role required' }
           });
         }
       });
 
       // GET /admin/organization - Get organization details
       app.get('/admin/organization', async (req, reply) => {
-        reply.send({ 
-          ok: true, 
-          data: orgData
-        });
+        try {
+          const supabase = getSupabaseClient();
+          const orgId = (req as any).user.org_id;
+          const { data, error } = await supabase
+            .from('organizations')
+            .select('*')
+            .eq('id', orgId)
+            .single();
+
+          if (error) {
+            app.log.error(error);
+            reply.code(500).send({
+              ok: false,
+              error: { code: 'INTERNAL_ERROR', message: 'Erreur interne du serveur' }
+            });
+            return;
+          }
+
+          reply.send({
+            ok: true,
+            data
+          });
+        } catch (error) {
+          app.log.error(error);
+          reply.code(500).send({
+            ok: false,
+            error: { code: 'INTERNAL_ERROR', message: 'Erreur interne du serveur' }
+          });
+        }
       });
 
       // PUT /admin/organization - Update organization
@@ -55,29 +65,40 @@ export function createApp() {
       }>('/admin/organization', async (req, reply) => {
         try {
           const updates = OrganizationUpdateSchema.parse(req.body);
-          
-          // Apply updates
-          if (updates.name) {
-            orgData.name = updates.name;
+          const supabase = getSupabaseClient();
+          const orgId = (req as any).user.org_id;
+
+          const patch: Record<string, any> = { updated_at: new Date().toISOString() };
+          if (updates.name) patch.name = updates.name;
+          if (updates.settings) patch.settings = updates.settings;
+
+          const { data, error } = await supabase
+            .from('organizations')
+            .update(patch)
+            .eq('id', orgId)
+            .select('*')
+            .single();
+
+          if (error) {
+            app.log.error(error);
+            reply.code(500).send({
+              ok: false,
+              error: { code: 'INTERNAL_ERROR', message: 'Erreur interne du serveur' }
+            });
+            return;
           }
-          
-          if (updates.settings) {
-            orgData.settings = { ...orgData.settings, ...updates.settings };
-          }
-          
-          orgData.updated_at = new Date().toISOString();
-          
+
           // Log admin action
           app.log.info({
             user: req.user.sub,
             action: 'org_update',
             changes: updates,
-            timestamp: orgData.updated_at
+            timestamp: patch.updated_at
           });
 
-          reply.send({ 
-            ok: true, 
-            data: orgData
+          reply.send({
+            ok: true,
+            data
           });
         } catch (error) {
           if (error instanceof z.ZodError) {
@@ -91,7 +112,10 @@ export function createApp() {
             });
           } else {
             app.log.error(error);
-            reply.code(500).send({ ok: false, error: 'Failed to update organization' });
+            reply.code(500).send({
+              ok: false,
+              error: { code: 'INTERNAL_ERROR', message: 'Erreur interne du serveur' }
+            });
           }
         }
       });

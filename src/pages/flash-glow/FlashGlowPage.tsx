@@ -3,9 +3,12 @@
  * Module complet avec séances, presets et statistiques
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { logger } from '@/lib/logger';
 import { motion, AnimatePresence } from 'framer-motion';
+import Scene3DErrorBoundary from '@/components/3d/Scene3DErrorBoundary';
+
+const MeditationEnvironment3D = lazy(() => import('@/components/3d/MeditationEnvironment3D'));
 import {
   Sun,
   Moon,
@@ -305,8 +308,30 @@ const FlashGlowPage: React.FC = () => {
     ? FLASH_PRESETS 
     : FLASH_PRESETS.filter(p => p.category === activeCategory);
 
+  // Map preset category to MeditationEnvironment3D theme
+  const get3DTheme = (): 'ocean' | 'forest' | 'cosmos' | 'dawn' => {
+    switch (selectedPreset.category) {
+      case 'relaxation': return 'ocean';
+      case 'energy': return 'dawn';
+      case 'focus': return 'cosmos';
+      case 'sleep': return 'forest';
+      default: return 'ocean';
+    }
+  };
+
   return (
-    <div className="container mx-auto py-8 px-4 max-w-7xl space-y-8">
+    <div className="relative container mx-auto py-8 px-4 max-w-7xl space-y-8">
+      {isPlaying && (
+        <Scene3DErrorBoundary>
+          <Suspense fallback={null}>
+            <MeditationEnvironment3D
+              theme={get3DTheme()}
+              breathPhase="inhale"
+              className="absolute inset-0 -z-10 opacity-30 pointer-events-none"
+            />
+          </Suspense>
+        </Scene3DErrorBoundary>
+      )}
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

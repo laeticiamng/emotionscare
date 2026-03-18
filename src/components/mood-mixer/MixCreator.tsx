@@ -121,7 +121,7 @@ const MixCreator: React.FC<MixCreatorProps> = ({
         <p className="text-muted-foreground mb-4">
           Sélectionnez d'abord une humeur pour commencer la création
         </p>
-        <Button variant="outline" onClick={() => {}}>
+        <Button variant="outline" onClick={() => availableMoods[0] && onCreateMix(availableMoods[0], {})}>
           <Target className="h-4 w-4 mr-2" />
           Choisir une Humeur
         </Button>

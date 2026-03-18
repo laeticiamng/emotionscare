@@ -9,8 +9,6 @@ export * from './enhancedAnalyzeService';
 export * from './analyzeService';
 export * from './emotionService';
 export * from './emotionUtilService';
-export * from './mockEmotionService';
-
 // Validation et qualité
 export * from './scanValidation';
 
