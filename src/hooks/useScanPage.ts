@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { EmotionResult, EmotionRecommendation, ScanSession, EmotionGoal } from '@/types/emotion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { useLogger } from '@/lib/logger';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -24,7 +25,8 @@ interface UseScanPageReturn {
 export function useScanPage(): UseScanPageReturn {
   const logger = useLogger();
   const queryClient = useQueryClient();
-  
+  const { user } = useAuth();
+
   // États locaux
   const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
   const [currentSession, setCurrentSession] = useState<ScanSession | null>(null);
@@ -33,10 +35,9 @@ export function useScanPage(): UseScanPageReturn {
 
   // Récupérer l'historique des scans
   const { data: scanHistory = [], isLoading: isLoadingHistory } = useQuery({
-    queryKey: ['scan-history'],
+    queryKey: ['scan-history', user?.id],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
+      if (!user?.id) return [];
 
       const { data, error } = await supabase
         .from('emotion_analyses')
@@ -65,15 +66,15 @@ export function useScanPage(): UseScanPageReturn {
         }
       })) as EmotionResult[];
     },
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    enabled: !!user?.id,
+    staleTime: 2 * 60 * 1000,
   });
 
   // Récupérer les objectifs émotionnels
   const { data: emotionGoals = [] } = useQuery({
-    queryKey: ['emotion-goals'],
+    queryKey: ['emotion-goals', user?.id],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
+      if (!user?.id) return [];
 
       const { data, error } = await supabase
         .from('emotion_goals')
@@ -88,14 +89,14 @@ export function useScanPage(): UseScanPageReturn {
       }
 
       return data as EmotionGoal[];
-    }
+    },
+    enabled: !!user?.id,
   });
 
   // Sauvegarder un résultat de scan
   const saveScanMutation = useMutation({
     mutationFn: async (result: EmotionResult) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
+      if (!user?.id) throw new Error('User not authenticated');
 
       const { error } = await supabase
         .from('emotion_analyses')
@@ -117,7 +118,7 @@ export function useScanPage(): UseScanPageReturn {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['scan-history'] });
+      queryClient.invalidateQueries({ queryKey: ['scan-history', user?.id] });
       logger.info('Scan result saved successfully');
     },
     onError: (error) => {
@@ -128,8 +129,7 @@ export function useScanPage(): UseScanPageReturn {
   // Créer un objectif émotionnel
   const createGoalMutation = useMutation({
     mutationFn: async (goalData: Partial<EmotionGoal>) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
+      if (!user?.id) throw new Error('User not authenticated');
 
       const goal: Partial<EmotionGoal> = {
         ...goalData,
@@ -149,171 +149,135 @@ export function useScanPage(): UseScanPageReturn {
       return goal;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['emotion-goals'] });
+      queryClient.invalidateQueries({ queryKey: ['emotion-goals', user?.id] });
       logger.info('Emotion goal created successfully');
     }
   });
 
-  // Générer des recommandations basées sur l'émotion
-  const generateRecommendations = useCallback(async (emotion: string): Promise<EmotionRecommendation[]> => {
+  // Fetch recommendations from Supabase based on emotion
+  const fetchRecommendations = useCallback(async (emotion: string): Promise<EmotionRecommendation[]> => {
     try {
-      // Recommandations spécifiques par émotion
-      const emotionRecommendations: Record<string, EmotionRecommendation[]> = {
-        happy: [
-          {
-            id: uuidv4(),
-            type: 'activity',
-            title: 'Partagez votre joie',
-            description: 'Contactez un proche pour partager ce moment positif',
-            emotion: 'happy',
-            content: 'Appelez un ami ou écrivez un message positif à quelqu\'un que vous aimez.',
-            category: 'social',
-            duration: 5,
-            difficulty: 'easy',
-            effectiveness: 85
-          },
-          {
-            id: uuidv4(),
-            type: 'music',
-            title: 'Playlist énergique',
-            description: 'Écoutez de la musique qui amplifie votre énergie positive',
-            emotion: 'happy',
-            content: 'Une sélection de musiques entraînantes pour maintenir votre bonne humeur.',
-            category: 'music',
-            duration: 15,
-            difficulty: 'easy',
-            effectiveness: 78
-          }
-        ],
-        sad: [
-          {
-            id: uuidv4(),
-            type: 'breathing',
-            title: 'Respiration apaisante',
-            description: 'Technique de respiration pour calmer les émotions difficiles',
-            emotion: 'sad',
-            content: 'Inspirez pendant 4 temps, retenez pendant 4 temps, expirez pendant 6 temps.',
-            category: 'mindfulness',
-            duration: 10,
-            difficulty: 'easy',
-            effectiveness: 82
-          },
-          {
-            id: uuidv4(),
-            type: 'journal',
-            title: 'Écriture thérapeutique',
-            description: 'Exprimez vos sentiments par écrit pour les traiter',
-            emotion: 'sad',
-            content: 'Prenez 10 minutes pour écrire librement sur ce que vous ressentez.',
-            category: 'reflection',
-            duration: 15,
-            difficulty: 'medium',
-            effectiveness: 79
-          }
-        ],
-        anxious: [
-          {
-            id: uuidv4(),
-            type: 'meditation',
-            title: 'Méditation de pleine conscience',
-            description: 'Technique pour se recentrer et réduire l\'anxiété',
-            emotion: 'anxious',
-            content: 'Concentrez-vous sur votre respiration et observez vos pensées sans jugement.',
-            category: 'mindfulness',
-            duration: 12,
-            difficulty: 'medium',
-            effectiveness: 88
-          },
-          {
-            id: uuidv4(),
-            type: 'activity',
-            title: 'Marche en nature',
-            description: 'Une courte promenade pour apaiser l\'esprit',
-            emotion: 'anxious',
-            content: 'Sortez prendre l\'air pendant 10-15 minutes en vous concentrant sur vos sens.',
-            category: 'physical',
-            duration: 15,
-            difficulty: 'easy',
-            effectiveness: 75
-          }
-        ]
-      };
+      if (!user?.id) return [];
 
-      const baseRecs = emotionRecommendations[emotion] || emotionRecommendations['happy'];
-      
-      // Personnaliser les recommandations basées sur l'historique
-      const personalizedRecs = await personalizeRecommendations(baseRecs);
-      
-      return personalizedRecs;
-    } catch (error) {
-      logger.error('Error generating recommendations', { error });
-      return getDefaultRecommendations();
+      // Try to fetch from ai_recommendations table
+      const { data, error } = await supabase
+        .from('ai_recommendations')
+        .select('*')
+        .or(`emotion.eq.${emotion},emotion.is.null`)
+        .order('effectiveness', { ascending: false })
+        .limit(5);
+
+      if (error) {
+        logger.error('Error fetching recommendations', { error });
+        return [];
+      }
+
+      if (data && data.length > 0) {
+        return data.map((item) => ({
+          id: item.id || uuidv4(),
+          type: item.type || 'activity',
+          title: item.title || '',
+          description: item.description || '',
+          emotion: item.emotion || emotion,
+          content: item.content || '',
+          category: item.category || 'general',
+          duration: item.duration || 10,
+          difficulty: item.difficulty || 'easy',
+          effectiveness: item.effectiveness || 70,
+        })) as EmotionRecommendation[];
+      }
+
+      return [];
+    } catch (err) {
+      logger.error('Error fetching recommendations', { error: err });
+      return [];
     }
-  }, [logger]);
+  }, [user?.id, logger]);
 
-  // Personnaliser les recommandations basées sur l'historique utilisateur
-  const personalizeRecommendations = async (baseRecs: EmotionRecommendation[]): Promise<EmotionRecommendation[]> => {
+  // Fetch alternative recommendations from Supabase
+  const fetchAlternativeRecommendations = useCallback(async (emotion: string): Promise<EmotionRecommendation[]> => {
     try {
-      // Ici, on pourrait analyser l'historique des préférences utilisateur
-      // Pour l'instant, on retourne les recommandations de base avec des scores ajustés
-      return baseRecs.map(rec => ({
-        ...rec,
-        personalizedScore: rec.effectiveness + Math.random() * 10,
-        usageCount: Math.floor(Math.random() * 5),
-        userRating: Math.random() > 0.5 ? 4 + Math.random() : undefined
-      })).sort((a, b) => (b.personalizedScore || 0) - (a.personalizedScore || 0));
-    } catch (error) {
-      logger.error('Error personalizing recommendations', { error });
+      if (!user?.id) return [];
+
+      const { data, error } = await supabase
+        .from('ai_recommendations')
+        .select('*')
+        .or(`emotion.eq.${emotion},emotion.is.null`)
+        .order('effectiveness', { ascending: true })
+        .range(5, 10);
+
+      if (error) {
+        logger.error('Error fetching alternative recommendations', { error });
+        return [];
+      }
+
+      return (data || []).map((item) => ({
+        id: item.id || uuidv4(),
+        type: item.type || 'activity',
+        title: item.title || '',
+        description: item.description || '',
+        emotion: item.emotion || emotion,
+        content: item.content || '',
+        category: item.category || 'general',
+        duration: item.duration || 10,
+        difficulty: item.difficulty || 'easy',
+        effectiveness: item.effectiveness || 70,
+      })) as EmotionRecommendation[];
+    } catch (err) {
+      logger.error('Error fetching alternative recommendations', { error: err });
+      return [];
+    }
+  }, [user?.id, logger]);
+
+  // Personalize recommendations based on user history
+  const personalizeRecommendations = useCallback(async (baseRecs: EmotionRecommendation[]): Promise<EmotionRecommendation[]> => {
+    try {
+      if (!user?.id || baseRecs.length === 0) return baseRecs;
+
+      // Fetch user's past recommendation interactions to personalize scores
+      const { data: interactions } = await supabase
+        .from('recommendation_interactions')
+        .select('recommendation_id, rating, usage_count')
+        .eq('user_id', user.id);
+
+      const interactionMap = new Map(
+        (interactions || []).map((i) => [i.recommendation_id, i])
+      );
+
+      return baseRecs.map((rec) => {
+        const interaction = interactionMap.get(rec.id);
+        return {
+          ...rec,
+          personalizedScore: rec.effectiveness + (interaction?.rating || 0) * 5,
+          usageCount: interaction?.usage_count || 0,
+          userRating: interaction?.rating || undefined,
+        };
+      }).sort((a, b) => (b.personalizedScore || 0) - (a.personalizedScore || 0));
+    } catch (err) {
+      logger.error('Error personalizing recommendations', { error: err });
       return baseRecs;
     }
-  };
-
-  // Recommandations par défaut
-  const getDefaultRecommendations = (): EmotionRecommendation[] => [
-    {
-      id: uuidv4(),
-      type: 'breathing',
-      title: 'Respiration profonde',
-      description: 'Technique simple pour se recentrer',
-      emotion: 'neutral',
-      content: 'Prenez 5 respirations lentes et profondes.',
-      category: 'mindfulness',
-      duration: 5,
-      difficulty: 'easy',
-      effectiveness: 70
-    },
-    {
-      id: uuidv4(),
-      type: 'activity',
-      title: 'Pause hydratation',
-      description: 'Prenez un moment pour vous hydrater',
-      emotion: 'neutral',
-      content: 'Buvez un verre d\'eau lentement en pleine conscience.',
-      category: 'physical',
-      duration: 3,
-      difficulty: 'easy',
-      effectiveness: 65
-    }
-  ];
+  }, [user?.id, logger]);
 
   // Gestionnaire de fin de scan
   const handleScanComplete = useCallback(async (result: EmotionResult) => {
     try {
       logger.info('Processing scan completion', { emotion: result.emotion });
-      
+
       setCurrentEmotion(result.emotion);
-      
+
       // Sauvegarder le résultat
       await saveScanMutation.mutateAsync(result);
-      
-      // Générer des recommandations
-      const newRecommendations = await generateRecommendations(result.emotion);
-      setRecommendations(newRecommendations);
-      
-      // Générer des alternatives
-      const alternatives = await generateAlternativeRecommendations(result.emotion);
+
+      // Fetch and personalize recommendations from Supabase
+      const rawRecommendations = await fetchRecommendations(result.emotion);
+      const personalizedRecs = await personalizeRecommendations(rawRecommendations);
+      setRecommendations(personalizedRecs);
+
+      // Fetch alternatives
+      const alternatives = await fetchAlternativeRecommendations(result.emotion);
       setAlternativeRecommendations(alternatives);
-      
+
       // Mettre à jour la session courante
       if (currentSession) {
         const updatedSession: ScanSession = {
@@ -325,58 +289,21 @@ export function useScanPage(): UseScanPageReturn {
         };
         setCurrentSession(updatedSession);
       }
-      
+
       // Vérifier les objectifs
       await checkGoalProgress(result);
-      
+
     } catch (error) {
       logger.error('Error handling scan completion', { error });
     }
-  }, [currentSession, logger, saveScanMutation, generateRecommendations]);
-
-  // Générer des recommandations alternatives
-  const generateAlternativeRecommendations = async (emotion: string): Promise<EmotionRecommendation[]> => {
-    const alternativeMap: Record<string, EmotionRecommendation[]> = {
-      happy: [
-        {
-          id: uuidv4(),
-          type: 'creative',
-          title: 'Expression créative',
-          description: 'Canalisez votre énergie positive dans une activité créative',
-          emotion: 'happy',
-          content: 'Dessinez, chantez ou dansez pendant quelques minutes.',
-          category: 'creative',
-          duration: 10,
-          difficulty: 'easy',
-          effectiveness: 72
-        }
-      ],
-      sad: [
-        {
-          id: uuidv4(),
-          type: 'social',
-          title: 'Connexion humaine',
-          description: 'Recherchez le soutien d\'un proche',
-          emotion: 'sad',
-          content: 'Appelez un ami de confiance ou un membre de votre famille.',
-          category: 'social',
-          duration: 20,
-          difficulty: 'medium',
-          effectiveness: 81
-        }
-      ]
-    };
-
-    return alternativeMap[emotion] || [];
-  };
+  }, [currentSession, logger, saveScanMutation, fetchRecommendations, fetchAlternativeRecommendations, personalizeRecommendations]);
 
   // Vérifier et mettre à jour les progrès des objectifs
   const checkGoalProgress = async (result: EmotionResult) => {
     try {
       for (const goal of emotionGoals) {
         let newProgress = goal.progress;
-        
-        // Logique de mise à jour basée sur le type d'objectif
+
         switch (goal.type) {
           case 'increase_positive':
             if (['happy', 'excited', 'calm'].includes(result.emotion)) {
@@ -389,13 +316,12 @@ export function useScanPage(): UseScanPageReturn {
             }
             break;
           case 'improve_stability':
-            // Logique basée sur la stabilité émotionnelle
             if (result.confidence.overall > 80) {
               newProgress = Math.min(100, goal.progress + 1);
             }
             break;
         }
-        
+
         if (newProgress !== goal.progress) {
           await updateGoalProgress(goal.id, newProgress);
         }
@@ -415,15 +341,15 @@ export function useScanPage(): UseScanPageReturn {
     try {
       const { error } = await supabase
         .from('emotion_goals')
-        .update({ 
-          progress, 
-          updated_at: new Date().toISOString() 
+        .update({
+          progress,
+          updated_at: new Date().toISOString()
         })
         .eq('id', goalId);
 
       if (error) throw error;
-      
-      queryClient.invalidateQueries({ queryKey: ['emotion-goals'] });
+
+      queryClient.invalidateQueries({ queryKey: ['emotion-goals', user?.id] });
       logger.info('Goal progress updated', { goalId, progress });
     } catch (error) {
       logger.error('Error updating goal progress', { error });
@@ -433,14 +359,13 @@ export function useScanPage(): UseScanPageReturn {
   // Obtenir des insights sur les scans
   const getScanInsights = async () => {
     try {
-      // Analyser les tendances récentes
       const recentScans = scanHistory.slice(0, 10);
       const insights = [];
 
       if (recentScans.length > 0) {
         const emotions = recentScans.map(scan => scan.emotion);
         const mostFrequent = getMostFrequent(emotions);
-        
+
         insights.push({
           type: 'trend',
           title: `Émotion dominante récente: ${mostFrequent}`,
@@ -449,7 +374,7 @@ export function useScanPage(): UseScanPageReturn {
         });
 
         const avgConfidence = recentScans.reduce((sum, scan) => sum + scan.confidence.overall, 0) / recentScans.length;
-        
+
         if (avgConfidence > 85) {
           insights.push({
             type: 'quality',
@@ -472,7 +397,7 @@ export function useScanPage(): UseScanPageReturn {
     try {
       const exportData = {
         exportDate: new Date().toISOString(),
-        scanHistory: scanHistory.slice(0, 100), // Limiter à 100 scans
+        scanHistory: scanHistory.slice(0, 100),
         emotionGoals,
         currentSession,
         recommendations,
@@ -485,10 +410,10 @@ export function useScanPage(): UseScanPageReturn {
         }
       };
 
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], { 
-        type: 'application/json' 
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+        type: 'application/json'
       });
-      
+
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -506,9 +431,11 @@ export function useScanPage(): UseScanPageReturn {
 
   // Initialiser une nouvelle session au chargement
   useEffect(() => {
+    if (!user?.id) return;
+
     const newSession: ScanSession = {
       id: `session_${Date.now()}`,
-      userId: 'current-user', // À remplacer par l'ID utilisateur réel
+      userId: user.id,
       startTime: new Date(),
       results: [],
       config: {
@@ -523,9 +450,9 @@ export function useScanPage(): UseScanPageReturn {
       emotionChanges: 0,
       stabilityScore: 100
     };
-    
+
     setCurrentSession(newSession);
-  }, []);
+  }, [user?.id]);
 
   return {
     currentEmotion,
@@ -549,7 +476,7 @@ function getMostFrequent<T>(arr: T[]): T {
     acc[item as string] = (acc[item as string] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
-  
+
   return Object.entries(counts)
     .sort(([,a], [,b]) => b - a)[0]?.[0] as T || arr[0];
 }

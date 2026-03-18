@@ -1,73 +1,91 @@
 // @ts-nocheck
 import { EmotionRecommendation } from '@/types/emotion';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 
-// Mock function to simulate fetching journal entries from a database
-const mockJournalEntries = [
-  {
-    id: '1',
-    userId: 'user123',
-    date: '2024-07-25',
-    content: 'Aujourd\'hui, je me suis senti particulièrement joyeux après avoir terminé un projet difficile. J\'ai passé du temps avec mes amis et nous avons bien ri.',
-    emotion: 'joy',
-    tags: ['travail', 'amis', 'joie']
-  },
-  {
-    id: '2',
-    userId: 'user123',
-    date: '2024-07-24',
-    content: 'J\'étais un peu triste aujourd\'hui car j\'ai manqué un appel important. J\'ai essayé de me remonter le moral en regardant un film.',
-    emotion: 'sadness',
-    tags: ['travail', 'déception', 'film']
-  },
-  {
-    id: '3',
-    userId: 'user123',
-    date: '2024-07-23',
-    content: 'J\'étais en colère à cause d\'un malentendu avec un collègue. J\'ai pris une longue marche pour me calmer.',
-    emotion: 'anger',
-    tags: ['travail', 'colère', 'marche']
-  },
-  {
-    id: '4',
-    userId: 'user123',
-    date: '2024-07-22',
-    content: 'J\'ai ressenti de l\'anxiété à propos d\'une présentation à venir. J\'ai pratiqué ma présentation plusieurs fois pour me sentir plus préparé.',
-    emotion: 'anxiety',
-    tags: ['travail', 'anxiété', 'préparation']
-  },
-  {
-    id: '5',
-    userId: 'user123',
-    date: '2024-07-21',
-    content: 'J\'ai été surpris par une visite inattendue d\'un vieil ami. Nous avons passé des heures à discuter et à nous remémorer le passé.',
-    emotion: 'surprise',
-    tags: ['amis', 'surprise', 'retrouvailles']
+// Fetch journal entries for a specific user from Supabase
+export const getJournalEntriesForUser = async (userId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('journal_entries')
+      .select('*')
+      .eq('user_id', userId)
+      .order('date', { ascending: false });
+
+    if (error) {
+      logger.error('Failed to fetch journal entries', { error, userId }, 'journal-service');
+      return [];
+    }
+
+    return data ?? [];
+  } catch (err) {
+    logger.error('Unexpected error fetching journal entries', { err }, 'journal-service');
+    return [];
   }
-];
-
-// Function to fetch journal entries for a specific user
-export const getJournalEntriesForUser = (userId: string) => {
-  return mockJournalEntries.filter(entry => entry.userId === userId);
 };
 
-// Function to fetch a specific journal entry by ID
-export const getJournalEntryById = (id: string) => {
-  return mockJournalEntries.find(entry => entry.id === id);
+// Fetch a specific journal entry by ID from Supabase
+export const getJournalEntryById = async (id: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('journal_entries')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      logger.error('Failed to fetch journal entry by id', { error, id }, 'journal-service');
+      return null;
+    }
+
+    return data ?? null;
+  } catch (err) {
+    logger.error('Unexpected error fetching journal entry', { err }, 'journal-service');
+    return null;
+  }
 };
 
-// Function to simulate saving a journal entry
-export const saveJournalEntry = (entry: any) => {
-  // In a real application, this would save the entry to a database
-  logger.info('Saving journal entry', { id: entry.id }, 'API');
-  return { ...entry, id: Math.random().toString(36).substring(7) }; // Simulate ID generation
+// Save a journal entry to Supabase
+export const saveJournalEntry = async (entry: any) => {
+  try {
+    const { data, error } = await supabase
+      .from('journal_entries')
+      .insert(entry)
+      .select()
+      .single();
+
+    if (error) {
+      logger.error('Failed to save journal entry', { error }, 'journal-service');
+      return null;
+    }
+
+    logger.info('Journal entry saved successfully', { id: data?.id }, 'journal-service');
+    return data;
+  } catch (err) {
+    logger.error('Unexpected error saving journal entry', { err }, 'journal-service');
+    return null;
+  }
 };
 
-// Function to simulate deleting a journal entry
-export const deleteJournalEntry = (id: string) => {
-  // In a real application, this would delete the entry from a database
-  logger.info('Deleting journal entry with ID', { id }, 'API');
-  return true;
+// Delete a journal entry from Supabase
+export const deleteJournalEntry = async (id: string) => {
+  try {
+    const { error } = await supabase
+      .from('journal_entries')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      logger.error('Failed to delete journal entry', { error, id }, 'journal-service');
+      return false;
+    }
+
+    logger.info('Journal entry deleted successfully', { id }, 'journal-service');
+    return true;
+  } catch (err) {
+    logger.error('Unexpected error deleting journal entry', { err }, 'journal-service');
+    return false;
+  }
 };
 
 // Function to get emotion recommendations based on the detected emotion

@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import {
   Users,
   TrendingUp,
@@ -23,11 +24,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useOrgAggregates } from '@/hooks/b2b/useOrgAggregates';
-import { useB2BTeams } from '@/hooks/useB2BTeams';
-import { useB2BAnalytics } from '@/hooks/useB2BAnalytics';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 
 interface TeamWellnessScore {
@@ -49,43 +50,6 @@ interface RiskAlert {
   createdAt: string;
 }
 
-// Mock data pour démonstration
-const MOCK_TEAM_SCORES: TeamWellnessScore[] = [
-  { teamId: '1', teamName: 'Développement', score: 72, trend: 'up', memberCount: 12, activeRate: 85 },
-  { teamId: '2', teamName: 'Marketing', score: 68, trend: 'stable', memberCount: 8, activeRate: 78 },
-  { teamId: '3', teamName: 'Support', score: 58, trend: 'down', memberCount: 15, activeRate: 92 },
-  { teamId: '4', teamName: 'RH', score: 81, trend: 'up', memberCount: 5, activeRate: 100 },
-  { teamId: '5', teamName: 'Finance', score: 65, trend: 'stable', memberCount: 6, activeRate: 67 },
-];
-
-const MOCK_ALERTS: RiskAlert[] = [
-  {
-    id: '1',
-    type: 'burnout',
-    severity: 'high',
-    teamId: '3',
-    teamName: 'Support',
-    message: 'Signaux de burnout détectés - baisse de 15% du score bien-être sur 2 semaines',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    type: 'engagement',
-    severity: 'medium',
-    teamId: '5',
-    teamName: 'Finance',
-    message: 'Taux de participation en baisse - 33% des membres inactifs depuis 7 jours',
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-  },
-  {
-    id: '3',
-    type: 'stress',
-    severity: 'low',
-    message: 'Niveau de stress global légèrement élevé cette semaine',
-    createdAt: new Date(Date.now() - 172800000).toISOString(),
-  },
-];
-
 const SEVERITY_COLORS = {
   low: 'text-yellow-500 bg-yellow-500/10 border-yellow-500/30',
   medium: 'text-orange-500 bg-orange-500/10 border-orange-500/30',
@@ -99,33 +63,110 @@ const TREND_ICONS = {
 };
 
 export function RHDashboard() {
+  const { user } = useAuth();
   const [selectedPeriod, setSelectedPeriod] = useState('week');
   const [selectedTeam, setSelectedTeam] = useState<string>('all');
-  
-  // Les vrais hooks seront utilisés ici
-  const teamScores = MOCK_TEAM_SCORES;
-  const alerts = MOCK_ALERTS;
 
-  const avgScore = Math.round(teamScores.reduce((acc, t) => acc + t.score, 0) / teamScores.length);
+  // Fetch team wellness scores from Supabase
+  const {
+    data: teamScores = [],
+    isLoading: isLoadingScores,
+    error: scoresError,
+  } = useQuery<TeamWellnessScore[]>({
+    queryKey: ['team_wellness_scores', user?.id, selectedPeriod],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('team_wellness_scores')
+        .select('*')
+        .order('score', { ascending: false });
+
+      if (error) throw error;
+
+      return (data ?? []).map((row: any) => ({
+        teamId: row.team_id ?? row.id,
+        teamName: row.team_name ?? row.name ?? 'Équipe',
+        score: row.score ?? 0,
+        trend: row.trend ?? 'stable',
+        memberCount: row.member_count ?? 0,
+        activeRate: row.active_rate ?? 0,
+      }));
+    },
+    enabled: !!user,
+  });
+
+  // Fetch alerts from Supabase
+  const {
+    data: alerts = [],
+    isLoading: isLoadingAlerts,
+    error: alertsError,
+  } = useQuery<RiskAlert[]>({
+    queryKey: ['wellness_alerts', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('clinical_signals')
+        .select('*')
+        .eq('signal_type', 'alert')
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+
+      return (data ?? []).map((row: any) => ({
+        id: row.id,
+        type: row.severity_level === 'high' ? 'burnout' : row.severity_level === 'medium' ? 'stress' : 'engagement',
+        severity: row.severity_level ?? 'low',
+        teamId: row.team_id,
+        teamName: row.team_name,
+        message: row.summary ?? row.description ?? 'Alerte détectée',
+        createdAt: row.created_at,
+      }));
+    },
+    enabled: !!user,
+  });
+
+  const isLoading = isLoadingScores || isLoadingAlerts;
+  const hasError = scoresError || alertsError;
+
+  const avgScore = teamScores.length > 0
+    ? Math.round(teamScores.reduce((acc, t) => acc + t.score, 0) / teamScores.length)
+    : 0;
   const totalMembers = teamScores.reduce((acc, t) => acc + t.memberCount, 0);
-  const avgActiveRate = Math.round(teamScores.reduce((acc, t) => acc + t.activeRate, 0) / teamScores.length);
+  const avgActiveRate = teamScores.length > 0
+    ? Math.round(teamScores.reduce((acc, t) => acc + t.activeRate, 0) / teamScores.length)
+    : 0;
   const criticalAlerts = alerts.filter(a => a.severity === 'high').length;
 
+  if (hasError) {
+    return (
+      <div className="space-y-6" role="alert" aria-label="Erreur de chargement du dashboard RH">
+        <Card className="border-red-500/50">
+          <CardContent className="p-6 text-center">
+            <AlertTriangle className="h-12 w-12 mx-auto text-red-500 mb-3" />
+            <p className="text-red-500 font-medium">Erreur lors du chargement des données</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Veuillez réessayer ultérieurement.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" aria-label="Dashboard RH">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Heart className="h-6 w-6 text-primary" />
+            <Heart className="h-6 w-6 text-primary" aria-hidden="true" />
             Dashboard RH
           </h1>
           <p className="text-muted-foreground">Vue d'ensemble du bien-être de votre organisation</p>
         </div>
-        
+
         <div className="flex items-center gap-2">
           <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[140px]" aria-label="Sélectionner la période">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -134,12 +175,12 @@ export function RHDashboard() {
               <SelectItem value="quarter">Ce trimestre</SelectItem>
             </SelectContent>
           </Select>
-          
-          <Button variant="outline" size="icon">
+
+          <Button variant="outline" size="icon" aria-label="Rafraîchir les données">
             <RefreshCw className="h-4 w-4" />
           </Button>
-          
-          <Button variant="outline" className="gap-2">
+
+          <Button variant="outline" className="gap-2" aria-label="Exporter les données">
             <Download className="h-4 w-4" />
             Exporter
           </Button>
@@ -148,85 +189,101 @@ export function RHDashboard() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Score bien-être</p>
-                <p className="text-3xl font-bold text-primary">{avgScore}%</p>
-              </div>
-              <div className={cn(
-                'p-3 rounded-full',
-                avgScore >= 70 ? 'bg-green-500/10' : avgScore >= 50 ? 'bg-yellow-500/10' : 'bg-red-500/10'
-              )}>
-                <Sparkles className={cn(
-                  'h-6 w-6',
-                  avgScore >= 70 ? 'text-green-500' : avgScore >= 50 ? 'text-yellow-500' : 'text-red-500'
-                )} />
-              </div>
-            </div>
-            <Progress value={avgScore} className="mt-4 h-2" />
-          </CardContent>
-        </Card>
+        {isLoading ? (
+          <>
+            {[1, 2, 3, 4].map(i => (
+              <Card key={i}>
+                <CardContent className="p-6">
+                  <Skeleton className="h-4 w-24 mb-2" />
+                  <Skeleton className="h-8 w-16 mb-4" />
+                  <Skeleton className="h-2 w-full" />
+                </CardContent>
+              </Card>
+            ))}
+          </>
+        ) : (
+          <>
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Score bien-être</p>
+                    <p className="text-3xl font-bold text-primary">{avgScore}%</p>
+                  </div>
+                  <div className={cn(
+                    'p-3 rounded-full',
+                    avgScore >= 70 ? 'bg-green-500/10' : avgScore >= 50 ? 'bg-yellow-500/10' : 'bg-red-500/10'
+                  )}>
+                    <Sparkles className={cn(
+                      'h-6 w-6',
+                      avgScore >= 70 ? 'text-green-500' : avgScore >= 50 ? 'text-yellow-500' : 'text-red-500'
+                    )} aria-hidden="true" />
+                  </div>
+                </div>
+                <Progress value={avgScore} className="mt-4 h-2" aria-label={`Score bien-être : ${avgScore}%`} />
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Collaborateurs actifs</p>
-                <p className="text-3xl font-bold text-foreground">{totalMembers}</p>
-              </div>
-              <div className="p-3 rounded-full bg-blue-500/10">
-                <Users className="h-6 w-6 text-blue-500" />
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground mt-2">
-              {avgActiveRate}% de taux de participation
-            </p>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Collaborateurs actifs</p>
+                    <p className="text-3xl font-bold text-foreground">{totalMembers}</p>
+                  </div>
+                  <div className="p-3 rounded-full bg-blue-500/10">
+                    <Users className="h-6 w-6 text-blue-500" aria-hidden="true" />
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">
+                  {avgActiveRate}% de taux de participation
+                </p>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Équipes suivies</p>
-                <p className="text-3xl font-bold text-foreground">{teamScores.length}</p>
-              </div>
-              <div className="p-3 rounded-full bg-purple-500/10">
-                <BarChart3 className="h-6 w-6 text-purple-500" />
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground mt-2">
-              {teamScores.filter(t => t.trend === 'up').length} en progression
-            </p>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Équipes suivies</p>
+                    <p className="text-3xl font-bold text-foreground">{teamScores.length}</p>
+                  </div>
+                  <div className="p-3 rounded-full bg-purple-500/10">
+                    <BarChart3 className="h-6 w-6 text-purple-500" aria-hidden="true" />
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">
+                  {teamScores.filter(t => t.trend === 'up').length} en progression
+                </p>
+              </CardContent>
+            </Card>
 
-        <Card className={cn(criticalAlerts > 0 && 'border-red-500/50')}>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Alertes actives</p>
-                <p className="text-3xl font-bold text-foreground">{alerts.length}</p>
-              </div>
-              <div className={cn(
-                'p-3 rounded-full',
-                criticalAlerts > 0 ? 'bg-red-500/10' : 'bg-green-500/10'
-              )}>
-                <AlertTriangle className={cn(
-                  'h-6 w-6',
-                  criticalAlerts > 0 ? 'text-red-500' : 'text-green-500'
-                )} />
-              </div>
-            </div>
-            {criticalAlerts > 0 && (
-              <p className="text-sm text-red-500 mt-2">
-                {criticalAlerts} alerte(s) critique(s)
-              </p>
-            )}
-          </CardContent>
-        </Card>
+            <Card className={cn(criticalAlerts > 0 && 'border-red-500/50')}>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Alertes actives</p>
+                    <p className="text-3xl font-bold text-foreground">{alerts.length}</p>
+                  </div>
+                  <div className={cn(
+                    'p-3 rounded-full',
+                    criticalAlerts > 0 ? 'bg-red-500/10' : 'bg-green-500/10'
+                  )}>
+                    <AlertTriangle className={cn(
+                      'h-6 w-6',
+                      criticalAlerts > 0 ? 'text-red-500' : 'text-green-500'
+                    )} aria-hidden="true" />
+                  </div>
+                </div>
+                {criticalAlerts > 0 && (
+                  <p className="text-sm text-red-500 mt-2">
+                    {criticalAlerts} alerte(s) critique(s)
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
 
       {/* Main Content */}
@@ -252,7 +309,7 @@ export function RHDashboard() {
               <CardTitle className="flex items-center justify-between">
                 <span>Scores par équipe</span>
                 <Select value={selectedTeam} onValueChange={setSelectedTeam}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-[180px]" aria-label="Filtrer par équipe">
                     <SelectValue placeholder="Toutes les équipes" />
                   </SelectTrigger>
                   <SelectContent>
@@ -265,49 +322,70 @@ export function RHDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {teamScores
-                  .filter(t => selectedTeam === 'all' || t.teamId === selectedTeam)
-                  .sort((a, b) => b.score - a.score)
-                  .map((team) => (
-                    <motion.div
-                      key={team.teamId}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex items-center gap-4 p-4 rounded-lg border border-border/50 hover:border-primary/30 transition-colors"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-foreground">{team.teamName}</span>
-                          {TREND_ICONS[team.trend]}
-                          <Badge variant="secondary" className="text-xs">
-                            {team.memberCount} membres
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <Progress
-                            value={team.score}
-                            className={cn(
-                              'flex-1 h-2',
-                              team.score >= 70 ? '[&>div]:bg-green-500' :
-                              team.score >= 50 ? '[&>div]:bg-yellow-500' : '[&>div]:bg-red-500'
-                            )}
-                          />
-                          <span className={cn(
-                            'text-sm font-medium min-w-[3rem] text-right',
-                            team.score >= 70 ? 'text-green-500' :
-                            team.score >= 50 ? 'text-yellow-500' : 'text-red-500'
-                          )}>
-                            {team.score}%
-                          </span>
-                        </div>
+              {isLoadingScores ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="flex items-center gap-4 p-4 rounded-lg border border-border/50">
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-2 w-full" />
                       </div>
-                      <div className="text-right text-sm text-muted-foreground">
-                        <p>{team.activeRate}% actifs</p>
-                      </div>
-                    </motion.div>
+                      <Skeleton className="h-4 w-16" />
+                    </div>
                   ))}
-              </div>
+                </div>
+              ) : teamScores.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground" aria-label="Aucune équipe trouvée">
+                  <Users className="h-12 w-12 mx-auto mb-3 opacity-50" aria-hidden="true" />
+                  <p>Aucune équipe trouvée</p>
+                  <p className="text-sm">Les scores de bien-être des équipes apparaîtront ici.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {teamScores
+                    .filter(t => selectedTeam === 'all' || t.teamId === selectedTeam)
+                    .sort((a, b) => b.score - a.score)
+                    .map((team) => (
+                      <motion.div
+                        key={team.teamId}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex items-center gap-4 p-4 rounded-lg border border-border/50 hover:border-primary/30 transition-colors"
+                        aria-label={`${team.teamName} : score ${team.score}%`}
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium text-foreground">{team.teamName}</span>
+                            {TREND_ICONS[team.trend]}
+                            <Badge variant="secondary" className="text-xs">
+                              {team.memberCount} membres
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <Progress
+                              value={team.score}
+                              className={cn(
+                                'flex-1 h-2',
+                                team.score >= 70 ? '[&>div]:bg-green-500' :
+                                team.score >= 50 ? '[&>div]:bg-yellow-500' : '[&>div]:bg-red-500'
+                              )}
+                            />
+                            <span className={cn(
+                              'text-sm font-medium min-w-[3rem] text-right',
+                              team.score >= 70 ? 'text-green-500' :
+                              team.score >= 50 ? 'text-yellow-500' : 'text-red-500'
+                            )}>
+                              {team.score}%
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-right text-sm text-muted-foreground">
+                          <p>{team.activeRate}% actifs</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -318,48 +396,59 @@ export function RHDashboard() {
               <CardTitle>Alertes et signalements</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {alerts.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">
-                    Aucune alerte active 🎉
-                  </p>
-                ) : (
-                  alerts.map((alert) => (
-                    <motion.div
-                      key={alert.id}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className={cn(
-                        'p-4 rounded-lg border',
-                        SEVERITY_COLORS[alert.severity]
-                      )}
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Badge
-                              variant="outline"
-                              className={cn('text-xs', SEVERITY_COLORS[alert.severity])}
-                            >
-                              {alert.severity === 'high' ? 'Critique' :
-                               alert.severity === 'medium' ? 'Attention' : 'Info'}
-                            </Badge>
-                            {alert.teamName && (
-                              <span className="text-sm text-muted-foreground">
-                                {alert.teamName}
-                              </span>
-                            )}
+              {isLoadingAlerts ? (
+                <div className="space-y-3">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="p-4 rounded-lg border">
+                      <Skeleton className="h-4 w-24 mb-2" />
+                      <Skeleton className="h-4 w-full" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {alerts.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8" aria-label="Aucune alerte active">
+                      Aucune alerte active
+                    </p>
+                  ) : (
+                    alerts.map((alert) => (
+                      <motion.div
+                        key={alert.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className={cn(
+                          'p-4 rounded-lg border',
+                          SEVERITY_COLORS[alert.severity]
+                        )}
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Badge
+                                variant="outline"
+                                className={cn('text-xs', SEVERITY_COLORS[alert.severity])}
+                              >
+                                {alert.severity === 'high' ? 'Critique' :
+                                 alert.severity === 'medium' ? 'Attention' : 'Info'}
+                              </Badge>
+                              {alert.teamName && (
+                                <span className="text-sm text-muted-foreground">
+                                  {alert.teamName}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-foreground">{alert.message}</p>
                           </div>
-                          <p className="text-sm text-foreground">{alert.message}</p>
+                          <Button variant="ghost" size="sm" aria-label="Voir les détails de l'alerte">
+                            Voir détails
+                          </Button>
                         </div>
-                        <Button variant="ghost" size="sm">
-                          Voir détails
-                        </Button>
-                      </div>
-                    </motion.div>
-                  ))
-                )}
-              </div>
+                      </motion.div>
+                    ))
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -371,7 +460,7 @@ export function RHDashboard() {
             </CardHeader>
             <CardContent className="flex items-center justify-center h-64 text-muted-foreground">
               <div className="text-center">
-                <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" aria-hidden="true" />
                 <p>Graphiques de tendances</p>
                 <p className="text-sm">Intégration Recharts à venir</p>
               </div>

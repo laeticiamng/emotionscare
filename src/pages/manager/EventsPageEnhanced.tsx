@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,19 +9,18 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Calendar, 
-  Plus, 
-  Users, 
-  MapPin, 
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Calendar,
+  Plus,
+  Users,
+  MapPin,
   Clock,
   Zap,
   Star,
   Edit,
   Trash,
   Share,
-  Download,
-  Bell
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -28,8 +28,8 @@ import { toast } from '@/hooks/use-toast';
 interface EventItem { id: number; title: string; description: string; date: string; time: string; duration: number; location: string; type: string; maxParticipants: number; currentParticipants: number; status: string; organizer: string; isPublic: boolean; tags: string[]; }
 
 const EventsPageEnhanced = () => {
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('calendar');
-  const [events, setEvents] = useState<EventItem[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const [eventForm, setEventForm] = useState({
@@ -44,73 +44,23 @@ const EventsPageEnhanced = () => {
     isPublic: true
   });
 
-  // Données simulées pour les événements
-  const mockEvents = [
-    {
-      id: 1,
-      title: 'Atelier Mindfulness Matinal',
-      description: 'Session de méditation guidée pour commencer la journée en pleine conscience',
-      date: '2024-02-20',
-      time: '09:00',
-      duration: 45,
-      location: 'Salle Zen - 2ème étage',
-      type: 'workshop',
-      maxParticipants: 30,
-      currentParticipants: 18,
-      status: 'upcoming',
-      organizer: 'Sophie Dubois',
-      isPublic: true,
-      tags: ['mindfulness', 'matinal', 'méditation']
+  const { data: events = [], isLoading } = useQuery<EventItem[]>({
+    queryKey: ['manager-events'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('organization_events')
+        .select('*')
+        .order('date', { ascending: true });
+      if (error) throw error;
+      return (data || []).map((e: any) => ({
+        ...e,
+        currentParticipants: e.current_participants ?? 0,
+        maxParticipants: e.max_participants ?? 50,
+        isPublic: e.is_public ?? true,
+        tags: e.tags ?? [],
+      }));
     },
-    {
-      id: 2,
-      title: 'Conférence Bien-être au Travail',
-      description: 'Intervention d\'experts sur l\'optimisation du bien-être en entreprise',
-      date: '2024-02-25',
-      time: '14:00',
-      duration: 120,
-      location: 'Grand Amphithéâtre',
-      type: 'conference',
-      maxParticipants: 200,
-      currentParticipants: 156,
-      status: 'upcoming',
-      organizer: 'Dr. Martin Leclerc',
-      isPublic: true,
-      tags: ['conférence', 'experts', 'bien-être']
-    },
-    {
-      id: 3,
-      title: 'Challenge Team Building VR',
-      description: 'Expérience immersive de cohésion d\'équipe en réalité virtuelle',
-      date: '2024-02-28',
-      time: '16:00',
-      duration: 90,
-      location: 'Espace VR Innovation',
-      type: 'team-building',
-      maxParticipants: 20,
-      currentParticipants: 12,
-      status: 'upcoming',
-      organizer: 'Alex Chen',
-      isPublic: false,
-      tags: ['VR', 'team-building', 'innovation']
-    },
-    {
-      id: 4,
-      title: 'Session de Respiration Active',
-      description: 'Techniques de respiration pour réduire le stress et augmenter l\'énergie',
-      date: '2024-02-15',
-      time: '12:30',
-      duration: 30,
-      location: 'Terrasse Détente',
-      type: 'workshop',
-      maxParticipants: 25,
-      currentParticipants: 25,
-      status: 'completed',
-      organizer: 'Marie Rodriguez',
-      isPublic: true,
-      tags: ['respiration', 'stress', 'pause-déjeuner']
-    }
-  ];
+  });
 
   const eventTypes = [
     { value: 'workshop', label: 'Atelier', color: 'bg-blue-500' },
@@ -120,60 +70,49 @@ const EventsPageEnhanced = () => {
     { value: 'wellness', label: 'Bien-être', color: 'bg-pink-500' }
   ];
 
-  const createEvent = async () => {
-    try {
-      // Simulation de création d'événement
-      const newEvent = {
-        id: Date.now(),
-        ...eventForm,
-        currentParticipants: 0,
+  const createMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from('organization_events').insert({
+        title: eventForm.title,
+        description: eventForm.description,
+        date: eventForm.date,
+        time: eventForm.time,
+        duration: eventForm.duration,
+        location: eventForm.location,
+        type: eventForm.type,
+        max_participants: eventForm.maxParticipants,
+        is_public: eventForm.isPublic,
         status: 'upcoming',
-        organizer: 'Vous',
-        tags: [eventForm.type, 'nouveau']
-      };
-      
-      setEvents(prev => [...prev, newEvent]);
-      setEventForm({
-        title: '',
-        description: '',
-        date: '',
-        time: '',
-        duration: 60,
-        location: '',
-        type: 'workshop',
-        maxParticipants: 50,
-        isPublic: true
       });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['manager-events'] });
+      setEventForm({ title: '', description: '', date: '', time: '', duration: 60, location: '', type: 'workshop', maxParticipants: 50, isPublic: true });
       setShowCreateModal(false);
-      
-      toast({
-        title: "Événement créé",
-        description: "Votre événement a été ajouté au calendrier.",
-      });
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer l'événement.",
-        variant: "destructive"
-      });
-    }
-  };
+      toast({ title: "Événement créé", description: "Votre événement a été ajouté au calendrier." });
+    },
+    onError: () => {
+      toast({ title: "Erreur", description: "Impossible de créer l'événement.", variant: "destructive" });
+    },
+  });
 
-  const deleteEvent = async (eventId: number) => {
-    try {
-      setEvents(prev => prev.filter(event => event.id !== eventId));
-      toast({
-        title: "Événement supprimé",
-        description: "L'événement a été retiré du calendrier.",
-      });
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer l'événement.",
-        variant: "destructive"
-      });
-    }
-  };
+  const deleteMutation = useMutation({
+    mutationFn: async (eventId: number) => {
+      const { error } = await supabase.from('organization_events').delete().eq('id', eventId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['manager-events'] });
+      toast({ title: "Événement supprimé", description: "L'événement a été retiré du calendrier." });
+    },
+    onError: () => {
+      toast({ title: "Erreur", description: "Impossible de supprimer l'événement.", variant: "destructive" });
+    },
+  });
+
+  const createEvent = () => createMutation.mutate();
+  const deleteEvent = (eventId: number) => deleteMutation.mutate(eventId);
 
   const getEventTypeColor = (type: string) => {
     return eventTypes.find(t => t.value === type)?.color || 'bg-gray-500';
@@ -188,10 +127,6 @@ const EventsPageEnhanced = () => {
     };
     return statusConfig[status] || statusConfig.upcoming;
   };
-
-  useEffect(() => {
-    setEvents(mockEvents);
-  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4">

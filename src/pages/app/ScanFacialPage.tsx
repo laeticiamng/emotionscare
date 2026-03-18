@@ -5,6 +5,9 @@
 import React, { useState, useCallback, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { Camera, ArrowLeft, RefreshCw, Loader2 } from 'lucide-react';
+import { Scene3DErrorBoundary } from '@/components/3d/Scene3DErrorBoundary';
+
+const EmotionSphere3D = lazy(() => import('@/components/3d/EmotionSphere3D'));
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -229,6 +232,16 @@ const ScanFacialPage: React.FC = () => {
               {lastResult ? (
                 <>
                   <SimpleResultCard result={lastResult} />
+                  {/* Visualisation 3D de l'état émotionnel */}
+                  <Scene3DErrorBoundary>
+                    <Suspense fallback={null}>
+                      <EmotionSphere3D
+                        valence={(lastResult.valence ?? 50) / 100}
+                        arousal={(lastResult.arousal ?? 50) / 100}
+                        emotion={lastResult.emotion}
+                      />
+                    </Suspense>
+                  </Scene3DErrorBoundary>
                   <Button variant="outline" onClick={handleReset} className="w-full gap-2">
                     <RefreshCw className="h-4 w-4" />
                     Nouveau scan

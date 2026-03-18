@@ -70,58 +70,11 @@ type HeatmapBucket = {
   lastTimestamp: number;
 };
 
-const FALLBACK_MOOD_TREND: MoodTrendPoint[] = [
-  { date: '2024-03-17', mood: 6.2, energy: 6.0, annotation: 'Respiration 4-7-8' },
-  { date: '2024-03-18', mood: 6.8, energy: 6.3, annotation: 'Séance VR focus' },
-  { date: '2024-03-19', mood: 7.1, energy: 6.9, annotation: 'Coaching empathique' },
-  { date: '2024-03-20', mood: 7.4, energy: 7.3, annotation: 'Routine complète' },
-  { date: '2024-03-21', mood: 7.2, energy: 7.0, annotation: 'Journal guidé' },
-  { date: '2024-03-22', mood: 7.9, energy: 7.6, annotation: 'Session immersive' },
-  { date: '2024-03-23', mood: 8.2, energy: 7.8, annotation: 'Mix musique + respiration' },
-  { date: '2024-03-24', mood: 8.4, energy: 8.2, annotation: 'Weekend ressourçant' },
-  { date: '2024-03-25', mood: 8.1, energy: 8.0, annotation: 'Check-in matinal' },
-  { date: '2024-03-26', mood: 8.6, energy: 8.4, annotation: 'Routine + appel coach' },
-];
+const FALLBACK_MOOD_TREND: MoodTrendPoint[] = [];
 
-const FALLBACK_WEEKLY_SESSIONS: WeeklySessionsPoint[] = [
-  { week: 'S08', guided: 2, breathwork: 1, vr: 0, journaling: 1, total: 4 },
-  { week: 'S09', guided: 3, breathwork: 2, vr: 1, journaling: 1, total: 7 },
-  { week: 'S10', guided: 3, breathwork: 2, vr: 2, journaling: 1, total: 8 },
-  { week: 'S11', guided: 4, breathwork: 2, vr: 2, journaling: 2, total: 10 },
-  { week: 'S12', guided: 4, breathwork: 3, vr: 2, journaling: 2, total: 11 },
-  { week: 'S13', guided: 5, breathwork: 3, vr: 3, journaling: 2, total: 13 },
-];
+const FALLBACK_WEEKLY_SESSIONS: WeeklySessionsPoint[] = [];
 
-const FALLBACK_HEATMAP: HeatmapPoint[] = [
-  { day: 'Lun', slot: 'Matin', intensity: 75, dominantMood: 'Apaisé', sessions: 2 },
-  { day: 'Lun', slot: 'Midi', intensity: 48, dominantMood: 'Concentré', sessions: 1 },
-  { day: 'Lun', slot: 'Après-midi', intensity: 62, dominantMood: 'Créatif', sessions: 1 },
-  { day: 'Lun', slot: 'Soir', intensity: 40, dominantMood: 'Repos', sessions: 1 },
-  { day: 'Mar', slot: 'Matin', intensity: 80, dominantMood: 'Positif', sessions: 2 },
-  { day: 'Mar', slot: 'Midi', intensity: 55, dominantMood: 'Motivé', sessions: 1 },
-  { day: 'Mar', slot: 'Après-midi', intensity: 68, dominantMood: 'Focus', sessions: 2 },
-  { day: 'Mar', slot: 'Soir', intensity: 35, dominantMood: 'Calme', sessions: 1 },
-  { day: 'Mer', slot: 'Matin', intensity: 72, dominantMood: 'Positif', sessions: 2 },
-  { day: 'Mer', slot: 'Midi', intensity: 58, dominantMood: 'Engagé', sessions: 1 },
-  { day: 'Mer', slot: 'Après-midi', intensity: 66, dominantMood: 'Concentré', sessions: 1 },
-  { day: 'Mer', slot: 'Soir', intensity: 44, dominantMood: 'Déconnexion', sessions: 1 },
-  { day: 'Jeu', slot: 'Matin', intensity: 84, dominantMood: 'Euphorique', sessions: 3 },
-  { day: 'Jeu', slot: 'Midi', intensity: 62, dominantMood: 'Créatif', sessions: 1 },
-  { day: 'Jeu', slot: 'Après-midi', intensity: 70, dominantMood: 'Confiant', sessions: 2 },
-  { day: 'Jeu', slot: 'Soir', intensity: 50, dominantMood: 'Serein', sessions: 1 },
-  { day: 'Ven', slot: 'Matin', intensity: 77, dominantMood: 'Motivé', sessions: 2 },
-  { day: 'Ven', slot: 'Midi', intensity: 60, dominantMood: 'Concentré', sessions: 1 },
-  { day: 'Ven', slot: 'Après-midi', intensity: 73, dominantMood: 'Inspiré', sessions: 2 },
-  { day: 'Ven', slot: 'Soir', intensity: 52, dominantMood: 'Calme', sessions: 1 },
-  { day: 'Sam', slot: 'Matin', intensity: 68, dominantMood: 'Détendu', sessions: 1 },
-  { day: 'Sam', slot: 'Midi', intensity: 54, dominantMood: 'Curieux', sessions: 1 },
-  { day: 'Sam', slot: 'Après-midi', intensity: 76, dominantMood: 'Enthousiaste', sessions: 2 },
-  { day: 'Sam', slot: 'Soir', intensity: 64, dominantMood: 'Serein', sessions: 2 },
-  { day: 'Dim', slot: 'Matin', intensity: 70, dominantMood: 'Positif', sessions: 1 },
-  { day: 'Dim', slot: 'Midi', intensity: 46, dominantMood: 'Paisible', sessions: 1 },
-  { day: 'Dim', slot: 'Après-midi', intensity: 58, dominantMood: 'Réflexif', sessions: 1 },
-  { day: 'Dim', slot: 'Soir', intensity: 49, dominantMood: 'Repos', sessions: 1 },
-];
+const FALLBACK_HEATMAP: HeatmapPoint[] = [];
 
 export const SCORES_DASHBOARD_FALLBACK: ScoresDashboardData = {
   moodTrend: FALLBACK_MOOD_TREND,

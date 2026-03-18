@@ -70,14 +70,15 @@ interface EmotionDimension {
   fullMark: 100;
 }
 
-const MOCK_WEEKLY_DATA: DailyEmotion[] = [
-  { day: 'Lun', valence: 65, arousal: 55, dominantEmotion: 'Calme', scansCount: 3 },
-  { day: 'Mar', valence: 72, arousal: 68, dominantEmotion: 'Joie', scansCount: 4 },
-  { day: 'Mer', valence: 58, arousal: 45, dominantEmotion: 'Fatigue', scansCount: 2 },
-  { day: 'Jeu', valence: 80, arousal: 75, dominantEmotion: 'Enthousiasme', scansCount: 5 },
-  { day: 'Ven', valence: 70, arousal: 60, dominantEmotion: 'Satisfaction', scansCount: 3 },
-  { day: 'Sam', valence: 85, arousal: 70, dominantEmotion: 'Joie', scansCount: 2 },
-  { day: 'Dim', valence: 75, arousal: 50, dominantEmotion: 'Sérénité', scansCount: 2 },
+// Empty default used when no data is available
+const EMPTY_WEEKLY_DATA: DailyEmotion[] = [
+  { day: 'Lun', valence: 0, arousal: 0, dominantEmotion: '-', scansCount: 0 },
+  { day: 'Mar', valence: 0, arousal: 0, dominantEmotion: '-', scansCount: 0 },
+  { day: 'Mer', valence: 0, arousal: 0, dominantEmotion: '-', scansCount: 0 },
+  { day: 'Jeu', valence: 0, arousal: 0, dominantEmotion: '-', scansCount: 0 },
+  { day: 'Ven', valence: 0, arousal: 0, dominantEmotion: '-', scansCount: 0 },
+  { day: 'Sam', valence: 0, arousal: 0, dominantEmotion: '-', scansCount: 0 },
+  { day: 'Dim', valence: 0, arousal: 0, dominantEmotion: '-', scansCount: 0 },
 ];
 
 // Dimensions par défaut (utilisées si aucune donnée réelle)
@@ -115,7 +116,7 @@ export const WeeklyEmotionReport: React.FC = () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
-          setWeeklyData(MOCK_WEEKLY_DATA);
+          setWeeklyData(EMPTY_WEEKLY_DATA);
           setIsLoadingData(false);
           return;
         }
@@ -132,8 +133,7 @@ export const WeeklyEmotionReport: React.FC = () => {
           .order('created_at', { ascending: true });
 
         if (error || !signals || signals.length === 0) {
-          // Fallback aux données mock si pas de données
-          setWeeklyData(MOCK_WEEKLY_DATA);
+          setWeeklyData(EMPTY_WEEKLY_DATA);
           setIsLoadingData(false);
           return;
         }
@@ -188,7 +188,7 @@ export const WeeklyEmotionReport: React.FC = () => {
         setWeeklyData(realData);
       } catch (err) {
         logger.error('[WeeklyEmotionReport] Error loading data:', err, 'SCAN');
-        setWeeklyData(MOCK_WEEKLY_DATA);
+        setWeeklyData(EMPTY_WEEKLY_DATA);
       } finally {
         setIsLoadingData(false);
       }
@@ -375,9 +375,8 @@ export const WeeklyEmotionReport: React.FC = () => {
     );
   }
 
-  // Détecter si on utilise des données réelles ou démo
-  const isUsingRealData = weeklyData.some(d => d.scansCount > 0) && 
-    weeklyData !== MOCK_WEEKLY_DATA;
+  // Détecter si on a des données réelles
+  const isUsingRealData = weeklyData.some(d => d.scansCount > 0);
 
   return (
     <div className="space-y-6">
@@ -391,13 +390,13 @@ export const WeeklyEmotionReport: React.FC = () => {
             </h2>
             {/* Indicateur données réelles vs démo */}
             <Badge variant={isUsingRealData ? "default" : "secondary"} className="text-xs">
-              {isUsingRealData ? "📊 Données réelles" : "🎭 Données démo"}
+              {isUsingRealData ? "Données réelles" : "Aucune donnée"}
             </Badge>
           </div>
           <p className="text-muted-foreground">
-            {isUsingRealData 
-              ? "Analyse de vos émotions cette semaine" 
-              : "Aperçu avec données de démonstration"}
+            {isUsingRealData
+              ? "Analyse de vos émotions cette semaine"
+              : "Effectuez des scans pour générer votre rapport"}
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">

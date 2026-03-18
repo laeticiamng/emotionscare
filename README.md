@@ -203,6 +203,26 @@ Storybook (component documentation)
 | **Resend** | Email Transactionnel | Notifications, rapports, onboarding | `send-email` |
 | **Sentry** | Monitoring | Tracking erreurs, performance, replays | `sentry-webhook-handler` |
 
+### Architecture 3D Immersive (Three.js / R3F)
+
+Le système 3D utilise `@react-three/fiber`, `@react-three/drei` et `@react-three/postprocessing` avec une architecture device-aware :
+
+| Composant | Usage | Fonctionnalité |
+|-----------|-------|----------------|
+| **EmotionSphere3D** | Scan émotionnel | Sphère pulsante colorée selon valence (rouge→vert) et arousal (taille/vitesse) |
+| **AchievementBadge3D** | Gamification | Badge 3D métallique par rareté : bronze, argent, or, diamant (arc-en-ciel) |
+| **MeditationEnvironment3D** | Méditation | Orbes flottants + particules sync respiration (thèmes : ocean, forest, cosmos, dawn) |
+| **DashboardBackground3D** | Dashboard | Fond géométrique subtil non-intrusif |
+| **HeroScene3D** | Landing page | Scène cosmique avec particules et post-processing |
+| **CosmicParticleField** | Partagé | Système de particules paramétrique (count, radius, color, speed, size) |
+
+**Device Tiers** (`visualDirection.ts`) :
+- **High** : 1200 particules, post-processing complet (bloom, vignette, noise)
+- **Medium** : 600 particules, bloom uniquement
+- **Low** : 200 particules, pas de post-processing
+
+**Accessibilité** : `prefersReducedMotion()` désactive toutes les animations. `Scene3DErrorBoundary` fournit un fallback élégant quand WebGL n'est pas disponible.
+
 ---
 
 ## Architecture du Projet
@@ -254,6 +274,17 @@ emotionscare/
 │   │
 │   ├── components/            # 2 031+ composants réutilisables
 │   │   ├── ui/                # shadcn/ui (60+ composants)
+│   │   ├── 3d/                # Système 3D immersif (Three.js/R3F)
+│   │   │   ├── ImmersiveCanvas.tsx       # Canvas wrapper réutilisable
+│   │   │   ├── CosmicParticleField.tsx   # Système de particules paramétrique
+│   │   │   ├── EmotionSphere3D.tsx       # Sphère émotionnelle (valence/arousal)
+│   │   │   ├── AchievementBadge3D.tsx    # Badge 3D par rareté (bronze→diamant)
+│   │   │   ├── MeditationEnvironment3D.tsx # Environnement méditation + sync respiration
+│   │   │   ├── DashboardBackground3D.tsx # Fond géométrique subtil pour dashboard
+│   │   │   ├── HeroScene3D.tsx           # Scène hero landing page
+│   │   │   ├── Scene3DErrorBoundary.tsx  # WebGL detection + fallback premium
+│   │   │   ├── ImmersivePostProcessing.tsx # Bloom, vignette adaptatif
+│   │   │   └── visualDirection.ts        # Direction visuelle unifiée (palettes, device tiers)
 │   │   ├── dashboard/         # Widgets dashboard (tendances, objectifs, notifications, IA)
 │   │   ├── error/             # Error boundaries multi-niveaux
 │   │   ├── layout/            # Shell, Header, Sidebar, Footer

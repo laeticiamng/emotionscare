@@ -3,15 +3,19 @@
  * Défis collaboratifs entre membres d'une guilde
  */
 
-import React, { useState, memo } from 'react';
+import React, { useState, useEffect, memo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Users, Trophy, Target, Clock, Flame, Star, 
-  Medal, Swords, ChevronRight, Gift 
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Users, Trophy, Target, Clock, Flame, Star,
+  Medal, Swords, ChevronRight, Gift, AlertTriangle
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -41,63 +45,73 @@ interface GuildChallenge {
   status: 'active' | 'upcoming' | 'completed';
 }
 
-const MOCK_CHALLENGES: GuildChallenge[] = [
-  {
-    id: '1',
-    title: 'Marathon de Méditation',
-    description: 'Atteignez collectivement 1000 minutes de méditation cette semaine',
-    type: 'collective',
-    goal: 1000,
-    progress: 687,
-    startDate: new Date(),
-    endDate: new Date(Date.now() + 259200000),
-    reward: { xp: 500, badge: 'Zen Masters', special: 'Thème exclusif "Forêt Enchantée"' },
-    participants: [
-      { id: '1', name: 'Marie L.', contribution: 145, rank: 1 },
-      { id: '2', name: 'Thomas B.', contribution: 132, rank: 2 },
-      { id: '3', name: 'Sophie M.', contribution: 98, rank: 3 },
-      { id: '4', name: 'Alex R.', contribution: 87, rank: 4 },
-      { id: '5', name: 'Julie P.', contribution: 75, rank: 5 }
-    ],
-    status: 'active'
-  },
-  {
-    id: '2',
-    title: 'Duel de Streaks',
-    description: 'Qui maintiendra la plus longue série quotidienne ?',
-    type: 'competitive',
-    goal: 14,
-    progress: 8,
-    startDate: new Date(Date.now() - 691200000),
-    endDate: new Date(Date.now() + 518400000),
-    reward: { xp: 300, badge: 'Streak Champion' },
-    participants: [
-      { id: '1', name: 'Marie L.', contribution: 8, rank: 1 },
-      { id: '2', name: 'Thomas B.', contribution: 7, rank: 2 },
-      { id: '3', name: 'Sophie M.', contribution: 6, rank: 3 }
-    ],
-    status: 'active'
-  },
-  {
-    id: '3',
-    title: 'Semaine de Respiration',
-    description: '50 sessions de respiration en équipe',
-    type: 'collective',
-    goal: 50,
-    progress: 50,
-    startDate: new Date(Date.now() - 604800000),
-    endDate: new Date(Date.now() - 86400000),
-    reward: { xp: 400, badge: 'Breath Warriors' },
-    participants: [
-      { id: '1', name: 'Marie L.', contribution: 12, rank: 1 },
-      { id: '2', name: 'Thomas B.', contribution: 10, rank: 2 }
-    ],
-    status: 'completed'
-  }
-];
-
 const GuildChallenges = memo(() => {
-  const [selectedChallenge, setSelectedChallenge] = useState<GuildChallenge>(MOCK_CHALLENGES[0]);
+  const { user } = useAuth();
+  const [selectedChallenge, setSelectedChallenge] = useState<GuildChallenge | null>(null);
+
+  // Fetch guild challenges from Supabase
+  const {
+    data: challenges = [],
+    isLoading,
+    error,
+  } = useQuery<GuildChallenge[]>({
+    queryKey: ['guild_challenges', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('guild_challenges')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const results: GuildChallenge[] = [];
+      for (const row of data ?? []) {
+        // Fetch participants for each challenge
+        const { data: participantsData } = await supabase
+          .from('guild_challenge_participants')
+          .select('*')
+          .eq('challenge_id', row.id)
+          .order('contribution', { ascending: false })
+          .limit(5);
+
+        const participants: GuildMember[] = (participantsData ?? []).map((p: any, idx: number) => ({
+          id: p.id ?? p.user_id,
+          name: p.display_name ?? p.username ?? `Membre ${idx + 1}`,
+          avatar: p.avatar_url,
+          contribution: p.contribution ?? 0,
+          rank: idx + 1,
+        }));
+
+        results.push({
+          id: row.id,
+          title: row.title ?? row.name ?? 'Défi',
+          description: row.description ?? '',
+          type: row.type ?? 'collective',
+          goal: row.goal ?? 100,
+          progress: row.progress ?? 0,
+          startDate: new Date(row.start_date ?? row.created_at),
+          endDate: new Date(row.end_date ?? Date.now() + 86400000),
+          reward: {
+            xp: row.reward_xp ?? 0,
+            badge: row.reward_badge,
+            special: row.reward_special,
+          },
+          participants,
+          status: row.status ?? 'active',
+        });
+      }
+
+      return results;
+    },
+    enabled: !!user?.id,
+  });
+
+  // Auto-select first challenge
+  useEffect(() => {
+    if (challenges.length > 0 && !selectedChallenge) {
+      setSelectedChallenge(challenges[0]);
+    }
+  }, [challenges, selectedChallenge]);
 
   const getTimeRemaining = (endDate: Date) => {
     const diff = endDate.getTime() - Date.now();
@@ -140,8 +154,47 @@ const GuildChallenges = memo(() => {
     }
   };
 
-  const activeChallenges = MOCK_CHALLENGES.filter(c => c.status === 'active');
-  const completedChallenges = MOCK_CHALLENGES.filter(c => c.status === 'completed');
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="h-4 w-64 mt-1" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-16 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="p-6 text-center" role="alert">
+          <AlertTriangle className="h-8 w-8 mx-auto text-red-500 mb-2" />
+          <p className="text-sm text-red-500">Erreur lors du chargement des défis</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (challenges.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-6 text-center">
+          <Trophy className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+          <p className="font-medium">Aucun défi disponible</p>
+          <p className="text-sm text-muted-foreground mt-1">Rejoignez une guilde pour participer aux défis !</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const activeChallenges = challenges.filter(c => c.status === 'active');
+  const completedChallenges = challenges.filter(c => c.status === 'completed');
 
   return (
     <Card>
@@ -156,124 +209,128 @@ const GuildChallenges = memo(() => {
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Défi principal sélectionné */}
-        <motion.div
-          key={selectedChallenge.id}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="p-4 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 border"
-        >
-          <div className="flex items-start justify-between mb-3">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                {getTypeBadge(selectedChallenge.type)}
-                {getStatusBadge(selectedChallenge.status)}
-              </div>
-              <h3 className="text-lg font-bold">{selectedChallenge.title}</h3>
-              <p className="text-sm text-muted-foreground">{selectedChallenge.description}</p>
-            </div>
-            <div className="text-right">
-              <div className="flex items-center gap-1 text-muted-foreground">
-                <Clock className="h-4 w-4" />
-                <span className="text-sm">{getTimeRemaining(selectedChallenge.endDate)}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Progression */}
-          <div className="mb-4">
-            <div className="flex justify-between text-sm mb-1">
-              <span>Progression</span>
-              <span className="font-medium">
-                {selectedChallenge.progress} / {selectedChallenge.goal}
-              </span>
-            </div>
-            <Progress 
-              value={(selectedChallenge.progress / selectedChallenge.goal) * 100} 
-              className="h-3"
-              aria-label="Progression du défi"
-            />
-          </div>
-
-          {/* Top contributeurs */}
-          <div className="mb-4">
-            <h4 className="text-sm font-medium mb-2">Top contributeurs</h4>
-            <div className="space-y-2">
-              {selectedChallenge.participants.slice(0, 3).map(member => (
-                <div key={member.id} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {getRankIcon(member.rank)}
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage src={member.avatar} />
-                      <AvatarFallback className="text-xs">
-                        {member.name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm">{member.name}</span>
-                  </div>
-                  <span className="text-sm font-medium">{member.contribution}</span>
+        {selectedChallenge && (
+          <motion.div
+            key={selectedChallenge.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-4 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 border"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  {getTypeBadge(selectedChallenge.type)}
+                  {getStatusBadge(selectedChallenge.status)}
                 </div>
+                <h3 className="text-lg font-bold">{selectedChallenge.title}</h3>
+                <p className="text-sm text-muted-foreground">{selectedChallenge.description}</p>
+              </div>
+              <div className="text-right">
+                <div className="flex items-center gap-1 text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  <span className="text-sm">{getTimeRemaining(selectedChallenge.endDate)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Progression */}
+            <div className="mb-4">
+              <div className="flex justify-between text-sm mb-1">
+                <span>Progression</span>
+                <span className="font-medium">
+                  {selectedChallenge.progress} / {selectedChallenge.goal}
+                </span>
+              </div>
+              <Progress
+                value={(selectedChallenge.progress / selectedChallenge.goal) * 100}
+                className="h-3"
+                aria-label="Progression du défi"
+              />
+            </div>
+
+            {/* Top contributeurs */}
+            <div className="mb-4">
+              <h4 className="text-sm font-medium mb-2">Top contributeurs</h4>
+              <div className="space-y-2">
+                {selectedChallenge.participants.slice(0, 3).map(member => (
+                  <div key={member.id} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {getRankIcon(member.rank)}
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={member.avatar} />
+                        <AvatarFallback className="text-xs">
+                          {member.name.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm">{member.name}</span>
+                    </div>
+                    <span className="text-sm font-medium">{member.contribution}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Récompenses */}
+            <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+              <div className="flex items-center gap-2 mb-2">
+                <Gift className="h-4 w-4 text-yellow-600" />
+                <span className="font-medium text-sm">Récompenses</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline">
+                  <Star className="h-3 w-3 mr-1" />
+                  {selectedChallenge.reward.xp} XP
+                </Badge>
+                {selectedChallenge.reward.badge && (
+                  <Badge variant="outline">
+                    <Medal className="h-3 w-3 mr-1" />
+                    {selectedChallenge.reward.badge}
+                  </Badge>
+                )}
+                {selectedChallenge.reward.special && (
+                  <Badge variant="outline" className="bg-purple-500/10 text-purple-600">
+                    {selectedChallenge.reward.special}
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Liste des autres défis */}
+        {activeChallenges.length > 0 && (
+          <div>
+            <h4 className="text-sm font-medium mb-3 text-muted-foreground">
+              DÉFIS ACTIFS ({activeChallenges.length})
+            </h4>
+            <div className="space-y-2">
+              {activeChallenges.map(challenge => (
+                <button
+                  key={challenge.id}
+                  onClick={() => setSelectedChallenge(challenge)}
+                  className={`w-full p-3 rounded-lg border text-left transition-all hover:bg-muted/50 ${
+                    selectedChallenge?.id === challenge.id ? 'border-primary' : ''
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
+                        <Target className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-sm">{challenge.title}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {Math.round((challenge.progress / challenge.goal) * 100)}% complété
+                        </div>
+                      </div>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                </button>
               ))}
             </div>
           </div>
-
-          {/* Récompenses */}
-          <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-            <div className="flex items-center gap-2 mb-2">
-              <Gift className="h-4 w-4 text-yellow-600" />
-              <span className="font-medium text-sm">Récompenses</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="outline">
-                <Star className="h-3 w-3 mr-1" />
-                {selectedChallenge.reward.xp} XP
-              </Badge>
-              {selectedChallenge.reward.badge && (
-                <Badge variant="outline">
-                  <Medal className="h-3 w-3 mr-1" />
-                  {selectedChallenge.reward.badge}
-                </Badge>
-              )}
-              {selectedChallenge.reward.special && (
-                <Badge variant="outline" className="bg-purple-500/10 text-purple-600">
-                  {selectedChallenge.reward.special}
-                </Badge>
-              )}
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Liste des autres défis */}
-        <div>
-          <h4 className="text-sm font-medium mb-3 text-muted-foreground">
-            DÉFIS ACTIFS ({activeChallenges.length})
-          </h4>
-          <div className="space-y-2">
-            {activeChallenges.map(challenge => (
-              <button
-                key={challenge.id}
-                onClick={() => setSelectedChallenge(challenge)}
-                className={`w-full p-3 rounded-lg border text-left transition-all hover:bg-muted/50 ${
-                  selectedChallenge.id === challenge.id ? 'border-primary' : ''
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Target className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-sm">{challenge.title}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {Math.round((challenge.progress / challenge.goal) * 100)}% complété
-                      </div>
-                    </div>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
+        )}
 
         {/* Défis terminés */}
         {completedChallenges.length > 0 && (

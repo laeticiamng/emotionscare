@@ -1,12 +1,15 @@
 /**
  * XPBar - Barre de progression XP visible dans le header
  * Affiche le niveau, les points d'expérience et les badges
- * Niveaux : Débutant → Initié → Praticien → Expert → Maître
+ * Niveaux : Débutant -> Initié -> Praticien -> Expert -> Maître
  */
 
 import React, { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, Trophy, Zap, ChevronDown } from 'lucide-react';
+import { Star, Trophy, Zap, ChevronDown, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Level {
@@ -16,6 +19,13 @@ interface Level {
   color: string;
 }
 
+interface BadgeItem {
+  id: string;
+  name: string;
+  icon: string;
+  earned: boolean;
+}
+
 const LEVELS: Level[] = [
   { name: 'Débutant', minXP: 0, icon: '🌱', color: 'from-green-400 to-green-600' },
   { name: 'Initié', minXP: 100, icon: '🌿', color: 'from-emerald-400 to-emerald-600' },
@@ -23,17 +33,6 @@ const LEVELS: Level[] = [
   { name: 'Expert', minXP: 600, icon: '💎', color: 'from-purple-400 to-purple-600' },
   { name: 'Maître', minXP: 1000, icon: '👑', color: 'from-amber-400 to-amber-600' },
 ];
-
-const BADGES = [
-  { id: 'first_scan', name: 'Premier Scan', icon: '🔍', earned: true },
-  { id: 'week_streak', name: '7 jours consécutifs', icon: '🔥', earned: true },
-  { id: 'night_owl', name: '5 séances sommeil', icon: '🌙', earned: true },
-  { id: 'zen_master', name: '50 respirations', icon: '🧘', earned: false },
-  { id: 'community', name: 'Entraide active', icon: '🤝', earned: false },
-];
-
-// Mock XP state — will be replaced by Supabase/Zustand
-const MOCK_XP = 340;
 
 function getCurrentLevel(xp: number): { current: Level; next: Level | null; progress: number } {
   let currentLevel = LEVELS[0];
@@ -58,11 +57,69 @@ function getCurrentLevel(xp: number): { current: Level; next: Level | null; prog
 
 const XPBar: React.FC<{ className?: string }> = ({ className }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const xp = MOCK_XP;
+  const { user } = useAuth();
 
+  // Fetch XP from Supabase
+  const { data: xpData, isLoading: xpLoading } = useQuery({
+    queryKey: ['user_xp', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return { xp: 0 };
+      const { data, error } = await supabase
+        .from('user_points')
+        .select('total_points, points')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) throw error;
+      return { xp: data?.total_points ?? data?.points ?? 0 };
+    },
+    enabled: !!user?.id,
+  });
+
+  // Fetch badges from Supabase
+  const { data: badges = [] } = useQuery<BadgeItem[]>({
+    queryKey: ['user_badges_xpbar', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+
+      // Fetch all available badges
+      const { data: allBadges } = await supabase
+        .from('badges')
+        .select('id, name, icon')
+        .limit(10);
+
+      // Fetch user's earned badges
+      const { data: earnedBadges } = await supabase
+        .from('user_badges')
+        .select('badge_id')
+        .eq('user_id', user.id);
+
+      const earnedIds = new Set((earnedBadges ?? []).map((b: any) => b.badge_id));
+
+      return (allBadges ?? []).map((b: any) => ({
+        id: b.id,
+        name: b.name ?? '',
+        icon: b.icon ?? '🏅',
+        earned: earnedIds.has(b.id),
+      }));
+    },
+    enabled: !!user?.id,
+  });
+
+  const xp = xpData?.xp ?? 0;
   const { current, next, progress } = useMemo(() => getCurrentLevel(xp), [xp]);
+  const earnedBadges = badges.filter((b) => b.earned);
 
-  const earnedBadges = BADGES.filter((b) => b.earned);
+  if (xpLoading) {
+    return (
+      <div className={cn('relative', className)}>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/60">
+          <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+          <span className="text-[10px] text-muted-foreground">Chargement...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={cn('relative', className)}>
@@ -169,30 +226,32 @@ const XPBar: React.FC<{ className?: string }> = ({ className }) => {
             </div>
 
             {/* Badges */}
-            <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
-                Badges ({earnedBadges.length}/{BADGES.length})
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {BADGES.map((badge) => (
-                  <div
-                    key={badge.id}
-                    className={cn(
-                      'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border',
-                      badge.earned
-                        ? 'bg-primary/10 border-primary/20 text-foreground'
-                        : 'bg-muted/50 border-border text-muted-foreground/40'
-                    )}
-                    title={badge.name}
-                  >
-                    <span className={cn(!badge.earned && 'grayscale opacity-40')}>
-                      {badge.icon}
-                    </span>
-                    <span className="hidden sm:inline">{badge.name}</span>
-                  </div>
-                ))}
+            {badges.length > 0 && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+                  Badges ({earnedBadges.length}/{badges.length})
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {badges.map((badge) => (
+                    <div
+                      key={badge.id}
+                      className={cn(
+                        'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border',
+                        badge.earned
+                          ? 'bg-primary/10 border-primary/20 text-foreground'
+                          : 'bg-muted/50 border-border text-muted-foreground/40'
+                      )}
+                      title={badge.name}
+                    >
+                      <span className={cn(!badge.earned && 'grayscale opacity-40')}>
+                        {badge.icon}
+                      </span>
+                      <span className="hidden sm:inline">{badge.name}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Level roadmap */}
             <div className="mt-4 pt-4 border-t border-border">

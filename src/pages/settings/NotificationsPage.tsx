@@ -1,9 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Bell, Mail, MessageSquare, Calendar, AlertCircle } from 'lucide-react';
+import { Bell, Mail, MessageSquare, Calendar, AlertCircle, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 /**
@@ -22,12 +23,18 @@ export default function NotificationsPage() {
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
-      <div className="mb-6">
+      <header className="mb-6">
+        <Button variant="ghost" size="sm" className="mb-4 gap-2" asChild>
+          <Link to="/settings" aria-label="Retour aux paramètres">
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            Retour aux paramètres
+          </Link>
+        </Button>
         <h1 className="text-3xl font-bold text-foreground">Notifications</h1>
         <p className="text-muted-foreground mt-2">
           Gérez vos préférences de notifications pour rester informé
         </p>
-      </div>
+      </header>
 
       <div className="space-y-6">
         <Card>

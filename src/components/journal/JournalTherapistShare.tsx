@@ -3,16 +3,20 @@
  * Permet de partager des entrées de journal avec un professionnel de santé
  */
 
-import React, { useState, memo } from 'react';
+import React, { useState, memo, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
-import { 
-  Shield, Share2, User, Mail, Lock, Eye, 
-  EyeOff, Check, X, AlertCircle, Clock, Trash2 
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Shield, Share2, User, Mail, Lock, Eye,
+  EyeOff, Check, X, AlertCircle, Clock, Trash2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -32,33 +36,98 @@ interface TherapistConnection {
   accessLevel: 'full' | 'selected' | 'none';
 }
 
-const MOCK_ENTRIES: SharedEntry[] = [
-  { id: '1', title: 'Réflexions sur ma semaine', date: new Date(), shared: true },
-  { id: '2', title: 'Moment de gratitude', date: new Date(Date.now() - 86400000), shared: false },
-  { id: '3', title: 'Exercice de respiration', date: new Date(Date.now() - 172800000), shared: true },
-  { id: '4', title: 'Objectifs du mois', date: new Date(Date.now() - 259200000), shared: false }
-];
-
 const JournalTherapistShare = memo(() => {
   const { toast } = useToast();
-  const [therapist, setTherapist] = useState<TherapistConnection | null>({
-    id: '1',
-    name: 'Dr. Marie Dupont',
-    email: 'dr.dupont@cabinet.fr',
-    verified: true,
-    connectedAt: new Date(Date.now() - 2592000000),
-    accessLevel: 'selected'
+  const { user } = useAuth();
+
+  // Fetch journal entries from Supabase
+  const {
+    data: fetchedEntries = [],
+    isLoading: entriesLoading,
+    error: entriesError,
+  } = useQuery<SharedEntry[]>({
+    queryKey: ['journal_entries_share', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data, error } = await supabase
+        .from('journal_entries')
+        .select('id, title, created_at, shared_with_therapist')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+
+      return (data ?? []).map((row: any) => ({
+        id: row.id,
+        title: row.title ?? 'Entrée sans titre',
+        date: new Date(row.created_at),
+        shared: row.shared_with_therapist ?? false,
+      }));
+    },
+    enabled: !!user?.id,
   });
-  const [entries, setEntries] = useState<SharedEntry[]>(MOCK_ENTRIES);
+
+  // Fetch therapist connection from Supabase
+  const {
+    data: fetchedTherapist,
+    isLoading: therapistLoading,
+  } = useQuery<TherapistConnection | null>({
+    queryKey: ['therapist_connection', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('therapist_connections')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!data) return null;
+
+      return {
+        id: data.id,
+        name: data.therapist_name ?? 'Thérapeute',
+        email: data.therapist_email ?? '',
+        verified: data.verified ?? false,
+        connectedAt: new Date(data.connected_at ?? data.created_at),
+        accessLevel: data.access_level ?? 'selected',
+      };
+    },
+    enabled: !!user?.id,
+  });
+
+  const [therapist, setTherapist] = useState<TherapistConnection | null>(null);
+  const [entries, setEntries] = useState<SharedEntry[]>([]);
   const [newTherapistEmail, setNewTherapistEmail] = useState('');
   const [showInvite, setShowInvite] = useState(false);
   const [autoShare, setAutoShare] = useState(false);
   const [endToEndEncryption, setEndToEndEncryption] = useState(true);
 
-  const toggleEntryShare = (entryId: string) => {
-    setEntries(prev => prev.map(e => 
-      e.id === entryId ? { ...e, shared: !e.shared } : e
+  // Sync fetched data to local state
+  useEffect(() => {
+    if (fetchedEntries.length > 0) setEntries(fetchedEntries);
+  }, [fetchedEntries]);
+
+  useEffect(() => {
+    if (fetchedTherapist !== undefined) setTherapist(fetchedTherapist);
+  }, [fetchedTherapist]);
+
+  const toggleEntryShare = async (entryId: string) => {
+    const entry = entries.find(e => e.id === entryId);
+    if (!entry) return;
+
+    const newShared = !entry.shared;
+    setEntries(prev => prev.map(e =>
+      e.id === entryId ? { ...e, shared: newShared } : e
     ));
+
+    await supabase
+      .from('journal_entries')
+      .update({ shared_with_therapist: newShared })
+      .eq('id', entryId);
+
     toast({ title: 'Partage mis à jour' });
   };
 
@@ -71,7 +140,7 @@ const JournalTherapistShare = memo(() => {
       });
       return;
     }
-    
+
     toast({
       title: 'Invitation envoyée',
       description: `Une invitation a été envoyée à ${newTherapistEmail}`
@@ -88,7 +157,39 @@ const JournalTherapistShare = memo(() => {
     });
   };
 
+  const isLoading = entriesLoading || therapistLoading;
   const sharedCount = entries.filter(e => e.shared).length;
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-4 w-72 mt-1" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-24 w-full" />
+          <div className="space-y-2">
+            {[1, 2, 3].map(i => (
+              <Skeleton key={i} className="h-14 w-full" />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (entriesError) {
+    return (
+      <Card>
+        <CardContent className="p-6 text-center" role="alert">
+          <AlertCircle className="h-8 w-8 mx-auto text-red-500 mb-2" />
+          <p className="text-sm text-red-500">Erreur lors du chargement des entrées</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -137,8 +238,8 @@ const JournalTherapistShare = memo(() => {
                   </div>
                 </div>
               </div>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="sm"
                 onClick={removeTherapist}
                 className="text-destructive hover:text-destructive"
@@ -226,33 +327,39 @@ const JournalTherapistShare = memo(() => {
             </div>
 
             <div className="space-y-2 max-h-[250px] overflow-y-auto">
-              {entries.map(entry => (
-                <div
-                  key={entry.id}
-                  className={`flex items-center justify-between p-3 rounded-lg border ${
-                    entry.shared ? 'bg-primary/5 border-primary/20' : 'bg-muted/30'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Checkbox
-                      checked={entry.shared}
-                      onCheckedChange={() => toggleEntryShare(entry.id)}
-                      aria-label={`Partager ${entry.title}`}
-                    />
-                    <div>
-                      <div className="font-medium text-sm">{entry.title}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {entry.date.toLocaleDateString('fr-FR')}
+              {entries.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  Aucune entrée de journal disponible
+                </p>
+              ) : (
+                entries.map(entry => (
+                  <div
+                    key={entry.id}
+                    className={`flex items-center justify-between p-3 rounded-lg border ${
+                      entry.shared ? 'bg-primary/5 border-primary/20' : 'bg-muted/30'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Checkbox
+                        checked={entry.shared}
+                        onCheckedChange={() => toggleEntryShare(entry.id)}
+                        aria-label={`Partager ${entry.title}`}
+                      />
+                      <div>
+                        <div className="font-medium text-sm">{entry.title}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {entry.date.toLocaleDateString('fr-FR')}
+                        </div>
                       </div>
                     </div>
+                    {entry.shared ? (
+                      <Eye className="h-4 w-4 text-primary" />
+                    ) : (
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                    )}
                   </div>
-                  {entry.shared ? (
-                    <Eye className="h-4 w-4 text-primary" />
-                  ) : (
-                    <EyeOff className="h-4 w-4 text-muted-foreground" />
-                  )}
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         )}
@@ -263,7 +370,7 @@ const JournalTherapistShare = memo(() => {
             <AlertCircle className="h-4 w-4 text-yellow-600 mt-0.5" />
             <div className="text-sm text-yellow-600">
               <p className="font-medium">Important</p>
-              <p>Le partage est facultatif et révocable à tout moment. 
+              <p>Le partage est facultatif et révocable à tout moment.
               Vous gardez le contrôle total sur vos données.</p>
             </div>
           </div>

@@ -1,18 +1,27 @@
+import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ArrowLeft } from 'lucide-react';
 
 export default function AccessibilitySettingsPage() {
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Paramètres d'Accessibilité</h1>
-        <p className="text-muted-foreground">
+    <div className="container mx-auto p-6 max-w-4xl space-y-6">
+      <header>
+        <Button variant="ghost" size="sm" className="mb-4 gap-2" asChild>
+          <Link to="/settings" aria-label="Retour aux paramètres">
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            Retour aux paramètres
+          </Link>
+        </Button>
+        <h1 className="text-3xl font-bold text-foreground">Paramètres d'Accessibilité</h1>
+        <p className="text-muted-foreground mt-2">
           Personnalisez l'accessibilité selon vos besoins
         </p>
-      </div>
+      </header>
 
       <div className="grid md:grid-cols-2 gap-6">
         <Card className="p-6 space-y-6">

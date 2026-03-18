@@ -1,56 +1,62 @@
 // @ts-nocheck
 import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useDashboardStore } from '@/store/dashboard.store';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
-
-const MOCK_CONTINUE_ITEMS = [
-  {
-    title: 'Story Synth',
-    subtitle: 'Chapitre 2 - La forêt enchantée',
-    deeplink: '/story-synth?resume=chapter2',
-    module: 'story_synth'
-  },
-  {
-    title: 'VR Respiration',
-    subtitle: 'Session paisible (3 min restantes)',
-    deeplink: '/vr-breath?resume=peaceful_3min',
-    module: 'vr_breath'
-  }
-];
 
 export const useContinue = () => {
   const store = useDashboardStore();
+  const { user } = useAuth();
+
+  const { data: continueItem, isLoading, isError, error } = useQuery({
+    queryKey: ['continue-item', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+
+      // Fetch the most recent incomplete activity session for this user
+      const { data, error } = await supabase
+        .from('activity_sessions')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('completed', false)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) {
+        logger.error('Failed to fetch continue data', error as Error, 'SYSTEM');
+        return null;
+      }
+
+      if (!data) return null;
+
+      // Map the activity session to a ContinueItem
+      return {
+        title: data.title || data.module_name || data.module || 'Activity',
+        subtitle: data.subtitle || data.description || '',
+        deeplink: data.deeplink || `/${data.module}?resume=${data.id}`,
+        module: data.module || data.module_name || '',
+      };
+    },
+    enabled: !!user?.id,
+    staleTime: 60 * 1000, // 1 minute
+  });
+
+  // Sync with dashboard store
+  useEffect(() => {
+    store.setLoading('continue', isLoading);
+  }, [isLoading]);
 
   useEffect(() => {
-    const fetchContinue = async () => {
-      try {
-        store.setLoading('continue', true);
-        
-        // Mock API call
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        // Randomly return a continue item or none
-        const hasContinue = Math.random() > 0.5;
-        const item = hasContinue 
-          ? MOCK_CONTINUE_ITEMS[Math.floor(Math.random() * MOCK_CONTINUE_ITEMS.length)]
-          : null;
-          
-        store.setContinueItem(item);
-      } catch (error) {
-        logger.error('Failed to fetch continue data', error as Error, 'SYSTEM');
-        store.setContinueItem(null);
-      } finally {
-        store.setLoading('continue', false);
-      }
-    };
-
-    if (store.continueItem === null && !store.loading.continue) {
-      fetchContinue();
-    }
-  }, []); // Empty dependencies to run only once
+    store.setContinueItem(continueItem ?? null);
+  }, [continueItem]);
 
   return {
-    item: store.continueItem,
-    loading: store.loading.continue
+    item: continueItem ?? null,
+    loading: isLoading,
+    isError,
+    error,
   };
 };
