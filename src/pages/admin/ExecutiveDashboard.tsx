@@ -51,7 +51,7 @@ const ExecutiveDashboard: React.FC = () => {
   };
 
   // Fetch executive metrics
-  const { data: executiveMetrics, isLoading, refetch } = useQuery({
+  const { data: executiveMetrics, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['executive-business-metrics', timePeriod],
     queryFn: async () => {
       const monthsCount = getMonthsCount(timePeriod);
@@ -247,6 +247,12 @@ const ExecutiveDashboard: React.FC = () => {
           </Button>
         </div>
       </div>
+
+      {isError && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-4">
+          <p className="text-destructive font-medium">Erreur lors du chargement des données</p>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

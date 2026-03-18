@@ -100,7 +100,7 @@ const AIRecommendationsWidget: React.FC<AIRecommendationsWidgetProps> = ({
   const { user } = useAuth();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const { data: recommendations = DEFAULT_RECOMMENDATIONS, isLoading, refetch } = useQuery({
+  const { data: recommendations = DEFAULT_RECOMMENDATIONS, isLoading, isError, refetch } = useQuery({
     queryKey: ['ai-recommendations', user?.id],
     queryFn: async () => {
       if (!user) return DEFAULT_RECOMMENDATIONS;
@@ -283,6 +283,11 @@ const AIRecommendationsWidget: React.FC<AIRecommendationsWidgetProps> = ({
 
   return (
     <Card className={className}>
+      {isError && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mx-6 mt-6">
+          <p className="text-destructive text-sm">Erreur lors du chargement</p>
+        </div>
+      )}
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-lg">

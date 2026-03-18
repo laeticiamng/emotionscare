@@ -31,6 +31,17 @@ export function createServer({ registerRoutes, enableRateLimiting = true }: Serv
   // Register application routes
   registerRoutes(app);
 
+  // Handle requests to undefined routes with a proper 404 response
+  app.setNotFoundHandler((request, reply) => {
+    reply.code(404).send({
+      ok: false,
+      error: {
+        code: 'NOT_FOUND',
+        message: 'Route non trouvée',
+      },
+    });
+  });
+
   return app;
 }
 

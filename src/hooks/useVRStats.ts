@@ -128,12 +128,14 @@ async function fetchVRStats(): Promise<VRNebulaStats> {
 }
 
 export function useVRStats() {
-  return useQuery({
+  const { data, isLoading, isError, error, ...rest } = useQuery({
     queryKey: ['vr-stats'],
     queryFn: fetchVRStats,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
+
+  return { data, isLoading, isError, error, ...rest };
 }
 
 async function fetchVRHistory(limit = 20): Promise<VRSessionSummary[]> {

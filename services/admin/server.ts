@@ -12,7 +12,10 @@ const OrganizationUpdateSchema = z.object({
 
 type OrgUpdate = z.infer<typeof OrganizationUpdateSchema>;
 
-// Mock organization data (in real app, this would be from database)
+// TODO: Replace mock organization data below with real DB queries.
+// This hardcoded data should be fetched from the database (e.g., via a
+// repository/service layer) in the route handlers instead of being kept
+// in module-level mutable state.
 let orgData = {
   id: 'org1',
   name: 'Demo Org',

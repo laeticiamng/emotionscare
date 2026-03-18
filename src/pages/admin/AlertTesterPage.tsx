@@ -46,7 +46,7 @@ const AlertTesterPage: React.FC = () => {
     }
   });
 
-  const { data: recentIncidents } = useQuery({
+  const { data: recentIncidents, isError: isIncidentsError, error: incidentsError } = useQuery({
     queryKey: ['recent-test-incidents'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -61,7 +61,7 @@ const AlertTesterPage: React.FC = () => {
     refetchInterval: 5000 // Rafraîchir toutes les 5 secondes
   });
 
-  const { data: recentTickets } = useQuery({
+  const { data: recentTickets, isError: isTicketsError, error: ticketsError } = useQuery({
     queryKey: ['recent-test-tickets'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -111,6 +111,11 @@ const AlertTesterPage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      {(isIncidentsError || isTicketsError) && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-4">
+          <p className="text-destructive font-medium">Erreur lors du chargement des données</p>
+        </div>
+      )}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <AlertTriangle className="h-8 w-8 text-destructive" />

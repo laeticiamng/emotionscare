@@ -15,8 +15,8 @@ export async function sendMessageHandler(message: string, history: ChatMessage[]
   try {
     return await chatCompletion(messages, { model: 'gpt-4o-mini', temperature: 0.7 });
   } catch (error) {
-    logger.error('Coach message send failed', error as Error, 'COACH');
-    return "Désolé, je rencontre un problème pour répondre. Réessayez dans quelques instants.";
+    logger.error('Coach message send failed', error instanceof Error ? error : new Error(String(error)), 'COACH');
+    throw error instanceof Error ? error : new Error('Coach service unavailable');
   }
 }
 
@@ -25,8 +25,8 @@ export async function analyzeEmotionHandler(text: string): Promise<{ emotion: st
     const result = await analyzeEmotion(text);
     return { emotion: result.primaryEmotion, score: result.intensity };
   } catch (error) {
-    logger.warn('Emotion analysis failed', error, 'COACH');
-    return { emotion: 'neutral', score: 0.5 };
+    logger.error('Emotion analysis failed', error instanceof Error ? error : new Error(String(error)), 'COACH');
+    throw error instanceof Error ? error : new Error('Emotion analysis unavailable');
   }
 }
 

@@ -58,8 +58,8 @@ export async function getNotificationPreferences(userId: string): Promise<Notifi
 
     return data?.notification_settings || DEFAULT_PREFERENCES;
   } catch (error) {
-    logger.error('Erreur lors de la récupération des préférences', error as Error, 'SYSTEM');
-    return DEFAULT_PREFERENCES;
+    logger.error('Erreur lors de la récupération des préférences', error instanceof Error ? error : new Error(String(error)), 'SYSTEM');
+    throw error instanceof Error ? error : new Error('Failed to fetch notification preferences');
   }
 }
 
@@ -87,8 +87,8 @@ export async function updateNotificationPreferences(
     logger.info('Préférences de notification mises à jour', { userId }, 'SYSTEM');
     return true;
   } catch (error) {
-    logger.error('Erreur lors de la mise à jour des préférences', error as Error, 'SYSTEM');
-    return false;
+    logger.error('Erreur lors de la mise à jour des préférences', error instanceof Error ? error : new Error(String(error)), 'SYSTEM');
+    throw error instanceof Error ? error : new Error('Failed to update notification preferences');
   }
 }
 
@@ -289,8 +289,8 @@ export async function getUnreadNotifications(userId: string): Promise<CoachNotif
       scheduledFor: n.scheduled_for,
     }));
   } catch (error) {
-    logger.error('Erreur lors de la récupération des notifications', error as Error, 'SYSTEM');
-    return [];
+    logger.error('Erreur lors de la récupération des notifications', error instanceof Error ? error : new Error(String(error)), 'SYSTEM');
+    throw error;
   }
 }
 
@@ -309,8 +309,8 @@ export async function markNotificationAsRead(notificationId: string): Promise<bo
     logger.debug('Notification marquée comme lue', { notificationId }, 'SYSTEM');
     return true;
   } catch (error) {
-    logger.error('Erreur lors du marquage de la notification', error as Error, 'SYSTEM');
-    return false;
+    logger.error('Erreur lors du marquage de la notification', error instanceof Error ? error : new Error(String(error)), 'SYSTEM');
+    throw error;
   }
 }
 
@@ -330,8 +330,8 @@ export async function markAllNotificationsAsRead(userId: string): Promise<boolea
     logger.info('Toutes les notifications marquées comme lues', { userId }, 'SYSTEM');
     return true;
   } catch (error) {
-    logger.error('Erreur lors du marquage des notifications', error as Error, 'SYSTEM');
-    return false;
+    logger.error('Erreur lors du marquage des notifications', error instanceof Error ? error : new Error(String(error)), 'SYSTEM');
+    throw error;
   }
 }
 
@@ -347,8 +347,8 @@ export async function deleteNotification(notificationId: string): Promise<boolea
     logger.debug('Notification supprimée', { notificationId }, 'SYSTEM');
     return true;
   } catch (error) {
-    logger.error('Erreur lors de la suppression de la notification', error as Error, 'SYSTEM');
-    return false;
+    logger.error('Erreur lors de la suppression de la notification', error instanceof Error ? error : new Error(String(error)), 'SYSTEM');
+    throw error;
   }
 }
 

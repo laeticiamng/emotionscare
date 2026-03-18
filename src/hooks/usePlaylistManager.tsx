@@ -1,8 +1,7 @@
-// @ts-nocheck
-
 import { useState, useEffect } from 'react';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
-import { mockPlaylists } from '@/data/mockMusic';
+import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface UsePlaylistManagerProps {
   autoLoad?: boolean;
@@ -21,16 +20,34 @@ export function usePlaylistManager({ autoLoad = true }: UsePlaylistManagerProps 
     }
   }, [autoLoad]);
 
-  // Fetch playlists from API (mocked)
+  // Fetch playlists from Supabase
   const fetchPlaylists = async () => {
     setLoading(true);
+    setError(null);
     try {
-      // Simulated API call delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      setPlaylists(mockPlaylists);
-      setLoading(false);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setPlaylists([]);
+        setLoading(false);
+        return;
+      }
+
+      const { data, error: fetchError } = await supabase
+        .from('music_playlists')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (fetchError) {
+        throw new Error(`Failed to fetch playlists: ${fetchError.message}`);
+      }
+
+      setPlaylists(data || []);
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch playlists'));
+      const e = err instanceof Error ? err : new Error('Failed to fetch playlists');
+      logger.error('Playlist fetch failed', e, 'MUSIC');
+      setError(e);
+    } finally {
       setLoading(false);
     }
   };
@@ -42,26 +59,44 @@ export function usePlaylistManager({ autoLoad = true }: UsePlaylistManagerProps 
     tracks: MusicTrack[] = []
   ) => {
     setLoading(true);
+    setError(null);
     try {
-      // Simulated API call delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const { data, error: insertError } = await supabase
+        .from('music_playlists')
+        .insert({
+          user_id: user.id,
+          name,
+          description,
+          tracks: JSON.stringify(tracks),
+        })
+        .select('*')
+        .single();
+
+      if (insertError) {
+        throw new Error(`Failed to create playlist: ${insertError.message}`);
+      }
+
       const newPlaylist: MusicPlaylist = {
-        id: `playlist-${Date.now()}`,
+        id: data.id,
         title: name,
         name,
         description,
         tracks,
         category: 'user-created'
       };
-      
-      setPlaylists((prevPlaylists) => [...prevPlaylists, newPlaylist]);
-      setLoading(false);
+
+      setPlaylists((prevPlaylists) => [newPlaylist, ...prevPlaylists]);
       return newPlaylist;
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to create playlist'));
+      const e = err instanceof Error ? err : new Error('Failed to create playlist');
+      logger.error('Playlist creation failed', e, 'MUSIC');
+      setError(e);
+      throw e;
+    } finally {
       setLoading(false);
-      throw err;
     }
   };
 
@@ -95,9 +130,9 @@ export function usePlaylistManager({ autoLoad = true }: UsePlaylistManagerProps 
       }
       return playlist;
     });
-    
+
     setPlaylists(updatedPlaylists);
-    
+
     // Update current playlist if it's the one being modified
     if (currentPlaylist?.id === playlistId) {
       const updatedPlaylist = updatedPlaylists.find((p) => p.id === playlistId);

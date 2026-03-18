@@ -20,7 +20,7 @@ export const useJournal = () => {
   const { setUploading, setCurrentEntry, addEntry } = useJournalStore();
   const queryClient = useQueryClient();
 
-  const { data, error, isLoading } = useQuery({
+  const { data, error, isLoading, isError } = useQuery({
     queryKey: ['journal-entries'],
     queryFn: () => fetchJournalEntries({}),
     refetchOnWindowFocus: false,
@@ -141,6 +141,7 @@ export const useJournal = () => {
   return {
     entries: data?.entries || [],
     loading: isLoading,
+    isError,
     error,
     submitVoice,
     submitText,

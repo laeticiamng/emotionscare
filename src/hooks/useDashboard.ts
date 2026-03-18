@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { DashboardService } from '@/modules/dashboard/dashboardService';
 
 export const useDashboard = (userId: string) => {
-  const { data: stats, isLoading: isLoadingStats } = useQuery({
+  const { data: stats, isLoading: isLoadingStats, isError: isErrorStats, error: errorStats } = useQuery({
     queryKey: ['dashboard-stats', userId],
     queryFn: () => DashboardService.getGlobalStats(userId),
     enabled: !!userId,
@@ -52,6 +52,8 @@ export const useDashboard = (userId: string) => {
     achievements,
     badges,
     weeklySummary,
-    isLoading: isLoadingStats || isLoadingModules
+    isLoading: isLoadingStats || isLoadingModules,
+    isError: isErrorStats,
+    error: errorStats
   };
 };

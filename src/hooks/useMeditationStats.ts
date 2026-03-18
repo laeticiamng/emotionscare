@@ -144,12 +144,14 @@ async function fetchMeditationStats(): Promise<MeditationStatsData> {
 }
 
 export function useMeditationStats() {
-  return useQuery({
+  const { data, isLoading, isError, error, ...rest } = useQuery({
     queryKey: ['meditation-stats'],
     queryFn: fetchMeditationStats,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
+
+  return { data, isLoading, isError, error, ...rest };
 }
 
 async function fetchMeditationHistory(limit = 20): Promise<MeditationSessionSummary[]> {

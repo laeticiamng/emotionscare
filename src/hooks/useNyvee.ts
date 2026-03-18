@@ -11,7 +11,7 @@ export const useNyvee = (userId: string) => {
   const { toast } = useToast();
 
   // Récupérer l'historique
-  const { data: history, isLoading } = useQuery({
+  const { data: history, isLoading, isError, error } = useQuery({
     queryKey: ['nyvee-history', userId],
     queryFn: () => nyveeService.getRecentSessions(10),
     enabled: !!userId
@@ -70,6 +70,8 @@ export const useNyvee = (userId: string) => {
   return {
     history,
     isLoading,
+    isError,
+    error,
     createSession: createSession.mutate,
     updateCozyLevel: updateCozyLevel.mutate,
     completeSession: completeSession.mutate,

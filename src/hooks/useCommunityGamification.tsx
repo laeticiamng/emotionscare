@@ -1,8 +1,6 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { Challenge, Badge } from '@/types/badge';
 import { toast } from '@/hooks/use-toast';
-import { mockBadges, mockChallenges } from './community-gamification/mockData';
 import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,6 +10,7 @@ export const useCommunityGamification = () => {
   const [badges, setBadges] = useState<Badge[]>([]);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     loadBadges();
@@ -20,38 +19,38 @@ export const useCommunityGamification = () => {
 
   const loadBadges = async () => {
     setIsLoading(true);
+    setError(null);
     try {
-      if (user) {
-        // Charger depuis Supabase
-        const { data, error } = await supabase
-          .from('user_achievements')
-          .select('*, achievements(*)')
-          .eq('user_id', user.id);
-
-        if (!error && data && data.length > 0) {
-          const supabaseBadges: Badge[] = data.map((ua: any) => ({
-            id: ua.achievements?.id || ua.id,
-            name: ua.achievements?.name || 'Badge',
-            description: ua.achievements?.description || '',
-            icon: ua.achievements?.icon || '🏆',
-            category: ua.achievements?.category || 'general',
-            unlocked: true,
-            earned: true,
-            unlockedAt: ua.unlocked_at
-          }));
-          setBadges([...mockBadges.map(b => ({
-            ...b,
-            unlocked: supabaseBadges.some(sb => sb.name === b.name),
-            earned: supabaseBadges.some(sb => sb.name === b.name)
-          }))]);
-          return;
-        }
+      if (!user) {
+        setBadges([]);
+        return;
       }
-      // Fallback vers mock data
-      setBadges(mockBadges);
-    } catch (error) {
-      logger.error('Error loading badges', error as Error, 'SYSTEM');
-      setBadges(mockBadges);
+
+      const { data, error: fetchError } = await supabase
+        .from('user_achievements')
+        .select('*, achievements(*)')
+        .eq('user_id', user.id);
+
+      if (fetchError) {
+        throw new Error(`Failed to load badges: ${fetchError.message}`);
+      }
+
+      const supabaseBadges: Badge[] = (data || []).map((ua: any) => ({
+        id: ua.achievements?.id || ua.id,
+        name: ua.achievements?.name || 'Badge',
+        description: ua.achievements?.description || '',
+        icon: ua.achievements?.icon || '🏆',
+        category: ua.achievements?.category || 'general',
+        unlocked: true,
+        earned: true,
+        unlockedAt: ua.unlocked_at
+      }));
+      setBadges(supabaseBadges);
+    } catch (err) {
+      const e = err instanceof Error ? err : new Error(String(err));
+      logger.error('Error loading badges', e, 'SYSTEM');
+      setError(e);
+      setBadges([]);
     } finally {
       setIsLoading(false);
     }
@@ -59,32 +58,39 @@ export const useCommunityGamification = () => {
 
   const loadChallenges = async () => {
     setIsLoading(true);
+    setError(null);
     try {
-      if (user) {
-        // Charger depuis Supabase
-        const { data, error } = await supabase
-          .from('user_challenge_progress')
-          .select('*')
-          .eq('user_id', user.id);
-
-        if (!error && data && data.length > 0) {
-          const progressMap = new Map(data.map((p: any) => [p.challenge_id, p]));
-          setChallenges(mockChallenges.map(c => {
-            const progress = progressMap.get(c.id);
-            return progress ? {
-              ...c,
-              progress: progress.progress || 0,
-              status: progress.completed_at ? 'completed' : c.status
-            } : c;
-          }));
-          return;
-        }
+      if (!user) {
+        setChallenges([]);
+        return;
       }
-      // Fallback vers mock data
-      setChallenges(mockChallenges);
-    } catch (error) {
-      logger.error('Error loading challenges', error as Error, 'SYSTEM');
-      setChallenges(mockChallenges);
+
+      const { data, error: fetchError } = await supabase
+        .from('user_challenge_progress')
+        .select('*, challenges(*)')
+        .eq('user_id', user.id);
+
+      if (fetchError) {
+        throw new Error(`Failed to load challenges: ${fetchError.message}`);
+      }
+
+      const challengeData: Challenge[] = (data || []).map((p: any) => ({
+        id: p.challenge_id || p.id,
+        name: p.challenges?.name || 'Challenge',
+        title: p.challenges?.title || p.challenges?.name || 'Challenge',
+        description: p.challenges?.description || '',
+        progress: p.progress || 0,
+        goal: p.challenges?.goal || 1,
+        totalSteps: p.challenges?.total_steps || 1,
+        points: p.challenges?.points || 0,
+        status: p.completed_at ? 'completed' : 'active',
+      }));
+      setChallenges(challengeData);
+    } catch (err) {
+      const e = err instanceof Error ? err : new Error(String(err));
+      logger.error('Error loading challenges', e, 'SYSTEM');
+      setError(e);
+      setChallenges([]);
     } finally {
       setIsLoading(false);
     }
@@ -205,6 +211,7 @@ export const useCommunityGamification = () => {
     badges,
     challenges,
     isLoading,
+    error,
     loadBadges,
     loadChallenges,
     updateChallengeProgress,

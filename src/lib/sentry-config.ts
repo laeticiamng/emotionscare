@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/react';
 import { Replay } from '@sentry/replay';

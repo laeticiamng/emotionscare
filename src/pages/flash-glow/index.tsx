@@ -772,30 +772,6 @@ const FlashGlowView: React.FC = () => {
     );
   }
 
-  return (
-    <ConsentGate>
-      <main
-        className="mx-auto max-w-3xl space-y-6 p-6"
-        data-testid="flash-glow-view"
-        data-visuals-intent={intendedVisuals}
-        data-breath-intent={intendedBreath}
-        data-audio-intent={intendedAudio}
-        data-haptics-intent={intendedHaptics}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl font-semibold">Flash Glow</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              Cette expérience lumineuse est momentanément indisponible.
-            </p>
-          </CardContent>
-        </Card>
-      </main>
-    </ConsentGate>
-  );
-
   const appearance = PHASE_APPEARANCE[snapshot.phase.id] ?? PHASE_APPEARANCE.warmup;
 
   const phaseSurface = (
