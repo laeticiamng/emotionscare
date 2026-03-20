@@ -20,6 +20,7 @@ import { PolicyAcceptanceModal } from '@/components/gdpr/PolicyAcceptanceModal';
 import AccessibilitySkipLinks from '@/components/accessibility/AccessibilitySkipLinks';
 import { CookieBanner } from '@/components/cookies/CookieBanner';
 import { composeProviders } from './compose';
+import { AmbientProvider } from '@/experience/providers/AmbientProvider';
 
 // Create query client outside component to avoid recreation
 const queryClient = new QueryClient({
@@ -59,6 +60,9 @@ const InfraAndStateProviders = composeProviders([
   [MoodProvider],
   [MusicProvider],
   [UnifiedProvider],
+
+  // 4b — Experience Layer (ambient, immersion, transitions)
+  [AmbientProvider],
 
   // 5 — Consentements & Accessibilité
   [ConsentProvider],
