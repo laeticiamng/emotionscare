@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useCallback, useRef } from 'react';
 import { logProductionEvent } from '@/utils/consoleCleanup';
 

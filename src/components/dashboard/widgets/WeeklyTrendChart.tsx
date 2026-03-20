@@ -106,7 +106,7 @@ export default function WeeklyTrendChart() {
     return () => window.removeEventListener('scan-saved', handleScanSaved);
   }, [queryClient, user?.id]);
 
-  const { data: weekData, isLoading } = useQuery({
+  const { data: weekData, isLoading, isError } = useQuery({
     queryKey: ['weekly-trend', user?.id],
     queryFn: () => fetchWeeklyTrend(user!.id),
     enabled: !!user?.id,
@@ -166,6 +166,11 @@ export default function WeeklyTrendChart() {
         </div>
       </CardHeader>
       <CardContent>
+        {isError && (
+          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+            <p className="text-destructive text-sm">Erreur lors du chargement</p>
+          </div>
+        )}
         {isLoading ? (
           <div className="space-y-2">
             <Skeleton className="h-16 w-full" />

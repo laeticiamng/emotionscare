@@ -34,7 +34,7 @@ const NotificationWebhooksConfig: React.FC = () => {
     events: ['ab_test_significant', 'ticket_created']
   });
 
-  const { data: webhooks, isLoading } = useQuery({
+  const { data: webhooks, isLoading, isError, error } = useQuery({
     queryKey: ['notification-webhooks'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -258,6 +258,12 @@ const NotificationWebhooksConfig: React.FC = () => {
           </DialogContent>
         </Dialog>
       </div>
+
+      {isError && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-4">
+          <p className="text-destructive font-medium">Erreur lors du chargement des données</p>
+        </div>
+      )}
 
       {isLoading ? (
         <Card>

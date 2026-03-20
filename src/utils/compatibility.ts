@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * Compatibility utilities to support both old and new property names
  * across component interfaces.

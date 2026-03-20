@@ -84,7 +84,7 @@ export default function GoalsProgressWidget() {
   const [newGoalTitle, setNewGoalTitle] = useState('');
   const [newGoalTarget, setNewGoalTarget] = useState(100);
 
-  const { data: goals, isLoading } = useQuery({
+  const { data: goals, isLoading, isError } = useQuery({
     queryKey: ['user-goals-widget', user?.id],
     queryFn: () => fetchUserGoals(user!.id),
     enabled: !!user?.id,
@@ -197,6 +197,11 @@ export default function GoalsProgressWidget() {
         </div>
       </CardHeader>
       <CardContent>
+        {isError && (
+          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+            <p className="text-destructive text-sm">Erreur lors du chargement</p>
+          </div>
+        )}
         {isLoading ? (
           <div className="space-y-3">
             <Skeleton className="h-4 w-full" />

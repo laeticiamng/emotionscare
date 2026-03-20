@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Hook pour le monitoring des APIs
  * Fournit un état en temps réel de toutes les APIs critiques

@@ -166,6 +166,8 @@ export function useWellbeingScore() {
     },
     trend: query.data?.trend ?? 'stable',
     loading: query.isLoading,
+    isError: query.isError,
+    error: query.error,
     refetch: query.refetch
   };
 }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * @deprecated Ce hook est legacy et utilise un store Zustand différent.
  * Pour les nouvelles fonctionnalités Screen Silk avec micro-pauses,

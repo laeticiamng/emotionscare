@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Perfect Dashboard - Tableau de bord intelligent et adaptatif
  * Interface principale avec données réelles Supabase

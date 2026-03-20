@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import * as React from "react";
 
 // Format: { THEME_NAME: CSS_SELECTOR }

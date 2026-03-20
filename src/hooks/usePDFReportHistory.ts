@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -56,8 +55,8 @@ export const usePDFReportHistory = (reportType?: string) => {
 
       setReports(data || []);
       logger.info('PDF reports fetched', { count: data?.length }, 'GDPR');
-    } catch (err: any) {
-      const errorMsg = err.message || 'Erreur lors du chargement des rapports';
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Erreur lors du chargement des rapports';
       setError(errorMsg);
       logger.error('Error fetching PDF reports', { error: err }, 'GDPR');
       toast({
@@ -86,7 +85,7 @@ export const usePDFReportHistory = (reportType?: string) => {
       if (fetchError) throw fetchError;
 
       setSchedules(data || []);
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('Error fetching schedules', { error: err }, 'GDPR');
     }
   }, [reportType]);
@@ -108,8 +107,8 @@ export const usePDFReportHistory = (reportType?: string) => {
       });
 
       logger.info('PDF report deleted', { reportId }, 'GDPR');
-    } catch (err: any) {
-      const errorMsg = err.message || 'Erreur lors de la suppression';
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Erreur lors de la suppression';
       logger.error('Error deleting report', { error: err }, 'GDPR');
       toast({
         title: 'Erreur',
@@ -139,8 +138,8 @@ export const usePDFReportHistory = (reportType?: string) => {
 
         logger.info('Schedule created', { scheduleId: data.id }, 'GDPR');
         return data;
-      } catch (err: any) {
-        const errorMsg = err.message || 'Erreur lors de la création de la planification';
+      } catch (err: unknown) {
+        const errorMsg = err instanceof Error ? err.message : 'Erreur lors de la création de la planification';
         logger.error('Error creating schedule', { error: err }, 'GDPR');
         toast({
           title: 'Erreur',
@@ -175,8 +174,8 @@ export const usePDFReportHistory = (reportType?: string) => {
         });
 
         logger.info('Schedule updated', { scheduleId }, 'GDPR');
-      } catch (err: any) {
-        const errorMsg = err.message || 'Erreur lors de la mise à jour';
+      } catch (err: unknown) {
+        const errorMsg = err instanceof Error ? err.message : 'Erreur lors de la mise à jour';
         logger.error('Error updating schedule', { error: err }, 'GDPR');
         toast({
           title: 'Erreur',
@@ -205,8 +204,8 @@ export const usePDFReportHistory = (reportType?: string) => {
       });
 
       logger.info('Schedule deleted', { scheduleId }, 'GDPR');
-    } catch (err: any) {
-      const errorMsg = err.message || 'Erreur lors de la suppression';
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Erreur lors de la suppression';
       logger.error('Error deleting schedule', { error: err }, 'GDPR');
       toast({
         title: 'Erreur',

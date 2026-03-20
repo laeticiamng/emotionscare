@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import Sidebar from "./Sidebar";
 import SidebarContent from "./SidebarContent";
 import { SidebarFooter } from "./SidebarFooter";

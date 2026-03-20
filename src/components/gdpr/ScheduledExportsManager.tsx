@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -67,7 +66,7 @@ export function ScheduledExportsManager() {
   };
 
   const getFrequencyLabel = (frequency: string) => {
-    const labels = {
+    const labels: Record<string, string> = {
       daily: 'Quotidien',
       weekly: 'Hebdomadaire',
       monthly: 'Mensuel',

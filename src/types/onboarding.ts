@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { ReactNode } from 'react';
 
 export type OnboardingStepType = 'welcome' | 'info' | 'action' | 'form' | 'quiz' | 'completion';

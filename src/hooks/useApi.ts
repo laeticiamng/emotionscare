@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useCallback } from 'react';
 import { ApiResponse, ApiError } from '@/services/api-client';
 
@@ -6,7 +5,7 @@ import { ApiResponse, ApiError } from '@/services/api-client';
  * Hook pour simplifier l'usage des APIs avec gestion d'état
  * Suit les bonnes pratiques UX pour les chargements et erreurs
  */
-export function useApi<T = any>() {
+export function useApi<T = unknown>() {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
@@ -71,7 +70,7 @@ export function useApi<T = any>() {
 /**
  * Hook spécialisé pour les listes de données
  */
-export function useApiList<T = any>() {
+export function useApiList<T = unknown>() {
   const [items, setItems] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);

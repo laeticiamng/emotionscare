@@ -121,7 +121,7 @@ class GamificationServiceEnriched {
   async getUserPoints(): Promise<UserPoints | null> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
+      if (!user) throw new Error('Utilisateur non connecté');
 
       const { data, error } = await supabase
         .from('user_points')
@@ -151,15 +151,15 @@ class GamificationServiceEnriched {
 
       return data;
     } catch (error) {
-      logger.error('Erreur récupération points', error as Error, 'GamificationService');
-      return null;
+      logger.error('Erreur récupération points', error instanceof Error ? error : new Error(String(error)), 'GamificationService');
+      throw error;
     }
   }
 
   async getUserBadges(): Promise<UserBadge[]> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
+      if (!user) throw new Error('Utilisateur non connecté');
 
       const { data, error } = await supabase
         .from('user_badges')
@@ -170,15 +170,15 @@ class GamificationServiceEnriched {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      logger.error('Erreur récupération badges', error as Error, 'GamificationService');
-      return [];
+      logger.error('Erreur récupération badges', error instanceof Error ? error : new Error(String(error)), 'GamificationService');
+      throw error;
     }
   }
 
   async getUserAchievements(): Promise<Achievement[]> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
+      if (!user) throw new Error('Utilisateur non connecté');
 
       const { data, error } = await supabase
         .from('achievements')
@@ -189,15 +189,15 @@ class GamificationServiceEnriched {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      logger.error('Erreur récupération achievements', error as Error, 'GamificationService');
-      return [];
+      logger.error('Erreur récupération achievements', error instanceof Error ? error : new Error(String(error)), 'GamificationService');
+      throw error;
     }
   }
 
   async getUserStreaks(): Promise<Streak[]> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
+      if (!user) throw new Error('Utilisateur non connecté');
 
       const { data, error } = await supabase
         .from('streaks')
@@ -207,8 +207,8 @@ class GamificationServiceEnriched {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      logger.error('Erreur récupération streaks', error as Error, 'GamificationService');
-      return [];
+      logger.error('Erreur récupération streaks', error instanceof Error ? error : new Error(String(error)), 'GamificationService');
+      throw error;
     }
   }
 
@@ -296,8 +296,8 @@ class GamificationServiceEnriched {
         isCurrentUser: user?.id === entry.user_id,
       })) || [];
     } catch (error) {
-      logger.error('Erreur récupération leaderboard', error as Error, 'GamificationService');
-      return [];
+      logger.error('Erreur récupération leaderboard', error instanceof Error ? error : new Error(String(error)), 'GamificationService');
+      throw error;
     }
   }
 

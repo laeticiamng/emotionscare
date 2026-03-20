@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { test, expect } from '@playwright/test';
 
 test.describe('Data Integrity E2E Tests', () => {

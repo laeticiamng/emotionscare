@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 import { useSessionClock } from '../useSessionClock';

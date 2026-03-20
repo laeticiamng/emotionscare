@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { EmotionResult, ScanMode, EmotionAnalysisConfig, BiometricData, EmotionConfidence, EmotionVector } from '@/types/emotion';
 import { emotionsCareApi } from '@/services/emotions-care-api';

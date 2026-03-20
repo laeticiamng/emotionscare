@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { EmotionalData } from '@/types/emotional-data';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';

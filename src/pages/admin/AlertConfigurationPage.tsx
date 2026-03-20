@@ -25,7 +25,7 @@ const AlertConfigurationPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Fetch configurations
-  const { data: configs, isLoading } = useQuery({
+  const { data: configs, isLoading, isError: isConfigsError, error: configsError } = useQuery({
     queryKey: ['alert-configurations'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -148,6 +148,11 @@ const AlertConfigurationPage = () => {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
+      {isConfigsError && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-4">
+          <p className="text-destructive font-medium">Erreur lors du chargement des données</p>
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Configuration des Alertes</h1>

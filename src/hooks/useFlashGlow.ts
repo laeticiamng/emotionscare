@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useEffect, useRef } from 'react';
 import { useGlowStore, type GlowPattern, type SelfReport } from '@/store/glow.store';
 import { supabase } from '@/integrations/supabase/client';
@@ -94,8 +93,8 @@ export const useFlashGlow = () => {
     animationRef.current = requestAnimationFrame(updateBreathCycle);
 
     // Analytics
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'flashglow.start', {
+    if (typeof window !== 'undefined' && (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {
+      (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag('event', 'flashglow.start', {
         pattern: store.pattern,
       });
     }
@@ -117,8 +116,8 @@ export const useFlashGlow = () => {
     }
 
     // Analytics
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'flashglow.pause');
+    if (typeof window !== 'undefined' && (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {
+      (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag('event', 'flashglow.pause');
     }
   }, [store]);
 
@@ -131,8 +130,8 @@ export const useFlashGlow = () => {
     animationRef.current = requestAnimationFrame(updateBreathCycle);
 
     // Analytics
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'flashglow.resume');
+    if (typeof window !== 'undefined' && (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {
+      (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag('event', 'flashglow.resume');
     }
   }, [store, updateBreathCycle]);
 
@@ -150,8 +149,8 @@ export const useFlashGlow = () => {
     }
 
     // Analytics
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'flashglow.finish', {
+    if (typeof window !== 'undefined' && (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {
+      (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag('event', 'flashglow.finish', {
         duration_sec: store.duration,
         cycles: store.totalCycles,
       });
@@ -196,8 +195,8 @@ export const useFlashGlow = () => {
       }
 
       // Analytics
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        (window as any).gtag('event', 'flashglow.metrics.submitted', {
+      if (typeof window !== 'undefined' && (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {
+        (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag('event', 'flashglow.metrics.submitted', {
           duration: store.duration,
           pattern: store.pattern,
         });

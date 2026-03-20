@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { test, expect } from '@playwright/test';
 
 test.describe('Validation de la route /b2b corrigée', () => {

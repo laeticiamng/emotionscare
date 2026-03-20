@@ -1,27 +1,37 @@
-// @ts-nocheck
 import { User } from '@/types';
-import { mockUsers } from '@/data/mockUsers';
+import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
 export const updateUser = async (updatedUserData: Partial<User>): Promise<User> => {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Mock updating the user in a real database
-  const existingUser = mockUsers.find(user => user.id === updatedUserData.id);
-  
-  if (!existingUser) {
+  if (!updatedUserData.id) {
+    throw new Error('User ID is required for update');
+  }
+
+  const { data: { user: authUser } } = await supabase.auth.getUser();
+  if (!authUser) {
+    throw new Error('User not authenticated');
+  }
+
+  // Update profile in Supabase
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({
+      ...updatedUserData,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', updatedUserData.id)
+    .select('*')
+    .single();
+
+  if (error) {
+    logger.error('Failed to update user profile', error, 'SYSTEM');
+    throw new Error(`Failed to update user: ${error.message}`);
+  }
+
+  if (!data) {
     throw new Error('User not found');
   }
-  
-  // Merge the existing user data with the updated data
-  const updatedUser = {
-    ...existingUser,
-    ...updatedUserData,
-  };
-  
-  // In a real implementation, we would update the user in the database here
-  logger.debug('User updated', updatedUser, 'SYSTEM');
-  
-  return updatedUser as User;
+
+  logger.info('User profile updated', { userId: updatedUserData.id }, 'SYSTEM');
+  return data as User;
 };

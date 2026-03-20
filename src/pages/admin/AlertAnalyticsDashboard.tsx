@@ -58,7 +58,7 @@ const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#a4de6c', '#d084d0'
 
 const AlertAnalyticsDashboard = () => {
   // Fetch analytics data
-  const { data: analytics, isLoading: analyticsLoading } = useQuery({
+  const { data: analytics, isLoading: analyticsLoading, isError: isAnalyticsError, error: analyticsError } = useQuery({
     queryKey: ['alert-analytics'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -73,7 +73,7 @@ const AlertAnalyticsDashboard = () => {
   });
 
   // Fetch dashboard stats
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  const { data: stats, isLoading: statsLoading, isError: isStatsError, error: statsError } = useQuery({
     queryKey: ['alert-dashboard-stats'],
     queryFn: async () => {
       const now = new Date();
@@ -190,6 +190,11 @@ const AlertAnalyticsDashboard = () => {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
+      {(isAnalyticsError || isStatsError) && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-4">
+          <p className="text-destructive font-medium">Erreur lors du chargement des données</p>
+        </div>
+      )}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Analytics des Alertes AI</h1>

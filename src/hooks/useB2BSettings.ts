@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Hook pour les paramètres B2B de l'organisation
  */

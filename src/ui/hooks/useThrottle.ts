@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useMemo, useRef } from "react";
 export function useThrottle<T extends (...args: any[]) => void>(fn: T, interval = 300) {
   const last = useRef(0);

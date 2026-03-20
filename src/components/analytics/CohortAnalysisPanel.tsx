@@ -4,23 +4,28 @@
  */
 
 import { memo, useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
+import { Skeleton } from '@/components/ui/skeleton';
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { 
-  Users, 
-  TrendingUp, 
+import {
+  Users,
+  TrendingUp,
   Calendar,
   BarChart3,
   Filter,
   Download,
+  AlertTriangle,
 } from 'lucide-react';
 
 interface CohortData {
@@ -40,22 +45,6 @@ interface CohortAnalysisPanelProps {
   className?: string;
 }
 
-const MOCK_COHORTS: CohortData[] = [
-  { period: 'Jan 2026', initialUsers: 1250, retentionRates: [100, 68, 52, 41, 35, 30] },
-  { period: 'Fév 2026', initialUsers: 1480, retentionRates: [100, 72, 58, 47, 40, 0] },
-  { period: 'Mars 2026', initialUsers: 1320, retentionRates: [100, 70, 55, 44, 0, 0] },
-  { period: 'Avr 2026', initialUsers: 1560, retentionRates: [100, 75, 60, 0, 0, 0] },
-  { period: 'Mai 2026', initialUsers: 1420, retentionRates: [100, 73, 0, 0, 0, 0] },
-  { period: 'Juin 2026', initialUsers: 1680, retentionRates: [100, 0, 0, 0, 0, 0] },
-];
-
-const MOCK_METRICS: CohortMetric[] = [
-  { name: 'Rétention J+30', value: 45, change: 3.2, trend: 'up' },
-  { name: 'LTV moyen', value: 89, change: -1.5, trend: 'down' },
-  { name: 'Sessions/user', value: 12.4, change: 0.8, trend: 'up' },
-  { name: 'Engagement', value: 67, change: 0, trend: 'stable' },
-];
-
 const WEEK_LABELS = ['Sem 0', 'Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5'];
 
 const getRetentionColor = (rate: number): string => {
@@ -69,16 +58,80 @@ const getRetentionColor = (rate: number): string => {
 export const CohortAnalysisPanel = memo(function CohortAnalysisPanel({
   className = '',
 }: CohortAnalysisPanelProps) {
+  const { user } = useAuth();
   const [selectedMetric, setSelectedMetric] = useState('retention');
   const [selectedPeriod, setSelectedPeriod] = useState('6m');
 
+  // Fetch cohort data from Supabase
+  const {
+    data: cohorts = [],
+    isLoading: cohortsLoading,
+    error: cohortsError,
+  } = useQuery<CohortData[]>({
+    queryKey: ['cohort_analysis', user?.id, selectedPeriod],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('cohort_analysis')
+        .select('*')
+        .order('period', { ascending: true });
+
+      if (error) throw error;
+
+      return (data ?? []).map((row: any) => ({
+        period: row.period ?? '',
+        initialUsers: row.initial_users ?? 0,
+        retentionRates: row.retention_rates ?? [100, 0, 0, 0, 0, 0],
+      }));
+    },
+    enabled: !!user?.id,
+  });
+
+  // Fetch cohort metrics from Supabase
+  const {
+    data: metrics = [],
+    isLoading: metricsLoading,
+    error: metricsError,
+  } = useQuery<CohortMetric[]>({
+    queryKey: ['cohort_metrics', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('cohort_metrics')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+
+      return (data ?? []).map((row: any) => ({
+        name: row.name ?? '',
+        value: row.value ?? 0,
+        change: row.change ?? 0,
+        trend: row.trend ?? 'stable',
+      }));
+    },
+    enabled: !!user?.id,
+  });
+
+  const isLoading = cohortsLoading || metricsLoading;
+  const error = cohortsError || metricsError;
+
   const averageRetention = useMemo(() => {
-    const week4Rates = MOCK_COHORTS
+    const week4Rates = cohorts
       .map((c) => c.retentionRates[4])
       .filter((r) => r > 0);
     if (week4Rates.length === 0) return 0;
     return Math.round(week4Rates.reduce((a, b) => a + b, 0) / week4Rates.length);
-  }, []);
+  }, [cohorts]);
+
+  if (error) {
+    return (
+      <Card className={className}>
+        <CardContent className="p-6 text-center" role="alert">
+          <AlertTriangle className="h-8 w-8 mx-auto text-red-500 mb-2" />
+          <p className="text-sm text-red-500">Erreur lors du chargement de l'analyse de cohortes</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className={className}>
@@ -121,8 +174,17 @@ export const CohortAnalysisPanel = memo(function CohortAnalysisPanel({
       
       <CardContent className="space-y-6">
         {/* Métriques clés */}
+        {isLoading ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-20 w-full" />)}
+            </div>
+            <Skeleton className="h-48 w-full" />
+          </div>
+        ) : (
+        <>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {MOCK_METRICS.map((metric) => (
+          {metrics.map((metric) => (
             <div key={metric.name} className="rounded-lg border p-3">
               <p className="text-xs text-muted-foreground">{metric.name}</p>
               <div className="flex items-end gap-2 mt-1">
@@ -153,7 +215,7 @@ export const CohortAnalysisPanel = memo(function CohortAnalysisPanel({
               </tr>
             </thead>
             <tbody>
-              {MOCK_COHORTS.map((cohort) => (
+              {cohorts.map((cohort) => (
                 <tr key={cohort.period} className="border-b last:border-0">
                   <td className="py-2 px-3 font-medium">{cohort.period}</td>
                   <td className="py-2 px-3 text-right text-muted-foreground">
@@ -198,18 +260,17 @@ export const CohortAnalysisPanel = memo(function CohortAnalysisPanel({
           </Badge>
         </div>
 
-        {/* Insights */}
-        <div className="rounded-lg bg-muted/50 p-4 space-y-2">
-          <h4 className="font-medium flex items-center gap-2">
-            <BarChart3 className="h-4 w-4 text-primary" />
-            Insights clés
-          </h4>
-          <ul className="text-sm text-muted-foreground space-y-1">
-            <li>• La cohorte Avril 2026 montre la meilleure rétention initiale (+5%)</li>
-            <li>• Chute significative entre Sem 1 et Sem 2 (à investiguer)</li>
-            <li>• Les utilisateurs qui passent Sem 3 ont 85% de chances de rester</li>
-          </ul>
-        </div>
+        {cohorts.length === 0 && (
+          <div className="text-center py-6">
+            <Users className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+            <p className="font-medium">Aucune donnée de cohorte</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Les données de cohorte apparaîtront ici une fois disponibles.
+            </p>
+          </div>
+        )}
+        </>
+        )}
       </CardContent>
     </Card>
   );

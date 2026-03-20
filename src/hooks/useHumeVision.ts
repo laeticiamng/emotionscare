@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useEffect, useRef } from 'react';
 import { useARStore, type VisionReading } from '@/store/ar.store';
 import { supabase } from '@/integrations/supabase/client';
@@ -90,9 +89,9 @@ export const useHumeVision = () => {
       logger.info('Hume Vision session started', { session_id }, 'SYSTEM');
       return { session_id };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Error starting Hume Vision session', error as Error, 'SYSTEM');
-      store.setError(error.message);
+      store.setError(error instanceof Error ? error.message : 'Unknown error');
       return null;
     }
   }, [store, prefs.camera]);

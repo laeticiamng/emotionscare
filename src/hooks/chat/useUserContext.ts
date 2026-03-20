@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useEffect } from 'react';
 import { UserContext } from '@/types/user-context';
 import { logger } from '@/lib/logger';

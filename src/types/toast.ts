@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { ReactElement } from 'react';
 
 export interface ToastProps {

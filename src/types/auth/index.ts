@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Unified Auth Types - Centralized exports
 export type { User, UserMode } from '../auth';
 export type { UserProfile } from '../api.d';

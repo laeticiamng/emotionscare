@@ -1,94 +1,128 @@
-// @ts-nocheck
-
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { CoachEvent } from '@/types/coach/CoachEvent';
+import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
 // Utilisation de la nouvelle interface CoachEvent
 export const useCoach = (userId: string) => {
   const { toast } = useToast();
-  const [events, setEvents] = useState<CoachEvent[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
   const [coachStatus, setCoachStatus] = useState<'active' | 'idle' | 'disabled'>('idle');
 
-  // Charger les événements précédents
-  useEffect(() => {
-    const loadEvents = async () => {
-      setIsLoading(true);
-      try {
-        // Simulation d'appel API
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Événements fictifs
-        const mockEvents: CoachEvent[] = [
-          {
-            id: '1',
-            type: 'message',
-            content: 'Bienvenue dans votre espace personnel ! Comment puis-je vous aider aujourd\'hui ?',
-            timestamp: new Date().toISOString(),
-            userId,
-            read: true
-          },
-          {
-            id: '2',
-            type: 'suggestion',
-            content: 'Avez-vous essayé la nouvelle fonctionnalité de méditation guidée ?',
-            timestamp: new Date(Date.now() - 3600000).toISOString(),
-            userId,
-            read: false
-          }
-        ];
-        
-        setEvents(mockEvents);
-      } catch (error) {
+  // Fetch coach events from Supabase
+  const {
+    data: events = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ['coach-events', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+
+      const { data, error } = await supabase
+        .from('coach_events')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) {
         logger.error('Error loading coach events', error as Error, 'UI');
-      } finally {
-        setIsLoading(false);
+        throw error;
       }
-    };
-    
-    if (userId) {
-      loadEvents();
-    }
-  }, [userId]);
+
+      return (data || []).map((item) => ({
+        id: item.id,
+        type: item.type || 'message',
+        content: item.content || '',
+        timestamp: item.created_at || item.timestamp,
+        userId: item.user_id,
+        metadata: item.metadata || {},
+        read: item.read ?? false,
+      })) as CoachEvent[];
+    },
+    enabled: !!userId,
+    staleTime: 30 * 1000, // 30 seconds
+  });
+
+  // Mutation to add a new event
+  const addEventMutation = useMutation({
+    mutationFn: async (event: Omit<CoachEvent, 'id' | 'timestamp' | 'userId'>) => {
+      const { data, error } = await supabase
+        .from('coach_events')
+        .insert({
+          user_id: userId,
+          type: event.type,
+          content: event.content,
+          read: event.read ?? false,
+          metadata: event.metadata || {},
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['coach-events', userId] });
+    },
+    onError: (error) => {
+      logger.error('Error adding coach event', error as Error, 'UI');
+    },
+  });
 
   // Ajouter un nouvel événement
-  const addEvent = useCallback((event: Omit<CoachEvent, 'id' | 'timestamp' | 'userId'>) => {
-    const newEvent: CoachEvent = {
-      id: `event-${Date.now()}`,
-      timestamp: new Date().toISOString(),
-      userId,
-      ...event
-    };
-    
-    setEvents(prev => [newEvent, ...prev]);
-    
-    // Afficher une notification pour certains types d'événements
-    if (event.type === 'suggestion' || event.type === 'notification') {
-      toast({
-        title: 'Message du coach',
-        description: event.content
-      });
-    }
-    
-    return newEvent.id;
-  }, [userId, toast]);
+  const addEvent = useCallback(
+    (event: Omit<CoachEvent, 'id' | 'timestamp' | 'userId'>) => {
+      // Optimistically update local state via query cache
+      const tempId = `temp-${Date.now()}`;
+      const newEvent: CoachEvent = {
+        id: tempId,
+        timestamp: new Date().toISOString(),
+        userId,
+        ...event,
+      };
 
-  // Simuler une activité du coach
-  useEffect(() => {
-    if (coachStatus === 'active') {
-      const timer = setTimeout(() => {
-        addEvent({
-          type: 'message',
-          content: 'Je remarque que vous explorez la plateforme. Avez-vous des questions ?',
-          read: false
+      // Optimistic update
+      queryClient.setQueryData(['coach-events', userId], (old: CoachEvent[] = []) => [
+        newEvent,
+        ...old,
+      ]);
+
+      // Persist to Supabase
+      addEventMutation.mutate(event);
+
+      // Afficher une notification pour certains types d'événements
+      if (event.type === 'suggestion' || event.type === 'notification') {
+        toast({
+          title: 'Message du coach',
+          description: event.content,
         });
-      }, 60000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [coachStatus, addEvent]);
+      }
+
+      return tempId;
+    },
+    [userId, toast, queryClient, addEventMutation]
+  );
+
+  // Mutation to mark event as read
+  const markAsReadMutation = useMutation({
+    mutationFn: async (eventId: string) => {
+      const { error } = await supabase
+        .from('coach_events')
+        .update({ read: true })
+        .eq('id', eventId)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['coach-events', userId] });
+    },
+  });
 
   // Démarrer une session
   const startSession = useCallback(() => {
@@ -96,7 +130,7 @@ export const useCoach = (userId: string) => {
     addEvent({
       type: 'message',
       content: 'Session démarrée. Je suis là pour vous accompagner !',
-      read: false
+      read: false,
     });
   }, [addEvent]);
 
@@ -106,25 +140,28 @@ export const useCoach = (userId: string) => {
   }, []);
 
   // Marquer un événement comme lu
-  const markAsRead = useCallback((eventId: string) => {
-    setEvents(prev => 
-      prev.map(event => 
-        event.id === eventId 
-          ? { ...event, read: true } 
-          : event
-      )
-    );
-  }, []);
+  const markAsRead = useCallback(
+    (eventId: string) => {
+      // Optimistic update
+      queryClient.setQueryData(['coach-events', userId], (old: CoachEvent[] = []) =>
+        old.map((event) => (event.id === eventId ? { ...event, read: true } : event))
+      );
+      markAsReadMutation.mutate(eventId);
+    },
+    [queryClient, userId, markAsReadMutation]
+  );
 
   return {
     events,
     isLoading,
+    isError,
+    error,
     coachStatus,
     addEvent,
     startSession,
     endSession,
     markAsRead,
-    unreadCount: events.filter(e => !e.read).length
+    unreadCount: events.filter((e) => !e.read).length,
   };
 };
 

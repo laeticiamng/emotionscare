@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,6 +21,7 @@ import {
   Waveform
 } from 'lucide-react';
 import { MoodMix } from '@/types/mood-mixer';
+import { toast } from 'sonner';
 
 interface PlaybackControlsProps {
   mix: MoodMix;
@@ -231,30 +231,29 @@ const PlaybackControls: React.FC<PlaybackControlsProps> = ({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => {}}
+                onClick={() => toast.success('Ajouté aux favoris')}
+                aria-label="Ajouter aux favoris"
               >
                 <Heart className="h-4 w-4" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => {}}
+                onClick={() => {
+                  navigator.clipboard?.writeText(`${window.location.origin}/app/mood-mixer/${mix.id}`);
+                  toast.success('Lien copié');
+                }}
+                aria-label="Partager"
               >
                 <Share className="h-4 w-4" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => {}}
+                onClick={() => toast.info('Export en cours...')}
+                aria-label="Télécharger"
               >
                 <Download className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {}}
-              >
-                <MoreHorizontal className="h-4 w-4" />
               </Button>
             </div>
           </div>

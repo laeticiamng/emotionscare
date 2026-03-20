@@ -1,6 +1,3 @@
-// @ts-nocheck
-
-// @ts-nocheck
 import React, { useMemo } from 'react';
 import { JournalEntry } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

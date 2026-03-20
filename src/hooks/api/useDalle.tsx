@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState } from 'react';
 import { dalle } from '@/services';
 import { useToast } from '@/hooks/use-toast';

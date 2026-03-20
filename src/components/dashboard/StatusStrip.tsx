@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { HealthBadge } from '@/components/system/HealthBadge';
 import { Alert, AlertDescription } from '@/components/ui/alert';

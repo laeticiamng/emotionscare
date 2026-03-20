@@ -25,6 +25,8 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/contexts/AuthContext';
+import { EnvironmentalStreak } from '@/experience/components/EnvironmentalStreak';
+import { useWellnessStreak } from '@/hooks/useWellnessStreak';
 
 interface EnhancedHeaderProps {
   scrolled?: boolean;
@@ -38,6 +40,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user, signOut } = useAuth();
+  const { streak } = useWellnessStreak();
 
   const handleLogout = async () => {
     try {
@@ -127,6 +130,14 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
 
         {/* Right Controls */}
         <div className="flex items-center space-x-2">
+          {/* Streak Indicator */}
+          {isAuthenticated && (
+            <EnvironmentalStreak
+              streakDays={streak?.currentStreak ?? 0}
+              onClick={() => navigate('/app/gamification')}
+            />
+          )}
+
           {/* Search Button */}
           <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
             <DialogTrigger asChild>

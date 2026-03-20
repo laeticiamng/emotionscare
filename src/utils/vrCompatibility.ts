@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { VRSession, VRSessionTemplate } from '@/types/vr';
 
 export const getVRSessionStartTime = (session: VRSession): string | Date => {

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';

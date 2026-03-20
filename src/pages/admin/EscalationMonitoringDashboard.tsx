@@ -34,7 +34,7 @@ const EscalationMonitoringDashboard: React.FC = () => {
   const chartsContainerRef = React.useRef<HTMLDivElement>(null);
 
   // Fetch active escalations
-  const { data: activeEscalations, refetch: refetchEscalations } = useQuery({
+  const { data: activeEscalations, refetch: refetchEscalations, isError: isEscalationsError, error: escalationsError } = useQuery({
     queryKey: ['active-escalations'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -50,7 +50,7 @@ const EscalationMonitoringDashboard: React.FC = () => {
   });
 
   // Fetch ML predictions
-  const { data: mlPredictions } = useQuery({
+  const { data: mlPredictions, isError: isPredictionsError, error: predictionsError } = useQuery({
     queryKey: ['ml-predictions'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -65,7 +65,7 @@ const EscalationMonitoringDashboard: React.FC = () => {
   });
 
   // Fetch performance metrics
-  const { data: performanceMetrics } = useQuery({
+  const { data: performanceMetrics, isError: isMetricsError, error: metricsError } = useQuery({
     queryKey: ['escalation-metrics'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -80,7 +80,7 @@ const EscalationMonitoringDashboard: React.FC = () => {
   });
 
   // Fetch error patterns for heatmap
-  const { data: errorPatterns } = useQuery({
+  const { data: errorPatterns, isError: isPatternsError, error: patternsError } = useQuery({
     queryKey: ['error-patterns-heatmap'],
     queryFn: async () => {
       const sevenDaysAgo = new Date();
@@ -98,7 +98,7 @@ const EscalationMonitoringDashboard: React.FC = () => {
   });
 
   // Fetch A/B tests for charts
-  const { data: abTests } = useQuery({
+  const { data: abTests, isError: isAbTestsError, error: abTestsError } = useQuery({
     queryKey: ['ab-tests-charts'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -216,6 +216,12 @@ const EscalationMonitoringDashboard: React.FC = () => {
           </Button>
         </div>
       </div>
+
+      {(isEscalationsError || isPredictionsError || isMetricsError || isPatternsError || isAbTestsError) && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-4">
+          <p className="text-destructive font-medium">Erreur lors du chargement des données</p>
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

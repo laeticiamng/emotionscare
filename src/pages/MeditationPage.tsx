@@ -2,8 +2,11 @@
  * Meditation Page - Module complet de méditation guidée
  */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { lazy, Suspense, useState, useEffect, useRef, useCallback } from 'react';
 import { logger } from '@/lib/logger';
+import { Scene3DErrorBoundary } from '@/components/3d/Scene3DErrorBoundary';
+
+const MeditationEnvironment3D = lazy(() => import('@/components/3d/MeditationEnvironment3D'));
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -496,8 +499,20 @@ export default function MeditationPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="space-y-6"
+              className="space-y-6 relative"
             >
+              {/* Environnement 3D en arrière-plan pendant la session */}
+              <div className="absolute inset-0 -z-10 pointer-events-none rounded-2xl overflow-hidden" aria-hidden="true">
+                <Scene3DErrorBoundary>
+                  <Suspense fallback={null}>
+                    <MeditationEnvironment3D
+                      theme="cosmos"
+                      breathPhase={breathPhase}
+                      className="opacity-40"
+                    />
+                  </Suspense>
+                </Scene3DErrorBoundary>
+              </div>
               {/* Meditation Circle */}
               <div className="flex items-center justify-center py-12">
                 <div className="relative">

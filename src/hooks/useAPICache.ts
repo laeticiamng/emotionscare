@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useCallback, useRef } from 'react';
 
 interface CacheEntry<T> {

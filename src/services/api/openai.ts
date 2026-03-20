@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Service OpenAI optimisé - Architecture minimale EmotionsCare
  * Couvre: chat, ASR Whisper, TTS, embeddings, moderation

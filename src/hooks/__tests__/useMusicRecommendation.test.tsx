@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { act, waitFor } from '@testing-library/react';
 import { renderHookWithMusicProvider } from '@/tests/utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';

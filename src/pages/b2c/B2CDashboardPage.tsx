@@ -1,6 +1,9 @@
-import React, { Suspense, useEffect, useMemo, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { routes } from '@/lib/routes';
+import { Scene3DErrorBoundary } from '@/components/3d/Scene3DErrorBoundary';
+
+const DashboardBackground3D = lazy(() => import('@/components/3d/DashboardBackground3D'));
 import { useOptimizedPage } from '@/hooks/useOptimizedPage';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -268,7 +271,15 @@ export default function B2CDashboardPage() {
         </Suspense>
       )}
       
-      <div data-testid="page-root" className="min-h-screen bg-background">
+      <div data-testid="page-root" className="min-h-screen bg-background relative">
+      {/* Arrière-plan 3D subtil */}
+      <div className="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
+        <Scene3DErrorBoundary>
+          <Suspense fallback={null}>
+            <DashboardBackground3D className="opacity-30" />
+          </Suspense>
+        </Scene3DErrorBoundary>
+      </div>
       {/* Skip Links pour l'accessibilité */}
       <a 
         href="#main-content" 

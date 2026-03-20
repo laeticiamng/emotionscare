@@ -80,9 +80,9 @@ export const useProfileSettings = () => {
       applyTheme();
       applyA11y();
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Load profile failed', error as Error, 'AUTH');
-      setError(error.message);
+      setError(error instanceof Error ? error.message : 'Unknown error');
       
       // Use stored profile as fallback
       applyTheme();
@@ -145,14 +145,14 @@ export const useProfileSettings = () => {
 
       return true;
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Rollback changes
       setProfile(originalProfile);
       applyTheme();
       applyA11y();
       
       logger.error('Save profile failed', error as Error, 'AUTH');
-      setError(error.message);
+      setError(error instanceof Error ? error.message : 'Unknown error');
       
       toast({
         title: "Erreur",

@@ -122,8 +122,8 @@ const ExchangeLeaderboard: React.FC = () => {
   });
   const { data: leaderboardData, isLoading } = useLeaderboard(selectedMarket, period);
 
-  // Transform API data or use mock as fallback
-  const mockLeaderboard: LeaderboardEntry[] = useMemo(() => {
+  // Transform API data into display format
+  const leaderboard: LeaderboardEntry[] = useMemo(() => {
     if (leaderboardData && leaderboardData.length > 0) {
       return leaderboardData.map((entry: any, index: number) => ({
         rank: index + 1,
@@ -131,33 +131,21 @@ const ExchangeLeaderboard: React.FC = () => {
         level: entry.profile?.level || 1,
         score: entry.score || 0,
         badges: index < 3 ? ['🏆', '⭐'].slice(0, 3 - index) : [],
-        totalTrades: Math.floor(Math.random() * 200) + 50,
-        winRate: Math.floor(Math.random() * 30) + 50,
-        joinDate: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        totalTrades: entry.total_trades || 0,
+        winRate: entry.win_rate || 0,
+        joinDate: entry.profile?.created_at?.split('T')[0] || '',
       }));
     }
-    // Fallback mock data
-    return [
-      { rank: 1, name: 'EmotionMaster', level: 42, score: 12450, badges: ['🏆', '⭐', '💎'], totalTrades: 245, winRate: 78, joinDate: '2023-06-15' },
-      { rank: 2, name: 'TrustBuilder', level: 38, score: 11200, badges: ['🥈', '🔥'], totalTrades: 198, winRate: 72, joinDate: '2023-07-20' },
-      { rank: 3, name: 'TimeTrader', level: 35, score: 10800, badges: ['🥉', '⚡'], totalTrades: 167, winRate: 68, joinDate: '2023-08-10' },
-      { rank: 4, name: 'CalmSeeker', level: 32, score: 9500, badges: ['🎯'], totalTrades: 134, winRate: 65, joinDate: '2023-09-01' },
-      { rank: 5, name: 'FocusHero', level: 30, score: 8900, badges: ['🌟'], totalTrades: 112, winRate: 62, joinDate: '2023-09-15' },
-      { rank: 6, name: 'EnergyBoost', level: 28, score: 8200, badges: [], totalTrades: 98, winRate: 60, joinDate: '2023-10-01' },
-      { rank: 7, name: 'JoyBringer', level: 26, score: 7600, badges: [], totalTrades: 87, winRate: 58, joinDate: '2023-10-15' },
-      { rank: 8, name: 'CreativeFlow', level: 24, score: 7100, badges: [], totalTrades: 76, winRate: 55, joinDate: '2023-11-01' },
-      { rank: 9, name: 'ConfidentOne', level: 22, score: 6500, badges: [], totalTrades: 65, winRate: 52, joinDate: '2023-11-15' },
-      { rank: 10, name: 'PeaceKeeper', level: 20, score: 6000, badges: [], totalTrades: 54, winRate: 50, joinDate: '2023-12-01' },
-    ];
+    return [];
   }, [leaderboardData]);
 
   // Filter leaderboard
   const filteredLeaderboard = useMemo(() => {
-    if (!searchQuery) return mockLeaderboard;
-    return mockLeaderboard.filter(entry => 
+    if (!searchQuery) return leaderboard;
+    return leaderboard.filter(entry => 
       entry.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [searchQuery, mockLeaderboard]);
+  }, [searchQuery, leaderboard]);
 
   const toggleFollow = (playerName: string) => {
     setFollowing(prev => {
@@ -192,7 +180,7 @@ const ExchangeLeaderboard: React.FC = () => {
   const exportLeaderboard = () => {
     const csv = [
       ['Rang', 'Nom', 'Niveau', 'Score', 'Badges'].join(','),
-      ...mockLeaderboard.map(e => [e.rank, e.name, e.level, e.score, e.badges.join(' ')].join(','))
+      ...leaderboard.map(e => [e.rank, e.name, e.level, e.score, e.badges.join(' ')].join(','))
     ].join('\n');
     
     const blob = new Blob([csv], { type: 'text/csv' });

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * Hooks d'API centralisés
  * 

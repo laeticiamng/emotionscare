@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
-  Play, Pause, Camera, Brain, Heart, Sparkles, Zap,
+  ArrowLeft, Play, Pause, Camera, Brain, Heart, Sparkles, Zap,
   ChevronRight, ArrowRight, CheckCircle, Star,
   Volume2, Users, Shield, Headphones,
   LucideIcon
@@ -208,6 +208,12 @@ const DemoPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       {/* Header */}
       <div className="container mx-auto px-4 py-12">
+        <Button variant="ghost" size="sm" className="mb-4 gap-2" asChild>
+          <Link to="/app/home" aria-label="Retour">
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            Retour
+          </Link>
+        </Button>
         <div className="text-center mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

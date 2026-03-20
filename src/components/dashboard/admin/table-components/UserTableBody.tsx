@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { TableBody, TableRow, TableCell } from '@/components/ui/table';
 import LoadingAnimation from '@/components/ui/loading-animation';

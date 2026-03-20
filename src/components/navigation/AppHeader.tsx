@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, Search, Menu, Sun, Moon, Maximize2 } from 'lucide-react';

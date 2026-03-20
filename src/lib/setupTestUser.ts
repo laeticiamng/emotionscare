@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { supabase } from './supabase-client';
 import { logger } from '@/lib/logger';
 

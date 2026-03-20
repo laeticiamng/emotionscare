@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * Coach Goal Tracker - Planification de sessions et suivi d'objectifs enrichi
  * Avec persistance, statistiques avancées, export et notifications

@@ -1,5 +1,4 @@
-// @ts-nocheck
-
+import React from 'react';
 import { Theme } from './theme';
 
 export interface LayoutContextType {

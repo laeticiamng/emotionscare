@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import GlobalNavigation from '@/components/navigation/GlobalNavigation';

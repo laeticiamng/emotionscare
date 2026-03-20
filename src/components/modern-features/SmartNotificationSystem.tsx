@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SmartNotificationSystem - Système de notifications intelligentes
  * Gère les notifications en temps réel avec personnalisation

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Feather, MessageCircle, Music, PenTool, Scan, Sparkles, Wind } from 'lucide-react';

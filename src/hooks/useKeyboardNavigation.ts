@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useEffect, useCallback, RefObject } from 'react';
 
 interface UseKeyboardNavigationOptions {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Service de monitoring global des APIs
  * Teste et surveille toutes les APIs critiques de la plateforme EmotionsCare

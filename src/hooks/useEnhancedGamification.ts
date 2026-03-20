@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -159,9 +158,9 @@ export const useEnhancedGamification = () => {
       if (historyError) throw historyError;
       setPointsHistory(historyData || []);
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('Error loading gamification data', err as Error, 'ANALYTICS');
-      setError(err.message || 'Failed to load gamification data');
+      setError(err instanceof Error ? err.message : 'Failed to load gamification data');
       toast({
         title: "Erreur",
         description: "Impossible de charger les données de gamification",
@@ -207,7 +206,7 @@ export const useEnhancedGamification = () => {
       }
       
       return false;
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Error generating challenges', error as Error, 'ANALYTICS');
       toast({
         title: "Erreur",
@@ -258,7 +257,7 @@ export const useEnhancedGamification = () => {
       }
 
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Error updating challenge progress', error as Error, 'ANALYTICS');
       toast({
         title: "Erreur",
@@ -303,7 +302,7 @@ export const useEnhancedGamification = () => {
       }
 
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Error unlocking achievement', error as Error, 'ANALYTICS');
       return false;
     }

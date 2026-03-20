@@ -3,8 +3,11 @@
  * Page d'onboarding accessible WCAG 2.1 AA
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Scene3DErrorBoundary from '@/components/3d/Scene3DErrorBoundary';
+
+const DashboardBackground3D = lazy(() => import('@/components/3d/DashboardBackground3D'));
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -168,10 +171,15 @@ const OnboardingPage: React.FC = () => {
         Aller au contenu principal
       </a>
 
-      <div 
-        className="min-h-screen bg-gradient-to-br from-info/10 to-accent/20 flex items-center justify-center p-6" 
+      <div
+        className="relative min-h-screen bg-gradient-to-br from-info/10 to-accent/20 flex items-center justify-center p-6"
         data-testid="page-root"
       >
+        <Scene3DErrorBoundary>
+          <Suspense fallback={null}>
+            <DashboardBackground3D className="absolute inset-0 -z-10 opacity-20 pointer-events-none" />
+          </Suspense>
+        </Scene3DErrorBoundary>
         <main id="main-content" role="main" className="w-full max-w-2xl">
           {/* En-tête avec progression */}
           <header className="text-center mb-8">

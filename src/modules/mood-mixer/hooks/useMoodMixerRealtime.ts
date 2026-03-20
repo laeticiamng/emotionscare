@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useCallback, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -71,7 +70,7 @@ export function useMoodMixerRealtime(userId?: string): UseMoodMixerRealtimeRetur
         },
         (payload) => {
           // New session created - could trigger achievements check
-          console.log('New session detected:', payload);
+          // Session detected via realtime subscription
         }
       )
       .subscribe((status) => {

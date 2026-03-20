@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { AudioTrack, AudioPlaylist } from '@/types/audio';
 
 // Format duration from seconds to mm:ss

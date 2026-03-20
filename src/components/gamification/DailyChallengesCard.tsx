@@ -11,6 +11,8 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useGamification, type DailyChallenge } from '@/modules/gamification';
 import { cn } from '@/lib/utils';
+import { DepthCard } from '@/experience/components/DepthCard';
+import { useImmersionLevel } from '@/experience/hooks/useAmbient';
 
 const CATEGORY_ICONS: Record<string, string> = {
   scan: '📷',
@@ -23,6 +25,7 @@ const CATEGORY_ICONS: Record<string, string> = {
 export function DailyChallengesCard() {
   const { dailyChallenges, getTimeRemaining, updateChallengeProgress } = useGamification();
   const [timeRemaining, setTimeRemaining] = useState(getTimeRemaining());
+  const immersionLevel = useImmersionLevel();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -39,7 +42,7 @@ export function DailyChallengesCard() {
     .reduce((sum, c) => sum + c.xpReward, 0);
 
   return (
-    <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5">
+    <DepthCard depth={immersionLevel >= 1 ? 1 : 0} className="border-primary/20 bg-gradient-to-br from-card to-primary/5">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
@@ -88,7 +91,7 @@ export function DailyChallengesCard() {
           </motion.div>
         )}
       </CardContent>
-    </Card>
+    </DepthCard>
   );
 }
 

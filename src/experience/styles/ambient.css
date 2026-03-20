@@ -1,0 +1,123 @@
+/**
+ * Experience Layer — Ambient CSS
+ * Global CSS for the experience layer.
+ * Animations, depth utilities, and ambient variables.
+ */
+
+/* ── Ambient Breathing Animation ─────────────────────────────── */
+
+@keyframes ambient-breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+/* ── Depth Utilities ─────────────────────────────────────────── */
+
+.depth-perspective {
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+.depth-hover-subtle {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+
+.depth-hover-subtle:hover {
+  transform: perspective(1200px) translateZ(10px);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.12);
+}
+
+.depth-hover-medium {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+
+.depth-hover-medium:hover {
+  transform: perspective(1200px) translateZ(20px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+.depth-hover-strong {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+
+.depth-hover-strong:hover {
+  transform: perspective(1200px) translateZ(30px);
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.18);
+}
+
+/* ── Ambient Glow Cursor ─────────────────────────────────────── */
+
+.ambient-glow-cursor {
+  background: radial-gradient(
+    ellipse 300px 300px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    var(--ambient-glow, hsl(var(--primary))) / 0.06,
+    transparent 70%
+  );
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  transition: background 0.8s ease-in-out;
+}
+
+/* ── Premium Cocooning Utilities ─────────────────────────────── */
+
+.premium-glass {
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  background: hsl(var(--card) / 0.75);
+  border: 1px solid hsl(var(--border) / 0.3);
+}
+
+.premium-shadow-soft {
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 10px 20px -5px rgba(0, 0, 0, 0.04),
+    0 25px 50px -12px rgba(0, 0, 0, 0.03);
+}
+
+.premium-shadow-elevated {
+  box-shadow:
+    0 8px 16px -4px rgba(0, 0, 0, 0.06),
+    0 20px 40px -8px rgba(0, 0, 0, 0.05),
+    0 40px 80px -16px rgba(0, 0, 0, 0.04);
+}
+
+/* ── Reduced Motion Override ─────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .depth-hover-subtle:hover,
+  .depth-hover-medium:hover,
+  .depth-hover-strong:hover {
+    transform: none;
+  }
+
+  .ambient-glow-cursor {
+    display: none;
+  }
+
+  @keyframes ambient-breathe {
+    0%, 100% {
+      transform: none;
+      opacity: 1;
+    }
+  }
+}
+
+/* ── Noise Texture ───────────────────────────────────────────── */
+
+.ambient-noise {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+}

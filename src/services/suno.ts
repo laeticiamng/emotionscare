@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { SunoGenerateRequest, SunoExtendRequest } from '@/types/music/parcours';
 
 const SUNO_API_BASE = import.meta.env.VITE_SUPABASE_URL 
@@ -104,7 +103,7 @@ export async function extendMusicSegment(
   });
 }
 
-export function buildSunoPrompt(preset: any, segmentIndex: number): string {
+export function buildSunoPrompt(preset: { segments: Array<{ title: string; type: string; start: number; end: number }>; music: { prompt: string } }, segmentIndex: number): string {
   const segment = preset.segments[segmentIndex];
   const music = preset.music;
   

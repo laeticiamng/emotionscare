@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 
 const GdprDisclaimer: React.FC = () => {

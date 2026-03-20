@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Helpers de rollout/cohortes + overrides dev (append-only)
 const UID_KEY = "ec_uid_v1";
 const OV_KEY = "ec_flag_overrides_v1";

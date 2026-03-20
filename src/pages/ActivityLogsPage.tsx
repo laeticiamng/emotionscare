@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -6,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
+  ArrowLeft,
   FileText,
   Download,
   AlertTriangle,
@@ -109,6 +111,12 @@ export default function ActivityLogsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       <div className="container mx-auto px-4 py-8">
+        <Button variant="ghost" size="sm" className="mb-4 gap-2" asChild>
+          <Link to="/settings" aria-label="Retour">
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            Retour
+          </Link>
+        </Button>
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">

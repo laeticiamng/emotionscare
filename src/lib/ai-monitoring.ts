@@ -199,42 +199,33 @@ class AIMonitoring {
 
       if (data?.analysis) {
         const analysis: AIAnalysisResult = data.analysis;
-        
-        // Afficher l'analyse dans la console de manière structurée
-        console.groupCollapsed(
-          `%c🤖 AI Analysis: ${analysis.category.toUpperCase()} [${analysis.priority}]`,
-          `color: ${this.getPriorityColor(analysis.priority)}; font-weight: bold; font-size: 12px`
-        );
-        
-        console.log('%c📊 Diagnostic:', 'font-weight: bold; color: #3b82f6', analysis.analysis);
-        
+
+        // Log analysis via structured logger instead of console
+        logger.debug(`AI Analysis: ${analysis.category} [${analysis.priority}] - ${analysis.analysis}`, 'MONITORING');
+
         if (analysis.isKnownIssue) {
-          logger.debug('%c✅ Issue connue', 'color: #10b981', 'LIB');
+          logger.debug('Known issue detected', 'MONITORING');
         }
-        
-        console.log('%c💡 Solution suggérée:', 'font-weight: bold; color: #8b5cf6', analysis.suggestedFix);
-        
+
+        logger.debug(`Suggested fix: ${analysis.suggestedFix}`, 'MONITORING');
+
         if (analysis.autoFixCode) {
-          console.log('%c🔧 Code de correction automatique:', 'font-weight: bold; color: #f59e0b');
-          logger.debug(analysis.autoFixCode, 'LIB');
+          logger.debug(`Auto-fix code: ${analysis.autoFixCode}`, 'MONITORING');
         }
-        
+
         if (analysis.relatedErrors.length > 0) {
-          console.log('%c🔗 Erreurs similaires:', 'font-weight: bold; color: #ec4899', analysis.relatedErrors);
+          logger.debug(`Related errors: ${analysis.relatedErrors.join(', ')}`, 'MONITORING');
         }
-        
+
         if (analysis.preventionTips.length > 0) {
-          console.log('%c🛡️ Conseils de prévention:', 'font-weight: bold; color: #14b8a6');
           analysis.preventionTips.forEach((tip, i) => {
-            logger.debug(`  ${i + 1}. ${tip}`, 'LIB');
+            logger.debug(`Prevention tip ${i + 1}: ${tip}`, 'MONITORING');
           });
         }
-        
+
         if (analysis.needsAlert) {
-          console.warn('%c⚠️ ATTENTION: Cette erreur nécessite une intervention immédiate!', 'font-weight: bold; color: #ef4444; font-size: 13px');
+          logger.warn('ATTENTION: Cette erreur necessite une intervention immediate!', 'MONITORING');
         }
-        
-        console.groupEnd();
       }
     } catch {
       // Silently swallow — never log here to prevent infinite recursion

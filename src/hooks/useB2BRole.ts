@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Hook pour la gestion des rôles B2B
  * Utilise les fonctions SECURITY DEFINER de la base de données

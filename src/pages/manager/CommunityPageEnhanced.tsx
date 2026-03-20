@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { 
-  Users, 
-  MessageSquare, 
-  Calendar, 
-  TrendingUp, 
-  Heart, 
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Users,
+  MessageSquare,
+  Calendar,
+  TrendingUp,
+  Heart,
   Star,
   Plus,
   Search,
@@ -22,6 +23,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CommunityStats { totalMembers: number; activeToday: number; monthlyPosts: number; engagement: number; wellbeingScore: number; }
 interface Discussion { id: number; title: string; author: string; replies: number; likes: number; lastActivity: string; category: string; isHot: boolean; }
@@ -29,100 +31,57 @@ interface CommunityEvent { id: number; title: string; date: string; time: string
 interface Contributor { name: string; points: number; posts: number; avatar: string; badge: string; }
 
 const CommunityPageEnhanced = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
-  const [communityStats, setCommunityStats] = useState<CommunityStats | null>(null);
-  const [discussions, setDiscussions] = useState<Discussion[]>([]);
-  const [events, setEvents] = useState<CommunityEvent[]>([]);
-  const [topContributors, setTopContributors] = useState<Contributor[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Données simulées pour la communauté
-  const mockStats = {
-    totalMembers: 156,
-    activeToday: 42,
-    monthlyPosts: 287,
-    engagement: 78,
-    wellbeingScore: 82
-  };
-
-  const mockDiscussions = [
-    {
-      id: 1,
-      title: 'Techniques de gestion du stress en télétravail',
-      author: 'Sarah M.',
-      replies: 23,
-      likes: 45,
-      lastActivity: '2h',
-      category: 'Bien-être',
-      isHot: true
+  const { data: communityStats, isLoading: statsLoading } = useQuery<CommunityStats>({
+    queryKey: ['community-stats', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_community_stats');
+      if (error) throw error;
+      return data || { totalMembers: 0, activeToday: 0, monthlyPosts: 0, engagement: 0, wellbeingScore: 0 };
     },
-    {
-      id: 2,
-      title: 'Organisation d\'une journée team building virtuel',
-      author: 'Alex T.',
-      replies: 18,
-      likes: 32,
-      lastActivity: '4h',
-      category: 'Événements',
-      isHot: false
+  });
+
+  const { data: discussions = [], isLoading: discussionsLoading } = useQuery<Discussion[]>({
+    queryKey: ['community-discussions'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('community_discussions')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return data || [];
     },
-    {
-      id: 3,
-      title: 'Retour d\'expérience: méditation en entreprise',
-      author: 'Maria R.',
-      replies: 15,
-      likes: 28,
-      lastActivity: '6h',
-      category: 'Témoignages',
-      isHot: true
-    }
-  ];
+  });
 
-  const mockEvents = [
-    {
-      id: 1,
-      title: 'Atelier Mindfulness Collectif',
-      date: '2024-02-15',
-      time: '14:00',
-      participants: 32,
-      maxParticipants: 50,
-      type: 'workshop',
-      status: 'upcoming'
+  const { data: events = [], isLoading: eventsLoading } = useQuery<CommunityEvent[]>({
+    queryKey: ['community-events'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('community_events')
+        .select('*')
+        .order('date', { ascending: true })
+        .limit(20);
+      if (error) throw error;
+      return data || [];
     },
-    {
-      id: 2,
-      title: 'Défi Bien-être Mensuel',
-      date: '2024-02-20',
-      time: '09:00',
-      participants: 78,
-      maxParticipants: 100,
-      type: 'challenge',
-      status: 'ongoing'
-    }
-  ];
+  });
 
-  const mockContributors = [
-    { name: 'Emma L.', points: 1250, posts: 45, avatar: '', badge: 'Expert' },
-    { name: 'Thomas K.', points: 980, posts: 32, avatar: '', badge: 'Mentor' },
-    { name: 'Sophie B.', points: 850, posts: 28, avatar: '', badge: 'Inspirateur' },
-    { name: 'Lucas M.', points: 720, posts: 24, avatar: '', badge: 'Contributeur' }
-  ];
-
-  const createEvent = async (_eventData: Partial<CommunityEvent>) => {
-    try {
-      // Simulation de création d'événement
-      toast({
-        title: "Événement créé",
-        description: "L'événement a été ajouté au calendrier communautaire.",
-      });
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer l'événement.",
-        variant: "destructive"
-      });
-    }
-  };
+  const { data: topContributors = [] } = useQuery<Contributor[]>({
+    queryKey: ['community-contributors'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('community_contributors')
+        .select('name, points, posts, avatar, badge')
+        .order('points', { ascending: false })
+        .limit(10);
+      if (error) throw error;
+      return data || [];
+    },
+  });
 
   const getBadgeColor = (badge: string) => {
     const colors: Record<string, string> = {
@@ -133,13 +92,6 @@ const CommunityPageEnhanced = () => {
     };
     return colors[badge] || 'bg-gray-500';
   };
-
-  useEffect(() => {
-    setCommunityStats(mockStats);
-    setDiscussions(mockDiscussions);
-    setEvents(mockEvents);
-    setTopContributors(mockContributors);
-  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">

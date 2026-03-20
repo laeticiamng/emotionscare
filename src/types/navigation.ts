@@ -1,8 +1,8 @@
-// @ts-nocheck
 /**
  * Types et constantes pour la navigation
  */
 
+import React from 'react';
 import { routes } from '@/routerV2';
 
 // Constantes de routes pour la navigation

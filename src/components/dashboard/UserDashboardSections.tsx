@@ -99,7 +99,7 @@ const categoryColors: Record<string, string> = {
 const UserDashboardSections: React.FC = () => {
   const { user } = useAuth();
 
-  const { data: sessions, isLoading } = useQuery({
+  const { data: sessions, isLoading, isError } = useQuery({
     queryKey: ['vr-recommended-sessions', user?.id],
     queryFn: () => fetchRecommendedSessions(user?.id || ''),
     staleTime: 10 * 60 * 1000, // 10 minutes
@@ -127,6 +127,11 @@ const UserDashboardSections: React.FC = () => {
         </div>
       </CardHeader>
       <CardContent>
+        {isError && (
+          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+            <p className="text-destructive text-sm">Erreur lors du chargement</p>
+          </div>
+        )}
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[1, 2, 3, 4].map(i => (

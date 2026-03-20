@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { InvitationData } from '@/types/invitation';
 import { formatDate } from '@/utils';

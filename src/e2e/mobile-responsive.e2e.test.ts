@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { test, expect } from '@playwright/test';
 
 test.describe('Mobile Responsive E2E Tests', () => {

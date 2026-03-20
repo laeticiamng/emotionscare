@@ -44,7 +44,7 @@ const StatItem: React.FC<StatItemProps> = ({ icon, value, label, color, trend })
 );
 
 export const LivePlatformStats: React.FC<{ className?: string }> = ({ className }) => {
-  const { data: stats, isLoading } = useQuery<PlatformStats>({
+  const { data: stats, isLoading, isError } = useQuery<PlatformStats>({
     queryKey: ['platform-stats'],
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_live_platform_stats');
@@ -105,6 +105,11 @@ export const LivePlatformStats: React.FC<{ className?: string }> = ({ className 
   return (
     <Card className={cn("border-0 shadow-sm bg-gradient-to-br from-background to-muted/20", className)}>
       <CardContent className="p-4">
+        {isError && (
+          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-4">
+            <p className="text-destructive text-sm">Erreur lors du chargement</p>
+          </div>
+        )}
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-sm text-muted-foreground">
             Statistiques en direct

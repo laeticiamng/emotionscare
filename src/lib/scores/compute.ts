@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { SessionEvent, ScoreSnapshot } from "@/SCHEMA";
 
 function toDate(d?: string) {

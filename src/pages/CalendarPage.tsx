@@ -1,4 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
+import { Scene3DErrorBoundary } from '@/components/3d/Scene3DErrorBoundary';
+import { Link } from 'react-router-dom';
+
+const DashboardBackground3D = lazy(() => import('@/components/3d/DashboardBackground3D'));
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -206,7 +210,19 @@ const CalendarPage: React.FC = () => {
   const days = getDaysInMonth(currentDate);
 
   return (
-    <div className="container mx-auto py-8 px-4" data-testid="page-root">
+    <div className="relative container mx-auto py-8 px-4" data-testid="page-root">
+      <Scene3DErrorBoundary>
+        <Suspense fallback={null}>
+          <DashboardBackground3D className="absolute inset-0 -z-10 opacity-15 pointer-events-none" />
+        </Suspense>
+      </Scene3DErrorBoundary>
+
+      <Button variant="ghost" size="sm" className="mb-4 gap-2" asChild>
+        <Link to="/app/home" aria-label="Retour">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          Retour
+        </Link>
+      </Button>
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <Calendar className="h-8 w-8 text-primary" />

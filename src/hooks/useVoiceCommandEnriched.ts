@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';

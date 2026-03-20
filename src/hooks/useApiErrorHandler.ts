@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';

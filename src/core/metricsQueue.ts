@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { logger } from '@/lib/logger';
 
 const STORAGE_KEY = "es_metrics_queue";

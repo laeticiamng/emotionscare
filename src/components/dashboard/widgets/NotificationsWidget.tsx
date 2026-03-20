@@ -164,7 +164,7 @@ export default function NotificationsWidget() {
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(() => getStoredSet(DISMISSED_KEY));
   const [readIds, setReadIds] = useState<Set<string>>(() => getStoredSet(READ_KEY));
 
-  const { data: notifications, isLoading, refetch } = useQuery({
+  const { data: notifications, isLoading, isError, refetch } = useQuery({
     queryKey: ['dashboard-notifications', user?.id],
     queryFn: () => fetchNotifications(user!.id),
     enabled: !!user?.id,
@@ -213,6 +213,11 @@ export default function NotificationsWidget() {
         </div>
       </CardHeader>
       <CardContent>
+        {isError && (
+          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+            <p className="text-destructive text-sm">Erreur lors du chargement</p>
+          </div>
+        )}
         {isLoading ? (
           <div className="space-y-3">
             <Skeleton className="h-16 w-full" />

@@ -24,7 +24,7 @@ const IncidentReportsPage: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined);
 
   // Fetch incident reports
-  const { data: incidents, isLoading } = useQuery<Incident[]>({
+  const { data: incidents, isLoading, isError, error } = useQuery<Incident[]>({
     queryKey: ['incident-reports'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -126,6 +126,12 @@ const IncidentReportsPage: React.FC = () => {
         <h1 className="text-3xl font-bold text-foreground">Rapports d'Incidents</h1>
         <p className="text-muted-foreground mt-1">Incidents avec analyse ML automatisée</p>
       </div>
+
+      {isError && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-4">
+          <p className="text-destructive font-medium">Erreur lors du chargement des données</p>
+        </div>
+      )}
 
       {/* Statistics */}
       <IncidentStats incidents={incidents} />

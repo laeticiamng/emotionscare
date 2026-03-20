@@ -1,74 +1,51 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MessageCircle, Calendar, Clock, CheckCircle, PlayCircle, ArrowLeft, Filter } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { MessageCircle, Calendar, Clock, CheckCircle, PlayCircle, ArrowLeft, Filter, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
+import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
+interface CoachSession {
+  id: string;
+  title: string;
+  program: string;
+  date: string;
+  duration: number;
+  status: string;
+  type: string;
+  notes: string | null;
+}
+
 export default function CoachSessionsPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [filter, setFilter] = useState<'all' | 'completed' | 'upcoming'>('all');
 
-  const sessions = [
-    {
-      id: '1',
-      title: 'Comprendre vos émotions',
-      program: 'Gestion du Stress',
-      date: new Date(2025, 9, 1),
-      duration: 30,
-      status: 'completed',
-      type: 'video',
-      notes: 'Excellente session, beaucoup appris sur la reconnaissance émotionnelle.',
+  const { data: sessions = [], isLoading } = useQuery<CoachSession[]>({
+    queryKey: ['coach-sessions', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('coach_sessions')
+        .select('id, title, program, date, duration, status, type, notes')
+        .eq('user_id', user?.id)
+        .order('date', { ascending: false });
+      if (error) throw error;
+      return data || [];
     },
-    {
-      id: '2',
-      title: 'Techniques de respiration',
-      program: 'Gestion du Stress',
-      date: new Date(2025, 9, 3),
-      duration: 25,
-      status: 'completed',
-      type: 'audio',
-      notes: 'La technique 4-7-8 fonctionne très bien pour moi.',
-    },
-    {
-      id: '3',
-      title: 'Méditation guidée matinale',
-      program: 'Pleine Conscience',
-      date: new Date(2025, 9, 5),
-      duration: 20,
-      status: 'upcoming',
-      type: 'video',
-      notes: null,
-    },
-    {
-      id: '4',
-      title: 'Gestion des pensées négatives',
-      program: 'Intelligence Émotionnelle',
-      date: new Date(2025, 9, 8),
-      duration: 35,
-      status: 'upcoming',
-      type: 'chat',
-      notes: null,
-    },
-    {
-      id: '5',
-      title: 'Définir vos objectifs SMART',
-      program: 'Atteinte des Objectifs',
-      date: new Date(2025, 9, 10),
-      duration: 40,
-      status: 'upcoming',
-      type: 'video',
-      notes: null,
-    },
-  ];
+    enabled: !!user?.id,
+  });
 
-  const filteredSessions = sessions.filter((session) => {
+  const filteredSessions = useMemo(() => sessions.filter((session) => {
     if (filter === 'all') return true;
     return session.status === filter;
-  });
+  }), [sessions, filter]);
 
   const completedCount = sessions.filter((s) => s.status === 'completed').length;
   const upcomingCount = sessions.filter((s) => s.status === 'upcoming').length;
@@ -110,7 +87,7 @@ export default function CoachSessionsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold">{sessions.length}</p>
+              {isLoading ? <Skeleton className="h-9 w-12" /> : <p className="text-3xl font-bold">{sessions.length}</p>}
             </CardContent>
           </Card>
           <Card>
@@ -121,7 +98,7 @@ export default function CoachSessionsPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2">
-                <p className="text-3xl font-bold">{completedCount}</p>
+                {isLoading ? <Skeleton className="h-9 w-12" /> : <p className="text-3xl font-bold">{completedCount}</p>}
                 <CheckCircle className="h-5 w-5 text-green-500" />
               </div>
             </CardContent>
@@ -134,7 +111,7 @@ export default function CoachSessionsPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2">
-                <p className="text-3xl font-bold">{upcomingCount}</p>
+                {isLoading ? <Skeleton className="h-9 w-12" /> : <p className="text-3xl font-bold">{upcomingCount}</p>}
                 <PlayCircle className="h-5 w-5 text-blue-500" />
               </div>
             </CardContent>
@@ -158,7 +135,16 @@ export default function CoachSessionsPage() {
 
         {/* Sessions List */}
         <div className="space-y-4">
-          {filteredSessions.length === 0 ? (
+          {isLoading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <Card key={i}>
+                  <CardHeader><Skeleton className="h-6 w-48" /><Skeleton className="h-4 w-32 mt-2" /></CardHeader>
+                  <CardContent><Skeleton className="h-20 w-full" /></CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : filteredSessions.length === 0 ? (
             <Card>
               <CardContent className="flex min-h-[200px] flex-col items-center justify-center py-10">
                 <Calendar className="mb-4 h-12 w-12 text-muted-foreground/50" />
@@ -191,7 +177,7 @@ export default function CoachSessionsPage() {
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
                       <span>
-                        {format(session.date, 'EEEE d MMMM yyyy', { locale: fr })}
+                        {format(new Date(session.date), 'EEEE d MMMM yyyy', { locale: fr })}
                       </span>
                     </div>
                     <div className="flex items-center gap-1">

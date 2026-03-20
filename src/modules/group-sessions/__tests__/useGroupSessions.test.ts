@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Tests complets pour useGroupSessions et useGroupSession hooks
  */

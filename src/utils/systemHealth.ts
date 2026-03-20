@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SystemHealth - Vérifications de santé réelles de la DB et des services
  */

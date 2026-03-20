@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * EmotionsCare API service
  * Unified service for AI integrations (Suno, Hume, OpenAI) and backend endpoints
@@ -64,10 +63,14 @@ export class EmotionsCareApi {
 
       if (error) {
         logger.error('Suno generation failed', error, 'MUSIC');
-        throw new Error(`Suno error: ${error.message}`);
+        throw new Error(`Music generation failed: ${error.message}`);
       }
 
-      logger.info('Suno response received', { data }, 'MUSIC');
+      if (!data?.tracks || data.tracks.length === 0) {
+        throw new Error('Music generation returned no tracks');
+      }
+
+      logger.info('Suno response received', { trackCount: data.tracks?.length }, 'MUSIC');
 
       // Transform Suno response into MusicPlaylist
       const playlist: MusicPlaylist = {
@@ -75,27 +78,25 @@ export class EmotionsCareApi {
         name: `Playlist ${params.emotion}`,
         description: `Musique thérapeutique générée pour l'émotion: ${params.emotion}`,
         emotion: params.emotion,
-        tracks: data.tracks?.map((track: any, index: number) => ({
+        tracks: data.tracks.map((track: any, index: number) => ({
           id: track.id || `track-${index}`,
           title: track.title || `Titre ${index + 1}`,
           artist: 'EmotionsCare AI',
           duration: track.duration || 180,
-          url: track.audio_url || '/audio/placeholder.mp3',
+          url: track.audio_url,
           coverUrl: track.image_url,
           emotion: params.emotion,
           energy: params.intensity,
           valence: this.getValenceFromEmotion(params.emotion),
           tags: track.tags || [params.emotion]
-        })) || [],
+        })),
         createdAt: new Date()
       };
 
       return playlist;
     } catch (error) {
       logger.error('Music generation error', error, 'MUSIC');
-
-      // Fallback with mocked playlist
-      return this.createFallbackPlaylist(params);
+      throw error instanceof Error ? error : new Error(String(error));
     }
   }
 
@@ -121,9 +122,7 @@ export class EmotionsCareApi {
           body = { text: params.data };
           break;
         default:
-          logger.error('Unsupported analysis type', new Error(`Type: ${params.type}`), 'API');
-          // Retourner un résultat par défaut au lieu de throw
-          return this.createFallbackEmotionResult('neutral');
+          throw new Error(`Unsupported emotion analysis type: ${params.type}`);
       }
 
       const { data, error } = await supabase.functions.invoke(functionName, {
@@ -132,8 +131,7 @@ export class EmotionsCareApi {
 
       if (error) {
         logger.error('Hume analysis failed', error, 'API');
-        // Retourner un résultat par défaut au lieu de throw
-        return this.createFallbackEmotionResult('neutral');
+        throw new Error(`Emotion analysis failed: ${error.message}`);
       }
 
       logger.info('Hume response received', { data }, 'API');
@@ -157,8 +155,7 @@ export class EmotionsCareApi {
       return emotionResult;
     } catch (error) {
       logger.error('Emotion analysis error', error, 'API');
-      // Retourner un résultat par défaut au lieu de throw
-      return this.createFallbackEmotionResult('neutral');
+      throw error instanceof Error ? error : new Error(String(error));
     }
   }
 
@@ -186,17 +183,15 @@ export class EmotionsCareApi {
 
       if (error) {
         logger.error('OpenAI analysis failed', error, 'API');
-        // Retourner une réponse par défaut au lieu de throw
-        return { content: 'Analyse non disponible', error: true };
+        throw new Error(`Text analysis failed: ${error.message}`);
       }
 
-      logger.info('OpenAI response received', { data }, 'API');
+      logger.info('OpenAI response received', undefined, 'API');
 
       return data;
     } catch (error) {
       logger.error('Text analysis error', error, 'API');
-      // Retourner une réponse par défaut au lieu de throw
-      return { content: 'Analyse non disponible', error: true };
+      throw error instanceof Error ? error : new Error(String(error));
     }
   }
 
@@ -205,9 +200,8 @@ export class EmotionsCareApi {
     try {
       return await apiService.analyzeEmotion(text);
     } catch (error) {
-      logger.error('Error analyzing emotion', error, 'API');
-      // Retourner un résultat par défaut au lieu de throw
-      return this.createFallbackEmotionResult('neutral');
+      logger.error('Error analyzing emotion text', error, 'API');
+      throw error instanceof Error ? error : new Error(String(error));
     }
   }
 
@@ -215,9 +209,8 @@ export class EmotionsCareApi {
     try {
       return await apiService.analyzeVoice(audioBlob);
     } catch (error) {
-      logger.error('Error analyzing voice', error, 'API');
-      // Retourner un résultat par défaut au lieu de throw
-      return this.createFallbackEmotionResult('neutral');
+      logger.error('Error analyzing voice emotion', error, 'API');
+      throw error instanceof Error ? error : new Error(String(error));
     }
   }
 
@@ -313,8 +306,7 @@ export class EmotionsCareApi {
       return await apiService.getDashboardStats();
     } catch (error) {
       logger.error('Error fetching dashboard data', error, 'API');
-      // Retourner des données par défaut au lieu de throw
-      return { stats: [], error: true };
+      throw error instanceof Error ? error : new Error(String(error));
     }
   }
 
@@ -323,8 +315,7 @@ export class EmotionsCareApi {
       return await apiService.saveJournalEntry(content);
     } catch (error) {
       logger.error('Error saving journal entry', error, 'API');
-      // Retourner un résultat d'échec au lieu de throw
-      return { success: false, error: true };
+      throw error instanceof Error ? error : new Error(String(error));
     }
   }
 
@@ -376,70 +367,12 @@ export class EmotionsCareApi {
         recommendations: emotionResult.recommendations || []
       };
     } catch (error) {
-      logger.error('Full session error', error, 'SYSTEM');
-      // Retourner une session par défaut au lieu de throw
-      return {
-        emotion: this.createFallbackEmotionResult(params.emotion),
-        playlist: this.createFallbackPlaylist({
-          emotion: params.emotion,
-          intensity: params.intensity || 0.5
-        }),
-        recommendations: [
-          'Pratiquer la respiration consciente',
-          'Écouter de la musique apaisante',
-          'Tenir un journal émotionnel'
-        ]
-      };
+      logger.error('Full emotion music session error', error, 'SYSTEM');
+      throw error instanceof Error ? error : new Error(String(error));
     }
   }
 
   // === Utility Methods ===
-  private createFallbackEmotionResult(emotion: string): EmotionResult {
-    return {
-      id: `fallback-${Date.now()}`,
-      timestamp: new Date().toISOString(),
-      emotion,
-      confidence: 0.5,
-      intensity: 0.5,
-      source: 'fallback',
-      details: {
-        message: 'Analyse par défaut utilisée en raison d\'une erreur'
-      }
-    };
-  }
-
-  private createFallbackPlaylist(params: SunoGenerationParams): MusicPlaylist {
-    return {
-      id: `fallback-${Date.now()}`,
-      name: `Playlist ${params.emotion} (Mode local)`,
-      description: `Musique de secours pour l'émotion: ${params.emotion}`,
-      emotion: params.emotion,
-      tracks: [
-        {
-          id: 'fallback-1',
-          title: `Mélodie apaisante ${params.emotion}`,
-          artist: 'EmotionsCare AI',
-          duration: 180,
-          url: '/audio/fallback/calm.mp3',
-          emotion: params.emotion,
-          energy: params.intensity,
-          valence: this.getValenceFromEmotion(params.emotion)
-        },
-        {
-          id: 'fallback-2',
-          title: `Harmonie thérapeutique`,
-          artist: 'EmotionsCare AI',
-          duration: 240,
-          url: '/audio/fallback/harmony.mp3',
-          emotion: params.emotion,
-          energy: params.intensity * 0.8,
-          valence: this.getValenceFromEmotion(params.emotion)
-        }
-      ],
-      createdAt: new Date()
-    };
-  }
-
   private getValenceFromEmotion(emotion: string): number {
     const valenceMap: Record<string, number> = {
       happy: 0.8,

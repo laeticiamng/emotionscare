@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { HRVSummary } from '@/store/bounce.store';
 import { logger } from '@/lib/logger';
@@ -29,9 +28,9 @@ export const useHRV = (config: HRVConfig) => {
       setError(null);
       
       // Check for available APIs (HealthKit on iOS, Google Fit on Android)
-      if (typeof (window as any).HealthKit !== 'undefined') {
+      if (typeof (window as Record<string, unknown>).HealthKit !== 'undefined') {
         // iOS HealthKit integration
-        const healthKit = (window as any).HealthKit;
+        const healthKit = (window as Record<string, unknown>).HealthKit;
         const success = await healthKit.requestAuthorization(['heartRate']);
         
         if (!success) {
@@ -42,9 +41,9 @@ export const useHRV = (config: HRVConfig) => {
         setIsActive(true);
         startHRVCollection();
         
-      } else if (typeof (window as any).GoogleFit !== 'undefined') {
+      } else if (typeof (window as Record<string, unknown>).GoogleFit !== 'undefined') {
         // Android Google Fit integration
-        const googleFit = (window as any).GoogleFit;
+        const googleFit = (window as Record<string, unknown>).GoogleFit;
         const success = await googleFit.requestAuthorization(['heartRate']);
         
         if (!success) {
@@ -89,12 +88,12 @@ export const useHRV = (config: HRVConfig) => {
         let hrv = 0;
         
         // Try to get real HRV data
-        if (typeof (window as any).HealthKit !== 'undefined') {
-          const healthKit = (window as any).HealthKit;
+        if (typeof (window as Record<string, unknown>).HealthKit !== 'undefined') {
+          const healthKit = (window as Record<string, unknown>).HealthKit;
           const data = await healthKit.getLatestSample('heartRateVariability');
           hrv = data?.value || 0;
-        } else if (typeof (window as any).GoogleFit !== 'undefined') {
-          const googleFit = (window as any).GoogleFit;
+        } else if (typeof (window as Record<string, unknown>).GoogleFit !== 'undefined') {
+          const googleFit = (window as Record<string, unknown>).GoogleFit;
           const data = await googleFit.getLatestSample('heartRateVariability');
           hrv = data?.value || 0;
         }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * ACCESSIBILITY FIXES - WCAG AAA Compliance
  * Automatic fixes for common accessibility issues
@@ -133,9 +132,9 @@ export const fixAccessibilityIssues = (issues: AccessibilityIssue[]): number => 
           break;
       }
     } catch (error) {
-      logProductionEvent('Accessibility Fix Error', { 
-        type: issue.type, 
-        error: error.message 
+      logProductionEvent('Accessibility Fix Error', {
+        type: issue.type,
+        error: error instanceof Error ? error.message : String(error)
       }, 'error');
     }
   });

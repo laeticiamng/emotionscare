@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export interface GlowWeek {
   week_start: string;
   glowScore: number;

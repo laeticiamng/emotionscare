@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -9,6 +8,8 @@ import { useWellnessStreak } from '@/hooks/useWellnessStreak';
 import { useHarmonyPoints } from '@/hooks/useHarmonyPoints';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { DepthCard } from '@/experience/components/DepthCard';
+import { useImmersionLevel } from '@/experience/hooks/useAmbient';
 import { 
   TrendingUp, TrendingDown, Minus, Flame, Zap, Trophy, Target,
   Share2, Settings, ChevronRight, Sparkles, Award, BarChart3
@@ -73,6 +74,7 @@ export const GamificationStats = () => {
     streak: 0,
   });
   const { toast } = useToast();
+  const immersionLevel = useImmersionLevel();
 
   // Load previous stats and animate values
   useEffect(() => {
@@ -389,10 +391,13 @@ export const GamificationStats = () => {
               >
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Card className={cn(
-                      'border-none relative overflow-hidden group cursor-pointer transition-all hover:scale-[1.02]', 
-                      stat.bgColor
-                    )}>
+                    <DepthCard
+                      depth={immersionLevel >= 1 ? 1 : 0}
+                      className={cn(
+                        'border-none relative overflow-hidden group',
+                        stat.bgColor
+                      )}
+                    >
                       {/* Background animation for streak */}
                       {stat.isStreak && stat.value > 0 && (
                         <motion.div
@@ -508,12 +513,8 @@ export const GamificationStats = () => {
                           </div>
                         </div>
 
-                        {/* Hover effect */}
-                        <motion.div
-                          className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"
-                        />
                       </CardContent>
-                    </Card>
+                    </DepthCard>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>

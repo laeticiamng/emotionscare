@@ -84,7 +84,7 @@ const MLAssignmentRulesPage: React.FC = () => {
     priority: 100
   });
 
-  const { data: rules, isLoading } = useQuery({
+  const { data: rules, isLoading, isError: isRulesError, error: rulesError } = useQuery({
     queryKey: ['ml-assignment-rules'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -97,7 +97,7 @@ const MLAssignmentRulesPage: React.FC = () => {
     }
   });
 
-  const { data: teamMembers } = useQuery({
+  const { data: teamMembers, isError: isTeamError, error: teamError } = useQuery({
     queryKey: ['team-member-skills'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -111,7 +111,7 @@ const MLAssignmentRulesPage: React.FC = () => {
     }
   });
 
-  const { data: assignmentHistory } = useQuery({
+  const { data: assignmentHistory, isError: isHistoryError, error: historyError } = useQuery({
     queryKey: ['ml-assignment-history'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -402,6 +402,12 @@ const MLAssignmentRulesPage: React.FC = () => {
           </DialogContent>
         </Dialog>
       </div>
+
+      {(isRulesError || isTeamError || isHistoryError) && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-4">
+          <p className="text-destructive font-medium">Erreur lors du chargement des données</p>
+        </div>
+      )}
 
       {/* Rules List */}
       <div className="grid gap-4">

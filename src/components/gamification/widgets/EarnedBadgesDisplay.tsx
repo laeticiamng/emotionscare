@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, Share2, Star, Lock, ChevronRight, Trophy } from 'lucide-react';

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 // Presets EmotionsCare - 80 humeurs optimisées
 export interface EmotionsCarePreset {
   tag: string;

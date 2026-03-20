@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 import React from "react";
 export function SlideIn({ children, from="20px", delay=0, duration=260 }:{children:React.ReactNode; from?:string; delay?:number; duration?:number}) {

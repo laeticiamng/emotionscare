@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { test, expect } from '@playwright/test';
 
 test.describe('Correction erreur React #426 - Route /b2b', () => {

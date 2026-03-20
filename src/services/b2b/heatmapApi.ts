@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { fetchHeatmap, fetchHeatmapPeriods as fetchPeriods } from './suiteClient';
 
 export interface HeatmapCell {

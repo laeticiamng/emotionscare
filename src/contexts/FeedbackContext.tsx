@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, Rea
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 
 interface FeedbackEntry {
   id: string;
@@ -70,26 +71,73 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     loadFeedbacks();
   }, [user]);
 
-  const loadFeedbacks = () => {
-    // TODO: Query feedbacks from Supabase when backend table is available
-    setFeedbacks([]);
-    setSuggestions([]);
+  const loadFeedbacks = async () => {
+    if (!user?.id) {
+      setFeedbacks([]);
+      setSuggestions([]);
+      return;
+    }
+    try {
+      const { data, error } = await supabase
+        .from('user_feedbacks')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (error) {
+        logger.error('Failed to load feedbacks', { error }, 'feedback');
+        setFeedbacks([]);
+        return;
+      }
+      if (data && data.length > 0) {
+        setFeedbacks(data.map((row: any) => ({
+          id: row.id,
+          userId: row.user_id,
+          module: row.module ?? 'general',
+          rating: row.rating ?? 0,
+          comment: row.comment ?? '',
+          category: row.category ?? 'improvement',
+          timestamp: row.created_at,
+          status: row.status ?? 'pending',
+          aiSuggestion: row.ai_suggestion,
+        })));
+      } else {
+        setFeedbacks([]);
+      }
+      setSuggestions([]);
+    } catch (err) {
+      logger.error('Unexpected error loading feedbacks', { err }, 'feedback');
+      setFeedbacks([]);
+    }
   };
 
   const submitFeedback = async (feedback: Omit<FeedbackEntry, 'id' | 'userId' | 'timestamp' | 'status'>) => {
     setLoading(true);
     try {
+      const { data, error } = await supabase.from('user_feedbacks').insert({
+        user_id: user?.id,
+        module: feedback.module,
+        rating: feedback.rating,
+        comment: feedback.comment,
+        category: feedback.category,
+        status: 'pending',
+      }).select().single();
+
+      if (error) throw error;
+
       const newFeedback: FeedbackEntry = {
-        ...feedback,
-        id: Date.now().toString(),
+        id: data?.id || Date.now().toString(),
         userId: user?.id || 'anonymous',
-        timestamp: new Date().toISOString(),
-        status: 'pending'
+        module: feedback.module,
+        rating: feedback.rating,
+        comment: feedback.comment,
+        category: feedback.category,
+        timestamp: data?.created_at || new Date().toISOString(),
+        status: 'pending',
       };
 
       setFeedbacks(prev => [newFeedback, ...prev]);
-
-      logger.info('Feedback soumis avec succès', newFeedback, 'UI');
+      logger.info('Feedback soumis avec succes', undefined, 'UI');
     } catch (error) {
       logger.error('Erreur lors de la soumission du feedback', error as Error, 'UI');
     } finally {
@@ -98,9 +146,20 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const processAISuggestions = async () => {
-    // TODO: Integrate real AI suggestion engine when backend is available
-    // For now, this is a no-op since we don't have a real AI processing pipeline
-    logger.info('processAISuggestions called — no-op until backend integration', undefined, 'UI');
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-feedback-suggestions', {
+        body: { feedbacks: feedbacks.slice(0, 10) },
+      });
+      if (error) {
+        logger.warn('AI suggestions not available', 'UI');
+        return;
+      }
+      if (data?.suggestions) {
+        setSuggestions(data.suggestions);
+      }
+    } catch {
+      logger.info('AI suggestion engine not configured', undefined, 'UI');
+    }
   };
 
   const generateImprovementReport = async (): Promise<string> => {

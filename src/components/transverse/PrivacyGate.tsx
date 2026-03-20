@@ -1,4 +1,4 @@
-// @ts-nocheck
+import React from "react";
 import { usePrivacy } from "@/core/privacy";
 import { NoCamVariant } from "./NoCamVariant";
 import { NoMicVariant } from "./NoMicVariant";

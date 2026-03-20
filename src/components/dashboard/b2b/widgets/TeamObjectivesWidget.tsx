@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * TeamObjectivesWidget - Widget d'objectifs d'équipe
  * Utilise des données dynamiques depuis team_challenges et Supabase

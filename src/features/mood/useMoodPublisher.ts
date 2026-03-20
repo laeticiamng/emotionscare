@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback } from 'react';
 import { captureException } from '@/lib/ai-monitoring';
 import { logger } from '@/lib/logger';

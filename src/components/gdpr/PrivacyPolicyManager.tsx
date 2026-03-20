@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { usePrivacyPolicyVersions, PrivacyPolicy, PolicyChange } from '@/hooks/usePrivacyPolicyVersions';
 import { Button } from '@/components/ui/button';
@@ -90,7 +89,7 @@ export function PrivacyPolicyManager() {
   };
 
   const getStatusBadge = (status: string) => {
-    const variants = {
+    const variants: Record<string, { label: string; className: string }> = {
       draft: { label: 'Brouillon', className: 'bg-secondary text-secondary-foreground' },
       published: { label: 'Publiée', className: 'bg-primary text-primary-foreground' },
       archived: { label: 'Archivée', className: 'bg-muted text-muted-foreground' },

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useCallback } from 'react';
 import { ChatMessage } from '@/types/chat';
 import { logger } from '@/lib/logger';
@@ -7,7 +5,7 @@ import { logger } from '@/lib/logger';
 export function useChatMessages(initialMessages: ChatMessage[] = []) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
 
-  const addMessage = useCallback((text: string, sender: 'user' | 'assistant', options?: any): ChatMessage => {
+  const addMessage = useCallback((text: string, sender: 'user' | 'assistant', options?: Partial<ChatMessage>): ChatMessage => {
     const newMessage: ChatMessage = {
       id: `msg-${Date.now()}`,
       text,

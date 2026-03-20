@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useEffect, useCallback } from 'react';
 import { useMusic } from '@/hooks/useMusic';
 import { useBranding } from '@/contexts/BrandingContext';

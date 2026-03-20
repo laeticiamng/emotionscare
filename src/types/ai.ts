@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export interface AIAssistant {
   id: string;
   name: string;

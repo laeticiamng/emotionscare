@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Universe } from '@/types/universes';
 import { Card, CardContent } from '@/components/ui/card';

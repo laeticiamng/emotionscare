@@ -1,10 +1,8 @@
-// @ts-nocheck
-
 /**
  * Calculate streak days from emotion entries
  * @param entries Array of emotion entries with date field
  */
-export const calculateStreakDays = (entries: any[]): number => {
+export const calculateStreakDays = (entries: Array<{ date: string | Date }>): number => {
   if (!entries || entries.length === 0) return 0;
   
   // Sort entries by date (most recent first)

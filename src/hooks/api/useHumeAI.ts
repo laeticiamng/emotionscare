@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useCallback } from 'react';
 import { EmotionResult, normalizeEmotionResult } from '@/types/emotion-unified';
 import { supabase } from '@/integrations/supabase/client';
@@ -104,7 +102,7 @@ const useHumeAI = () => {
         source: 'facial',
         timestamp: new Date().toISOString(),
         summary: `Expression ${dominantEmotion} détectée`,
-        emotions: analysis?.emotions?.reduce((acc: Record<string, number>, e: any) => {
+        emotions: analysis?.emotions?.reduce((acc: Record<string, number>, e: { name: string; confidence: number }) => {
           acc[e.name] = e.confidence * 100;
           return acc;
         }, {}) || {}

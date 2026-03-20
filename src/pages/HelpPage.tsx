@@ -23,6 +23,7 @@ import {
   Shield,
   Users,
   ChevronRight,
+  ArrowLeft,
   ArrowRight,
   Mail,
   Book,
@@ -245,6 +246,14 @@ const HelpPage: React.FC = () => {
         </a>
 
         <main id="main-content" role="main">
+          <div className="container px-4 sm:px-6 pt-6">
+            <Button variant="ghost" size="sm" className="mb-4 gap-2" asChild>
+              <Link to="/app/home" aria-label="Retour">
+                <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+                Retour
+              </Link>
+            </Button>
+          </div>
           {/* ────── Hero ────── */}
           <section className="relative pt-24 pb-20 md:pt-36 md:pb-28 overflow-hidden">
             {/* Gradient background */}

@@ -1,4 +1,3 @@
-// @ts-nocheck
 export type FlashGlowVisualIntensity = 'baseline' | 'lowered';
 export type FlashGlowBreathPattern = 'steady' | 'exhale_longer';
 export type FlashGlowAudioFade = 'gentle' | 'slow';

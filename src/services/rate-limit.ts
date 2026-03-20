@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * Rate limiter avec backoff exponentiel et jitter pour Suno API
  * Limite: 20 requêtes / 10 secondes

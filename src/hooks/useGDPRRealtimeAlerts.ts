@@ -10,7 +10,7 @@ interface GDPRAlert {
   severity: 'info' | 'warning' | 'critical';
   title: string;
   description: string | null;
-  metadata: any;
+  metadata: Record<string, unknown> | null;
   user_id: string | null;
   resolved: boolean;
   created_at: string;

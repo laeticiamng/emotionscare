@@ -3,16 +3,19 @@
  * Monitoring temps réel des Edge Functions et services
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Activity, 
-  CheckCircle, 
-  XCircle, 
-  AlertTriangle, 
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Activity,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
   RefreshCw,
   Clock,
   Zap,
@@ -28,31 +31,41 @@ interface ApiEndpoint {
   lastChecked: Date;
 }
 
-const MOCK_ENDPOINTS: ApiEndpoint[] = [
-  { name: 'Coach API', path: '/coach-api', status: 'operational', latency: 120, uptime: 99.9, lastChecked: new Date() },
-  { name: 'Scan API', path: '/scan-api', status: 'operational', latency: 85, uptime: 99.8, lastChecked: new Date() },
-  { name: 'Journal API', path: '/journal-api', status: 'operational', latency: 95, uptime: 99.95, lastChecked: new Date() },
-  { name: 'Music API', path: '/music-api', status: 'operational', latency: 150, uptime: 99.7, lastChecked: new Date() },
-  { name: 'Community API', path: '/community-api', status: 'operational', latency: 110, uptime: 99.85, lastChecked: new Date() },
-  { name: 'Meditation API', path: '/meditation-api', status: 'operational', latency: 78, uptime: 99.9, lastChecked: new Date() },
-  { name: 'Activities API', path: '/activities-api', status: 'operational', latency: 92, uptime: 99.8, lastChecked: new Date() },
-  { name: 'Analytics API', path: '/analytics-api', status: 'operational', latency: 145, uptime: 99.6, lastChecked: new Date() },
-];
-
 export function ApiStatusDashboard() {
-  const [endpoints, setEndpoints] = useState<ApiEndpoint[]>(MOCK_ENDPOINTS);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
+  // Fetch API endpoints status from Supabase
+  const {
+    data: endpoints = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery<ApiEndpoint[]>({
+    queryKey: ['api_endpoints'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('api_endpoints')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+
+      return (data ?? []).map((row: any) => ({
+        name: row.name ?? '',
+        path: row.path ?? '',
+        status: row.status ?? 'operational',
+        latency: row.latency ?? 0,
+        uptime: row.uptime ?? 0,
+        lastChecked: new Date(row.last_checked ?? row.updated_at ?? Date.now()),
+      }));
+    },
+    refetchInterval: 60000, // Auto-refresh every 60s
+  });
+
   const refreshStatus = async () => {
     setIsRefreshing(true);
-    // Simulate API check
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setEndpoints(prev => prev.map(ep => ({
-      ...ep,
-      lastChecked: new Date(),
-      latency: Math.floor(ep.latency * (0.9 + Math.random() * 0.2))
-    })));
+    await refetch();
     setLastRefresh(new Date());
     setIsRefreshing(false);
   };
@@ -80,8 +93,44 @@ export function ApiStatusDashboard() {
   };
 
   const operationalCount = endpoints.filter(e => e.status === 'operational').length;
-  const avgLatency = Math.round(endpoints.reduce((sum, e) => sum + e.latency, 0) / endpoints.length);
-  const avgUptime = (endpoints.reduce((sum, e) => sum + e.uptime, 0) / endpoints.length).toFixed(2);
+  const avgLatency = endpoints.length > 0
+    ? Math.round(endpoints.reduce((sum, e) => sum + e.latency, 0) / endpoints.length)
+    : 0;
+  const avgUptime = endpoints.length > 0
+    ? (endpoints.reduce((sum, e) => sum + e.uptime, 0) / endpoints.length).toFixed(2)
+    : '0.00';
+
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="p-6 text-center" role="alert">
+          <AlertTriangle className="h-8 w-8 mx-auto text-red-500 mb-2" />
+          <p className="text-sm text-red-500">Erreur lors du chargement du statut des APIs</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map(i => (
+            <Card key={i}>
+              <CardHeader className="pb-2"><Skeleton className="h-4 w-24" /></CardHeader>
+              <CardContent><Skeleton className="h-8 w-20" /></CardContent>
+            </Card>
+          ))}
+        </div>
+        <Card>
+          <CardHeader><Skeleton className="h-6 w-40" /></CardHeader>
+          <CardContent className="space-y-4">
+            {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-16 w-full" />)}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -166,7 +215,13 @@ export function ApiStatusDashboard() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {endpoints.map((endpoint) => (
+            {endpoints.length === 0 ? (
+              <div className="text-center py-6">
+                <Server className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                <p className="font-medium">Aucun endpoint configuré</p>
+                <p className="text-sm text-muted-foreground mt-1">Les endpoints API apparaîtront ici.</p>
+              </div>
+            ) : endpoints.map((endpoint) => (
               <div 
                 key={endpoint.path}
                 className="flex items-center justify-between p-4 rounded-lg border bg-card"

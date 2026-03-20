@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { EmotionTrend, EmotionPattern, EmotionResult, EmotionInsight } from '@/types/emotion';
@@ -20,6 +19,7 @@ interface UseEmotionAnalyticsReturn {
   emotionPatterns: EmotionPattern[];
   insights: EmotionInsight[];
   isLoading: boolean;
+  isError: boolean;
   error: Error | null;
   refreshAnalytics: () => void;
   getEmotionInsights: (period: 'day' | 'week' | 'month') => Promise<EmotionInsight[]>;
@@ -34,7 +34,7 @@ export const useEmotionAnalytics = (): UseEmotionAnalyticsReturn => {
   const [insights, setInsights] = useState<EmotionInsight[]>([]);
 
   // Récupérer les données d'analyse d'émotions
-  const { data: emotionData, isLoading, error, refetch } = useQuery({
+  const { data: emotionData, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['emotion-analytics'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -360,6 +360,7 @@ export const useEmotionAnalytics = (): UseEmotionAnalyticsReturn => {
     emotionPatterns,
     insights,
     isLoading,
+    isError,
     error: error as Error | null,
     refreshAnalytics,
     getEmotionInsights

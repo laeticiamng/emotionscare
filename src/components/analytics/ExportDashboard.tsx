@@ -4,13 +4,17 @@
  */
 
 import { memo, useState, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { 
+import { Skeleton } from '@/components/ui/skeleton';
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -18,8 +22,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Download, 
+import {
+  Download,
   FileSpreadsheet,
   FileText,
   FileJson,
@@ -29,6 +33,7 @@ import {
   Loader2,
   History,
   Settings,
+  AlertTriangle,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -80,20 +85,68 @@ const FORMAT_ICONS: Record<string, React.ReactNode> = {
   pdf: <FileText className="h-4 w-4" />,
 };
 
-const MOCK_HISTORY: ExportHistory[] = [
-  { id: 'e1', filename: 'export_mood_2026-02.xlsx', format: 'xlsx', size: '2.4 MB', createdAt: new Date(Date.now() - 3600000), status: 'completed' },
-  { id: 'e2', filename: 'export_full_2026-01.csv', format: 'csv', size: '8.1 MB', createdAt: new Date(Date.now() - 86400000), status: 'completed' },
-  { id: 'e3', filename: 'export_journal_2026-02.json', format: 'json', size: '1.2 MB', createdAt: new Date(Date.now() - 172800000), status: 'failed' },
-];
-
-const MOCK_SCHEDULED: ScheduledExport[] = [
-  { id: 's1', name: 'Rapport hebdo humeur', frequency: 'weekly', nextRun: new Date(Date.now() + 259200000), modules: ['mood', 'scan'], format: 'xlsx', active: true },
-  { id: 's2', name: 'Backup mensuel complet', frequency: 'monthly', nextRun: new Date(Date.now() + 1209600000), modules: AVAILABLE_MODULES.map(m => m.id), format: 'json', active: true },
-];
 
 export const ExportDashboard = memo(function ExportDashboard({
   className = '',
 }: ExportDashboardProps) {
+  const { user } = useAuth();
+
+  // Fetch export history from Supabase
+  const {
+    data: history = [],
+    isLoading: historyLoading,
+    error: historyError,
+  } = useQuery<ExportHistory[]>({
+    queryKey: ['export_history', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('export_history')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+
+      return (data ?? []).map((row: any) => ({
+        id: row.id,
+        filename: row.filename ?? '',
+        format: row.format ?? 'csv',
+        size: row.size ?? '0 B',
+        createdAt: new Date(row.created_at),
+        status: row.status ?? 'completed',
+      }));
+    },
+    enabled: !!user?.id,
+  });
+
+  // Fetch scheduled exports from Supabase
+  const {
+    data: scheduled = [],
+    isLoading: scheduledLoading,
+    error: scheduledError,
+  } = useQuery<ScheduledExport[]>({
+    queryKey: ['scheduled_exports', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('scheduled_exports')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return (data ?? []).map((row: any) => ({
+        id: row.id,
+        name: row.name ?? '',
+        frequency: row.frequency ?? 'weekly',
+        nextRun: new Date(row.next_run ?? Date.now()),
+        modules: row.modules ?? [],
+        format: row.format ?? 'csv',
+        active: row.active ?? true,
+      }));
+    },
+    enabled: !!user?.id,
+  });
+
   const [config, setConfig] = useState<ExportConfig>({
     format: 'xlsx',
     modules: ['mood', 'journal'],
@@ -270,34 +323,50 @@ export const ExportDashboard = memo(function ExportDashboard({
           </TabsContent>
 
           <TabsContent value="scheduled" className="space-y-4">
-            {MOCK_SCHEDULED.map((scheduled) => (
+            {scheduledLoading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+              </div>
+            ) : scheduledError ? (
+              <div className="text-center py-6" role="alert">
+                <AlertTriangle className="h-8 w-8 mx-auto text-red-500 mb-2" />
+                <p className="text-sm text-red-500">Erreur lors du chargement des exports planifiés</p>
+              </div>
+            ) : scheduled.length === 0 ? (
+              <div className="text-center py-6">
+                <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                <p className="font-medium">Aucun export planifié</p>
+                <p className="text-sm text-muted-foreground mt-1">Planifiez un export récurrent ci-dessous.</p>
+              </div>
+            ) : scheduled.map((scheduledItem) => (
               <div
-                key={scheduled.id}
+                key={scheduledItem.id}
                 className="rounded-lg border p-4 flex items-center justify-between"
               >
                 <div>
                   <div className="flex items-center gap-2">
-                    <h4 className="font-medium">{scheduled.name}</h4>
-                    <Badge variant={scheduled.active ? 'default' : 'secondary'}>
-                      {scheduled.active ? 'Actif' : 'Inactif'}
+                    <h4 className="font-medium">{scheduledItem.name}</h4>
+                    <Badge variant={scheduledItem.active ? 'default' : 'secondary'}>
+                      {scheduledItem.active ? 'Actif' : 'Inactif'}
                     </Badge>
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {scheduled.frequency === 'daily' && 'Quotidien'}
-                    {scheduled.frequency === 'weekly' && 'Hebdomadaire'}
-                    {scheduled.frequency === 'monthly' && 'Mensuel'}
+                    {scheduledItem.frequency === 'daily' && 'Quotidien'}
+                    {scheduledItem.frequency === 'weekly' && 'Hebdomadaire'}
+                    {scheduledItem.frequency === 'monthly' && 'Mensuel'}
                     {' • '}
-                    Prochain : {scheduled.nextRun.toLocaleDateString('fr-FR')}
+                    Prochain : {scheduledItem.nextRun.toLocaleDateString('fr-FR')}
                   </p>
                   <div className="flex gap-1 mt-2">
-                    {scheduled.modules.slice(0, 3).map((m) => (
+                    {scheduledItem.modules.slice(0, 3).map((m) => (
                       <Badge key={m} variant="outline" className="text-xs">
                         {AVAILABLE_MODULES.find((am) => am.id === m)?.label || m}
                       </Badge>
                     ))}
-                    {scheduled.modules.length > 3 && (
+                    {scheduledItem.modules.length > 3 && (
                       <Badge variant="outline" className="text-xs">
-                        +{scheduled.modules.length - 3}
+                        +{scheduledItem.modules.length - 3}
                       </Badge>
                     )}
                   </div>
@@ -314,7 +383,24 @@ export const ExportDashboard = memo(function ExportDashboard({
           </TabsContent>
 
           <TabsContent value="history" className="space-y-3">
-            {MOCK_HISTORY.map((item) => (
+            {historyLoading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+              </div>
+            ) : historyError ? (
+              <div className="text-center py-6" role="alert">
+                <AlertTriangle className="h-8 w-8 mx-auto text-red-500 mb-2" />
+                <p className="text-sm text-red-500">Erreur lors du chargement de l'historique</p>
+              </div>
+            ) : history.length === 0 ? (
+              <div className="text-center py-6">
+                <History className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                <p className="font-medium">Aucun export effectué</p>
+                <p className="text-sm text-muted-foreground mt-1">Vos exports apparaîtront ici.</p>
+              </div>
+            ) : history.map((item) => (
               <div
                 key={item.id}
                 className="rounded-lg border p-3 flex items-center justify-between"

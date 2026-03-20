@@ -14,6 +14,9 @@ import { usePageSEO } from '@/hooks/usePageSEO';
 import { useEmotionScan } from '@/hooks/useEmotionScan';
 import { useToast } from '@/hooks/use-toast';
 import { EmotionResult, ConfidenceLevel } from '@/types/emotion-unified';
+import Scene3DErrorBoundary from '@/components/3d/Scene3DErrorBoundary';
+
+const EmotionSphere3D = lazy(() => import('@/components/3d/EmotionSphere3D'));
 
 const getConfidenceValue = (confidence: number | ConfidenceLevel | undefined): number => {
   if (confidence === undefined) return 0;
@@ -248,6 +251,15 @@ const ScanVoicePage: React.FC = () => {
             <div className="space-y-4">
               {lastResult ? (
                 <>
+                  <Scene3DErrorBoundary>
+                    <Suspense fallback={null}>
+                      <EmotionSphere3D
+                        valence={(lastResult.valence || 50) / 100}
+                        arousal={(lastResult.arousal || 50) / 100}
+                        className="w-full h-48 mb-4"
+                      />
+                    </Suspense>
+                  </Scene3DErrorBoundary>
                   <SimpleResultCard result={lastResult} />
                   <Button variant="outline" onClick={handleReset} className="w-full gap-2">
                     <RefreshCw className="h-4 w-4" />

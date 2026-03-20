@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface ExperimentFeature {
   id: string;
@@ -55,97 +57,77 @@ interface InnovationContextType {
 
 const InnovationContext = createContext<InnovationContextType | undefined>(undefined);
 
-const mockExperiments: ExperimentFeature[] = [
-  {
-    id: 'ai-coach-v2',
-    name: 'Coach IA Avancé',
-    description: 'Nouveau moteur d\'IA avec apprentissage personnalisé',
-    enabled: true,
-    category: 'ai',
-    rolloutPercentage: 25,
-    metrics: { adoption: 78, satisfaction: 4.2, performance: 0.95 },
-    feedback: ['Plus personnalisé', 'Réponses plus rapides'],
-    startDate: '2024-01-15'
-  },
-  {
-    id: 'voice-emotion-detection',
-    name: 'Détection Émotionnelle Vocale',
-    description: 'Analyse des émotions via reconnaissance vocale',
-    enabled: false,
-    category: 'ai',
-    rolloutPercentage: 10,
-    metrics: { adoption: 45, satisfaction: 3.8, performance: 0.82 },
-    feedback: ['Très innovant', 'Besoin d\'améliorer la précision'],
-    startDate: '2024-02-01'
-  },
-  {
-    id: 'micro-interactions',
-    name: 'Micro-interactions Avancées',
-    description: 'Nouvelles animations et retours haptiques',
-    enabled: true,
-    category: 'ui',
-    rolloutPercentage: 50,
-    metrics: { adoption: 89, satisfaction: 4.5, performance: 0.98 },
-    feedback: ['Interface plus fluide', 'Très agréable'],
-    startDate: '2024-01-20'
-  },
-  {
-    id: 'real-time-collaboration',
-    name: 'Collaboration Temps Réel',
-    description: 'Espace de travail collaboratif pour les équipes',
-    enabled: false,
-    category: 'performance',
-    rolloutPercentage: 5,
-    metrics: { adoption: 32, satisfaction: 3.5, performance: 0.75 },
-    feedback: ['Potentiel énorme', 'Performance à optimiser'],
-    startDate: '2024-02-15'
-  }
-];
-
-const mockTechTrends: TechTrend[] = [
-  {
-    id: 'webgl-vr',
-    name: 'WebGL/WebXR Natif',
-    category: 'Réalité Virtuelle',
-    impact: 'high',
-    maturity: 'growing',
-    adoptionScore: 7.5,
-    description: 'VR native dans le navigateur sans plugins',
-    potentialBenefits: ['Expérience immersive', 'Pas d\'installation'],
-    implementationComplexity: 8
-  },
-  {
-    id: 'edge-ai',
-    name: 'IA Edge Computing',
-    category: 'Intelligence Artificielle',
-    impact: 'high',
-    maturity: 'emerging',
-    adoptionScore: 6.8,
-    description: 'Traitement IA local pour la confidentialité',
-    potentialBenefits: ['Latence réduite', 'Confidentialité totale'],
-    implementationComplexity: 9
-  },
-  {
-    id: 'web-assembly',
-    name: 'WebAssembly Advanced',
-    category: 'Performance',
-    impact: 'medium',
-    maturity: 'mature',
-    adoptionScore: 8.2,
-    description: 'Calculs haute performance dans le navigateur',
-    potentialBenefits: ['Performance native', 'Polyvalence'],
-    implementationComplexity: 6
-  }
-];
-
 export const InnovationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [experiments, setExperiments] = useState<ExperimentFeature[]>(mockExperiments);
-  const [techTrends, setTechTrends] = useState<TechTrend[]>(mockTechTrends);
+  const [experiments, setExperiments] = useState<ExperimentFeature[]>([]);
+  const [techTrends, setTechTrends] = useState<TechTrend[]>([]);
   const [enabledFeatures, setEnabledFeatures] = useState<string[]>([]);
   const { user } = useAuth();
 
   useEffect(() => {
-    // Calculer les fonctionnalités activées basées sur les expériences
+    async function loadExperiments() {
+      try {
+        const { data, error } = await supabase
+          .from('feature_experiments')
+          .select('*')
+          .order('start_date', { ascending: false });
+        if (error) {
+          logger.error('Failed to load experiments', { error }, 'innovation');
+          return;
+        }
+        if (data && data.length > 0) {
+          const mapped: ExperimentFeature[] = data.map((row: any) => ({
+            id: row.id,
+            name: row.name ?? '',
+            description: row.description ?? '',
+            enabled: row.enabled ?? false,
+            category: row.category ?? 'ui',
+            rolloutPercentage: row.rollout_percentage ?? 0,
+            metrics: row.metrics ?? { adoption: 0, satisfaction: 0, performance: 0 },
+            feedback: row.feedback ?? [],
+            startDate: row.start_date ?? '',
+            endDate: row.end_date,
+          }));
+          setExperiments(mapped);
+        }
+      } catch (err) {
+        logger.error('Unexpected error loading experiments', { err }, 'innovation');
+      }
+    }
+
+    async function loadTechTrends() {
+      try {
+        const { data, error } = await supabase
+          .from('tech_trends')
+          .select('*')
+          .order('adoption_score', { ascending: false });
+        if (error) {
+          logger.error('Failed to load tech trends', { error }, 'innovation');
+          return;
+        }
+        if (data && data.length > 0) {
+          const mapped: TechTrend[] = data.map((row: any) => ({
+            id: row.id,
+            name: row.name ?? '',
+            category: row.category ?? '',
+            impact: row.impact ?? 'medium',
+            maturity: row.maturity ?? 'emerging',
+            adoptionScore: row.adoption_score ?? 0,
+            description: row.description ?? '',
+            potentialBenefits: row.potential_benefits ?? [],
+            implementationComplexity: row.implementation_complexity ?? 5,
+          }));
+          setTechTrends(mapped);
+        }
+      } catch (err) {
+        logger.error('Unexpected error loading tech trends', { err }, 'innovation');
+      }
+    }
+
+    loadExperiments();
+    loadTechTrends();
+  }, []);
+
+  useEffect(() => {
     const enabled = experiments
       .filter(exp => exp.enabled && Math.random() * 100 < exp.rolloutPercentage)
       .map(exp => exp.id);
@@ -155,9 +137,9 @@ export const InnovationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const metrics: InnovationMetrics = {
     totalExperiments: experiments.length,
     activeExperiments: experiments.filter(e => e.enabled).length,
-    successRate: experiments.length > 0 ? 
+    successRate: experiments.length > 0 ?
       experiments.filter(e => e.metrics.satisfaction > 4.0).length / experiments.length * 100 : 0,
-    averageAdoptionTime: 14, // jours
+    averageAdoptionTime: 14,
     innovationScore: calculateInnovationScore(),
     techDebtRatio: 0.15,
     scalabilityIndex: 8.7
@@ -166,11 +148,13 @@ export const InnovationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   function calculateInnovationScore(): number {
     const activeExp = experiments.filter(e => e.enabled);
     if (activeExp.length === 0) return 0;
-    
+
     const avgSatisfaction = activeExp.reduce((sum, e) => sum + e.metrics.satisfaction, 0) / activeExp.length;
     const avgAdoption = activeExp.reduce((sum, e) => sum + e.metrics.adoption, 0) / activeExp.length;
-    const techScore = techTrends.reduce((sum, t) => sum + t.adoptionScore, 0) / techTrends.length;
-    
+    const techScore = techTrends.length > 0
+      ? techTrends.reduce((sum, t) => sum + t.adoptionScore, 0) / techTrends.length
+      : 0;
+
     return Math.round((avgSatisfaction * 20 + avgAdoption * 0.5 + techScore * 5) / 3);
   }
 
@@ -179,14 +163,14 @@ export const InnovationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const toggleExperiment = (experimentId: string) => {
-    setExperiments(prev => prev.map(exp => 
+    setExperiments(prev => prev.map(exp =>
       exp.id === experimentId ? { ...exp, enabled: !exp.enabled } : exp
     ));
   };
 
   const addFeedback = (experimentId: string, feedback: string) => {
-    setExperiments(prev => prev.map(exp => 
-      exp.id === experimentId ? 
+    setExperiments(prev => prev.map(exp =>
+      exp.id === experimentId ?
         { ...exp, feedback: [...exp.feedback, feedback] } : exp
     ));
   };

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * Moniteur de performance pour l'application
  * Collecte et rapporte les métriques de performance clés

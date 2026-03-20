@@ -222,7 +222,7 @@ export const VRGalaxyMain: React.FC<VRGalaxyMainProps> = ({ className = '' }) =>
         <TabsContent value="history">
           <GalaxySessionHistoryPanel
             sessions={galaxy.sessionHistory}
-            onSessionSelect={(session) => console.log('Selected session:', session)}
+            onSessionSelect={(session) => galaxy.selectSession?.(session)}
           />
         </TabsContent>
 

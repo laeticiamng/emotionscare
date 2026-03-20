@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { ComponentType } from 'react';
 import { logger } from '@/lib/logger';
 

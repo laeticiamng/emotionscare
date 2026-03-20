@@ -134,6 +134,7 @@ export function useUserStatsQuery() {
   return {
     stats: query.data || DEFAULT_STATS,
     loading: query.isLoading,
+    isError: query.isError,
     error: query.error,
     isRefetching: query.isRefetching,
     invalidateStats,

@@ -3,12 +3,13 @@
  */
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Shield, Key, Smartphone, AlertTriangle } from 'lucide-react';
+import { Shield, Key, Smartphone, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { toast } from 'sonner';
 
@@ -28,6 +29,19 @@ const SecuritySettingsPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl space-y-6">
+      <header className="mb-2">
+        <Button variant="ghost" size="sm" className="mb-4 gap-2" asChild>
+          <Link to="/settings" aria-label="Retour aux paramètres">
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            Retour aux paramètres
+          </Link>
+        </Button>
+        <h1 className="text-3xl font-bold text-foreground">Sécurité du compte</h1>
+        <p className="text-muted-foreground mt-2">
+          Mot de passe, authentification et sessions actives
+        </p>
+      </header>
+
       {/* Changement de mot de passe */}
       <Card>
         <CardHeader>

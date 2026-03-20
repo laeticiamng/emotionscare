@@ -1,4 +1,3 @@
-// @ts-nocheck
 export async function safeFetch(url: string, opts: RequestInit & { timeoutMs?: number; retries?: number } = {}) {
   const { timeoutMs, retries = 0, ...rest } = opts;
   const controller = new AbortController();

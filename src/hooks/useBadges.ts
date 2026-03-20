@@ -59,7 +59,7 @@ export const useBadges = () => {
 
       toast.success('Badge débloqué ! 🎉');
       fetchBadges();
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Error unlocking badge:', error, 'HOOK');
       toast.error('Erreur lors du déblocage du badge');
     }
@@ -89,7 +89,7 @@ export const useBadges = () => {
       }
 
       fetchBadges();
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Error updating badge progress:', error, 'HOOK');
     }
   };
@@ -123,7 +123,7 @@ export const useBadges = () => {
 
       toast.success('Badge partagé !');
       fetchBadges();
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Error sharing badge:', error, 'HOOK');
       toast.error('Erreur lors du partage');
     }

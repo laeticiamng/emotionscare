@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { Sparkles, Zap, Battery, BatteryLow, BatteryCharging, Coffee, Moon, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';

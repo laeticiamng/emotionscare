@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * Utility to emit mode change events
  * This helps components react to mode changes without direct coupling

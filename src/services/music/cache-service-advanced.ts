@@ -1,4 +1,3 @@
-// @ts-nocheck - Complex caching service with flexible typing
 /**
  * Advanced Music Cache Service
  *

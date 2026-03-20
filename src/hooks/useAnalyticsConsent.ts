@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useLocalStorage } from './useLocalStorage';
 
 export const useAnalyticsConsent = () => {

@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -71,6 +74,7 @@ const EXPORT_FORMATS: ExportFormat[] = [
 const EMOTIONS = ['Joie', 'Calme', 'Neutre', 'Anxiété', 'Tristesse', 'Colère'];
 
 export const CoachAdvancedFiltering = () => {
+  const { user } = useAuth();
   const [filters, setFilters] = useState<FilterOptions>({
     dateRange: 'month',
     emotionFilter: [],
@@ -93,28 +97,48 @@ export const CoachAdvancedFiltering = () => {
   };
 
   const handleExport = async (format: string) => {
-    // Simulation d'export
-    const mockData = {
-      exportDate: new Date().toISOString(),
-      filters: filters,
-      dataPoints: 156,
-      conversations: 12,
-      format: format,
-      message: `Export en ${format.toUpperCase()} généré avec succès`,
-    };
+    try {
+      // Build date range
+      const rangeMap: Record<string, number> = { week: 7, month: 30, quarter: 90, year: 365, all: 3650 };
+      const days = rangeMap[filters.dateRange] || 30;
+      const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
 
-    setExportedData(JSON.stringify(mockData, null, 2));
+      let query = supabase
+        .from('mood_entries')
+        .select('*')
+        .gte('created_at', since)
+        .order('created_at', { ascending: false });
 
-    // Simuler le téléchargement
-    const blob = new Blob([JSON.stringify(mockData, null, 2)], {
-      type: 'application/json',
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `coach-export-${Date.now()}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
+      if (user?.id) {
+        query = query.eq('user_id', user.id);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      const exportPayload = {
+        exportDate: new Date().toISOString(),
+        filters,
+        dataPoints: data?.length || 0,
+        format,
+        entries: filters.anonymize
+          ? (data ?? []).map(({ user_id, ...rest }: any) => rest)
+          : data ?? [],
+      };
+
+      const content = JSON.stringify(exportPayload, null, 2);
+      setExportedData(content);
+
+      const blob = new Blob([content], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `coach-export-${Date.now()}.${format}`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setExportedData(JSON.stringify({ error: 'Export failed' }, null, 2));
+    }
   };
 
   const handleCopyExport = () => {
@@ -333,7 +357,7 @@ export const CoachAdvancedFiltering = () => {
                 {filters.anonymize ? '+ Anonymisation' : ''}
               </p>
               <p className="pt-2">
-                <strong>Résultat estimé:</strong> 156 points de données dans 12 conversations
+                <strong>Résultat estimé:</strong> Appliquez l'export pour voir le nombre de points de données
               </p>
             </CardContent>
           </Card>

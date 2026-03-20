@@ -14,7 +14,6 @@ import {
   recordTrackPlay,
   fetchPlayHistory
 } from '@/services/music/realMusicService';
-import { sampleTracks, samplePlaylists } from '@/data/sampleTracks';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 export function useRealMusicLibrary() {
@@ -71,19 +70,8 @@ export function useRealMusicLibrary() {
     queryClient.invalidateQueries({ queryKey: ['music-history', user.id] });
   };
 
-  // Combiner les pistes réelles avec les pistes sample comme fallback
-  const allTracks: MusicTrack[] = [
-    ...(tracksQuery.data || []),
-    // Ajouter les samples si l'utilisateur n'a pas de pistes
-    ...((!tracksQuery.data || tracksQuery.data.length === 0) ? sampleTracks : []),
-  ];
-
-  // Combiner les playlists réelles avec les playlists sample
-  const allPlaylists: MusicPlaylist[] = [
-    ...(playlistsQuery.data || []),
-    // Ajouter les samples si l'utilisateur n'a pas de playlists
-    ...((!playlistsQuery.data || playlistsQuery.data.length === 0) ? samplePlaylists : []),
-  ];
+  const allTracks: MusicTrack[] = tracksQuery.data || [];
+  const allPlaylists: MusicPlaylist[] = playlistsQuery.data || [];
 
   return {
     tracks: allTracks,

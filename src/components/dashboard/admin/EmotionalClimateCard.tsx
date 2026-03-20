@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart } from 'lucide-react';

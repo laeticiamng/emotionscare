@@ -188,9 +188,9 @@ export const useAdvancedLeaderboard = (): UseAdvancedLeaderboardResult => {
       const mapped = (data as RawLeaderboardRow[] | null)?.map(normaliseRow) ?? [];
       setEntries(mapped);
       setError(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('Erreur lors du chargement du leaderboard avancé:', err, 'HOOK');
-      setError(err.message ?? 'Une erreur inattendue est survenue');
+      setError(err instanceof Error ? err.message : 'Une erreur inattendue est survenue');
     } finally {
       setLoading(false);
     }

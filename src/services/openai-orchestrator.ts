@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import sunoRequestSchema from '../../schemas/suno-request.schema.json';
 import { applyEmotionMapping } from '@/lib/yaml-loader';

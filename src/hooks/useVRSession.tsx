@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useEffect } from 'react';
 import VRService from '@/lib/vrService';
 import { VRSession, VRSessionTemplate, VRSessionFeedback } from '@/types/vr';

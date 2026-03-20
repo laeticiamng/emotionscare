@@ -1,6 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { lazy, Suspense, useMemo } from 'react';
 import DemoBanner from '@/components/ui/DemoBanner';
 import { motion } from 'framer-motion';
+import { Scene3DErrorBoundary } from '@/components/3d/Scene3DErrorBoundary';
+
+const AchievementBadge3D = lazy(() => import('@/components/3d/AchievementBadge3D'));
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -281,6 +284,22 @@ export default function AchievementsPage() {
             </Card>
           </motion.div>
         </div>
+
+        {/* Badge 3D en vedette — dernier badge débloqué ou aperçu */}
+        {timeline.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold mb-3">Dernier badge obtenu</h2>
+            <Scene3DErrorBoundary>
+              <Suspense fallback={null}>
+                <AchievementBadge3D
+                  rarity={stats.totalBadges >= 7 ? 'legendary' : stats.totalBadges >= 5 ? 'epic' : stats.totalBadges >= 3 ? 'rare' : 'common'}
+                  name={timeline[0]?.zoneName ?? 'Badge'}
+                  unlocked
+                />
+              </Suspense>
+            </Scene3DErrorBoundary>
+          </div>
+        )}
 
         <Tabs defaultValue="timeline" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">

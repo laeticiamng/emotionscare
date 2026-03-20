@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { describe, it, expect } from 'vitest';
 import { ROUTES_REGISTRY } from '../registry';
 import type { RouteMeta, Segment, Role, LayoutType } from '../schema';

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 // Parcours thérapeutique progressif EmotionsCare
 import { supabase } from '@/integrations/supabase/client';
 import { EmotionInput, ANALGESIC_ROUTER } from './analgesic';

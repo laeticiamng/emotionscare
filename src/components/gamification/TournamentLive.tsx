@@ -4,14 +4,17 @@
  */
 
 import React, { useState, useEffect, memo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Trophy, Users, Clock, Flame, Star, Medal, 
-  Play, Eye, Bell, ChevronUp, ChevronDown, Minus 
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Trophy, Users, Clock, Flame, Star, Medal,
+  Play, Eye, Bell, ChevronUp, ChevronDown, Minus, AlertTriangle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -42,37 +45,68 @@ interface Tournament {
   };
 }
 
-const MOCK_TOURNAMENT: Tournament = {
-  id: '1',
-  name: 'Championnat Zen Hebdomadaire',
-  type: 'mixed',
-  status: 'live',
-  startTime: new Date(Date.now() - 3600000),
-  endTime: new Date(Date.now() + 7200000),
-  viewers: 234,
-  prizePool: {
-    first: '1000 XP + Badge Or',
-    second: '500 XP + Badge Argent',
-    third: '250 XP + Badge Bronze'
-  },
-  participants: [
-    { id: '1', name: 'ZenMaster42', score: 2850, previousRank: 2, currentRank: 1, streak: 12, isOnline: true },
-    { id: '2', name: 'MeditationPro', score: 2720, previousRank: 1, currentRank: 2, streak: 8, isOnline: true },
-    { id: '3', name: 'BreathKing', score: 2650, previousRank: 3, currentRank: 3, streak: 15, isOnline: true },
-    { id: '4', name: 'CalmWarrior', score: 2480, previousRank: 5, currentRank: 4, streak: 6, isOnline: true },
-    { id: '5', name: 'PeacefulMind', score: 2350, previousRank: 4, currentRank: 5, streak: 4, isOnline: false },
-    { id: '6', name: 'SoulSeeker', score: 2200, previousRank: 6, currentRank: 6, streak: 9, isOnline: true },
-    { id: '7', name: 'HarmonyFlow', score: 2100, previousRank: 8, currentRank: 7, streak: 3, isOnline: true },
-    { id: '8', name: 'MindfulOne', score: 1980, previousRank: 7, currentRank: 8, streak: 7, isOnline: false }
-  ]
-};
-
 const TournamentLive = memo(() => {
-  const [tournament] = useState<Tournament>(MOCK_TOURNAMENT);
   const [isNotifying, setIsNotifying] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState('');
 
+  // Fetch live tournament from Supabase
+  const {
+    data: tournament,
+    isLoading,
+    error,
+  } = useQuery<Tournament | null>({
+    queryKey: ['tournament_live'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('tournaments')
+        .select('*')
+        .eq('status', 'live')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!data) return null;
+
+      // Fetch participants
+      const { data: participantsData } = await supabase
+        .from('tournament_participants')
+        .select('*')
+        .eq('tournament_id', data.id)
+        .order('score', { ascending: false });
+
+      const participants: Participant[] = (participantsData ?? []).map((p: any, index: number) => ({
+        id: p.id ?? p.user_id,
+        name: p.display_name ?? p.username ?? `Joueur ${index + 1}`,
+        avatar: p.avatar_url,
+        score: p.score ?? 0,
+        previousRank: p.previous_rank ?? index + 1,
+        currentRank: index + 1,
+        streak: p.streak ?? 0,
+        isOnline: p.is_online ?? true,
+      }));
+
+      return {
+        id: data.id,
+        name: data.name ?? data.title ?? 'Tournoi en cours',
+        type: data.type ?? 'mixed',
+        status: 'live' as const,
+        startTime: new Date(data.start_time ?? data.started_at ?? data.created_at),
+        endTime: new Date(data.end_time ?? data.ends_at ?? Date.now() + 7200000),
+        participants,
+        viewers: data.viewers_count ?? data.viewers ?? 0,
+        prizePool: {
+          first: data.prize_first ?? '1000 XP + Badge Or',
+          second: data.prize_second ?? '500 XP + Badge Argent',
+          third: data.prize_third ?? '250 XP + Badge Bronze',
+        },
+      };
+    },
+    refetchInterval: 30000, // Refresh every 30s for live data
+  });
+
   useEffect(() => {
+    if (!tournament) return;
     const updateTime = () => {
       const diff = tournament.endTime.getTime() - Date.now();
       if (diff <= 0) {
@@ -88,7 +122,7 @@ const TournamentLive = memo(() => {
     updateTime();
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
-  }, [tournament.endTime]);
+  }, [tournament?.endTime]);
 
   const getRankChange = (participant: Participant) => {
     const change = participant.previousRank - participant.currentRank;
@@ -109,6 +143,46 @@ const TournamentLive = memo(() => {
   const toggleNotifications = () => {
     setIsNotifying(!isNotifying);
   };
+
+  if (isLoading) {
+    return (
+      <Card className="overflow-hidden">
+        <CardHeader className="bg-gradient-to-r from-primary/20 to-primary/5 pb-4">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-4 w-32 mt-2" />
+        </CardHeader>
+        <CardContent className="space-y-4 pt-4">
+          <div className="flex items-end justify-center gap-2 h-24 mb-4">
+            {[1, 2, 3].map(i => <Skeleton key={i} className="h-20 w-12" />)}
+          </div>
+          {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-14 w-full" />)}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="p-6 text-center" role="alert">
+          <AlertTriangle className="h-8 w-8 mx-auto text-red-500 mb-2" />
+          <p className="text-sm text-red-500">Erreur lors du chargement du tournoi</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!tournament) {
+    return (
+      <Card>
+        <CardContent className="p-6 text-center">
+          <Trophy className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+          <p className="font-medium">Aucun tournoi en cours</p>
+          <p className="text-sm text-muted-foreground mt-1">Revenez bientôt pour participer !</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const leaderScore = tournament.participants[0]?.score || 0;
 
@@ -140,37 +214,39 @@ const TournamentLive = memo(() => {
       </CardHeader>
       <CardContent className="space-y-4 pt-4">
         {/* Podium animé */}
-        <div className="flex items-end justify-center gap-2 h-24 mb-4">
-          {tournament.participants.slice(0, 3).map((p, i) => {
-            const heights = ['h-20', 'h-24', 'h-16'];
-            const order = [1, 0, 2];
-            const participant = tournament.participants[order[i]];
-            return (
-              <motion.div
-                key={participant.id}
-                initial={{ height: 0 }}
-                animate={{ height: 'auto' }}
-                className={`flex flex-col items-center ${heights[i]} justify-end`}
-                style={{ order: i }}
-              >
-                <Avatar className={`${i === 1 ? 'h-12 w-12' : 'h-10 w-10'} border-2 ${
-                  i === 0 ? 'border-yellow-500' : i === 1 ? 'border-gray-400' : 'border-amber-600'
-                }`}>
-                  <AvatarImage src={participant.avatar} />
-                  <AvatarFallback>{participant.name[0]}</AvatarFallback>
-                </Avatar>
-                <div className="text-xs font-medium truncate max-w-[60px] mt-1">
-                  {participant.name}
-                </div>
-                <div className={`w-12 ${heights[i]} rounded-t flex items-center justify-center ${
-                  order[i] === 0 ? 'bg-yellow-500' : order[i] === 1 ? 'bg-gray-400' : 'bg-amber-600'
-                }`}>
-                  <span className="text-white font-bold">{order[i] + 1}</span>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
+        {tournament.participants.length >= 3 && (
+          <div className="flex items-end justify-center gap-2 h-24 mb-4">
+            {tournament.participants.slice(0, 3).map((p, i) => {
+              const heights = ['h-20', 'h-24', 'h-16'];
+              const order = [1, 0, 2];
+              const participant = tournament.participants[order[i]];
+              return (
+                <motion.div
+                  key={participant.id}
+                  initial={{ height: 0 }}
+                  animate={{ height: 'auto' }}
+                  className={`flex flex-col items-center ${heights[i]} justify-end`}
+                  style={{ order: i }}
+                >
+                  <Avatar className={`${i === 1 ? 'h-12 w-12' : 'h-10 w-10'} border-2 ${
+                    i === 0 ? 'border-yellow-500' : i === 1 ? 'border-gray-400' : 'border-amber-600'
+                  }`}>
+                    <AvatarImage src={participant.avatar} />
+                    <AvatarFallback>{participant.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="text-xs font-medium truncate max-w-[60px] mt-1">
+                    {participant.name}
+                  </div>
+                  <div className={`w-12 ${heights[i]} rounded-t flex items-center justify-center ${
+                    order[i] === 0 ? 'bg-yellow-500' : order[i] === 1 ? 'bg-gray-400' : 'bg-amber-600'
+                  }`}>
+                    <span className="text-white font-bold">{order[i] + 1}</span>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Classement complet */}
         <div className="space-y-2 max-h-[300px] overflow-y-auto">
@@ -194,7 +270,7 @@ const TournamentLive = memo(() => {
                     <div className="w-8 flex justify-center">
                       {getRankBadge(participant.currentRank)}
                     </div>
-                    
+
                     <div className="relative">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={participant.avatar} />
@@ -226,8 +302,8 @@ const TournamentLive = memo(() => {
                     </div>
                     <div className="text-right">
                       <div className="font-bold">{participant.score.toLocaleString()}</div>
-                      <Progress 
-                        value={(participant.score / leaderScore) * 100} 
+                      <Progress
+                        value={leaderScore > 0 ? (participant.score / leaderScore) * 100 : 0}
                         className="h-1 w-16"
                         aria-label={`Score de ${participant.name}`}
                       />
@@ -270,7 +346,7 @@ const TournamentLive = memo(() => {
             <Play className="h-4 w-4 mr-2" />
             Participer
           </Button>
-          <Button 
+          <Button
             variant={isNotifying ? 'default' : 'outline'}
             onClick={toggleNotifications}
           >

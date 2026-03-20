@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Target, Sparkles } from 'lucide-react';
 import ActionButton from '@/components/buttons/ActionButton';

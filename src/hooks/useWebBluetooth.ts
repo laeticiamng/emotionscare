@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Hook Web Bluetooth API native - Architecture minimale
  * Pour Bubble-Beat et capteurs de rythme cardiaque

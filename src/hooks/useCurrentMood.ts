@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useMemo } from "react";
 
 import { useMood } from "@/contexts/MoodContext";

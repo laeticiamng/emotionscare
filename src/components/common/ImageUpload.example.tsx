@@ -26,7 +26,7 @@ export function AvatarUploadExample() {
     formData.append('avatar', avatar[0]);
 
     // await uploadToStorage(formData);
-    console.log('Uploading avatar:', avatar[0]);
+    // Upload logic: await uploadToStorage(formData);
   };
 
   return (
@@ -65,7 +65,7 @@ export function ProductImagesExample() {
   const [productImages, setProductImages] = useState<File[]>([]);
 
   const handleSubmit = () => {
-    console.log('Uploading product images:', productImages);
+    // Upload logic: await uploadProductImages(productImages);
     // Process and upload images
   };
 

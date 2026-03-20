@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useEffect } from 'react';
 import { ChatMessage } from '@/types/chat';
 import { chatHistoryService, conversationsService } from '@/lib/chat/services';

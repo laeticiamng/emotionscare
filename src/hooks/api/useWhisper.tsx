@@ -1,8 +1,12 @@
-// @ts-nocheck
-
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
+
+declare global {
+  interface Window {
+    stopWhisperRecording?: () => void;
+  }
+}
 
 export function useWhisper() {
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +32,7 @@ export function useWhisper() {
   /**
    * Transcrit un fichier audio en texte
    */
-  const transcribeAudio = async (audioFile: File | Blob, options: any = {}) => {
+  const transcribeAudio = async (audioFile: File | Blob, options: Record<string, unknown> = {}) => {
     setIsLoading(true);
     setError(null);
     
@@ -76,7 +80,7 @@ export function useWhisper() {
   /**
    * Enregistre et transcrit l'audio du microphone
    */
-  const startRecordingAndTranscribe = async (options: any = {}) => {
+  const startRecordingAndTranscribe = async (options: Record<string, unknown> = {}) => {
     if (isRecording) return '';
     
     setIsRecording(true);

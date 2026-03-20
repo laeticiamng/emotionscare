@@ -1,6 +1,3 @@
-// @ts-nocheck
-
-// @ts-nocheck
 import { Badge } from '@/types/gamification';
 import { Challenge, LeaderboardEntry } from '@/types/gamification';
 

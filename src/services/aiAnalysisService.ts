@@ -54,8 +54,8 @@ class AIAnalysisService {
       });
 
       if (error) {
-        logger.warn('Transcription via Edge Function failed, using fallback', { error: error.message }, 'AI_ANALYSIS');
-        return this.fallbackTranscription(audioBlob);
+        logger.error('Transcription via Edge Function failed', { error: error.message }, 'AI_ANALYSIS');
+        throw new Error(`Transcription failed: ${error.message}`);
       }
 
       return {
@@ -64,22 +64,11 @@ class AIAnalysisService {
         duration: data?.duration,
       };
     } catch (error) {
-      logger.error('Error transcribing audio', error as Error, 'AI_ANALYSIS');
-      return this.fallbackTranscription(audioBlob);
+      logger.error('Error transcribing audio', error instanceof Error ? error : new Error(String(error)), 'AI_ANALYSIS');
+      throw error instanceof Error ? error : new Error(`Transcription error: ${String(error)}`);
     }
   }
 
-  /**
-   * Fallback pour la transcription si l'API n'est pas disponible
-   */
-  private fallbackTranscription(audioBlob: Blob): TranscriptionResult {
-    const duration = audioBlob.size / 16000; // Estimation approximative
-    return {
-      text: `[Enregistrement vocal de ${Math.round(duration)}s - Transcription automatique temporairement indisponible]`,
-      language: 'fr',
-      duration,
-    };
-  }
 
   /**
    * Analyse le sentiment d'un texte via Edge Function
@@ -91,8 +80,9 @@ class AIAnalysisService {
       });
 
       if (error) {
-        logger.warn('Sentiment analysis via Edge Function failed, using fallback', { error: error.message }, 'AI_ANALYSIS');
-        return this.fallbackSentimentAnalysis(text);
+        logger.warn('Sentiment analysis via Edge Function failed, using local heuristic', { error: error.message }, 'AI_ANALYSIS');
+        const result = this.fallbackSentimentAnalysis(text);
+        return { ...result, _fallback: true } as SentimentAnalysisResult;
       }
 
       return {
@@ -101,8 +91,9 @@ class AIAnalysisService {
         confidence: data?.confidence || 0.5,
       };
     } catch (error) {
-      logger.error('Error analyzing sentiment', error as Error, 'AI_ANALYSIS');
-      return this.fallbackSentimentAnalysis(text);
+      logger.error('Error analyzing sentiment', error instanceof Error ? error : new Error(String(error)), 'AI_ANALYSIS');
+      const result = this.fallbackSentimentAnalysis(text);
+      return { ...result, _fallback: true } as SentimentAnalysisResult;
     }
   }
 

@@ -1,8 +1,7 @@
-// @ts-nocheck
 // Stub pour éviter les erreurs d'import dans AccessibilityAudit
 export const useAccessibilityValidation = () => {
   return {
-    issues: [] as any[],
+    issues: [] as unknown[],
     criticalCount: 0,
     warningCount: 0,
     infoCount: 0,
@@ -13,8 +12,8 @@ export const useAccessibilityValidation = () => {
         aa: true,
         aaa: false
       },
-      issues: [] as any[],
-      passedRules: [] as any[]
+      issues: [] as unknown[],
+      passedRules: [] as unknown[]
     },
     isValidating: false,
     validateAccessibility: async () => {}

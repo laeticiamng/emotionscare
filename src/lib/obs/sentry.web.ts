@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as Sentry from '@sentry/react';
 import type { Breadcrumb } from '@sentry/types';
 

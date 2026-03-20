@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useState } from 'react';
 import type { RefObject } from 'react';
 import { exportElementToPng, type DomExportOptions } from '@/lib/export/domExport';

@@ -13,10 +13,11 @@ import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
-  Search, 
-  HelpCircle, 
-  Home, 
-  ArrowRight, 
+  ArrowLeft,
+  Search,
+  HelpCircle,
+  Home,
+  ArrowRight,
   MessageSquare,
   Shield,
   Zap,
@@ -256,6 +257,12 @@ export default function FAQPage() {
       {/* Main Content */}
       <main id="main-content" role="main" className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-8">
+          <Button variant="ghost" size="sm" className="mb-4 gap-2" asChild>
+            <Link to="/app/home" aria-label="Retour">
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+              Retour
+            </Link>
+          </Button>
           {/* Header */}
           <header className="text-center space-y-4">
             <div className="flex items-center justify-center gap-3">

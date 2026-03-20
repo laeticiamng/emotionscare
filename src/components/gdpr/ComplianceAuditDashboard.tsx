@@ -1,13 +1,12 @@
-// @ts-nocheck
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Shield, Play, Download, AlertTriangle, CheckCircle, 
+import {
+  Shield, Play, Download, AlertTriangle, CheckCircle,
   XCircle, TrendingUp, FileText, Clock
 } from 'lucide-react';
 import PDFExportButton from './PDFExportButton';
@@ -15,8 +14,11 @@ import {
   RadialBarChart, RadialBar, Legend, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip
 } from 'recharts';
+import { useComplianceAudit } from '@/hooks/useComplianceAudit';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
-const SEVERITY_CONFIG = {
+const SEVERITY_CONFIG: Record<string, { color: string; label: string; icon: React.ComponentType<{ className?: string }> }> = {
   critical: { color: 'bg-red-500', label: 'Critique', icon: XCircle },
   high: { color: 'bg-orange-500', label: 'Élevée', icon: AlertTriangle },
   medium: { color: 'bg-yellow-500', label: 'Moyenne', icon: AlertTriangle },

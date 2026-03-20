@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { Badge } from '@/types/gamification';
 
 export const getCategoryColor = (category: string): string => {

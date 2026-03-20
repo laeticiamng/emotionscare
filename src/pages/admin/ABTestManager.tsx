@@ -25,7 +25,7 @@ const ABTestManager: React.FC = () => {
     confidence_level: 0.95
   });
 
-  const { data: tests, isLoading } = useQuery({
+  const { data: tests, isLoading, isError: isTestsError, error: testsError } = useQuery({
     queryKey: ['ab-tests'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -38,7 +38,7 @@ const ABTestManager: React.FC = () => {
     }
   });
 
-  const { data: rules } = useQuery({
+  const { data: rules, isError: isRulesError, error: rulesError } = useQuery({
     queryKey: ['escalation-rules'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -161,6 +161,11 @@ const ABTestManager: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      {(isTestsError || isRulesError) && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-4">
+          <p className="text-destructive font-medium">Erreur lors du chargement des données</p>
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Tests A/B - Règles d'escalade</h1>

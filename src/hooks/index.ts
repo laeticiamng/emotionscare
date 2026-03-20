@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * HOOKS UNIFIÉS - Index central pour tous les hooks
  * Architecture premium avec accessibilité WCAG AAA

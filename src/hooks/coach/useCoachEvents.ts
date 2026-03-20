@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useCallback, useEffect } from 'react';
 import { CoachEvent } from '@/types/coach/CoachEvent';
 import { logger } from '@/lib/logger';

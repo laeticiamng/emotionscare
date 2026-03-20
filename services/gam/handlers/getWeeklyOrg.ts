@@ -10,9 +10,14 @@ function parseSince(url: string | undefined): Date {
 }
 
 export async function getWeeklyOrg(req: IncomingMessage, res: ServerResponse, orgId: string) {
-  const since = parseSince(req.url);
-  const rows = listWeeklyOrg(orgId, since);
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'application/json');
-  res.end(JSON.stringify(rows));
+  try {
+    const since = parseSince(req.url);
+    const rows = listWeeklyOrg(orgId, since);
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify(rows));
+  } catch (_err) {
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: { code: 'INTERNAL_ERROR', message: 'Erreur interne du serveur' } }));
+  }
 }

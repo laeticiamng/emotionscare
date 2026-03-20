@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export interface Group {
   id: string;
   name: string;

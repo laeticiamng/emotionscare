@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { lazy } from 'react';
 
 // B2C Pages

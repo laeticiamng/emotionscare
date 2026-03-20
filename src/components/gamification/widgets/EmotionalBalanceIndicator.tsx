@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { HeartHandshake, TrendingUp, TrendingDown, Minus, Info, Sparkles, Target } from 'lucide-react';

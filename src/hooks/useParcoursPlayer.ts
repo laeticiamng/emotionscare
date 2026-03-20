@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { ParcoursRun, ParcoursSegment, ParcoursPlayerState } from '@/types/music/parcours';
 import { supabase } from '@/integrations/supabase/client';

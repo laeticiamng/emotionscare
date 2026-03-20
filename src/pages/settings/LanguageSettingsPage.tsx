@@ -3,9 +3,10 @@
  */
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Globe, Check } from 'lucide-react';
+import { Globe, Check, ArrowLeft } from 'lucide-react';
 import { usePageSEO } from '@/hooks/usePageSEO';
 
 const LANGUAGES = [
@@ -22,7 +23,20 @@ const LanguageSettingsPage: React.FC = () => {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
+    <div className="container mx-auto px-4 py-8 max-w-2xl space-y-6">
+      <header className="mb-2">
+        <Button variant="ghost" size="sm" className="mb-4 gap-2" asChild>
+          <Link to="/settings" aria-label="Retour aux paramètres">
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            Retour aux paramètres
+          </Link>
+        </Button>
+        <h1 className="text-3xl font-bold text-foreground">Langue</h1>
+        <p className="text-muted-foreground mt-2">
+          Choisissez la langue d'affichage de l'application
+        </p>
+      </header>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

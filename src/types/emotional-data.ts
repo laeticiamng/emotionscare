@@ -1,7 +1,3 @@
-// @ts-nocheck
-
-import { EmotionSource } from './emotion';
-
 export interface EmotionalData {
   id: string;
   user_id: string;

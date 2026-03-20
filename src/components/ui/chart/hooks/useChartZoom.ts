@@ -1,6 +1,4 @@
-// @ts-nocheck
-
-import { useState, useCallback, RefObject } from 'react';
+import React, { useState, useCallback, RefObject } from 'react';
 
 // Define the brush index interface
 export interface BrushStartEndIndex {

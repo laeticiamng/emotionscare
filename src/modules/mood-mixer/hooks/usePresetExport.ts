@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import type { MoodPreset } from '../useMoodMixerEnriched';

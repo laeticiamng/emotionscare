@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { MusicPlaylist, MusicTrack } from '@/types/music';
 
 /**

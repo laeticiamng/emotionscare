@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import { EmotionResult } from '@/types/emotion';
 import { v4 as uuid } from 'uuid';

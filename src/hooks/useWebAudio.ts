@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Hook Web Audio API native - Architecture minimale
  * Remplace les libs audio externes pour lecteur/mix/guidage

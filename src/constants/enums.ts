@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export const NotificationFrequency = {
   REALTIME: 'realtime',
   DAILY: 'daily',

@@ -25,7 +25,7 @@ const AlertTemplatesPage = () => {
   const [previewMode, setPreviewMode] = useState(false);
 
   // Fetch templates
-  const { data: templates, isLoading } = useQuery({
+  const { data: templates, isLoading, isError: isTemplatesError, error: templatesError } = useQuery({
     queryKey: ['alert-templates'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -139,6 +139,11 @@ const AlertTemplatesPage = () => {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
+      {isTemplatesError && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-4">
+          <p className="text-destructive font-medium">Erreur lors du chargement des données</p>
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Templates de Notifications</h1>

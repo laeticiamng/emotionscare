@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import { Users, Search, Filter, Edit3, Shield, Mail, Phone, Calendar, MapPin, Ac
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
@@ -52,83 +53,59 @@ interface UserFilters {
 
 export const AdvancedUserManagement: React.FC = () => {
   const { user } = useAuth();
-  const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [filters, setFilters] = useState<UserFilters>({});
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
   const [sortBy, setSortBy] = useState<'name' | 'email' | 'created_at' | 'lastLogin'>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
-  // Statistiques globales
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    activeUsers: 0,
-    newUsersThisMonth: 0,
-    premiumUsers: 0
-  });
-
-  useEffect(() => {
-    loadUsers();
-  }, []);
-
-  useEffect(() => {
-    applyFilters();
-  }, [users, filters, sortBy, sortOrder]);
-
-  const loadUsers = async () => {
-    try {
-      setLoading(true);
-      
-      // Simulation de données utilisateurs avancées
-      const mockUsers: User[] = Array.from({ length: 150 }, (_, i) => ({
-        id: `user-${i + 1}`,
-        email: `user${i + 1}@example.com`,
-        name: `Utilisateur ${i + 1}`,
-        role: ['admin', 'manager', 'user'][Math.floor(Math.random() * 3)],
-        status: ['active', 'inactive', 'suspended', 'pending'][Math.floor(Math.random() * 4)] as any,
-        lastLogin: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-        created_at: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
+  const { data: users = [], isLoading: loading } = useQuery({
+    queryKey: ['admin-users-management'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, email, name, role, created_at, phone, location, subscription_plan, department')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data || []).map((p) => ({
+        id: p.id,
+        email: p.email || '',
+        name: p.name || p.email || '',
+        role: p.role || 'user',
+        status: 'active' as const,
+        lastLogin: undefined,
+        created_at: p.created_at || new Date().toISOString(),
         profile: {
-          firstName: `Prénom${i + 1}`,
-          lastName: `Nom${i + 1}`,
-          phone: `+33 6 ${String(Math.floor(Math.random() * 100000000)).padStart(8, '0')}`,
-          location: ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Nice'][Math.floor(Math.random() * 5)],
+          firstName: p.name?.split(' ')[0],
+          lastName: p.name?.split(' ').slice(1).join(' '),
+          phone: p.phone || undefined,
+          location: p.location || undefined,
         },
         subscription: {
-          plan: ['free', 'premium', 'enterprise'][Math.floor(Math.random() * 3)],
-          status: ['active', 'expired', 'cancelled'][Math.floor(Math.random() * 3)],
-          expiresAt: new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString()
+          plan: p.subscription_plan || 'free',
+          status: 'active',
         },
         metrics: {
-          sessionsCount: Math.floor(Math.random() * 100),
-          totalTime: Math.floor(Math.random() * 10000),
-          lastActivity: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
-        }
-      }));
+          sessionsCount: 0,
+          totalTime: 0,
+          lastActivity: p.created_at || '',
+        },
+      })) as User[];
+    },
+    staleTime: 2 * 60 * 1000,
+  });
 
-      setUsers(mockUsers);
-      
-      // Calculer les statistiques
-      setStats({
-        totalUsers: mockUsers.length,
-        activeUsers: mockUsers.filter(u => u.status === 'active').length,
-        newUsersThisMonth: mockUsers.filter(u => 
-          new Date(u.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-        ).length,
-        premiumUsers: mockUsers.filter(u => u.subscription?.plan !== 'free').length
-      });
+  // Statistiques globales
+  const stats = useMemo(() => ({
+    totalUsers: users.length,
+    activeUsers: users.filter(u => u.status === 'active').length,
+    newUsersThisMonth: users.filter(u =>
+      new Date(u.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+    ).length,
+    premiumUsers: users.filter(u => u.subscription?.plan !== 'free').length
+  }), [users]);
 
-    } catch (error) {
-      logger.error('Erreur lors du chargement des utilisateurs', error, 'Admin');
-      toast.error('Erreur lors du chargement des utilisateurs');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const applyFilters = () => {
+  const filteredUsers = useMemo(() => {
     let filtered = [...users];
 
     // Filtrage par recherche
@@ -192,8 +169,8 @@ export const AdvancedUserManagement: React.FC = () => {
       }
     });
 
-    setFilteredUsers(filtered);
-  };
+    return filtered;
+  }, [users, filters, sortBy, sortOrder]);
 
   const handleUserAction = async (userId: string, action: string, data?: any) => {
     try {

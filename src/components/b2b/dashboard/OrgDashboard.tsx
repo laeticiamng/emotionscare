@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Organisation Dashboard - Vue macro pour institutions B2B
  * Affiche uniquement des données agrégées et anonymisées

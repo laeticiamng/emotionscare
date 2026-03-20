@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export interface Recommendation {
   id: string;
   title: string;

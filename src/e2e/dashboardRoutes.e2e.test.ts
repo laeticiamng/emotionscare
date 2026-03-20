@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { expect, test } from 'vitest';
 import { ROUTES_REGISTRY } from '@/routerV2/registry';
 import { ROUTE_ALIASES, type LegacyPath } from '@/routerV2/aliases';

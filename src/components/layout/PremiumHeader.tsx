@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Search, Bell, User, Menu, X, Command, Settings, MessageSquare } from 'lucide-react';

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Eye, Scan } from 'lucide-react';
 import ActionButton from '@/components/buttons/ActionButton';

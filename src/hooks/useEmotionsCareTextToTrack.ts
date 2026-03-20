@@ -1,5 +1,3 @@
-// @ts-nocheck -- TODO: typer les réponses Edge Function text-to-track
-
 // Hook React pour la génération de tracks EmotionsCare à partir de texte
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -17,9 +15,9 @@ export interface GeneratedTrack {
   title: string;
   lyricsTaskId: string;
   musicTaskId: string;
-  preset: any;
-  emotions: any[];
-  metadata: any;
+  preset: Record<string, unknown>;
+  emotions: Array<Record<string, unknown>>;
+  metadata: Record<string, unknown>;
 }
 
 export function useEmotionsCareTextToTrack() {

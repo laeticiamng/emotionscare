@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * ProfileSettings ENRICHED - Paramètres de profil complets
  * Version enrichie avec objectifs personnels, badges détaillés, gamification, partage

@@ -1,4 +1,3 @@
-// @ts-nocheck
 export const legal = {
   // Terms of Service
   termsOfService: 'Conditions d\'utilisation',
