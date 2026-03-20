@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * OpenAI API Client - VERSION SÉCURISÉE
  * 

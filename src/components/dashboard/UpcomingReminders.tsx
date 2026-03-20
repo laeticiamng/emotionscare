@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bell, Calendar, CheckCircle, Plus, Clock, Repeat, X, AlarmClock } from 'lucide-react';

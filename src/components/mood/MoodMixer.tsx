@@ -1,14 +1,13 @@
-// @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Palette, 
-  Shuffle, 
-  Save, 
+import {
+  Palette,
+  Shuffle,
+  Save,
   Play,
   Pause,
   RotateCcw,
@@ -20,7 +19,8 @@ import {
   Moon,
   Wind,
   Sparkles,
-  Settings
+  Settings,
+  type LucideIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Matrix } from 'ml-matrix';
@@ -34,7 +34,7 @@ interface EmotionComponent {
   arousal: number; // 0 to 1 (calm to energetic)
   dominance: number; // 0 to 1 (submissive to dominant)
   description: string;
-  icon: LucideIconType;
+  icon: LucideIcon;
   soundFreq?: number;
   visualEffect: 'particles' | 'waves' | 'pulse' | 'flow';
 }

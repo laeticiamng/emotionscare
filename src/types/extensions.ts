@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export interface ExtensionMeta {
   id: string;
   name: string;

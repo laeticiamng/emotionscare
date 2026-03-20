@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState } from 'react';
 import useOpenAI from './api/useOpenAI';
 import { logger } from '@/lib/logger';

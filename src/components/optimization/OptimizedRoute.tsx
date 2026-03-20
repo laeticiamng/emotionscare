@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * 🚀 MIGRATED TO ROUTERV2 - Phase 2 Complete
  * All hardcoded links replaced with typed Routes.xxx() helpers

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { User, UserWithStatus } from '@/types/user';
 
 export function getUserInitials(user: UserWithStatus | User | null): string {

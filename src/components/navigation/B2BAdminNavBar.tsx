@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Users, FileBarChart, Calendar, Settings, BookOpen, Scan, Music, Box } from 'lucide-react';

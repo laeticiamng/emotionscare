@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { CoachContext } from "./context";
 
 export type Advice = {

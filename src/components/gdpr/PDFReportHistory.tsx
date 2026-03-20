@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -71,7 +70,7 @@ export const PDFReportHistory: React.FC = () => {
   const comparisonData = getComparisonData();
 
   const getReportTypeLabel = (type: string) => {
-    const labels = {
+    const labels: Record<string, string> = {
       audit: 'Audit',
       violations: 'Violations',
       dsar: 'DSAR',
@@ -81,7 +80,7 @@ export const PDFReportHistory: React.FC = () => {
   };
 
   const getReportTypeColor = (type: string) => {
-    const colors = {
+    const colors: Record<string, string> = {
       audit: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
       violations: 'bg-red-500/10 text-red-500 border-red-500/20',
       dsar: 'bg-purple-500/10 text-purple-500 border-purple-500/20',

@@ -60,6 +60,8 @@ export const BuddyChat: React.FC<BuddyChatProps> = ({
       await onSendMessage(input.trim());
       setInput('');
       inputRef.current?.focus();
+    } catch {
+      // Error handled by parent; no toast needed here as onSendMessage owns error UX
     } finally {
       setSending(false);
     }

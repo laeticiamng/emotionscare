@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -70,11 +69,11 @@ const PDFExportButton: React.FC<PDFExportButtonProps> = ({
       });
 
       logger.info('PDF report exported', { reportType, auditId }, 'GDPR');
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error exporting PDF', { error }, 'GDPR');
       toast({
         title: 'Erreur d\'export',
-        description: error.message || 'Impossible de générer le rapport',
+        description: error instanceof Error ? error.message : 'Impossible de générer le rapport',
         variant: 'destructive',
       });
     } finally {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { usePseudonymization, PseudonymizationAlgorithm } from '@/hooks/usePseudonymization';
 import { Button } from '@/components/ui/button';

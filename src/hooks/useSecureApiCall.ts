@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useCallback } from 'react';
 import { GlobalInterceptor } from '@/utils/globalInterceptor';
 import { useApiErrorHandler } from '@/hooks/useApiErrorHandler';
@@ -30,7 +28,7 @@ export const useSecureApiCall = () => {
       }
 
       return response;
-    } catch (error: any) {
+    } catch (error: unknown) {
       await handleError(error, context);
       return null;
     }

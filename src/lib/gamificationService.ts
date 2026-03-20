@@ -1,5 +1,4 @@
-// @ts-nocheck
-import type { Badge } from '@/types/gamification';
+import type { Badge, Challenge, GamificationStats } from '@/types/gamification';
 import { supabase } from '@/integrations/supabase/client';
 
 // Service for gamification features backed by Supabase

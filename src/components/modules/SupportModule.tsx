@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useRef, useEffect } from 'react';
 import { useSupport } from '@/providers/SupportProvider';
 import { Button } from '@/components/ui/button';

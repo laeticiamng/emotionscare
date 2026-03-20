@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 
@@ -59,7 +58,7 @@ export const useSSE = (url: string | null, options: UseSSEOptions = {}): UseSSER
       };
 
       eventSource.onerror = (event) => {
-        logger.error('SSE: Error', event as any, 'SYSTEM');
+        logger.error('SSE: Error', event as unknown as Error, 'SYSTEM');
         setIsConnected(false);
         
         if (eventSource.readyState === EventSource.CLOSED) {

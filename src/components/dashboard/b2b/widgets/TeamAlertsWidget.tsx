@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * TeamAlertsWidget - Widget des alertes équipe
  * Affiche les alertes RH sans données individuelles

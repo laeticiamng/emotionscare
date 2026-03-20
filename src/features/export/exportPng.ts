@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { logger } from '@/lib/logger';
 
 export async function exportNodeToPng(node: HTMLElement, filename: string) {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { addDays, addWeeks, differenceInCalendarDays, formatISO, getISOWeek, getISOWeekYear, startOfDay, startOfISOWeek, subDays, subWeeks } from 'date-fns';
 import { Sentry } from '@/lib/errors/sentry-compat';
 import { supabase } from '@/integrations/supabase/client';

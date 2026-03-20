@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Hook WebXR API native - Architecture minimale
  * Pour VR Galaxy, VR Respiration avec fallback 2D

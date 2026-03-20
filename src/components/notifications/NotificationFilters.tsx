@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { NotificationFilter, Notification } from '@/types/notifications';

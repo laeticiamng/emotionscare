@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { describe, expect, test } from 'vitest';
 import { mapScanRow, type EmotionScanRow } from '../emotionScan.service';
 

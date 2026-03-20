@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useContext } from 'react';
 import { BrandingContext, BrandingContextType } from '@/contexts/BrandingContext';
 

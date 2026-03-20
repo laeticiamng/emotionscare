@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { Suspense, lazy, ComponentType, memo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import LoadingAnimation from '@/components/ui/loading-animation';

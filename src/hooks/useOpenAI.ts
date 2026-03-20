@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -45,8 +43,8 @@ export const useOpenAI = () => {
       }
 
       return data?.response || null;
-    } catch (err: any) {
-      const errorMessage = err.message || 'Erreur lors de la génération de texte';
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la génération de texte';
       setError(errorMessage);
       toast.error(errorMessage);
       return null;

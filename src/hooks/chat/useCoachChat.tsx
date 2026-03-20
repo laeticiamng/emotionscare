@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useCallback } from 'react';
 import { useCoach } from '@/contexts/coach/CoachContextProvider';
 import { useAI } from '@/hooks/useAI';

@@ -1,4 +1,3 @@
-// @ts-nocheck
 export const errors = {
   // General errors
   generalError: 'An error occurred',

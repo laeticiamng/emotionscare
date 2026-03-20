@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export { default as DataExportSection } from './DataExportSection';
 export { default as GdprRightsSection } from './GdprRightsSection';
 export { default as PrivacyAccessLogs } from './PrivacyAccessLogs';

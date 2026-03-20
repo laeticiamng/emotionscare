@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Analyseur de similarités et redondances dans les routes
  */

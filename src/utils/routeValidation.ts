@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { Routes } from '@/routerV2';
 
 export interface RouteValidationResult {

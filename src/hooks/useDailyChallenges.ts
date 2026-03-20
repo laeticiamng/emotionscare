@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
@@ -8,7 +7,7 @@ export interface DailyChallenge {
   type: string;
   objective: string;
   reward_type: string;
-  reward_value: any;
+  reward_value: string | number | null;
   emotional_profile: string;
 }
 
@@ -64,9 +63,9 @@ export const useDailyChallenges = (emotionalProfile: string = 'all') => {
       }
 
       setError(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('Error fetching challenges:', err, 'HOOK');
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
@@ -131,9 +130,9 @@ export const useDailyChallenges = (emotionalProfile: string = 'all') => {
           [challengeId]: data
         }));
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('Error updating challenge progress:', err, 'HOOK');
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
     }
   };
 
@@ -143,9 +142,9 @@ export const useDailyChallenges = (emotionalProfile: string = 'all') => {
       if (error) throw error;
       
       await fetchChallenges();
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('Error generating challenges:', err, 'HOOK');
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
     }
   };
 

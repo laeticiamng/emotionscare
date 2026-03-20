@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePrivacyPrefs } from './usePrivacyPrefs';
 import { logger } from '@/lib/logger';
@@ -65,9 +64,9 @@ export const useHRVSilk = () => {
       logger.info('HRV device connected', undefined, 'SYSTEM');
       return true;
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to HR device', error as Error, 'SYSTEM');
-      setError(error.message);
+      setError(error instanceof Error ? error.message : 'Unknown error');
       return false;
     }
   }, [isSupported]);

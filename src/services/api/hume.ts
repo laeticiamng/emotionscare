@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Service Hume AI optimisé - Architecture minimale EmotionsCare
  * Couvre: émotions voix/visage/prosodie

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useConsentAnalytics } from '@/hooks/useConsentAnalytics';
 import { TrendingUp, TrendingDown, Activity, BarChart3, PieChart } from 'lucide-react';

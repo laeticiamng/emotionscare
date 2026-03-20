@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, X, Check, Lightbulb, Flame, Award, Clock } from 'lucide-react';

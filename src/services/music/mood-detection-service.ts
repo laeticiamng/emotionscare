@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Service de détection d'émotions/mood en temps réel
  *

@@ -29,7 +29,7 @@ export const useNyvee = (userId: string) => {
       queryClient.invalidateQueries({ queryKey: ['nyvee-history', userId] });
       toast({ title: 'Session démarrée' });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: 'Erreur',
         description: error.message,

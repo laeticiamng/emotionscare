@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { logger } from '@/lib/logger';
 
 /**
@@ -24,7 +22,7 @@ export const handlePlayError = (error: Error, onError: (error: Error) => void): 
 /**
  * Get the audio URL from a track object
  */
-export const getTrackAudioUrl = (track: any): string | null => {
+export const getTrackAudioUrl = (track: { url?: string; audioUrl?: string } | null): string | null => {
   if (!track) return null;
   
   // Try to find a valid URL from common properties

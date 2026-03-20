@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState } from 'react';
 import { useMusic } from '@/hooks/useMusic';
 import { EmotionMusicParams } from '@/types/music';

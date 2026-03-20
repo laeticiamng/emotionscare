@@ -1,5 +1,3 @@
-// @ts-nocheck -- TODO: refactor quand EmotionResult sera unifié (14+ erreurs de mapping legacy)
-
 import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
 import { v4 as uuid } from 'uuid';
 

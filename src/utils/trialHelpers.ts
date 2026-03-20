@@ -1,5 +1,3 @@
-
-
 export const TRIAL_DURATION_DAYS = 3;
 
 export const calculateTrialEndDate = (): string => {

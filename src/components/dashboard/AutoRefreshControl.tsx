@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { RotateCw } from 'lucide-react';
 import { cn } from "@/lib/utils";

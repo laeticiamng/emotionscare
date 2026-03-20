@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Sun, CloudSun, Zap, TrendingUp, TrendingDown, Minus, Share2, History, ChevronDown, Sparkles, Heart, Copy, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

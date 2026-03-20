@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export interface UserHistory {
   lastInteraction?: string;
   frequentTopics?: string[];

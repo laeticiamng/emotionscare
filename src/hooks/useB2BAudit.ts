@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Hook pour les logs d'audit B2B
  */

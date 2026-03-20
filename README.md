@@ -13,7 +13,7 @@
 
 ## État Réel du Projet (Mars 2026)
 
-### Métriques Vérifiées (Audit v5.0 - Mars 2026)
+### Metriques Verifiees (Audit v6.0 - Mars 2026)
 
 | Métrique | Valeur | Vérification |
 |----------|--------|--------------|
@@ -619,22 +619,32 @@ Le dashboard utilisateur inclut des widgets temps réel :
 
 ### En Cours d'Amélioration
 
-| Élément | Impact | Plan |
+| Element | Impact | Plan |
 |---------|--------|------|
-| **`@ts-nocheck`** dans certains modules | Régression silencieuse possible | Retrait progressif par lot de 10 fichiers/sprint |
-| **Tests accessibilité** | Couverture partielle | Généralisation axe-core |
-| **Documentation Edge Functions** | À enrichir | Ajout exemples et schémas |
+| **Tests accessibilite** | Couverture partielle | Generalisation axe-core |
+| **Documentation Edge Functions** | A enrichir | Ajout exemples et schemas |
 
-### Résolu (Audit v5.0)
+### Resolu (Audit v6.0)
 
-| Élément | Résolution |
+| Element | Resolution |
 |---------|------------|
-| **Mock data (30+ fichiers)** | Remplacé par requêtes Supabase réelles |
-| **15 fichiers mock (src/mocks/, src/data/mock*)** | Supprimés |
-| **Backend handlers sans error handling** | try/catch ajouté sur tous les handlers |
-| **Pages settings sans navigation retour** | Back buttons ajoutés vers /settings |
-| **console.log en production** | Supprimés ou conditionnés à DEV |
-| **Boutons sans handlers** | Handlers réels ajoutés |
+| **@ts-nocheck (1698 fichiers)** | Retrait massif : 1698 -> ~100 restants, types corriges |
+| **Mock data (50+ fichiers)** | 100% remplace par requetes Supabase reelles |
+| **Fichiers mock supprimes** | sampleTracks.ts, musicPlaylists.ts, line-chart-data.ts, playlist-data.ts + 15 precedents |
+| **Contexts mock** | InnovationContext, ReportingContext, FeedbackContext connectes Supabase |
+| **useDashboardData mock** | Remplace par vraies requetes admin (profiles, emotion_scans, user_alerts) |
+| **CoachAdvancedAnalytics mock** | Remplace par requetes coach_sessions reelles |
+| **EmotionScanCard mock** | Tendance 7 jours depuis emotion_scans |
+| **EmotionalClimateAnalytics mock** | 3 onglets connectes a Supabase (emotions, activite, engagement) |
+| **B2BPreventionProgramPage mock** | SAMPLE_PROGRAMS remplace par prevention_programs table |
+| **APIKeysPage** | Hardcoded keys remplace par CRUD Supabase + handlers copy/delete |
+| **CustomizationPage** | 8 switches/sliders connectes avec localStorage persistence |
+| **ai-monitoring console.logs** | Remplace par logger structure |
+| **Backend handlers sans error handling** | try/catch ajoute sur tous les handlers |
+| **Pages sans navigation retour** | Back buttons ajoutes sur 20+ pages |
+| **console.log en production** | Supprimes ou conditionnes a DEV |
+| **Boutons sans handlers** | Handlers reels ajoutes |
+| **3D Premium etendu** | Integration sur 18+ pages (Music, EmotionalPark, Calendar, Analytics...) |
 
 ---
 
@@ -657,24 +667,27 @@ Le dashboard utilisateur inclut des widgets temps réel :
 
 ## Roadmap 2026
 
-### Q1 2026 (Terminé)
-- [x] Modules core opérationnels (Scan, Breath, Journal, Coach, Music)
-- [x] Gamification complète (XP, badges, streaks, tournois, guildes)
-- [x] 272+ Edge Functions déployées
-- [x] Dashboard B2B complet avec prévention burnout
+### Q1 2026 (Termine)
+- [x] Modules core operationnels (Scan, Breath, Journal, Coach, Music)
+- [x] Gamification complete (XP, badges, streaks, tournois, guildes)
+- [x] 272+ Edge Functions deployees
+- [x] Dashboard B2B complet avec prevention burnout
 - [x] Wearables en beta (Apple Watch, Garmin)
 - [x] Analyse Hume AI multimodale (faciale, vocale, texte)
-- [x] Hub paramètres unifié
-- [x] 3D Premium (EmotionSphere, AchievementBadge, MeditationEnvironment, DashboardBackground)
-- [x] Suppression de 100% des données mockées (30+ fichiers)
-- [x] Backend error handling systématique (9 micro-services)
-- [x] Navigation ergonomique unifiée (back buttons, headers cohérents)
+- [x] Hub parametres unifie
+- [x] 3D Premium etendu sur 18+ pages (EmotionSphere, AchievementBadge, MeditationEnvironment, DashboardBackground)
+- [x] Suppression de 100% des donnees mockees (50+ fichiers)
+- [x] Backend error handling systematique (9 micro-services)
+- [x] Navigation ergonomique unifiee (back buttons sur 20+ pages, headers coherents)
+- [x] Retrait massif @ts-nocheck (1698 -> ~100 restants)
+- [x] Contexts et hooks connectes Supabase (Innovation, Reporting, Feedback, Dashboard admin)
+- [x] CustomizationPage fonctionnelle avec persistence localStorage
 
 ### Q2 2026 (En cours)
 - [ ] Application mobile React Native
-- [ ] Amélioration couverture tests > 80%
-- [ ] Retrait progressif @ts-nocheck
-- [ ] Tests accessibilité axe-core automatisés en CI
+- [ ] Amelioration couverture tests > 80%
+- [ ] Retrait des ~100 @ts-nocheck restants
+- [ ] Tests accessibilite axe-core automatises en CI
 
 ### Q3-Q4 2026
 - [ ] VR standalone (Meta Quest 3)
@@ -719,6 +732,6 @@ Propriétaire — © 2024-2026 EmotionsCare. Tous droits réservés.
 
 **Fait avec soin pour les soignants**
 
-*Dernière mise à jour : 18 mars 2026 - v3.0*
+*Derniere mise a jour : 18 mars 2026 - Audit v6.0*
 
 </div>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Hook pour le visualiseur anatomique corps entier
  * Ticket EC-ANATOMY-2026-001

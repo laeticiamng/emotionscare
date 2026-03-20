@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { AuraKey, AurasLevels, AurasOrchestrationAction } from './types';
 
 const resolveAuraKey = (level: number | undefined): AuraKey => {

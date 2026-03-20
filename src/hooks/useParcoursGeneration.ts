@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { ParcoursRun, ParcoursSegment } from '@/types/music/parcours';
@@ -76,9 +75,9 @@ export function useParcoursGeneration() {
 
       throw new Error('Generation timeout - please try again');
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('Parcours generation error', err as Error, 'MUSIC');
-      setError(err.message || 'Failed to generate parcours');
+      setError(err instanceof Error ? err.message : 'Failed to generate parcours');
       setIsGenerating(false);
       return null;
     }

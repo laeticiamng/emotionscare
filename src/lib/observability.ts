@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Observabilité et monitoring centralisé
  * Logs, métriques, traces et analyses d'erreurs

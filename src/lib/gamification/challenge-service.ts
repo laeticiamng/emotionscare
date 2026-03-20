@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Challenge, Badge } from '@/types/gamification';
 import { logger } from '@/lib/logger';
 

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { X, UserPlus, MoreHorizontal, Mail } from 'lucide-react';

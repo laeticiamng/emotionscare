@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { describe, expect, it } from 'vitest';
 
 import { computeMixerActions, type MixerAction } from './moodMixer.orchestrator';

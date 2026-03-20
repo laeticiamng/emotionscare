@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useCallback } from 'react';
 import { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';

@@ -129,10 +129,12 @@ export default function WidgetsPage() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <Link to="/app/home" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-        <ArrowLeft className="h-4 w-4" />
-        Retour au dashboard
-      </Link>
+      <Button variant="ghost" size="sm" className="mb-4 gap-2" asChild>
+        <Link to="/app/home" aria-label="Retour">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          Retour
+        </Link>
+      </Button>
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Widgets</h1>
         <p className="text-muted-foreground">

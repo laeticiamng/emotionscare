@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';

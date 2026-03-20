@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { SlidersSchema, type Sliders } from '@/modules/mood-mixer/types';
 
 export const PREVIEW_FALLBACK_URL = '/samples/preview-30s.mp3';

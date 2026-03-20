@@ -1,4 +1,3 @@
-// @ts-nocheck
 export const journal = {
   header: 'Journal émotionnel',
   intro: 'Capturez vos ressentis et repérez les tendances au fil du temps.',

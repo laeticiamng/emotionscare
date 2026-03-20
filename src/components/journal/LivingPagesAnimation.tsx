@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Living Pages Animation Component
  * Animated visualization of journal entries as floating, living pages

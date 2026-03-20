@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { coachService, CoachingSession, CoachMessage, CoachingRecommendation } from '@/services/coach';

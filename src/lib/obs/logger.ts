@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { redact } from './redact';
 
 type LogMethod = (message: string, meta?: unknown) => void;

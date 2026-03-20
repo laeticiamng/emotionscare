@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { AlertOctagon, Brain, RefreshCw, Music, ExternalLink } from 'lucide-react';

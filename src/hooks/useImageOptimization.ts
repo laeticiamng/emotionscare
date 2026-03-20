@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useEffect, useCallback } from 'react';
 
 interface ImageOptimizationOptions {
@@ -31,7 +29,7 @@ export const useImageOptimization = () => {
 
     // Détection de la vitesse de connexion
     if ('connection' in navigator) {
-      const connection = (navigator as any).connection;
+      const connection = (navigator as unknown as { connection: { effectiveType: string } }).connection;
       const speed = connection.effectiveType;
       setConnectionSpeed(['slow-2g', '2g', '3g'].includes(speed) ? 'slow' : 'fast');
     }

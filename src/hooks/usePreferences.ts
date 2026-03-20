@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * usePreferences - Hook de gestion des préférences utilisateur
  * Synchronise avec Supabase + localStorage comme fallback

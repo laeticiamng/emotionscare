@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Chargeur YAML pour la configuration emotion-mapping
  * Permet de définir des règles éditables pour le mapping émotions → musique

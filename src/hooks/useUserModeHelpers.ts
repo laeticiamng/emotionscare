@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useUserMode } from '@/contexts/UserModeContext';
 import { normalizeUserMode, getModeDashboardPath, getUserModeDisplayName } from '@/utils/userModeHelpers';
 

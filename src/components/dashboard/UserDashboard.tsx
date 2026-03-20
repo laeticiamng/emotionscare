@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import EnhancedUserDashboard from '@/components/modern-features/EnhancedUserDashboard';
 import { User } from '@/types/user';

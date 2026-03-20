@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { TableHeader, TableRow, TableHead } from '@/components/ui/table';
 import SortableTableHead, { SortDirection } from '@/components/ui/data-table/SortableTableHead';

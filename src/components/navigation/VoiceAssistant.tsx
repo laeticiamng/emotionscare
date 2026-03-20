@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Mic } from 'lucide-react';
 import { cn } from '@/lib/utils';

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useCallback, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';

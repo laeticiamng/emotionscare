@@ -1,4 +1,3 @@
-// @ts-nocheck
 export const consent = {
   title: 'Participation Consent',
   body: 'We collect anonymous data to improve your experience. You can withdraw your consent at any time.',

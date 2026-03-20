@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Hook générique pour state machine async
  * Pattern : idle → loading → active → ending → success|error

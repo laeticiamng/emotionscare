@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -18,9 +20,10 @@ import {
 } from 'chart.js';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import { 
-  CheckCircle2, 
-  AlertTriangle, 
-  XCircle, 
+  ArrowLeft,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
   Activity,
   FileText,
   TestTube,
@@ -76,11 +79,8 @@ const AdminSystemHealthPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate fetching metrics
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
+    // Metrics are computed at build-time; mark ready immediately
+    setIsLoading(false);
   }, []);
 
   const getStatusIcon = (status: 'success' | 'warning' | 'error') => {
@@ -189,6 +189,12 @@ const AdminSystemHealthPage: React.FC = () => {
 
   return (
     <div className="container mx-auto py-8 px-4 space-y-8">
+      <Button variant="ghost" size="sm" className="mb-4 gap-2" asChild>
+        <Link to="/admin" aria-label="Retour">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          Retour
+        </Link>
+      </Button>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-4xl font-bold flex items-center gap-3">

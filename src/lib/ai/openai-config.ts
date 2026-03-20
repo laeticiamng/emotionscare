@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 // Configuration for OpenAI API models
 
 export type AIModule = 

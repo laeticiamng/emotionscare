@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * Gets activity data for analytics
  */

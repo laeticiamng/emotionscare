@@ -1,4 +1,3 @@
-// @ts-nocheck -- TODO: typer 461 lignes de service help (Supabase dynamique)
 import { useState, useEffect, useCallback } from 'react';
 import { useHelpStore, type Section, type ArticleSummary, type Article, type Feedback } from '@/store/help.store';
 import { toast } from '@/hooks/use-toast';
@@ -157,7 +156,7 @@ export const useHelpEnriched = () => {
           faq.question.toLowerCase().includes(query.toLowerCase()) ||
           faq.answer.toLowerCase().includes(query.toLowerCase())
         );
-        setSearchResults(filtered as any);
+        setSearchResults(filtered as unknown as ArticleSummary[]);
       }
 
       // Sauvegarder dans l'historique

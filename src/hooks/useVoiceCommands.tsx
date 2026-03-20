@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from './use-toast';
 import type { SpeechRecognition } from '@/types/speech';

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Clinical Orchestration Service
  * Handles invisible clinical signals to adapt module behavior

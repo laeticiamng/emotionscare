@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Database Query Optimizer
  * Remplace tous les .single() par .maybeSingle() pour éviter les erreurs

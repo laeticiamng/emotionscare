@@ -1,4 +1,3 @@
-// @ts-nocheck -- TODO: typer 492 lignes de service musical (30+ Record<string, any>)
 /**
  * Music API Service - Gestion complète de la musicothérapie IA
  *

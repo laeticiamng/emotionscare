@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * useFocusAnalytics - Analytics avancées Focus Flow
  */

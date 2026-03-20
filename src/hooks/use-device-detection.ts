@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useEffect, useState } from 'react';
 
 interface DeviceInfo {

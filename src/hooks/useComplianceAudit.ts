@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -21,7 +20,7 @@ export interface ComplianceCategory {
   max_score: number;
   checks_passed: number;
   checks_total: number;
-  findings: any[];
+  findings: Array<Record<string, unknown>>;
 }
 
 export interface ComplianceRecommendation {
@@ -90,7 +89,7 @@ export const useComplianceAudit = () => {
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
 
-      const updateData: any = { status };
+      const updateData: Record<string, string | undefined> = { status };
       if (status === 'resolved') {
         updateData.resolved_at = new Date().toISOString();
         updateData.resolved_by = user?.id;

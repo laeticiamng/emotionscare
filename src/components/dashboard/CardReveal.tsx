@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Composant : Révélation de la carte tirée
  */

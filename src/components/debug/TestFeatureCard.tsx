@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import FeatureCard from '@/components/common/FeatureCard';
 import { Target, Zap } from 'lucide-react';

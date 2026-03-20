@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Eye, Users, Star, Brain, ArrowRight, User } from 'lucide-react';
 import { Button } from "@/components/ui/button";

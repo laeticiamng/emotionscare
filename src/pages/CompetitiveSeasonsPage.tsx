@@ -1,11 +1,15 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
+import { Scene3DErrorBoundary } from '@/components/3d/Scene3DErrorBoundary';
+import { Link } from 'react-router-dom';
+
+const AchievementBadge3D = lazy(() => import('@/components/3d/AchievementBadge3D'));
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
-import { Trophy, Crown, Award, TrendingUp, Calendar, Gift } from 'lucide-react';
+import { ArrowLeft, Trophy, Crown, Award, TrendingUp, Calendar, Gift } from 'lucide-react';
 import {
   seasonService,
   CompetitiveSeason,
@@ -87,7 +91,19 @@ export default function CompetitiveSeasonsPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="relative container mx-auto p-6 space-y-6">
+      <Scene3DErrorBoundary>
+        <Suspense fallback={null}>
+          <AchievementBadge3D className="absolute inset-0 -z-10 opacity-15 pointer-events-none" />
+        </Suspense>
+      </Scene3DErrorBoundary>
+
+      <Button variant="ghost" size="sm" className="mb-4 gap-2" asChild>
+        <Link to="/app/home" aria-label="Retour">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          Retour
+        </Link>
+      </Button>
       {/* Current Season Header */}
       {currentSeason && (
         <Card className="border-primary/20">

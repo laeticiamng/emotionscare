@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export interface EmotionPrediction {
   emotion: string;
   probability: number;

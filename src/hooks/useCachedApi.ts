@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useCallback } from 'react';
 import { useQuery, useQueryClient, QueryKey } from '@tanstack/react-query';
 import { apiCache, withCache } from '@/utils/cacheStrategies';

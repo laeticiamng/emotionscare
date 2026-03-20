@@ -4,7 +4,10 @@
  * Intégration complète: météo, streak, favoris, notifications, partage, énergie
  */
 
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, Suspense, lazy } from 'react';
+import { Scene3DErrorBoundary } from '@/components/3d/Scene3DErrorBoundary';
+
+const MeditationEnvironment3D = lazy(() => import('@/components/3d/MeditationEnvironment3D'));
 import { useUserStatsQuery } from '@/hooks/useUserStatsQuery';
 import { useUserPreference } from '@/hooks/useSupabaseStorage';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -369,7 +372,13 @@ export default function EmotionalPark() {
   }, [newlyUnlockedZone, zones, attractions]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5">
+    <div className="relative min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5">
+      <Scene3DErrorBoundary>
+        <Suspense fallback={null}>
+          <MeditationEnvironment3D className="absolute inset-0 -z-10 opacity-15 pointer-events-none" />
+        </Suspense>
+      </Scene3DErrorBoundary>
+
       {/* Guided Tour Modal */}
       <GuidedTourModal
         isOpen={showTourModal}
@@ -418,13 +427,12 @@ export default function EmotionalPark() {
             {/* Title and Stats */}
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-                <Link
-                  to="/app/consumer/home"
-                  className="p-2 rounded-full hover:bg-muted transition-colors"
-                  aria-label="Retour au tableau de bord"
-                >
-                  <ArrowLeft className="h-5 w-5 text-muted-foreground" />
-                </Link>
+                <Button variant="ghost" size="sm" className="gap-2" asChild>
+                  <Link to="/app/home" aria-label="Retour">
+                    <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+                    Retour
+                  </Link>
+                </Button>
                 <motion.div
                   animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
                   transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}

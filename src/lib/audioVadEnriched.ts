@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * audioVadEnriched - Voice Activity Detection réel avec analyse audio
  */

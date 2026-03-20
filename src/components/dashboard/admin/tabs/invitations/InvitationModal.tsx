@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 // Need to modify the InvitationForm import to accept the onInvitationSent prop
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';

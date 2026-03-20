@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { ChatConversation, ChatMessage } from '@/types/chat';
 
 export interface UseChatHistoryResult {

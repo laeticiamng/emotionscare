@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { captureException } from '@/lib/ai-monitoring';
 import { logger } from '@/lib/logger';
 import { Sentry } from '@/lib/errors/sentry-compat';

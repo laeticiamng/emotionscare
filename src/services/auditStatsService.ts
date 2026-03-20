@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 import { startOfWeek, endOfWeek, subDays, format } from 'date-fns';

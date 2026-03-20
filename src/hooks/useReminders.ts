@@ -49,9 +49,9 @@ export const useReminders = () => {
 
       setReminders((data || []) as Reminder[]);
       logger.info('[Reminders] Loaded', { count: data?.length || 0 }, 'REMINDERS');
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('Load reminders failed', err as Error, 'SYSTEM');
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
       setInitialized(true);
@@ -99,9 +99,9 @@ export const useReminders = () => {
 
       logger.info('[Reminders] Created', { kind: reminderData.kind }, 'REMINDERS');
       return newReminder;
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('Create reminder failed', err as Error, 'SYSTEM');
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
       toast({
         title: "Erreur",
         description: "Impossible de créer le rappel.",
@@ -142,11 +142,11 @@ export const useReminders = () => {
 
       logger.info('[Reminders] Updated', { id }, 'REMINDERS');
       return true;
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Rollback on error
       await loadReminders();
       logger.error('Update reminder failed', err as Error, 'SYSTEM');
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour le rappel.",
@@ -187,13 +187,13 @@ export const useReminders = () => {
 
       logger.info('[Reminders] Deleted', { id }, 'REMINDERS');
       return true;
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Rollback on error
       if (reminder) {
         setReminders(prev => [...prev, reminder]);
       }
       logger.error('Delete reminder failed', err as Error, 'SYSTEM');
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
       toast({
         title: "Erreur",
         description: "Impossible de supprimer le rappel.",

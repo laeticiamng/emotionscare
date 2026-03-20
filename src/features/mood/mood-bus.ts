@@ -1,4 +1,3 @@
-// @ts-nocheck
 export type MoodQuadrant = 'HVAL_HAROUS' | 'HVAL_LAROUS' | 'LVAL_HAROUS' | 'LVAL_LAROUS';
 
 export interface MoodEventDetail {

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, BookOpen, Music, Scan, MessageSquare, Glasses, Trophy, Settings, HeartHandshake, Box } from 'lucide-react';

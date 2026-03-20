@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -16,7 +15,7 @@ export interface GDPRViolation {
   status: 'detected' | 'investigating' | 'resolved' | 'false_positive';
   risk_score: number;
   ml_confidence: number;
-  metadata: any;
+  metadata: Record<string, unknown> | null;
   resolved_at?: string;
   resolved_by?: string;
   resolution_notes?: string;
@@ -28,7 +27,7 @@ export interface ViolationAlert {
   severity: 'info' | 'warning' | 'critical';
   title: string;
   message: string;
-  risk_indicators: any;
+  risk_indicators: Record<string, unknown> | null;
   recommendations: string[];
   predicted_impact: string;
   confidence_score: number;
@@ -46,7 +45,7 @@ export interface MonitoringMetric {
   threshold_value?: number;
   is_anomaly: boolean;
   recorded_at: string;
-  metadata: any;
+  metadata: Record<string, unknown> | null;
 }
 
 export interface ViolationStats {
@@ -193,7 +192,7 @@ export const useViolationMonitoring = () => {
     resolutionNotes?: string
   ) => {
     try {
-      const updates: any = { status };
+      const updates: Record<string, string> = { status };
       if (status === 'resolved') {
         updates.resolved_at = new Date().toISOString();
         updates.resolution_notes = resolutionNotes || '';

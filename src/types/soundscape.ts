@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export interface SoundscapeContextType {
   isEnabled: boolean;
   volume: number;

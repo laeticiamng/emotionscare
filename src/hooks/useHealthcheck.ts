@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useRef, useCallback } from 'react';
 import { useSystemStore, Healthz, HealthState } from '@/store/system.store';
 import { supabase } from '@/integrations/supabase/client';

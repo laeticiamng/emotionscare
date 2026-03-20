@@ -1,5 +1,3 @@
-
-
 // Helps filter data for charts based on selected time range
 export const getFilteredData = (
   data: Array<{ date: string; value: number }>,

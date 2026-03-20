@@ -1,4 +1,3 @@
-// @ts-nocheck
 const LANDING_SOURCE = 'landing';
 const LANDING_CAMPAIGN = 'launch';
 

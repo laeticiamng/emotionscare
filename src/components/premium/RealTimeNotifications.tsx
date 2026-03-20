@@ -1,10 +1,9 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
+import {
   Bell, X, CheckCircle, AlertCircle, Info, Heart,
   Music, Brain, Users, Star, Zap, Gift, TrendingUp
 } from 'lucide-react';

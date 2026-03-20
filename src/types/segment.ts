@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export interface SegmentOption {
   id: string;
   label: string;

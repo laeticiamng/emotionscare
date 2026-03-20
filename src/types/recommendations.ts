@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export interface MoodBasedRecommendationsProps {
   mood: string;
   standalone?: boolean;

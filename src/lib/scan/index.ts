@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Module principal de scan émotionnel
  * Centralise tous les services, utilitaires et constantes liés au scan émotionnel

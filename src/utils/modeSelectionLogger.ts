@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { logger } from '@/lib/logger';
 
 export const logModeSelection = (selectionType: string, additionalData?: any) => {

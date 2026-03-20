@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Queue offline IndexedDB pour POST /metrics/* avec TTL et dédup
  */

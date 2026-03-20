@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { Flame, TrendingUp, Target, Zap, Trophy, Calendar, ChevronUp, ChevronDown, Minus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { createRng, pick } from "./rng";
 
 export type Brief = {

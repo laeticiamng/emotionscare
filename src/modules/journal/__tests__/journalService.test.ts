@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Tests complets pour journalService
  * Couvre toutes les méthodes CRUD et legacy

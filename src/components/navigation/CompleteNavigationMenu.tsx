@@ -1,10 +1,8 @@
-// @ts-nocheck
 /**
  * CompleteNavigationMenu - Menu de navigation complet
  * Accès à toutes les fonctionnalités de la plateforme
  */
 
-// @ts-nocheck
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';

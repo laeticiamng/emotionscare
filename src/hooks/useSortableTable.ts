@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { SortDirection } from '@/components/dashboard/admin/types/tableTypes';

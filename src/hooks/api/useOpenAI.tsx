@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -19,7 +17,7 @@ export function useOpenAI() {
   /**
    * Génère du texte avec OpenAI
    */
-  const generateText = async (prompt: string, options: any = {}): Promise<string> => {
+  const generateText = async (prompt: string, options: Record<string, unknown> = {}): Promise<string> => {
     setIsLoading(true);
     setError(null);
     
@@ -56,7 +54,7 @@ export function useOpenAI() {
   /**
    * Traite une conversation complète avec OpenAI
    */
-  const chatCompletion = async (messages: any[], options: any = {}): Promise<string> => {
+  const chatCompletion = async (messages: Array<{ role: string; content: string }>, options: Record<string, unknown> = {}): Promise<string> => {
     setIsLoading(true);
     setError(null);
     
@@ -109,7 +107,7 @@ export function useOpenAI() {
   /**
    * Génère une image avec DALL-E
    */
-  const generateImage = async (prompt: string, options: any = {}): Promise<string> => {
+  const generateImage = async (prompt: string, options: Record<string, unknown> = {}): Promise<string> => {
     setIsLoading(true);
     setError(null);
     

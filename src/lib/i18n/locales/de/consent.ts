@@ -1,4 +1,3 @@
-// @ts-nocheck
 export const consent = {
   title: 'Einwilligung zur Teilnahme',
   body: 'Wir erheben anonyme Daten, um Ihre Erfahrung zu verbessern. Sie können Ihre Einwilligung jederzeit widerrufen.',

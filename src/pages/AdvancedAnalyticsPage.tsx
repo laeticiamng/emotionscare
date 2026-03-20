@@ -3,7 +3,10 @@
  * Affiche le dashboard complet avec graphiques et quêtes
  */
 
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
+import { Scene3DErrorBoundary } from '@/components/3d/Scene3DErrorBoundary';
+
+const DashboardBackground3D = lazy(() => import('@/components/3d/DashboardBackground3D'));
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { AdvancedAnalyticsDashboard } from '@/components/analytics/AdvancedAnalyticsDashboard';
 import { DailyQuestsPanel } from '@/components/quests/DailyQuestsPanel';
@@ -19,15 +22,21 @@ const AdvancedAnalyticsPage: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background">
+      <Scene3DErrorBoundary>
+        <Suspense fallback={null}>
+          <DashboardBackground3D className="absolute inset-0 -z-10 opacity-15 pointer-events-none" />
+        </Suspense>
+      </Scene3DErrorBoundary>
+
       <div className="container mx-auto px-4 py-8 space-y-6">
-        <div className="flex items-center gap-4">
-          <Link to="/app/home">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour
-            </Button>
+        <Button variant="ghost" size="sm" className="mb-4 gap-2" asChild>
+          <Link to="/app/home" aria-label="Retour">
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            Retour
           </Link>
+        </Button>
+        <div className="flex items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold">Analytics Avancées</h1>
             <p className="text-muted-foreground">

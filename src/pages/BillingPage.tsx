@@ -3,10 +3,11 @@
  * Branche sur Stripe via useSubscription (donnees reelles, pas de mock)
  */
 
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CreditCard, ExternalLink, AlertCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, CreditCard, ExternalLink, AlertCircle, Loader2 } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -63,6 +64,12 @@ export default function BillingPage() {
   return (
     <div className="min-h-screen bg-background p-6" data-testid="page-root">
       <div className="max-w-4xl mx-auto space-y-6">
+        <Button variant="ghost" size="sm" className="mb-4 gap-2" asChild>
+          <Link to="/settings" aria-label="Retour">
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            Retour
+          </Link>
+        </Button>
         <header>
           <h1 className="text-3xl font-bold">Facturation</h1>
           <p className="text-muted-foreground">G\u00e9rez votre abonnement EmotionsCare</p>

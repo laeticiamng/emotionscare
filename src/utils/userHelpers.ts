@@ -1,4 +1,3 @@
-
 import { UserModeType } from "@/types/userMode";
 
 /** Loose user shape accepted by helpers — avoids coupling to a single User interface */

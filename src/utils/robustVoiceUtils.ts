@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { toast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
 

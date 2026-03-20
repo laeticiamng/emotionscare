@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { Flame, Award, Shield, Calendar, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';

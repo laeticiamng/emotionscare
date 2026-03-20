@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';

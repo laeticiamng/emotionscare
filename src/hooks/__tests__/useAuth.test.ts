@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useAuthFlow } from '../useAuth';
@@ -18,10 +17,10 @@ describe('useAuthFlow', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useSimpleAuth as any).mockReturnValue({
+    vi.mocked(useSimpleAuth).mockReturnValue({
       signIn: mockSignIn,
       signOut: mockSignOut,
-    });
+    } as ReturnType<typeof useSimpleAuth>);
   });
 
   it('should login successfully', async () => {
@@ -113,11 +112,11 @@ describe('useAuthFlow', () => {
 
   it('should handle auth state changes', async () => {
     const mockCallback = vi.fn();
-    (useSimpleAuth as any).mockReturnValue({
+    vi.mocked(useSimpleAuth).mockReturnValue({
       signIn: mockSignIn,
       signOut: mockSignOut,
       onAuthStateChange: mockCallback,
-    });
+    } as ReturnType<typeof useSimpleAuth>);
 
     const { result } = renderHook(() => useAuthFlow());
     

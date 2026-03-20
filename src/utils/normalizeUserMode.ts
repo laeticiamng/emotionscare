@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export const normalizeUserMode = (mode: string): string => {
   const normalizedMode = mode.toLowerCase().trim();
   

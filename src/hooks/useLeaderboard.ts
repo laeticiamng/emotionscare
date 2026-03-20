@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
@@ -9,7 +8,7 @@ export interface LeaderboardEntry {
   total_badges: number;
   rank: number | null;
   monthly_badge: boolean;
-  zones_completed: any[];
+  zones_completed: unknown[];
 }
 
 export const useLeaderboard = () => {
@@ -48,15 +47,16 @@ export const useLeaderboard = () => {
       }
 
       setError(null);
-    } catch (err: any) {
-      logger.error('Error fetching leaderboard:', err, 'HOOK');
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      logger.error('Error fetching leaderboard:', err as Error, 'HOOK');
+      setError(message);
     } finally {
       setLoading(false);
     }
   };
 
-  const updateMyEntry = async (totalBadges: number, zonesCompleted: any[]) => {
+  const updateMyEntry = async (totalBadges: number, zonesCompleted: unknown[]) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -105,9 +105,10 @@ export const useLeaderboard = () => {
       await supabase.functions.invoke('calculate-rankings');
       
       await fetchLeaderboard();
-    } catch (err: any) {
-      logger.error('Error updating leaderboard entry:', err, 'HOOK');
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      logger.error('Error updating leaderboard entry:', err as Error, 'HOOK');
+      setError(message);
     }
   };
 

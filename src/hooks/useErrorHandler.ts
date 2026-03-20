@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useCallback } from 'react';
 import { useError } from '@/contexts';
 import { logger } from '@/lib/logger';
@@ -57,7 +55,7 @@ export const useErrorHandler = () => {
   }, [notify]);
 
   const handleAsyncError = useCallback(async (
-    asyncFn: () => Promise<any>,
+    asyncFn: () => Promise<unknown>,
     context?: string,
     options?: ErrorHandlerOptions
   ) => {

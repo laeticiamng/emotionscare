@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 
@@ -142,7 +141,7 @@ export const useHumeVoice = (config: HumeVoiceConfig) => {
     }, interval);
   }, [config.sampleRate]);
 
-  const calculateTensionLevel = useCallback((prosody: any): number => {
+  const calculateTensionLevel = useCallback((prosody: Record<string, number>): number => {
     // Extract tension indicators from prosody features
     // This is a simplified calculation - in reality, Hume provides more sophisticated features
     const pitch = prosody.pitch || 0;

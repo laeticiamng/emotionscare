@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useQuery, UseQueryOptions, QueryKey } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 import { apiCache, withCache } from '@/utils/cacheStrategies';

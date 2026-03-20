@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -69,8 +67,8 @@ export const useResend = () => {
 
       toast.success('Email envoyé avec succès');
       return true;
-    } catch (err: any) {
-      const errorMessage = err.message || 'Erreur envoi email';
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Erreur envoi email';
       toast.error(errorMessage);
       return false;
     } finally {

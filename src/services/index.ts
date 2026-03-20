@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Services API centralisés pour EmotionsCare
 export { default as openaiService } from './openai.service';
 export { default as humeService } from './hume.service';

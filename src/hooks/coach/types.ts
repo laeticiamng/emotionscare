@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export interface EmotionalTrend {
   emotion: string;
   count: number;

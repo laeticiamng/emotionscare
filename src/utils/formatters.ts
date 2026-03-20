@@ -1,5 +1,3 @@
-
-
 /**
  * Formats a duration in seconds to a string in the format MM:SS
  */
