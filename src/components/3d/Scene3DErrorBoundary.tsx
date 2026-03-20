@@ -183,6 +183,8 @@ export const WebGLGate: React.FC<WebGLGateProps> = ({ children, scene, height, c
 
 /* ── Diagnostic Badge (dev/preview only) ──────────────────── */
 
+export default Scene3DErrorBoundary;
+
 export const WebGLDiagnosticBadge: React.FC = () => {
   const [info, setInfo] = useState<{
     webgl: WebGLStatus;
