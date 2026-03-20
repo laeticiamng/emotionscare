@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Utilitaires de test consolidés avec tous les providers
  * Résout les erreurs de context manquants (Tooltip, Auth, Theme, etc.)

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { MusicTrack } from '@/types/music';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';

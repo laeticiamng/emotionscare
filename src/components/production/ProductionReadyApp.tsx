@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useEffect } from 'react';
 import { initProductionSecurity } from '@/lib/security/productionSecurity';
 import { initBuildOptimizations } from '@/utils/buildOptimization';

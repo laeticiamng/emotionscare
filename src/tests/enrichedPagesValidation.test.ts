@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { test, expect } from '@playwright/test';
 
 // Pages enrichies - Phases 1 & 2 (10 pages)

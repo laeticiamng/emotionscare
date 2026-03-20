@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState } from 'react';
 import { Challenge, Badge } from '@/types/challenge';
 import { updateChallenge, completeChallenge } from '@/lib/gamification/challenge-service';

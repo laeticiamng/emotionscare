@@ -1,4 +1,3 @@
-// @ts-nocheck -- TODO: typer 414 lignes de service Suno (types ApiResponse generics)
 import { useState, useCallback } from 'react';
 import { sunoService } from '@/services';
 import type { ApiResponse, MusicRecommendation, EmotionData } from '@/services/types';

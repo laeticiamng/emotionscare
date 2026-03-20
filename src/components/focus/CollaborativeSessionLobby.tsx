@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * CollaborativeSessionLobby - Interface pour sessions Focus Flow collaboratives
  */

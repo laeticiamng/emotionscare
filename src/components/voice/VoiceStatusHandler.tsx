@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { toast } from '@/hooks/use-toast';
 import { AlertTriangle } from 'lucide-react';

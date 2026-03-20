@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { SecureAnalytics } from '@/utils/secureAnalytics';
 import { GlobalInterceptor } from '@/utils/globalInterceptor';
