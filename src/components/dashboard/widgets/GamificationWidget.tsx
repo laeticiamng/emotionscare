@@ -10,10 +10,14 @@ import { useGamification } from '@/modules/gamification';
 import { Trophy, Star, Award, ArrowRight, Flame, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { DepthCard } from '@/experience/components/DepthCard';
+import { ProgressionAura } from '@/experience/components/ProgressionAura';
+import { useImmersionLevel } from '@/experience/hooks/useAmbient';
 
 const GamificationWidget: React.FC = () => {
   const { progress, achievements, dailyChallenges, isLoading } = useGamification();
   const navigate = useNavigate();
+  const immersionLevel = useImmersionLevel();
 
   if (isLoading) {
     return (
@@ -45,7 +49,7 @@ const GamificationWidget: React.FC = () => {
   const completedChallenges = dailyChallenges.filter(c => c.completed).length;
 
   return (
-    <Card className="overflow-hidden">
+    <DepthCard depth={immersionLevel >= 1 ? 1 : 0} className="overflow-hidden">
       <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10">
         <CardTitle className="flex items-center gap-2">
           <Trophy className="h-5 w-5 text-warning" />
@@ -53,13 +57,18 @@ const GamificationWidget: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 pt-4">
-        {/* XP Progress */}
-        <div>
-          <div className="flex justify-between text-sm text-muted-foreground mb-2">
-            <span>{currentXp} XP</span>
-            <span>{nextLevelXp - currentXp} pour niveau {currentLevel + 1}</span>
+        {/* XP Progress with ProgressionAura */}
+        <div className="flex items-center gap-3">
+          {immersionLevel >= 1 ? (
+            <ProgressionAura progress={progressPercentage} compact className="shrink-0" />
+          ) : null}
+          <div className="flex-1">
+            <div className="flex justify-between text-sm text-muted-foreground mb-2">
+              <span>{currentXp} XP</span>
+              <span>{nextLevelXp - currentXp} pour niveau {currentLevel + 1}</span>
+            </div>
+            <Progress value={progressPercentage} className="h-2" />
           </div>
-          <Progress value={progressPercentage} className="h-2" />
         </div>
         
         {/* Stats Grid */}
@@ -135,7 +144,7 @@ const GamificationWidget: React.FC = () => {
           <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
         </Button>
       </CardContent>
-    </Card>
+    </DepthCard>
   );
 };
 

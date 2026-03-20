@@ -11,6 +11,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Trophy, Zap, ChevronDown, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ProgressionAura } from '@/experience/components/ProgressionAura';
+import { useImmersionLevel } from '@/experience/hooks/useAmbient';
 
 interface Level {
   name: string;
@@ -58,6 +60,7 @@ function getCurrentLevel(xp: number): { current: Level; next: Level | null; prog
 const XPBar: React.FC<{ className?: string }> = ({ className }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const { user } = useAuth();
+  const immersionLevel = useImmersionLevel();
 
   // Fetch XP from Supabase
   const { data: xpData, isLoading: xpLoading } = useQuery({
@@ -135,15 +138,19 @@ const XPBar: React.FC<{ className?: string }> = ({ className }) => {
         </span>
         <div className="flex items-center gap-1.5">
           <span className="text-xs font-medium hidden sm:inline">{current.name}</span>
-          {/* Mini progress bar */}
-          <div className="w-16 h-1.5 bg-muted-foreground/20 rounded-full overflow-hidden">
-            <motion.div
-              className={cn('h-full rounded-full bg-gradient-to-r', current.color)}
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.8 }}
-            />
-          </div>
+          {/* Mini progress bar or ProgressionAura */}
+          {immersionLevel >= 1 ? (
+            <ProgressionAura progress={progress} compact />
+          ) : (
+            <div className="w-16 h-1.5 bg-muted-foreground/20 rounded-full overflow-hidden">
+              <motion.div
+                className={cn('h-full rounded-full bg-gradient-to-r', current.color)}
+                initial={{ width: 0 }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.8 }}
+              />
+            </div>
+          )}
           <span className="text-[10px] text-muted-foreground font-medium">{xp} XP</span>
         </div>
         <ChevronDown

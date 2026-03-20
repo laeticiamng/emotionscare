@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  Trophy, Medal, Award, TrendingUp, TrendingDown, Minus, 
-  Users, Calendar, Flame, RefreshCw 
+import {
+  Trophy, Medal, Award, TrendingUp, TrendingDown, Minus,
+  Users, Calendar, Flame, RefreshCw
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
@@ -15,6 +15,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { DepthCard } from '@/experience/components/DepthCard';
+import { useImmersionLevel } from '@/experience/hooks/useAmbient';
 
 interface LeaderboardEntry {
   rank: number;
@@ -48,6 +50,7 @@ const LeaderboardWidget: React.FC<LeaderboardWidgetProps> = ({
   const { userMode } = useUserMode();
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('week');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const immersionLevel = useImmersionLevel();
 
   // Mock data with trends
   const defaultEntries: LeaderboardEntry[] = [
@@ -115,7 +118,7 @@ const LeaderboardWidget: React.FC<LeaderboardWidgetProps> = ({
 
   return (
     <TooltipProvider>
-      <Card>
+      <DepthCard depth={immersionLevel >= 1 ? 1 : 0}>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
@@ -283,7 +286,7 @@ const LeaderboardWidget: React.FC<LeaderboardWidgetProps> = ({
             </div>
           </div>
         </CardContent>
-      </Card>
+      </DepthCard>
     </TooltipProvider>
   );
 };
