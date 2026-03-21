@@ -154,9 +154,12 @@ const AboutPage: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-10 items-center">
                     {/* Avatar */}
                     <div className="flex justify-center">
-                      <div className="w-32 h-32 md:w-40 md:h-40 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground text-4xl md:text-5xl font-bold shadow-2xl shadow-primary/20">
-                        LM
-                      </div>
+                      <img
+                        src={laeticiaPhoto}
+                        alt="Laeticia Motongane — Médecin · Fondatrice d'EmotionsCare"
+                        className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover shadow-2xl shadow-primary/20 ring-4 ring-primary/10"
+                        loading="lazy"
+                      />
                     </div>
 
                     {/* Bio */}

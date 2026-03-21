@@ -112,9 +112,12 @@ const SocialProofSection: React.FC = () => {
           viewport={{ once: true }}
           className="text-center bg-card border border-border/50 rounded-2xl p-8 max-w-2xl mx-auto"
         >
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold text-xl mx-auto mb-4">
-            LM
-          </div>
+          <img
+            src="https://media.licdn.com/dms/image/v2/D4E03AQEtYkSyftmFow/profile-displayphoto-scale_200_200/B4EZz50UGgJoAY-/0/1773717767476?e=2147483647&v=beta&t=kNzX8Nj5_Xq4nfx-Ok6Kj7RxIY_Fm4hf2Nn17zHcPo0"
+            alt="Laeticia Motongane — Médecin · Fondatrice d'EmotionsCare"
+            className="w-16 h-16 rounded-full object-cover mx-auto mb-4 ring-2 ring-primary/20"
+            loading="lazy"
+          />
           <blockquote className="text-muted-foreground italic mb-4 max-w-lg mx-auto">
             <Quote className="h-4 w-4 text-primary inline mr-1" aria-hidden="true" />
             J'ai créé EmotionsCare parce que les soignants méritent des outils à la hauteur de ce qu'ils donnent chaque jour. Le stress ne devrait pas être le prix du soin.
