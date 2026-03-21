@@ -17,9 +17,10 @@ import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { 
-  User, Mail, Phone, MapPin, Calendar, Camera, Shield, 
-  Settings, Bell, Lock, Eye, Download, Trash2, 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  User, Mail, Phone, MapPin, Calendar, Camera, Shield,
+  Settings, Bell, Lock, Eye, Download, Trash2,
   Star, Award, TrendingUp, Activity, Heart, Loader2,
   Save, X, Globe, Briefcase, Sparkles, CheckCircle2,
   AlertTriangle, Key, Share2
@@ -51,7 +52,6 @@ const B2CProfileSettingsPage: React.FC = () => {
   } = useProfile();
 
   const [activeTab, setActiveTab] = useState<string>('profile');
-  const [isEditing, setIsEditing] = useState(false);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [show2FADialog, setShow2FADialog] = useState(false);
@@ -84,26 +84,6 @@ const B2CProfileSettingsPage: React.FC = () => {
       });
     }
   }, [profile]);
-
-  const handleStartEditing = useCallback(() => {
-    setIsEditing(true);
-    announce('Mode édition activé');
-  }, [announce]);
-
-  const handleCancelEditing = useCallback(() => {
-    if (profile) {
-      setEditForm({
-        name: profile.name || '',
-        bio: profile.bio || '',
-        phone: profile.phone || '',
-        location: profile.location || '',
-        website: profile.website || '',
-        job_title: profile.job_title || '',
-      });
-    }
-    setIsEditing(false);
-    announce('Modifications annulées');
-  }, [profile, announce]);
 
   const handleSaveProfile = useCallback(async () => {
     try {
@@ -318,24 +298,36 @@ const B2CProfileSettingsPage: React.FC = () => {
                         onChange={handleAvatarChange}
                       />
                       
-                      <div className="flex gap-2 justify-center flex-wrap">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={profile.avatar_url ? removeAvatar : handleAvatarClick}
-                          disabled={isSaving}
-                        >
-                          <Camera className="h-4 w-4 mr-2" />
-                          {profile.avatar_url ? 'Supprimer la photo' : 'Ajouter une photo'}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={handleShareProfile}
-                        >
-                          <Share2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      <Select
+                        value=""
+                        onValueChange={(value) => {
+                          if (value === 'upload') handleAvatarClick();
+                          if (value === 'remove') removeAvatar();
+                          if (value === 'share') handleShareProfile();
+                        }}
+                      >
+                        <SelectTrigger className="w-48 mx-auto">
+                          <SelectValue placeholder={
+                            <span className="flex items-center gap-2">
+                              <Camera className="h-4 w-4" />
+                              Photo & partage
+                            </span>
+                          } />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="upload">
+                            <span className="flex items-center gap-2"><Camera className="h-4 w-4" /> {profile.avatar_url ? 'Changer la photo' : 'Ajouter une photo'}</span>
+                          </SelectItem>
+                          {profile.avatar_url && (
+                            <SelectItem value="remove">
+                              <span className="flex items-center gap-2"><Trash2 className="h-4 w-4" /> Supprimer la photo</span>
+                            </SelectItem>
+                          )}
+                          <SelectItem value="share">
+                            <span className="flex items-center gap-2"><Share2 className="h-4 w-4" /> Partager le profil</span>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     
                     <div className="space-y-4">
@@ -552,69 +544,56 @@ const B2CProfileSettingsPage: React.FC = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    {/* Password */}
-                    <div className="flex items-center justify-between p-6 border rounded-xl hover:bg-muted/50 transition-colors">
-                      <div className="flex items-start gap-4">
-                        <div className="p-2 rounded-lg bg-primary/10">
-                          <Lock className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold">Mot de passe</h4>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            Modifiez votre mot de passe régulièrement
-                          </p>
-                        </div>
+                    {/* Account Actions - consolidated dropdown */}
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <label className="font-medium">Actions du compte</label>
+                        <p className="text-sm text-muted-foreground">
+                          Mot de passe, 2FA, sessions actives
+                        </p>
                       </div>
-                      <Button variant="outline" onClick={() => setShowPasswordDialog(true)}>
-                        Modifier
-                      </Button>
+                      <Select
+                        value=""
+                        onValueChange={(value) => {
+                          if (value === 'password') setShowPasswordDialog(true);
+                          if (value === '2fa') setShow2FADialog(true);
+                          if (value === 'sessions') setShowSessionsDialog(true);
+                        }}
+                      >
+                        <SelectTrigger className="w-56">
+                          <SelectValue placeholder="Choisir une action..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="password">
+                            <span className="flex items-center gap-2"><Lock className="h-4 w-4" /> Modifier le mot de passe</span>
+                          </SelectItem>
+                          <SelectItem value="2fa">
+                            <span className="flex items-center gap-2"><Key className="h-4 w-4" /> Configurer la 2FA</span>
+                          </SelectItem>
+                          <SelectItem value="sessions">
+                            <span className="flex items-center gap-2"><Activity className="h-4 w-4" /> Sessions actives</span>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
 
-                    {/* 2FA */}
-                    <div className="flex items-center justify-between p-6 border rounded-xl hover:bg-muted/50 transition-colors">
-                      <div className="flex items-start gap-4">
-                        <div className="p-2 rounded-lg bg-primary/10">
-                          <Key className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-semibold">Authentification à deux facteurs</h4>
-                            <Badge variant="secondary" className="bg-orange-500/10 text-orange-600">
-                              Recommandé
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            Sécurisez votre compte avec une vérification supplémentaire
-                          </p>
-                          <p className="text-sm font-medium mt-2 text-orange-600">
-                            Non configuré
-                          </p>
-                        </div>
+                    {/* Status indicators */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="p-3 rounded-lg bg-muted/50 text-center">
+                        <Lock className="h-4 w-4 mx-auto mb-1 text-muted-foreground" />
+                        <p className="text-xs text-muted-foreground">Mot de passe</p>
+                        <p className="text-sm font-medium">Actif</p>
                       </div>
-                      <Button variant="outline" onClick={handle2FASetup}>
-                        Configurer
-                      </Button>
-                    </div>
-
-                    {/* Active Sessions */}
-                    <div className="flex items-center justify-between p-6 border rounded-xl hover:bg-muted/50 transition-colors">
-                      <div className="flex items-start gap-4">
-                        <div className="p-2 rounded-lg bg-primary/10">
-                          <Activity className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold">Sessions actives</h4>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            Gérez les appareils connectés à votre compte
-                          </p>
-                          <p className="text-sm font-medium mt-2 text-blue-600">
-                            1 appareil actif
-                          </p>
-                        </div>
+                      <div className="p-3 rounded-lg bg-muted/50 text-center">
+                        <Key className="h-4 w-4 mx-auto mb-1 text-orange-500" />
+                        <p className="text-xs text-muted-foreground">2FA</p>
+                        <Badge variant="secondary" className="bg-orange-500/10 text-orange-600 text-xs">Non configuré</Badge>
                       </div>
-                      <Button variant="outline" onClick={() => setShowSessionsDialog(true)}>
-                        Voir détails
-                      </Button>
+                      <div className="p-3 rounded-lg bg-muted/50 text-center">
+                        <Activity className="h-4 w-4 mx-auto mb-1 text-blue-500" />
+                        <p className="text-xs text-muted-foreground">Sessions</p>
+                        <p className="text-sm font-medium text-blue-600">1 active</p>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -689,34 +668,32 @@ const B2CProfileSettingsPage: React.FC = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <h4 className="font-medium">Exporter mes données</h4>
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <label className="font-medium">Actions sur les données</label>
                         <p className="text-sm text-muted-foreground">
-                          Téléchargez toutes vos données dans un format portable
+                          Exportez vos données ou supprimez votre compte
                         </p>
                       </div>
-                      <Button variant="outline" onClick={handleExportData} disabled={isSaving}>
-                        {isSaving ? (
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        ) : (
-                          <Download className="h-4 w-4 mr-2" />
-                        )}
-                        Exporter
-                      </Button>
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 border border-destructive/50 rounded-lg bg-destructive/5">
-                      <div>
-                        <h4 className="font-medium text-destructive">Supprimer mon compte</h4>
-                        <p className="text-sm text-destructive/80">
-                          Cette action est irréversible et supprimera toutes vos données
-                        </p>
-                      </div>
-                      <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Supprimer
-                      </Button>
+                      <Select
+                        value=""
+                        onValueChange={(value) => {
+                          if (value === 'export') handleExportData();
+                          if (value === 'delete') setShowDeleteDialog(true);
+                        }}
+                      >
+                        <SelectTrigger className="w-56">
+                          <SelectValue placeholder="Choisir une action..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="export">
+                            <span className="flex items-center gap-2"><Download className="h-4 w-4" /> Exporter mes données</span>
+                          </SelectItem>
+                          <SelectItem value="delete">
+                            <span className="flex items-center gap-2 text-destructive"><Trash2 className="h-4 w-4" /> Supprimer mon compte</span>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </CardContent>
                 </Card>

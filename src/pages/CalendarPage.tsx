@@ -21,7 +21,8 @@ import {
   ArrowLeft,
   ArrowRight,
   X,
-  Zap
+  Zap,
+  MoreHorizontal
 } from 'lucide-react';
 import {
   Dialog,
@@ -418,16 +419,25 @@ const CalendarPage: React.FC = () => {
                       {event.time} • {event.duration}
                     </div>
                   </div>
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {event.status !== 'completed' && (
-                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleCompleteEvent(event.id)}>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button size="icon" variant="ghost" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <MoreHorizontal className="h-4 w-4" />
                       </Button>
-                    )}
-                    <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleDeleteEvent(event.id)}>
-                      <X className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {event.status !== 'completed' && (
+                        <DropdownMenuItem onClick={() => handleCompleteEvent(event.id)}>
+                          <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+                          Marquer comme terminé
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteEvent(event.id)}>
+                        <X className="h-4 w-4 mr-2" />
+                        Supprimer
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                   <div className="mt-1">
                     {getStatusIcon(event.status)}
                   </div>

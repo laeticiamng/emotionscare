@@ -11,7 +11,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMoodMixerEnriched, type MoodComponent, type MoodPreset } from '@/modules/mood-mixer/useMoodMixerEnriched';
@@ -19,7 +20,7 @@ import {
   Palette, Heart, Zap, Smile, CloudRain, Sun, Moon, Sparkles,
   Play, Pause, RotateCcw, Save, Star, Clock, TrendingUp,
   History, BarChart3, ThumbsUp, ThumbsDown, Minus, Award, ArrowLeft,
-  MoreHorizontal, ChevronDown
+  MoreHorizontal, ChevronDown, X
 } from 'lucide-react';
 
 const ICON_MAP: Record<string, React.FC<{ className?: string }>> = {
@@ -371,30 +372,24 @@ const B2CMoodMixerPage: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Category filters */}
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    size="sm"
-                    variant={selectedCategory === null ? 'default' : 'outline'}
-                    onClick={() => setSelectedCategory(null)}
-                  >
-                    Tous
-                  </Button>
-                  {['relax', 'energy', 'focus', 'sleep', 'creative', 'custom'].map(cat => (
-                    <Button
-                      key={cat}
-                      size="sm"
-                      variant={selectedCategory === cat ? 'default' : 'outline'}
-                      onClick={() => setSelectedCategory(cat)}
-                    >
-                      {cat === 'relax' ? 'Relaxation' : 
-                       cat === 'energy' ? 'Énergie' : 
-                       cat === 'focus' ? 'Concentration' :
-                       cat === 'sleep' ? 'Sommeil' :
-                       cat === 'creative' ? 'Créativité' : 'Personnalisé'}
-                    </Button>
-                  ))}
-                </div>
+                {/* Category filter */}
+                <Select
+                  value={selectedCategory ?? 'all'}
+                  onValueChange={(v) => setSelectedCategory(v === 'all' ? null : v)}
+                >
+                  <SelectTrigger className="w-48">
+                    <SelectValue placeholder="Filtrer par catégorie" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes les catégories</SelectItem>
+                    <SelectItem value="relax">Relaxation</SelectItem>
+                    <SelectItem value="energy">Énergie</SelectItem>
+                    <SelectItem value="focus">Concentration</SelectItem>
+                    <SelectItem value="sleep">Sommeil</SelectItem>
+                    <SelectItem value="creative">Créativité</SelectItem>
+                    <SelectItem value="custom">Personnalisé</SelectItem>
+                  </SelectContent>
+                </Select>
 
                 <ScrollArea className="h-[400px]">
                   <div className="space-y-4">
@@ -702,30 +697,40 @@ const PresetCard: React.FC<PresetCardProps> = ({ preset, index, onApply, onToggl
           </p>
         </div>
 
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-8 w-8 p-0"
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleFavorite(preset.id);
-            }}
-          >
-            <Star className={`h-4 w-4 ${preset.isFavorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
-          </Button>
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            className="h-8 w-8 p-0"
-            onClick={(e) => {
-              e.stopPropagation();
-              onApply(preset);
-            }}
-          >
-            <Play className="h-4 w-4" />
-          </Button>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onApply(preset); }}>
+              <Play className="h-4 w-4 mr-2" />
+              Appliquer
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onToggleFavorite(preset.id); }}>
+              <Star className={`h-4 w-4 mr-2 ${preset.isFavorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+              {preset.isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+            </DropdownMenuItem>
+            {!preset.isBuiltIn && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-destructive"
+                  onClick={(e) => { e.stopPropagation(); onDelete(preset.id); }}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Supprimer
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </motion.div>
   );

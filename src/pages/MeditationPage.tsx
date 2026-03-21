@@ -28,11 +28,6 @@ import {
   BarChart3,
   Wind,
   Waves,
-  TreePine,
-  Flame,
-  Cloud,
-  Calendar,
-  Download
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -407,7 +402,6 @@ export default function MeditationPage() {
             </div>
             
             <div className="flex items-center gap-2">
-              <MeditationExportButton />
               <Button
                 variant="ghost"
                 size="icon"
@@ -705,26 +699,14 @@ export default function MeditationPage() {
                         );
                       })}
                     </div>
-                    {!showAllTechniques && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full mt-2 text-muted-foreground"
-                        onClick={() => setShowAllTechniques(true)}
-                      >
-                        Voir toutes les techniques ({TECHNIQUE_OPTIONS.length - TECHNIQUE_OPTIONS.filter(t => t.featured).length} de plus)
-                      </Button>
-                    )}
-                    {showAllTechniques && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full mt-2 text-muted-foreground"
-                        onClick={() => setShowAllTechniques(false)}
-                      >
-                        Voir moins
-                      </Button>
-                    )}
+                    <button
+                      className="w-full mt-2 text-sm text-muted-foreground hover:text-foreground transition-colors py-1"
+                      onClick={() => setShowAllTechniques(prev => !prev)}
+                    >
+                      {showAllTechniques
+                        ? 'Voir moins'
+                        : `Voir toutes les techniques (${TECHNIQUE_OPTIONS.length - TECHNIQUE_OPTIONS.filter(t => t.featured).length} de plus)`}
+                    </button>
                   </div>
 
                   {/* Start Button */}
@@ -918,24 +900,26 @@ export default function MeditationPage() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
-              <div className="flex justify-between">
-                {[1, 2, 3, 4, 5].map((mood) => (
+              <div className="flex justify-center gap-6">
+                {([{ value: 20, emoji: '😔', label: 'Mal' }, { value: 60, emoji: '😐', label: 'Neutre' }, { value: 100, emoji: '😊', label: 'Bien' }] as const).map((mood) => (
                   <button
-                    key={mood}
-                    onClick={() => confirmStart(mood * 20)}
-                    className="w-12 h-12 rounded-full bg-muted hover:bg-primary/20 flex items-center justify-center text-lg font-medium transition-colors"
+                    key={mood.value}
+                    onClick={() => confirmStart(mood.value)}
+                    className="flex flex-col items-center gap-1 group"
                   >
-                    {mood === 1 ? '😔' : mood === 2 ? '😕' : mood === 3 ? '😐' : mood === 4 ? '🙂' : '😊'}
+                    <span className="w-14 h-14 rounded-full bg-muted group-hover:bg-primary/20 flex items-center justify-center text-2xl transition-colors">
+                      {mood.emoji}
+                    </span>
+                    <span className="text-xs text-muted-foreground">{mood.label}</span>
                   </button>
                 ))}
               </div>
-              <Button
-                variant="ghost"
-                className="w-full"
+              <button
+                className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors py-1"
                 onClick={() => confirmStart(null)}
               >
                 Passer cette étape
-              </Button>
+              </button>
             </div>
           </DialogContent>
         </Dialog>
@@ -950,24 +934,26 @@ export default function MeditationPage() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
-              <div className="flex justify-between">
-                {[1, 2, 3, 4, 5].map((mood) => (
+              <div className="flex justify-center gap-6">
+                {([{ value: 20, emoji: '😔', label: 'Mal' }, { value: 60, emoji: '😐', label: 'Neutre' }, { value: 100, emoji: '😊', label: 'Bien' }] as const).map((mood) => (
                   <button
-                    key={mood}
-                    onClick={() => completeSession(mood * 20)}
-                    className="w-12 h-12 rounded-full bg-muted hover:bg-primary/20 flex items-center justify-center text-lg font-medium transition-colors"
+                    key={mood.value}
+                    onClick={() => completeSession(mood.value)}
+                    className="flex flex-col items-center gap-1 group"
                   >
-                    {mood === 1 ? '😔' : mood === 2 ? '😕' : mood === 3 ? '😐' : mood === 4 ? '🙂' : '😊'}
+                    <span className="w-14 h-14 rounded-full bg-muted group-hover:bg-primary/20 flex items-center justify-center text-2xl transition-colors">
+                      {mood.emoji}
+                    </span>
+                    <span className="text-xs text-muted-foreground">{mood.label}</span>
                   </button>
                 ))}
               </div>
-              <Button
-                variant="ghost"
-                className="w-full"
+              <button
+                className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors py-1"
                 onClick={() => completeSession(undefined)}
               >
                 Passer cette étape
-              </Button>
+              </button>
             </div>
           </DialogContent>
         </Dialog>
@@ -1059,6 +1045,10 @@ export default function MeditationPage() {
                   max={100}
                   step={5}
                 />
+              </div>
+
+              <div className="pt-2 border-t">
+                <MeditationExportButton />
               </div>
             </div>
           </DialogContent>

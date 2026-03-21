@@ -11,7 +11,7 @@ const MeditationEnvironment3D = lazy(() => import('@/components/3d/MeditationEnv
 import { useUserStatsQuery } from '@/hooks/useUserStatsQuery';
 import { useUserPreference } from '@/hooks/useSupabaseStorage';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Filter, Search, X, TrendingUp, Target, Award, ChevronDown, Star, Calendar, Sparkles, Trophy, Zap, BarChart3, Map, Clock, Heart, Share2, Download, Settings } from 'lucide-react';
+import { Filter, Search, X, TrendingUp, Award, ChevronDown, Star, Calendar, Sparkles, Trophy, Zap, BarChart3, Map, Clock, Heart, Settings } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ParkAttraction } from '@/components/park/ParkAttraction';
 import type { Attraction } from '@/types/park';
@@ -72,8 +72,7 @@ export default function EmotionalPark() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showStatistics, setShowStatistics] = useState(true);
-  const [showMap, setShowMap] = useState(false);
-  const [showTimeline, setShowTimeline] = useState(false);
+  // Map and timeline are now in the Insights Tabs only
   const [showFavorites, setShowFavorites] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [achievementToShare, setAchievementToShare] = useState<ShareableAchievement | null>(null);
@@ -82,7 +81,6 @@ export default function EmotionalPark() {
   
   // Mood persisté via Supabase
   const [currentMood, setCurrentMood] = useUserPreference<string>('emotional-park-mood', '');
-  const [showProgressDashboard, setShowProgressDashboard] = useState(false);
 
   // Energy system (persisté via Supabase)
   const { 
@@ -698,7 +696,7 @@ export default function EmotionalPark() {
             onShowFavorites={() => setShowFavorites(!showFavorites)}
             onShare={handleShare}
             onExport={exportToJSON}
-            onShowMap={() => setShowMap(!showMap)}
+            onShowMap={undefined}
             onRandomAttraction={handleRandomAttraction}
             onDailyChallenge={() => dailyChallenge && handleAttractionClick(dailyChallenge)}
             onAchievements={() => setShowAchievementsPanel(true)}
@@ -842,122 +840,10 @@ export default function EmotionalPark() {
           onQuestStart={(questId) => updateQuestProgress(questId, 1)}
         />
 
-        {/* Toggle buttons for Map & Timeline */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <Button
-            variant={showMap ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setShowMap(!showMap)}
-            className="flex items-center gap-2"
-          >
-            <Map className="h-4 w-4" />
-            {showMap ? 'Masquer la carte' : 'Voir la carte'}
-          </Button>
-          <Button
-            variant={showTimeline ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setShowTimeline(!showTimeline)}
-            className="flex items-center gap-2"
-          >
-            <Clock className="h-4 w-4" />
-            {showTimeline ? 'Masquer la timeline' : 'Voir la timeline'}
-          </Button>
-        </div>
-
-        {/* Park Map Visualization */}
-        <AnimatePresence>
-          {showMap && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-            >
-              <ParkMapVisualization
-                zones={Object.entries(zones).map(([key, zone], index) => ({
-                  name: zone.name,
-                  emoji: zone.emoji,
-                  color: ['#8b5cf6', '#06b6d4', '#f97316', '#22c55e', '#ec4899', '#3b82f6', '#eab308', '#ef4444'][index % 8],
-                  x: 100 + (index % 4) * 200,
-                  y: 150 + Math.floor(index / 4) * 250,
-                  attractions: attractions.filter(a => a.zone === key).length,
-                  completed: getZoneProgress(attractions.filter(a => a.zone === key).map(a => a.id)).visited
-                }))}
-                selectedZone={selectedZone !== 'all' ? zones[selectedZone as keyof typeof zones]?.name : undefined}
-                onZoneClick={(zoneName) => {
-                  const zoneKey = Object.entries(zones).find(([_, z]) => z.name === zoneName)?.[0];
-                  if (zoneKey) setSelectedZone(zoneKey);
-                }}
-                completionData={Object.fromEntries(
-                  Object.entries(zones).map(([key, zone]) => [
-                    zone.name,
-                    getZoneProgress(attractions.filter(a => a.zone === key).map(a => a.id))
-                  ])
-                )}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Progression Timeline */}
-        <AnimatePresence>
-          {showTimeline && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-            >
-              <ProgressionTimeline
-                events={Object.entries(visitedAttractions).map(([id, visit]) => {
-                  const attraction = attractions.find(a => a.id === id);
-                  return {
-                    id,
-                    title: attraction?.title || 'Attraction visitée',
-                    description: attraction?.subtitle || '',
-                    icon: attraction?.zone === 'calm' ? '🧘' : attraction?.zone === 'creative' ? '🎨' : '🏛️',
-                    timestamp: new Date(typeof visit === 'object' && visit !== null ? visit.visitedAt : Date.now()),
-                    type: 'attraction' as const,
-                    completed: true
-                  };
-                })}
-                maxDisplay={10}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Map & Timeline are available in the Insights Tabs above */}
       </div>
 
-      {/* Navigation Buttons */}
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center gap-3 flex-wrap">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate('/app/achievements')}
-            className="flex items-center gap-2"
-          >
-            <Trophy className="h-4 w-4" />
-            Mes Succès
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate('/app/daily-challenges')}
-            className="flex items-center gap-2"
-          >
-            <Target className="h-4 w-4" />
-            Défis du jour
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate('/app/home')}
-            className="flex items-center gap-2"
-          >
-            <Award className="h-4 w-4" />
-            Tableau de bord
-          </Button>
-        </div>
-      </div>
+      {/* Navigation is handled via header back button and quick actions */}
 
       {/* Zone Progress Dashboard */}
       {selectedZone === 'all' && !searchTerm && (
