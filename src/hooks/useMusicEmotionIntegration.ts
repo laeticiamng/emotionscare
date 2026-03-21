@@ -180,7 +180,7 @@ export const useMusicEmotionIntegration = () => {
     const descriptions: Record<string, string> = {
       joie: 'Musique joyeuse et entraînante pour célébrer votre bonne humeur',
       calme: 'Sons apaisants et mélodies douces pour maintenir votre sérénité',
-      tristesse: 'Musique réconfortante pour accompagner et transformer votre émotion',
+      tristesse: 'Musique réconfortante pour accompagner et adoucir votre émotion',
       colère: 'Rythmes libérateurs pour canaliser votre énergie',
       anxiété: 'Compositions relaxantes pour apaiser votre esprit',
       sérénité: 'Ambiances zen et harmonieuses pour prolonger votre bien-être',

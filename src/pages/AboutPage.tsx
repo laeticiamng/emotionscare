@@ -114,7 +114,7 @@ const AboutPage: React.FC = () => {
                 >
                   EmotionsCare accompagne les soignants vers un meilleur
                   équilibre émotionnel, avec des exercices courts et
-                  scientifiquement fondés.
+                  fondés sur les neurosciences.
                 </motion.p>
 
                 <motion.div

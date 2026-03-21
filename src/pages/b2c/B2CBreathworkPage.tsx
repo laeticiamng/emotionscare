@@ -89,7 +89,7 @@ export default function B2CBreathworkPage() {
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Techniques validées scientifiquement</p>
+                        <p>Techniques issues de la recherche en neurosciences</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>

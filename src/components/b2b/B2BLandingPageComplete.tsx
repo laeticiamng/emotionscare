@@ -135,7 +135,7 @@ const B2BLandingPageComplete: React.FC = () => {
 
       {/* CTA Section */}
       <div className="text-center space-y-4">
-        <h3 className="text-xl font-semibold">Prêt à transformer votre organisation ?</h3>
+        <h3 className="text-xl font-semibold">Prêt à prendre soin de vos équipes ?</h3>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button asChild>
             <Link to="/register?segment=b2b">

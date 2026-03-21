@@ -223,7 +223,7 @@ const ExperienceShowcase: React.FC = () => {
               <Users className="h-6 w-6 text-blue-600" />
             </div>
             <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-              Prêt à transformer votre relation au bien-être ?
+              Prêt à améliorer votre bien-être au quotidien ?
             </h3>
             <p className="text-lg text-slate-600 dark:text-slate-400 mb-6 max-w-2xl mx-auto">
               Rejoignez dès aujourd'hui une communauté qui place l'humain au cœur de l'innovation technologique.

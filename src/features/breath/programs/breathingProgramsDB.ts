@@ -151,7 +151,7 @@ export const BREATHING_PROGRAMS: Record<string, BreathingProgram> = {
     id: 'focus_master',
     name: 'Maître de la Concentration',
     description: '7 jours pour augmenter ta concentration et ta clarté mentale',
-    longDescription: 'Un programme scientifiquement conçu pour optimiser ta concentration et ta performance cognitive. Idéal pour les étudiants, créatifs et professionnels qui veulent maximiser leur potentiel mental.',
+    longDescription: 'Un programme fondé sur les neurosciences pour améliorer ta concentration et ta clarté mentale. Idéal pour les étudiants, créatifs et professionnels.',
     duration_days: 7,
     difficulty: 'intermediate',
     benefits: ['Meilleure concentration', 'Clarté mentale accrue', 'Moins de distractions', 'Performance cognitive'],

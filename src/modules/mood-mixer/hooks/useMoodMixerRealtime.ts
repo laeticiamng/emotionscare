@@ -22,7 +22,7 @@ export interface UseMoodMixerRealtimeReturn {
 
 const TIPS = [
   "Essayez le preset 'Focus' avant une tâche importante",
-  "Une session de 5 minutes peut transformer votre journée",
+  "Une session de 5 minutes peut améliorer votre journée",
   "Combinez 'Calme' élevé avec 'Focus' pour la méditation",
   "Exportez vos presets préférés pour les partager",
   "Le matin, privilégiez un mix énergisant",

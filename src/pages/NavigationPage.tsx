@@ -254,7 +254,6 @@ const allRoutes: RouteItem[] = [
   { path: '/app/social-cocon', label: 'Social Cocon', description: 'Espace bienveillant', category: 'Social', icon: Heart, requiresAuth: true },
   { path: '/app/buddies', label: 'Buddies', description: 'Trouver un binôme', category: 'Social', icon: Users, requiresAuth: true },
   { path: '/app/group-sessions', label: 'Sessions Groupe', description: 'Pratique collective', category: 'Social', icon: Users, requiresAuth: true },
-  { path: '/app/exchange', label: 'Exchange Hub', description: 'Partage ressources', category: 'Social', icon: RefreshCw, requiresAuth: true },
   { path: '/messages', label: 'Messages', description: 'Messagerie', category: 'Social', icon: MessageCircle, requiresAuth: true },
   { path: '/app/friends', label: 'Amis', description: 'Liste d\'amis', category: 'Social', icon: Users, requiresAuth: true },
   { path: '/app/groups', label: 'Groupes', description: 'Mes groupes', category: 'Social', icon: Users, requiresAuth: true },

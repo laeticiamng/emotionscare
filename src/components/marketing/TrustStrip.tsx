@@ -34,7 +34,7 @@ const TRUST_INDICATORS = [
   {
     icon: Award,
     title: 'Données protégées',
-    description: 'Sécurité et confidentialité garanties'
+    description: 'Sécurité et confidentialité renforcées'
   },
   {
     icon: Heart,

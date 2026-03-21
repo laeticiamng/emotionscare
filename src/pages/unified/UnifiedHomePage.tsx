@@ -338,7 +338,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
           <section className="py-16 bg-primary text-primary-foreground" aria-labelledby="b2c-cta-heading">
             <div className="container mx-auto px-4 text-center">
               <h2 id="b2c-cta-heading" className="text-3xl font-bold mb-6">
-                Prêt à transformer votre bien-être ?
+                Prêt à prendre soin de votre bien-être ?
               </h2>
             <p className="text-xl mb-8 opacity-90">
               Rejoignez les professionnels de santé qui améliorent leur qualité de vie
@@ -447,7 +447,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                 </h1>
                 
                 <p className="text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-                  La première plateforme de régulation émotionnelle conçue par et pour les soignants. 
+                  Une plateforme de régulation émotionnelle conçue par et pour les soignants. 
                   <strong className="text-foreground"> Gérez votre stress en 3 minutes</strong> avec des exercices basés sur les neurosciences.
                 </p>
               </div>
@@ -828,7 +828,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                 className="text-center space-y-8 max-w-4xl mx-auto"
               >
                 <h2 className="text-4xl lg:text-5xl font-bold">
-                  Prêt à transformer votre vie émotionnelle ?
+                  Prêt à prendre soin de vos émotions ?
                 </h2>
                 <p className="text-xl opacity-90 leading-relaxed">
                   Découvrez des outils concrets pour prendre soin de votre bien-être émotionnel.

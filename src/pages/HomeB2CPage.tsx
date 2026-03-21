@@ -469,7 +469,7 @@ const HomeB2CPage: React.FC = () => {
               transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
               className="text-3xl md:text-5xl font-bold mb-6"
             >
-              Prêt à transformer votre bien-être ?
+              Prêt à prendre soin de votre bien-être ?
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 12 }}
