@@ -12,6 +12,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Sentry } from '@/lib/errors/sentry-compat';
+import { SUPABASE_URL } from '@/lib/env';
 import type {
   AmbitionRun,
   AmbitionQuest,
@@ -31,9 +32,7 @@ import type {
   SortOption,
 } from './types';
 
-const EDGE_FUNCTION_URL = import.meta.env.VITE_SUPABASE_URL
-  ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ambition-arcade`
-  : 'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1/ambition-arcade';
+const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/ambition-arcade`;
 
 // ============================================================================
 // RUNS MANAGEMENT

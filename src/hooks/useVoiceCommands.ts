@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
+import { SUPABASE_URL } from '@/lib/env';
 
 interface VoiceCommandsConfig {
   onCommand: (command: string, params?: any) => void;
@@ -192,7 +193,7 @@ export const useVoiceCommands = ({ onCommand, onTranscript }: VoiceCommandsConfi
 
       // Connect to WebSocket
       const ws = new WebSocket(
-        'wss://yaincoxihiqdksxgrsrk.supabase.co/functions/v1/realtime-voice-commands'
+        `${SUPABASE_URL.replace('https://', 'wss://')}/functions/v1/realtime-voice-commands`
       );
 
       ws.onopen = async () => {

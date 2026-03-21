@@ -5,6 +5,7 @@ import { Shield, Activity, AlertTriangle, Bell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Line, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { SUPABASE_URL } from '@/lib/env';
 
 // Components from GDPRMonitoringPage
 import GDPRAlerts from '@/components/gdpr/GDPRAlerts';
@@ -83,7 +84,7 @@ export default function UnifiedGDPRDashboard() {
   }, [rgpdData]);
 
   const handleViewLogs = (functionName: string) => {
-    const projectId = 'yaincoxihiqdksxgrsrk';
+    const projectId = new URL(SUPABASE_URL).hostname.split('.')[0];
     window.open(
       `https://supabase.com/dashboard/project/${projectId}/functions/${functionName}/logs`,
       '_blank'

@@ -1,8 +1,7 @@
 import type { SunoGenerateRequest, SunoExtendRequest } from '@/types/music/parcours';
+import { SUPABASE_URL } from '@/lib/env';
 
-const SUNO_API_BASE = import.meta.env.VITE_SUPABASE_URL 
-  ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`
-  : 'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1';
+const SUNO_API_BASE = `${SUPABASE_URL}/functions/v1`;
 
 // Rate limiting: max 20 requests per 10 seconds
 class RateLimiter {

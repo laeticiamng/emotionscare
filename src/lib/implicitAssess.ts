@@ -1,4 +1,5 @@
 import { submitAssess } from '@/lib/assess/client';
+import { SUPABASE_URL } from '@/lib/env';
 
 let ON = true;
 
@@ -110,7 +111,7 @@ if (typeof window !== 'undefined') {
       });
       
       navigator.sendBeacon(
-        'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1/assess-submit',
+        `${SUPABASE_URL}/functions/v1/assess-submit`,
         new Blob([payload], { type: 'application/json' })
       );
     }

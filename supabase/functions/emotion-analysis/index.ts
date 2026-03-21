@@ -33,6 +33,8 @@ serve(async (req) => {
     return new Response(null, { headers: getCorsHeaders(req) });
   }
 
+  const corsHeaders = getCorsHeaders(req);
+
   try {
     // 🔒 SÉCURITÉ: Authentification obligatoire
     const authResult = await authenticateRequest(req);

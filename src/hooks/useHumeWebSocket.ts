@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { logger } from '@/lib/logger';
+import { SUPABASE_URL } from '@/lib/env';
 
 export interface HumeEmotion {
   name: string;
@@ -36,8 +37,7 @@ export const useHumeWebSocket = ({ enabled = false, onEmotions }: UseHumeWebSock
 
     try {
       // Get project ID from env
-      const projectId = 'yaincoxihiqdksxgrsrk';
-      const wsUrl = `wss://${projectId}.supabase.co/functions/v1/hume-websocket-proxy`;
+      const wsUrl = `${SUPABASE_URL.replace('https://', 'wss://')}/functions/v1/hume-websocket-proxy`;
       
       logger.info('Connecting to Hume WebSocket proxy', { wsUrl }, 'HUME');
       

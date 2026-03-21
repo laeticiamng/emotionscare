@@ -4,6 +4,7 @@
  */
 
 import html2canvas from 'html2canvas';
+import DOMPurify from 'dompurify';
 import { supabase } from '@/integrations/supabase/client';
 import type { CoachSession, CoachMessage } from './types';
 
@@ -324,9 +325,9 @@ export async function exportSessionToPDF(
       }
     );
 
-    // Créer un container temporaire
+    // Créer un container temporaire (sanitized to prevent XSS)
     const container = document.createElement('div');
-    container.innerHTML = htmlContent;
+    container.innerHTML = DOMPurify.sanitize(htmlContent);
     container.style.position = 'absolute';
     container.style.left = '-9999px';
     container.style.top = '0';
@@ -473,9 +474,9 @@ export async function exportMultipleSessionsReport(
       </div>
     `;
 
-    // Créer le container temporaire et exporter
+    // Créer le container temporaire et exporter (sanitized)
     const container = document.createElement('div');
-    container.innerHTML = reportHtml;
+    container.innerHTML = DOMPurify.sanitize(reportHtml);
     container.style.position = 'absolute';
     container.style.left = '-9999px';
     document.body.appendChild(container);

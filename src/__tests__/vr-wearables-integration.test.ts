@@ -180,19 +180,19 @@ describe('Wearables Integration', () => {
 
 describe('Environment Configuration', () => {
   it('should have valid Supabase URL', () => {
-    const url = 'https://yaincoxihiqdksxgrsrk.supabase.co';
+    const url = import.meta.env.VITE_SUPABASE_URL ?? 'https://test-project.supabase.co';
     expect(url).toMatch(/^https:\/\/.*\.supabase\.co$/);
   });
 
   it('should have valid anon key format', () => {
-    const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhaW5jb3hpaGlxZGtzeGdyc3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTE4MjcsImV4cCI6MjA1ODM4NzgyN30.HBfwymB2F9VBvb3uyeTtHBMZFZYXzL0wQmS5fqd65yU';
+    const key = import.meta.env.VITE_SUPABASE_ANON_KEY ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlc3QtcHJvamVjdCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjIwMDAwMDAwMDB9.placeholder';
     expect(key.split('.').length).toBe(3); // JWT format
   });
 
   it('should not expose secrets in frontend', () => {
     const config = {
       SUPABASE: {
-        URL: 'https://yaincoxihiqdksxgrsrk.supabase.co',
+        URL: import.meta.env.VITE_SUPABASE_URL ?? 'https://test-project.supabase.co',
         ANON_KEY: 'eyJ...' // Public key is OK
       }
     };

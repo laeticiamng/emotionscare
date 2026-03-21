@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
 import { useStorySynthPersistence, type StorySynthStory } from '@/hooks/useStorySynthPersistence';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface LocalStory {
   id: string;
@@ -65,25 +66,16 @@ const B2CStorySynthLabPage: React.FC = () => {
     setIsGenerating(true);
     
     try {
-      // Appel à l'Edge Function story-synth
-      const response = await fetch(
-        `https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1/story-synth`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhaW5jb3hpaGlxZGtzeGdyc3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTE4MjcsImV4cCI6MjA1ODM4NzgyN30.HBfwymB2F9VBvb3uyeTtHBMZFZYXzL0wQmS5fqd65yU`
-          },
-          body: JSON.stringify({
-            intentions: validIntentions,
-            style: 'relaxation',
-            duration: 'medium'
-          })
+      // Appel à l'Edge Function story-synth via Supabase client
+      const { data, error: invokeError } = await supabase.functions.invoke('story-synth', {
+        body: {
+          intentions: validIntentions,
+          style: 'relaxation',
+          duration: 'medium'
         }
-      );
+      });
 
-      if (response.ok) {
-        const data = await response.json();
+      if (!invokeError && data) {
         
         const generatedStory: LocalStory = {
           id: data.id || Date.now().toString(),

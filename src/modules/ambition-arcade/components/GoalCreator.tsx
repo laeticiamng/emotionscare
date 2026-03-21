@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, Plus, Sparkles, Target, X, Wand2 } from 'lucide-react';
 import { useCreateGoal, useCreateQuest } from '../hooks';
 import { supabase } from '@/integrations/supabase/client';
+import { SUPABASE_URL } from '@/lib/env';
 import { useToast } from '@/hooks/use-toast';
 import { useConfetti } from '../hooks/useConfetti';
 
@@ -83,7 +84,7 @@ export const GoalCreator: React.FC<GoalCreatorProps> = ({ onSuccess, onCancel })
       }
 
       const response = await fetch(
-        'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1/ambition-arcade',
+        `${SUPABASE_URL}/functions/v1/ambition-arcade`,
         {
           method: 'POST',
           headers: {

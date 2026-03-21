@@ -6,6 +6,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
+import { SUPABASE_URL } from '@/lib/env';
 import type {
   AmbitionRun,
   AmbitionQuest,
@@ -17,7 +18,7 @@ import type {
   GameStructure,
 } from './types';
 
-const EDGE_FUNCTION_URL = 'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1/ambition-arcade';
+const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/ambition-arcade`;
 
 /**
  * Créer un nouveau run d'ambition

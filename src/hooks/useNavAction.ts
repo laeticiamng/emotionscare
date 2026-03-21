@@ -81,6 +81,17 @@ export function useNavAction() {
 
         case "external": {
           const url = action.href;
+          // Validate URL to prevent open redirect attacks
+          try {
+            const parsed = new URL(url, window.location.origin);
+            if (!['http:', 'https:'].includes(parsed.protocol)) {
+              logger.warn('Blocked navigation to non-HTTP URL', { url }, 'NAV');
+              return { success: false, error: 'Invalid URL protocol' };
+            }
+          } catch {
+            logger.warn('Blocked navigation to invalid URL', { url }, 'NAV');
+            return { success: false, error: 'Invalid URL' };
+          }
           if (action.newTab) {
             window.open(url, '_blank', 'noopener,noreferrer');
           } else {

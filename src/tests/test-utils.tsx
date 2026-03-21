@@ -37,7 +37,7 @@ const MockAuthContext = createContext({
   session: { access_token: 'test-token', refresh_token: 'test-refresh' },
   isLoading: false,
   isAuthenticated: true,
-  isTestMode: true,
+
   signUp: vi.fn(),
   signIn: vi.fn(),
   signOut: vi.fn(),
@@ -61,7 +61,7 @@ function AllTheProviders({ children }: { children: React.ReactNode }) {
             session: { access_token: 'test-token', refresh_token: 'test-refresh' } as any,
             isLoading: false,
             isAuthenticated: true,
-            isTestMode: true,
+          
             signUp: vi.fn(),
             signIn: vi.fn(),
             signOut: vi.fn(),

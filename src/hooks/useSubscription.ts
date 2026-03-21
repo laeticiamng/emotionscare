@@ -110,7 +110,7 @@ export function useSubscription(): UseSubscriptionReturn {
     checkSubscription();
   }, [checkSubscription]);
 
-  // Auto-refresh toutes les 60 secondes si l'utilisateur est connecté
+  // Auto-refresh toutes les 5 minutes si l'utilisateur est connecté
   useEffect(() => {
     if (!user) return;
 

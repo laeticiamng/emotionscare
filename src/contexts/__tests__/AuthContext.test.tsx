@@ -40,13 +40,6 @@ vi.mock('@/lib/logger', () => ({
   },
 }));
 
-vi.mock('@/lib/config', () => ({
-  TEST_MODE: {
-    BYPASS_AUTH: false,
-    MOCK_USER: null,
-  },
-}));
-
 vi.mock('@/lib/auth/authErrorService', () => ({
   getFriendlyAuthError: (err: unknown) => ({
     message: err instanceof Error ? err.message : 'Auth error',

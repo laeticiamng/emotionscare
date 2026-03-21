@@ -3,6 +3,7 @@
  */
 
 import { logger } from '@/lib/logger';
+import { SUPABASE_URL } from '@/lib/env';
 
 // Configuration des chunks optimisés
 export const CHUNK_OPTIMIZATION = {
@@ -91,7 +92,7 @@ export const PWA_CONFIG = {
 export function optimizeNetworkPerformance(): void {
   // Préconnexion aux domaines critiques
   const criticalDomains = [
-    'https://yaincoxihiqdksxgrsrk.supabase.co',
+    SUPABASE_URL,
     'https://fonts.googleapis.com',
     'https://fonts.gstatic.com'
   ];

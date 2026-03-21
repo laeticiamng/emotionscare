@@ -7,12 +7,12 @@ import { describe, it, expect, vi } from 'vitest';
 describe('Configuration Environnement', () => {
   describe('Variables Supabase', () => {
     it('doit avoir une URL Supabase valide', () => {
-      const supabaseUrl = 'https://yaincoxihiqdksxgrsrk.supabase.co';
-      expect(supabaseUrl).toMatch(/^https:\/\/[a-z]+\.supabase\.co$/);
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? 'https://test-project.supabase.co';
+      expect(supabaseUrl).toMatch(/^https:\/\/[a-z0-9-]+\.supabase\.co$/);
     });
 
     it('doit avoir une clé anon valide (format JWT)', () => {
-      const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhaW5jb3hpaGlxZGtzeGdyc3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTE4MjcsImV4cCI6MjA1ODM4NzgyN30.HBfwymB2F9VBvb3uyeTtHBMZFZYXzL0wQmS5fqd65yU';
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlc3QtcHJvamVjdCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjIwMDAwMDAwMDB9.placeholder';
       expect(anonKey).toMatch(/^eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/);
     });
 

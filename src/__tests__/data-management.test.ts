@@ -11,38 +11,39 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 describe('Environment Configuration Validation', () => {
   describe('Supabase Configuration', () => {
     it('should have valid project URL format', () => {
-      const url = 'https://yaincoxihiqdksxgrsrk.supabase.co';
-      const urlPattern = /^https:\/\/[a-z0-9]+\.supabase\.co$/;
+      const url = import.meta.env.VITE_SUPABASE_URL ?? 'https://test-project.supabase.co';
+      const urlPattern = /^https:\/\/[a-z0-9-]+\.supabase\.co$/;
       expect(urlPattern.test(url)).toBe(true);
     });
 
     it('should have valid JWT anon key structure', () => {
-      const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhaW5jb3hpaGlxZGtzeGdyc3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTE4MjcsImV4cCI6MjA1ODM4NzgyN30.HBfwymB2F9VBvb3uyeTtHBMZFZYXzL0wQmS5fqd65yU';
-      
+      const key = import.meta.env.VITE_SUPABASE_ANON_KEY ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlc3QtcHJvamVjdCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjIwMDAwMDAwMDB9.placeholder';
+
       // JWT has 3 parts separated by dots
       const parts = key.split('.');
       expect(parts.length).toBe(3);
-      
+
       // Decode header
       const header = JSON.parse(atob(parts[0]));
       expect(header.alg).toBe('HS256');
       expect(header.typ).toBe('JWT');
-      
+
       // Decode payload
       const payload = JSON.parse(atob(parts[1]));
       expect(payload.iss).toBe('supabase');
       expect(payload.role).toBe('anon');
-      expect(payload.ref).toBe('yaincoxihiqdksxgrsrk');
     });
 
     it('should validate websocket URL', () => {
-      const wsUrl = 'wss://yaincoxihiqdksxgrsrk.supabase.co/realtime/v1';
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? 'https://test-project.supabase.co';
+      const wsUrl = supabaseUrl.replace('https://', 'wss://') + '/realtime/v1';
       expect(wsUrl.startsWith('wss://')).toBe(true);
       expect(wsUrl.includes('/realtime/v1')).toBe(true);
     });
 
     it('should validate functions URL', () => {
-      const fnUrl = 'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1';
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? 'https://test-project.supabase.co';
+      const fnUrl = `${supabaseUrl}/functions/v1`;
       expect(fnUrl.includes('/functions/v1')).toBe(true);
     });
   });

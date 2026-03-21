@@ -245,6 +245,15 @@ const PricingPageWorking: React.FC = () => {
 
       if (error) throw error;
       if (data?.url) {
+        // Validate the checkout URL is a legitimate Stripe domain
+        try {
+          const parsed = new URL(data.url);
+          if (!parsed.hostname.endsWith('stripe.com')) {
+            throw new Error('Invalid checkout URL');
+          }
+        } catch {
+          throw new Error('Invalid checkout URL received');
+        }
         window.location.href = data.url;
       }
     } catch (err) {

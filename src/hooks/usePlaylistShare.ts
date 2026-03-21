@@ -113,6 +113,16 @@ export const usePlaylistShare = () => {
 
       const { authUrl } = response.data;
 
+      // Validate authUrl points to Spotify before redirecting
+      try {
+        const parsed = new URL(authUrl);
+        if (!parsed.hostname.endsWith('spotify.com')) {
+          throw new Error('Invalid OAuth redirect URL');
+        }
+      } catch {
+        throw new Error('Invalid Spotify authentication URL');
+      }
+
       // Rediriger vers Spotify pour l'authentification
       window.location.href = authUrl;
     } catch (error) {

@@ -75,6 +75,7 @@ interface PersonalizationVector {
   };
 }
 
+// Placeholder rules — will be loaded from Supabase when backend is ready
 const mockRules: RecommendationRule[] = [
   {
     id: '1',
@@ -93,9 +94,9 @@ const mockRules: RecommendationRule[] = [
       intensity: 'low'
     },
     metrics: {
-      triggers: 1247,
-      successRate: 87,
-      avgRating: 4.3
+      triggers: 0,
+      successRate: 0,
+      avgRating: 0
     }
   },
   {
@@ -115,9 +116,9 @@ const mockRules: RecommendationRule[] = [
       intensity: 'medium'
     },
     metrics: {
-      triggers: 892,
-      successRate: 92,
-      avgRating: 4.7
+      triggers: 0,
+      successRate: 0,
+      avgRating: 0
     }
   }
 ];
@@ -188,7 +189,7 @@ export default function RecommendationEngineAdminPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       <div className="container mx-auto px-4 py-8">
-        <DemoBanner message="Ce moteur de recommandations IA est une démonstration. Les règles, scores et l'entraînement du modèle sont simulés." />
+        <DemoBanner message="Module en cours d'intégration — les règles de recommandation sont des modèles de configuration, pas des données de production." />
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
@@ -256,9 +257,9 @@ export default function RecommendationEngineAdminPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">3,247</div>
+                  <div className="text-2xl font-bold">--</div>
                   <div className="text-xs text-muted-foreground">
-                    Ce mois
+                    En attente d'intégration
                   </div>
                 </CardContent>
               </Card>
@@ -271,9 +272,9 @@ export default function RecommendationEngineAdminPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">2h</div>
+                  <div className="text-2xl font-bold">--</div>
                   <div className="text-xs text-muted-foreground">
-                    Il y a 2 heures
+                    Non entraîné
                   </div>
                 </CardContent>
               </Card>
@@ -485,11 +486,11 @@ export default function RecommendationEngineAdminPage() {
                     <h4 className="font-medium mb-3">Types de Recommandations</h4>
                     <div className="space-y-2">
                       {[
-                        { type: 'Exercices de respiration', usage: '67%' },
-                        { type: 'Musique thérapeutique', usage: '54%' },
-                        { type: 'Sessions VR', usage: '32%' },
-                        { type: 'Coaching personnalisé', usage: '78%' },
-                        { type: 'Journal guidé', usage: '45%' }
+                        { type: 'Exercices de respiration', usage: '--' },
+                        { type: 'Musique thérapeutique', usage: '--' },
+                        { type: 'Sessions VR', usage: '--' },
+                        { type: 'Coaching personnalisé', usage: '--' },
+                        { type: 'Journal guidé', usage: '--' }
                       ].map((item, index) => (
                         <div key={index} className="flex justify-between items-center">
                           <span className="text-sm">{item.type}</span>
@@ -594,16 +595,16 @@ export default function RecommendationEngineAdminPage() {
                   {[
                     {
                       name: 'Recommandations Proactives vs Réactives',
-                      status: 'En cours',
-                      participants: 1247,
-                      confidence: 85,
-                      winner: 'Proactives (+12% engagement)'
+                      status: 'Non démarré',
+                      participants: 0,
+                      confidence: 0,
+                      winner: 'Non déterminé'
                     },
                     {
                       name: 'Fréquence des Notifications',
-                      status: 'En cours',
-                      participants: 892,
-                      confidence: 73,
+                      status: 'Non démarré',
+                      participants: 0,
+                      confidence: 0,
                       winner: 'Non déterminé'
                     }
                   ].map((test, index) => (
@@ -642,24 +643,24 @@ export default function RecommendationEngineAdminPage() {
                 <CardContent>
                   <div className="space-y-4">
                     {[
-                      { type: 'Exercices', success: 89, triggers: 2456 },
-                      { type: 'Musique', success: 92, triggers: 1789 },
-                      { type: 'VR', success: 78, triggers: 567 },
-                      { type: 'Coach', success: 85, triggers: 1234 },
-                      { type: 'Journal', success: 76, triggers: 890 }
+                      { type: 'Exercices', success: 0, triggers: 0 },
+                      { type: 'Musique', success: 0, triggers: 0 },
+                      { type: 'VR', success: 0, triggers: 0 },
+                      { type: 'Coach', success: 0, triggers: 0 },
+                      { type: 'Journal', success: 0, triggers: 0 }
                     ].map((item, index) => (
                       <div key={index} className="flex items-center justify-between">
                         <span className="text-sm">{item.type}</span>
                         <div className="flex items-center gap-4">
                           <div className="w-20 bg-muted rounded-full h-2">
-                            <div 
+                            <div
                               className="bg-primary h-2 rounded-full"
                               style={{ width: `${item.success}%` }}
                             />
                           </div>
-                          <span className="text-sm font-medium w-12">{item.success}%</span>
+                          <span className="text-sm font-medium w-12">--</span>
                           <span className="text-xs text-muted-foreground w-16">
-                            {item.triggers} fois
+                            -- fois
                           </span>
                         </div>
                       </div>
@@ -675,10 +676,10 @@ export default function RecommendationEngineAdminPage() {
                 <CardContent>
                   <div className="space-y-4">
                     {[
-                      { time: 'Matin (6h-12h)', engagement: 78, preferences: 'Énergisant, Coaching' },
-                      { time: 'Après-midi (12h-18h)', engagement: 65, preferences: 'Concentration, Musique' },
-                      { time: 'Soir (18h-24h)', engagement: 89, preferences: 'Relaxation, VR' },
-                      { time: 'Nuit (0h-6h)', engagement: 34, preferences: 'Sommeil, Ambiance' }
+                      { time: 'Matin (6h-12h)', engagement: 0, preferences: 'Énergisant, Coaching' },
+                      { time: 'Après-midi (12h-18h)', engagement: 0, preferences: 'Concentration, Musique' },
+                      { time: 'Soir (18h-24h)', engagement: 0, preferences: 'Relaxation, VR' },
+                      { time: 'Nuit (0h-6h)', engagement: 0, preferences: 'Sommeil, Ambiance' }
                     ].map((item, index) => (
                       <div key={index} className="border rounded p-3">
                         <div className="flex justify-between items-center mb-2">
@@ -702,19 +703,19 @@ export default function RecommendationEngineAdminPage() {
               <CardContent>
                 <div className="grid md:grid-cols-4 gap-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">87%</div>
+                    <div className="text-2xl font-bold text-blue-600">--</div>
                     <div className="text-sm text-muted-foreground">Précision Globale</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">4.3/5</div>
+                    <div className="text-2xl font-bold text-green-600">--</div>
                     <div className="text-sm text-muted-foreground">Satisfaction Moyenne</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-600">23min</div>
+                    <div className="text-2xl font-bold text-purple-600">--</div>
                     <div className="text-sm text-muted-foreground">Temps de Session Moyen</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-orange-600">67%</div>
+                    <div className="text-2xl font-bold text-orange-600">--</div>
                     <div className="text-sm text-muted-foreground">Taux de Complétion</div>
                   </div>
                 </div>

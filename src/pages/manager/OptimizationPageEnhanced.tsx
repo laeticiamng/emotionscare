@@ -40,69 +40,28 @@ const OptimizationPageEnhanced = () => {
   });
   const [isOptimizing, setIsOptimizing] = useState(false);
 
-  // Données simulées pour l'optimisation (hoisted for type inference)
+  // Données de démonstration — seront remplacées par des données Supabase
   const mockOptimizationData = {
     performance: {
-      overallScore: 78,
-      improvement: '+12%',
-      bottlenecks: [
-        { name: 'Temps de session trop courts', impact: 'high', solution: 'Augmenter durée recommandée' },
-        { name: 'Faible engagement après 15h', impact: 'medium', solution: 'Notifications adaptives' },
-        { name: 'Abandon méditation guidée', impact: 'low', solution: 'Personnaliser les voix' }
-      ],
+      overallScore: 0,
+      improvement: '--',
+      bottlenecks: [] as { name: string; impact: string; solution: string }[],
       metrics: [
-        { name: 'Temps de réponse', current: 1.2, target: 1.0, unit: 's', trend: 'up' },
-        { name: 'Taux d\'engagement', current: 73, target: 80, unit: '%', trend: 'up' },
-        { name: 'Satisfaction utilisateur', current: 4.2, target: 4.5, unit: '/5', trend: 'stable' },
-        { name: 'Retention mensuelle', current: 68, target: 75, unit: '%', trend: 'down' }
+        { name: 'Temps de réponse', current: 0, target: 1.0, unit: 's', trend: 'up' },
+        { name: 'Taux d\'engagement', current: 0, target: 80, unit: '%', trend: 'up' },
+        { name: 'Satisfaction utilisateur', current: 0, target: 4.5, unit: '/5', trend: 'stable' },
+        { name: 'Retention mensuelle', current: 0, target: 75, unit: '%', trend: 'down' }
       ]
     },
     ai: {
-      recommendations: [
-        {
-          id: 1,
-          title: 'Optimiser les créneaux de méditation',
-          description: 'L\'IA recommande de proposer plus de sessions entre 12h-14h basé sur les pics d\'utilisation',
-          impact: 'high',
-          estimatedGain: '+15% engagement',
-          effort: 'low',
-          status: 'pending'
-        },
-        {
-          id: 2,
-          title: 'Personnaliser les notifications',
-          description: 'Adapter les notifications selon les patterns comportementaux individuels',
-          impact: 'medium',
-          estimatedGain: '+8% retention',
-          effort: 'medium',
-          status: 'in-progress'
-        },
-        {
-          id: 3,
-          title: 'Optimiser la durée des sessions VR',
-          description: 'Réduire de 2-3 minutes les sessions VR pour améliorer le taux de completion',
-          impact: 'medium',
-          estimatedGain: '+22% completion',
-          effort: 'low',
-          status: 'completed'
-        }
-      ],
-      predictions: [
-        { metric: 'Usage pic', prediction: 'Augmentation 25% lundi 14h-16h', confidence: 87 },
-        { metric: 'Abandon session', prediction: 'Risque élevé après 12min', confidence: 92 },
-        { metric: 'Satisfaction', prediction: 'Baisse probable sans ajustements', confidence: 78 }
-      ]
+      recommendations: [] as { id: number; title: string; description: string; impact: string; estimatedGain: string; effort: string; status: string }[],
+      predictions: [] as { metric: string; prediction: string; confidence: number }[]
     },
     automation: {
-      activeRules: 12,
-      processedEvents: 1847,
-      efficiency: 94,
-      rules: [
-        { name: 'Auto-adaptation notifications', status: 'active', savings: '2.3h/semaine' },
-        { name: 'Optimisation horaires sessions', status: 'active', savings: '15% engagement' },
-        { name: 'Allocation ressources VR', status: 'active', savings: '23% utilisation' },
-        { name: 'Recommandations personnalisées', status: 'pending', savings: 'Est. +18% satisfaction' }
-      ]
+      activeRules: 0,
+      processedEvents: 0,
+      efficiency: 0,
+      rules: [] as { name: string; status: string; savings: string }[]
     }
   };
 
@@ -192,7 +151,7 @@ const OptimizationPageEnhanced = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 p-4">
       <div className="max-w-7xl mx-auto">
-        <DemoBanner message="Cette page affiche des données de démonstration. Les optimisations et recommandations IA sont simulées." />
+        <DemoBanner message="Module en cours d'intégration — les données affichées sont des aperçus de la mise en page, pas des données réelles." />
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

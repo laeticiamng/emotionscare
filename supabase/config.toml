@@ -3,6 +3,8 @@ project_id = "yaincoxihiqdksxgrsrk"
 # ========================================
 # ROUTEURS CONSOLIDÉS (v2.0)
 # Réduction de ~235 fonctions → 10 routeurs
+# verify_jwt = false car les routeurs gèrent l'authentification
+# en interne via authenticateRequest() / validateJwt()
 # ========================================
 
 [functions.router-ai]
@@ -36,6 +38,12 @@ verify_jwt = false
 [functions.ai-router]
 verify_jwt = false
 
+# ========================================
+# WEBHOOKS — verify_jwt = false requis car les callbacks
+# proviennent de services externes (Stripe, Shopify, Sentry, Suno)
+# Chaque webhook valide la signature du service appelant.
+# ========================================
+
 [functions.suno-callback]
 verify_jwt = false
 
@@ -47,6 +55,12 @@ verify_jwt = false
 
 [functions.sentry-webhook-handler]
 verify_jwt = false
+
+# ========================================
+# FONCTIONS AVEC AUTH INTERNE
+# verify_jwt = false car elles gèrent l'authentification
+# via authenticateRequest() dans le code de la fonction
+# ========================================
 
 [functions.health-edge]
 verify_jwt = false
