@@ -12,7 +12,8 @@ import {
   MapPin, Send, Phone, Video, Gift, Trophy,
   Coffee, Book, Music, Gamepad2, Camera,
   Zap, Clock, CheckCircle, UserPlus, Search,
-  Filter, Settings, Activity, Target, Sparkles
+  Filter, Settings, Activity, Target, Sparkles,
+  Pause
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
