@@ -82,7 +82,7 @@ const features = [
     icon: Shield,
     title: 'RGPD natif',
     description:
-      'Anonymat garanti par design. Aucune donnée individuelle n\'est accessible aux managers. Hébergement sécurisé en UE.',
+      'Anonymat par design. Aucune donnée individuelle n\'est accessible aux managers. Hébergement sécurisé en UE.',
     gradient: 'from-primary/80 to-primary',
   },
   {
@@ -420,7 +420,7 @@ const B2BEntreprisePage: React.FC = () => {
             >
               {[
                 { label: 'Conforme RGPD', color: 'bg-green-500' },
-                { label: 'Anonymat garanti', color: 'bg-primary' },
+                { label: 'Anonymat par design', color: 'bg-primary' },
                 { label: 'Made in France', color: 'bg-accent' },
               ].map((badge) => (
                 <span key={badge.label} className="flex items-center gap-2">

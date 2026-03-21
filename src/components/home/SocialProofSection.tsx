@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Shield, Award, Heart, GraduationCap, Sparkles, Quote, Brain, Clock, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import laeticiaPhoto from '@/assets/laeticia-motongane.jpg';
 
 /** Principes vérifiables — pas de témoignages inventés */
 const principles = [
@@ -31,8 +32,8 @@ const principles = [
 
 const trustBadges = [
   { icon: Shield, label: 'Conforme RGPD' },
-  { icon: Award, label: 'Hébergé en France' },
-  { icon: GraduationCap, label: 'Validé scientifiquement' },
+  { icon: Award, label: 'Hébergé en Europe (UE)' },
+  { icon: GraduationCap, label: 'Fondé sur les neurosciences' },
   { icon: Heart, label: 'Créé par une médecin' },
 ];
 
@@ -53,7 +54,7 @@ const SocialProofSection: React.FC = () => {
             Pourquoi nous faire confiance
           </span>
           <h2 id="social-proof-heading" className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-4">
-            Pourquoi{' '}
+            Pourquoi choisir{' '}
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               EmotionsCare
             </span>
@@ -113,7 +114,7 @@ const SocialProofSection: React.FC = () => {
           className="text-center bg-card border border-border/50 rounded-2xl p-8 max-w-2xl mx-auto"
         >
           <img
-            src="https://media.licdn.com/dms/image/v2/D4E03AQEtYkSyftmFow/profile-displayphoto-scale_200_200/B4EZz50UGgJoAY-/0/1773717767476?e=2147483647&v=beta&t=kNzX8Nj5_Xq4nfx-Ok6Kj7RxIY_Fm4hf2Nn17zHcPo0"
+            src={laeticiaPhoto}
             alt="Laeticia Motongane — Médecin · Fondatrice d'EmotionsCare"
             className="w-16 h-16 rounded-full object-cover mx-auto mb-4 ring-2 ring-primary/20"
             loading="lazy"

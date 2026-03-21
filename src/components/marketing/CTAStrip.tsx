@@ -41,7 +41,7 @@ export const CTAStrip: React.FC<CTAStripProps> = ({ segment }) => {
         <div className="max-w-7xl mx-auto px-4 py-16">
           <div className="text-center max-w-3xl mx-auto">
             <h2 className="text-3xl font-bold mb-4">
-              Prêt à transformer votre culture d'entreprise ?
+              Prêt à prendre soin de vos équipes ?
             </h2>
             <p className="text-lg text-blue-100 mb-8">
               Rejoignez les entreprises qui ont choisi l'approche bienveillante 

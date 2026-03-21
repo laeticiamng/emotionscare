@@ -25,7 +25,7 @@ const STEPS: OnboardingStep[] = [
     illustration: '📊',
   },
   {
-    title: 'Confidentialité garantie',
+    title: 'Confidentialité renforcée',
     description: 'Vos données restent privées. Vous choisissez si vous souhaitez les enregistrer pour un suivi dans le temps. Aucune image vidéo n\'est jamais stockée.',
     illustration: '🔒',
   },

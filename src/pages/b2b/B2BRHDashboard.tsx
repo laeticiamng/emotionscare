@@ -411,7 +411,7 @@ export default function B2BRHDashboard() {
           <span className="inline-block h-2 w-2 rounded-full bg-success animate-pulse" aria-hidden="true" />
           <span>Données synchronisées</span>
           <Eye className="h-3 w-3 ml-2" aria-hidden="true" />
-          <span>Anonymat garanti</span>
+          <span>Anonymat par design</span>
         </div>
       </main>
 

@@ -145,7 +145,6 @@ export const MainNavigation: React.FC = () => {
       category: 'Social',
       subItems: [
         { title: 'Social Cocon', route: '/app/social-cocon', description: 'Espace bienveillant' },
-        { title: 'Exchange Hub', route: '/app/exchange', description: 'Marchés émotionnels' },
       ]
     },
 

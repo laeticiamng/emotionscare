@@ -380,7 +380,7 @@ export const coachPrograms: CoachProgram[] = [
           introduction: 'La pleine conscience est l\'art de porter attention au moment présent avec ouverture et bienveillance.',
           objectives: [
             'Comprendre ce qu\'est la pleine conscience',
-            'Découvrir les bienfaits scientifiquement prouvés',
+            'Découvrir les bienfaits documentés par la recherche',
             'Pratiquer votre première méditation',
             'Intégrer la pleine conscience au quotidien',
           ],

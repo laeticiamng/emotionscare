@@ -28,7 +28,7 @@ export default function SupportPage() {
 
   usePageSEO({
     title: 'Support Client - EmotionsCare',
-    description: 'Contactez notre équipe support. Chat en direct, email ou formulaire. Réponse garantie sous 24h.',
+    description: 'Contactez notre équipe support. Chat en direct, email ou formulaire. Réponse sous 24h en jours ouvrés.',
     keywords: 'support, aide, contact, EmotionsCare, assistance',
   });
 

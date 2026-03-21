@@ -18,7 +18,7 @@ const FACTUAL_STATS = [
   {
     id: 'modules',
     label: 'Modules',
-    value: '37',
+    value: '10+',
     icon: <Layers className="h-4 w-4" />,
     color: 'text-primary',
   },

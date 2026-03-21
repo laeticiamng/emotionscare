@@ -71,7 +71,7 @@ const ModulesSection: React.FC<ModulesSectionProps> = ({
           description="Sessions guidées, exercices de respiration et ambiances sonores pour votre bien-être mental"
           statIcon={<Waves className="h-4 w-4" />}
           statText="Sessions disponibles"
-          statValue="50+"
+          statValue="20+"
           to={routes.b2c.meditation()}
           gradient="from-indigo-500 via-purple-600 to-violet-700"
         />

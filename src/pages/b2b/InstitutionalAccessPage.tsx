@@ -326,7 +326,7 @@ export default function InstitutionalAccessPage() {
                   <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                     <Lock className="h-5 w-5 text-success mt-0.5" />
                     <div>
-                      <p className="font-medium text-sm">Anonymat garanti</p>
+                      <p className="font-medium text-sm">Anonymat par design</p>
                       <p className="text-xs text-muted-foreground">
                         Votre employeur n'aura jamais accès à vos données personnelles
                       </p>

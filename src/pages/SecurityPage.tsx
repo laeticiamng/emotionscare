@@ -149,9 +149,9 @@ export default function SecurityPage() {
               et ne remplace pas un suivi médical, psychologique ou psychiatrique.
             </p>
             <p>
-              <strong className="text-foreground">Certification HDS en cours d'étude.</strong>{' '}
-              Nous travaillons à l'obtention de la certification Hébergement de Données de Santé (HDS).
-              Nos données sont actuellement hébergées sur des serveurs conformes aux standards européens.
+              <strong className="text-foreground">Certification HDS non acquise à ce jour.</strong>{' '}
+              EmotionsCare n'est pas certifié HDS (Hébergement de Données de Santé). Nous étudions cette certification
+              pour une future mise en conformité. Nos données sont actuellement hébergées sur des serveurs conformes aux standards européens (Supabase / AWS eu-west).
             </p>
             <p>
               <strong className="text-foreground">Sous-traitants techniques.</strong>{' '}

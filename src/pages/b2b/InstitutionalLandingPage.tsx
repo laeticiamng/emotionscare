@@ -381,8 +381,8 @@ export default function InstitutionalLandingPage() {
               Prêt à prendre soin de vos équipes ?
             </h2>
             <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Déployez EmotionsCare dans votre organisation en quelques jours.
-              Sans complexité, sans risque, avec un impact positif immédiat.
+              Déployez EmotionsCare dans votre organisation simplement.
+              Sans complexité, sans risque, dans le respect de la confidentialité.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 

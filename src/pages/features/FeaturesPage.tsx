@@ -145,11 +145,11 @@ const SECTIONS: {
       },
       {
         id: 'immersive',
-        title: 'Expériences Immersives',
-        tagline: 'Réalité virtuelle et augmentée thérapeutique',
-        description: 'Galaxie VR pour la méditation, respiration guidée 3D, filtres AR émotionnels et environnements adaptatifs pour une relaxation profonde.',
+        title: 'Relaxation Immersive',
+        tagline: 'Environnements sonores et visuels apaisants',
+        description: 'Respiration guidée avec animations 3D, ambiances sonores immersives et environnements adaptatifs pour une relaxation profonde.',
         icon: Headphones,
-        highlights: ['Galaxie VR', 'Filtres AR', 'Environnements 3D adaptatifs'],
+        highlights: ['Animations 3D apaisantes', 'Ambiances sonores', 'Environnements adaptatifs'],
         gradient: 'from-primary/80 to-accent',
         iconBg: 'bg-primary/20 text-primary',
       },
@@ -242,7 +242,7 @@ const ADDITIONAL_MODULES: { category: string; modules: CompactModule[] }[] = [
     category: 'Accessibilité & Personnalisation',
     modules: [
       { title: 'Accessibilité WCAG 2.1 AA', description: 'Contraste élevé, mode daltonien, taille du texte, navigation clavier et lecteur d\'écran.', icon: Eye },
-      { title: 'Support multilingue', description: 'Interface disponible en Français et English.', icon: Globe },
+      { title: 'Support multilingue', description: 'Interface disponible en français. D\'autres langues seront ajoutées prochainement.', icon: Globe },
       { title: 'Mode hors ligne (PWA)', description: 'Installez EmotionsCare sur votre appareil et accédez aux protocoles essentiels sans connexion.', icon: Smartphone },
     ],
   },
@@ -267,15 +267,15 @@ const STATS = [
 const HOW_IT_WORKS = [
   { step: '01', title: 'Scannez', description: 'Analysez votre état émotionnel en quelques secondes grâce à l\'IA.' },
   { step: '02', title: 'Comprenez', description: 'Recevez des insights personnalisés et des recommandations adaptées.' },
-  { step: '03', title: 'Agissez', description: 'Choisissez l\'exercice le plus adapté : respiration, coaching, musique ou VR.' },
+  { step: '03', title: 'Agissez', description: 'Choisissez l\'exercice le plus adapté : respiration, coaching ou musique.' },
 ];
 
 /* ─── Component ─── */
 const FeaturesPage: React.FC = () => {
   usePageSEO({
     title: 'Fonctionnalités - EmotionsCare | Tous nos modules',
-    description: 'Découvrez les modules EmotionsCare : scanner émotionnel IA, coach IA, musicothérapie, réalité virtuelle, gamification, journal émotionnel et plus.',
-    keywords: 'gestion du stress, bien-être au travail, santé mentale soignants, scanner émotionnel, respiration guidée, journal émotionnel, musicothérapie, réalité virtuelle, coach IA, gamification',
+    description: 'Découvrez les modules EmotionsCare : scanner émotionnel IA, coach IA, musicothérapie, relaxation immersive, gamification, journal émotionnel et plus.',
+    keywords: 'gestion du stress, bien-être au travail, santé mentale soignants, scanner émotionnel, respiration guidée, journal émotionnel, musicothérapie, relaxation immersive, coach IA, gamification',
   });
 
   return (
@@ -541,8 +541,8 @@ const FeaturesPage: React.FC = () => {
             </h2>
 
             <p className="text-lg text-muted-foreground mb-10 leading-relaxed">
-              Rejoignez les professionnels de santé qui améliorent leur bien-être émotionnel
-              au quotidien avec EmotionsCare.
+              Rejoignez les premiers professionnels de santé qui utilisent EmotionsCare
+              pour améliorer leur bien-être émotionnel au quotidien.
             </p>
 
             <div className="flex flex-wrap justify-center gap-4">

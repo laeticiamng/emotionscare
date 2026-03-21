@@ -98,7 +98,7 @@ export const MusicJourneySection: React.FC = () => {
           Parcours Musical Guidé
         </CardTitle>
         <CardDescription>
-          Un voyage progressif de 3 à 5 étapes pour transformer votre état émotionnel
+          Un voyage progressif de 3 à 5 étapes pour apaiser votre état émotionnel
         </CardDescription>
       </CardHeader>
       <CardContent>

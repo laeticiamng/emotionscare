@@ -34,8 +34,8 @@ const features = [
   },
   {
     icon: Shield,
-    title: 'Confidentialité garantie',
-    description: 'Vos données sont chiffrées et restent entièrement privées.',
+    title: 'Confidentialité renforcée',
+    description: 'Vos données sont chiffrées et restent entièrement privées. Conforme RGPD.',
     badge: 'RGPD'
   },
   {

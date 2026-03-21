@@ -114,7 +114,7 @@ const AboutPage: React.FC = () => {
                 >
                   EmotionsCare accompagne les soignants vers un meilleur
                   équilibre émotionnel, avec des exercices courts et
-                  scientifiquement fondés.
+                  fondés sur les neurosciences.
                 </motion.p>
 
                 <motion.div
@@ -214,13 +214,13 @@ const AboutPage: React.FC = () => {
                       icon: Brain,
                       title: 'Fondée sur les neurosciences',
                       description:
-                        'Chaque exercice est fondé sur les neurosciences et la psychologie positive. Pas de promesses vagues, des résultats mesurables.',
+                        'Chaque exercice est fondé sur les neurosciences et la psychologie positive. Des techniques éprouvées, adaptées au quotidien des soignants.',
                     },
                     {
                       icon: Shield,
                       title: 'Confidentialité absolue',
                       description:
-                        'Vos données émotionnelles restent les vôtres. Conforme RGPD, hébergé en France, aucune revente à des tiers.',
+                        'Vos données émotionnelles restent les vôtres. Conforme RGPD, hébergé en Europe (UE), aucune revente à des tiers.',
                     },
                     {
                       icon: Target,
@@ -269,7 +269,7 @@ const AboutPage: React.FC = () => {
                     {
                       icon: Lock,
                       title: 'Confidentialité',
-                      text: 'Vos émotions sont privées. Nous ne vendons ni ne partageons jamais vos données.',
+                      text: 'Vos émotions sont privées. Nous ne vendons jamais vos données. Nos sous-traitants techniques sont encadrés par le RGPD.',
                     },
                     {
                       icon: Sparkles,
@@ -309,7 +309,7 @@ const AboutPage: React.FC = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto text-center">
                 {[
                   { icon: Shield, label: 'Conforme RGPD' },
-                  { icon: Lock, label: 'Hébergé en France' },
+                  { icon: Lock, label: 'Hébergé en Europe (UE)' },
                   { icon: Stethoscope, label: 'Créé par une médecin' },
                   { icon: Heart, label: 'Made in France' },
                 ].map((badge, i) => (
@@ -408,7 +408,7 @@ const AboutPage: React.FC = () => {
                     </span>
                   </h2>
                   <p className="text-xl text-muted-foreground mb-10 font-light">
-                    Rejoignez les soignants qui ont déjà adopté EmotionsCare
+                    Rejoignez les premiers soignants qui utilisent EmotionsCare
                     pour retrouver un équilibre émotionnel au quotidien.
                   </p>
                   <div className="flex flex-wrap justify-center gap-4">

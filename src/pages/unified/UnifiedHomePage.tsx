@@ -172,7 +172,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
   ];
 
   const stats = [
-    { label: "Modules", value: "37", description: "Outils intégrés pour votre bien-être", icon: Users, progress: 85 },
+    { label: "Modules", value: "10+", description: "Outils intégrés pour votre bien-être", icon: Users, progress: 85 },
     { label: "Par session", value: "3 min", description: "Micro-interventions efficaces", icon: Clock, progress: 92 },
     { label: "Données protégées", value: "100%", description: "Chiffrement RGPD conforme", icon: Shield, progress: 100 },
     { label: "Disponibilité", value: "7/7", description: "Accès permanent, jour et nuit", icon: Activity, progress: 99 }
@@ -338,7 +338,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
           <section className="py-16 bg-primary text-primary-foreground" aria-labelledby="b2c-cta-heading">
             <div className="container mx-auto px-4 text-center">
               <h2 id="b2c-cta-heading" className="text-3xl font-bold mb-6">
-                Prêt à transformer votre bien-être ?
+                Prêt à prendre soin de votre bien-être ?
               </h2>
             <p className="text-xl mb-8 opacity-90">
               Rejoignez les professionnels de santé qui améliorent leur qualité de vie
@@ -447,7 +447,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                 </h1>
                 
                 <p className="text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-                  La première plateforme de régulation émotionnelle conçue par et pour les soignants. 
+                  Une plateforme de régulation émotionnelle conçue par et pour les soignants. 
                   <strong className="text-foreground"> Gérez votre stress en 3 minutes</strong> avec des exercices basés sur les neurosciences.
                 </p>
               </div>
@@ -593,7 +593,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                   <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent"> Nouvelle Génération</span>
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                  Découvrez nos outils révolutionnaires conçus par des experts en psychologie et ingénieurs IA pour maximiser votre potentiel émotionnel.
+                  Découvrez nos outils conçus par des experts en psychologie et ingénieurs IA pour accompagner votre bien-être émotionnel.
                 </p>
               </motion.div>
 
@@ -828,7 +828,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                 className="text-center space-y-8 max-w-4xl mx-auto"
               >
                 <h2 className="text-4xl lg:text-5xl font-bold">
-                  Prêt à transformer votre vie émotionnelle ?
+                  Prêt à prendre soin de vos émotions ?
                 </h2>
                 <p className="text-xl opacity-90 leading-relaxed">
                   Découvrez des outils concrets pour prendre soin de votre bien-être émotionnel.

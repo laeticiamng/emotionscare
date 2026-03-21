@@ -90,7 +90,6 @@ const socialItems = [
   { title: "Messages", url: "/messages", icon: MessageSquare },
   { title: "Buddies", url: "/app/buddies", icon: Users },
   { title: "Social Cocon", url: "/app/social-cocon", icon: Heart },
-  { title: "Exchange Hub", url: "/app/exchange", icon: Users },
 ]
 
 const analyticsItems = [

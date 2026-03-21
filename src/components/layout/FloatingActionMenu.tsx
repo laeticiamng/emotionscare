@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Zap, Brain, Music, Heart, Eye, Sparkles, TrendingUp } from 'lucide-react';
+import { Plus, Zap, Brain, Music, Heart, Eye, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useNavigate } from 'react-router-dom';
@@ -60,14 +60,6 @@ const FloatingActionMenu: React.FC = () => {
       color: 'bg-pink-500',
       gradient: 'from-pink-400 to-rose-600'
     },
-    {
-      id: 'exchange',
-      icon: <TrendingUp className="w-5 h-5" aria-hidden="true" />,
-      label: 'Exchange Hub',
-      path: routes.b2c.exchange(),
-      color: 'bg-emerald-500',
-      gradient: 'from-emerald-400 to-teal-600'
-    }
   ];
 
   const handleActionClick = (action: FloatingAction) => {

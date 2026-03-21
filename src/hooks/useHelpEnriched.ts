@@ -343,7 +343,7 @@ export const useHelpEnriched = () => {
       {
         id: 'faq-2',
         question: 'Mes données sont-elles sécurisées ?',
-        answer: 'Oui, toutes vos données sont chiffrées et stockées conformément au RGPD. Nous ne partageons jamais vos informations personnelles.',
+        answer: 'Oui, toutes vos données sont chiffrées et stockées conformément au RGPD. Nos sous-traitants techniques sont encadrés contractuellement.',
         slug: 'securite-donnees',
         category: 'rgpd',
         views: 980

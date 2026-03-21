@@ -230,7 +230,7 @@ export const ADVANCED_BREATHING_PATTERNS: BreathingPattern[] = [
     ],
     benefits: [
       'Calme en 1 seule respiration',
-      'Prouvé scientifiquement (Stanford)',
+      'Étudié à Stanford (Huberman Lab, 2023)',
       'Utilisable partout, discret',
       'Reset du système nerveux'
     ],

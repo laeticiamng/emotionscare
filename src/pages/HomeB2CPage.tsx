@@ -169,9 +169,9 @@ const HomeB2CPage: React.FC = () => {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="text-lg h-14 px-8 backdrop-blur-sm">
-                  <Link to="/about">
+                  <Link to="/features">
                     <Camera className="w-5 h-5 mr-2" />
-                    Voir la démo
+                    Découvrir les fonctionnalités
                   </Link>
                 </Button>
               </motion.div>
@@ -265,69 +265,6 @@ const HomeB2CPage: React.FC = () => {
               );
             })}
           </div>
-        </div>
-      </section>
-
-      {/* Exchange Hub Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <Link to="/app/exchange" className="block">
-              <div className="group relative rounded-3xl p-8 bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 text-white shadow-2xl backdrop-blur-xl overflow-hidden hover:scale-[1.02] transition-all duration-300">
-                {/* Background Effects */}
-                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute -top-20 -right-20 w-60 h-60 bg-white/10 rounded-full blur-3xl" />
-                <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-white/10 rounded-full blur-3xl" />
-                
-                <div className="relative z-10">
-                  <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                    {/* Icon */}
-                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
-                      <TrendingUp className="w-8 h-8 md:w-10 md:h-10 text-white" />
-                    </div>
-                    
-                    {/* Content */}
-                    <div className="flex-1">
-                      <Badge className="mb-2 bg-white/20 text-white border-white/30 hover:bg-white/30">
-                        Nouveau
-                      </Badge>
-                      <h3 className="text-2xl md:text-3xl font-bold mb-2">Exchange Hub</h3>
-                      <p className="text-lg opacity-90 mb-4 max-w-2xl">
-                        La première bourse émotionnelle et comportementale. Accédez aux 4 marchés interactifs : 
-                        <span className="font-semibold"> Amélioration</span>,
-                        <span className="font-semibold"> Confiance</span>,
-                        <span className="font-semibold"> Temps</span> et
-                        <span className="font-semibold"> Émotions</span>.
-                      </p>
-                      
-                      {/* Markets Preview */}
-                      <div className="flex flex-wrap gap-2 mb-6">
-                        {['📈 Amélioration', '🤝 Confiance', '⏰ Temps', '💜 Émotions'].map((market) => (
-                          <span key={market} className="px-3 py-1 rounded-full bg-white/20 text-sm font-medium">
-                            {market}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    {/* CTA Button */}
-                    <Button 
-                      size="lg"
-                      className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm rounded-xl px-6 py-3 font-semibold group-hover:bg-white group-hover:text-emerald-600 transition-all duration-300"
-                    >
-                      Accéder à l'Exchange Hub
-                      <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          </motion.div>
         </div>
       </section>
 
@@ -452,8 +389,8 @@ const HomeB2CPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <Card3D className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 !border-blue-500/20 p-6 text-center" animate={false}>
                     <Music className="w-8 h-8 mx-auto mb-3 text-blue-500" />
-                    <div className="text-2xl font-bold mb-1">37</div>
-                    <div className="text-sm text-muted-foreground">Modules disponibles</div>
+                    <div className="text-2xl font-bold mb-1">10+</div>
+                    <div className="text-sm text-muted-foreground">Modules intégrés</div>
                 </Card3D>
                 <Card3D className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 !border-purple-500/20 p-6 text-center" animate={false}>
                     <MessageCircle className="w-8 h-8 mx-auto mb-3 text-purple-500" />
@@ -467,8 +404,8 @@ const HomeB2CPage: React.FC = () => {
                 </Card3D>
                 <Card3D className="bg-gradient-to-br from-orange-500/10 to-red-500/10 !border-orange-500/20 p-6 text-center" animate={false}>
                     <TrendingUp className="w-8 h-8 mx-auto mb-3 text-orange-500" />
-                    <div className="text-2xl font-bold mb-1">7 jours</div>
-                    <div className="text-sm text-muted-foreground">Premiers résultats</div>
+                    <div className="text-2xl font-bold mb-1">3 min</div>
+                    <div className="text-sm text-muted-foreground">Par exercice</div>
                 </Card3D>
               </div>
             </motion.div>
@@ -532,7 +469,7 @@ const HomeB2CPage: React.FC = () => {
               transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
               className="text-3xl md:text-5xl font-bold mb-6"
             >
-              Prêt à transformer votre bien-être ?
+              Prêt à prendre soin de votre bien-être ?
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 12 }}
@@ -566,7 +503,7 @@ const HomeB2CPage: React.FC = () => {
             <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm opacity-80">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4" />
-                Gratuit pendant 14 jours
+                100% gratuit pour commencer
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4" />
@@ -578,6 +515,17 @@ const HomeB2CPage: React.FC = () => {
               </div>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Disclaimer médical */}
+      <section className="py-6 border-t border-border/30">
+        <div className="container mx-auto px-4">
+          <p className="text-xs text-muted-foreground text-center max-w-3xl mx-auto leading-relaxed">
+            EmotionsCare est un outil de prévention et de bien-être émotionnel. Il ne constitue pas un dispositif médical
+            et ne remplace pas un suivi médical, psychologique ou psychiatrique.{' '}
+            <Link to="/security" className="underline hover:text-foreground">En savoir plus</Link>
+          </p>
         </div>
       </section>
     </div>

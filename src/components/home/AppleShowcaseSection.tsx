@@ -60,10 +60,16 @@ const AppleShowcaseSection: React.FC = () => {
             <div className="relative mx-auto max-w-4xl">
               {/* Glow effect */}
               <div className="absolute -inset-4 bg-gradient-to-r from-primary via-accent to-primary rounded-[3rem] blur-2xl opacity-30" />
-              
+
               {/* Screen */}
               <div className="relative bg-gradient-to-br from-background to-muted rounded-[2.5rem] p-2 shadow-2xl">
-                <div className="relative aspect-[16/10] rounded-[2rem] overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20">
+                {/* App-like top bar */}
+                <div className="relative rounded-t-[2rem] bg-background/80 px-6 py-3 flex items-center justify-between border-b border-border/20">
+                  <span className="text-xs font-medium text-muted-foreground">EmotionsCare</span>
+                  <span className="text-xs text-primary font-medium">Respiration guidée</span>
+                  <span className="text-xs text-muted-foreground">2:00</span>
+                </div>
+                <div className="relative aspect-[16/10] rounded-b-[2rem] overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20">
                   {/* Immersive breathing experience */}
                   <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/10 via-accent/5 to-primary/10">
                     {/* Ambient rings */}
@@ -108,7 +114,16 @@ const AppleShowcaseSection: React.FC = () => {
                       >
                         Respirez
                       </motion.span>
-                </motion.div>
+                    </motion.div>
+
+                    {/* Phase indicator */}
+                    <motion.p
+                      className="absolute bottom-8 text-sm text-background/50 font-medium tracking-wide"
+                      animate={{ opacity: [0.4, 0.8, 0.4] }}
+                      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      Inspirez… Expirez…
+                    </motion.p>
                   </div>
                 </div>
               </div>
@@ -116,10 +131,10 @@ const AppleShowcaseSection: React.FC = () => {
               {/* CTA below animation */}
               <div className="mt-6 flex justify-center">
                 <Link
-                  to={ctaPath}
+                  to={isAuthenticated ? '/app/breathing' : '/features'}
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/30 hover:scale-105"
                 >
-                  {isAuthenticated ? 'Retourner à mon espace' : 'Essayer cet exercice'}
+                  {isAuthenticated ? 'Lancer un exercice' : 'Découvrir nos exercices'}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -138,11 +153,11 @@ const AppleShowcaseSection: React.FC = () => {
               { title: "Recharge mentale", desc: "Rechargez votre énergie après un moment difficile ou une garde.", badge: "5 min" },
               { title: "Sas sommeil", desc: "Décompressez avant le coucher avec respiration immersive et sons apaisants.", badge: "Avant le coucher" },
             ].map((item, i) => (
-              <Link key={i} to={ctaPath} className="text-center p-6 rounded-2xl border border-background/10 hover:border-primary/50 hover:bg-background/5 transition-all duration-300 cursor-pointer group block">
+              <Link key={i} to={isAuthenticated ? '/app/breathing' : '/features'} className="text-center p-6 rounded-2xl border border-background/10 hover:border-primary/50 hover:bg-background/5 transition-all duration-300 cursor-pointer group block">
                 <span className="inline-block text-xs font-medium text-primary bg-primary/20 rounded-full px-3 py-1 mb-3">{item.badge}</span>
                 <h3 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">{item.title}</h3>
                 <p className="text-background/60 text-sm mb-3">{item.desc}</p>
-                <span className="text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">{isAuthenticated ? 'Ouvrir →' : 'Essayer →'}</span>
+                <span className="text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">{isAuthenticated ? 'Ouvrir →' : 'En savoir plus →'}</span>
               </Link>
             ))}
           </motion.div>
