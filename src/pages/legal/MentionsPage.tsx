@@ -47,7 +47,7 @@ const sections: Section[] = [
     content: (
       <>
         <p>
-          La directrice de la publication est Dr Laeticia Motongane, en sa qualité de Présidente de EmotionsCare SASU. Elle est
+          La directrice de la publication est Laeticia Motongane, en sa qualité de Présidente de EmotionsCare SASU. Elle est
           joignable à l'adresse contact@emotionscare.com pour toute question relative au contenu éditorial.
         </p>
       </>
