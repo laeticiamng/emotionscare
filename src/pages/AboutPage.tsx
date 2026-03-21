@@ -4,6 +4,7 @@
  */
 
 import React, { memo, useRef } from 'react';
+import laeticiaPhoto from '@/assets/laeticia-motongane.jpg';
 import { motion, useInView } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
