@@ -6,7 +6,7 @@
 import React, { memo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Menu, X, HelpCircle, Heart } from 'lucide-react';
+import { ArrowRight, Menu, X, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -59,18 +59,6 @@ const SharedHeader: React.FC<SharedHeaderProps> = ({ extraDesktopCTA }) => {
                 {label}
               </Link>
             ))}
-            <Link
-              to="/help"
-              className={cn(
-                'text-sm transition-colors flex items-center gap-1',
-                isActive('/help')
-                  ? 'text-primary font-medium'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              <HelpCircle className="h-3.5 w-3.5" aria-hidden="true" />
-              Aide
-            </Link>
           </nav>
 
           {/* Desktop CTA */}
@@ -134,19 +122,6 @@ const SharedHeader: React.FC<SharedHeaderProps> = ({ extraDesktopCTA }) => {
                   {label}
                 </Link>
               ))}
-              <Link
-                to="/help"
-                className={cn(
-                  'block text-lg transition-colors flex items-center gap-2',
-                  isActive('/help')
-                    ? 'text-primary font-medium'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <HelpCircle className="h-4 w-4" aria-hidden="true" />
-                Aide & Support
-              </Link>
               <div className="pt-4 border-t border-border space-y-3">
                 {isAuthenticated ? (
                   <Link to="/app/home" onClick={() => setMobileMenuOpen(false)}>

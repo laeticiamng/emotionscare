@@ -7,7 +7,7 @@ import React, { memo, useRef, lazy, Suspense } from 'react';
 import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, ChevronDown, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -103,7 +103,7 @@ const AppleHeroSection: React.FC = () => {
             className="text-xl sm:text-2xl md:text-3xl text-muted-foreground max-w-3xl mx-auto mb-4 font-light leading-relaxed"
           >
             Respiration guidée, coaching IA et exercices anti-stress
-            <span className="text-foreground font-medium"> pensés pour les soignants.</span>
+            <span className="text-foreground font-medium"> pensés pour vous, soignants.</span>
           </motion.p>
 
           {/* Concrete value prop */}
@@ -150,7 +150,7 @@ const AppleHeroSection: React.FC = () => {
               }}
               className="group px-6 sm:px-8 py-5 sm:py-7 text-base sm:text-lg font-medium text-muted-foreground hover:text-foreground rounded-full w-full sm:w-auto"
             >
-              <Sparkles className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
+              <ChevronDown className="h-5 w-5 mr-2 group-hover:translate-y-1 transition-transform" />
               Comment ça marche
             </Button>
           </motion.div>
@@ -164,7 +164,7 @@ const AppleHeroSection: React.FC = () => {
           >
             <div className="flex flex-wrap justify-center gap-2 sm:gap-4 items-center">
               <span className="text-xs sm:text-sm font-medium text-muted-foreground tracking-wide px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-muted/50">
-                100% gratuit pour commencer
+                Exercices de 2 à 5 minutes
               </span>
               <span className="text-xs sm:text-sm font-medium text-muted-foreground tracking-wide px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-muted/50">
                 Compte créé en 30 secondes

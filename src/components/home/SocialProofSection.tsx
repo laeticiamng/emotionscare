@@ -32,7 +32,7 @@ const principles = [
 const trustBadges = [
   { icon: Shield, label: 'Conforme RGPD' },
   { icon: Award, label: 'Hébergé en France' },
-  { icon: GraduationCap, label: 'Validé scientifiquement' },
+  { icon: GraduationCap, label: 'Fondé sur les neurosciences' },
   { icon: Heart, label: 'Créé par une médecin' },
 ];
 
@@ -53,7 +53,7 @@ const SocialProofSection: React.FC = () => {
             Pourquoi nous faire confiance
           </span>
           <h2 id="social-proof-heading" className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-4">
-            Pourquoi{' '}
+            Pourquoi choisir{' '}
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               EmotionsCare
             </span>
