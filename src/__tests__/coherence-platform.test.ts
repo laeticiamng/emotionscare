@@ -8,19 +8,18 @@ describe('Cohérence Backend/Frontend', () => {
   describe('Configuration Supabase', () => {
     const CONFIG = {
       SUPABASE: {
-        URL: 'https://yaincoxihiqdksxgrsrk.supabase.co',
-        ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhaW5jb3hpaGlxZGtzeGdyc3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTE4MjcsImV4cCI6MjA1ODM4NzgyN30.HBfwymB2F9VBvb3uyeTtHBMZFZYXzL0wQmS5fqd65yU'
+        URL: import.meta.env.VITE_SUPABASE_URL ?? 'https://test-project.supabase.co',
+        ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlc3QtcHJvamVjdCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjIwMDAwMDAwMDB9.placeholder'
       }
     };
 
-    it('doit avoir le même project_id partout', () => {
-      const projectId = 'yaincoxihiqdksxgrsrk';
-      expect(CONFIG.SUPABASE.URL).toContain(projectId);
+    it('doit avoir une URL Supabase valide', () => {
+      expect(CONFIG.SUPABASE.URL).toMatch(/^https:\/\/[a-z0-9-]+\.supabase\.co$/);
     });
 
-    it('doit avoir une clé anon valide avec le bon ref', () => {
+    it('doit avoir une clé anon valide avec le bon rôle', () => {
       const decoded = JSON.parse(atob(CONFIG.SUPABASE.ANON_KEY.split('.')[1]));
-      expect(decoded.ref).toBe('yaincoxihiqdksxgrsrk');
+      expect(decoded.iss).toBe('supabase');
       expect(decoded.role).toBe('anon');
     });
   });

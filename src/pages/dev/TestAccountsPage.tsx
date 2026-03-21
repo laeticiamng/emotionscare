@@ -34,38 +34,41 @@ interface TestAccount {
   created?: boolean;
 }
 
+// Passwords are loaded from environment variables — never hardcode credentials in source
+const DEFAULT_TEST_PASSWORD = import.meta.env.VITE_TEST_ACCOUNT_PASSWORD ?? '';
+
 const TEST_ACCOUNTS: TestAccount[] = [
   {
     email: 'test.user@emotionscare.dev',
-    password: 'Test123!EmotionsCare',
+    password: DEFAULT_TEST_PASSWORD,
     type: 'b2c',
     role: 'user',
     description: 'Utilisateur B2C standard - Accès à tous les modules particuliers'
   },
   {
     email: 'test.premium@emotionscare.dev',
-    password: 'Premium123!EmotionsCare',
+    password: DEFAULT_TEST_PASSWORD,
     type: 'b2c',
     role: 'premium_user',
     description: 'Utilisateur B2C Premium - Accès VR, coach IA, modules avancés'
   },
   {
     email: 'test.collab@emotionscare.dev',
-    password: 'Collab123!EmotionsCare',
+    password: DEFAULT_TEST_PASSWORD,
     type: 'b2b',
     role: 'collaborator',
     description: 'Collaborateur B2B - Accès modules entreprise, dashboard collab'
   },
   {
     email: 'test.rh@emotionscare.dev',
-    password: 'RH123!EmotionsCare',
+    password: DEFAULT_TEST_PASSWORD,
     type: 'b2b',
     role: 'hr_manager',
     description: 'Manager RH - Accès dashboard RH, analytics équipe, rapports'
   },
   {
     email: 'test.admin@emotionscare.dev',
-    password: 'Admin123!EmotionsCare',
+    password: DEFAULT_TEST_PASSWORD,
     type: 'admin',
     role: 'admin',
     description: 'Administrateur - Accès complet à tous les modules et dashboards'

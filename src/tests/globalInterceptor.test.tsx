@@ -60,7 +60,7 @@ describe('GlobalInterceptor', () => {
       const result = await GlobalInterceptor.secureFetch('/test', {});
 
       expect(result).toBeNull();
-      expect(localStorageMock.removeItem).toHaveBeenCalledWith('sb-yaincoxihiqdksxgrsrk-auth-token');
+      expect(localStorageMock.removeItem).toHaveBeenCalledWith('sb-test-project-auth-token');
     });
 
     it('should retry request on token refresh', async () => {
