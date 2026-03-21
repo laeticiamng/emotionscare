@@ -34,7 +34,7 @@ const modules: ModuleHighlight[] = [
     span: 'md:col-span-2 md:row-span-2',
     gradient: 'from-primary/15 to-accent/10',
     authHref: '/app/scan',
-    anonHref: '/signup',
+    anonHref: '/features',
   },
   {
     title: "Respiration guidée",
@@ -44,7 +44,7 @@ const modules: ModuleHighlight[] = [
     span: 'md:col-span-1 md:row-span-1',
     gradient: 'from-accent/15 to-primary/10',
     authHref: '/app/breathing',
-    anonHref: '/signup',
+    anonHref: '/features',
   },
   {
     title: "Coach IA",
@@ -54,7 +54,7 @@ const modules: ModuleHighlight[] = [
     span: 'md:col-span-1 md:row-span-1',
     gradient: 'from-primary/10 to-accent/15',
     authHref: '/app/coach',
-    anonHref: '/signup',
+    anonHref: '/features',
   },
   {
     title: "Musique apaisante",
@@ -64,7 +64,7 @@ const modules: ModuleHighlight[] = [
     span: 'md:col-span-1 md:row-span-1',
     gradient: 'from-accent/10 to-primary/15',
     authHref: '/app/music',
-    anonHref: '/signup',
+    anonHref: '/features',
   },
   {
     title: "Exercice sommeil",
@@ -74,7 +74,7 @@ const modules: ModuleHighlight[] = [
     span: 'md:col-span-1 md:row-span-1',
     gradient: 'from-primary/15 to-accent/5',
     authHref: '/app/breathing',
-    anonHref: '/signup',
+    anonHref: '/features',
   },
   {
     title: "Évaluation Burnout",
@@ -84,7 +84,7 @@ const modules: ModuleHighlight[] = [
     span: 'md:col-span-1 md:row-span-1',
     gradient: 'from-primary/10 to-accent/10',
     authHref: '/app/assess/burnout',
-    anonHref: '/signup',
+    anonHref: '/features',
   },
   {
     title: "Données sécurisées",
@@ -153,7 +153,7 @@ const BentoCard: React.FC<{ module: ModuleHighlight; index: number; isAuthentica
                 </Badge>
               )}
               <span className="flex items-center gap-1 text-xs text-muted-foreground group-hover:text-primary transition-colors">
-                {isAuthenticated ? 'Ouvrir' : 'Essayer'}
+                {isAuthenticated ? 'Ouvrir' : 'Découvrir'}
                 <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
               </span>
             </div>

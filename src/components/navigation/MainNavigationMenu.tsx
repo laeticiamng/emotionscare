@@ -88,7 +88,6 @@ const navigationItems: NavigationItem[] = [
   // ═══════════════════════════════════════════════════════════
   { id: 'entraide', label: 'Entraide', icon: Users, href: '/app/entraide', category: 'Communauté', description: 'Espace bienveillant' },
   { id: 'buddies', label: 'Buddies', icon: Heart, href: '/app/buddies', category: 'Communauté', description: 'Trouver un binôme' },
-  { id: 'exchange', label: 'Exchange Hub', icon: Sparkles, href: '/app/exchange', category: 'Communauté', description: 'Marchés émotions' },
 
   // ═══════════════════════════════════════════════════════════
   // PARAMÈTRES

@@ -172,7 +172,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
   ];
 
   const stats = [
-    { label: "Modules", value: "37", description: "Outils intégrés pour votre bien-être", icon: Users, progress: 85 },
+    { label: "Modules", value: "10+", description: "Outils intégrés pour votre bien-être", icon: Users, progress: 85 },
     { label: "Par session", value: "3 min", description: "Micro-interventions efficaces", icon: Clock, progress: 92 },
     { label: "Données protégées", value: "100%", description: "Chiffrement RGPD conforme", icon: Shield, progress: 100 },
     { label: "Disponibilité", value: "7/7", description: "Accès permanent, jour et nuit", icon: Activity, progress: 99 }
@@ -593,7 +593,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                   <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent"> Nouvelle Génération</span>
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                  Découvrez nos outils révolutionnaires conçus par des experts en psychologie et ingénieurs IA pour maximiser votre potentiel émotionnel.
+                  Découvrez nos outils conçus par des experts en psychologie et ingénieurs IA pour accompagner votre bien-être émotionnel.
                 </p>
               </motion.div>
 

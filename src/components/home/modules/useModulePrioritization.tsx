@@ -46,10 +46,10 @@ export const useModulePrioritization = (isAuthenticated: boolean, selectedMood: 
       priority: 3
     },
     {
-      title: "Séances VR",
-      description: "Immergez-vous dans des expériences relaxantes en réalité virtuelle",
+      title: "Relaxation immersive",
+      description: "Explorez des environnements sonores apaisants pour une détente profonde",
       icon: <Headset className="h-5 w-5" />,
-      to: isAuthenticated ? "/vr" : "/login?redirect=/vr",
+      to: isAuthenticated ? "/app/music" : "/login?redirect=/app/music",
       statIcon: <Activity className="h-4 w-4" />,
       statText: "Sessions",
       statValue: "3",

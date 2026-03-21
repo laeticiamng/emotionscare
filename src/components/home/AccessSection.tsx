@@ -54,7 +54,7 @@ const AccessSection = () => {
             Fonctionnalités principales
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
-            Découvrez comment notre plateforme révolutionnaire peut vous aider à mieux comprendre et gérer vos émotions au quotidien.
+            Découvrez comment notre plateforme peut vous aider à mieux comprendre et gérer vos émotions au quotidien.
           </p>
         </motion.div>
         
