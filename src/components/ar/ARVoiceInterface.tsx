@@ -9,7 +9,7 @@ interface ARVoiceInterfaceProps {
 }
 
 const ARVoiceInterface: React.FC<ARVoiceInterfaceProps> = ({ onCommand }) => {
-  const { isListening, toggleListening, supported, lastCommand } = useVoiceCommands();
+  const { isListening, isConnected, startListening, stopListening } = useVoiceCommands({ onCommand, onTranscript: () => {} });
   const { toast } = useToast();
   
   React.useEffect(() => {
