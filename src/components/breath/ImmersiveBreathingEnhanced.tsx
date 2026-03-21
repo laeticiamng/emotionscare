@@ -17,7 +17,8 @@ import {
   Calendar,
   Heart,
   Activity,
-  Zap
+  Zap,
+  Moon
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';

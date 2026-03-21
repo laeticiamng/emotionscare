@@ -1,6 +1,5 @@
-import { screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { render } from '@/tests/utils';
 import BreathHeatmap from '../BreathHeatmap';
 
 const data = [
