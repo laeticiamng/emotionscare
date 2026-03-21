@@ -319,9 +319,10 @@ const B2BEntreprisePage: React.FC = () => {
   usePageSEO({
     title: 'EmotionsCare Entreprise — Bien-être soignant pour vos équipes',
     description:
-      'Offrez à vos équipes soignantes des exercices de régulation émotionnelle en 3 minutes. Anonyme, RGPD, déploiement en 24h.',
+      'Offrez à vos équipes soignantes des exercices de régulation émotionnelle en 3 minutes. Anonyme, conforme RGPD, déploiement en 24h, rapports anonymisés.',
     keywords:
-      'bien-être entreprise, QVT soignants, burn-out prévention, RGPD, RH santé',
+      'bien-être entreprise, QVT soignants, burn-out prévention, RGPD, RH santé, prévention RPS',
+    canonical: 'https://emotionscare.com/b2b/entreprise',
   });
 
   return (

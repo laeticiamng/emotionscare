@@ -155,7 +155,7 @@ export default function FAQPage() {
   }, []);
 
   usePageSEO({
-    title: 'FAQ - Questions Fréquentes sur EmotionsCare',
+    title: 'FAQ EmotionsCare — Questions sur les fonctionnalités, compte, sécurité et tarifs',
     description: 'Trouvez les réponses à toutes vos questions sur EmotionsCare : compte, fonctionnalités, facturation, sécurité des données et confidentialité.',
     keywords: 'FAQ, questions fréquentes, aide EmotionsCare, support, soignants, bien-être émotionnel',
     canonical: 'https://emotionscare.com/faq',

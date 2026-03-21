@@ -206,10 +206,11 @@ const HelpPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   usePageSEO({
-    title: "Centre d'Aide - EmotionsCare",
+    title: "Centre d'Aide EmotionsCare — Support, FAQ, guide utilisateur",
     description:
-      "Trouvez des réponses à vos questions sur EmotionsCare. Guide utilisateur, FAQ, support technique et contact.",
-    keywords: 'aide,support,FAQ,EmotionsCare,bien-être,santé mentale',
+      "Support, FAQ, guide utilisateur et contact pour EmotionsCare. Trouvez toutes les réponses pour optimiser votre utilisation de la plateforme de régulation émotionnelle.",
+    keywords: 'aide,support,FAQ,EmotionsCare,bien-être,santé mentale,soignants',
+    canonical: 'https://emotionscare.com/help',
   });
 
   const filteredCategories = useMemo(() => {
