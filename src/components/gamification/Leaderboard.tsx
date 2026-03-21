@@ -79,8 +79,8 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({ index, style, data }) =
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: Math.min(index * 0.03, 0.3) }}
         className={`
-          flex items-center gap-3 p-3 rounded-lg border transition-all
-          ${isCurrentUser ? 'bg-primary/10 border-primary/30 shadow-sm' : 'hover:bg-muted/50'}
+          flex items-center gap-3 p-3 rounded-xl border transition-all duration-500
+          ${isCurrentUser ? 'bg-primary/10 border-primary/30 shadow-md shadow-primary/5 backdrop-blur-sm' : 'hover:bg-muted/50 hover:shadow-sm'}
           ${rankStyle}
         `}
         role="row"

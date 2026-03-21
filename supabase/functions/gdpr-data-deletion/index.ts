@@ -43,12 +43,46 @@ serve(async (req) => {
       });
     }
 
-    const { confirmationCode } = await req.json();
-    
+    const { confirmationCode, password } = await req.json();
+
     if (!confirmationCode || confirmationCode !== 'DELETE_ALL_MY_DATA') {
       return new Response(
         JSON.stringify({ error: 'Code de confirmation invalide' }),
         { status: 400, headers: getCorsHeaders(req) }
+      );
+    }
+
+    // ✅ SÉCURITÉ: Re-authentification obligatoire avant suppression
+    // Empêche la suppression via un token volé sans connaître le mot de passe
+    if (!password) {
+      return new Response(
+        JSON.stringify({ error: 'Veuillez saisir votre mot de passe pour confirmer la suppression' }),
+        { status: 400, headers: getCorsHeaders(req) }
+      );
+    }
+
+    const userEmail = authResult.user.email;
+    if (!userEmail) {
+      return new Response(
+        JSON.stringify({ error: 'Impossible de vérifier votre identité' }),
+        { status: 400, headers: getCorsHeaders(req) }
+      );
+    }
+
+    // Vérifier le mot de passe via re-sign-in
+    const reAuthClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+    const { error: reAuthError } = await reAuthClient.auth.signInWithPassword({
+      email: userEmail,
+      password,
+    });
+    if (reAuthError) {
+      await logUnauthorizedAccess(req, 'gdpr-deletion: invalid password re-auth');
+      return new Response(
+        JSON.stringify({ error: 'Mot de passe incorrect. Suppression annulée.' }),
+        { status: 403, headers: getCorsHeaders(req) }
       );
     }
 

@@ -156,10 +156,10 @@ const AchievementBadge: React.FC<AchievementBadgeProps> = ({
         >
           <Card 
             className={`
-              ${getRarityColor(achievement.rarity)} 
-              border-2 
+              ${getRarityColor(achievement.rarity)}
+              border-2 backdrop-blur-sm
               ${achievement.unlocked ? getRarityGlow(achievement.rarity) : 'opacity-60 grayscale'}
-              transition-all duration-300 relative overflow-hidden
+              transition-all duration-500 relative overflow-hidden hover:-translate-y-1 hover:shadow-xl
               ${isShowcased ? 'ring-2 ring-primary ring-offset-2' : ''}
             `}
           >

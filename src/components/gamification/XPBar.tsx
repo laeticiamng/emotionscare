@@ -169,7 +169,7 @@ const XPBar: React.FC<{ className?: string }> = ({ className }) => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-full right-0 mt-2 w-72 bg-popover border border-border rounded-2xl shadow-xl p-5 z-50"
+            className="absolute top-full right-0 mt-2 w-72 bg-popover/95 backdrop-blur-xl border border-border/50 rounded-2xl shadow-2xl shadow-primary/5 p-5 z-50"
             role="dialog"
             aria-label="Détails de progression"
           >

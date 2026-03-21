@@ -147,7 +147,6 @@
     "eslint-plugin-react": "^7.34.1",
     "fastify": "^4.29.1",
     "file-saver": "^2.0.5",
-    "firebase": "^11.7.3",
     "framer-motion": "^11.1.2",
     "glob": "^11.0.2",
     "globby": "^14.0.2",

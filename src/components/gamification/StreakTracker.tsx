@@ -405,8 +405,8 @@ export default function StreakTracker() {
 
   return (
     <TooltipProvider>
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-red-500/10">
+      <Card className="overflow-hidden transition-all duration-500 hover:shadow-lg hover:shadow-amber-500/5">
+        <CardHeader className="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-red-500/10 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">

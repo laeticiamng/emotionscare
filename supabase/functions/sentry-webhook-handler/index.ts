@@ -57,6 +57,18 @@ const THRESHOLDS: AlertThresholds = {
 
 const handler = withMonitoring('sentry-webhook-handler', async (req, context) => {
   try {
+    // ✅ SÉCURITÉ: Vérifier le secret webhook Sentry
+    const webhookSecret = Deno.env.get('SENTRY_WEBHOOK_SECRET');
+    if (webhookSecret) {
+      const sentrySignature = req.headers.get('sentry-hook-signature');
+      if (!sentrySignature || sentrySignature !== webhookSecret) {
+        logger.warn('Invalid Sentry webhook signature — rejecting', context);
+        return { success: false, error: 'Invalid webhook signature' };
+      }
+    } else {
+      logger.warn('SENTRY_WEBHOOK_SECRET not set — webhook signature verification disabled', context);
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''

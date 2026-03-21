@@ -47,6 +47,27 @@ const AppleHomePage: React.FC = () => {
       <main id="main-content" role="main" className="pt-16">
         <AppleHeroSection />
 
+        {/* SEO/GEO: Semantic summary for AI crawlers and assistive tech */}
+        <section className="sr-only" aria-label="Résumé EmotionsCare">
+          <h2>EmotionsCare en bref</h2>
+          <p>
+            EmotionsCare est une plateforme française de régulation émotionnelle conçue pour les soignants
+            et étudiants en santé. Elle propose des exercices de respiration guidée, un coaching IA 24/7,
+            de la musicothérapie adaptative et un journal émotionnel — le tout en 2 à 5 minutes,
+            utilisable entre deux consultations. Créée par une médecin, conforme RGPD, gratuite pour commencer.
+          </p>
+          <dl>
+            <dt>Pour qui ?</dt>
+            <dd>Étudiants en médecine, infirmiers, aides-soignants, cadres de santé</dd>
+            <dt>Durée d'une session</dt>
+            <dd>2 à 5 minutes</dd>
+            <dt>Tarif</dt>
+            <dd>Gratuit pour commencer, Pro à 14,90 €/mois</dd>
+            <dt>Sécurité</dt>
+            <dd>Conforme RGPD, données hébergées en Union Européenne, analyse faciale locale</dd>
+          </dl>
+        </section>
+
         <HowItWorksSection />
         <Suspense fallback={<SectionSkeleton />}>
           <AppleFeatureSection />

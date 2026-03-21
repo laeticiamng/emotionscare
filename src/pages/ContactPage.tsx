@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Send, MessageCircle, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, MessageCircle, CheckCircle, AlertTriangle, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -172,7 +172,13 @@ const ContactPage: React.FC = () => {
                           
                           <fieldset className="grid sm:grid-cols-2 gap-4">
                             <legend className="sr-only">Informations personnelles</legend>
-                            <FormField
+                            {/* FAQ suggestion before form */}
+                          <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 text-sm text-muted-foreground mb-4">
+                            <HelpCircle className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                            <span>Vous avez une question ? Consultez d'abord notre <a href="/faq" className="text-primary hover:underline font-medium">FAQ</a> — votre réponse s'y trouve peut-être.</span>
+                          </div>
+
+                          <FormField
                               control={form.control}
                               name="name"
                               render={({ field }) => (
