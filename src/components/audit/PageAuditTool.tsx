@@ -87,7 +87,7 @@ const PageAuditTool: React.FC = () => {
     const loadTime = endTime - startTime;
     
     // Validation d'accès
-    const validation = validateRouteAccess(route, isAuthenticated, user?.role || userMode);
+    const validation = validateRouteAccess(route, isAuthenticated, user?.role ?? userMode ?? undefined);
     
     // Évaluation de la qualité de la page
     const qualityScore = calculateQualityScore(route, validation.hasAccess, loadTime);
