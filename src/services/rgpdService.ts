@@ -21,6 +21,7 @@ export interface ExportResult {
 
 export interface DeletionOptions {
   confirmationCode: string;
+  password?: string;
   softDelete?: boolean;
 }
 
@@ -184,7 +185,7 @@ class RGPDService {
       }
 
       // Vérifier le code de confirmation
-      if (options.confirmationCode !== 'DELETE_MY_ACCOUNT') {
+      if (options.confirmationCode !== 'DELETE_ALL_MY_DATA') {
         return { success: false, error: 'Invalid confirmation code' };
       }
 

@@ -50,6 +50,15 @@ export default function NotFound() {
             </Link>
           </Button>
         </div>
+
+        <div className="mt-6 rounded-xl border border-primary/20 bg-primary/5 px-6 py-4 text-center">
+          <p className="text-sm text-muted-foreground">
+            Besoin de gérer votre stress en 2 minutes ?
+          </p>
+          <Button asChild variant="link" size="sm" className="mt-1 text-primary">
+            <Link to="/signup">Créer un compte gratuit &rarr;</Link>
+          </Button>
+        </div>
       </div>
     </main>
   );

@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, AlertTriangle, Calendar, Undo } from 'lucide-react';
+import { Trash2, AlertTriangle, Calendar, Undo, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { rgpdService } from '@/services/rgpdService';
 import { analyticsService } from '@/services/analyticsService';
@@ -19,6 +19,7 @@ export const AccountDeletionDialog: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<'confirm' | 'scheduled' | 'error'>('confirm');
   const [confirmationCode, setConfirmationCode] = useState('');
+  const [password, setPassword] = useState('');
   const [scheduledDate, setScheduledDate] = useState<string>('');
   const [error, setError] = useState<string>('');
   const { toast } = useToast();
@@ -29,11 +30,17 @@ export const AccountDeletionDialog: React.FC = () => {
       return;
     }
 
+    if (!password) {
+      setError('Veuillez saisir votre mot de passe');
+      return;
+    }
+
     analyticsService.trackAccountDeletion('requested');
 
     try {
       const result = await rgpdService.requestAccountDeletion({
         confirmationCode,
+        password,
         softDelete: true
       });
 
@@ -122,13 +129,27 @@ export const AccountDeletionDialog: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium">
-                Tapez "DELETE_ALL_MY_DATA" pour confirmer:
+                Tapez "DELETE_ALL_MY_DATA" pour confirmer :
               </label>
               <Input
                 value={confirmationCode}
                 onChange={(e) => setConfirmationCode(e.target.value)}
                 placeholder="DELETE_ALL_MY_DATA"
                 className="font-mono"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5" aria-hidden="true" />
+                Confirmez votre mot de passe :
+              </label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Votre mot de passe actuel"
+                autoComplete="current-password"
               />
             </div>
 
@@ -149,7 +170,7 @@ export const AccountDeletionDialog: React.FC = () => {
               <Button
                 variant="destructive"
                 onClick={handleDeletion}
-                disabled={confirmationCode !== 'DELETE_ALL_MY_DATA'}
+                disabled={confirmationCode !== 'DELETE_ALL_MY_DATA' || !password}
                 className="flex-1"
               >
                 Programmer la suppression

@@ -203,7 +203,7 @@ const GamificationDashboard: React.FC = () => {
   return (
     <div className="space-y-6 p-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-gradient-to-br from-purple-500 to-pink-500 text-white">
+        <Card className="bg-gradient-to-br from-purple-500 to-pink-500 text-white backdrop-blur-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/20">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -219,7 +219,7 @@ const GamificationDashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="transition-all duration-500 hover:-translate-y-1 hover:shadow-lg hover:shadow-yellow-500/10">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -231,7 +231,7 @@ const GamificationDashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="transition-all duration-500 hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-500/10">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -243,7 +243,7 @@ const GamificationDashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="transition-all duration-500 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/10">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
