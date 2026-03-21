@@ -7,6 +7,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
+import { SUPABASE_URL } from '@/lib/env';
 import type { DiscoveryItem, DiscoveryCategory, DifficultyLevel } from './types';
 
 // ============================================================================
@@ -76,7 +77,7 @@ export interface SearchResponse {
 // ============================================================================
 
 export class DiscoveryService {
-  private static readonly FUNCTION_URL = 'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1/discovery-api';
+  private static readonly FUNCTION_URL = `${SUPABASE_URL}/functions/v1/discovery-api`;
 
   /**
    * Appel générique à l'Edge Function discovery-api

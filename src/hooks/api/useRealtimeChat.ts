@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { logger } from '@/lib/logger';
+import { SUPABASE_URL } from '@/lib/env';
 
 export interface RealtimeChatMessage {
   id: string;
@@ -225,7 +226,7 @@ export const useRealtimeChat = () => {
       await initializeAudio();
 
       logger.info('Connecting to realtime chat', undefined, 'RealtimeChat');
-      const wsUrl = 'wss://yaincoxihiqdksxgrsrk.functions.supabase.co/functions/v1/openai-realtime';
+      const wsUrl = `${SUPABASE_URL.replace('https://', 'wss://').replace('.supabase.co', '.functions.supabase.co')}/functions/v1/openai-realtime`;
       wsRef.current = new WebSocket(wsUrl);
 
       wsRef.current.onopen = () => {

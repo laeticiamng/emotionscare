@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import BreadcrumbNav from './BreadcrumbNav';
 import { logger } from '@/lib/logger';
+import { SUPABASE_URL } from '@/lib/env';
 
 const OptimizedLayout: React.FC = () => {
   React.useEffect(() => {
@@ -38,7 +39,7 @@ const OptimizedLayout: React.FC = () => {
       <Helmet>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="//yaincoxihiqdksxgrsrk.supabase.co" />
+        <link rel="dns-prefetch" href={SUPABASE_URL.replace('https:', '')} />
       </Helmet>
       
       <div className="min-h-screen bg-background">

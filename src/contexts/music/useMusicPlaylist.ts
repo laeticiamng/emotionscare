@@ -6,6 +6,7 @@ import { useCallback, Dispatch } from 'react';
 import { MusicState, MusicAction, MusicTrack } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
+import { SUPABASE_URL } from '@/lib/env';
 
 export const useMusicPlaylist = (
   state: MusicState,
@@ -47,9 +48,8 @@ export const useMusicPlaylist = (
         return [];
       }
 
-      // Construct URL with query params - use direct URL instead of VITE env var
-      const supabaseUrl = 'https://yaincoxihiqdksxgrsrk.supabase.co';
-      const url = new URL(`${supabaseUrl}/functions/v1/adaptive-music/recommendations`);
+      // Construct URL with query params
+      const url = new URL(`${SUPABASE_URL}/functions/v1/adaptive-music/recommendations`);
       url.searchParams.set('emotion', emotion);
       url.searchParams.set('intensity', intensity.toString());
 
