@@ -452,8 +452,8 @@ const HomeB2CPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <Card3D className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 !border-blue-500/20 p-6 text-center" animate={false}>
                     <Music className="w-8 h-8 mx-auto mb-3 text-blue-500" />
-                    <div className="text-2xl font-bold mb-1">37</div>
-                    <div className="text-sm text-muted-foreground">Modules disponibles</div>
+                    <div className="text-2xl font-bold mb-1">10+</div>
+                    <div className="text-sm text-muted-foreground">Modules intégrés</div>
                 </Card3D>
                 <Card3D className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 !border-purple-500/20 p-6 text-center" animate={false}>
                     <MessageCircle className="w-8 h-8 mx-auto mb-3 text-purple-500" />
@@ -467,8 +467,8 @@ const HomeB2CPage: React.FC = () => {
                 </Card3D>
                 <Card3D className="bg-gradient-to-br from-orange-500/10 to-red-500/10 !border-orange-500/20 p-6 text-center" animate={false}>
                     <TrendingUp className="w-8 h-8 mx-auto mb-3 text-orange-500" />
-                    <div className="text-2xl font-bold mb-1">7 jours</div>
-                    <div className="text-sm text-muted-foreground">Premiers résultats</div>
+                    <div className="text-2xl font-bold mb-1">3 min</div>
+                    <div className="text-sm text-muted-foreground">Par exercice</div>
                 </Card3D>
               </div>
             </motion.div>
@@ -566,7 +566,7 @@ const HomeB2CPage: React.FC = () => {
             <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm opacity-80">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4" />
-                Gratuit pendant 14 jours
+                100% gratuit pour commencer
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4" />

@@ -214,7 +214,7 @@ const AboutPage: React.FC = () => {
                       icon: Brain,
                       title: 'Fondée sur les neurosciences',
                       description:
-                        'Chaque exercice est fondé sur les neurosciences et la psychologie positive. Pas de promesses vagues, des résultats mesurables.',
+                        'Chaque exercice est fondé sur les neurosciences et la psychologie positive. Des techniques éprouvées, adaptées au quotidien des soignants.',
                     },
                     {
                       icon: Shield,
@@ -408,7 +408,7 @@ const AboutPage: React.FC = () => {
                     </span>
                   </h2>
                   <p className="text-xl text-muted-foreground mb-10 font-light">
-                    Rejoignez les soignants qui ont déjà adopté EmotionsCare
+                    Rejoignez les premiers soignants qui utilisent EmotionsCare
                     pour retrouver un équilibre émotionnel au quotidien.
                   </p>
                   <div className="flex flex-wrap justify-center gap-4">
