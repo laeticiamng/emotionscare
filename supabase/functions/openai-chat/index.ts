@@ -22,6 +22,8 @@ function getCorsHeaders(req) {
     return new Response('ok', { headers: getCorsHeaders(req) })
   }
 
+  const corsHeaders = getCorsHeaders(req);
+
   try {
     // 🔒 SÉCURITÉ: Authentification obligatoire
     const authResult = await authenticateRequest(req);

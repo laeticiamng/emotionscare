@@ -23,11 +23,11 @@ const ALLOWED_ORIGINS = [
 ];
 
 /**
- * @deprecated Utiliser getCorsHeadersForRequest(req) a la place pour restreindre l'origin.
- * Conserve pour compatibilite avec les fonctions existantes.
+ * CORS headers securises - restreints a l'origin par defaut (emotionscare.com)
+ * Preferer getCorsHeadersForRequest(req) pour obtenir l'origin exacte.
  */
 export const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://emotionscare.com',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 

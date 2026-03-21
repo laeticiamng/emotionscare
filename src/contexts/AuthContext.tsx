@@ -1,16 +1,12 @@
 /**
  * AuthContext - Gestion de l'authentification centralisée
  * Intégration Supabase avec gestion d'état et persistence
- * 
- * ⚠️ MODE TEST: Si TEST_MODE.BYPASS_AUTH est activé dans config.ts,
- * l'authentification est bypassée et un utilisateur mock est utilisé.
  */
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
-import { TEST_MODE } from '@/lib/config';
 import { getFriendlyAuthError } from '@/lib/auth/authErrorService';
 
 interface AuthContextType {
@@ -18,7 +14,6 @@ interface AuthContextType {
   session: Session | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  isTestMode: boolean; // Nouveau flag pour indiquer le mode test
   signUp: (email: string, password: string, metadata?: any) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -35,50 +30,10 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-// Créer un faux utilisateur pour le mode test (uniquement si mock disponible)
-const createMockUser = (): User | null => {
-  if (!TEST_MODE.BYPASS_AUTH || !TEST_MODE.MOCK_USER) return null;
-  const mockData = TEST_MODE.MOCK_USER as { id: string; email: string; user_metadata?: Record<string, unknown> } | null;
-  if (!mockData) return null;
-  return {
-    id: mockData.id,
-    email: mockData.email,
-    app_metadata: {},
-    user_metadata: mockData.user_metadata ?? {},
-    aud: 'authenticated',
-    created_at: new Date().toISOString(),
-  } as User;
-};
-
-// Créer une fausse session pour le mode test
-const createMockSession = (user: User): Session => ({
-  access_token: 'test-access-token',
-  refresh_token: 'test-refresh-token',
-  expires_in: 3600,
-  expires_at: Math.floor(Date.now() / 1000) + 3600,
-  token_type: 'bearer',
-  user,
-} as Session);
-
 export function AuthProvider({ children }: AuthProviderProps) {
-  const isTestMode = TEST_MODE.BYPASS_AUTH && TEST_MODE.MOCK_USER !== null;
-  
-  // En mode test, initialiser directement avec l'utilisateur mock
-  const mockUser = isTestMode ? createMockUser() : null;
-  const mockSession = isTestMode && mockUser ? createMockSession(mockUser) : null;
-  
-  const [user, setUser] = useState<User | null>(mockUser);
-  const [session, setSession] = useState<Session | null>(mockSession);
-  const [isLoading, setIsLoading] = useState(!isTestMode); // Pas de loading en mode test
-  
-  // Log si mode test activé
-  useEffect(() => {
-    if (isTestMode && TEST_MODE.MOCK_USER) {
-      const mockData = TEST_MODE.MOCK_USER as { email?: string } | null;
-      logger.warn('⚠️ MODE TEST ACTIVÉ - Authentification bypassée!', undefined, 'AUTH');
-      console.warn('🧪 MODE TEST: Authentification désactivée. Utilisateur mock:', mockData?.email);
-    }
-  }, [isTestMode]);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
@@ -286,7 +241,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     session,
     isLoading,
     isAuthenticated: !!user,
-    isTestMode,
     signUp,
     signIn,
     signOut,
