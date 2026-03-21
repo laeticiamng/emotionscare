@@ -130,7 +130,7 @@ const PageAuditTool: React.FC = () => {
 
   const hasKnownIssues = (route: string): boolean => {
     // Vérification des problèmes connus
-    const problematicRoutes = [];
+    const problematicRoutes: string[] = [];
     return problematicRoutes.includes(route);
   };
 

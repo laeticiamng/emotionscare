@@ -506,7 +506,7 @@ export const AdvancedBreathwork: React.FC = () => {
                               </div>
                               <div>
                                 <CardTitle className="text-lg">{pattern.name}</CardTitle>
-                                <Badge variant="outline" size="sm">
+                                <Badge variant="outline">
                                   {pattern.difficulty}
                                 </Badge>
                               </div>

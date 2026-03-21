@@ -129,7 +129,7 @@ const AccessibilityAudit: React.FC = () => {
               {report.issues.length > 0 && (
                 <div className="space-y-4">
                   <h4 className="font-semibold">Problèmes détectés</h4>
-                  {report.issues.map((issue, index) => (
+                  {(report.issues as AuditIssue[]).map((issue, index) => (
                     <Alert key={index} className={
                       issue.impact === 'critical' ? 'border-red-200 bg-red-50' :
                       issue.impact === 'serious' ? 'border-orange-200 bg-orange-50' :

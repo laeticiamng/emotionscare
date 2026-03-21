@@ -179,7 +179,7 @@ const SystemAudit: React.FC = () => {
   }, [isAuthenticated, userMode]);
 
   const totalRoutes = allRoutes.length; // Should be 26 now
-  const completedAudits = auditResults.filter(r => r.status === 'success').length;
+  const completedAudits = auditResults.filter(r => r.score >= 70).length;
   const globalScore = totalRoutes > 0 ? Math.round((completedAudits / totalRoutes) * 100) : 0;
 
   return (

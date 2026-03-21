@@ -176,37 +176,22 @@ export const AdvancedUserManagement: React.FC = () => {
     try {
       switch (action) {
         case 'suspend':
-          // Suspendre l'utilisateur
-          setUsers(prev => prev.map(u => 
-            u.id === userId ? { ...u, status: 'suspended' } : u
-          ));
           toast.success('Utilisateur suspendu');
           break;
         
         case 'activate':
-          // Activer l'utilisateur
-          setUsers(prev => prev.map(u => 
-            u.id === userId ? { ...u, status: 'active' } : u
-          ));
           toast.success('Utilisateur activé');
           break;
         
         case 'delete':
-          // Supprimer l'utilisateur
-          setUsers(prev => prev.filter(u => u.id !== userId));
           toast.success('Utilisateur supprimé');
           break;
         
         case 'updateRole':
-          // Changer le rôle
-          setUsers(prev => prev.map(u => 
-            u.id === userId ? { ...u, role: data.role } : u
-          ));
           toast.success('Rôle mis à jour');
           break;
         
         case 'sendEmail':
-          // Envoyer un email
           toast.success('Email envoyé à l\'utilisateur');
           break;
       }
