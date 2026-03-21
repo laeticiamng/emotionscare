@@ -84,7 +84,7 @@ const AccessibilityAudit: React.FC = () => {
                     <XCircle className="h-5 w-5 text-error" />
                     <div>
                       <div className="font-semibold text-error">
-                        {report.issues.filter((i: AuditIssue) => i.impact === 'critical').length}
+                        {(report.issues as AuditIssue[]).filter(i => i.impact === 'critical').length}
                       </div>
                       <div className="text-xs text-muted-foreground">Critiques</div>
                     </div>
