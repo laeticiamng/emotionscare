@@ -128,6 +128,23 @@ export const ImmersivePostProcessing = (props: ImmersivePostProcessingProps) => 
   const chromaticAberration = props.chromaticAberration ?? adapted.chromaticAberration;
   const chromaticOffset = props.chromaticOffset ?? adapted.chromaticOffset;
 
+  if (chromaticAberration && chromaticOffset > 0) {
+    return (
+      <PostProcessingErrorBoundary>
+        <EffectComposer multisampling={0}>
+          <Bloom
+            intensity={bloomIntensity}
+            luminanceThreshold={bloomThreshold}
+            luminanceSmoothing={0.85}
+            radius={bloomRadius}
+          />
+          <Vignette offset={vignetteOffset} darkness={vignetteDarkness} />
+          <ChromaticOffsetVector offset={chromaticOffset} />
+        </EffectComposer>
+      </PostProcessingErrorBoundary>
+    );
+  }
+
   return (
     <PostProcessingErrorBoundary>
       <EffectComposer multisampling={0}>
@@ -138,9 +155,6 @@ export const ImmersivePostProcessing = (props: ImmersivePostProcessingProps) => 
           radius={bloomRadius}
         />
         <Vignette offset={vignetteOffset} darkness={vignetteDarkness} />
-        {chromaticAberration && chromaticOffset > 0 && (
-          <ChromaticOffsetVector offset={chromaticOffset} />
-        )}
       </EffectComposer>
     </PostProcessingErrorBoundary>
   );
