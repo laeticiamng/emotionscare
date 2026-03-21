@@ -31,52 +31,48 @@ const ReportsPageEnhanced = () => {
   const [reportData, setReportData] = useState<typeof mockReportData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Données simulées (hoisted for type inference)
+  // Données de démonstration — seront remplacées par des données Supabase
+  const DEMO_LABEL = ' (démo)';
   const mockReportData = {
     wellbeing: {
-      averageScore: 78,
+      averageScore: 0,
       trend: 'up',
-      change: '+5%',
-      totalSessions: 1247,
-      activeUsers: 89,
+      change: '--',
+      totalSessions: 0,
+      activeUsers: 0,
       departments: [
-        { name: 'Tech', score: 82, users: 25, change: '+3%' },
-        { name: 'Marketing', score: 76, users: 18, change: '+7%' },
-        { name: 'Sales', score: 74, users: 22, change: '+2%' },
-        { name: 'HR', score: 85, users: 12, change: '+8%' },
-        { name: 'Finance', score: 71, users: 15, change: '-1%' }
+        { name: 'Tech', score: 0, users: 0, change: '--' },
+        { name: 'Marketing', score: 0, users: 0, change: '--' },
+        { name: 'Sales', score: 0, users: 0, change: '--' },
+        { name: 'HR', score: 0, users: 0, change: '--' },
+        { name: 'Finance', score: 0, users: 0, change: '--' }
       ]
     },
     productivity: {
-      overallScore: 85,
-      focusTime: 6.8,
-      breaksTaken: 4.2,
-      stressLevel: 32,
+      overallScore: 0,
+      focusTime: 0,
+      breaksTaken: 0,
+      stressLevel: 0,
       metrics: [
-        { name: 'Temps de focus moyen', value: '6h 48min', trend: 'up', change: '+12min' },
-        { name: 'Pauses actives', value: '4.2/jour', trend: 'up', change: '+0.8' },
-        { name: 'Niveau de stress', value: '32%', trend: 'down', change: '-5%' },
-        { name: 'Satisfaction', value: '85%', trend: 'up', change: '+3%' }
+        { name: 'Temps de focus moyen', value: '--', trend: 'up', change: '--' },
+        { name: 'Pauses actives', value: '--', trend: 'up', change: '--' },
+        { name: 'Niveau de stress', value: '--', trend: 'down', change: '--' },
+        { name: 'Satisfaction', value: '--', trend: 'up', change: '--' }
       ]
     },
     engagement: {
-      participationRate: 73,
-      completionRate: 68,
-      averageSessionDuration: 12.5,
+      participationRate: 0,
+      completionRate: 0,
+      averageSessionDuration: 0,
       activities: [
-        { name: 'Méditation', participation: 85, satisfaction: 9.2 },
-        { name: 'Exercices respiratoires', participation: 72, satisfaction: 8.8 },
-        { name: 'Journal émotionnel', participation: 67, satisfaction: 8.5 },
-        { name: 'Défis équipe', participation: 56, satisfaction: 9.0 },
-        { name: 'Sessions VR', participation: 43, satisfaction: 9.5 }
+        { name: 'Méditation', participation: 0, satisfaction: 0 },
+        { name: 'Exercices respiratoires', participation: 0, satisfaction: 0 },
+        { name: 'Journal émotionnel', participation: 0, satisfaction: 0 },
+        { name: 'Défis équipe', participation: 0, satisfaction: 0 },
+        { name: 'Sessions VR', participation: 0, satisfaction: 0 }
       ]
     },
-    alerts: [
-      { type: 'warning', message: 'Baisse de participation dans le département Finance', priority: 'medium' },
-      { type: 'success', message: 'Objectif mensuel atteint pour la méditation', priority: 'low' },
-      { type: 'info', message: 'Nouveau record de sessions VR cette semaine', priority: 'low' },
-      { type: 'warning', message: 'Stress élevé détecté dans l\'équipe Sales', priority: 'high' }
-    ]
+    alerts: [] as { type: string; message: string; priority: string }[]
   };
 
   const generateReport = async (type: string, period: string) => {
@@ -138,7 +134,7 @@ const ReportsPageEnhanced = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4">
-      <DemoBanner message="Cette page affiche des données de démonstration. Les rapports et statistiques d'équipe sont simulés." />
+      <DemoBanner message="Module en cours d'intégration — les données affichées sont des aperçus de la mise en page, pas des données réelles." />
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
