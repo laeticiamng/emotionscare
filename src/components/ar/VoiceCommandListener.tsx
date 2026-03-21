@@ -1,8 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Mic, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { useVoiceCommands } from '@/hooks/useVoiceCommands';
 
 interface VoiceCommandListenerProps {
   isActive: boolean;
@@ -10,26 +8,21 @@ interface VoiceCommandListenerProps {
 }
 
 const VoiceCommandListener: React.FC<VoiceCommandListenerProps> = ({ isActive, onCommand }) => {
-  const { isListening, toggleListening, supported, lastCommand } = useVoiceCommands();
-  
-  const { toast } = useToast();
-  
-  // Pass commands to parent when recognized
-  React.useEffect(() => {
-    if (lastCommand && isActive) {
-      onCommand(lastCommand);
-    }
-  }, [lastCommand, onCommand, isActive]);
-  
+  const [isListening, setIsListening] = useState(false);
+  const supported = typeof window !== 'undefined' && 'webkitSpeechRecognition' in window;
+
+  const toggleListening = () => {
+    setIsListening(prev => !prev);
+  };
+
   if (!supported || !isActive) return null;
-  
+
   return (
-    <Button 
-      variant="outline" 
-      size="icon"
+    <Button
+      variant={isListening ? 'destructive' : 'outline'}
+      size="sm"
       onClick={toggleListening}
-      className={`rounded-full ${isListening ? 'bg-primary/20' : ''}`}
-      aria-label={isListening ? "Arrêter les commandes vocales" : "Activer les commandes vocales"}
+      aria-label={isListening ? 'Arrêter' : 'Écouter'}
     >
       {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
     </Button>

@@ -2,22 +2,23 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
-import { useVoiceCommands } from '@/hooks/useVoiceCommands';
 
 interface ARVoiceInterfaceProps {
   onCommand: (command: string) => void;
 }
 
 const ARVoiceInterface: React.FC<ARVoiceInterfaceProps> = ({ onCommand }) => {
-  const { isListening, toggleListening, supported, lastCommand } = useVoiceCommands();
+  const [isListening, setIsListening] = useState(false);
   const { toast } = useToast();
-  
-  React.useEffect(() => {
-    if (lastCommand) {
-      onCommand(lastCommand);
+  const supported = typeof window !== 'undefined' && 'webkitSpeechRecognition' in window;
+
+  const toggleListening = () => {
+    setIsListening(prev => !prev);
+    if (!isListening) {
+      toast({ title: 'Écoute activée', description: 'Dites une commande vocale.' });
     }
-  }, [lastCommand, onCommand]);
-  
+  };
+
   if (!supported) {
     return (
       <div className="ar-voice-interface-error">
@@ -25,24 +26,17 @@ const ARVoiceInterface: React.FC<ARVoiceInterfaceProps> = ({ onCommand }) => {
       </div>
     );
   }
-  
+
   return (
     <div className="ar-voice-interface">
       <Button
         onClick={toggleListening}
-        variant={isListening ? "default" : "outline"}
-        size="lg"
-        className="rounded-full h-14 w-14 flex items-center justify-center"
+        variant={isListening ? 'destructive' : 'default'}
+        size="icon"
+        aria-label={isListening ? 'Arrêter l\'écoute' : 'Démarrer l\'écoute'}
       >
-        {isListening ? (
-          <MicOff className="h-6 w-6" />
-        ) : (
-          <Mic className="h-6 w-6" />
-        )}
+        {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
       </Button>
-      <p className="text-sm mt-2">
-        {isListening ? "Parlez maintenant..." : "Cliquez pour activer les commandes vocales"}
-      </p>
     </div>
   );
 };

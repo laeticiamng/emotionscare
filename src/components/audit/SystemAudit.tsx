@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle, XCircle, AlertTriangle, RefreshCw } from 'lucide-react';
-import { routes } from '@/routerV2';
+import { routes, Routes } from '@/routerV2';
 import { validateRouteAccess } from '@/utils/routeValidation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
@@ -76,7 +76,7 @@ const SystemAudit: React.FC = () => {
 
     try {
       // Validation d'accès
-      const validation = validateRouteAccess(route, isAuthenticated, user?.role || userMode);
+      const validation = validateRouteAccess(route, isAuthenticated, user?.role ?? userMode ?? undefined);
       if (!validation.hasAccess) {
         accessible = false;
         errors.push('Accès refusé');
@@ -179,7 +179,7 @@ const SystemAudit: React.FC = () => {
   }, [isAuthenticated, userMode]);
 
   const totalRoutes = allRoutes.length; // Should be 26 now
-  const completedAudits = auditResults.filter(r => r.status === 'success').length;
+  const completedAudits = auditResults.filter(r => r.score >= 70).length;
   const globalScore = totalRoutes > 0 ? Math.round((completedAudits / totalRoutes) * 100) : 0;
 
   return (

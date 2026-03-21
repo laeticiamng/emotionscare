@@ -7,6 +7,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAccessibilityValidation } from '@/hooks/useAccessibilityValidation';
 import { CheckCircle, XCircle, AlertTriangle, RefreshCw, Shield, Eye, Keyboard, Volume2 } from 'lucide-react';
 
+interface AuditIssue {
+  impact: string;
+  message: string;
+  rule: string;
+  element?: string;
+}
 const AccessibilityAudit: React.FC = () => {
   const { report, isValidating, validateAccessibility } = useAccessibilityValidation();
 
@@ -78,7 +84,7 @@ const AccessibilityAudit: React.FC = () => {
                     <XCircle className="h-5 w-5 text-error" />
                     <div>
                       <div className="font-semibold text-error">
-                        {report.issues.filter(i => i.impact === 'critical').length}
+                        {(report.issues as AuditIssue[]).filter(i => i.impact === 'critical').length}
                       </div>
                       <div className="text-xs text-muted-foreground">Critiques</div>
                     </div>
@@ -89,7 +95,7 @@ const AccessibilityAudit: React.FC = () => {
                     <AlertTriangle className="h-5 w-5 text-destructive" />
                     <div>
                       <div className="font-semibold text-destructive">
-                        {report.issues.filter(i => i.impact === 'serious').length}
+                        {(report.issues as AuditIssue[]).filter(i => i.impact === 'serious').length}
                       </div>
                       <div className="text-xs text-muted-foreground">Graves</div>
                     </div>
@@ -100,7 +106,7 @@ const AccessibilityAudit: React.FC = () => {
                     <AlertTriangle className="h-5 w-5 text-warning" />
                     <div>
                       <div className="font-semibold text-yellow-500">
-                        {report.issues.filter(i => i.impact === 'moderate').length}
+                        {(report.issues as AuditIssue[]).filter(i => i.impact === 'moderate').length}
                       </div>
                       <div className="text-xs text-muted-foreground">Modérés</div>
                     </div>
@@ -123,7 +129,7 @@ const AccessibilityAudit: React.FC = () => {
               {report.issues.length > 0 && (
                 <div className="space-y-4">
                   <h4 className="font-semibold">Problèmes détectés</h4>
-                  {report.issues.map((issue, index) => (
+                  {(report.issues as AuditIssue[]).map((issue, index) => (
                     <Alert key={index} className={
                       issue.impact === 'critical' ? 'border-red-200 bg-red-50' :
                       issue.impact === 'serious' ? 'border-orange-200 bg-orange-50' :

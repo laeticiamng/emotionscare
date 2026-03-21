@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { routes } from '@/routerV2';
+import { routes, Routes } from '@/routerV2';
 import { validateRouteAccess } from '@/utils/routeValidation';
 import { 
   CheckCircle, 
@@ -87,7 +87,7 @@ const PageAuditTool: React.FC = () => {
     const loadTime = endTime - startTime;
     
     // Validation d'accès
-    const validation = validateRouteAccess(route, isAuthenticated, user?.role || userMode);
+    const validation = validateRouteAccess(route, isAuthenticated, user?.role ?? userMode ?? undefined);
     
     // Évaluation de la qualité de la page
     const qualityScore = calculateQualityScore(route, validation.hasAccess, loadTime);
@@ -124,13 +124,13 @@ const PageAuditTool: React.FC = () => {
 
   const isBlankPage = (route: string): boolean => {
     // Liste des pages potentiellement vides ou incomplètes
-    const suspiciousRoutes = [];
+    const suspiciousRoutes: string[] = [];
     return suspiciousRoutes.includes(route);
   };
 
   const hasKnownIssues = (route: string): boolean => {
     // Vérification des problèmes connus
-    const problematicRoutes = [];
+    const problematicRoutes: string[] = [];
     return problematicRoutes.includes(route);
   };
 
