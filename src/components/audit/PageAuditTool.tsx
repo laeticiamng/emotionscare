@@ -124,7 +124,7 @@ const PageAuditTool: React.FC = () => {
 
   const isBlankPage = (route: string): boolean => {
     // Liste des pages potentiellement vides ou incomplètes
-    const suspiciousRoutes = [];
+    const suspiciousRoutes: string[] = [];
     return suspiciousRoutes.includes(route);
   };
 
