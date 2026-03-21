@@ -1,11 +1,12 @@
 import { toast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
+import { SUPABASE_URL } from '@/lib/env';
 
 /**
  * Service vocal sécurisé avec gestion robuste des erreurs
  */
 export class SecureVoiceService {
-  private static baseUrl = 'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1';
+  private static baseUrl = `${SUPABASE_URL}/functions/v1`;
   private static disabledButtons = new Set<string>();
   
   /**

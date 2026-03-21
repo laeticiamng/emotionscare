@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { VoiceEmotionResult } from '@/types/realtime-emotion';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
+import { SUPABASE_URL } from '@/lib/env';
 
 export const useVoiceEmotion = () => {
   const [isActive, setIsActive] = useState(false);
@@ -35,7 +36,7 @@ export const useVoiceEmotion = () => {
   const start = useCallback(async () => {
     try {
       // Connexion WebSocket au proxy Hume
-      const wsUrl = `wss://yaincoxihiqdksxgrsrk.supabase.co/functions/v1/hume-websocket-proxy`;
+      const wsUrl = `${SUPABASE_URL.replace('https://', 'wss://')}/functions/v1/hume-websocket-proxy`;
       wsRef.current = new WebSocket(wsUrl);
 
       wsRef.current.onopen = () => {

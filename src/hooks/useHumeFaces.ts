@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { HumeSummary } from '@/store/grit.store';
 import { logger } from '@/lib/logger';
+import { SUPABASE_URL } from '@/lib/env';
 
 interface HumeFacesConfig {
   enabled: boolean;
@@ -52,8 +53,7 @@ export const useHumeFaces = (config: HumeFacesConfig) => {
       }
 
       // Connect to Hume WebSocket (via backend proxy)
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://yaincoxihiqdksxgrsrk.supabase.co';
-      const wsUrl = `${supabaseUrl.replace('https', 'wss')}/functions/v1/hume-proxy`;
+      const wsUrl = `${SUPABASE_URL.replace('https://', 'wss://')}/functions/v1/hume-proxy`;
       wsRef.current = new WebSocket(wsUrl);
       
       wsRef.current.onopen = () => {

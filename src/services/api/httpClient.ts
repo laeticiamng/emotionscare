@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { SUPABASE_URL } from '@/lib/env';
 import { ApiResponse, RequestConfig, ErrorInterceptor, RequestInterceptor } from '@/types/api';
 import { logger } from '@/lib/logger';
 
@@ -11,7 +12,7 @@ class HttpClient {
   private requestInterceptors: RequestInterceptor[] = [];
   private errorInterceptors: ErrorInterceptor[] = [];
 
-  constructor(baseURL: string = 'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1') {
+  constructor(baseURL: string = `${SUPABASE_URL}/functions/v1`) {
     this.baseURL = baseURL;
     this.setupDefaultInterceptors();
   }

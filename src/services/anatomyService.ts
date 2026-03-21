@@ -4,8 +4,9 @@
  */
 
 import { supabase } from '@/lib/supabase-client';
+import { SUPABASE_URL } from '@/lib/env';
 
-const EDGE_BASE_URL = 'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1';
+const EDGE_BASE_URL = `${SUPABASE_URL}/functions/v1`;
 
 export interface AnatomicalStructure {
   id: string;

@@ -4,7 +4,8 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
-import { 
+import { SUPABASE_URL } from '@/lib/env';
+import {
   EmotionAnalysisResult,
   MusicGenerationRequest,
   TherapySession,
@@ -19,7 +20,7 @@ class UnifiedApiService {
   private version: string = 'v1';
 
   constructor() {
-    this.baseUrl = `https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1`;
+    this.baseUrl = `${SUPABASE_URL}/functions/v1`;
   }
 
   // === UTILITAIRES DE BASE ===

@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { SUPABASE_URL } from '@/lib/env';
 import { logger } from '@/lib/logger';
 
 export interface AuditResult {
@@ -52,7 +53,7 @@ export class EmotionsCareAudit {
 
     for (const endpoint of endpoints) {
       try {
-        const response = await fetch(`https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1${endpoint.path}`, {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1${endpoint.path}`, {
           headers: {
             'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token || 'demo-token'}`
           }

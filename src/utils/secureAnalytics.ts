@@ -2,13 +2,14 @@
 
 import { GlobalInterceptor } from './globalInterceptor';
 import { logger } from '@/lib/logger';
+import { SUPABASE_URL } from '@/lib/env';
 
 /**
  * Analytics sécurisées avec fallbacks robustes
  * Ne bloque JAMAIS l'UI en cas d'erreur
  */
 export class SecureAnalytics {
-  private static baseUrl = 'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1';
+  private static baseUrl = `${SUPABASE_URL}/functions/v1`;
   private static timeout = 5000; // 5s timeout pour analytics
   private static isOffline = false;
   
