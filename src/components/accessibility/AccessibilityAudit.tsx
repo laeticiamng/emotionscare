@@ -106,7 +106,7 @@ const AccessibilityAudit: React.FC = () => {
                     <AlertTriangle className="h-5 w-5 text-warning" />
                     <div>
                       <div className="font-semibold text-yellow-500">
-                        {report.issues.filter((i: AuditIssue) => i.impact === 'moderate').length}
+                        {(report.issues as AuditIssue[]).filter(i => i.impact === 'moderate').length}
                       </div>
                       <div className="text-xs text-muted-foreground">Modérés</div>
                     </div>
