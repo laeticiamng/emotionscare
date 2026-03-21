@@ -8,9 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { 
-  Calendar, 
-  Plus, 
+import {
+  Calendar,
+  Plus,
   Clock,
   Heart,
   Brain,
@@ -20,7 +20,9 @@ import {
   CheckCircle,
   ArrowLeft,
   ArrowRight,
-  X
+  X,
+  Zap,
+  MoreHorizontal
 } from 'lucide-react';
 import {
   Dialog,
@@ -38,6 +40,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
 
 interface CalendarEvent {
@@ -411,16 +419,25 @@ const CalendarPage: React.FC = () => {
                       {event.time} • {event.duration}
                     </div>
                   </div>
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {event.status !== 'completed' && (
-                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleCompleteEvent(event.id)}>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button size="icon" variant="ghost" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <MoreHorizontal className="h-4 w-4" />
                       </Button>
-                    )}
-                    <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleDeleteEvent(event.id)}>
-                      <X className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {event.status !== 'completed' && (
+                        <DropdownMenuItem onClick={() => handleCompleteEvent(event.id)}>
+                          <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+                          Marquer comme terminé
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteEvent(event.id)}>
+                        <X className="h-4 w-4 mr-2" />
+                        Supprimer
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                   <div className="mt-1">
                     {getStatusIcon(event.status)}
                   </div>
@@ -442,55 +459,49 @@ const CalendarPage: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5" />
+                <Zap className="h-5 w-5" />
                 Actions Rapides
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <Button 
-                variant="outline" 
-                className="w-full justify-start"
-                onClick={() => {
-                  setNewEvent(prev => ({ ...prev, type: 'meditation', title: 'Méditation' }));
-                  setIsDialogOpen(true);
-                }}
-              >
-                <Brain className="h-4 w-4 mr-2" />
-                Planifier méditation
-              </Button>
-              <Button 
-                variant="outline" 
-                className="w-full justify-start"
-                onClick={() => {
-                  setNewEvent(prev => ({ ...prev, type: 'wellness', title: 'Pause bien-être' }));
-                  setIsDialogOpen(true);
-                }}
-              >
-                <Heart className="h-4 w-4 mr-2" />
-                Pause bien-être
-              </Button>
-              <Button 
-                variant="outline" 
-                className="w-full justify-start"
-                onClick={() => {
-                  setNewEvent(prev => ({ ...prev, type: 'music', title: 'Session musicale' }));
-                  setIsDialogOpen(true);
-                }}
-              >
-                <Music className="h-4 w-4 mr-2" />
-                Session musicale
-              </Button>
-              <Button 
-                variant="outline" 
-                className="w-full justify-start"
-                onClick={() => {
-                  setNewEvent(prev => ({ ...prev, type: 'journal', title: 'Journal émotionnel' }));
-                  setIsDialogOpen(true);
-                }}
-              >
-                <Target className="h-4 w-4 mr-2" />
-                Journal émotionnel
-              </Button>
+            <CardContent>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="w-full gap-2">
+                    <Plus className="h-4 w-4" />
+                    Planifier une activité
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56">
+                  <DropdownMenuItem onClick={() => {
+                    setNewEvent(prev => ({ ...prev, type: 'meditation', title: 'Méditation' }));
+                    setIsDialogOpen(true);
+                  }}>
+                    <Brain className="h-4 w-4 mr-2" />
+                    Méditation
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {
+                    setNewEvent(prev => ({ ...prev, type: 'wellness', title: 'Pause bien-être' }));
+                    setIsDialogOpen(true);
+                  }}>
+                    <Heart className="h-4 w-4 mr-2" />
+                    Pause bien-être
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {
+                    setNewEvent(prev => ({ ...prev, type: 'music', title: 'Session musicale' }));
+                    setIsDialogOpen(true);
+                  }}>
+                    <Music className="h-4 w-4 mr-2" />
+                    Session musicale
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {
+                    setNewEvent(prev => ({ ...prev, type: 'journal', title: 'Journal émotionnel' }));
+                    setIsDialogOpen(true);
+                  }}>
+                    <Target className="h-4 w-4 mr-2" />
+                    Journal émotionnel
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </CardContent>
           </Card>
         </div>

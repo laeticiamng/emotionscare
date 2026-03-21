@@ -164,14 +164,14 @@ export const AccessibilityToolbar: React.FC = () => {
 
   return (
     <>
-      {/* Bouton d'ouverture */}
+      {/* Bouton d'ouverture — en bas à gauche pour ne pas chevaucher le FAB */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 z-50 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        className="fixed bottom-4 left-4 z-50 p-2 bg-muted text-muted-foreground rounded-full shadow-md hover:bg-muted/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 opacity-70 hover:opacity-100 transition-opacity"
         aria-label="Ouvrir les paramètres d'accessibilité"
         title="Accessibilité"
       >
-        <Accessibility className="h-6 w-6" />
+        <Accessibility className="h-5 w-5" />
       </button>
 
       {/* Panel des paramètres */}

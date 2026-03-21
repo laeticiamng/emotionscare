@@ -70,33 +70,16 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({ items }) => {
             </AnimatePresence>
           </nav>
           
-          <div className="border-t mt-6 pt-6">
-            <h3 className="text-sm font-medium mb-3">Actions rapides</h3>
-            <div className="space-y-2">
-              {isAuthenticated ? (
-                <>
-                  <Button variant="outline" className="w-full justify-start" onClick={() => setOpen(false)}>
-                    Mon profil
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start" onClick={() => setOpen(false)}>
-                    Paramètres
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start" onClick={() => setOpen(false)}>
-                    Support
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button className="w-full" onClick={() => setOpen(false)}>
-                    Se connecter
-                  </Button>
-                  <Button variant="outline" className="w-full" onClick={() => setOpen(false)}>
-                    S'inscrire
-                  </Button>
-                </>
-              )}
+          {!isAuthenticated && (
+            <div className="border-t mt-6 pt-6 space-y-2">
+              <Button className="w-full" onClick={() => setOpen(false)}>
+                Se connecter
+              </Button>
+              <Button variant="outline" className="w-full" onClick={() => setOpen(false)}>
+                S'inscrire
+              </Button>
             </div>
-          </div>
+          )}
         </div>
       </SheetContent>
     </Sheet>
