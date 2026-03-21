@@ -18,6 +18,8 @@ import type { Attraction } from '@/types/park';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useAttractionProgress } from '@/hooks/useAttractionProgress';
 import { BadgeUnlockModal } from '@/components/park/BadgeUnlockModal';
 import { ZoneProgressCard } from '@/components/park/ZoneProgressCard';
@@ -524,27 +526,21 @@ export default function EmotionalPark() {
             </div>
 
             {/* Zone Filter */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2">
+            <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
-              <Button
-                variant={selectedZone === 'all' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedZone('all')}
-                className="shrink-0"
-              >
-                Toutes
-              </Button>
-              {Object.entries(zones).map(([key, zone]) => (
-                <Button
-                  key={key}
-                  variant={selectedZone === key ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedZone(key)}
-                  className="shrink-0"
-                >
-                  {zone.emoji} {zone.name}
-                </Button>
-              ))}
+              <Select value={selectedZone} onValueChange={setSelectedZone}>
+                <SelectTrigger className="w-[220px] h-9">
+                  <SelectValue placeholder="Filtrer par zone" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Toutes les zones</SelectItem>
+                  {Object.entries(zones).map(([key, zone]) => (
+                    <SelectItem key={key} value={key}>
+                      {zone.emoji} {zone.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
@@ -609,56 +605,92 @@ export default function EmotionalPark() {
           />
         </div>
 
-        {/* Progress Dashboard Toggle */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          <Button
-            variant={showProgressDashboard ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setShowProgressDashboard(!showProgressDashboard)}
-            className="gap-2"
-          >
-            <TrendingUp className="h-4 w-4" />
-            {showProgressDashboard ? 'Masquer le tableau de bord' : 'Mon tableau de bord'}
-          </Button>
-        </motion.div>
+        {/* Insights Tabs: Dashboard, Map, Timeline */}
+        <Tabs defaultValue="none" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="dashboard" className="gap-1.5 text-xs sm:text-sm">
+              <TrendingUp className="h-4 w-4" />
+              Tableau de bord
+            </TabsTrigger>
+            <TabsTrigger value="map" className="gap-1.5 text-xs sm:text-sm">
+              <Map className="h-4 w-4" />
+              Carte
+            </TabsTrigger>
+            <TabsTrigger value="timeline" className="gap-1.5 text-xs sm:text-sm">
+              <Clock className="h-4 w-4" />
+              Timeline
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Progress Dashboard */}
-        <AnimatePresence>
-          {showProgressDashboard && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-            >
-              <ParkProgressDashboard
-                streak={{
-                  current: currentStreak,
-                  longest: longestStreak,
-                  lastActivityDate: lastActivityDate || undefined,
-                  weeklyProgress: weeklyActivity
-                }}
-                level={{
-                  level: Math.floor(getCompletedQuestsCount() / 2) + 1,
-                  xp: getTotalRewards(),
-                  xpToNextLevel: (Math.floor(getCompletedQuestsCount() / 2) + 1) * 500,
-                  title: 'Explorateur'
-                }}
-                dailyGoals={[
-                  { id: '1', title: 'Visiter une attraction', progress: Object.keys(visitedAttractions).length > 0 ? 1 : 0, target: 1, icon: '🎪', completed: Object.keys(visitedAttractions).length > 0 },
-                  { id: '2', title: 'Compléter une quête', progress: getCompletedQuestsCount() > 0 ? 1 : 0, target: 1, icon: '🏆', completed: getCompletedQuestsCount() > 0 },
-                  { id: '3', title: 'Explorer 3 zones', progress: Math.min(3, new Set(Object.keys(visitedAttractions).map(id => attractions.find(a => a.id === id)?.zone)).size), target: 3, icon: '🗺️', completed: new Set(Object.keys(visitedAttractions).map(id => attractions.find(a => a.id === id)?.zone)).size >= 3 }
-                ]}
-                totalVisits={Object.keys(visitedAttractions).length}
-                zonesCompleted={unlockedBadges.length}
-                totalZones={Object.keys(zones).length}
-                onStartActivity={handleRandomAttraction}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+          <TabsContent value="dashboard">
+            <ParkProgressDashboard
+              streak={{
+                current: currentStreak,
+                longest: longestStreak,
+                lastActivityDate: lastActivityDate || undefined,
+                weeklyProgress: weeklyActivity
+              }}
+              level={{
+                level: Math.floor(getCompletedQuestsCount() / 2) + 1,
+                xp: getTotalRewards(),
+                xpToNextLevel: (Math.floor(getCompletedQuestsCount() / 2) + 1) * 500,
+                title: 'Explorateur'
+              }}
+              dailyGoals={[
+                { id: '1', title: 'Visiter une attraction', progress: Object.keys(visitedAttractions).length > 0 ? 1 : 0, target: 1, icon: '🎪', completed: Object.keys(visitedAttractions).length > 0 },
+                { id: '2', title: 'Compléter une quête', progress: getCompletedQuestsCount() > 0 ? 1 : 0, target: 1, icon: '🏆', completed: getCompletedQuestsCount() > 0 },
+                { id: '3', title: 'Explorer 3 zones', progress: Math.min(3, new Set(Object.keys(visitedAttractions).map(id => attractions.find(a => a.id === id)?.zone)).size), target: 3, icon: '🗺️', completed: new Set(Object.keys(visitedAttractions).map(id => attractions.find(a => a.id === id)?.zone)).size >= 3 }
+              ]}
+              totalVisits={Object.keys(visitedAttractions).length}
+              zonesCompleted={unlockedBadges.length}
+              totalZones={Object.keys(zones).length}
+              onStartActivity={handleRandomAttraction}
+            />
+          </TabsContent>
+
+          <TabsContent value="map">
+            <ParkMapVisualization
+              zones={Object.entries(zones).map(([key, zone], index) => ({
+                name: zone.name,
+                emoji: zone.emoji,
+                color: ['#8b5cf6', '#06b6d4', '#f97316', '#22c55e', '#ec4899', '#3b82f6', '#eab308', '#ef4444'][index % 8],
+                x: 100 + (index % 4) * 200,
+                y: 150 + Math.floor(index / 4) * 250,
+                attractions: attractions.filter(a => a.zone === key).length,
+                completed: getZoneProgress(attractions.filter(a => a.zone === key).map(a => a.id)).visited
+              }))}
+              selectedZone={selectedZone !== 'all' ? zones[selectedZone as keyof typeof zones]?.name : undefined}
+              onZoneClick={(zoneName) => {
+                const zoneKey = Object.entries(zones).find(([_, z]) => z.name === zoneName)?.[0];
+                if (zoneKey) setSelectedZone(zoneKey);
+              }}
+              completionData={Object.fromEntries(
+                Object.entries(zones).map(([key, zone]) => [
+                  zone.name,
+                  getZoneProgress(attractions.filter(a => a.zone === key).map(a => a.id))
+                ])
+              )}
+            />
+          </TabsContent>
+
+          <TabsContent value="timeline">
+            <ProgressionTimeline
+              events={Object.entries(visitedAttractions).map(([id, visit]) => {
+                const attraction = attractions.find(a => a.id === id);
+                return {
+                  id,
+                  title: attraction?.title || 'Attraction visitée',
+                  description: attraction?.subtitle || '',
+                  icon: attraction?.zone === 'calm' ? '🧘' : attraction?.zone === 'creative' ? '🎨' : '🏛️',
+                  timestamp: new Date(typeof visit === 'object' && visit !== null ? visit.visitedAt : Date.now()),
+                  type: 'attraction' as const,
+                  completed: true
+                };
+              })}
+              maxDisplay={10}
+            />
+          </TabsContent>
+        </Tabs>
 
         {/* Quick Actions */}
         <div className="flex items-center justify-between">
@@ -766,29 +798,26 @@ export default function EmotionalPark() {
           role="group"
           aria-labelledby="mood-selector-label"
         >
-          <p id="mood-selector-label" className="text-sm font-medium mb-3 text-foreground">
-            Comment te sens-tu en ce moment?
-          </p>
-          <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Sélection de l'humeur">
-            {([
-              { value: 'happy', emoji: '😊', label: 'Heureux' },
-              { value: 'calm', emoji: '😌', label: 'Calme' },
-              { value: 'anxious', emoji: '😰', label: 'Anxieux' },
-              { value: 'sad', emoji: '😢', label: 'Triste' },
-              { value: 'excited', emoji: '🤩', label: 'Excité' }
-            ] as const).map(mood => (
-              <Button
-                key={mood.value}
-                variant={currentMood === mood.value ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setCurrentMood(currentMood === mood.value ? '' : mood.value)}
-                className="gap-1"
-                aria-pressed={currentMood === mood.value}
-                aria-label={`Humeur: ${mood.label}`}
-              >
-                <span aria-hidden="true">{mood.emoji}</span> {mood.label}
-              </Button>
-            ))}
+          <div className="flex items-center gap-3">
+            <p id="mood-selector-label" className="text-sm font-medium text-foreground whitespace-nowrap">
+              Comment te sens-tu ?
+            </p>
+            <Select
+              value={currentMood || 'none'}
+              onValueChange={(val) => setCurrentMood(val === 'none' ? '' : val)}
+            >
+              <SelectTrigger className="w-[180px] h-9" aria-label="Sélection de l'humeur">
+                <SelectValue placeholder="Choisis ton humeur" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Aucune</SelectItem>
+                <SelectItem value="happy">Heureux</SelectItem>
+                <SelectItem value="calm">Calme</SelectItem>
+                <SelectItem value="anxious">Anxieux</SelectItem>
+                <SelectItem value="sad">Triste</SelectItem>
+                <SelectItem value="excited">Excité</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </motion.div>
 

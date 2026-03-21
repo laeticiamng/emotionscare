@@ -65,71 +65,79 @@ import { MeditationRecommendationWidget } from '@/components/meditation/Meditati
 import { MeditationExportButton } from '@/components/meditation/MeditationExportButton';
 
 const TECHNIQUE_OPTIONS = [
-  { 
-    id: 'pause-soignant', 
-    title: 'Pause Soignant', 
+  {
+    id: 'pause-soignant',
+    title: 'Pause Soignant',
     description: 'Récupération rapide entre deux patients',
     icon: Heart,
     color: 'bg-primary/10 text-primary',
     durations: [3, 5, 10],
-    isNew: true
+    isNew: true,
+    featured: true
   },
-  { 
-    id: 'mindfulness', 
-    title: 'Pleine conscience', 
+  {
+    id: 'mindfulness',
+    title: 'Pleine conscience',
     description: 'Observer le moment présent sans jugement',
     icon: Brain,
     color: 'bg-info/10 text-info',
-    durations: [5, 10, 15, 20]
+    durations: [5, 10, 15, 20],
+    featured: true
   },
-  { 
-    id: 'breath-focus', 
-    title: 'Focus respiration', 
+  {
+    id: 'breath-focus',
+    title: 'Focus respiration',
     description: 'Se concentrer sur le souffle naturel',
     icon: Wind,
     color: 'bg-info/10 text-info',
-    durations: [5, 10, 15]
+    durations: [5, 10, 15],
+    featured: true
   },
-  { 
-    id: 'body-scan', 
-    title: 'Scan corporel', 
+  {
+    id: 'body-scan',
+    title: 'Scan corporel',
     description: 'Relâcher les tensions accumulées',
     icon: Heart,
     color: 'bg-accent/10 text-accent-foreground',
-    durations: [10, 15, 20, 30]
+    durations: [10, 15, 20, 30],
+    featured: false
   },
-  { 
-    id: 'decompression', 
-    title: 'Décompression', 
+  {
+    id: 'decompression',
+    title: 'Décompression',
     description: 'Après une situation difficile ou stressante',
     icon: Waves,
     color: 'bg-success/10 text-success',
     durations: [5, 10, 15],
-    isNew: true
+    isNew: true,
+    featured: false
   },
-  { 
-    id: 'visualization', 
-    title: 'Visualisation', 
+  {
+    id: 'visualization',
+    title: 'Visualisation',
     description: 'Créer des images mentales apaisantes',
     icon: Sparkles,
     color: 'bg-accent/10 text-accent-foreground',
-    durations: [10, 15, 20]
+    durations: [10, 15, 20],
+    featured: false
   },
-  { 
-    id: 'loving-kindness', 
-    title: 'Bienveillance', 
+  {
+    id: 'loving-kindness',
+    title: 'Bienveillance',
     description: 'Cultiver la compassion envers soi et les autres',
     icon: Heart,
     color: 'bg-destructive/10 text-destructive',
-    durations: [10, 15, 20]
+    durations: [10, 15, 20],
+    featured: false
   },
-  { 
-    id: 'mantra', 
-    title: 'Mantra', 
+  {
+    id: 'mantra',
+    title: 'Mantra',
     description: 'Répéter un son calmant',
     icon: Volume2,
     color: 'bg-primary/10 text-primary',
-    durations: [5, 10, 15, 20]
+    durations: [5, 10, 15, 20],
+    featured: false
   },
 ];
 
@@ -166,6 +174,7 @@ export default function MeditationPage() {
   const [activeTab, setActiveTab] = useState<'practice' | 'history' | 'progress' | 'calendar'>('practice');
   const [breathScale, setBreathScale] = useState(1);
   const [breathPhase, setBreathPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
+  const [showAllTechniques, setShowAllTechniques] = useState(false);
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const breathRef = useRef<NodeJS.Timeout | null>(null);
@@ -625,17 +634,9 @@ export default function MeditationPage() {
                     <Brain className="h-4 w-4 mr-2" />
                     Pratiquer
                   </TabsTrigger>
-                  <TabsTrigger value="history" className="flex-1">
-                    <History className="h-4 w-4 mr-2" />
-                    Historique
-                  </TabsTrigger>
                   <TabsTrigger value="progress" className="flex-1">
                     <BarChart3 className="h-4 w-4 mr-2" />
-                    Progrès
-                  </TabsTrigger>
-                  <TabsTrigger value="calendar" className="flex-1">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Calendrier
+                    Suivi
                   </TabsTrigger>
                 </TabsList>
 
@@ -653,7 +654,7 @@ export default function MeditationPage() {
                   <div>
                     <h2 className="text-lg font-semibold mb-4">Choisissez votre technique</h2>
                     <div className="grid gap-3 md:grid-cols-2">
-                      {TECHNIQUE_OPTIONS.map((technique) => {
+                      {(showAllTechniques ? TECHNIQUE_OPTIONS : TECHNIQUE_OPTIONS.filter(t => t.featured || selectedTechnique === t.id)).map((technique) => {
                         const Icon = technique.icon;
                         const isSelected = selectedTechnique === technique.id;
                         return (
@@ -704,6 +705,26 @@ export default function MeditationPage() {
                         );
                       })}
                     </div>
+                    {!showAllTechniques && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full mt-2 text-muted-foreground"
+                        onClick={() => setShowAllTechniques(true)}
+                      >
+                        Voir toutes les techniques ({TECHNIQUE_OPTIONS.length - TECHNIQUE_OPTIONS.filter(t => t.featured).length} de plus)
+                      </Button>
+                    )}
+                    {showAllTechniques && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full mt-2 text-muted-foreground"
+                        onClick={() => setShowAllTechniques(false)}
+                      >
+                        Voir moins
+                      </Button>
+                    )}
                   </div>
 
                   {/* Start Button */}
@@ -737,65 +758,6 @@ export default function MeditationPage() {
                       </p>
                     </CardContent>
                   </Card>
-                </TabsContent>
-
-                <TabsContent value="history" className="space-y-3">
-                  {historyLoading ? (
-                    Array.from({ length: 3 }).map((_, i) => (
-                      <Skeleton key={i} className="h-20 w-full" />
-                    ))
-                  ) : history && history.length > 0 ? (
-                    history.map((session) => (
-                      <Card key={session.id} className="hover:shadow-md transition-shadow">
-                        <CardContent className="p-4">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="font-medium">
-                                  {TECHNIQUE_LABELS[session.technique] || session.technique}
-                                </span>
-                                <Badge variant={session.completed ? 'default' : 'secondary'} className="text-xs">
-                                  {session.completed ? 'Terminée' : 'Incomplète'}
-                                </Badge>
-                              </div>
-                              <p className="text-sm text-muted-foreground">
-                                {format(new Date(session.created_at), "d MMM yyyy 'à' HH:mm", { locale: fr })}
-                                {' • '}{Math.round((session.completed_duration || session.duration) / 60)} min
-                              </p>
-                            </div>
-                            {session.mood_delta !== null && (
-                              <div className="text-right">
-                                <p className={`text-lg font-bold ${
-                                  session.mood_delta > 0 
-                                    ? 'text-green-600 dark:text-green-400' 
-                                    : session.mood_delta < 0 
-                                      ? 'text-red-600 dark:text-red-400' 
-                                      : 'text-muted-foreground'
-                                }`}>
-                                  {session.mood_delta > 0 ? '+' : ''}{session.mood_delta}
-                                </p>
-                                <p className="text-xs text-muted-foreground">Δ Humeur</p>
-                              </div>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))
-                  ) : (
-                    <Card className="border-dashed">
-                      <CardContent className="p-8 text-center">
-                        <Brain className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                        <h3 className="font-medium mb-2">Aucune session</h3>
-                        <p className="text-sm text-muted-foreground mb-4">
-                          Commencez votre première méditation
-                        </p>
-                        <Button onClick={() => setActiveTab('practice')}>
-                          <Play className="h-4 w-4 mr-2" />
-                          Commencer
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  )}
                 </TabsContent>
 
                 <TabsContent value="progress" className="space-y-4">
@@ -881,10 +843,65 @@ export default function MeditationPage() {
                       </CardContent>
                     </Card>
                   </div>
-                </TabsContent>
-
-                <TabsContent value="calendar">
+                  {/* Calendar */}
                   <MeditationCalendar />
+
+                  {/* Recent History */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <History className="h-4 w-4" />
+                        Sessions récentes
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {historyLoading ? (
+                        Array.from({ length: 3 }).map((_, i) => (
+                          <Skeleton key={i} className="h-16 w-full" />
+                        ))
+                      ) : history && history.length > 0 ? (
+                        history.map((session) => (
+                          <div key={session.id} className="flex items-center justify-between py-2 border-b last:border-0">
+                            <div>
+                              <div className="flex items-center gap-2 mb-0.5">
+                                <span className="font-medium text-sm">
+                                  {TECHNIQUE_LABELS[session.technique] || session.technique}
+                                </span>
+                                {!session.completed && (
+                                  <Badge variant="secondary" className="text-xs">Incomplète</Badge>
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                {format(new Date(session.created_at), "d MMM yyyy 'à' HH:mm", { locale: fr })}
+                                {' · '}{Math.round((session.completed_duration || session.duration) / 60)} min
+                              </p>
+                            </div>
+                            {session.mood_delta !== null && (
+                              <span className={`text-sm font-bold ${
+                                session.mood_delta > 0
+                                  ? 'text-green-600 dark:text-green-400'
+                                  : session.mood_delta < 0
+                                    ? 'text-red-600 dark:text-red-400'
+                                    : 'text-muted-foreground'
+                              }`}>
+                                {session.mood_delta > 0 ? '+' : ''}{session.mood_delta}
+                              </span>
+                            )}
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                          Aucune session enregistrée.{' '}
+                          <span
+                            className="text-primary cursor-pointer hover:underline"
+                            onClick={() => setActiveTab('practice')}
+                          >
+                            Commencer une méditation
+                          </span>
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
                 </TabsContent>
               </Tabs>
             </motion.div>

@@ -676,61 +676,55 @@ const B2CSettingsPage = () => {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     {/* Theme Selector */}
-                    <div className="space-y-3">
-                      <label className="font-medium">Thème</label>
-                      <div className="grid grid-cols-3 gap-4">
-                        {[
-                          { value: 'light', label: 'Clair', icon: Sun },
-                          { value: 'dark', label: 'Sombre', icon: Moon },
-                          { value: 'auto', label: 'Auto', icon: Monitor },
-                        ].map(({ value, label, icon: Icon }) => (
-                          <button
-                            key={value}
-                            onClick={() => setLocalSettings(prev => ({ ...prev, theme: value as 'light' | 'dark' | 'auto' }))}
-                            className={`p-4 rounded-lg border-2 transition-all flex flex-col items-center gap-2 ${
-                              localSettings.theme === value 
-                                ? 'border-primary bg-primary/10' 
-                                : 'border-border hover:border-primary/50'
-                            }`}
-                          >
-                            <Icon className={`h-6 w-6 ${localSettings.theme === value ? 'text-primary' : 'text-muted-foreground'}`} />
-                            <span className={localSettings.theme === value ? 'font-medium' : ''}>{label}</span>
-                            {localSettings.theme === value && (
-                              <CheckCircle2 className="h-4 w-4 text-primary" />
-                            )}
-                          </button>
-                        ))}
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <label htmlFor="theme-select" className="font-medium">Thème</label>
+                        <p className="text-sm text-muted-foreground">Mode d'affichage de l'application</p>
                       </div>
+                      <Select
+                        value={localSettings.theme}
+                        onValueChange={(value) => setLocalSettings(prev => ({ ...prev, theme: value as 'light' | 'dark' | 'auto' }))}
+                      >
+                        <SelectTrigger className="w-48" id="theme-select">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="light">
+                            <span className="flex items-center gap-2"><Sun className="h-4 w-4" /> Clair</span>
+                          </SelectItem>
+                          <SelectItem value="dark">
+                            <span className="flex items-center gap-2"><Moon className="h-4 w-4" /> Sombre</span>
+                          </SelectItem>
+                          <SelectItem value="auto">
+                            <span className="flex items-center gap-2"><Monitor className="h-4 w-4" /> Automatique</span>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <Separator />
 
                     {/* Font Size */}
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <label className="font-medium">Taille de police</label>
-                        <Badge variant="secondary">{FONT_SIZES.find(f => f.value === localSettings.fontSize)?.label}</Badge>
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <label htmlFor="font-size-select" className="font-medium">Taille de police</label>
+                        <p className="text-sm text-muted-foreground">Ajustez la taille du texte</p>
                       </div>
-                      <div className="grid grid-cols-3 gap-4">
-                        {FONT_SIZES.map(size => (
-                          <button
-                            key={size.value}
-                            onClick={() => setLocalSettings(prev => ({ ...prev, fontSize: size.value }))}
-                            className={`p-3 rounded-lg border-2 transition-all ${
-                              localSettings.fontSize === size.value 
-                                ? 'border-primary bg-primary/10' 
-                                : 'border-border hover:border-primary/50'
-                            }`}
-                          >
-                            <span className={`${
-                              size.value === 'small' ? 'text-sm' : 
-                              size.value === 'large' ? 'text-lg' : 'text-base'
-                            }`}>
+                      <Select
+                        value={localSettings.fontSize}
+                        onValueChange={(value) => setLocalSettings(prev => ({ ...prev, fontSize: value }))}
+                      >
+                        <SelectTrigger className="w-48" id="font-size-select">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {FONT_SIZES.map(size => (
+                            <SelectItem key={size.value} value={size.value}>
                               {size.label}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <Separator />
@@ -1084,32 +1078,32 @@ const B2CSettingsPage = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle>Actions</CardTitle>
+                    <CardDescription>Gérer vos paramètres</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start"
-                      onClick={() => setShowExportDialog(true)}
+                  <CardContent>
+                    <Select
+                      value=""
+                      onValueChange={(value) => {
+                        if (value === 'export') setShowExportDialog(true);
+                        if (value === 'import') setShowImportDialog(true);
+                        if (value === 'reset') setShowResetDialog(true);
+                      }}
                     >
-                      <Download className="h-4 w-4 mr-2" />
-                      Exporter mes paramètres
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start"
-                      onClick={() => setShowImportDialog(true)}
-                    >
-                      <Upload className="h-4 w-4 mr-2" />
-                      Importer des paramètres
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start text-destructive hover:text-destructive"
-                      onClick={() => setShowResetDialog(true)}
-                    >
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Réinitialiser les paramètres
-                    </Button>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Choisir une action..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="export">
+                          <span className="flex items-center gap-2"><Download className="h-4 w-4" /> Exporter mes paramètres</span>
+                        </SelectItem>
+                        <SelectItem value="import">
+                          <span className="flex items-center gap-2"><Upload className="h-4 w-4" /> Importer des paramètres</span>
+                        </SelectItem>
+                        <SelectItem value="reset">
+                          <span className="flex items-center gap-2 text-destructive"><RefreshCw className="h-4 w-4" /> Réinitialiser les paramètres</span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </CardContent>
                 </Card>
               </motion.div>

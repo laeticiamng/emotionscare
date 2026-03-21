@@ -319,28 +319,18 @@ const B2CProfileSettingsPage: React.FC = () => {
                       />
                       
                       <div className="flex gap-2 justify-center flex-wrap">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={handleAvatarClick}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={profile.avatar_url ? removeAvatar : handleAvatarClick}
                           disabled={isSaving}
                         >
                           <Camera className="h-4 w-4 mr-2" />
-                          Changer
+                          {profile.avatar_url ? 'Supprimer la photo' : 'Ajouter une photo'}
                         </Button>
-                        {profile.avatar_url && (
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={removeAvatar}
-                            disabled={isSaving}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        )}
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={handleShareProfile}
                         >
                           <Share2 className="h-4 w-4" />
@@ -402,38 +392,9 @@ const B2CProfileSettingsPage: React.FC = () => {
 
                 {/* Personal Information */}
                 <Card className="lg:col-span-2">
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <div>
-                      <CardTitle>Informations Personnelles</CardTitle>
-                      <CardDescription>Gérez vos informations de profil</CardDescription>
-                    </div>
-                    {!isEditing ? (
-                      <Button onClick={handleStartEditing} className="shrink-0">
-                        <Settings className="h-4 w-4 mr-2" />
-                        Modifier
-                      </Button>
-                    ) : (
-                      <div className="flex gap-2 shrink-0">
-                        <Button 
-                          variant="outline" 
-                          onClick={handleCancelEditing}
-                          disabled={isSaving}
-                        >
-                          Annuler
-                        </Button>
-                        <Button 
-                          onClick={handleSaveProfile}
-                          disabled={isSaving}
-                        >
-                          {isSaving ? (
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          ) : (
-                            <Save className="h-4 w-4 mr-2" />
-                          )}
-                          Enregistrer
-                        </Button>
-                      </div>
-                    )}
+                  <CardHeader>
+                    <CardTitle>Informations Personnelles</CardTitle>
+                    <CardDescription>Modifiez vos informations puis enregistrez</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -445,7 +406,6 @@ const B2CProfileSettingsPage: React.FC = () => {
                         <Input
                           id="name"
                           value={editForm.name}
-                          disabled={!isEditing}
                           onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
                           placeholder="Votre nom"
                         />
@@ -477,7 +437,6 @@ const B2CProfileSettingsPage: React.FC = () => {
                           id="phone"
                           type="tel"
                           value={editForm.phone}
-                          disabled={!isEditing}
                           onChange={(e) => setEditForm(prev => ({ ...prev, phone: e.target.value }))}
                           placeholder="+33 6 XX XX XX XX"
                         />
@@ -491,7 +450,6 @@ const B2CProfileSettingsPage: React.FC = () => {
                         <Input
                           id="location"
                           value={editForm.location}
-                          disabled={!isEditing}
                           onChange={(e) => setEditForm(prev => ({ ...prev, location: e.target.value }))}
                           placeholder="Paris, France"
                         />
@@ -505,7 +463,6 @@ const B2CProfileSettingsPage: React.FC = () => {
                         <Input
                           id="website"
                           value={editForm.website}
-                          disabled={!isEditing}
                           onChange={(e) => setEditForm(prev => ({ ...prev, website: e.target.value }))}
                           placeholder="https://..."
                         />
@@ -519,7 +476,6 @@ const B2CProfileSettingsPage: React.FC = () => {
                         <Input
                           id="job_title"
                           value={editForm.job_title}
-                          disabled={!isEditing}
                           onChange={(e) => setEditForm(prev => ({ ...prev, job_title: e.target.value }))}
                           placeholder="Votre profession"
                         />
@@ -531,7 +487,6 @@ const B2CProfileSettingsPage: React.FC = () => {
                       <Textarea
                         id="bio"
                         value={editForm.bio}
-                        disabled={!isEditing}
                         onChange={(e) => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
                         placeholder="Parlez-nous de vous, vos objectifs et votre parcours..."
                         rows={4}
@@ -540,6 +495,18 @@ const B2CProfileSettingsPage: React.FC = () => {
                         {editForm.bio.length}/500 caractères
                       </p>
                     </div>
+
+                    <Button
+                      onClick={handleSaveProfile}
+                      disabled={isSaving}
+                    >
+                      {isSaving ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Save className="h-4 w-4 mr-2" />
+                      )}
+                      Enregistrer les modifications
+                    </Button>
                   </CardContent>
                 </Card>
 

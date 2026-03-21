@@ -281,29 +281,22 @@ const DashboardSettingsPage: React.FC = () => {
                         Choisissez entre clair, sombre ou automatique
                       </p>
                     </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant={theme === 'light' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setTheme('light')}
-                      >
-                        <Sun className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant={theme === 'dark' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setTheme('dark')}
-                      >
-                        <Moon className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant={theme === 'system' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setTheme('system')}
-                      >
-                        <Monitor className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <Select value={theme} onValueChange={(value: 'light' | 'dark' | 'system') => setTheme(value)}>
+                      <SelectTrigger className="w-44">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="light">
+                          <span className="flex items-center gap-2"><Sun className="h-4 w-4" /> Clair</span>
+                        </SelectItem>
+                        <SelectItem value="dark">
+                          <span className="flex items-center gap-2"><Moon className="h-4 w-4" /> Sombre</span>
+                        </SelectItem>
+                        <SelectItem value="system">
+                          <span className="flex items-center gap-2"><Monitor className="h-4 w-4" /> Automatique</span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </CardContent>
               </Card>

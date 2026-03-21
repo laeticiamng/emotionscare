@@ -11,12 +11,15 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMoodMixerEnriched, type MoodComponent, type MoodPreset } from '@/modules/mood-mixer/useMoodMixerEnriched';
-import { 
-  Palette, Heart, Zap, Smile, CloudRain, Sun, Moon, Sparkles, 
-  Play, Pause, RotateCcw, Save, Star, Clock, TrendingUp, 
-  History, BarChart3, ThumbsUp, ThumbsDown, Minus, Award, ArrowLeft
+import {
+  Palette, Heart, Zap, Smile, CloudRain, Sun, Moon, Sparkles,
+  Play, Pause, RotateCcw, Save, Star, Clock, TrendingUp,
+  History, BarChart3, ThumbsUp, ThumbsDown, Minus, Award, ArrowLeft,
+  MoreHorizontal, ChevronDown
 } from 'lucide-react';
 
 const ICON_MAP: Record<string, React.FC<{ className?: string }>> = {
@@ -153,12 +156,23 @@ const B2CMoodMixerPage: React.FC = () => {
                           {isPlaying ? <Pause className="w-4 h-4 mr-1" /> : <Play className="w-4 h-4 mr-1" />}
                           {isPlaying ? "Pause" : "Écouter"}
                         </Button>
-                        <Button size="sm" variant="outline" onClick={resetComponents}>
-                          <RotateCcw className="w-4 h-4" />
-                        </Button>
-                        <Button size="sm" variant="outline" onClick={() => setShowSaveDialog(true)}>
-                          <Save className="w-4 h-4" />
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button size="sm" variant="outline">
+                              <MoreHorizontal className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={resetComponents}>
+                              <RotateCcw className="w-4 h-4 mr-2" />
+                              Réinitialiser
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setShowSaveDialog(true)}>
+                              <Save className="w-4 h-4 mr-2" />
+                              Sauvegarder
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
                   </CardHeader>
@@ -406,25 +420,15 @@ const B2CMoodMixerPage: React.FC = () => {
                       </div>
                     )}
 
-                    {/* Other presets */}
+                    {/* Other presets - show top 3 with expand */}
                     {otherPresets.length > 0 && (
-                      <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-2">
-                          {favoritePresets.length > 0 ? 'Autres presets' : 'Tous les presets'}
-                        </h4>
-                        <div className="grid gap-3">
-                          {otherPresets.map((preset, index) => (
-                            <PresetCard 
-                              key={preset.id} 
-                              preset={preset} 
-                              index={index}
-                              onApply={applyPreset}
-                              onToggleFavorite={toggleFavorite}
-                              onDelete={deletePreset}
-                            />
-                          ))}
-                        </div>
-                      </div>
+                      <PresetsCollapsibleSection
+                        title={favoritePresets.length > 0 ? 'Autres presets' : 'Tous les presets'}
+                        presets={otherPresets}
+                        onApply={applyPreset}
+                        onToggleFavorite={toggleFavorite}
+                        onDelete={deletePreset}
+                      />
                     )}
                   </div>
                 </ScrollArea>
@@ -622,7 +626,7 @@ const B2CMoodMixerPage: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {/* End Session Dialog */}
+      {/* End Session Dialog - Emoji picker */}
       <Dialog open={showEndDialog} onOpenChange={setShowEndDialog}>
         <DialogContent>
           <DialogHeader>
@@ -631,31 +635,22 @@ const B2CMoodMixerPage: React.FC = () => {
               Votre feedback nous aide à personnaliser votre expérience.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-3 gap-4 py-4">
-            <Button
-              variant="outline"
-              onClick={() => handleEndSession('negative')}
-              className="flex-col gap-2 h-auto py-6 hover:bg-red-50 hover:border-red-200"
-            >
-              <ThumbsDown className="w-8 h-8 text-red-500" />
-              <span>Pas génial</span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => handleEndSession('neutral')}
-              className="flex-col gap-2 h-auto py-6 hover:bg-gray-50"
-            >
-              <Minus className="w-8 h-8 text-gray-500" />
-              <span>Neutre</span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => handleEndSession('positive')}
-              className="flex-col gap-2 h-auto py-6 hover:bg-green-50 hover:border-green-200"
-            >
-              <ThumbsUp className="w-8 h-8 text-green-500" />
-              <span>Super !</span>
-            </Button>
+          <div className="flex justify-center gap-6 py-6">
+            {([
+              { emoji: '\ud83d\ude1e', value: 'negative' as const, label: 'Pas génial' },
+              { emoji: '\ud83d\ude10', value: 'neutral' as const, label: 'Neutre' },
+              { emoji: '\ud83d\ude0a', value: 'positive' as const, label: 'Super !' },
+            ]).map(({ emoji, value, label }) => (
+              <button
+                key={value}
+                onClick={() => handleEndSession(value)}
+                className="flex flex-col items-center gap-2 group cursor-pointer"
+                title={label}
+              >
+                <span className="text-4xl transition-transform group-hover:scale-125">{emoji}</span>
+                <span className="text-xs text-muted-foreground">{label}</span>
+              </button>
+            ))}
           </div>
         </DialogContent>
       </Dialog>
@@ -733,6 +728,69 @@ const PresetCard: React.FC<PresetCardProps> = ({ preset, index, onApply, onToggl
         </div>
       </div>
     </motion.div>
+  );
+};
+
+// Collapsible presets section - shows top 3, expand for more
+interface PresetsCollapsibleSectionProps {
+  title: string;
+  presets: MoodPreset[];
+  onApply: (preset: MoodPreset) => void;
+  onToggleFavorite: (id: string) => void;
+  onDelete: (id: string) => void;
+}
+
+const PresetsCollapsibleSection: React.FC<PresetsCollapsibleSectionProps> = ({
+  title,
+  presets,
+  onApply,
+  onToggleFavorite,
+  onDelete,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const visiblePresets = presets.slice(0, 3);
+  const hiddenPresets = presets.slice(3);
+
+  return (
+    <div>
+      <h4 className="text-sm font-medium text-muted-foreground mb-2">{title}</h4>
+      <div className="grid gap-3">
+        {visiblePresets.map((preset, index) => (
+          <PresetCard
+            key={preset.id}
+            preset={preset}
+            index={index}
+            onApply={onApply}
+            onToggleFavorite={onToggleFavorite}
+            onDelete={onDelete}
+          />
+        ))}
+      </div>
+      {hiddenPresets.length > 0 && (
+        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+          <CollapsibleContent>
+            <div className="grid gap-3 mt-3">
+              {hiddenPresets.map((preset, index) => (
+                <PresetCard
+                  key={preset.id}
+                  preset={preset}
+                  index={index + 3}
+                  onApply={onApply}
+                  onToggleFavorite={onToggleFavorite}
+                  onDelete={onDelete}
+                />
+              ))}
+            </div>
+          </CollapsibleContent>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm" className="w-full mt-2 gap-1 text-muted-foreground">
+              <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+              {isOpen ? 'Voir moins' : `Voir plus (${hiddenPresets.length})`}
+            </Button>
+          </CollapsibleTrigger>
+        </Collapsible>
+      )}
+    </div>
   );
 };
 
