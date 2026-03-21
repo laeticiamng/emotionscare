@@ -230,7 +230,7 @@ export default function B2CDashboardPage() {
   }, [activeTone, clinicalTone]);
 
   const orderedQuickActions = useMemo(
-    () => orderQuickActions(QUICK_ACTIONS, activeTone ?? undefined).slice(0, 5),
+    () => orderQuickActions(QUICK_ACTIONS, activeTone ?? undefined).slice(0, 4),
     [activeTone],
   );
 

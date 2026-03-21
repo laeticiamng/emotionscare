@@ -1,19 +1,17 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Activity, Music, MessageCircle, Camera, Calendar, Book } from 'lucide-react';
+import { Activity, Wind, MessageCircle, Book } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const QuickActionsWidget: React.FC = () => {
   const navigate = useNavigate();
 
   const actions = [
-    { title: 'Scan Émotionnel', icon: Activity, path: '/app/scan', color: 'bg-blue-500' },
-    { title: 'Musique', icon: Music, path: '/app/music', color: 'bg-purple-500' },
-    { title: 'Coach IA', icon: MessageCircle, path: '/app/coach', color: 'bg-green-500' },
+    { title: 'Scan', icon: Activity, path: '/app/scan', color: 'bg-blue-500' },
+    { title: 'Respiration', icon: Wind, path: '/app/breath', color: 'bg-cyan-500' },
     { title: 'Journal', icon: Book, path: '/app/journal', color: 'bg-orange-500' },
-    { title: 'Réalité Virtuelle', icon: Camera, path: '/app/vr', color: 'bg-indigo-500' },
-    { title: 'Événements', icon: Calendar, path: '/app/events', color: 'bg-red-500' },
+    { title: 'Coach IA', icon: MessageCircle, path: '/app/coach', color: 'bg-green-500' },
   ];
 
   return (
