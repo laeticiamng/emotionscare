@@ -95,7 +95,7 @@ const AccessibilityAudit: React.FC = () => {
                     <AlertTriangle className="h-5 w-5 text-destructive" />
                     <div>
                       <div className="font-semibold text-destructive">
-                        {report.issues.filter(i => i.impact === 'serious').length}
+                        {report.issues.filter((i: AuditIssue) => i.impact === 'serious').length}
                       </div>
                       <div className="text-xs text-muted-foreground">Graves</div>
                     </div>
