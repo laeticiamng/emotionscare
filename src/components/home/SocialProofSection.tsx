@@ -60,7 +60,7 @@ const SocialProofSection: React.FC = () => {
             </span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Une plateforme pensée pour le terrain, par une professionnelle de santé. En cours de lancement — rejoignez les premiers utilisateurs.
+            Une plateforme pensée pour le terrain, par une professionnelle de santé qui connaît la réalité du quotidien soignant.
           </p>
         </motion.div>
 

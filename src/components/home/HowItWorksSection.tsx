@@ -57,11 +57,11 @@ const HowItWorksSection: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.15 }}
-              className="flex flex-col items-center text-center"
+              className="relative flex flex-col items-center text-center group"
             >
               {/* Number circle */}
               <div className="relative mb-6">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center transition-all duration-500 group-hover:shadow-lg group-hover:shadow-primary/10 group-hover:scale-105">
                   <step.icon className="h-8 w-8 text-primary" aria-hidden="true" />
                 </div>
                 <span className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center shadow-md">
@@ -76,9 +76,11 @@ const HowItWorksSection: React.FC = () => {
                 {step.description}
               </p>
 
-              {/* Connector line on desktop */}
+              {/* Connector arrow on desktop — visual flow indicator */}
               {index < steps.length - 1 && (
-                <div className="hidden md:block absolute" aria-hidden="true" />
+                <div className="hidden md:block absolute -right-6 top-1/2 -translate-y-1/2 text-muted-foreground/30" aria-hidden="true">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </div>
               )}
             </motion.div>
           ))}

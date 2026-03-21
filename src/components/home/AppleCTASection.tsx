@@ -89,14 +89,13 @@ const AppleCTASection: React.FC = () => {
               </Button>
             </Link>
             
-            {/* Lien installation PWA */}
-            <Link to="/features">
-              <Button 
+            <Link to="/pricing">
+              <Button
                 variant="outline"
-                size="lg" 
+                size="lg"
                 className="group px-8 py-6 text-lg font-medium rounded-full border-2 border-muted-foreground/30 hover:border-primary hover:bg-primary/5 transition-all duration-300"
               >
-                Découvrir les fonctionnalités
+                Voir les tarifs
                 <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>

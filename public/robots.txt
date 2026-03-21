@@ -4,7 +4,9 @@ Disallow: /app/
 Disallow: /admin/
 Disallow: /api/
 Disallow: /auth/
-Disallow: /b2b/
+Disallow: /b2b/dashboard
+Disallow: /b2b/admin
+Disallow: /b2b/reports
 Disallow: /dev/
 Disallow: /test
 Disallow: /dashboard

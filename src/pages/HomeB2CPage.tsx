@@ -176,20 +176,14 @@ const HomeB2CPage: React.FC = () => {
                 </Button>
               </motion.div>
 
-              <div className="flex items-center gap-6 pt-4">
-                <div className="flex -space-x-2">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div
-                      key={i}
-                      className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-500 border-2 border-background flex items-center justify-center text-white text-xs font-bold"
-                    >
-                      {String.fromCharCode(64 + i)}
-                    </div>
-                  ))}
-                </div>
-                <div className="text-sm">
-                  <div className="font-semibold">Plateforme en lancement</div>
-                  <div className="text-muted-foreground">Rejoignez les premiers utilisateurs</div>
+              <div className="flex items-center gap-4 pt-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Heart className="h-4 w-4 text-primary" />
+                  <span>Créé par une médecin</span>
+                  <span className="text-border">•</span>
+                  <span>Gratuit pour commencer</span>
+                  <span className="text-border">•</span>
+                  <span>Conforme RGPD</span>
                 </div>
               </div>
             </motion.div>

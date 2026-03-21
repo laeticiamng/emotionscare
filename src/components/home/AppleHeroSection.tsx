@@ -36,7 +36,7 @@ const AppleHeroSection: React.FC = () => {
   const scaleSpring = useSpring(scale, springConfig);
 
   // Text reveal animation — grouped for reading flow
-  const words = ["Gérez", "votre stress", "en 3 minutes."];
+  const words = ["Respirez.", "Récupérez.", "Reprenez."];
   
   return (
     <section 
@@ -102,8 +102,9 @@ const AppleHeroSection: React.FC = () => {
             transition={{ duration: 0.8, delay: 0.7 }}
             className="text-xl sm:text-2xl md:text-3xl text-muted-foreground max-w-3xl mx-auto mb-4 font-light leading-relaxed"
           >
-            Respiration guidée, coaching IA et exercices anti-stress
-            <span className="text-foreground font-medium"> pensés pour vous, soignants.</span>
+            La plateforme de régulation émotionnelle
+            <span className="text-foreground font-medium"> conçue pour les soignants.</span>
+            {' '}Respiration guidée, coaching IA et exercices anti-stress en 3 minutes.
           </motion.p>
 
           {/* Concrete value prop */}
