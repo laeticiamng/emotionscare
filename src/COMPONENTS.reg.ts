@@ -9,7 +9,7 @@ export { LoadingSpinner } from './components/ui/LoadingSpinner.tsx';
 export { NavBar } from '@/ui/NavBar';
 export { Footer } from '@/ui/Footer';
 export { GlowSurface } from '@/ui/GlowSurface';
-export { CookieConsent, hasConsent } from '@/ui/CookieConsent';
+export { hasConsent } from '@/ui/CookieConsent';
 export { SeoHead } from '@/lib/seo/SeoHead';
 
 // --- shadcn / UI primitives -------------------------------------------------
