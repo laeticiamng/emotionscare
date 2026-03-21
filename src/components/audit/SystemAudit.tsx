@@ -76,7 +76,7 @@ const SystemAudit: React.FC = () => {
 
     try {
       // Validation d'accès
-      const validation = validateRouteAccess(route, isAuthenticated, user?.role || userMode);
+      const validation = validateRouteAccess(route, isAuthenticated, user?.role ?? userMode ?? undefined);
       if (!validation.hasAccess) {
         accessible = false;
         errors.push('Accès refusé');
