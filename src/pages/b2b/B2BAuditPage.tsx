@@ -58,7 +58,7 @@ const B2BAuditPage: React.FC = () => {
       priority: 'high',
       lastChecked: new Date(),
       recommendation: 'SSO fonctionnel, aucune action requise',
-      businessImpact: 'Sécurité optimale pour 500+ utilisateurs'
+      businessImpact: 'Sécurité optimale pour vos équipes'
     },
     {
       id: '2',
@@ -75,7 +75,7 @@ const B2BAuditPage: React.FC = () => {
       id: '3',
       category: 'Performance',
       title: 'Temps de réponse Enterprise',
-      description: 'Mesure des performances sous charge enterprise (1000+ utilisateurs)',
+      description: 'Mesure des performances sous charge enterprise',
       status: 'pass',
       priority: 'medium',
       lastChecked: new Date(),
