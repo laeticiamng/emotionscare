@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { routes } from '@/routerV2';
+import { routes, Routes } from '@/routerV2';
 import { validateRouteAccess } from '@/utils/routeValidation';
 import { 
   CheckCircle, 
