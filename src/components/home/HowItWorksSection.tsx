@@ -5,7 +5,10 @@
 
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
-import { UserPlus, Compass, Smile } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { UserPlus, Compass, Smile, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 
 const steps = [
   {
@@ -23,12 +26,14 @@ const steps = [
   {
     icon: Smile,
     number: '3',
-    title: 'Ressentez la différence',
-    description: 'En 2 à 5 minutes, retrouvez calme et clarté pour continuer votre journée.',
+    title: 'Retrouvez le calme',
+    description: 'En 2 à 5 minutes : respiration plus lente, esprit plus clair, stress réduit.',
   },
 ];
 
 const HowItWorksSection: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+
   return (
     <section className="py-12 sm:py-20 md:py-28 bg-background" aria-labelledby="how-it-works-heading">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
@@ -85,6 +90,25 @@ const HowItWorksSection: React.FC = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* CTA after steps */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="text-center mt-10 sm:mt-14"
+        >
+          <Link to={isAuthenticated ? '/app/home' : '/signup'}>
+            <Button
+              size="lg"
+              className="rounded-full px-8 py-6 text-base font-semibold gap-2"
+            >
+              {isAuthenticated ? 'Accéder à mes exercices' : 'Essayer gratuitement'}
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+        </motion.div>
       </div>
     </section>
   );
