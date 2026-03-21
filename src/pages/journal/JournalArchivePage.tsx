@@ -193,7 +193,7 @@ const JournalArchivePage = memo(() => {
               <h3 className="font-medium text-success">Conformité RGPD</h3>
               <p className="text-sm text-muted-foreground mt-1">
                 Vos données sont chiffrées et vous pouvez les exporter ou les supprimer à tout moment.
-                Nous ne partageons jamais vos informations personnelles.
+                Nos sous-traitants techniques sont encadrés conformément au RGPD.
               </p>
             </div>
           </div>

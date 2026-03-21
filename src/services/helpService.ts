@@ -57,7 +57,7 @@ const DEFAULT_FAQS: FAQ[] = [
   {
     id: 'faq-2',
     question: 'Mes données sont-elles sécurisées ?',
-    answer: 'Oui, toutes vos données sont chiffrées en transit (TLS 1.3) et au repos (AES-256). Nous sommes conformes au RGPD et ne partageons jamais vos informations personnelles.',
+    answer: 'Oui, toutes vos données sont chiffrées en transit (TLS 1.3) et au repos (AES-256). Nous sommes conformes au RGPD. Nos sous-traitants techniques sont encadrés contractuellement.',
     slug: 'securite-donnees',
     category: 'rgpd'
   },

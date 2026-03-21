@@ -220,7 +220,7 @@ const AboutPage: React.FC = () => {
                       icon: Shield,
                       title: 'Confidentialité absolue',
                       description:
-                        'Vos données émotionnelles restent les vôtres. Conforme RGPD, hébergé en France, aucune revente à des tiers.',
+                        'Vos données émotionnelles restent les vôtres. Conforme RGPD, hébergé en Europe (UE), aucune revente à des tiers.',
                     },
                     {
                       icon: Target,
@@ -269,7 +269,7 @@ const AboutPage: React.FC = () => {
                     {
                       icon: Lock,
                       title: 'Confidentialité',
-                      text: 'Vos émotions sont privées. Nous ne vendons ni ne partageons jamais vos données.',
+                      text: 'Vos émotions sont privées. Nous ne vendons jamais vos données. Nos sous-traitants techniques sont encadrés par le RGPD.',
                     },
                     {
                       icon: Sparkles,
@@ -309,7 +309,7 @@ const AboutPage: React.FC = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto text-center">
                 {[
                   { icon: Shield, label: 'Conforme RGPD' },
-                  { icon: Lock, label: 'Hébergé en France' },
+                  { icon: Lock, label: 'Hébergé en Europe (UE)' },
                   { icon: Stethoscope, label: 'Créé par une médecin' },
                   { icon: Heart, label: 'Made in France' },
                 ].map((badge, i) => (

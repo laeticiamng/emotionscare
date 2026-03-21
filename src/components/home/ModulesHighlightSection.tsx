@@ -88,7 +88,7 @@ const modules: ModuleHighlight[] = [
   },
   {
     title: "Données sécurisées",
-    description: "Vos données restent les vôtres. Conforme RGPD, hébergé en France, aucune revente.",
+    description: "Vos données restent les vôtres. Conforme RGPD, hébergé en Europe (UE), aucune revente.",
     icon: Shield,
     highlight: 'RGPD',
     span: 'md:col-span-1 md:row-span-1',

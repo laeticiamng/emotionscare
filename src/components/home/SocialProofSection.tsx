@@ -32,7 +32,7 @@ const principles = [
 
 const trustBadges = [
   { icon: Shield, label: 'Conforme RGPD' },
-  { icon: Award, label: 'Hébergé en France' },
+  { icon: Award, label: 'Hébergé en Europe (UE)' },
   { icon: GraduationCap, label: 'Fondé sur les neurosciences' },
   { icon: Heart, label: 'Créé par une médecin' },
 ];
