@@ -7,6 +7,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAccessibilityValidation } from '@/hooks/useAccessibilityValidation';
 import { CheckCircle, XCircle, AlertTriangle, RefreshCw, Shield, Eye, Keyboard, Volume2 } from 'lucide-react';
 
+interface AuditIssue {
+  impact: string;
+  message: string;
+  rule: string;
+  element?: string;
+}
 const AccessibilityAudit: React.FC = () => {
   const { report, isValidating, validateAccessibility } = useAccessibilityValidation();
 
