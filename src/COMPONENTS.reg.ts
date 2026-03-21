@@ -61,4 +61,4 @@ export { flagActive, inCohort, setOverride, clearOverride, getOverrides } from '
 
 // --- Providers additionnels -------------------------------------------------
 export { AccessibilityProvider } from '@/components/common/AccessibilityProvider';
-export { ThemeProvider as LegacyThemeProvider } from '@/providers/ThemeProvider';
+export { ThemeProvider as LegacyThemeProvider } from '@/theme/ThemeProvider';
