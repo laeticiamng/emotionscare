@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Shield, Award, Heart, GraduationCap, Sparkles, Quote, Brain, Clock, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import laeticiaPhoto from '@/assets/laeticia-motongane.jpg';
 
 /** Principes vérifiables — pas de témoignages inventés */
 const principles = [
@@ -113,7 +114,7 @@ const SocialProofSection: React.FC = () => {
           className="text-center bg-card border border-border/50 rounded-2xl p-8 max-w-2xl mx-auto"
         >
           <img
-            src="https://media.licdn.com/dms/image/v2/D4E03AQEtYkSyftmFow/profile-displayphoto-scale_200_200/B4EZz50UGgJoAY-/0/1773717767476?e=2147483647&v=beta&t=kNzX8Nj5_Xq4nfx-Ok6Kj7RxIY_Fm4hf2Nn17zHcPo0"
+            src={laeticiaPhoto}
             alt="Laeticia Motongane — Médecin · Fondatrice d'EmotionsCare"
             className="w-16 h-16 rounded-full object-cover mx-auto mb-4 ring-2 ring-primary/20"
             loading="lazy"

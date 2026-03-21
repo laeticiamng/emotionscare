@@ -377,7 +377,7 @@ const PricingPageWorking: React.FC = () => {
                 },
                 {
                   q: 'Mes données sont-elles protégées ?',
-                  a: 'Oui. EmotionsCare est conforme RGPD, hébergé en France, et aucune donnée n\'est vendue ou partagée avec des tiers. Vos données émotionnelles restent strictement confidentielles.',
+                  a: 'Oui. EmotionsCare est conforme RGPD, hébergé en Europe, et aucune donnée n\'est vendue. Nos sous-traitants techniques (Supabase, Stripe) sont documentés conformément au RGPD. Vos données émotionnelles restent strictement confidentielles.',
                 },
               ].map((faq, i) => (
                 <motion.div

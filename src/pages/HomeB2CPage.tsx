@@ -169,9 +169,9 @@ const HomeB2CPage: React.FC = () => {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="text-lg h-14 px-8 backdrop-blur-sm">
-                  <Link to="/about">
+                  <Link to="/features">
                     <Camera className="w-5 h-5 mr-2" />
-                    Voir la démo
+                    Découvrir les fonctionnalités
                   </Link>
                 </Button>
               </motion.div>
