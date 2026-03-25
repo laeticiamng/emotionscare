@@ -53,6 +53,7 @@ export const supabase = createSupabaseClient();
 
 // Log de connexion en développement
 if (IS_DEV) {
+  // eslint-disable-next-line no-console
   console.info(
     `[SYSTEM] ${isSupabaseConfigured ? '🔌 Supabase client initialized' : '⚠️ Supabase not configured — app running in degraded mode'}`
   );
