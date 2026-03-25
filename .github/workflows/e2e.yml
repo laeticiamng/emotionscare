@@ -15,23 +15,20 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
+          cache: 'npm'
+      - run: npm ci
 
       - name: Seed DB (idempotent)
-        run: pnpm seed:ci
+        run: npx tsx scripts/seed-e2e.ts
 
       - name: Install Playwright
         run: npx playwright install --with-deps
 
       - name: Run E2E
-        run: pnpm e2e
+        run: npm run e2e
         env:
           PREVIEW_URL: ${{ env.PREVIEW_URL }}
 
