@@ -4,7 +4,7 @@
  */
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, isSupabaseConfigured } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 import { getFriendlyAuthError } from '@/lib/auth/authErrorService';
@@ -36,15 +36,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // If Supabase is not configured, skip auth initialization entirely
+    // to avoid network errors and let the app render public pages
+    if (!isSupabaseConfigured) {
+      logger.warn('Supabase not configured — skipping auth initialization', undefined, 'AUTH');
+      setIsLoading(false);
+      return;
+    }
+
     let mounted = true;
 
     // Récupérer la session initiale
     const getInitialSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
-        
+
         if (!mounted) return;
-        
+
         if (error) {
           logger.error('Erreur lors de la récupération de la session', error, 'AUTH');
         } else {
@@ -67,7 +75,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (!mounted) return;
 
         logger.info(`Auth state changed: ${event}`, { email: currentSession?.user?.email }, 'AUTH');
-        
+
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         setIsLoading(false);
