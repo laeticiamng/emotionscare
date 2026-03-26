@@ -169,7 +169,7 @@ export const useSunoService = (): SunoServiceHook => {
         
         // Mettre à jour la playlist avec les prochaines pistes
         if (response.data.nextTracks) {
-          setPlaylist(prev => [...prev, ...response.data.nextTracks]);
+          setPlaylist(prev => [...prev, ...response.data!.nextTracks]);
         }
       } else if (response.error) {
         setError(response.error);
