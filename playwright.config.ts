@@ -70,10 +70,12 @@ export default defineConfig({
       },
     },
   ],
-  webServer: {
-    command: 'npm run dev',
-    url: baseURL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120000,
-  },
+  webServer: process.env.PW_BASE_URL || process.env.PREVIEW_URL
+    ? undefined
+    : {
+        command: 'npm run dev',
+        url: baseURL,
+        reuseExistingServer: true,
+        timeout: 120000,
+      },
 });

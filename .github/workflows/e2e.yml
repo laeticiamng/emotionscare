@@ -4,9 +4,6 @@ on:
   pull_request:
 
 env:
-  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-  PREVIEW_URL: ${{ secrets.PREVIEW_URL }}
   NODE_ENV: test
 
 jobs:
@@ -21,8 +18,25 @@ jobs:
           cache: 'npm'
       - run: npm ci
 
-      - name: Seed DB (idempotent)
-        run: npx tsx scripts/seed-e2e.ts
+      - name: Build
+        run: npm run build
+
+      - name: Start preview server
+        run: |
+          npx vite preview --host 0.0.0.0 --port 4173 > preview.log 2>&1 &
+          echo $! > preview.pid
+
+      - name: Wait for preview server
+        run: |
+          for i in {1..30}; do
+            if curl -sSf http://127.0.0.1:4173 > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Preview server failed to start" >&2
+          cat preview.log
+          exit 1
 
       - name: Install Playwright
         run: npx playwright install --with-deps
@@ -30,7 +44,14 @@ jobs:
       - name: Run E2E
         run: npm run e2e
         env:
-          PREVIEW_URL: ${{ env.PREVIEW_URL }}
+          PW_BASE_URL: http://127.0.0.1:4173
+
+      - name: Stop preview server
+        if: always()
+        run: |
+          if [ -f preview.pid ]; then
+            kill $(cat preview.pid) || true
+          fi
 
       - name: Upload Playwright artifacts
         if: always()
@@ -40,3 +61,4 @@ jobs:
           path: |
             playwright-report
             test-results
+            preview.log
