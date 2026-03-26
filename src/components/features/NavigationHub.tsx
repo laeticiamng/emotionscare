@@ -432,7 +432,7 @@ const NavigationHub: React.FC = () => {
                   "h-full hover:shadow-lg transition-all duration-300 cursor-pointer group",
                   item.isActive && "ring-2 ring-primary border-primary"
                 )}
-                asChild
+                asChild={undefined as any}
               >
                 <Link to={item.path}>
                   <CardHeader className="pb-3">
