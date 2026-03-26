@@ -22,7 +22,7 @@ const EnhancedAdminDashboard: React.FC = () => {
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   
   return (
-    <OnboardingProvider steps={b2bAdminOnboardingSteps}>
+    <OnboardingProvider>
       <div className="container mx-auto py-6 space-y-8">
         <motion.div 
           className="flex flex-col space-y-2 md:flex-row md:items-center md:justify-between"

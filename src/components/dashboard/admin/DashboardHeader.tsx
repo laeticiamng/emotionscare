@@ -28,7 +28,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onRefresh }) => {
       <div>
         <h1 className="text-2xl font-bold">Tableau de bord</h1>
         <p className="text-muted-foreground">
-          {user ? `Bienvenue, ${user.name}` : 'Aperçu de votre bien-être'}
+          {user ? `Bienvenue, ${(user as any).name || user.email}` : 'Aperçu de votre bien-être'}
         </p>
       </div>
       

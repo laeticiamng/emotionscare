@@ -4,9 +4,9 @@ import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import { DraggableCard } from './draggable/DraggableCard';
 import { DraggableKpiCardsGridProps, DraggableCardProps } from '@/types/widgets';
 
-const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({ kpiCards }) => {
+const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({ kpiCards = [] }) => {
   const [cards, setCards] = useState<DraggableCardProps[]>(
-    kpiCards.map((card, index) => ({
+    (kpiCards || []).map((card, index) => ({
       ...card,
       id: card.id || `card-${index}`
     }))
