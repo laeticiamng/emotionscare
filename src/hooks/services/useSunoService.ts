@@ -336,7 +336,7 @@ export const useSunoService = (): SunoServiceHook => {
           // Mettre à jour la piste générée avec l'URL finale
           setGeneratedTrack(prev => prev ? {
             ...prev,
-            audioUrl: response.data.audioUrl
+            audioUrl: response.data!.audioUrl
           } : null);
         }
       }

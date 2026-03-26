@@ -141,7 +141,7 @@ export const useAmbitionRun = () => {
             unlocked: true,
             cost: 0,
             description: `Débloqu grâce à vos réponses`
-          });
+          } as any);
         });
       }
       

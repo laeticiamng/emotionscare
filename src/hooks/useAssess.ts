@@ -8,7 +8,7 @@ import type {
   SubmitOutput, 
   AggregateInput, 
   Instrument 
-} from '../../../packages/contracts/assess';
+} from '@/lib/assess/types';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
 

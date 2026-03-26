@@ -40,8 +40,8 @@ export const useConversationManagement = () => {
         lastMessage: "",
         created_at: new Date().toISOString(), // legacy field
         updated_at: new Date().toISOString(), // legacy field
-        last_message: "", // legacy field
-        user_id: "user-123", // Normally dynamic according to logged user
+        lastMessage: "",
+        user_id: "user-123",
         messages: [] // Add empty messages array
       };
       

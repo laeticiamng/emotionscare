@@ -25,8 +25,8 @@ export const useAPICache = <T = any>(options: CacheOptions = {}) => {
 
     // Remove oldest entries if cache is full
     if (cache.current.size >= maxSize) {
-      const oldestKey = cache.current.keys().next().value;
-      cache.current.delete(oldestKey);
+      const oldestKey = cache.current.keys().next().value as string | undefined;
+      if (oldestKey) cache.current.delete(oldestKey);
     }
 
     cache.current.set(key, entry);

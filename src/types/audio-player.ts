@@ -18,3 +18,14 @@ export interface AudioPlayerControls {
 }
 
 export type AudioPlayerHook = AudioPlayerState & AudioPlayerControls;
+
+export interface UseAudioPlayerStateReturn extends AudioPlayerState {
+  audioRef: React.RefObject<HTMLAudioElement | null>;
+  setIsPlaying: (v: boolean) => void;
+  setCurrentTime: (v: number) => void;
+  setDuration: (v: number) => void;
+  setVolume: (v: number) => void;
+  setIsMuted: (v: boolean) => void;
+  setIsLoading: (v: boolean) => void;
+  setError: (v: string | null) => void;
+}

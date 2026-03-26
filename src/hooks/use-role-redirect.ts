@@ -38,8 +38,8 @@ export function useRoleRedirect() {
       location.pathname === '/b2b/admin/login';
     
     if (isAuthenticated && user && isExplicitLoginPage) {
-      logger.info('[useRoleRedirect] Redirecting authenticated user to', { path: getModeDashboardPath(normalizeUserMode(user.role)) }, 'AUTH');
-      navigate(getModeDashboardPath(normalizeUserMode(user.role)));
+      logger.info('[useRoleRedirect] Redirecting authenticated user to', { path: getModeDashboardPath(normalizeUserMode(user.role ?? '') as any) }, 'AUTH');
+      navigate(getModeDashboardPath(normalizeUserMode(user.role ?? '') as any));
     }
   }, [isAuthenticated, user, isLoading, navigate, location.pathname]);
   

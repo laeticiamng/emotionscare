@@ -63,7 +63,7 @@ const ConversationTimeline: React.FC<ConversationTimelineProps> = ({
             {groupedConversations[date].map((conversation) => {
               const isActive = activeConversationId === conversation.id;
               const emotionalTone = getEmotionalTone(conversation);
-              const createdTime = new Date(conversation.createdAt);
+              const createdTime = new Date(conversation.createdAt ?? Date.now());
               
               return (
                 <button

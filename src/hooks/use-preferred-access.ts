@@ -45,7 +45,7 @@ const usePreferredAccess = () => {
     if (isAuthenticated && user?.role && 
         (location.pathname.includes('/dashboard') || location.pathname.includes('/profile'))) {
       
-      const normalizedRole = normalizeUserMode(user.role);
+      const normalizedRole = normalizeUserMode(user.role as string) as UserMode;
       const correctPathPrefix = 
         normalizedRole === 'b2b_admin' ? '/b2b/admin' :
         normalizedRole === 'b2b_user' ? '/b2b/user' :

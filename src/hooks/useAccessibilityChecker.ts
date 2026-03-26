@@ -182,7 +182,7 @@ export function useAccessibilityChecker() {
 
   const checkPageTitle = async (): Promise<{ passed: boolean; issue?: AccessibilityIssue }> => {
     const title = document.title;
-    const passed = title && title.length > 0 && title.length <= 60;
+    const passed = !!(title && title.length > 0 && title.length <= 60);
     
     return {
       passed,

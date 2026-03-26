@@ -97,3 +97,24 @@ export interface LevelConfig {
   benefits: string[];
   badge_unlock?: string;
 }
+
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  difficulty: string;
+  points: number;
+  deadline?: string;
+  completed?: boolean;
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  user_id: string;
+  username: string;
+  avatar?: string;
+  points: number;
+  level: number;
+  rank: number;
+}
