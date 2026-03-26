@@ -427,14 +427,13 @@ const NavigationHub: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
             >
+              <Link to={item.path}>
               <Card 
                 className={cn(
                   "h-full hover:shadow-lg transition-all duration-300 cursor-pointer group",
                   item.isActive && "ring-2 ring-primary border-primary"
                 )}
-                asChild={undefined as any}
               >
-                <Link to={item.path}>
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
