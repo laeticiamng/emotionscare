@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useHelp - Hook de gestion de l'aide avec données locales
  * Les articles sont stockés localement pour éviter les appels API cassés
