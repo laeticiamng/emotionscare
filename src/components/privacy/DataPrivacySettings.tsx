@@ -146,7 +146,7 @@ const DataPrivacySettings: React.FC = () => {
       anonymization: 'Anonymisation automatique',
     };
     
-    addToHistory(settingNames[key], privacySettings[key], value);
+    addToHistory(settingNames[key], Boolean(privacySettings[key]), value);
     await updatePrivacySettings({ [key]: value });
   };
 
