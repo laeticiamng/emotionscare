@@ -126,7 +126,7 @@ export const useDashboardStats = () => {
     emotionalScore: { current: 0, trend: 0 }
   });
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { segment } = useSegment();
+  const segment = (useSegment() as any)?.segment;
 
   const fetchData = async () => {
     try {
