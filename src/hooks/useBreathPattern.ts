@@ -169,7 +169,7 @@ export const useBreathPattern = () => {
     // Get HRV data if active
     let hrvData: HRVData | null = null;
     if (store.hrvActive) {
-      hrvData = hrv.stopRecording();
+      hrvData = hrv.stopRecording() ?? null;
       store.setHRVActive(false);
     }
 

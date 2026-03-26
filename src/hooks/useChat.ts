@@ -7,7 +7,7 @@ export interface ChatMessage {
   timestamp: Date;
 }
 
-export const useChat = () => {
+export const useChatSimple = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 

@@ -165,7 +165,7 @@ export const useEmotionAnalysisEngine = () => {
 
       toast({
         title: "Analyse vocale terminée",
-        description: `Émotion détectée: ${result.emotion} (${Math.round(result.confidence * 100)}%)`,
+        description: `Émotion détectée: ${result.emotion} (${Math.round((typeof result.confidence === 'number' ? result.confidence : 0.5) * 100)}%)`,
       });
 
       return enrichedResult;
