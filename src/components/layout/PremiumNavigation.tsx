@@ -71,7 +71,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Tableau de Bord',
           description: 'Vue d\'ensemble de votre bien-être',
           icon: <BarChart3 className="w-5 h-5" />,
-          path: Routes.consumerHome(),
+          path: routes.consumer.home(),
           category: 'core',
           xp: 50,
           segment: 'consumer'
