@@ -48,7 +48,7 @@ const PrivacyPreferencesComponent: React.FC<PrivacyPreferencesProps> = ({
   
   const privacySettings = getPrivacySettings();
   
-  const handleUpdatePrivacy = (key: keyof PrivacyPreferences, value: any) => {
+  const handleUpdatePrivacy = (key: string, value: any) => {
     if (onUpdate) {
       const updatedPrivacy: PrivacyPreferences = {
         ...privacySettings,
