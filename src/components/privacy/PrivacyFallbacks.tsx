@@ -30,8 +30,8 @@ const PrivacyFallback: React.FC<PrivacyFallbackProps> = ({
   fallbackContent,
   showSettings = true
 }) => {
-  const { prefs, setPref } = usePrivacyStore();
-  const isEnabled = prefs[type];
+  const { prefs, setPref } = usePrivacyStore() as any;
+  const isEnabled = (prefs as any)[type];
 
   const getFallbackInfo = () => {
     switch (type) {
