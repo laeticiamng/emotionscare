@@ -119,10 +119,10 @@ const ColorPaletteDisplay: React.FC = () => {
                   <Badge variant="info">Info</Badge>
                   <Badge variant="error">Error</Badge>
                   <Badge variant="outline">Outline</Badge>
-                  <Badge variant="success-subtle">Success Subtle</Badge>
-                  <Badge variant="warning-subtle">Warning Subtle</Badge>
-                  <Badge variant="info-subtle">Info Subtle</Badge>
-                  <Badge variant="error-subtle">Error Subtle</Badge>
+                  <Badge variant="success">Success Subtle</Badge>
+                  <Badge variant="warning">Warning Subtle</Badge>
+                  <Badge variant="info">Info Subtle</Badge>
+                  <Badge variant="error">Error Subtle</Badge>
                 </div>
               </div>
 
