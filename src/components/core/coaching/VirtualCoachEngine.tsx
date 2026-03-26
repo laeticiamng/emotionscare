@@ -89,7 +89,7 @@ const VirtualCoachEngine: React.FC<VirtualCoachEngineProps> = ({
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
   const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   // Personnalités de coach disponibles
