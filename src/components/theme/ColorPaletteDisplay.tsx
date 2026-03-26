@@ -135,7 +135,7 @@ const ColorPaletteDisplay: React.FC = () => {
                   </AlertDescription>
                 </Alert>
                 
-                <Alert variant="success">
+                <Alert variant="destructive">
                   <CheckCircle2 className="h-4 w-4" />
                   <AlertTitle>Succès</AlertTitle>
                   <AlertDescription>
