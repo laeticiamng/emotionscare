@@ -233,7 +233,7 @@ const PerfectDashboard: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-2">{dashboardData.todaysSessions}</div>
+              <div className="text-3xl font-bold mb-2">{metrics.todaysSessions}</div>
               <p className="text-sm text-muted-foreground mb-2">Sessions complétées</p>
               <Button size="sm" variant="outline" className="w-full">
                 <Clock className="w-4 h-4 mr-2" />
