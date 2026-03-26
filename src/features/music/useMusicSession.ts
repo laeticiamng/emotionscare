@@ -16,7 +16,7 @@ interface ApplyInputs {
 
 type SessionStatus = 'idle' | 'running' | 'completed';
 
-type PostCta = 'nyvee' | 'encore_2min' | 'none';
+type PostCta = 'nyvee' | 'cocoon' | 'encore_2min' | 'none';
 
 type VisualizerMode = 'reduced' | 'standard';
 

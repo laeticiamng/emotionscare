@@ -15,7 +15,7 @@ const B2BModeGuard: React.FC<B2BModeGuardProps> = ({ children, requiredMode }) =
   const location = useLocation();
 
   useEffect(() => {
-    const normalized = normalizeUserMode(userMode);
+    const normalized = normalizeUserMode(userMode as string);
     const expected = requiredMode || (location.pathname.includes('/b2b/admin') ? 'b2b_admin' : 'b2b_user');
     if (normalized !== expected) {
       logger.warn('B2BModeGuard access blocked without valid selection', {

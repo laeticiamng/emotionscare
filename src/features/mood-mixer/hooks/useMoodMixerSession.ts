@@ -64,7 +64,7 @@ const emit = <K extends keyof MoodMixerEventMap>(event: K, payload: MoodMixerEve
 
 export const moodMixerBus = {
   on<K extends keyof MoodMixerEventMap>(event: K, listener: MoodMixerListener<K>) {
-    const bucket = (listeners[event] ??= new Set<MoodMixerListener<K>>()) as Set<MoodMixerListener<K>>;
+    const bucket = (listeners[event] ??= new Set() as any) as Set<MoodMixerListener<K>>;
     bucket.add(listener);
     return () => {
       bucket.delete(listener);

@@ -319,7 +319,7 @@ function describeMoodNuance(tone: MoodToneId, valence: number, arousal: number):
     case 'éveillé':
       return arousal > 0.9 ? 'éveil pétillant' : 'éveil doux';
     default:
-      return MOOD_TONE_DESCRIPTORS[tone].baseline;
+      return (MOOD_TONE_DESCRIPTORS[tone] as any)?.baseline ?? 'équilibre';
   }
 }
 

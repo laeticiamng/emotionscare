@@ -150,7 +150,7 @@ export async function persistNyveeSession(
 
   try {
     await createSession({
-      type: 'nyvee',
+      type: 'nyvee' as any,
       duration_sec: 0,
       mood_delta: null,
       meta: {
