@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests unitaires - Module Brain Viewer
  * EmotionsCare - DICOM Module

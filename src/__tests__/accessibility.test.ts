@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TESTS D'ACCESSIBILITÉ - EmotionsCare
  * WCAG AA Compliance

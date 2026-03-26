@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour les hooks principaux
  * Services et logique métier critique

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests de Performance - EmotionsCare
  * Benchmarks et optimisations

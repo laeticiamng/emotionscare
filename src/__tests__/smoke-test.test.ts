@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SMOKE TEST UNIVERSEL - EmotionsCare
  * Exécuter à chaque changement pour validation

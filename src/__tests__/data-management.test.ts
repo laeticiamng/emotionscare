@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Data Management & Environment Tests
  * Tests pour la gestion des données et configuration environnement

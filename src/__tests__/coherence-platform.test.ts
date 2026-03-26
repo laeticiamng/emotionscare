@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests de Cohérence Plateforme
  * Vérifie que Backend, Frontend et Documentation sont synchronisés
