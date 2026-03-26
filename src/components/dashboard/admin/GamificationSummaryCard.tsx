@@ -1,7 +1,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Challenge, Badge as BadgeType } from '@/types/gamification';
+import { Badge as BadgeType } from '@/types/gamification';
+import type { Challenge } from '@/types/badge';
 import { Trophy, Award } from 'lucide-react';
 
 interface GamificationSummaryCardProps {
