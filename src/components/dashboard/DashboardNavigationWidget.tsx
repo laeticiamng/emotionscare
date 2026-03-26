@@ -76,7 +76,7 @@ export default function DashboardNavigationWidget() {
                     "p-2 rounded-lg bg-gradient-to-br text-primary-foreground",
                     action.color
                   )}>
-                    {React.createElement(action.icon, { className: "h-4 w-4" })}
+                    <action.icon className="h-4 w-4" />
                   </div>
                   <span className="text-sm font-medium text-left flex-1">
                     {action.label}

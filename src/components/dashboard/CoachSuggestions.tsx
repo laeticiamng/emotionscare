@@ -213,7 +213,7 @@ const CoachSuggestions: React.FC = () => {
                   onClick={() => navigate(suggestion.link)}
                 >
                   <div className={`p-2 rounded-full ${categoryColor}`}>
-                    {React.createElement(Icon, { className: "h-4 w-4" })}
+                    <Icon className="h-4 w-4" />
                   </div>
                   
                   <div className="flex-1 min-w-0">
