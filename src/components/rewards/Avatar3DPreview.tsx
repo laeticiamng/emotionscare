@@ -51,9 +51,9 @@ const Particles = ({ count = 50, isNew }: { count?: number; isNew?: boolean }) =
       dummy.rotation.set(s * 5, s * 5, s * 5);
       dummy.updateMatrix();
       
-      meshRef.current.setMatrixAt(i, dummy.matrix);
+      meshRef.current!.setMatrixAt(i, dummy.matrix);
     });
-    meshRef.current.instanceMatrix.needsUpdate = true;
+    meshRef.current!.instanceMatrix.needsUpdate = true;
   });
 
   return (

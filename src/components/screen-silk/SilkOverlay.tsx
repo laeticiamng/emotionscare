@@ -175,18 +175,17 @@ export const SilkOverlay: React.FC<SilkOverlayProps> = ({
       )}
 
       {/* Custom CSS for animations */}
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes gentle-drift {
           0%, 100% { transform: translateX(0) translateY(0); }
           25% { transform: translateX(1px) translateY(-1px); }
           50% { transform: translateX(-0.5px) translateY(0.5px); }
           75% { transform: translateX(0.5px) translateY(-0.5px); }
         }
-        
         .bg-gradient-radial {
           background: radial-gradient(ellipse at center, var(--tw-gradient-stops));
         }
-      `}</style>
+      ` }} />
     </div>
   );
 };

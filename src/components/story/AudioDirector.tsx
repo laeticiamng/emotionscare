@@ -92,7 +92,7 @@ const AudioDirector: React.FC<AudioDirectorProps> = ({
         audioRef.current.src = '';
       }
       
-      [audioRef.current, nextAudioRef.current] = [nextAudioRef.current, audioRef.current];
+      const temp = audioRef.current; (audioRef as any).current = nextAudioRef.current; (nextAudioRef as any).current = temp;
       
       setIsPlaying(true);
       setError(null);
@@ -123,7 +123,7 @@ const AudioDirector: React.FC<AudioDirectorProps> = ({
     };
 
     const handleError = (e: Event) => {
-      logger.error('Audio load error', e as Error, 'MUSIC');
+      logger.error('Audio load error', e as unknown as Error, 'MUSIC');
       setError('Impossible de charger l\'audio');
       setIsLoading(false);
     };

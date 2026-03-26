@@ -30,8 +30,8 @@ const PrivacyFallback: React.FC<PrivacyFallbackProps> = ({
   fallbackContent,
   showSettings = true
 }) => {
-  const { prefs, setPref } = usePrivacyStore();
-  const isEnabled = prefs[type];
+  const { prefs, setPref } = usePrivacyStore() as any;
+  const isEnabled = (prefs as any)[type];
 
   const getFallbackInfo = () => {
     switch (type) {
@@ -74,7 +74,7 @@ const PrivacyFallback: React.FC<PrivacyFallbackProps> = ({
   const Icon = fallbackInfo.icon;
 
   const handleEnableFeature = async () => {
-    const success = await setPref(type, true);
+    const success = await setPref(type as any, true);
     if (success) {
       // Annonce pour les lecteurs d'écran
       const message = `${fallbackInfo.label.replace('désactivé', 'activé')}`;

@@ -21,7 +21,7 @@ interface SearchItem {
   title: string;
   description: string;
   path: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   category: string;
   keywords: string[];
 }

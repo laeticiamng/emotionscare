@@ -15,7 +15,7 @@ import {
   Pause, 
   Download,
   Upload,
-  Waveform,
+  AudioWaveform as Waveform,
   Volume2,
   Filter,
   Sliders,

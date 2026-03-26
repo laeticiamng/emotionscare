@@ -174,6 +174,7 @@ const PremiumUIShowcase: React.FC = () => {
                     icon={Heart}
                     onClick={() => logger.info('Floating button clicked', {}, 'UI')}
                     variant="primary"
+                    ariaLabel="Action flottante"
                   />
                 </CardContent>
               </Card>

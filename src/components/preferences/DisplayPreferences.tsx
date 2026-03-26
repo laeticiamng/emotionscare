@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { FontSize, FontFamily, ThemeName } from '@/types/theme';
+import { Theme, FontSize, FontFamily } from '@/types/preferences';
 
 const DisplayPreferences: React.FC = () => {
   const { preferences, updatePreferences } = useUserPreferences();
@@ -12,16 +12,16 @@ const DisplayPreferences: React.FC = () => {
   // Make sure theme is a ThemeName
   const theme = (preferences.theme || 'system') as ThemeName;
 
-  const handleThemeChange = (value: ThemeName) => {
-    updatePreferences({ theme: value });
+  const handleThemeChange = (value: string) => {
+    updatePreferences({ theme: value as Theme });
   };
 
-  const handleFontSizeChange = (value: FontSize) => {
-    updatePreferences({ fontSize: value });
+  const handleFontSizeChange = (value: string) => {
+    updatePreferences({ fontSize: value as FontSize });
   };
 
-  const handleFontFamilyChange = (value: FontFamily) => {
-    updatePreferences({ fontFamily: value });
+  const handleFontFamilyChange = (value: string) => {
+    updatePreferences({ fontFamily: value as FontFamily });
   };
 
   const handleDarkModeChange = (checked: boolean) => {

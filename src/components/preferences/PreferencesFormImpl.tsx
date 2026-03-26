@@ -34,7 +34,7 @@ const UserPreferencesFormImpl: React.FC<UserPreferencesFormProps> = ({
   const { toast } = useToast();
 
   const handleChange = (name: string, value: any) => {
-    setFormValues(prev => ({ ...prev, [name]: value }));
+    setFormValues((prev: Record<string, any>) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {

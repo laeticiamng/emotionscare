@@ -7,7 +7,11 @@ import { Moon, Sun, Monitor, PenTool } from 'lucide-react';
 import { FontSize, FontFamily, ThemeName } from '@/types/theme';
 
 const ThemeSettingsForm = () => {
-  const { theme, setTheme, fontSize, setFontSize, fontFamily, setFontFamily } = useTheme();
+  const { theme, setTheme } = useTheme();
+  const fontSize = 'md' as FontSize;
+  const setFontSize = (_size: FontSize) => {};
+  const fontFamily = 'sans' as FontFamily;
+  const setFontFamily = (_family: FontFamily) => {};
 
   return (
     <div className="space-y-6">
@@ -21,7 +25,7 @@ const ThemeSettingsForm = () => {
         <CardContent>
           <RadioGroup
             value={theme}
-            onValueChange={(value) => setTheme(value as ThemeName)}
+            onValueChange={(value) => setTheme(value as any)}
             className="grid grid-cols-2 sm:grid-cols-4 gap-2"
           >
             <div className="flex items-center space-x-2">

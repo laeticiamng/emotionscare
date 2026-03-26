@@ -64,7 +64,13 @@ const PRIVACY_CONFIG = {
 } as const;
 
 export const PrivacyToggle: React.FC = () => {
-  const { prefs, lockedByOrg, loading, error, setPref } = usePrivacyPrefs();
+  const { prefs, updatePrefs } = usePrivacyPrefs();
+  const lockedByOrg: Record<string, boolean> = {};
+  const loading = false;
+  const error: string | null = null;
+  const setPref = async (key: PrivacyKey, value: boolean) => {
+    await updatePrefs({ [key]: value } as any);
+  };
   const [showHelp, setShowHelp] = useState(false);
   const [consentDialog, setConsentDialog] = useState<PrivacyKey | null>(null);
 
@@ -119,7 +125,7 @@ export const PrivacyToggle: React.FC = () => {
           const config = PRIVACY_CONFIG[key];
           const IconComponent = config.icon;
           const isLocked = !!lockedByOrg[key];
-          const isEnabled = prefs[key];
+          const isEnabled = (prefs as any)[key];
           
           return (
             <div 

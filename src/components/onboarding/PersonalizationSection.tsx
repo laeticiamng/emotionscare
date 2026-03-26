@@ -36,7 +36,7 @@ export interface PersonalizationSectionProps {
 
 interface WellnessGoal {
   id: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   title: string;
   description: string;
 }

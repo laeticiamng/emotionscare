@@ -49,11 +49,12 @@ export const HealthMonitor: React.FC = () => {
       });
 
       // Memory Check
-      const memStats = memoryManager.getCacheStats();
-      const memoryUsage = performance.memory ? {
-        used: Math.round(performance.memory?.usedJSHeapSize / 1024 / 1024),
-        total: Math.round(performance.memory?.totalJSHeapSize / 1024 / 1024),
-        limit: Math.round(performance.memory?.jsHeapSizeLimit / 1024 / 1024)
+      const memStats = (memoryManager as any).getCacheStats?.() ?? {};
+      const perfMemory = (performance as any).memory;
+      const memoryUsage = perfMemory ? {
+        used: Math.round(perfMemory.usedJSHeapSize / 1024 / 1024),
+        total: Math.round(perfMemory.totalJSHeapSize / 1024 / 1024),
+        limit: Math.round(perfMemory.jsHeapSizeLimit / 1024 / 1024)
       } : null;
 
       checks.push({

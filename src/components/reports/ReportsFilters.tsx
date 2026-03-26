@@ -125,8 +125,8 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({ onFiltersChange }) => {
                   <PopoverContent className="w-auto p-0">
                     <Calendar
                       mode="single"
-                      selected={filters.dateRange.start}
-                      onSelect={(date) => updateFilter('dateRange', { ...filters.dateRange, start: date })}
+                      selected={filters.dateRange.start || undefined}
+                      onSelect={(date) => updateFilter('dateRange', { ...filters.dateRange, start: date || null })}
                       locale={fr}
                     />
                   </PopoverContent>
@@ -145,8 +145,8 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({ onFiltersChange }) => {
                   <PopoverContent className="w-auto p-0">
                     <Calendar
                       mode="single"
-                      selected={filters.dateRange.end}
-                      onSelect={(date) => updateFilter('dateRange', { ...filters.dateRange, end: date })}
+                      selected={filters.dateRange.end || undefined}
+                      onSelect={(date) => updateFilter('dateRange', { ...filters.dateRange, end: date || null })}
                       locale={fr}
                     />
                   </PopoverContent>

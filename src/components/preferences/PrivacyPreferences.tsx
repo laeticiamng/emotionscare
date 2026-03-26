@@ -17,29 +17,33 @@ const PrivacyPreferencesComponent: React.FC<PrivacyPreferencesProps> = ({
   const getPrivacySettings = (): PrivacyPreferences => {
     if (!privacy) {
       return {
+        profileVisibility: 'private',
+        dataCollection: false,
+        analytics: false,
+        marketing: false,
         shareData: false,
         shareEmotions: false,
         shareActivity: false,
         publicProfile: false,
         dataSharing: false,
-        analytics: false,
         thirdParty: false,
         anonymizeReports: true,
-        profileVisibility: 'private'
       };
     }
     
     if (typeof privacy === 'string') {
       return {
+        profileVisibility: privacy as 'private' | 'friends' | 'public',
+        dataCollection: privacy !== 'private',
+        analytics: privacy !== 'private',
+        marketing: privacy !== 'private',
         shareData: privacy !== 'private',
         shareEmotions: privacy !== 'private',
         shareActivity: privacy !== 'private',
         publicProfile: privacy !== 'private',
         dataSharing: privacy !== 'private',
-        analytics: privacy !== 'private',
         thirdParty: privacy !== 'private',
         anonymizeReports: true,
-        profileVisibility: privacy
       };
     }
     
@@ -48,9 +52,9 @@ const PrivacyPreferencesComponent: React.FC<PrivacyPreferencesProps> = ({
   
   const privacySettings = getPrivacySettings();
   
-  const handleUpdatePrivacy = (key: keyof PrivacyPreferences, value: any) => {
+  const handleUpdatePrivacy = (key: string, value: any) => {
     if (onUpdate) {
-      const updatedPrivacy: PrivacyPreferences = {
+      const updatedPrivacy: any = {
         ...privacySettings,
         [key]: value
       };

@@ -4,8 +4,8 @@ import { Outlet, useLocation } from 'react-router-dom';
 import PremiumBackground from './PremiumBackground';
 import RealTimeNotifications from './RealTimeNotifications';
 import ImmersiveExperience from './ImmersiveExperience';
-import { FloatingActionMenu } from '../layout/FloatingActionMenu';
-import { EnhancedHeader } from '../layout/EnhancedHeader';
+import FloatingActionMenu from '../layout/FloatingActionMenu';
+import EnhancedHeader from '../layout/EnhancedHeader';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 
@@ -57,7 +57,7 @@ const PremiumLayout: React.FC<PremiumLayoutProps> = ({
   const getBackgroundIntensity = () => {
     switch (variant) {
       case 'immersive':
-        return 'high';
+        return 'intense';
       case 'premium':
         return 'medium';
       default:

@@ -50,7 +50,7 @@ const SearchResultsList = ({
               {sectionLabels[sectionKey as keyof SearchResultsType]}
             </h3>
             <div className="space-y-1">
-              {items.map((item, idx) => {
+              {items.map((item: any, idx: number) => {
                 const currentIndex = globalIndex;
                 globalIndex++;
                 

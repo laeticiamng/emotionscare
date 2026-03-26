@@ -39,6 +39,7 @@ const ChartContainer: React.FC<ChartContainerProps> = ({
   }
 
   const renderChart = () => {
+    if (!chartData) return null;
     switch (type) {
       case 'overview':
         return (

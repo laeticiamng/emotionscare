@@ -20,6 +20,13 @@ export interface PrivacyPreferences {
   dataCollection: boolean;
   analytics: boolean;
   marketing: boolean;
+  shareData?: boolean;
+  shareEmotions?: boolean;
+  shareActivity?: boolean;
+  publicProfile?: boolean;
+  dataSharing?: boolean;
+  thirdParty?: boolean;
+  anonymizeReports?: boolean;
 }
 
 export interface AccessibilityPreferences {
@@ -52,6 +59,11 @@ export interface UserPreferences {
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
   fullAnonymity?: boolean;
+  highContrast?: boolean;
+  colorBlindMode?: boolean;
+  reduceMotion?: boolean;
+  shareData?: boolean;
+  anonymizedData?: boolean;
 }
 
 export interface UserPreferencesContextType {
