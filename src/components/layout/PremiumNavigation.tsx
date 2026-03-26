@@ -173,7 +173,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Journal Intelligent',
           description: 'Journaling avec IA émotionnelle',
           icon: <BookOpen className="w-5 h-5" />,
-          path: Routes.journal(),
+          path: routes.consumer.journal(),
           category: 'creative',
           xp: 90,
           segment: 'consumer'
