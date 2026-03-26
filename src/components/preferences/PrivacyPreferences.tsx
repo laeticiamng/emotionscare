@@ -17,15 +17,17 @@ const PrivacyPreferencesComponent: React.FC<PrivacyPreferencesProps> = ({
   const getPrivacySettings = (): PrivacyPreferences => {
     if (!privacy) {
       return {
+        profileVisibility: 'private',
+        dataCollection: false,
+        analytics: false,
+        marketing: false,
         shareData: false,
         shareEmotions: false,
         shareActivity: false,
         publicProfile: false,
         dataSharing: false,
-        analytics: false,
         thirdParty: false,
         anonymizeReports: true,
-        profileVisibility: 'private'
       };
     }
     
