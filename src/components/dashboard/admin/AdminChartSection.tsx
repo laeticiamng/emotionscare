@@ -50,7 +50,7 @@ const AdminChartSection: React.FC<AdminChartSectionProps> = ({
       <ChartCard
         title="Taux d'absentéisme"
         data={absenteeismData}
-        icon={<Users className="w-5 h-5" />}
+        icon={Users}
         isLoading={isLoading}
         valueFormat={(val) => `${val}%`}
         trend={absenteeismTrend}
