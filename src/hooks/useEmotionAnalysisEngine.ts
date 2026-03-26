@@ -98,7 +98,7 @@ export const useEmotionAnalysisEngine = () => {
 
       toast({
         title: "Analyse faciale terminée",
-        description: `Émotion détectée: ${result.emotion} (${Math.round(result.confidence * 100)}%)`,
+        description: `Émotion détectée: ${result.emotion} (${Math.round((typeof result.confidence === 'number' ? result.confidence : 0.5) * 100)}%)`,
       });
 
       // Actions automatiques
