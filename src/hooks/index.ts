@@ -3,19 +3,6 @@
  * Architecture premium avec accessibilité WCAG AAA
  */
 
-// Export du store unifié
-export {
-  useUnifiedStore, 
-  useUnifiedContext,
-  useAuth,
-  useMusic,
-  useEmotions,
-  useAccessibility 
-} from '@/core/UnifiedStateManager';
-
-// Export des hooks natifs optimisés
-export { usePerformanceOptimization, useConditionalLazyLoad } from './performance/useOptimizedPerformance';
-
 // Scan hooks
 export { useScanHistory } from './useScanHistory';
 export { useScanSettings } from './useScanSettings';
@@ -114,73 +101,6 @@ export const useDebounce = <T>(value: T, delay: number) => {
   return debouncedValue;
 };
 
-// ==================== HOOK THÈME PREMIUM ====================
-export const useTheme = () => {
-  const { user, updateUserPreferences } = useUnifiedStore();
-  
-  const setTheme = useCallback((theme: 'light' | 'dark' | 'system') => {
-    updateUserPreferences({ theme });
-    
-    const root = document.documentElement;
-    root.classList.remove('light', 'dark');
-    
-    if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      root.classList.add(systemTheme);
-    } else {
-      root.classList.add(theme);
-    }
-  }, [updateUserPreferences]);
-
-  return {
-    theme: user?.preferences.theme || 'light',
-    setTheme,
-  };
-};
-
-// ==================== HOOK ACCESSIBILITÉ AVANCÉE ====================
-export const useAccessibilityEnhanced = () => {
-  const { user, updateUserPreferences } = useUnifiedStore();
-  const { announceToScreenReader } = useUnifiedContext();
-  
-  const toggleHighContrast = useCallback(() => {
-    const newValue = !user?.preferences.accessibility.highContrast;
-    updateUserPreferences({
-      accessibility: { ...user?.preferences.accessibility, highContrast: newValue }
-    });
-    
-    document.documentElement.classList.toggle('high-contrast', newValue);
-    announceToScreenReader(`Contraste élevé ${newValue ? 'activé' : 'désactivé'}`);
-  }, [user, updateUserPreferences, announceToScreenReader]);
-  
-  const toggleReducedMotion = useCallback(() => {
-    const newValue = !user?.preferences.accessibility.reducedMotion;
-    updateUserPreferences({
-      accessibility: { ...user?.preferences.accessibility, reducedMotion: newValue }
-    });
-    
-    document.documentElement.classList.toggle('reduced-motion', newValue);
-    announceToScreenReader(`Mouvements réduits ${newValue ? 'activé' : 'désactivé'}`);
-  }, [user, updateUserPreferences, announceToScreenReader]);
-  
-  const setFontScale = useCallback((scale: number) => {
-    updateUserPreferences({
-      accessibility: { ...user?.preferences.accessibility, largeText: scale > 1 }
-    });
-    
-    document.documentElement.style.setProperty('--font-scale', scale.toString());
-    announceToScreenReader(`Taille de police définie à ${Math.round(scale * 100)}%`);
-  }, [user, updateUserPreferences, announceToScreenReader]);
-
-  return {
-    settings: user?.preferences.accessibility,
-    toggleHighContrast,
-    toggleReducedMotion,
-    setFontScale,
-    announce: announceToScreenReader,
-  };
-};
-
 // ==================== HOOK PERFORMANCE MONITORING ====================
 export const usePerformanceMonitor = (componentName: string) => {
   const startTime = useRef<number>(Date.now());
@@ -191,7 +111,7 @@ export const usePerformanceMonitor = (componentName: string) => {
     
     if (import.meta.env.DEV) {
       const renderTime = Date.now() - startTime.current;
-      if (renderTime > 16) { // > 1 frame at 60fps
+      if (renderTime > 16) {
         logger.warn(`⚡ Slow render in ${componentName}: ${renderTime}ms (render #${renderCount.current})`, {}, 'SYSTEM');
       }
     }
@@ -208,79 +128,6 @@ export const usePerformanceMonitor = (componentName: string) => {
       }
     }
   };
-};
-
-// ==================== HOOK NAVIGATION SÉCURISÉE ====================
-export const useSecureNavigation = () => {
-  const { validateSecureAction, logSecurityEvent } = useUnifiedContext();
-  
-  const navigateSecurely = useCallback((path: string, options?: { replace?: boolean }) => {
-    if (!validateSecureAction('navigation')) {
-      logSecurityEvent('Blocked navigation attempt', { path });
-      return false;
-    }
-    
-    try {
-      if (options?.replace) {
-        window.history.replaceState(null, '', path);
-      } else {
-        window.history.pushState(null, '', path);
-      }
-      
-      // Dispatch custom navigation event
-      window.dispatchEvent(new CustomEvent('secureNavigation', { detail: { path } }));
-      return true;
-    } catch (error) {
-      logSecurityEvent('Navigation error', { path, error });
-      return false;
-    }
-  }, [validateSecureAction, logSecurityEvent]);
-
-  return { navigateSecurely };
-};
-
-// ==================== HOOK NOTIFICATIONS AVANCÉES ====================
-export const useNotifications = () => {
-  const { user } = useUnifiedStore();
-  const { toast } = useToast();
-  const { announceToScreenReader } = useUnifiedContext();
-  
-  const notify = useCallback((
-    message: string, 
-    type: 'success' | 'error' | 'warning' | 'info' = 'info',
-    options: { 
-      duration?: number;
-      action?: { label: string; onClick: () => void };
-      persistent?: boolean;
-    } = {}
-  ) => {
-    // Vérifier les préférences de notification
-    if (!user?.preferences.notifications.inApp) return;
-    
-    // Annoncer aux lecteurs d'écran
-    announceToScreenReader(`${type}: ${message}`);
-    
-    // Afficher le toast
-    toast({
-      title: type.charAt(0).toUpperCase() + type.slice(1),
-      description: message,
-      variant: type === 'error' ? 'destructive' : 'default',
-      duration: options.persistent ? Infinity : (options.duration || 5000),
-      action: options.action ? {
-        altText: options.action.label,
-        onClick: options.action.onClick,
-        children: options.action.label
-      } : undefined
-    });
-    
-    // Vibration sur mobile si supportée
-    if ('vibrate' in navigator && user?.preferences.notifications.sound) {
-      const pattern = type === 'error' ? [100, 50, 100] : [100];
-      navigator.vibrate(pattern);
-    }
-  }, [user, toast, announceToScreenReader]);
-
-  return { notify };
 };
 
 // ==================== HOOK KEYBOARD NAVIGATION ====================
@@ -331,37 +178,6 @@ export const useKeyboardNavigation = () => {
   return { trapFocus, handleEscapeKey };
 };
 
-// ==================== HOOK PRÉFÉRENCES AVANCÉES ====================
-export const usePreferences = () => {
-  const { user, updateUserPreferences } = useUnifiedStore();
-  
-  const updateAccessibility = useCallback((settings: Partial<typeof user.preferences.accessibility>) => {
-    updateUserPreferences({
-      accessibility: { ...user?.preferences.accessibility, ...settings }
-    });
-  }, [user, updateUserPreferences]);
-  
-  const updateNotifications = useCallback((settings: Partial<typeof user.preferences.notifications>) => {
-    updateUserPreferences({
-      notifications: { ...user?.preferences.notifications, ...settings }
-    });
-  }, [user, updateUserPreferences]);
-  
-  const updatePrivacy = useCallback((settings: Partial<typeof user.preferences.privacy>) => {
-    updateUserPreferences({
-      privacy: { ...user?.preferences.privacy, ...settings }
-    });
-  }, [user, updateUserPreferences]);
-
-  return {
-    preferences: user?.preferences,
-    updatePreferences: updateUserPreferences,
-    updateAccessibility,
-    updateNotifications,
-    updatePrivacy,
-  };
-};
-
 // ==================== HOOK OPTIMISATION AUTOMATIQUE ====================
 export const useAutoOptimization = () => {
   const isMobile = useMobile();
@@ -378,10 +194,3 @@ export const useAutoOptimization = () => {
   
   return optimizationSettings;
 };
-
-// ==================== HOOKS SCAN ÉMOTIONNEL ====================
-export { useEmotionScanHistory } from './useEmotionScanHistory';
-export { useScanPageState } from './useScanPageState';
-export { useScanHistory } from './useScanHistory';
-export { useScanSettings } from './useScanSettings';
-export { useEmotionScan } from './useEmotionScan';

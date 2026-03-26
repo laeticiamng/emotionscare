@@ -5,6 +5,7 @@ export interface ChatMessage {
   text?: string;
   content: string;
   conversationId?: string;
+  conversation_id?: string;
   sender?: 'user' | 'assistant' | 'system' | 'coach';
   role?: 'user' | 'assistant' | 'system' | 'coach';
   timestamp: string;
@@ -16,8 +17,10 @@ export interface ChatConversation {
   id: string;
   title: string;
   messages: ChatMessage[];
-  createdAt: Date | string;
-  updatedAt: Date | string;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  created_at?: string;
+  updated_at?: string;
   userId?: string;
   user_id?: string;
   lastMessage?: string;
