@@ -222,7 +222,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Bubble Beat Sync',
           description: 'Jeu rythmique anti-stress',
           icon: <Activity className="w-5 h-5" />,
-          path: routes.consumer.bubbleBeat?.() || '/app/bubble-beat',
+          path: '/app/bubble-beat',
           category: 'games',
           xp: 100,
           segment: 'consumer'
