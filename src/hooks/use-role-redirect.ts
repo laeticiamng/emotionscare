@@ -12,8 +12,8 @@ export function getRoleHomePath(role: UserRole | string | undefined | null): str
   if (!role) return '/b2c/dashboard';
   
   // Use the existing utility function to get the dashboard path based on normalized role
-  const normalizedMode = normalizeUserMode(role);
-  return getModeDashboardPath(normalizedMode);
+  const normalizedMode = normalizeUserMode(role as string);
+  return getModeDashboardPath(normalizedMode as any);
 }
 
 /**
