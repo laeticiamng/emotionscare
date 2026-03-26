@@ -140,7 +140,7 @@ const PremiumHeader: React.FC<PremiumHeaderProps> = ({
           </Button>
           
           {/* Theme Switcher */}
-          <ThemeSwitcher size="icon" />
+          <ThemeSwitcher />
           
           {/* Mini Music Player */}
           <div className="hidden sm:block">

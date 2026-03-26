@@ -64,7 +64,7 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
   
   const handleCreateMusic = () => {
     if (selectedEmotion) {
-      setOpenDrawer(true);
+      (musicCtx as any)?.setOpenDrawer?.(true);
       toast({
         title: "Musique thérapeutique",
         description: getEmotionMusicDescription(selectedEmotion)
