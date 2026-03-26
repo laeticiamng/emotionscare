@@ -196,7 +196,7 @@ const PerfectDashboard: React.FC = () => {
             </Badge>
             <Badge variant="default" className="gap-1">
               <Target className="w-4 h-4" />
-              Série: {dashboardData.weekStreak} jours
+              Série: {metrics.weekStreak} jours
             </Badge>
           </div>
         </motion.div>
