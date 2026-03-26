@@ -3,6 +3,7 @@ import { useVRStore, VR_PATTERN_TIMINGS, type VRPattern, type VRBreathPhase } fr
 import { useHRVSilk, type HRVData } from './useHRVSilk';
 import { usePrivacyPrefs } from './usePrivacyPrefs';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export const useBreathPattern = () => {
   const store = useVRStore();
