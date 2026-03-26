@@ -192,7 +192,7 @@ const PerfectDashboard: React.FC = () => {
             </Badge>
             <Badge variant="secondary" className="gap-1">
               <Activity className="w-4 h-4" />
-              Score: {dashboardData.wellnessScore}/100
+              Score: {metrics.wellnessScore}/100
             </Badge>
             <Badge variant="default" className="gap-1">
               <Target className="w-4 h-4" />
