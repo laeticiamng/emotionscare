@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils';
 interface QuickAction {
   label: string;
   path: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   color: string;
   category: 'core' | 'fun' | 'social';
   new?: boolean;
