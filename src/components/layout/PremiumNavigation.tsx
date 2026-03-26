@@ -132,7 +132,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Coach IA Personnel',
           description: 'Accompagnement personnalisé 24/7',
           icon: <MessageCircle className="w-5 h-5" />,
-          path: Routes.coach(),
+          path: routes.consumer.coach(),
           category: 'therapy',
           premium: true,
           xp: 180,
