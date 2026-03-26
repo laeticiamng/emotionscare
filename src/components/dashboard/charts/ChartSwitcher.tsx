@@ -73,7 +73,7 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
 
   const getCurrentDimensionOptions = (): SegmentOption[] => {
     if (!selectedDimensionId) return [];
-    const dimension = availableDimensions.find(d => d.id === selectedDimensionId);
+    const dimension = availableDimensions.find((d: any) => d.id === selectedDimensionId);
     return dimension ? dimension.options : [];
   };
 
