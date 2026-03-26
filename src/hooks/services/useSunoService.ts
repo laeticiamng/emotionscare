@@ -260,7 +260,7 @@ export const useSunoService = (): SunoServiceHook => {
     setError(null);
 
     try {
-      const response = await sunoService.getPersonalizedPlaylist(userId, context);
+      const response = await (sunoService as any).getPersonalizedPlaylist(userId, context);
       
       if (response.success && response.data?.playlist) {
         setPlaylist(response.data.playlist);
