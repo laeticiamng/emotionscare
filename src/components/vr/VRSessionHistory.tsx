@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDistanceToNow, format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Clock, Calendar, CheckCircle } from 'lucide-react';
-import { VRSessionHistoryProps } from '@/types/vr';
+import { VRSessionHistoryProps } from '@/types/VRSessionHistoryProps';
 import { getVRSessionStartTime, getVRSessionEndTime } from '@/utils/vrCompatibility';
 
 const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
