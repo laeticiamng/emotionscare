@@ -153,7 +153,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Expérience VR Immersive',
           description: 'Environnements virtuels thérapeutiques',
           icon: <Compass className="w-5 h-5" />,
-          path: Routes.vr(),
+          path: routes.consumer.vr?.() || '/app/vr',
           category: 'therapy',
           premium: true,
           new: true,
