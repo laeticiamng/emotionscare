@@ -91,7 +91,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, className }
                 )}>
                   <div className="flex justify-between">
                     <h3 className="font-medium text-sm">
-                      {challenge.name}
+                      {ch.name || challenge.title}
                     </h3>
                     {challenge.difficulty && (
                       <span className={cn("text-xs font-medium", difficultyColor)}>
