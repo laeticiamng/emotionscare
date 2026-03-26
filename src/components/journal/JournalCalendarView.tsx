@@ -1,5 +1,5 @@
 import React from 'react';
-interface JournalEntry { id: string; content: string; mood?: string; timestamp?: Date | string; date?: Date | string; tags?: string[]; emotionAnalysis?: any; }
+interface JournalEntry { id: string; content: string; mood?: string; timestamp?: Date | string; date?: Date | string; tags?: string[]; emotionAnalysis?: any; emotion?: string; title?: string; }
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent } from '@/components/ui/card';
 import { format } from 'date-fns';
