@@ -22,9 +22,8 @@ const DevTools: React.FC<{ enabled?: boolean }> = ({ enabled = false }) => {
       });
 
       setCacheStats({
-        api: apiCache.getStats(),
-        image: imageCache.getStats(),
-        user: userCache.getStats()
+        api: { size: (apiCache as any).cache?.size || 0, hitRate: 0, hits: 0 },
+        user: { size: (userCache as any).cache?.size || 0, hitRate: 0, hits: 0 }
       });
     };
 
