@@ -143,7 +143,7 @@ const ColorPaletteDisplay: React.FC = () => {
                   </AlertDescription>
                 </Alert>
                 
-                <Alert variant="warning">
+                <Alert>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertTitle>Attention</AlertTitle>
                   <AlertDescription>
