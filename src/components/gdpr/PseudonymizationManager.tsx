@@ -49,7 +49,7 @@ export const PseudonymizationManager = () => {
   });
 
   const handleCreateRule = async () => {
-    const result = await createRule(newRule);
+    const result = await createRule(newRule as any);
     if (result) {
       setIsCreateDialogOpen(false);
       setNewRule({
