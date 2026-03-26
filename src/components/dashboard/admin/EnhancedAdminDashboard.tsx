@@ -13,7 +13,7 @@ import { motion } from 'framer-motion';
 import OnboardingButton from '@/components/admin/OnboardingButton';
 import { OnboardingProvider } from '@/contexts/OnboardingContext';
 import { b2bAdminOnboardingSteps } from '@/data/onboardingSteps';
-import { CommandMenu } from '@/components/ui/command-menu';
+import CommandMenu from '@/components/ui/command-menu';
 import { AnimatePresence } from 'framer-motion';
 
 const EnhancedAdminDashboard: React.FC = () => {
@@ -22,7 +22,7 @@ const EnhancedAdminDashboard: React.FC = () => {
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   
   return (
-    <OnboardingProvider steps={b2bAdminOnboardingSteps}>
+    <OnboardingProvider>
       <div className="container mx-auto py-6 space-y-8">
         <motion.div 
           className="flex flex-col space-y-2 md:flex-row md:items-center md:justify-between"
@@ -242,18 +242,7 @@ const EnhancedAdminDashboard: React.FC = () => {
         </Tabs>
       </div>
       
-      <CommandMenu 
-        open={isCommandOpen} 
-        onOpenChange={setIsCommandOpen}
-        commands={[
-          { category: "Navigation", command: "Aller au tableau de bord", shortcut: "G D" },
-          { category: "Navigation", command: "Aller aux paramètres", shortcut: "G S" },
-          { category: "Navigation", command: "Aller aux équipes", shortcut: "G T" },
-          { category: "Actions", command: "Exporter les données", shortcut: "E D" },
-          { category: "Actions", command: "Créer un rapport", shortcut: "C R" },
-          { category: "Actions", command: "Lancer la formation", shortcut: "L F" },
-        ]}
-      />
+      {isCommandOpen && <CommandMenu />}
     </OnboardingProvider>
   );
 };

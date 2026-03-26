@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { 
   TrendingUp, TrendingDown, Activity, Heart, 
-  Brain, Zap, Target, Award, Clock, Star 
+  Brain, Zap, Target, Award, Clock, Star, Sparkles 
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

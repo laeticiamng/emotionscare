@@ -25,7 +25,7 @@ export const FaceMoodCard: React.FC<FaceMoodCardProps> = ({ data }) => {
         <CardTitle>Humeur visage</CardTitle>
       </CardHeader>
       <CardContent className="w-full flex flex-col items-center">
-        <motion.div animate={{ value: valence_face_avg }} className="w-24 h-24">
+        <motion.div animate={{ opacity: 1 }} className="w-24 h-24">
           <CircularProgressbar
             value={valence_face_avg * 100}
             styles={buildStyles({ pathColor: color, trailColor: '#eee' })}

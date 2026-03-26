@@ -62,7 +62,7 @@ const KpiCards: React.FC<KpiCardsProps> = ({
             delta={{
               value: sessionsDelta,
               trend: sessionsDelta >= 0 ? 'up' : 'down',
-              direction: sessionsDelta >= 0 ? 'up' : 'down',
+              direction: sessionsDelta >= 0 ? 'up' : 'down' as const,
               label: "depuis le mois dernier"
             }}
             ariaLabel={`Sessions VR ce mois: ${vrSessionsThisMonth}`}

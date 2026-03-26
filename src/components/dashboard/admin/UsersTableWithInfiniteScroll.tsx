@@ -32,7 +32,7 @@ export const UsersTableWithInfiniteScroll: React.FC = () => {
             </div>
           ))}
           <div className="text-center py-4">
-            <Button variant="ghost" size="sm">Charger plus...</Button>
+            <button className="text-sm text-muted-foreground hover:text-foreground">Charger plus...</button>
           </div>
         </div>
       </div>

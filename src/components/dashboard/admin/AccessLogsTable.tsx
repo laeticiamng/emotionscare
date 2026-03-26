@@ -1,6 +1,18 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { AdminAccessLog } from '@types/dashboard';
+
+interface AdminAccessLog {
+  id: string;
+  adminId: string;
+  action: string;
+  timestamp: string;
+  userName?: string;
+  resource?: string;
+  ip?: string;
+  adminName?: string;
+  userId?: string;
+  details?: string;
+}
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 

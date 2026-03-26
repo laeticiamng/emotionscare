@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
 const SegmentSelector: React.FC = () => {
+  const segmentContext = useSegment() as any;
   const { 
     segment = 'all',
     setSegment,
@@ -20,7 +21,7 @@ const SegmentSelector: React.FC = () => {
     isLoading,
     activeDimension,
     activeOption
-  } = useSegment();
+  } = segmentContext || {};
 
   const handleDimensionSelect = (dimension: string) => {
     if (!setSegment) return;
@@ -41,7 +42,7 @@ const SegmentSelector: React.FC = () => {
       <div className="flex items-center space-x-2">
         <span className="text-sm font-medium">Filtrer par:</span>
         
-        {dimensions.map((dimension) => (
+        {dimensions.map((dimension: any) => (
           <Select 
             key={dimension.key} 
             value={activeDimension === dimension.key ? activeOption : undefined}
@@ -53,7 +54,7 @@ const SegmentSelector: React.FC = () => {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>{dimension.label}</SelectLabel>
-                {dimension.options.map((option) => (
+                {dimension.options.map((option: any) => (
                   <SelectItem 
                     key={option.key} 
                     value={option.key}

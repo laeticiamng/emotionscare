@@ -2,20 +2,23 @@ import { ReactNode } from 'react';
 import { LucideIcon } from 'lucide-react';
 
 export interface DraggableCardProps {
-  id: string;
+  id?: string;
   title: string;
-  value: string | number;
+  value: string | number | React.ReactNode;
   icon?: ReactNode;
   delta?: number | {
     value: number;
     label?: string;
     trend: 'up' | 'down' | 'neutral';
+    direction?: 'up' | 'down' | 'stable';
   };
   subtitle?: string | ReactNode;
   ariaLabel?: string;
   onClick?: () => void;
-  status?: 'success' | 'warning' | 'danger' | 'info';
+  status?: string;
   className?: string;
+  isLoading?: boolean;
+  footer?: ReactNode;
   x?: number;
   y?: number;
   w?: number;

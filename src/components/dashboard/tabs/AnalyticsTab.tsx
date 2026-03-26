@@ -41,9 +41,9 @@ const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ className, personalOnly }) 
 
           return {
             date: new Date(scan.created_at).toLocaleDateString('fr-FR'),
-            emotion: emotion.charAt(0).toUpperCase() + emotion.slice(1),
+            emotion: String(emotion).charAt(0).toUpperCase() + String(emotion).slice(1),
             score: score,
-            type: type.charAt(0).toUpperCase() + type.slice(1)
+            type: String(type).charAt(0).toUpperCase() + String(type).slice(1)
           };
         });
 

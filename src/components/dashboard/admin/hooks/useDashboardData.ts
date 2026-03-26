@@ -8,7 +8,7 @@ export const useDashboardData = (timePeriod: string) => {
   const [absenteeismData, setAbsenteeismData] = useState<ChartData[]>([]);
   const [productivityData, setProductivityData] = useState<ChartData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { segment } = useSegment();
+  const segment = (useSegment() as any)?.segment;
 
   const fetchData = async () => {
     try {
@@ -64,7 +64,7 @@ export const useDashboardData = (timePeriod: string) => {
 export const useEmotionalScoreTrend = () => {
   const [data, setData] = useState<ChartData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { segment } = useSegment();
+  const segment = (useSegment() as any)?.segment;
 
   const fetchData = async () => {
     try {
@@ -126,7 +126,7 @@ export const useDashboardStats = () => {
     emotionalScore: { current: 0, trend: 0 }
   });
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { segment } = useSegment();
+  const segment = (useSegment() as any)?.segment;
 
   const fetchData = async () => {
     try {

@@ -29,7 +29,7 @@ const MusicTherapyCard: React.FC<MusicTherapyCardProps> = ({ className = '' }) =
             <p className="font-medium">Ta piste repère</p>
             {mainFavorite ? (
               <>
-                <p>{mainFavorite.title ?? 'Ambiance personnalisée'}</p>
+                <p>{(mainFavorite as any)?.title ?? 'Ambiance personnalisée'}</p>
                 <p className="text-xs text-muted-foreground">Toujours prête à être relancée en douceur.</p>
               </>
             ) : (

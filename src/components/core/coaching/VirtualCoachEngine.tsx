@@ -89,7 +89,7 @@ const VirtualCoachEngine: React.FC<VirtualCoachEngineProps> = ({
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
   const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   // Personnalités de coach disponibles
@@ -288,7 +288,7 @@ const VirtualCoachEngine: React.FC<VirtualCoachEngineProps> = ({
     if (personalityResponses) {
       const category = Object.keys(personalityResponses)[Math.floor(Math.random() * Object.keys(personalityResponses).length)];
       const patterns = personalityResponses[category as keyof typeof personalityResponses];
-      const selectedPattern = patterns[Math.floor(Math.random() * patterns.length)];
+      const selectedPattern = (patterns as string[])[Math.floor(Math.random() * (patterns as string[]).length)];
       
       // Ajout de suggestions contextuelles
       const suggestions = analysis.suggestions.slice(0, 2).map((s, i) => 

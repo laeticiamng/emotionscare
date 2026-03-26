@@ -134,7 +134,7 @@ const PerfectDashboard: React.FC = () => {
 
   const getGreeting = () => {
     const hour = currentTime.getHours();
-    const name = user?.name || 'utilisateur';
+    const name = (user as any)?.name || user?.email || 'utilisateur';
     
     if (hour < 12) return `Bonjour ${name} !`;
     if (hour < 18) return `Bel après-midi ${name} !`;
@@ -150,7 +150,7 @@ const PerfectDashboard: React.FC = () => {
     }
   };
 
-  if (isLoading || !dashboardData) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -188,15 +188,15 @@ const PerfectDashboard: React.FC = () => {
           <div className="flex items-center gap-4 justify-center md:justify-start">
             <Badge variant="outline" className="gap-1">
               <Smile className="w-4 h-4" />
-              État: {dashboardData.emotionalState}
+              État: {metrics.emotionalState}
             </Badge>
             <Badge variant="secondary" className="gap-1">
               <Activity className="w-4 h-4" />
-              Score: {dashboardData.wellnessScore}/100
+              Score: {metrics.wellnessScore}/100
             </Badge>
             <Badge variant="default" className="gap-1">
               <Target className="w-4 h-4" />
-              Série: {dashboardData.weekStreak} jours
+              Série: {metrics.weekStreak} jours
             </Badge>
           </div>
         </motion.div>
@@ -216,11 +216,11 @@ const PerfectDashboard: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-2">{dashboardData.wellnessScore}/100</div>
-              <Progress value={dashboardData.wellnessScore} className="mb-2" />
+              <div className="text-3xl font-bold mb-2">{metrics.wellnessScore}/100</div>
+              <Progress value={metrics.wellnessScore} className="mb-2" />
               <p className="text-sm text-muted-foreground">
-                {dashboardData.wellnessScore >= 80 ? 'Excellent' :
-                 dashboardData.wellnessScore >= 60 ? 'Bon' : 'À améliorer'}
+                {metrics.wellnessScore >= 80 ? 'Excellent' :
+                 metrics.wellnessScore >= 60 ? 'Bon' : 'À améliorer'}
               </p>
             </CardContent>
           </Card3D>
@@ -233,7 +233,7 @@ const PerfectDashboard: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-2">{dashboardData.todaysSessions}</div>
+              <div className="text-3xl font-bold mb-2">{metrics.todaysSessions}</div>
               <p className="text-sm text-muted-foreground mb-2">Sessions complétées</p>
               <Button size="sm" variant="outline" className="w-full">
                 <Clock className="w-4 h-4 mr-2" />
@@ -250,14 +250,14 @@ const PerfectDashboard: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-2">{dashboardData.weekStreak}</div>
+              <div className="text-3xl font-bold mb-2">{metrics.weekStreak}</div>
               <p className="text-sm text-muted-foreground mb-2">Jours consécutifs</p>
               <div className="flex items-center gap-1">
                 {Array.from({ length: 7 }).map((_, i) => (
                   <div
                     key={i}
                     className={`w-4 h-4 rounded-full ${
-                      i < dashboardData.weekStreak ? 'bg-warning' : 'bg-muted'
+                      i < metrics.weekStreak ? 'bg-warning' : 'bg-muted'
                     }`}
                   />
                 ))}
@@ -278,7 +278,7 @@ const PerfectDashboard: React.FC = () => {
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {dashboardData.recommendations.map((rec, index) => (
+            {recommendations.map((rec: Recommendation, index: number) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -328,7 +328,7 @@ const PerfectDashboard: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {dashboardData.recentActivities.map((activity) => (
+                {metrics.recentActivities.map((activity: any) => (
                   <div key={activity.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                     <div>
                       <p className="font-medium">{activity.title}</p>
@@ -362,7 +362,7 @@ const PerfectDashboard: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {dashboardData.achievements.map((achievement) => (
+                {metrics.achievements.map((achievement: any) => (
                   <div key={achievement.id} className="space-y-2">
                     <div className="flex items-start justify-between">
                       <div>

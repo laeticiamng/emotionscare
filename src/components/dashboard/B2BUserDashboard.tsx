@@ -5,14 +5,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Music, Trophy, ChartLine, Bell, BookOpen, Lightbulb } from 'lucide-react';
+import { Music, Trophy, TrendingUp, Bell, BookOpen, Lightbulb } from 'lucide-react';
 import DashboardContainer from '@/components/dashboard/DashboardContainer';
 import { UserModeSelector } from '@/components/ui/user-mode-selector';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
-// Import types from unified auth types
-import type { Challenge } from '@/types/badge';
+// Local challenge type for this dashboard
+interface B2BChallenge {
+  id: string;
+  title: string;
+  description: string;
+  progress: number;
+  dueDate: string;
+  type: 'daily' | 'weekly' | 'special';
+}
 
 // Type pour simuler les données du reporting
 interface ReportingMetric {
@@ -28,7 +35,7 @@ const B2BUserDashboard: React.FC = () => {
   // États pour gérer le chargement et les erreurs
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [challenges, setChallenges] = useState<B2BChallenge[]>([]);
   const [metrics, setMetrics] = useState<ReportingMetric[]>([]);
   const [notifications, setNotifications] = useState<number>(0);
   
@@ -106,7 +113,7 @@ const B2BUserDashboard: React.FC = () => {
       <DashboardContainer>
         <div className="flex flex-col items-center justify-center p-8">
           <div className="bg-destructive/10 p-4 rounded-full mb-4">
-            <ChartLine className="h-8 w-8 text-destructive" />
+            <TrendingUp className="h-8 w-8 text-destructive" />
           </div>
           <h2 className="text-2xl font-bold mb-2">Impossible de charger votre tableau de bord</h2>
           <p className="text-muted-foreground mb-6 text-center">
@@ -150,7 +157,7 @@ const B2BUserDashboard: React.FC = () => {
               Tableau de bord Collaborateur
             </h1>
             <p className="text-muted-foreground">
-              Bienvenue dans votre espace de bien-être professionnel, {user?.name || 'collaborateur'}
+              Bienvenue dans votre espace de bien-être professionnel, {(user as any)?.name || user?.email || 'collaborateur'}
             </p>
           </motion.div>
           
@@ -168,7 +175,7 @@ const B2BUserDashboard: React.FC = () => {
                 </span>
               )}
             </Button>
-            <UserModeSelector className="hidden md:block" minimal />
+            <UserModeSelector minimal />
           </div>
         </div>
 
@@ -195,7 +202,7 @@ const B2BUserDashboard: React.FC = () => {
                 <span className="hidden sm:inline">Défis</span>
               </TabsTrigger>
               <TabsTrigger value="reporting" className="flex items-center gap-2">
-                <ChartLine className="h-4 w-4" />
+                <TrendingUp className="h-4 w-4" />
                 <span className="hidden sm:inline">Reporting</span>
               </TabsTrigger>
               <TabsTrigger value="focus" className="flex items-center gap-2">
@@ -292,7 +299,7 @@ const B2BUserDashboard: React.FC = () => {
                 <CardContent>
                   {metrics.length === 0 ? (
                     <div className="flex flex-col items-center py-12">
-                      <ChartLine className="h-12 w-12 text-muted-foreground opacity-50 mb-4" />
+                      <TrendingUp className="h-12 w-12 text-muted-foreground opacity-50 mb-4" />
                       <p className="text-muted-foreground">Aucune donnée disponible pour le moment</p>
                     </div>
                   ) : (

@@ -157,7 +157,7 @@ const MusicTherapyEngine: React.FC<MusicTherapyEngineProps> = ({
     };
 
     return [
-      ...baseInstruments[style],
+      ...(baseInstruments as Record<string, string[]>)[style],
       ...(emotionMods[emotion.toLowerCase() as keyof typeof emotionMods] || [])
     ];
   };

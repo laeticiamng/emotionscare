@@ -56,7 +56,7 @@ export const useActivityData = ({
       if (fetchError) throw new Error(fetchError.message);
       
       // Process the data to ensure no identifying information
-      const processedData = data?.map(item => ({
+      const processedData = data?.map((item: any) => ({
         id: item.id,
         activity_type: item.activity_type,
         category: item.category || 'Non catégorisé',

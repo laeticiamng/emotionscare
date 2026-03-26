@@ -18,14 +18,14 @@ interface KpiCardBadgeProps {
  */
 const KpiCardBadge: React.FC<KpiCardBadgeProps> = ({ delta, className, isLoading = false }) => {
   // Determine badge variant based on trend
-  const getBadgeVariant = (trend: 'up' | 'down' | 'neutral') => {
+  const getBadgeVariant = (trend: 'up' | 'down' | 'neutral'): "default" | "destructive" | "outline" | "secondary" | "success" | "warning" | "info" => {
     switch(trend) {
       case 'up':
-        return 'success-subtle';
+        return 'success';
       case 'down':
-        return 'error-subtle';
+        return 'destructive';
       default:
-        return 'info-subtle';
+        return 'info';
     }
   };
 
