@@ -20,7 +20,7 @@ interface MicroAction {
   title: string;
   subtitle: string;
   duration: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   path: string;
   tone: 'soft' | 'energize' | 'center';
   color: string;
