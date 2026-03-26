@@ -121,7 +121,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Musicothérapie IA',
           description: 'Musique adaptative pour votre humeur',
           icon: <Music className="w-5 h-5" />,
-          path: Routes.music(),
+          path: routes.consumer.music(),
           category: 'therapy',
           premium: true,
           xp: 200,
