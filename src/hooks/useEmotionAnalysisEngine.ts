@@ -80,7 +80,7 @@ export const useEmotionAnalysisEngine = () => {
       // Enrichir le résultat
       const enrichedResult: EmotionResult = {
         ...result,
-        sessionId: state.sessionId,
+        sessionId: state.sessionId ?? undefined,
         scanMode: 'facial',
         timestamp: new Date().toISOString()
       };
