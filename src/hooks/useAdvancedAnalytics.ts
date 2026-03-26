@@ -109,7 +109,7 @@ export const useAdvancedAnalytics = (filter?: AnalyticsFilter) => {
         
         return {
           pattern: monthlyAverages,
-          strength: this.calculateVariance(monthlyAverages) / 3,
+          strength: (this as any).calculateVariance(monthlyAverages) / 3,
           peak: monthlyAverages.indexOf(Math.max(...monthlyAverages)),
           trough: monthlyAverages.indexOf(Math.min(...monthlyAverages))
         };
