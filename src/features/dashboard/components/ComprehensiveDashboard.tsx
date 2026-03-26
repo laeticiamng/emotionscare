@@ -601,7 +601,7 @@ export function ComprehensiveDashboard() {
 function StatsCard({ title, value, icon: Icon, trend, color }: {
   title: string;
   value: string | number;
-  icon: React.ElementType;
+  icon: React.ReactNode;
   trend: string;
   color: string;
 }) {
