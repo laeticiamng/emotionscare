@@ -46,7 +46,7 @@ const ActivityChart: React.FC<ActivityChartProps> = ({ data, height = 350 }) => 
             type="monotone" 
             dataKey={activityType} 
             name={activityType.charAt(0).toUpperCase() + activityType.slice(1)} 
-            stroke={activityColors[activityType] || '#888'} 
+            stroke={(activityColors as Record<string, string>)[activityType] || '#888'} 
             activeDot={{ r: 8 }} 
           />
         ))}

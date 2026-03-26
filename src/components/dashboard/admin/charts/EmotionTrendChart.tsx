@@ -50,8 +50,8 @@ const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({
             type="monotone"
             dataKey={emotion}
             name={emotion.charAt(0).toUpperCase() + emotion.slice(1)}
-            stroke={emotionColors[emotion] || '#888'}
-            fill={emotionColors[emotion] || '#888'}
+            stroke={(emotionColors as Record<string, string>)[emotion] || '#888'}
+            fill={(emotionColors as Record<string, string>)[emotion] || '#888'}
             stackId={stackedView ? "1" : undefined}
             fillOpacity={stackedView ? 0.6 : 0.3}
           />

@@ -54,7 +54,7 @@ const SegmentSelector: React.FC = () => {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>{dimension.label}</SelectLabel>
-                {dimension.options.map((option) => (
+                {dimension.options.map((option: any) => (
                   <SelectItem 
                     key={option.key} 
                     value={option.key}

@@ -8,7 +8,7 @@ export const useDashboardData = (timePeriod: string) => {
   const [absenteeismData, setAbsenteeismData] = useState<ChartData[]>([]);
   const [productivityData, setProductivityData] = useState<ChartData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { segment } = useSegment();
+  const { segment } = useSegment() as any;
 
   const fetchData = async () => {
     try {
