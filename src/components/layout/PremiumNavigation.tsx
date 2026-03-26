@@ -232,7 +232,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Mood Mixer DJ',
           description: 'DJ personnel émotionnel',
           icon: <Headphones className="w-5 h-5" />,
-          path: Routes.moodMixer(),
+          path: routes.consumer.moodMixer?.() || '/app/mood-mixer',
           category: 'games',
           xp: 130,
           segment: 'consumer'
