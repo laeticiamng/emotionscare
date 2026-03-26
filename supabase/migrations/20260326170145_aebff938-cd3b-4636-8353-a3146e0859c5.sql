@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "user_settings_public_read" ON "public"."user_settings";
