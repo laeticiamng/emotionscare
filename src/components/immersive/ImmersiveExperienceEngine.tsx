@@ -219,7 +219,7 @@ const ImmersiveExperienceEngine: React.FC<ImmersiveProps> = ({
             <motion.div
               className="absolute rounded-full border-4"
               style={{
-                borderColor: theme?.glowColor || '#a29bfe',
+                borderColor: (theme as any)?.glowColor || '#a29bfe',
                 left: springX.get() - 50,
                 top: springY.get() - 50,
                 width: 100,
