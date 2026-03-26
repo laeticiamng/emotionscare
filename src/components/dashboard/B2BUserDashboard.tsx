@@ -35,7 +35,7 @@ const B2BUserDashboard: React.FC = () => {
   // États pour gérer le chargement et les erreurs
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [challenges, setChallenges] = useState<B2BChallenge[]>([]);
   const [metrics, setMetrics] = useState<ReportingMetric[]>([]);
   const [notifications, setNotifications] = useState<number>(0);
   
