@@ -243,7 +243,6 @@ const EnhancedAdminDashboard: React.FC = () => {
       </div>
       
       {isCommandOpen && <CommandMenu />}
-      />
     </OnboardingProvider>
   );
 };
