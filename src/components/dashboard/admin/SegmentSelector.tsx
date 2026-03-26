@@ -42,7 +42,7 @@ const SegmentSelector: React.FC = () => {
       <div className="flex items-center space-x-2">
         <span className="text-sm font-medium">Filtrer par:</span>
         
-        {dimensions.map((dimension) => (
+        {dimensions.map((dimension: any) => (
           <Select 
             key={dimension.key} 
             value={activeDimension === dimension.key ? activeOption : undefined}
