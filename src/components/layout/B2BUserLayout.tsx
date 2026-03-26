@@ -103,7 +103,7 @@ const B2BUserLayout: React.FC = () => {
     }
   };
 
-  const firstName = user?.name ? user.name.split(' ')[0] : 'Utilisateur';
+  const firstName = (user as any)?.name ? (user as any).name.split(' ')[0] : 'Utilisateur';
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return "Bonjour";
