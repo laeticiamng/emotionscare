@@ -91,7 +91,7 @@ export function AppSidebar() {
   // Vérification stricte du rôle admin
   const userIsAdmin = isAdminRole(user?.role);
   
-  const collapsed = state === 'collapsed' || !open;
+  const collapsed = state === 'closed' || !open;
 
   const isActive = (url: string) => currentPath === url || currentPath.startsWith(url);
 
