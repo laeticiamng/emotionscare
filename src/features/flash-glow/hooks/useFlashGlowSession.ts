@@ -149,7 +149,7 @@ export const useFlashGlowSession = (): Runtime => {
       exitTimerRef.current = null;
     }
 
-    logger.info('flash:soft_exit', undefined, 'FLASH');
+    console.info('flash:soft_exit');
 
     applyAudioFade('slow');
     applyVisuals('lowered');
