@@ -92,7 +92,7 @@ const OptimizedImage = memo<OptimizedImageProps>(({
   
   // Référence combinée pour l'intersection observer
   const setRef = useCallback((element: HTMLImageElement | null) => {
-    imgRef.current = element;
+    (imgRef as React.MutableRefObject<HTMLImageElement | null>).current = element;
     if (lazy) {
       setTarget(element);
     }

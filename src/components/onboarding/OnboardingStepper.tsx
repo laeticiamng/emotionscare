@@ -256,7 +256,7 @@ export const OnboardingStepper: React.FC<OnboardingStepperProps> = ({
                               animate={{ scale: [1, 1.2, 1] }}
                               transition={{ repeat: Infinity, duration: 2 }}
                             >
-                              {step.icon || stepNum}
+                              {(step as any).icon || stepNum}
                             </motion.div>
                           </motion.div>
                         ) : (

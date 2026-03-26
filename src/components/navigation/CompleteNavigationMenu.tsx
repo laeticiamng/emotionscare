@@ -23,7 +23,7 @@ import RouteValidator from '@/components/navigation/RouteValidator';
 
 interface NavigationCategory {
   name: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   color: string;
   routes: NavigationRoute[];
 }
@@ -31,7 +31,7 @@ interface NavigationCategory {
 interface NavigationRoute {
   name: string;
   path: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   description: string;
   badge?: string;
   premium?: boolean;

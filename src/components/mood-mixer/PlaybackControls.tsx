@@ -18,7 +18,7 @@ import {
   Repeat,
   Shuffle,
   Clock,
-  Waveform
+  AudioWaveform as Waveform
 } from 'lucide-react';
 import { MoodMix } from '@/types/mood-mixer';
 import { toast } from 'sonner';

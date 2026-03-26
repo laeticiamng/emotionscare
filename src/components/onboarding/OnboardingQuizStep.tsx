@@ -17,7 +17,7 @@ const OnboardingQuizStep: React.FC<OnboardingQuizStepProps> = ({
   options,
   stepId
 }) => {
-  const { updateResponse, userResponses } = useOnboarding();
+  const { handleResponse: updateResponse, userResponses } = useOnboarding();
   const [selectedOption, setSelectedOption] = useState<string | null>(
     userResponses[stepId] ? userResponses[stepId].optionId : null
   );
@@ -112,7 +112,7 @@ const OnboardingQuizStep: React.FC<OnboardingQuizStepProps> = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Alert variant={isCorrect ? "success" : "destructive"}>
+          <Alert variant={isCorrect ? "default" : "destructive"}>
             <AlertTitle>
               {isCorrect 
                 ? "Bonne réponse !" 

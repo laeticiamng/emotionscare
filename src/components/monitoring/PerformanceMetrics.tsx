@@ -25,14 +25,18 @@ const PerformanceMetrics: React.FC = () => {
 
   useEffect(() => {
     const updateMetrics = () => {
-      const vitals = performanceMonitor.getVitalMetrics();
+      const allMetrics = performanceMonitor.getMetrics();
       const cacheStats = globalCache.getStats();
 
       setMetrics({
-        renderTime: vitals.averageRenderTime,
-        apiCalls: vitals.averageApiCall,
-        memoryUsage: vitals.memoryUsage,
-        cacheStats,
+        renderTime: performanceMonitor.getAverageMetric('render'),
+        apiCalls: performanceMonitor.getAverageMetric('api'),
+        memoryUsage: performanceMonitor.getAverageMetric('memory'),
+        cacheStats: {
+          size: cacheStats.api.size + cacheStats.image.size + cacheStats.user.size + cacheStats.static.size,
+          maxSize: cacheStats.api.maxSize + cacheStats.image.maxSize + cacheStats.user.maxSize + cacheStats.static.maxSize,
+          hitRate: cacheStats.api.hitRate,
+        },
       });
     };
 

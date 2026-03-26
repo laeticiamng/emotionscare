@@ -58,9 +58,11 @@ export function NavButton({
     if (node.action) {
       await executeAction(node.action);
     } else if (hasChildren) {
-      // Ouvrir sous-menu ou naviguer vers la première action disponible
-      logger.debug('Navigation action', { type, path, nodeId: node.id }, 'UI');
-      if (path) navigate(path);
+      // Navigate to first child route if available
+      const firstChild = node.children?.[0];
+      const childPath = firstChild?.action?.type === 'route' ? (firstChild.action as any).to : undefined;
+      logger.debug('Navigation action', { nodeId: node.id }, 'UI');
+      if (childPath) navigate(childPath);
     } else {
       // Fallback pour les actions non encore implémentées
       handleFallbackAction(node, navigate);

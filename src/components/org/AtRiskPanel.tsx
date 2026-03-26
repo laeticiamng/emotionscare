@@ -3,7 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, CheckCircle } from 'lucide-react';
-import { OrgWeekly } from '@/store/org.store';
+
+interface OrgWeekly {
+  teams: any[];
+  [key: string]: any;
+}
 
 interface AtRiskPanelProps {
   data: OrgWeekly;

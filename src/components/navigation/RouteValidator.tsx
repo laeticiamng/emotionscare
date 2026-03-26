@@ -250,10 +250,10 @@ export default function RouteValidator() {
                         {test.route.path}
                       </code>
                       {test.route.guard && (
-                        <Badge variant="outline" size="sm">Protégé</Badge>
+                      <Badge variant="outline">Protégé</Badge>
                       )}
                       {test.route.role && (
-                        <Badge variant="outline" size="sm">{test.route.role}</Badge>
+                        <Badge variant="outline">{test.route.role}</Badge>
                       )}
                     </div>
                     {test.error && (

@@ -28,7 +28,7 @@ interface OnboardingStep {
   title: string;
   description: string;
   content: React.ReactNode;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   interactive?: boolean;
   required?: boolean;
   validation?: () => boolean;
@@ -174,12 +174,12 @@ export const InteractiveOnboarding: React.FC<OnboardingProps> = ({
               initial={{
                 x: Math.random() * window.innerWidth,
                 y: -10,
-                rotation: 0,
+                rotate: 0,
                 opacity: 1
               }}
               animate={{
                 y: window.innerHeight + 10,
-                rotation: 360 * 3,
+                rotate: 360 * 3,
                 opacity: 0
               }}
               transition={{

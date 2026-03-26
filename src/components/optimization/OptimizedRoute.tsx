@@ -78,7 +78,7 @@ const OptimizedRoute = memo<OptimizedRouteProps>(({
       return <Navigate to={routes.auth.login()} replace />;
     }
   
-  if (allowedRoles.length > 0 && user && !allowedRoles.includes(user.role)) {
+  if (allowedRoles.length > 0 && user && !allowedRoles.includes((user as any).role || '')) {
     return <Navigate to={routes.special.unauthorized()} replace />;
   }
   

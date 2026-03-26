@@ -148,7 +148,7 @@ export const MoodCards: React.FC<MoodCardsProps> = ({
                   drag
                   className="cursor-grab active:cursor-grabbing"
                   tabIndex={0}
-                  onKeyDown={(e) => handleKeyDown(e, card.id, true)}
+                  onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, card.id, true)}
                   role="button"
                   aria-label={`Carte sélectionnée: ${card.name}. Appuyez sur Entrée pour retirer.`}
                 >

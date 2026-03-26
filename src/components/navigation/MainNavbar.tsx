@@ -30,7 +30,7 @@ const MainNavbar: React.FC = () => {
   };
   
   const handleDashboardClick = () => {
-    navigate(getModeDashboardPath(userMode));
+    navigate(getModeDashboardPath(userMode as any));
     closeMobileMenu();
   };
   
@@ -53,14 +53,14 @@ const MainNavbar: React.FC = () => {
           <div className="hidden md:flex items-center space-x-4">
             <Button
               variant="ghost"
-              onClick={() => navigate(routes.public.pricing())}
+              onClick={() => navigate('/pricing')}
               className={isActive('/pricing') ? 'bg-accent' : ''}
             >
               Tarifs
             </Button>
             <Button
               variant="ghost"
-              onClick={() => navigate(routes.public.support())}
+              onClick={() => navigate('/help')}
               className={isActive('/support') ? 'bg-accent' : ''}
             >
               Support
@@ -132,7 +132,7 @@ const MainNavbar: React.FC = () => {
                 variant="ghost"
                 className="w-full justify-start"
                 onClick={() => {
-                  navigate(routes.public.pricing());
+                  navigate('/pricing');
                   closeMobileMenu();
                 }}
               >
@@ -142,7 +142,7 @@ const MainNavbar: React.FC = () => {
                 variant="ghost"
                 className="w-full justify-start"
                 onClick={() => {
-                  navigate(routes.public.support());
+                  navigate('/help');
                   closeMobileMenu();
                 }}
               >

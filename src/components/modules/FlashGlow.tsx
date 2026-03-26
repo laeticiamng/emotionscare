@@ -20,7 +20,7 @@ export default function FlashGlow() {
   const { playTone, stopAll } = useWebAudio();
   const btHook = useWebBluetooth();
   const hrConnected = btHook.isConnected;
-  const heartRate = (btHook as any).heartRate ?? btHook.heartRateData?.heartRate ?? null;
+  const heartRate = (btHook as any).heartRate ?? btHook.heartRateData?.bpm ?? null;
   
   const [session, setSession] = useState<BreathingSession>({
     phase: 'inhale',

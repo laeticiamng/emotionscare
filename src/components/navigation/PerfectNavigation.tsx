@@ -208,7 +208,7 @@ const PerfectNavigation: React.FC = () => {
       social: 'from-indigo-500/20 to-purple-500/20',
       neutral: 'from-gray-500/20 to-slate-500/20'
     };
-    return colors[emotion] || colors.neutral;
+    return colors[emotion as keyof typeof colors] || colors.neutral;
   };
 
   const isActivePath = (path: string) => {

@@ -57,14 +57,14 @@ const MobileNav: React.FC<MobileNavProps> = ({ className }) => {
           <SheetHeader className="p-6 bg-gradient-to-r from-primary/10 to-primary/5">
             <div className="flex items-center gap-3">
               <Avatar className="h-12 w-12">
-                <AvatarImage src={user?.avatar_url} alt={user?.name || 'Utilisateur'} />
+                <AvatarImage src={(user as any)?.avatar_url || user?.user_metadata?.avatar_url} alt={(user as any)?.name || user?.user_metadata?.name || 'Utilisateur'} />
                 <AvatarFallback>
-                  {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                  {((user as any)?.name || user?.user_metadata?.name || user?.email || 'U').charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <SheetTitle className="text-left">
-                  {user?.name || 'Utilisateur'}
+                  {(user as any)?.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'Utilisateur'}
                 </SheetTitle>
                 <div className="flex items-center gap-2 mt-1">
                   <Badge variant={roleBadge.variant} className="text-xs">
