@@ -134,7 +134,7 @@ const PerfectDashboard: React.FC = () => {
 
   const getGreeting = () => {
     const hour = currentTime.getHours();
-    const name = user?.name || 'utilisateur';
+    const name = (user as any)?.name || user?.email || 'utilisateur';
     
     if (hour < 12) return `Bonjour ${name} !`;
     if (hour < 18) return `Bel après-midi ${name} !`;
