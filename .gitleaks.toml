@@ -1,0 +1,24 @@
+# Gitleaks configuration for EmotionsCare
+# https://github.com/gitleaks/gitleaks
+
+[extend]
+useDefault = true
+
+# Allowlist patterns for test files and placeholders
+[allowlist]
+  description = "Allow test placeholders and non-secret patterns"
+
+  # Test files use placeholder JWTs (ending with .placeholder)
+  paths = [
+    '''src/__tests__/.*\.test\.ts$''',
+    '''src/__tests__/.*\.test\.tsx$''',
+    '''\.env\.example$''',
+  ]
+
+  regexTarget = "match"
+  regexes = [
+    # Placeholder JWTs used in tests (not real tokens)
+    '''eyJhbGci.*\.placeholder''',
+    # Truncated JWT placeholders in UI (e.g. "eyJhbG...")
+    '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.\.\.''',
+  ]
