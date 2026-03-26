@@ -39,7 +39,7 @@ const PrivacyPreferencesComponent: React.FC<PrivacyPreferencesProps> = ({
         analytics: privacy !== 'private',
         thirdParty: privacy !== 'private',
         anonymizeReports: true,
-        profileVisibility: privacy
+        profileVisibility: privacy as 'private' | 'friends' | 'public'
       };
     }
     
