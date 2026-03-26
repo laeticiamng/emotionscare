@@ -10,7 +10,7 @@ const DisplayPreferences: React.FC = () => {
   const { preferences, updatePreferences } = useUserPreferences();
 
   // Make sure theme is a ThemeName
-  const theme = (preferences.theme || 'system') as ThemeName;
+  const theme = (preferences.theme || 'system') as Theme;
 
   const handleThemeChange = (value: string) => {
     updatePreferences({ theme: value as Theme });
