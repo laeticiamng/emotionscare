@@ -16,7 +16,8 @@ const ParticlesBackground: React.FC<ParticlesBackgroundProps> = ({
   className = ''
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { theme, reduceMotion } = useTheme();
+  const { resolvedTheme: theme } = useTheme();
+  const reduceMotion = false; // Default to false, can be enhanced later
   
   useEffect(() => {
     if (!containerRef.current) return;
