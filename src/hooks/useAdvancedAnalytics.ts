@@ -88,7 +88,7 @@ export const useAdvancedAnalytics = (filter?: AnalyticsFilter) => {
             : 0;
         });
 
-        const variance = this.calculateVariance(weeklyAverages);
+        const variance = (this as any).calculateVariance(weeklyAverages);
         return {
           pattern: weeklyAverages,
           strength: Math.min(1, variance / 2),
