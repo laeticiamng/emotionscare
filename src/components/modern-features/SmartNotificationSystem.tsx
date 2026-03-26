@@ -187,12 +187,12 @@ const SmartNotificationSystem: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       if (Math.random() > 0.7) { // 30% de chance toutes les 30 secondes
-        const types: (keyof typeof settings)[] = ['wellness', 'goals', 'achievements'];
+        const types = ['wellness', 'goals', 'achievements'] as const;
         const randomType = types[Math.floor(Math.random() * types.length)];
         
         const newNotification: Notification = {
           id: Date.now().toString(),
-          type: randomType,
+          type: randomType as any,
           title: 'Nouvelle notification',
           message: 'Vous avez une nouvelle activité à découvrir !',
           timestamp: new Date(),

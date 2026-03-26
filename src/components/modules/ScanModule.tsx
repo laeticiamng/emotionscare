@@ -42,8 +42,8 @@ export const ScanModule: React.FC = () => {
     setIsScanning(true);
     try {
       const result = await EmotionService.analyzeText(textInput);
-      setCurrentResult(result);
-      setScanHistory(prev => [result, ...prev.slice(0, 9)]);
+      setCurrentResult(result as any);
+      setScanHistory(prev => [result as any, ...prev.slice(0, 9)]);
       toast.success('Analyse textuelle terminée');
     } catch (error) {
       toast.error('Erreur lors de l\'analyse textuelle');
@@ -89,8 +89,8 @@ export const ScanModule: React.FC = () => {
     setIsScanning(true);
     try {
       const result = await EmotionService.analyzeAudio(audioBlob);
-      setCurrentResult(result);
-      setScanHistory(prev => [result, ...prev.slice(0, 9)]);
+      setCurrentResult(result as any);
+      setScanHistory(prev => [result as any, ...prev.slice(0, 9)]);
       toast.success('Analyse vocale terminée');
     } catch (error) {
       toast.error('Erreur lors de l\'analyse vocale');
@@ -130,8 +130,8 @@ export const ScanModule: React.FC = () => {
     try {
       const imageData = canvas.toDataURL('image/jpeg');
       const result = await EmotionService.analyzeFacial(imageData);
-      setCurrentResult(result);
-      setScanHistory(prev => [result, ...prev.slice(0, 9)]);
+      setCurrentResult(result as any);
+      setScanHistory(prev => [result as any, ...prev.slice(0, 9)]);
       toast.success('Analyse faciale terminée');
       
       // Arrêter le stream vidéo

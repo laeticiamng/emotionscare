@@ -80,7 +80,7 @@ const B2BUserLayout: React.FC = () => {
       });
       navigate('/');
     } catch (error) {
-      logger.error("Erreur lors de la déconnexion", error as Error, 'AUTH');
+      console.error("Erreur lors de la déconnexion", error);
     }
   };
 
@@ -103,7 +103,7 @@ const B2BUserLayout: React.FC = () => {
     }
   };
 
-  const firstName = user?.name ? user.name.split(' ')[0] : 'Utilisateur';
+  const firstName = (user as any)?.name ? (user as any).name.split(' ')[0] : 'Utilisateur';
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return "Bonjour";
@@ -119,16 +119,16 @@ const B2BUserLayout: React.FC = () => {
           <div className="p-4 border-b border-gray-200 dark:border-gray-800">
             <div className="flex items-center gap-3">
               <Avatar className="h-10 w-10 border-2 border-blue-200 dark:border-blue-800">
-                {user?.avatar ? (
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                ) : (
-                  <AvatarFallback className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
-                    {user?.name?.charAt(0) || '?'}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-              <div className="flex flex-col">
-                <span className="font-medium truncate max-w-[120px]">{user?.name || 'Chargement...'}</span>
+                {(user as any)?.avatar ? (
+                   <AvatarImage src={(user as any).avatar} alt={(user as any).name} />
+                 ) : (
+                   <AvatarFallback className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
+                     {(user as any)?.name?.charAt(0) || '?'}
+                   </AvatarFallback>
+                 )}
+               </Avatar>
+               <div className="flex flex-col">
+                 <span className="font-medium truncate max-w-[120px]">{(user as any)?.name || 'Chargement...'}</span>
                 <span className="text-xs text-muted-foreground">Collaborateur</span>
               </div>
             </div>
@@ -189,16 +189,16 @@ const B2BUserLayout: React.FC = () => {
               <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-9 w-9 border border-blue-200 dark:border-blue-800">
-                    {user?.avatar ? (
-                      <AvatarImage src={user.avatar} alt={user.name} />
-                    ) : (
-                      <AvatarFallback className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
-                        {user?.name?.charAt(0) || '?'}
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{user?.name || 'Chargement...'}</span>
+                    {(user as any)?.avatar ? (
+                       <AvatarImage src={(user as any).avatar} alt={(user as any).name} />
+                     ) : (
+                       <AvatarFallback className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
+                         {(user as any)?.name?.charAt(0) || '?'}
+                       </AvatarFallback>
+                     )}
+                   </Avatar>
+                   <div className="flex flex-col">
+                     <span className="font-medium">{(user as any)?.name || 'Chargement...'}</span>
                     <span className="text-xs text-muted-foreground">Collaborateur</span>
                   </div>
                 </div>
@@ -287,11 +287,11 @@ const B2BUserLayout: React.FC = () => {
                 aria-label="Ouvrir le menu de navigation"
               >
                 <Avatar className="h-8 w-8 border border-blue-200 dark:border-blue-800 cursor-pointer">
-                  {user?.avatar ? (
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                  ) : (
-                    <AvatarFallback className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
-                      {user?.name?.charAt(0) || <User className="h-4 w-4" />}
+                  {(user as any)?.avatar ? (
+                     <AvatarImage src={(user as any).avatar} alt={(user as any).name} />
+                   ) : (
+                     <AvatarFallback className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
+                       {(user as any)?.name?.charAt(0) || <User className="h-4 w-4" />}
                     </AvatarFallback>
                   )}
                 </Avatar>

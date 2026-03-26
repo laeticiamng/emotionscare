@@ -18,7 +18,12 @@ export default function EmotionScan() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const { stream, startCamera, stopCamera, isStreaming, error: cameraError } = useUserMedia();
+  const mediaHook = useUserMedia();
+  const stream = mediaHook.stream;
+  const startCamera = (mediaHook as any).startCamera || (mediaHook as any).start || (() => {});
+  const stopCamera = (mediaHook as any).stopCamera || (mediaHook as any).stop || (() => {});
+  const isStreaming = (mediaHook as any).isStreaming ?? mediaHook.isActive;
+  const cameraError = (mediaHook as any).error;
   
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<EmotionResult | null>(null);

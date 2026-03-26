@@ -71,7 +71,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Tableau de Bord',
           description: 'Vue d\'ensemble de votre bien-être',
           icon: <BarChart3 className="w-5 h-5" />,
-          path: Routes.consumerHome(),
+          path: routes.consumer.home(),
           category: 'core',
           xp: 50,
           segment: 'consumer'
@@ -92,7 +92,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Scan Rapide',
           description: 'Analyse instantanée de votre état',
           icon: <Eye className="w-5 h-5" />,
-          path: Routes.scan(),
+          path: routes.consumer.scan(),
           category: 'core',
           xp: 75,
           segment: 'consumer'
@@ -121,7 +121,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Musicothérapie IA',
           description: 'Musique adaptative pour votre humeur',
           icon: <Music className="w-5 h-5" />,
-          path: Routes.music(),
+          path: routes.consumer.music(),
           category: 'therapy',
           premium: true,
           xp: 200,
@@ -132,7 +132,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Coach IA Personnel',
           description: 'Accompagnement personnalisé 24/7',
           icon: <MessageCircle className="w-5 h-5" />,
-          path: Routes.coach(),
+          path: routes.consumer.coach(),
           category: 'therapy',
           premium: true,
           xp: 180,
@@ -143,7 +143,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Respiration Thérapeutique',
           description: 'Techniques avancées de respiration',
           icon: <Wind className="w-5 h-5" />,
-          path: Routes.breath(),
+          path: routes.consumer.breath(),
           category: 'therapy',
           xp: 120,
           segment: 'consumer'
@@ -153,7 +153,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Expérience VR Immersive',
           description: 'Environnements virtuels thérapeutiques',
           icon: <Compass className="w-5 h-5" />,
-          path: Routes.vr(),
+          path: routes.consumer.vr?.() || '/app/vr',
           category: 'therapy',
           premium: true,
           new: true,
@@ -173,7 +173,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Journal Intelligent',
           description: 'Journaling avec IA émotionnelle',
           icon: <BookOpen className="w-5 h-5" />,
-          path: Routes.journal(),
+          path: routes.consumer.journal(),
           category: 'creative',
           xp: 90,
           segment: 'consumer'
@@ -212,7 +212,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Flash Glow Boost',
           description: 'Boost d\'énergie instantané',
           icon: <Zap className="w-5 h-5" />,
-          path: Routes.flashGlow(),
+          path: routes.consumer.flashGlow?.() || '/app/flash-glow',
           category: 'games',
           xp: 80,
           segment: 'consumer'
@@ -222,7 +222,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Bubble Beat Sync',
           description: 'Jeu rythmique anti-stress',
           icon: <Activity className="w-5 h-5" />,
-          path: Routes.bubbleBeat(),
+          path: '/app/bubble-beat',
           category: 'games',
           xp: 100,
           segment: 'consumer'
@@ -232,7 +232,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Mood Mixer DJ',
           description: 'DJ personnel émotionnel',
           icon: <Headphones className="w-5 h-5" />,
-          path: Routes.moodMixer(),
+          path: routes.consumer.moodMixer?.() || '/app/mood-mixer',
           category: 'games',
           xp: 130,
           segment: 'consumer'
@@ -242,7 +242,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Boss Level Grit',
           description: 'Développement de la détermination',
           icon: <Target className="w-5 h-5" />,
-          path: Routes.bossGrit(),
+          path: '/app/boss-grit',
           category: 'games',
           premium: true,
           xp: 200,
@@ -513,11 +513,11 @@ const PremiumNavigation: React.FC = () => {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
                 <Avatar className="w-8 h-8">
-                  <AvatarImage src={user?.avatar} alt={user?.name || 'Avatar utilisateur'} />
-                  <AvatarFallback>{user?.name?.[0] || 'U'}</AvatarFallback>
+                  <AvatarImage src={(user as any)?.avatar} alt={(user as any)?.name || 'Avatar utilisateur'} />
+                  <AvatarFallback>{(user as any)?.name?.[0] || 'U'}</AvatarFallback>
                 </Avatar>
                 <div className="text-sm">
-                  <p className="font-medium">{user?.name || 'Utilisateur'}</p>
+                  <p className="font-medium">{(user as any)?.name || 'Utilisateur'}</p>
                   <p className="text-muted-foreground text-xs">
                     {user?.role === 'consumer' ? 'B2C' : user?.role === 'employee' ? 'Employé' : 'Manager'}
                   </p>

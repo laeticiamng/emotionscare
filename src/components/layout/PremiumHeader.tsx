@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { useTheme } from '@/providers/theme';
 import { cn } from '@/lib/utils';
-import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher';
+import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
 import MusicMiniPlayer from '@/components/music/MusicMiniPlayer';
 
 interface PremiumHeaderProps {
@@ -24,7 +24,8 @@ const PremiumHeader: React.FC<PremiumHeaderProps> = ({
 }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { theme, isDarkMode } = useTheme();
+  const { theme, resolvedTheme } = useTheme();
+  const isDarkMode = resolvedTheme === 'dark';
   const { scrollY } = useScroll();
   
   const headerBgOpacity = useTransform(scrollY, [0, 50], [0.5, 0.95]);
@@ -139,7 +140,7 @@ const PremiumHeader: React.FC<PremiumHeaderProps> = ({
           </Button>
           
           {/* Theme Switcher */}
-          <ThemeSwitcher size="icon" />
+          <ThemeSwitcher />
           
           {/* Mini Music Player */}
           <div className="hidden sm:block">

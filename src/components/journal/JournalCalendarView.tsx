@@ -1,5 +1,5 @@
 import React from 'react';
-interface JournalEntry { id: string; content: string; mood?: string; timestamp?: Date | string; date?: Date | string; tags?: string[]; emotionAnalysis?: any; }
+interface JournalEntry { id: string; content: string; mood?: string; timestamp?: Date | string; date?: Date | string; tags?: string[]; emotionAnalysis?: any; emotion?: string; title?: string; }
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent } from '@/components/ui/card';
 import { format } from 'date-fns';
@@ -21,7 +21,7 @@ const JournalCalendarView: React.FC<JournalCalendarViewProps> = ({ entries, onEn
     const map: Record<string, JournalEntry[]> = {};
     
     entries.forEach(entry => {
-      const dateKey = format(new Date(entry.date), 'yyyy-MM-dd');
+      const dateKey = format(new Date(entry.date || entry.timestamp || new Date()), 'yyyy-MM-dd');
       if (!map[dateKey]) {
         map[dateKey] = [];
       }

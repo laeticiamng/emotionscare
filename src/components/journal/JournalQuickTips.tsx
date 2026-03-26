@@ -1,4 +1,4 @@
-import { memo, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -242,7 +242,7 @@ export const JournalQuickTips = memo<JournalQuickTipsProps>(({ className = '' })
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
             <div className="p-2 rounded-full bg-primary/10">
-              <currentTip.icon className="h-5 w-5 text-primary" aria-hidden="true" />
+              {React.createElement(currentTip.icon as React.ComponentType<any>, { className: "h-5 w-5 text-primary" })}
             </div>
             
             <div className="flex-1 space-y-3">
@@ -444,7 +444,7 @@ export const JournalQuickTips = memo<JournalQuickTipsProps>(({ className = '' })
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
-                    <tip.icon className="h-5 w-5 text-primary mt-0.5" />
+                    {React.createElement(tip.icon as React.ComponentType<any>, { className: "h-5 w-5 text-primary mt-0.5" })}
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold">{tip.title}</h4>

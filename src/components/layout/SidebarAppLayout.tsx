@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/layout/AppSidebar";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Bell, Search, User } from "lucide-react";

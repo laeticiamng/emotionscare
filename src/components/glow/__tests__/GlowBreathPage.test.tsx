@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
-import B2CFlashGlowPage from '@/pages/B2CFlashGlowPage';
+import B2CFlashGlowPage from '@/pages/b2c/B2CFlashGlowPage';
 
 // Mock the store
 vi.mock('@/store/useGlowBreathStore', () => ({
