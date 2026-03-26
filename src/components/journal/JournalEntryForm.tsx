@@ -32,7 +32,7 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
   const { toast } = useToast();
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const { getEmotionMusicDescription } = useMusicEmotionIntegration();
-  const { setOpenDrawer } = useMusic();
+  const musicCtx = useMusic();
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

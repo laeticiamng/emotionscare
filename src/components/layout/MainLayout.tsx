@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import GlobalNavigation from '@/components/navigation/GlobalNavigation';
 import BreadcrumbNavigation from '@/components/navigation/BreadcrumbNavigation';
-import QuickAccessPanel from '@/components/navigation/QuickAccessPanel';
+const QuickAccessPanel = React.lazy(() => import('@/components/layout/QuickAccessSidebar').then(m => ({ default: m.default })));
 import FloatingQuickActions from '@/components/navigation/FloatingQuickActions';
 import MainNavigationMenu from '@/components/navigation/MainNavigationMenu';
 import UnifiedHeader from '@/components/unified/UnifiedHeader';

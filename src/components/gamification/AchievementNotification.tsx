@@ -263,9 +263,9 @@ const AchievementNotification: React.FC<AchievementNotificationProps> = ({
                 <motion.div
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ 
-                    scale: 1, 
                     rotate: 0,
                     ...config.animation,
+                    scale: 1,
                   }}
                   transition={{ 
                     delay: 0.2, 

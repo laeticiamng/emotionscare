@@ -68,7 +68,7 @@ const B2BAdminLayout: React.FC = () => {
                   Administration
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  {user.name} - {user.role === 'admin' ? 'Administrateur' : 'RH'}
+                  {(user as any).name || user.email} - {user.role === 'admin' ? 'Administrateur' : 'RH'}
                 </p>
               </div>
             )}

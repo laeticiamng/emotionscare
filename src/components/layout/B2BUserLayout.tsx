@@ -287,11 +287,11 @@ const B2BUserLayout: React.FC = () => {
                 aria-label="Ouvrir le menu de navigation"
               >
                 <Avatar className="h-8 w-8 border border-blue-200 dark:border-blue-800 cursor-pointer">
-                  {user?.avatar ? (
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                  ) : (
-                    <AvatarFallback className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
-                      {user?.name?.charAt(0) || <User className="h-4 w-4" />}
+                  {(user as any)?.avatar ? (
+                     <AvatarImage src={(user as any).avatar} alt={(user as any).name} />
+                   ) : (
+                     <AvatarFallback className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
+                       {(user as any)?.name?.charAt(0) || <User className="h-4 w-4" />}
                     </AvatarFallback>
                   )}
                 </Avatar>

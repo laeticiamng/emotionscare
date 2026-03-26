@@ -444,7 +444,7 @@ export const JournalQuickTips = memo<JournalQuickTipsProps>(({ className = '' })
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
-                    <tip.icon className="h-5 w-5 text-primary mt-0.5" />
+                    {React.createElement(tip.icon as React.ComponentType<{className?: string}>, { className: "h-5 w-5 text-primary mt-0.5" })}
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold">{tip.title}</h4>

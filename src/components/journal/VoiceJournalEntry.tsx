@@ -456,7 +456,7 @@ export const VoiceJournalEntry: React.FC = () => {
                   onClick={() => applyTemplate(template.id)}
                   className="gap-1"
                 >
-                  <template.icon className="h-4 w-4" />
+                  {React.createElement(template.icon as React.ComponentType<{className?: string}>, { className: "h-4 w-4" })}
                   {template.name}
                 </Button>
               ))}

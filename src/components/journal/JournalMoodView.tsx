@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { JournalEntry } from '@/types';
+interface JournalEntry { id: string; content: string; mood?: string; date: Date | string; tags?: string[]; emotion?: string; title?: string; mood_score?: number; }
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { getEmotionIcon, getEmotionColor } from '@/lib/emotionUtils';

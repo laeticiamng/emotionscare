@@ -59,7 +59,7 @@ const JournalListView: React.FC<JournalListViewProps> = ({ entries, onDeleteEntr
             <CardContent>
               <p className="line-clamp-3">{entry.content}</p>
               <div className="flex flex-wrap gap-1 mt-3">
-                {entry.tags?.map((tag) => (
+                {entry.tags?.map((tag: string) => (
                   <Badge key={tag} variant="outline">
                     {tag}
                   </Badge>

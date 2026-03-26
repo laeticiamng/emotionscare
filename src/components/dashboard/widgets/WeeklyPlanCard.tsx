@@ -213,7 +213,7 @@ export const WeeklyPlanCard: React.FC = () => {
       if (submitted) {
         const summary = buildWellbeingSummary(
           computation.summary,
-          computation.level,
+          computation.level as 0 | 1 | 2 | 3 | 4,
           computation.generatedAt,
         );
         persistSummary(summary);
