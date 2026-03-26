@@ -89,8 +89,8 @@ export const ScanModule: React.FC = () => {
     setIsScanning(true);
     try {
       const result = await EmotionService.analyzeAudio(audioBlob);
-      setCurrentResult(result);
-      setScanHistory(prev => [result, ...prev.slice(0, 9)]);
+      setCurrentResult(result as any);
+      setScanHistory(prev => [result as any, ...prev.slice(0, 9)]);
       toast.success('Analyse vocale terminée');
     } catch (error) {
       toast.error('Erreur lors de l\'analyse vocale');
