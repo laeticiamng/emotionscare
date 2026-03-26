@@ -76,7 +76,7 @@ export function useMusicSession(engine: UseMusicEngine): MusicSessionControls {
       actions.forEach((action) => {
         if (action.action === 'post_cta') {
           cta = action.key as PostCta;
-          if (action.key === 'nyvee') {
+          if ((action.key as string) === 'nyvee') {
             logBreadcrumb('music:cta:nyvee');
           } else if (action.key === 'encore_2min') {
             logBreadcrumb('music:cta:encore2min');
