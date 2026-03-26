@@ -151,7 +151,7 @@ const ColorPaletteDisplay: React.FC = () => {
                   </AlertDescription>
                 </Alert>
 
-                <Alert variant="info">
+                <Alert>
                   <Info className="h-4 w-4" />
                   <AlertTitle>Information</AlertTitle>
                   <AlertDescription>
