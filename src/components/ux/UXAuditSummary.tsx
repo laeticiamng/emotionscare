@@ -315,7 +315,7 @@ const UXAuditSummary: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-3 gap-4">
-                <Link to={Routes.adminOptimization()}>
+                <Link to="/admin/optimization">
                   <Button className="w-full" size="lg">
                     📊 Dashboard UX Live
                   </Button>
