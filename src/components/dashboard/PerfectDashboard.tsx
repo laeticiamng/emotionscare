@@ -188,7 +188,7 @@ const PerfectDashboard: React.FC = () => {
           <div className="flex items-center gap-4 justify-center md:justify-start">
             <Badge variant="outline" className="gap-1">
               <Smile className="w-4 h-4" />
-              État: {dashboardData.emotionalState}
+              État: {metrics.emotionalState}
             </Badge>
             <Badge variant="secondary" className="gap-1">
               <Activity className="w-4 h-4" />
