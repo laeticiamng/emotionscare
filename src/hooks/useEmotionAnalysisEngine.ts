@@ -217,7 +217,7 @@ export const useEmotionAnalysisEngine = () => {
         intensity: result.intensity || 0.5,
         source: 'text_analysis',
         scanMode: 'text',
-        sessionId: state.sessionId,
+        sessionId: state.sessionId ?? undefined,
         text,
         recommendations: result.recommendations
       };
