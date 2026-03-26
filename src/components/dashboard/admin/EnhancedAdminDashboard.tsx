@@ -13,7 +13,7 @@ import { motion } from 'framer-motion';
 import OnboardingButton from '@/components/admin/OnboardingButton';
 import { OnboardingProvider } from '@/contexts/OnboardingContext';
 import { b2bAdminOnboardingSteps } from '@/data/onboardingSteps';
-import { CommandMenu } from '@/components/ui/command-menu';
+import CommandMenu from '@/components/ui/command-menu';
 import { AnimatePresence } from 'framer-motion';
 
 const EnhancedAdminDashboard: React.FC = () => {
