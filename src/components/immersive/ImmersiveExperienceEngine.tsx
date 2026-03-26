@@ -159,7 +159,7 @@ const ImmersiveExperienceEngine: React.FC<ImmersiveProps> = ({
       peaceful: { scale: 0.95, blur: 2, saturate: 0.9 }
     };
 
-    return effects[experienceContext.emotion] || effects.calm;
+    return (effects as any)[experienceContext.emotion] || effects.calm;
   };
 
   const emotionEffects = getEmotionEffects();
