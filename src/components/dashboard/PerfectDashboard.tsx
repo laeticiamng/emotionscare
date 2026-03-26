@@ -216,11 +216,11 @@ const PerfectDashboard: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-2">{dashboardData.wellnessScore}/100</div>
-              <Progress value={dashboardData.wellnessScore} className="mb-2" />
+              <div className="text-3xl font-bold mb-2">{metrics.wellnessScore}/100</div>
+              <Progress value={metrics.wellnessScore} className="mb-2" />
               <p className="text-sm text-muted-foreground">
-                {dashboardData.wellnessScore >= 80 ? 'Excellent' :
-                 dashboardData.wellnessScore >= 60 ? 'Bon' : 'À améliorer'}
+                {metrics.wellnessScore >= 80 ? 'Excellent' :
+                 metrics.wellnessScore >= 60 ? 'Bon' : 'À améliorer'}
               </p>
             </CardContent>
           </Card3D>
