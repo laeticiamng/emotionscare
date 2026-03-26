@@ -109,7 +109,7 @@ const DataPrivacySettings: React.FC<DataPrivacyProps> = ({
                 </p>
               </div>
               <Controller
-                name="shareData"
+                name={"shareData" as any}
                 control={control}
                 render={({ field }) => (
                   <motion.div whileTap={{ scale: 0.9 }}>
