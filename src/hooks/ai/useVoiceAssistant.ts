@@ -207,7 +207,7 @@ export function useVoiceAssistant(options: VoiceAssistantOptions = {}) {
       case 'play_music':
         navigate('/music');
         // Music started with params - silent
-        return `🎵 Lecture de musique démarrée avec les paramètres: ${JSON.stringify(params)}`;
+        return `🎵 Lecture de musique démarrée`;
         break;
       
       case 'scan_emotion':
@@ -224,7 +224,7 @@ export function useVoiceAssistant(options: VoiceAssistantOptions = {}) {
       
       case 'search_content':
         // Search with params - silent
-        return `🔍 Recherche effectuée avec les paramètres: ${JSON.stringify(params)}`;
+        return `🔍 Recherche effectuée`;
         navigate('/app/scan');
         break;
       

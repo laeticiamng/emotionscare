@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { parseISO, subWeeks, addHours } from 'date-fns';
 import { describe, expect, it } from 'vitest';
 

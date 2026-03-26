@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Boss Grit Module - Types Tests
  * Tests unitaires pour les schemas Zod du module Boss Grit

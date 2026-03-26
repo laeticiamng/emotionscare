@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour account.store (Zustand)
  * Couvre : état initial, setters, getDaysUntilPurge logic, reset

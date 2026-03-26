@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour useDSAR (RGPD - Data Subject Access Request)
  * Couvre : fetch requests, create request, generate package

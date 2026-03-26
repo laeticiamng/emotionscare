@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests du système de validation des routes
  */

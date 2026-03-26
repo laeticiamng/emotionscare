@@ -51,7 +51,7 @@ const useHumeAI = () => {
           valence: (data?.valence || 0.5) * 100,
           arousal: (data?.arousal || 0.5) * 100,
           confidence: (data?.confidence || 0.7) * 100,
-          source: 'image',
+          source: 'facial' as const,
           timestamp: new Date().toISOString(),
           summary: data?.summary,
           emotions: data?.emotions || {}

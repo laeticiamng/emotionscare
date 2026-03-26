@@ -148,10 +148,7 @@ export function useAssessment(instrument: string): UseAssessmentResult {
         return { stage, startedAt, response };
       } catch (error) {
         const message = error instanceof Error ? error.message : 'assessment_start_failed';
-        Sentry.captureException(error, {
-          tags: { scope: 'useAssessment', instrument },
-          extra: { stage },
-        });
+        console.error('[useAssessment] start error:', error);
         setState((prev) => ({
           ...prev,
           isStarting: false,
@@ -206,10 +203,7 @@ export function useAssessment(instrument: string): UseAssessmentResult {
         return { stage, submittedAt, summary: stripNumbers(response.summary) };
       } catch (error) {
         const message = error instanceof Error ? error.message : 'assessment_submit_failed';
-        Sentry.captureException(error, {
-          tags: { scope: 'useAssessment', instrument },
-          extra: { stage },
-        });
+        console.error('[useAssessment] submit error:', error);
         setState((prev) => ({
           ...prev,
           isSubmitting: false,

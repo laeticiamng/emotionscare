@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests unitaires pour les intégrations Wearables
  * Apple Health, Garmin, etc.

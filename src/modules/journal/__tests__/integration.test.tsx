@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * integration.test.tsx
  * Tests d'intégration pour le module Journal

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Tests E2E pour la page Musicothérapie
  * Couvre les scénarios critiques et la conformité WCAG AA

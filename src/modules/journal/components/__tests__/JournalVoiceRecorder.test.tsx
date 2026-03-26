@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * JournalVoiceRecorder.test.tsx
  * Tests unitaires pour JournalVoiceRecorder

@@ -585,10 +585,10 @@ export function ComprehensiveDashboard() {
           </CardContent>
           <CardFooter>
             <Button asChild variant="outline" className="w-full justify-center gap-2">
-              <Link to="/app/mood-mixer">
+              <a href="/app/mood-mixer">
                 <Sparkles className="h-4 w-4" />
                 Ouvrir le Mood Mixer
-              </Link>
+              </a>
             </Button>
           </CardFooter>
         </Card>
@@ -601,7 +601,7 @@ export function ComprehensiveDashboard() {
 function StatsCard({ title, value, icon: Icon, trend, color }: {
   title: string;
   value: string | number;
-  icon: React.ElementType;
+  icon: React.ReactNode;
   trend: string;
   color: string;
 }) {
@@ -610,7 +610,7 @@ function StatsCard({ title, value, icon: Icon, trend, color }: {
       <CardContent className="p-6">
         <div className="flex items-center justify-between space-y-0 pb-2">
           <p className="text-sm font-medium">{title}</p>
-          <Icon className={`h-4 w-4 ${color}`} />
+          {Icon}
         </div>
         <div className="space-y-1">
           <p className="text-2xl font-bold">{value}</p>
@@ -777,7 +777,7 @@ async function fetchRecentScans(userId?: string): Promise<ScanResult[]> {
     const entries = await getEmotionScanHistory(userId, 12);
     return entries.map(mapHistoryEntryToScan);
   } catch (error) {
-    logger.error('Unable to fetch emotion scans', error as Error, 'SCAN');
+    console.error('Unable to fetch emotion scans', error);
     return [];
   }
 }

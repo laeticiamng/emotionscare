@@ -10,7 +10,7 @@ const DisplayPreferences: React.FC = () => {
   const { preferences, updatePreferences } = useUserPreferences();
 
   // Make sure theme is a ThemeName
-  const theme = (preferences.theme || 'system') as ThemeName;
+  const theme = (preferences.theme || 'system') as Theme;
 
   const handleThemeChange = (value: string) => {
     updatePreferences({ theme: value as Theme });
@@ -52,7 +52,7 @@ const DisplayPreferences: React.FC = () => {
           <Label htmlFor="theme">Thème</Label>
           <Select
             value={theme}
-            onValueChange={value => handleThemeChange(value as ThemeName)}
+            onValueChange={value => handleThemeChange(value as Theme)}
           >
             <SelectTrigger id="theme">
               <SelectValue placeholder="Choisir un thème" />

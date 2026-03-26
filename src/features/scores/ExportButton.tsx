@@ -28,7 +28,7 @@ export function ExportButton({ targetRef, fileName, label, className, onError, o
     try {
       setIsExporting(true);
       onStart?.();
-      logger.info('scores:export:png', { fileName }, 'SCORES');
+      console.info('scores:export:png', { fileName });
       await exportElementToPng(container, {
         fileName,
         backgroundColor: '#ffffff',

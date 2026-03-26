@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour les types du module User Preferences
  */

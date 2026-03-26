@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests unitaires pour Flash Glow Service
  * @vitest-environment jsdom

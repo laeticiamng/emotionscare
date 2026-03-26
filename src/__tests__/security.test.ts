@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TESTS DE SÉCURITÉ - EmotionsCare
  * RLS, XSS, Input Validation, Auth

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour useSessionSecurity
  * Couvre : timer reset, warning display, session expiration

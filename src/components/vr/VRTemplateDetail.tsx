@@ -1,7 +1,14 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { VRTemplateDetailProps } from '@/types/vr';
+import { VRSessionTemplate } from '@/types/vr';
+
+interface VRTemplateDetailProps {
+  template: VRSessionTemplate;
+  onStart: () => void;
+  onBack: () => void;
+  heartRate?: number;
+}
 import { Play, ArrowLeft, Heart } from 'lucide-react';
 
 const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({ 
@@ -47,7 +54,7 @@ const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
           </div>
 
           <Button 
-            onClick={() => onStart(template)} 
+            onClick={() => onStart()} 
             className="w-full"
             size="lg"
           >

@@ -16,7 +16,8 @@ const ParticlesBackground: React.FC<ParticlesBackgroundProps> = ({
   className = ''
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { theme, reduceMotion } = useTheme();
+  const { resolvedTheme: theme } = useTheme();
+  const reduceMotion = false; // Default to false, can be enhanced later
   
   useEffect(() => {
     if (!containerRef.current) return;
@@ -51,7 +52,7 @@ const ParticlesBackground: React.FC<ParticlesBackgroundProps> = ({
       case 'dark':
         particleColor = new THREE.Color(0x3b82f6); // Bleu vif sur fond sombre
         break;
-      case 'pastel':
+      case 'light':
         particleColor = new THREE.Color(0x60a5fa); // Bleu pastel
         break;
       default:

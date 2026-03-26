@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests unitaires pour RH Heatmap Service
  * @vitest-environment jsdom

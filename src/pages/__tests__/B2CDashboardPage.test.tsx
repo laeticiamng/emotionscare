@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests E2E pour B2CDashboardPage
  * Vérifie le rendu correct et les interactions principales

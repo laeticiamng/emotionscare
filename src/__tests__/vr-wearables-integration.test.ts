@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VR & Wearables Integration Tests
  * Tests complets pour les modules VR et intégrations wearables

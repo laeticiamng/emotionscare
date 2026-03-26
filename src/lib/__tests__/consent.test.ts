@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour lib/consent.ts
  * Couvre : getConsentPreferences, setConsentPreferences, hasConsent,

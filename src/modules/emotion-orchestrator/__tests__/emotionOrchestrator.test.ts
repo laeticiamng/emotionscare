@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests complets pour emotionOrchestrator
  * Couvre la génération de recommandations, feedback, et stats

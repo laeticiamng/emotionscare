@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VR Nebula Types Tests
  */

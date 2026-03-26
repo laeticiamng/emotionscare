@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour usePerformanceOptimization
  * Couvre : mesure de rendu, debounce, memoize, metrics

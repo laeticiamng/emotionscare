@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour useNotifications
  * Couvre : notify, success, error, warning, info

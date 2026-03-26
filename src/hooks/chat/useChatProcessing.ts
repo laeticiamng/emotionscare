@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { ChatMessage } from '@/types';
+import { ChatMessage } from '@/types/chat';
 
 // Simulate API response delay
 const mockDelay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

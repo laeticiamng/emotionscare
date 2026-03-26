@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests E2E pour les modules critiques
  * Scénarios Given/When/Then

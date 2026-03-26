@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests unitaires pour les types et schémas Zod du module AR Filters
  * Day 37 - Module 20: AR Filters

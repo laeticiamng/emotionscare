@@ -131,7 +131,7 @@ export const useFlashGlowSession = (): Runtime => {
       extendTimerRef.current = null;
     }
 
-    logger.info(`flash:extend:${safeDuration}`, { duration_ms: safeDuration }, 'FLASH');
+    console.info(`flash:extend:${safeDuration}`, { duration_ms: safeDuration });
 
     setState((current) => ({ ...current, extendedMs: current.extendedMs + safeDuration }));
 
@@ -149,7 +149,7 @@ export const useFlashGlowSession = (): Runtime => {
       exitTimerRef.current = null;
     }
 
-    logger.info('flash:soft_exit', undefined, 'FLASH');
+    console.info('flash:soft_exit');
 
     applyAudioFade('slow');
     applyVisuals('lowered');
@@ -205,12 +205,7 @@ export const useFlashGlowSession = (): Runtime => {
           })
         : actions;
 
-      Sentry.addBreadcrumb({
-        category: 'flash',
-        level: 'info',
-        message: 'flash:runtime:apply',
-        data: { actions: normalized.map((action) => action.type) },
-      });
+      console.debug('flash:runtime:apply', { actions: normalized.map((action) => action.type) });
 
       normalized.forEach((action) => {
         switch (action.type) {

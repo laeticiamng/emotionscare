@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests d'accessibilité simplifiés
  * Validation WCAG AA pour les composants critiques

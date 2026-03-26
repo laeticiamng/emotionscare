@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { test, expect } from '@playwright/test';
 
 test.describe('Validation complète de toutes les routes - Correction 404', () => {

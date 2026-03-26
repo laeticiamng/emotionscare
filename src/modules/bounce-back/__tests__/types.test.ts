@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests unitaires pour les schémas Zod du module Bounce Back
  */

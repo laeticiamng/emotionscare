@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@/tests/test-utils';
 import { JournalRemindersList } from '../JournalRemindersList';

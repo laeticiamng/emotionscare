@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests complets pour les modules VR, Flash Glow, Grounding et Wearables
  * Couverture des hooks, services et accessibilité

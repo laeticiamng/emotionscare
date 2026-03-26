@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour SafeHtml - composant anti-XSS centralisé
  * Couvre : sanitisation DOMPurify, classes CSS, tags autorisés

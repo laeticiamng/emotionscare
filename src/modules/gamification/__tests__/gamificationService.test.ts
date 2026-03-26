@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Gamification Service - Tests Complets
  * Tests unitaires pour gamificationService

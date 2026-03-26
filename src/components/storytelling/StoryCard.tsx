@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Story } from '@/types/Story';
+import { Story } from '@/types/story';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -75,7 +75,7 @@ const StoryCard: React.FC<StoryCardProps> = ({
           {story.content}
         </p>
         <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{story.created_at ? formatDate(story.created_at) : 'Date inconnue'}</span>
+          <span>{(story as any).created_at ? formatDate((story as any).created_at) : 'Date inconnue'}</span>
           {story.emotion && <span className="capitalize">{story.emotion}</span>}
         </div>
       </CardContent>

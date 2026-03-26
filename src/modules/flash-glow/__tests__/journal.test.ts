@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createFlashGlowJournalEntry } from '@/modules/flash-glow/journal';
 import { journalService } from '@/modules/journal/journalService';

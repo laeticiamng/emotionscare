@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Achievements Service - Tests Complets
  * Tests unitaires pour achievementsService

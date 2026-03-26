@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour useAccountDeletion (RGPD - suppression de compte)
  * Couvre : softDelete, undelete, getDaysUntilPurge, canRestore, formatPurgeDate

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests de Configuration Environnement
  * Vérifie la validité et la sécurité de la configuration

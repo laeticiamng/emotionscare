@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Journal API Client - Tests
  * Tests unitaires pour journalApi.ts

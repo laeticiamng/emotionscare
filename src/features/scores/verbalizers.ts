@@ -129,14 +129,16 @@ const SESSION_LABELS: Record<string, string> = {
   autre: 'Autres pratiques',
 };
 
-export interface SessionVerbalRow extends WeeklySessionPoint {
+export type SessionVerbalRow = {
   weekKey: string;
   axisLabel: string;
   longLabel: string;
   total: number;
   rhythm: string;
   highlights: string[];
-}
+  week: string;
+  [key: string]: string | number | string[];
+};
 
 export function buildMoodVerbalSeries(points: MoodPoint[]): MoodVerbalPoint[] {
   if (!Array.isArray(points)) {
@@ -318,7 +320,7 @@ function describeMoodNuance(tone: MoodToneId, valence: number, arousal: number):
     case 'éveillé':
       return arousal > 0.9 ? 'éveil pétillant' : 'éveil doux';
     default:
-      return MOOD_TONE_DESCRIPTORS[tone].baseline;
+      return (MOOD_TONE_DESCRIPTORS[tone] as any)?.baseline ?? 'équilibre';
   }
 }
 

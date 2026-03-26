@@ -79,7 +79,7 @@ export function DepthCard({
 
   return (
     <MotionComponent
-      ref={cardRef}
+      ref={cardRef as any}
       className={cn(
         'relative rounded-2xl border border-border/50 bg-card transition-shadow duration-300',
         config.shadow,

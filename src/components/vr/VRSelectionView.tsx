@@ -2,28 +2,32 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import VRTemplateGrid from './VRTemplateGrid';
 
-const VR_TEMPLATES = [
+const VR_TEMPLATES: any[] = [
   {
     id: '1',
     title: 'Méditation en forêt',
+    name: 'Méditation en forêt',
     description: 'Une expérience de méditation apaisante dans une forêt luxuriante avec des sons de la nature.',
     duration: 15,
     tags: ['Méditation', 'Nature', 'Débutant', 'Relaxation'],
     environment: 'forest',
     thumbnailUrl: '/images/vr/forest-meditation.jpg',
     emotionTarget: 'calm',
-    category: 'Méditation'
+    category: 'Méditation',
+    difficulty: 'easy'
   },
   {
     id: '2',
     title: 'Plage au coucher de soleil',
+    name: 'Plage au coucher de soleil',
     description: 'Relaxez-vous sur une plage tranquille au coucher du soleil avec le son des vagues.',
     duration: 20,
     tags: ['Relaxation', 'Plage', 'Coucher de soleil', 'Apaisant'],
     environment: 'beach',
     thumbnailUrl: '/images/vr/sunset-beach.jpg',
     emotionTarget: 'peaceful',
-    category: 'Relaxation'
+    category: 'Relaxation',
+    difficulty: 'easy'
   }
 ];
 

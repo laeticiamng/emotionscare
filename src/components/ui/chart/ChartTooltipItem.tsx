@@ -1,5 +1,12 @@
 import React from 'react';
-import { getPayloadConfigFromPayload } from './ChartTooltip';
+
+const getPayloadConfigFromPayload = (payload: any) => ({
+  name: payload?.name || payload?.dataKey || '',
+  value: payload?.value ?? '',
+  color: payload?.color || payload?.fill || payload?.stroke || '#8884d8',
+  fill: payload?.fill,
+  stroke: payload?.stroke,
+});
 
 interface ChartTooltipItemProps {
   payload: any;

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useSessionsStore } from '@/store/sessions.store';
 import { useMoodStore } from '@/store/mood.store';

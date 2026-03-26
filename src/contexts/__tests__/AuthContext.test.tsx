@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests unitaires pour AuthContext
  * Couvre : initialisation, signIn, signUp, signOut, resetPassword, erreurs

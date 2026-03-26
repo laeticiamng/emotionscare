@@ -1,5 +1,12 @@
 import React from 'react';
-import { VRTemplateDetailProps } from '@/types/vr';
+import { VRSessionTemplate } from '@/types/vr';
+
+interface VRTemplateDetailProps {
+  template: VRSessionTemplate;
+  onStart: () => void;
+  onBack: () => void;
+  heartRate?: number;
+}
 import VRTemplateDetail from './VRTemplateDetail';
 
 interface VRTemplateDetailViewProps {

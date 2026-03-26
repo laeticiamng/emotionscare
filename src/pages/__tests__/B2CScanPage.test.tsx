@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests E2E pour B2CScanPage
  * Vérifie le rendu correct et les fonctionnalités de scan

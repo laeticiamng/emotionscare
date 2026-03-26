@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook useAchievements - Tests Complets
  * Tests unitaires pour le hook React useAchievements

@@ -41,14 +41,15 @@ const emit = <K extends keyof MoodMixerEventMap>(event: K, payload: MoodMixerEve
   }
 
   if (event === 'mixer.params.applied') {
+    const p = payload as MoodMixerEventMap['mixer.params.applied'];
     logger.info('mixer.params.applied', {
-      warmth: payload.params.warmth,
-      brightness: payload.params.brightness,
-      tempo: payload.params.tempo,
-      rhythm: payload.params.rhythm,
-      dynamics: payload.params.dynamics,
-      reverb: payload.params.reverb,
-      crossfadeMs: payload.crossfadeMs,
+      warmth: p.params.warmth,
+      brightness: p.params.brightness,
+      tempo: p.params.tempo,
+      rhythm: p.params.rhythm,
+      dynamics: p.params.dynamics,
+      reverb: p.params.reverb,
+      crossfadeMs: p.crossfadeMs,
     }, 'MIXER');
   }
 
@@ -63,7 +64,7 @@ const emit = <K extends keyof MoodMixerEventMap>(event: K, payload: MoodMixerEve
 
 export const moodMixerBus = {
   on<K extends keyof MoodMixerEventMap>(event: K, listener: MoodMixerListener<K>) {
-    const bucket = (listeners[event] ??= new Set<MoodMixerListener<K>>()) as Set<MoodMixerListener<K>>;
+    const bucket = (listeners[event] ??= new Set() as any) as Set<MoodMixerListener<K>>;
     bucket.add(listener);
     return () => {
       bucket.delete(listener);

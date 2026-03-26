@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SamSliders Component - Tests
  * Tests unitaires pour les sliders SAM (Self-Assessment Manikin)

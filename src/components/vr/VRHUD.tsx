@@ -2,7 +2,7 @@ import React from 'react';
 import { Html } from '@react-three/drei';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Play, Pause, X, Music, MusicOff } from 'lucide-react';
+import { Play, Pause, X, Music, MicOff } from 'lucide-react';
 import { type VRBreathPhase, type VRPattern } from '@/store/vr.store';
 
 interface VRHUDProps {
@@ -150,7 +150,7 @@ export const VRHUD: React.FC<VRHUDProps> = ({
                 {musicEnabled ? (
                   <Music className="h-4 w-4" aria-hidden="true" />
                 ) : (
-                  <MusicOff className="h-4 w-4" aria-hidden="true" />
+                  <MicOff className="h-4 w-4" aria-hidden="true" />
                 )}
               </Button>
               

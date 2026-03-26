@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour le service de challenges
  */

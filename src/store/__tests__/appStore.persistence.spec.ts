@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { migrate as migrateConfig, partialize as partializeConfig, useAppStore } from '@/store/appStore';

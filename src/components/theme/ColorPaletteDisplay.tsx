@@ -119,10 +119,10 @@ const ColorPaletteDisplay: React.FC = () => {
                   <Badge variant="info">Info</Badge>
                   <Badge variant="error">Error</Badge>
                   <Badge variant="outline">Outline</Badge>
-                  <Badge variant="success-subtle">Success Subtle</Badge>
-                  <Badge variant="warning-subtle">Warning Subtle</Badge>
-                  <Badge variant="info-subtle">Info Subtle</Badge>
-                  <Badge variant="error-subtle">Error Subtle</Badge>
+                  <Badge variant="success">Success Subtle</Badge>
+                  <Badge variant="warning">Warning Subtle</Badge>
+                  <Badge variant="info">Info Subtle</Badge>
+                  <Badge variant="error">Error Subtle</Badge>
                 </div>
               </div>
 
@@ -135,7 +135,7 @@ const ColorPaletteDisplay: React.FC = () => {
                   </AlertDescription>
                 </Alert>
                 
-                <Alert variant="success">
+                <Alert variant="destructive">
                   <CheckCircle2 className="h-4 w-4" />
                   <AlertTitle>Succès</AlertTitle>
                   <AlertDescription>
@@ -143,7 +143,7 @@ const ColorPaletteDisplay: React.FC = () => {
                   </AlertDescription>
                 </Alert>
                 
-                <Alert variant="warning">
+                <Alert>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertTitle>Attention</AlertTitle>
                   <AlertDescription>
@@ -151,7 +151,7 @@ const ColorPaletteDisplay: React.FC = () => {
                   </AlertDescription>
                 </Alert>
 
-                <Alert variant="info">
+                <Alert>
                   <Info className="h-4 w-4" />
                   <AlertTitle>Information</AlertTitle>
                   <AlertDescription>
@@ -159,7 +159,7 @@ const ColorPaletteDisplay: React.FC = () => {
                   </AlertDescription>
                 </Alert>
                 
-                <Alert variant="error">
+                <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Erreur</AlertTitle>
                   <AlertDescription>
@@ -245,9 +245,9 @@ const ColorPaletteDisplay: React.FC = () => {
               Toutes les combinaisons de couleurs ont été testées pour assurer un contraste minimum de:
             </p>
             <ul className="list-disc pl-5 space-y-2 text-sm">
-              <li>Texte normal: <Badge variant="success-subtle">AAA (7:1)</Badge> ou au minimum <Badge variant="info-subtle">AA (4.5:1)</Badge></li>
-              <li>Texte large: <Badge variant="info-subtle">AA (3:1)</Badge></li>
-              <li>Éléments non textuels: <Badge variant="info-subtle">AA (3:1)</Badge></li>
+              <li>Texte normal: <Badge variant="success">AAA (7:1)</Badge> ou au minimum <Badge variant="info">AA (4.5:1)</Badge></li>
+              <li>Texte large: <Badge variant="info">AA (3:1)</Badge></li>
+              <li>Éléments non textuels: <Badge variant="info">AA (3:1)</Badge></li>
             </ul>
           </section>
         </CardContent>

@@ -7,7 +7,7 @@ import { BarChart2, Globe, Sun, ArrowLeft } from 'lucide-react';
 interface SynthesisRoute {
   path: string;
   label: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
 }
 
 const routes: SynthesisRoute[] = [

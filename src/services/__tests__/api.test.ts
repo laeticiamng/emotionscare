@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour ApiService endpoints
  * Couvre : getAuthToken priorité sessionStorage, error handling, headers

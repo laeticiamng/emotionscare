@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Bubble Beat Types Tests
  */

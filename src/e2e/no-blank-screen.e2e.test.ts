@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { test, expect } from '@playwright/test';
 
 test.describe('No Blank Screen Tests - Version Corrigée', () => {

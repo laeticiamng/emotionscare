@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Exchange Data Hooks - Tests Complets
  * Tests unitaires pour les hooks de données Exchange

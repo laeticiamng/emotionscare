@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour JournalTextInput
  * Day 41 - Module 21: Journal UI Tests

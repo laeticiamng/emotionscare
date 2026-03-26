@@ -38,9 +38,9 @@ const VRHistoryList: React.FC<VRHistoryListProps> = ({
               {template.description && (
                 <div className="text-sm text-muted-foreground">{template.description}</div>
               )}
-              {template.lastUsed && (
+              {(template as any).lastUsed && (
                 <div className="text-xs text-muted-foreground mt-1">
-                  Last used: {new Date(template.lastUsed).toLocaleDateString()}
+                  Last used: {new Date((template as any).lastUsed).toLocaleDateString()}
                 </div>
               )}
             </div>

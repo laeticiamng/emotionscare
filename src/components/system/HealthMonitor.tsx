@@ -77,7 +77,7 @@ export const HealthMonitor: React.FC = () => {
 
       // Error Rate Check
       const logs = logger.getLogs();
-      const errorLogs = logs.filter(l => l.level === 0); // LogLevel.ERROR = 0
+      const errorLogs = logs.filter(l => String(l.level) === '0'); // LogLevel.ERROR = 0
       const errorRate = logs.length > 0 ? (errorLogs.length / logs.length) * 100 : 0;
 
       checks.push({

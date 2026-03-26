@@ -1,5 +1,5 @@
 import React from 'react';
-import { VRSessionTemplate } from '@/types';
+import { VRSessionTemplate } from '@/types/vr';
 
 export interface VRRecommendationsProps {
   templates: VRSessionTemplate[];

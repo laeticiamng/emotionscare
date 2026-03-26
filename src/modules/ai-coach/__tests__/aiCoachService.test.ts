@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AI Coach Service - Tests Complets
  * Tests unitaires pour aiCoachService

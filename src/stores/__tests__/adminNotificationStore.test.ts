@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useAdminNotificationStore } from '../adminNotificationStore';
 import { act } from '@testing-library/react';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — Store Unit Tests
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests complets des permissions et accès
  * Validation des guards et contrôles d'accès

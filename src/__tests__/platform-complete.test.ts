@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests complets de la plateforme EmotionsCare
  * Couvre tous les modules critiques

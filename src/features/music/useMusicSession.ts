@@ -16,7 +16,7 @@ interface ApplyInputs {
 
 type SessionStatus = 'idle' | 'running' | 'completed';
 
-type PostCta = 'nyvee' | 'encore_2min' | 'none';
+type PostCta = 'nyvee' | 'cocoon' | 'encore_2min' | 'none';
 
 type VisualizerMode = 'reduced' | 'standard';
 
@@ -75,8 +75,8 @@ export function useMusicSession(engine: UseMusicEngine): MusicSessionControls {
 
       actions.forEach((action) => {
         if (action.action === 'post_cta') {
-          cta = action.key;
-          if (action.key === 'nyvee') {
+          cta = action.key as PostCta;
+          if ((action.key as string) === 'nyvee') {
             logBreadcrumb('music:cta:nyvee');
           } else if (action.key === 'encore_2min') {
             logBreadcrumb('music:cta:encore2min');
@@ -109,7 +109,7 @@ export function useMusicSession(engine: UseMusicEngine): MusicSessionControls {
           intensity: engine.state.intensity,
           bpm_profile: engine.state.bpmProfile,
           crossfade_ms: engine.state.crossfadeMs,
-          post_cta: postCta,
+          post_cta: postCta as any,
         },
         durationSec: options?.durationSec,
       };
