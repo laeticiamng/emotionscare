@@ -175,7 +175,7 @@ const B2BUserDashboard: React.FC = () => {
                 </span>
               )}
             </Button>
-            <UserModeSelector className="hidden md:block" minimal />
+            <UserModeSelector minimal />
           </div>
         </div>
 
