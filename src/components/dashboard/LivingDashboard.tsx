@@ -297,7 +297,7 @@ const LivingDashboard: React.FC = () => {
                 >
                   <CardContent className="p-6">
                     <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${action.color} mb-4 flex items-center justify-center`}>
-                      <action.icon className="w-6 h-6 text-white" />
+                      {React.createElement(action.icon, { className: "w-6 h-6 text-white" })}
                     </div>
                     <h3 className="font-medium text-foreground mb-1">{action.title}</h3>
                     <p className="text-muted-foreground text-sm mb-3">{action.subtitle}</p>

@@ -108,7 +108,7 @@ const QuickAccessMenu: React.FC = () => {
           key={item.id}
           variant="outline"
           size="sm"
-          onClick={() => item.path ? handleAction(item.id, item.path) : handleAction(item.action || item.id)}
+          onClick={() => 'path' in item && item.path ? handleAction(item.id, item.path) : handleAction(('action' in item && item.action) || item.id)}
           disabled={loading === item.id}
         >
           {item.icon}

@@ -211,7 +211,7 @@ export default function NavigationCards({ maxCards, showAllButton = true }: Navi
                       card.color,
                       "text-primary-foreground group-hover:scale-110 transition-transform duration-300"
                     )}>
-                      <card.icon className="h-6 w-6" />
+                      {React.createElement(card.icon, { className: "h-6 w-6" })}
                     </div>
                     <div className="flex flex-col gap-1">
                       {card.premium && (

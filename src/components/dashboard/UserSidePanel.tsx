@@ -4,7 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, Clock, TrendingUp, CheckCircle, Star } from 'lucide-react';
-import { GamificationStats } from '@/types/gamification';
+
+interface GamificationStats {
+  level: number;
+  points: number;
+  streakDays: number;
+  longestStreak: number;
+  completedChallenges: number;
+  totalChallenges: number;
+  unlockedBadges: number;
+  totalBadges: number;
+}
 
 interface UserSidePanelProps {
   userName?: string;

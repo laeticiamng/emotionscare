@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
 const SegmentSelector: React.FC = () => {
+  const segmentContext = useSegment() as any;
   const { 
     segment = 'all',
     setSegment,
@@ -20,7 +21,7 @@ const SegmentSelector: React.FC = () => {
     isLoading,
     activeDimension,
     activeOption
-  } = useSegment();
+  } = segmentContext || {};
 
   const handleDimensionSelect = (dimension: string) => {
     if (!setSegment) return;

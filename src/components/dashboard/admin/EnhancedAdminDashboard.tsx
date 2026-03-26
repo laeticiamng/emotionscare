@@ -242,17 +242,7 @@ const EnhancedAdminDashboard: React.FC = () => {
         </Tabs>
       </div>
       
-      <CommandMenu 
-        open={isCommandOpen} 
-        onOpenChange={setIsCommandOpen}
-        commands={[
-          { category: "Navigation", command: "Aller au tableau de bord", shortcut: "G D" },
-          { category: "Navigation", command: "Aller aux paramètres", shortcut: "G S" },
-          { category: "Navigation", command: "Aller aux équipes", shortcut: "G T" },
-          { category: "Actions", command: "Exporter les données", shortcut: "E D" },
-          { category: "Actions", command: "Créer un rapport", shortcut: "C R" },
-          { category: "Actions", command: "Lancer la formation", shortcut: "L F" },
-        ]}
+      {isCommandOpen && <CommandMenu />}
       />
     </OnboardingProvider>
   );

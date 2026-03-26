@@ -299,7 +299,7 @@ const B2BUserDashboard: React.FC = () => {
                 <CardContent>
                   {metrics.length === 0 ? (
                     <div className="flex flex-col items-center py-12">
-                      <ChartLine className="h-12 w-12 text-muted-foreground opacity-50 mb-4" />
+                      <TrendingUp className="h-12 w-12 text-muted-foreground opacity-50 mb-4" />
                       <p className="text-muted-foreground">Aucune donnée disponible pour le moment</p>
                     </div>
                   ) : (

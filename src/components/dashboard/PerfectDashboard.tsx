@@ -362,7 +362,7 @@ const PerfectDashboard: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {dashboardData.achievements.map((achievement) => (
+                {metrics.achievements.map((achievement: any) => (
                   <div key={achievement.id} className="space-y-2">
                     <div className="flex items-start justify-between">
                       <div>
