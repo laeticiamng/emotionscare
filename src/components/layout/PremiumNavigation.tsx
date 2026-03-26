@@ -92,7 +92,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Scan Rapide',
           description: 'Analyse instantanée de votre état',
           icon: <Eye className="w-5 h-5" />,
-          path: Routes.scan(),
+          path: routes.consumer.scan(),
           category: 'core',
           xp: 75,
           segment: 'consumer'
