@@ -76,7 +76,7 @@ const StatusIndicator: React.FC<StatusIndicatorProps> = ({
   // Pour les indicateurs plus complets
   return (
     <Alert 
-      variant={getVariant()} 
+      variant={getVariant() === 'destructive' ? 'destructive' : 'default'} 
       className={cn(
         position === 'fixed' && "fixed top-4 right-4 max-w-md z-50",
         position === 'absolute' && "absolute top-4 right-4 max-w-md z-10",

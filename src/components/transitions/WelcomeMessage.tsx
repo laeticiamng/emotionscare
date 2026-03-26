@@ -29,7 +29,7 @@ const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
       greeting = 'Bonsoir';
     }
     
-    const name = user?.name || '';
+    const name = (user as any)?.name || (user as any)?.user_metadata?.name || '';
     setGreetingMessage(`${greeting}${name ? ` ${name}` : ''}`);
     
     // Hide after 3 seconds

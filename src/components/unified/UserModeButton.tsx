@@ -39,7 +39,7 @@ const UserModeButton: React.FC<UserModeButtonProps> = ({
     >
       {getModeIcon()}
       {!minimal && (
-        <span className="ml-2">{getUserModeDisplayName(userMode || 'b2c')}</span>
+        <span className="ml-2">{getUserModeDisplayName((userMode || 'b2c') as any)}</span>
       )}
     </Button>
   );

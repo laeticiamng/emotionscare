@@ -52,7 +52,7 @@ const DisplayPreferences: React.FC = () => {
           <Label htmlFor="theme">Thème</Label>
           <Select
             value={theme}
-            onValueChange={value => handleThemeChange(value as ThemeName)}
+            onValueChange={value => handleThemeChange(value as Theme)}
           >
             <SelectTrigger id="theme">
               <SelectValue placeholder="Choisir un thème" />

@@ -1,7 +1,7 @@
 import React, { forwardRef, HTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
-export interface ChartContainerProps extends HTMLAttributes<HTMLDivElement> {
+export interface ChartContainerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   title?: React.ReactNode;
   description?: React.ReactNode;
   footer?: React.ReactNode;

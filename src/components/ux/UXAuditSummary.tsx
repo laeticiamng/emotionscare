@@ -320,7 +320,7 @@ const UXAuditSummary: React.FC = () => {
                     📊 Dashboard UX Live
                   </Button>
                 </Link>
-                <Link to={Routes.adminAccessibility()}>
+                <Link to="/admin/accessibility">
                   <Button variant="outline" className="w-full" size="lg">
                     ♿ Audit Accessibilité  
                   </Button>

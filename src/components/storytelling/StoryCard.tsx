@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Story } from '@/types/Story';
+import { Story } from '@/types/story';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 

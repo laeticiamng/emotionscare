@@ -77,7 +77,7 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
       )}
       <CardContent>
         <div className="space-y-4">
-          {displaySessions.map(session => {
+          {displaySessions.map((session: any) => {
             const startTime = getVRSessionStartTime(session);
             const endTime = getVRSessionEndTime(session);
             
