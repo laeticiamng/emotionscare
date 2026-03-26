@@ -14,7 +14,7 @@ interface Suggestion {
   id: string;
   title: string;
   description: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   link: string;
   duration: string;
   category: 'respiration' | 'meditation' | 'music' | 'journal' | 'exercise';
