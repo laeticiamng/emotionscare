@@ -71,7 +71,7 @@ export const useSunoService = (): SunoServiceHook => {
       setGenerationProgress(100);
 
       if (response.success && response.data) {
-        setGeneratedTrack(response.data);
+        setGeneratedTrack(response.data as any);
         
         // Si c'est un statut de génération, vérifier périodiquement
         if (response.data.status === 'generating') {
