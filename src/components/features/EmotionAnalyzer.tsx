@@ -41,7 +41,7 @@ const EmotionAnalyzer: React.FC = () => {
     
     setIsAnalyzing(true);
     try {
-      const result = await emotionsCareApi.analyzeEmotionText(textInput);
+      const result: any = await emotionsCareApi.analyzeEmotionText(textInput);
       setEmotionResult({
         emotion: result.emotion || 'Neutre',
         confidence: result.confidence || 0.85,
@@ -66,7 +66,7 @@ const EmotionAnalyzer: React.FC = () => {
         try {
           // Simulation d'un blob audio
           const mockBlob = new Blob(['mock audio data'], { type: 'audio/wav' });
-          const result = await emotionsCareApi.analyzeVoiceEmotion(mockBlob);
+          const result: any = await emotionsCareApi.analyzeVoiceEmotion(mockBlob);
           setEmotionResult({
             emotion: result.emotion || 'Calme',
             confidence: result.confidence || 0.92,

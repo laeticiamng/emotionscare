@@ -1,5 +1,5 @@
 import React from 'react';
-import { JournalEntry } from '@/types';
+interface JournalEntry { id: string; content: string; mood?: string; timestamp?: Date | string; date?: Date | string; tags?: string[]; emotionAnalysis?: any; }
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent } from '@/components/ui/card';
 import { format } from 'date-fns';
@@ -84,7 +84,8 @@ const JournalCalendarView: React.FC<JournalCalendarViewProps> = ({ entries, onEn
             modifiers={{ hasEntry: daysWithEntries }}
             modifiersStyles={modifiersStyles as any}
             components={{
-              Day: ({ date, ...props }) => {
+              Day: (props: any) => {
+                const date = props.date || props.day?.date || new Date();
                 const dateKey = format(date, 'yyyy-MM-dd');
                 const dayEntries = entriesByDate[dateKey] || [];
                 const hasEntries = dayEntries.length > 0;
@@ -94,8 +95,7 @@ const JournalCalendarView: React.FC<JournalCalendarViewProps> = ({ entries, onEn
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
-                          {...props}
-                          className={`${props.className} ${getDayClassName(date)}`}
+                          className={`${props.className || ''} ${getDayClassName(date)}`}
                         >
                           {format(date, 'd')}
                           {hasEntries && (

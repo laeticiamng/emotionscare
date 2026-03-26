@@ -7,7 +7,9 @@ import { Trophy, Star, Target, Flame, Award } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const GamificationPanel: React.FC = () => {
-  const { userPoints, userBadges, loading } = useGamification();
+  const { userStats, loading } = useGamification();
+  const userPoints = userStats as any;
+  const userBadges = (userPoints?.badges || []) as any[];
 
   if (loading) {
     return (

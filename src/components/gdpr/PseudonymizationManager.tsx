@@ -49,7 +49,7 @@ export const PseudonymizationManager = () => {
   });
 
   const handleCreateRule = async () => {
-    const result = await createRule(newRule);
+    const result = await createRule(newRule as any);
     if (result) {
       setIsCreateDialogOpen(false);
       setNewRule({
@@ -278,7 +278,7 @@ export const PseudonymizationManager = () => {
                   {rules.map((rule) => (
                     <TableRow key={rule.id}>
                       <TableCell>
-                        <Badge variant="outline">{dataTypeLabels[rule.data_type] || rule.data_type}</Badge>
+                        <Badge variant="outline">{(dataTypeLabels as any)[rule.data_type] || rule.data_type}</Badge>
                       </TableCell>
                       <TableCell className="font-mono text-sm">{rule.field_name}</TableCell>
                       <TableCell>{algorithmLabels[rule.algorithm]}</TableCell>

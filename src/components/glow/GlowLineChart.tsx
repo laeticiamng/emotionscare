@@ -56,9 +56,6 @@ export const GlowLineChart: React.FC<GlowLineChartProps> = ({ data }) => {
                 strokeWidth={3}
                 dot={{ fill: '#8B5CF6', strokeWidth: 2, r: 4 }}
                 activeDot={{ r: 6, fill: '#8B5CF6' }}
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
               />
               <Line
                 type="monotone"
@@ -67,9 +64,6 @@ export const GlowLineChart: React.FC<GlowLineChartProps> = ({ data }) => {
                 strokeWidth={3}
                 dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
                 activeDot={{ r: 6, fill: '#10B981' }}
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
               />
               <Line
                 type="monotone"
@@ -78,9 +72,6 @@ export const GlowLineChart: React.FC<GlowLineChartProps> = ({ data }) => {
                 strokeWidth={3}
                 dot={{ fill: '#F59E0B', strokeWidth: 2, r: 4 }}
                 activeDot={{ r: 6, fill: '#F59E0B' }}
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
               />
               <Line
                 type="monotone"
@@ -89,9 +80,6 @@ export const GlowLineChart: React.FC<GlowLineChartProps> = ({ data }) => {
                 strokeWidth={3}
                 dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
                 activeDot={{ r: 6, fill: '#3B82F6' }}
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
               />
             </motion.g>
           </LineChart>

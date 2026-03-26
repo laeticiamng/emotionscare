@@ -68,7 +68,7 @@ const EmotionalWeatherWidget: React.FC<EmotionalWeatherWidgetProps> = ({
       transition: {
         x: {
           repeat: Infinity,
-          repeatType: "loop",
+          repeatType: "loop" as const,
           duration: 20,
           ease: "linear",
         },
@@ -82,7 +82,7 @@ const EmotionalWeatherWidget: React.FC<EmotionalWeatherWidgetProps> = ({
       opacity: [0.7, 1, 0.7],
       transition: {
         repeat: Infinity,
-        repeatType: "loop",
+        repeatType: "loop" as const,
         duration: 3,
         ease: "easeInOut",
       },

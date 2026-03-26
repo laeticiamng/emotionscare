@@ -45,7 +45,7 @@ const StrictRoleGuard: React.FC<StrictRoleGuardProps> = ({
   const currentRole = user?.role || userMode;
   
   // Normaliser le rôle pour les comparaisons
-  const normalizedRole = normalizeRole(currentRole);
+  const normalizedRole = normalizeRole(currentRole || undefined);
   const normalizedAllowedRoles = allowedRoles.map(role => normalizeRole(role));
 
   // Vérifier si le rôle est autorisé
@@ -72,7 +72,7 @@ export const useRoleAccess = () => {
   const { user } = useAuth();
   const { userMode } = useUserMode();
 
-  const currentRole = normalizeRole(user?.role || userMode);
+  const currentRole = normalizeRole(user?.role || userMode || undefined);
 
   const hasAccess = (allowedRoles: string[]): boolean => {
     const normalizedAllowedRoles = allowedRoles.map(role => normalizeRole(role));

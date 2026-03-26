@@ -146,7 +146,7 @@ const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }
       value: '312%',
       change: 18,
       trend: 'up',
-      icon: <Sparkles className="w-5 h-5" />,
+      icon: <span className="w-5 h-5" />,
       color: 'bg-success',
       description: 'Retour sur investissement'
     }

@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { performanceMonitor } from '@/utils/performanceMonitor';
-import { apiCache, imageCache, userCache } from '@/utils/cacheStrategies';
+import { apiCache, userCache } from '@/utils/cacheStrategies';
 import { logger } from '@/lib/logger';
 
 const DevTools: React.FC<{ enabled?: boolean }> = ({ enabled = false }) => {
@@ -22,9 +22,8 @@ const DevTools: React.FC<{ enabled?: boolean }> = ({ enabled = false }) => {
       });
 
       setCacheStats({
-        api: apiCache.getStats(),
-        image: imageCache.getStats(),
-        user: userCache.getStats()
+        api: { size: (apiCache as any).cache?.size || 0, hitRate: 0, hits: 0 },
+        user: { size: (userCache as any).cache?.size || 0, hitRate: 0, hits: 0 }
       });
     };
 
@@ -149,7 +148,6 @@ const DevTools: React.FC<{ enabled?: boolean }> = ({ enabled = false }) => {
                       <Button 
                         onClick={() => {
                           apiCache.clear();
-                          imageCache.clear();
                           userCache.clear();
                         }}
                         variant="outline" 

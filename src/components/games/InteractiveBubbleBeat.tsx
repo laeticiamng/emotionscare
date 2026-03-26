@@ -89,7 +89,8 @@ const gameLevels: GameLevel[] = [
 export default function InteractiveBubbleBeat() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
-  const { isConnected: hrConnected, heartRate } = useWebBluetooth();
+  const { isConnected: hrConnected, heartRateData } = useWebBluetooth();
+  const heartRate = heartRateData?.bpm || 0;
   
   // Game state
   const [isPlaying, setIsPlaying] = useState(false);

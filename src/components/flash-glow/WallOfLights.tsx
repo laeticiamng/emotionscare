@@ -242,7 +242,7 @@ export const WallOfLights: React.FC<WallOfLightsProps> = ({
         {phase === 'settle' && 'Apaisement...'}
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes pulse-subtle {
           0%,
           100% {

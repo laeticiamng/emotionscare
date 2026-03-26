@@ -86,12 +86,12 @@ const GamificationStatsCards: React.FC<GamificationStatsCardsProps> = ({
     extra,
     gradient 
   }: { 
-    icon: React.ElementType; 
+    icon: React.ComponentType<{ className?: string }>; 
     iconColor: string; 
     label: string; 
     value: number; 
     unit: string; 
-    trend: { icon: React.ElementType; color: string; label: string };
+    trend: { icon: React.ComponentType<{ className?: string }>; color: string; label: string };
     extra?: React.ReactNode;
     gradient?: string;
   }) => {

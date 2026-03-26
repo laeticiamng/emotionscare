@@ -159,7 +159,7 @@ const ImmersiveExperienceEngine: React.FC<ImmersiveProps> = ({
       peaceful: { scale: 0.95, blur: 2, saturate: 0.9 }
     };
 
-    return effects[experienceContext.emotion] || effects.calm;
+    return (effects as any)[experienceContext.emotion] || effects.calm;
   };
 
   const emotionEffects = getEmotionEffects();
@@ -169,7 +169,7 @@ const ImmersiveExperienceEngine: React.FC<ImmersiveProps> = ({
       className="immersive-experience-engine relative min-h-screen overflow-hidden"
       onMouseMove={handleMouseMove}
       style={{
-        background: theme?.background || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: (theme as any)?.background || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         filter: `saturate(${emotionEffects.saturate}) blur(${emotionEffects.blur}px)`
       }}
       initial={{ scale: 0.9, opacity: 0 }}
@@ -187,8 +187,8 @@ const ImmersiveExperienceEngine: React.FC<ImmersiveProps> = ({
               key={particle.id}
               className="absolute w-1 h-1 rounded-full"
               style={{
-                background: theme?.particleColor || '#74b9ff',
-                boxShadow: `0 0 6px ${theme?.glowColor || '#a29bfe'}`,
+                background: (theme as any)?.particleColor || '#74b9ff',
+                boxShadow: `0 0 6px ${(theme as any)?.glowColor || '#a29bfe'}`,
                 left: particle.x,
                 top: particle.y
               }}
@@ -219,7 +219,7 @@ const ImmersiveExperienceEngine: React.FC<ImmersiveProps> = ({
             <motion.div
               className="absolute rounded-full border-4"
               style={{
-                borderColor: theme?.glowColor || '#a29bfe',
+                borderColor: (theme as any)?.glowColor || '#a29bfe',
                 left: springX.get() - 50,
                 top: springY.get() - 50,
                 width: 100,
@@ -239,7 +239,7 @@ const ImmersiveExperienceEngine: React.FC<ImmersiveProps> = ({
                 key={i}
                 className="absolute w-2 h-2 rounded-full"
                 style={{
-                  background: theme?.particleColor || '#74b9ff',
+                  background: (theme as any)?.particleColor || '#74b9ff',
                   left: springX.get(),
                   top: springY.get()
                 }}
@@ -288,7 +288,7 @@ const ImmersiveExperienceEngine: React.FC<ImmersiveProps> = ({
 
           {user && (
             <div className="mt-2 text-xs opacity-60">
-              Expérience personnalisée pour {user.name}
+              Expérience personnalisée pour {(user as any).name || user.email}
             </div>
           )}
         </div>

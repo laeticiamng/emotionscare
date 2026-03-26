@@ -198,7 +198,7 @@ export const WeeklyPlanCard: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const computation = clinicalScoringService.calculate('WHO5', formattedAnswers, assessment.state.locale);
+      const computation = clinicalScoringService.calculate('WHO5' as any, formattedAnswers, assessment.state.locale);
       let submitted = false;
 
       if (assessment.state.currentInstrument === 'WHO5' && assessment.state.hasConsent) {

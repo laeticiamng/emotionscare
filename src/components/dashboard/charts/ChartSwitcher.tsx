@@ -51,7 +51,7 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
     setSelectedDimensionId(value);
     
     // Find the full dimension object
-    const dimension = availableDimensions.find(d => d.id === value);
+    const dimension = availableDimensions.find((d: any) => d.id === value);
     if (dimension && setSelectedDimension) {
       setSelectedDimension(dimension);
     }
@@ -61,10 +61,10 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
     // Find the full option object
     if (!selectedDimensionId) return;
     
-    const dimension = availableDimensions.find(d => d.id === selectedDimensionId);
+    const dimension = availableDimensions.find((d: any) => d.id === selectedDimensionId);
     if (!dimension) return;
     
-    const option = dimension.options.find(o => o.value === value);
+    const option = dimension.options.find((o: any) => o.value === value);
     
     if (option && setSelectedOption) {
       setSelectedOption(option);
@@ -73,7 +73,7 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
 
   const getCurrentDimensionOptions = (): SegmentOption[] => {
     if (!selectedDimensionId) return [];
-    const dimension = availableDimensions.find(d => d.id === selectedDimensionId);
+    const dimension = availableDimensions.find((d: any) => d.id === selectedDimensionId);
     return dimension ? dimension.options : [];
   };
 
@@ -97,7 +97,7 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
                 <SelectValue placeholder="Filtre" />
               </SelectTrigger>
               <SelectContent>
-                {availableDimensions.map((dim) => (
+                {availableDimensions.map((dim: any) => (
                   <SelectItem key={dim.id} value={dim.id}>
                     {dim.label || dim.name}
                   </SelectItem>

@@ -93,7 +93,7 @@ const InteractiveJournal: React.FC = () => {
     setIsAnalyzing(true);
     try {
       // Analyse de l'émotion du texte
-      const analysis = await emotionsCareApi.analyzeEmotionText(currentEntry);
+      const analysis: any = await emotionsCareApi.analyzeEmotionText(currentEntry);
       
       setIsSaving(true);
       

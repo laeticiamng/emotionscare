@@ -3,12 +3,22 @@ import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { Button } from "@/components/ui/button";
-import { DraggableKpiCardsGridProps, KpiCardProps } from 'types/dashboard';
+import { DraggableCardProps } from '@/types/widgets';
+
+interface DraggableGridProps {
+  cards?: DraggableCardProps[];
+  onCardsReorder?: (cards: DraggableCardProps[]) => void;
+  onOrderChange?: (cards: DraggableCardProps[]) => void;
+  onSave?: (layouts: any) => void;
+  savedLayout?: any;
+  className?: string;
+  isEditable?: boolean;
+}
 import KpiCard from '../KpiCard';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({
+const DraggableKpiCardsGrid: React.FC<DraggableGridProps> = ({
   cards = [],
   onCardsReorder,
   onOrderChange,

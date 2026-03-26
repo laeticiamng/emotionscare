@@ -427,14 +427,13 @@ const NavigationHub: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
             >
+              <Link to={item.path}>
               <Card 
                 className={cn(
                   "h-full hover:shadow-lg transition-all duration-300 cursor-pointer group",
                   item.isActive && "ring-2 ring-primary border-primary"
                 )}
-                asChild
               >
-                <Link to={item.path}>
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -444,7 +443,7 @@ const NavigationHub: React.FC = () => {
                             ? "bg-primary text-primary-foreground" 
                             : "bg-muted group-hover:bg-primary/10"
                         )}>
-                          <item.icon className="h-5 w-5" />
+                          {React.createElement(item.icon as any, { className: "h-5 w-5" })}
                         </div>
                         <div className="space-y-1">
                           <CardTitle className="text-base leading-tight">
@@ -487,8 +486,8 @@ const NavigationHub: React.FC = () => {
                       </div>
                     )}
                   </CardContent>
-                </Link>
-              </Card>
+                </Card>
+              </Link>
             </motion.div>
           ))}
         </div>

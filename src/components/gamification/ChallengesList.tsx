@@ -47,29 +47,30 @@ const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, className }
       <CardContent>
         <div className="space-y-4">
           {challenges.map((challenge) => {
+            const ch = challenge as any;
             // Calculate progress percentage
-            const progress = challenge.completed
+            const progress = ch.completed
               ? 100 
-              : challenge.progress !== undefined && (typeof challenge.goal === 'number' || challenge.total || challenge.totalSteps) 
-                ? Math.round((challenge.progress / (
-                    typeof challenge.goal === 'number' 
-                      ? challenge.goal 
-                      : challenge.total || challenge.totalSteps || 1
+              : ch.progress !== undefined && (typeof ch.goal === 'number' || ch.total || ch.totalSteps) 
+                ? Math.round((ch.progress / (
+                    typeof ch.goal === 'number' 
+                      ? ch.goal 
+                      : ch.total || ch.totalSteps || 1
                   )) * 100)
                 : 0;
                   
             // For challenges with completions
-            const completionsProgress = challenge.completions !== undefined && (typeof challenge.goal === 'number' || challenge.total || challenge.totalSteps)
-              ? Math.round((challenge.completions / (
-                  typeof challenge.goal === 'number'
-                    ? challenge.goal
-                    : challenge.total || challenge.totalSteps || 1
+            const completionsProgress = ch.completions !== undefined && (typeof ch.goal === 'number' || ch.total || ch.totalSteps)
+              ? Math.round((ch.completions / (
+                  typeof ch.goal === 'number'
+                    ? ch.goal
+                    : ch.total || ch.totalSteps || 1
                 )) * 100)
               : 0;
             
             // Determine difficulty color
             const difficultyColor = 
-              challenge.difficulty === 'hard' ? 'text-red-500' :
+              challenge.difficulty === 'hard' ? 'text-destructive' :
               challenge.difficulty === 'medium' ? 'text-amber-500' : 
               'text-green-500';
             
@@ -90,7 +91,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, className }
                 )}>
                   <div className="flex justify-between">
                     <h3 className="font-medium text-sm">
-                      {challenge.name}
+                      {ch.name || challenge.title}
                     </h3>
                     {challenge.difficulty && (
                       <span className={cn("text-xs font-medium", difficultyColor)}>
@@ -107,7 +108,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, className }
                     <div className="flex items-center space-x-1">
                       <Flag className="h-3 w-3 text-muted-foreground" />
                       <span>
-                        {challenge.progress || challenge.completions || 0} / {typeof challenge.goal === 'number' ? challenge.goal : (challenge.total || challenge.totalSteps || 1)}
+                        {ch.progress || ch.completions || 0} / {typeof ch.goal === 'number' ? ch.goal : (ch.total || ch.totalSteps || 1)}
                       </span>
                     </div>
                     
