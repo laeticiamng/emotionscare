@@ -136,6 +136,7 @@ export interface SessionVerbalRow extends WeeklySessionPoint {
   total: number;
   rhythm: string;
   highlights: string[];
+  [key: string]: string | number | string[];
 }
 
 export function buildMoodVerbalSeries(points: MoodPoint[]): MoodVerbalPoint[] {
