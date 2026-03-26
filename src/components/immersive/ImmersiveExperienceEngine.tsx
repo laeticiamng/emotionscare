@@ -239,7 +239,7 @@ const ImmersiveExperienceEngine: React.FC<ImmersiveProps> = ({
                 key={i}
                 className="absolute w-2 h-2 rounded-full"
                 style={{
-                  background: theme?.particleColor || '#74b9ff',
+                  background: (theme as any)?.particleColor || '#74b9ff',
                   left: springX.get(),
                   top: springY.get()
                 }}
