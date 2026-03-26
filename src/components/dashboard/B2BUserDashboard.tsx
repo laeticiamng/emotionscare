@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Music, Trophy, ChartLine, Bell, BookOpen, Lightbulb } from 'lucide-react';
+import { Music, Trophy, TrendingUp, Bell, BookOpen, Lightbulb } from 'lucide-react';
 import DashboardContainer from '@/components/dashboard/DashboardContainer';
 import { UserModeSelector } from '@/components/ui/user-mode-selector';
 import { toast } from 'sonner';
