@@ -1,16 +1,68 @@
 import { useState, useCallback } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { startAssess, submitAssess, aggregateAssess } from '@/lib/assess/client';
-import type { 
-  StartInput, 
-  StartOutput, 
-  SubmitInput, 
-  SubmitOutput, 
-  AggregateInput, 
-  Instrument 
-} from '@/lib/assess/types';
+import { useMutation } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
+import type { InstrumentCode, StartRequest } from '@/lib/assess/types';
+import { supabase } from '@/integrations/supabase/client';
+
+// Local types matching the contract schemas
+interface StartInput {
+  instrument: string;
+  lang?: string;
+  context?: string;
+}
+
+interface StartOutput {
+  session_id: string;
+  items: Array<{ id: string; prompt: string; choices?: (string | number)[] }>;
+  expiry_ts: number;
+}
+
+interface SubmitInput {
+  session_id: string;
+  answers: Array<{ id: string; value: number }>;
+  meta?: { duration_ms?: number; device_flags?: Record<string, any> };
+}
+
+interface SubmitOutput {
+  receipt_id: string;
+  orchestration: { hints: string[] };
+}
+
+interface AggregateInput {
+  org_id: string;
+  period: { from: string; to: string };
+  instruments?: string[];
+  team_id?: string;
+  min_n?: number;
+}
+
+interface AggregateOutput {
+  ok: true;
+  n: number;
+  text_summary: string[];
+}
+
+type Instrument = string;
+
+// Stubs for edge function calls
+async function startAssess(input: StartInput): Promise<StartOutput> {
+  const { data, error } = await supabase.functions.invoke('assess-start', { body: input });
+  if (error) throw error;
+  return data as StartOutput;
+}
+
+async function submitAssess(input: SubmitInput): Promise<SubmitOutput> {
+  const { data, error } = await supabase.functions.invoke('assess-submit', { body: input });
+  if (error) throw error;
+  return data as SubmitOutput;
+}
+
+async function aggregateAssess(input: AggregateInput): Promise<AggregateOutput> {
+  const { data, error } = await supabase.functions.invoke('assess-aggregate', { body: input });
+  if (error) throw error;
+  return data as AggregateOutput;
+}
 
 interface UseAssessOptions {
   onSubmitSuccess?: (result: SubmitOutput) => void;
@@ -22,25 +74,15 @@ export function useAssess(options: UseAssessOptions = {}) {
   const [currentSession, setCurrentSession] = useState<StartOutput | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Start assessment
   const startMutation = useMutation({
     mutationFn: startAssess,
     onSuccess: (data) => {
       setCurrentSession(data);
-      // Télémétrie anonyme
-      if (typeof window !== 'undefined' && window.analytics) {
-        window.analytics.track('assess_started', {
-          instrument: data.items.length ? 'unknown' : 'unknown', // On évite de logger l'instrument spécifique
-          context: 'unknown',
-          locale: navigator.language || 'fr'
-        });
-      }
     },
     onError: (error) => {
       logger.error('Start assessment error', error as Error, 'UI');
       options.onError?.(error);
       
-      // Messages d'erreur utilisateur-friendly
       if (error.message.includes('feature_disabled')) {
         toast({
           title: "Fonction temporairement indisponible",
@@ -57,157 +99,70 @@ export function useAssess(options: UseAssessOptions = {}) {
     }
   });
 
-  // Submit assessment avec retry automatique
   const submitMutation = useMutation({
     mutationFn: submitAssess,
     retry: (failureCount, error) => {
-      // Retry seulement sur rate limiting, max 2 fois
-      if (error.message.includes('rate_limited') && failureCount < 2) {
-        return true;
-      }
+      if (error.message.includes('rate_limited') && failureCount < 2) return true;
       return false;
     },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
-    onMutate: () => {
-      setIsSubmitting(true);
-    },
+    onMutate: () => { setIsSubmitting(true); },
     onSuccess: (data) => {
       setIsSubmitting(false);
       options.onSubmitSuccess?.(data);
-      
-      // Télémétrie anonyme - seulement le badge final
-      if (typeof window !== 'undefined' && window.analytics) {
-        window.analytics.track('assess_submitted', {
-          badge_label: data.orchestration.hints[0] || 'completed',
-          context: 'unknown'
-        });
-      }
     },
     onError: (error) => {
       setIsSubmitting(false);
       logger.error('Submit assessment error', error as Error, 'UI');
       options.onError?.(error);
 
-      // Gestion d'erreurs spécifiques sans révéler de détails techniques
-      if (error.message.includes('already_submitted')) {
-        // Idempotent - pas d'erreur visible
-        return;
-      } else if (error.message.includes('rate_limited')) {
-        toast({
-          title: "Un instant...",
-          description: "On réessaie plus tard automatiquement.",
-          variant: "default"
-        });
+      if (error.message.includes('already_submitted')) return;
+      if (error.message.includes('rate_limited')) {
+        toast({ title: "Un instant...", description: "On réessaie plus tard automatiquement.", variant: "default" });
       } else if (error.message.includes('unauthorized')) {
-        toast({
-          title: "Session expirée",
-          description: "Veuillez vous reconnecter.",
-          variant: "destructive"
-        });
+        toast({ title: "Session expirée", description: "Veuillez vous reconnecter.", variant: "destructive" });
       } else {
-        toast({
-          title: "Envoi impossible",
-          description: "Vos réponses n'ont pas pu être envoyées. Réessayez plus tard.",
-          variant: "destructive"
-        });
+        toast({ title: "Envoi impossible", description: "Vos réponses n'ont pas pu être envoyées.", variant: "destructive" });
       }
     }
   });
 
-  // Aggregate pour B2B/managers
   const aggregateMutation = useMutation({
     mutationFn: aggregateAssess,
-    onSuccess: (data) => {
-      // Télémétrie B2B
-      if (typeof window !== 'undefined' && window.analytics) {
-        window.analytics.track('assess_aggregate_viewed', {
-          scope: 'team',
-          period: 'unknown',
-          can_show: data.n >= 5
-        });
-      }
-    },
     onError: (error) => {
       logger.error('Aggregate assessment error', error as Error, 'UI');
       options.onError?.(error);
-      
-      toast({
-        title: "Données indisponibles",
-        description: "Impossible de charger le résumé d'équipe.",
-        variant: "destructive"
-      });
+      toast({ title: "Données indisponibles", description: "Impossible de charger le résumé d'équipe.", variant: "destructive" });
     }
   });
 
-  // Helper pour démarrer un assessment
   const start = useCallback((instrument: Instrument, context?: string, lang: string = 'fr') => {
-    const input: StartInput = {
-      instrument,
-      lang,
-      context: context as any
-    };
-    
-    // Télémétrie
-    if (typeof window !== 'undefined' && window.analytics) {
-      window.analytics.track('assess_viewed', {
-        instrument,
-        context: context || 'unknown',
-        locale: lang
-      });
-    }
-    
+    const input: StartInput = { instrument, lang, context };
     return startMutation.mutate(input);
   }, [startMutation]);
 
-  // Helper pour soumettre
   const submit = useCallback((sessionId: string, answers: Array<{id: string, value: number}>, meta?: any) => {
-    if (isSubmitting) return; // Éviter double submit
-    
-    const input: SubmitInput = {
-      session_id: sessionId,
-      answers,
-      meta
-    };
-    
+    if (isSubmitting) return;
+    const input: SubmitInput = { session_id: sessionId, answers, meta };
     return submitMutation.mutate(input);
   }, [submitMutation, isSubmitting]);
 
-  // Helper pour agréger
   const aggregate = useCallback((orgId: string, period: {from: string, to: string}, instruments?: Instrument[], teamId?: string) => {
-    const input: AggregateInput = {
-      org_id: orgId,
-      period,
-      instruments,
-      team_id: teamId,
-      min_n: 5
-    };
-    
+    const input: AggregateInput = { org_id: orgId, period, instruments, team_id: teamId, min_n: 5 };
     return aggregateMutation.mutate(input);
   }, [aggregateMutation]);
 
   return {
-    // Actions
-    start,
-    submit,
-    aggregate,
-    
-    // État
-    currentSession,
-    isSubmitting,
+    start, submit, aggregate,
+    currentSession, isSubmitting,
     isStarting: startMutation.isPending,
     isAggregating: aggregateMutation.isPending,
-    
-    // Données
     startResult: startMutation.data,
     submitResult: submitMutation.data,
     aggregateResult: aggregateMutation.data,
-    
-    // Erreurs
     startError: startMutation.error,
     submitError: submitMutation.error,
     aggregateError: aggregateMutation.error,
-    
-    // Helpers
     reset: () => {
       setCurrentSession(null);
       setIsSubmitting(false);

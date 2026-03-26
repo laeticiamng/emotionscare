@@ -16,7 +16,6 @@ export const useCommunityAmbience = (options: UseCommunityAmbienceOptions = {}) 
   const [isLoaded, setIsLoaded] = useState(false);
   
   useEffect(() => {
-    // Load default emotion playlist on mount if autoPlay is true
     if (autoPlay && !isLoaded) {
       loadEmotionMusic(defaultEmotion);
     }
@@ -25,16 +24,11 @@ export const useCommunityAmbience = (options: UseCommunityAmbienceOptions = {}) 
   const loadEmotionMusic = async (emotion: string, intensity?: number) => {
     try {
       setIsLoaded(false);
+      const params: EmotionMusicParams = { emotion, intensity: intensity || 0.5 };
       
-      // Create valid EmotionMusicParams object
-      const params: EmotionMusicParams = {
-        emotion,
-        intensity: intensity || 0.5
-      };
-      
-      const playlist = await music.loadPlaylistForEmotion(params);
-      
-      if (playlist) {
+      // Use getRecommendationsForEmotion which exists on MusicContextType
+      const tracks = await music.getRecommendationsForEmotion(emotion);
+      if (tracks && tracks.length > 0) {
         setCurrentEmotion(emotion);
         setIsLoaded(true);
         return true;
@@ -48,24 +42,20 @@ export const useCommunityAmbience = (options: UseCommunityAmbienceOptions = {}) 
   
   const playEmotionMusic = async (emotion: string, intensity?: number) => {
     const success = await loadEmotionMusic(emotion, intensity);
-    if (success && music.currentTrack) {
-      music.playTrack(music.currentTrack);
+    if (success) {
+      await music.play();
       setIsPlaying(true);
     }
     return success;
   };
   
   const pauseMusic = () => {
-    music.pauseTrack();
+    music.pause();
     setIsPlaying(false);
   };
   
   const resumeMusic = () => {
-    if (music.resumeTrack) {
-      music.resumeTrack();
-    } else {
-      music.togglePlay();
-    }
+    music.play();
     setIsPlaying(true);
   };
   
@@ -78,20 +68,11 @@ export const useCommunityAmbience = (options: UseCommunityAmbienceOptions = {}) 
   };
   
   const matchMusicToEmotion = async (emotion: string) => {
-    // Stop current music if playing
-    if (isPlaying) {
-      pauseMusic();
-    }
+    if (isPlaying) pauseMusic();
     
-    // Create valid EmotionMusicParams object for the API
-    const params: EmotionMusicParams = {
-      emotion
-    };
-    
-    await music.loadPlaylistForEmotion(params);
-    
-    if (music.currentTrack) {
-      music.playTrack(music.currentTrack);
+    const tracks = await music.getRecommendationsForEmotion(emotion);
+    if (tracks && tracks.length > 0) {
+      await music.play(tracks[0]);
       setIsPlaying(true);
       setCurrentEmotion(emotion);
       return true;
@@ -110,8 +91,8 @@ export const useCommunityAmbience = (options: UseCommunityAmbienceOptions = {}) 
     togglePlayback,
     matchMusicToEmotion,
     setVolume: music.setVolume,
-    currentTrack: music.currentTrack,
-    progress: music.currentTime / (music.duration || 1),
+    currentTrack: music.state.currentTrack,
+    progress: music.state.duration > 0 ? music.state.currentTime / music.state.duration : 0,
   };
 };
 
