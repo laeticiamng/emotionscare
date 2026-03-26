@@ -28,9 +28,9 @@ export const useOptimizedMusicRecommendation = () => {
     if (useCache) {
       const cachedPlaylist = cache.getFromCache(params);
       if (cachedPlaylist) {
-        setCurrentPlaylist(cachedPlaylist);
+        setCurrentPlaylist(cachedPlaylist as any);
         setError(null);
-        return cachedPlaylist;
+        return cachedPlaylist as any;
       }
     }
 

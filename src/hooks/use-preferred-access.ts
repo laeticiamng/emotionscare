@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { getModeDashboardPath, normalizeUserMode } from '@/utils/userModeHelpers';
+import { getModeDashboardPath, normalizeUserMode, type UserMode } from '@/utils/userModeHelpers';
 import { logger } from '@/lib/logger';
 
 /**

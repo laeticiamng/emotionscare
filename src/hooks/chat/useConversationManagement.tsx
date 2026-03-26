@@ -38,11 +38,7 @@ export const useConversationManagement = () => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         lastMessage: "",
-        created_at: new Date().toISOString(), // legacy field
-        updated_at: new Date().toISOString(), // legacy field
-        lastMessage: "",
-        user_id: "user-123",
-        messages: [] // Add empty messages array
+        messages: []
       };
       
       // Dans une vraie application, sauvegarder dans la base de données

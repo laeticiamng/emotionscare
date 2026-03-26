@@ -18,10 +18,6 @@ const extendedChatHistoryService = {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         lastMessage: "Dernier message de test",
-        created_at: new Date().toISOString(), // legacy field
-        updated_at: new Date().toISOString(), // legacy field
-        lastMessage: "Dernier message de test",
-        user_id: userId,
         messages: []
       },
       {
@@ -30,9 +26,6 @@ const extendedChatHistoryService = {
         createdAt: new Date(Date.now() - 86400000).toISOString(),
         updatedAt: new Date(Date.now() - 3600000).toISOString(),
         lastMessage: "Un autre message de test",
-        created_at: new Date(Date.now() - 86400000).toISOString(),
-        updated_at: new Date(Date.now() - 3600000).toISOString(),
-        user_id: userId,
         messages: []
       }
     ];
