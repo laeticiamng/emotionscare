@@ -278,7 +278,7 @@ const PerfectDashboard: React.FC = () => {
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {dashboardData.recommendations.map((rec, index) => (
+            {recommendations.map((rec: Recommendation, index: number) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, scale: 0.9 }}
