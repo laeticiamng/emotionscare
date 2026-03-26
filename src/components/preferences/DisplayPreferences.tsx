@@ -13,8 +13,8 @@ const DisplayPreferences: React.FC = () => {
   // Make sure theme is a ThemeName
   const theme = (preferences.theme || 'system') as ThemeName;
 
-  const handleThemeChange = (value: ThemeName) => {
-    updatePreferences({ theme: value });
+  const handleThemeChange = (value: string) => {
+    updatePreferences({ theme: value as Theme });
   };
 
   const handleFontSizeChange = (value: FontSize) => {
