@@ -212,7 +212,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Flash Glow Boost',
           description: 'Boost d\'énergie instantané',
           icon: <Zap className="w-5 h-5" />,
-          path: Routes.flashGlow(),
+          path: routes.consumer.flashGlow?.() || '/app/flash-glow',
           category: 'games',
           xp: 80,
           segment: 'consumer'
