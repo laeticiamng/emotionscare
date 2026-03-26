@@ -18,11 +18,11 @@ const ThreeCanvas: React.FC = () => {
 
     // Ajout de lumières
     const ambientLight = new THREE.AmbientLight(0x404040, 2);
-    scene.add(ambientLight as unknown as THREE.Object3D);
+    (scene as any).add(ambientLight);
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(1, 1, 1);
-    scene.add(directionalLight as unknown as THREE.Object3D);
+    (scene as any).add(directionalLight);
 
     // Création des particules pour l'arrière-plan
     const particlesGeometry = new THREE.BufferGeometry();

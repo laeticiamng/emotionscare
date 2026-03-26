@@ -68,7 +68,7 @@ const VRSessionsList: React.FC<VRSessionsListProps> = ({
                       <p className="text-xs text-muted-foreground">
                         {new Date(session.startTime).toLocaleDateString()}
                         {" • "}
-                        {formatDuration(template?.duration)}
+                        {formatDuration(template?.duration ?? 0)}
                       </p>
                     </div>
                   </div>

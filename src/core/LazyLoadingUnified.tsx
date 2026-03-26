@@ -103,14 +103,14 @@ export const createLazyComponent = <T extends ComponentType<any>>(
   };
   
   WrappedComponent.displayName = `LazyComponent(${chunkName || 'Unknown'})`;
-  WrappedComponent.preload = () => {
+  (WrappedComponent as any).preload = () => {
     if (!componentCache) {
       componentCache = importFn();
     }
     return componentCache;
   };
   
-  return WrappedComponent;
+  return WrappedComponent as any;
 };
 
 /**

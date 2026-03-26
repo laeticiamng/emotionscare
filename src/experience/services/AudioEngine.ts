@@ -174,7 +174,7 @@ class AudioEngineService {
     this.ambientGain.gain.setTargetAtTime(0.15, ctx.currentTime + crossfadeDuration / 2, crossfadeDuration / 3);
 
     osc.start();
-    this.currentSource = osc;
+    this.currentSource = osc as any;
   }
 
   stopAmbient() {

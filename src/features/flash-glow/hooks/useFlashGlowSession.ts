@@ -205,12 +205,7 @@ export const useFlashGlowSession = (): Runtime => {
           })
         : actions;
 
-      Sentry.addBreadcrumb({
-        category: 'flash',
-        level: 'info',
-        message: 'flash:runtime:apply',
-        data: { actions: normalized.map((action) => action.type) },
-      });
+      console.debug('flash:runtime:apply', { actions: normalized.map((action) => action.type) });
 
       normalized.forEach((action) => {
         switch (action.type) {

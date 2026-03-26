@@ -96,9 +96,7 @@ export default function EmpathicRepliesPanel(): JSX.Element {
         description: 'Tu peux sélectionner le texte et le copier manuellement.',
         variant: 'warning',
       });
-      Sentry.captureException(error, {
-        tags: { scope: 'community', action: 'copy_reply' },
-      });
+      console.error('[EmpathicRepliesPanel] copy error:', error);
     }
   }, [preview, toast]);
 

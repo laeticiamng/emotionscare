@@ -150,7 +150,7 @@ export const VRHUD: React.FC<VRHUDProps> = ({
                 {musicEnabled ? (
                   <Music className="h-4 w-4" aria-hidden="true" />
                 ) : (
-                  <MusicOff className="h-4 w-4" aria-hidden="true" />
+                  <MicOff className="h-4 w-4" aria-hidden="true" />
                 )}
               </Button>
               

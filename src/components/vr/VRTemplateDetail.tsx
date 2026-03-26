@@ -54,7 +54,7 @@ const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
           </div>
 
           <Button 
-            onClick={() => onStart(template)} 
+            onClick={() => onStart()} 
             className="w-full"
             size="lg"
           >

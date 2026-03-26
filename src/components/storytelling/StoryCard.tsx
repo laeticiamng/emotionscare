@@ -75,7 +75,7 @@ const StoryCard: React.FC<StoryCardProps> = ({
           {story.content}
         </p>
         <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{story.created_at ? formatDate(story.created_at) : 'Date inconnue'}</span>
+          <span>{(story as any).created_at ? formatDate((story as any).created_at) : 'Date inconnue'}</span>
           {story.emotion && <span className="capitalize">{story.emotion}</span>}
         </div>
       </CardContent>

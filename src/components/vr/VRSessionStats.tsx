@@ -2,7 +2,15 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Activity, Heart, Brain, TrendingUp } from 'lucide-react';
 import { VRSession } from '@/types/vr';
-import { getVRSessionHeartRateBefore, getVRSessionHeartRateAfter, getVRSessionMetrics } from '@/utils/vrCompatibility';
+
+const getVRSessionHeartRateBefore = (session: VRSession): number | undefined => {
+  return session.metrics?.heartRate?.[0];
+};
+const getVRSessionHeartRateAfter = (session: VRSession): number | undefined => {
+  const hr = session.metrics?.heartRate;
+  return hr && hr.length > 0 ? hr[hr.length - 1] : undefined;
+};
+const getVRSessionMetrics = (session: VRSession) => session.metrics;
 
 interface VRSessionStatsProps {
   session: VRSession;

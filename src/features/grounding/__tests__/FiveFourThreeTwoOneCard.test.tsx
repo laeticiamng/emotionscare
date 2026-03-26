@@ -40,7 +40,7 @@ describe('FiveFourThreeTwoOneCard', () => {
     }));
 
     const originalMatchMedia = window.matchMedia;
-    // @ts-expect-error we intentionally override for the test
+    // @ts-ignore we intentionally override for the test
     window.matchMedia = mockMatchMedia;
 
     const { container } = render(<FiveFourThreeTwoOneCard />);
