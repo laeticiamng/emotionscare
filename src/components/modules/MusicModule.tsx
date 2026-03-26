@@ -9,7 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Play, Pause, SkipForward, SkipBack, Volume2, Shuffle, 
-  Repeat, Music, Waveform, Heart, Download, Share2 
+  Repeat, Music, AudioWaveform as Waveform, Heart, Download, Share2 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDuration } from '@/utils/musicCompatibility';

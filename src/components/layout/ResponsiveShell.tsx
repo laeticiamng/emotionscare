@@ -17,15 +17,12 @@ const ResponsiveShell: React.FC<ResponsiveShellProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Sidebar */}
-      <Sidebar 
-        isOpen={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
-      />
+      <Sidebar />
 
       {/* Contenu principal */}
       <div className="lg:ml-64 flex flex-col min-h-screen">
         {/* Header */}
-        <Header onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+        <Header />
 
         {/* Contenu de la page */}
         <main className="flex-1 p-4 lg:p-6">

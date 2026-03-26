@@ -18,7 +18,8 @@ interface BreathingSession {
 
 export default function FlashGlow() {
   const { playTone, stopAll } = useWebAudio();
-  const { isConnected: hrConnected, heartRate } = useWebBluetooth();
+  const { isConnected: hrConnected, heartRateData } = useWebBluetooth();
+  const heartRate = heartRateData?.heartRate ?? null;
   
   const [session, setSession] = useState<BreathingSession>({
     phase: 'inhale',

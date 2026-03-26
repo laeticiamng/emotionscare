@@ -54,7 +54,7 @@ const UserNav: React.FC = () => {
               {user.email}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
-              {getUserModeDisplayName(userMode)}
+              {getUserModeDisplayName(userMode as any)}
             </p>
           </div>
         </DropdownMenuLabel>

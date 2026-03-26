@@ -513,11 +513,11 @@ const PremiumNavigation: React.FC = () => {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
                 <Avatar className="w-8 h-8">
-                  <AvatarImage src={user?.avatar} alt={user?.name || 'Avatar utilisateur'} />
-                  <AvatarFallback>{user?.name?.[0] || 'U'}</AvatarFallback>
+                  <AvatarImage src={(user as any)?.avatar} alt={(user as any)?.name || 'Avatar utilisateur'} />
+                  <AvatarFallback>{(user as any)?.name?.[0] || 'U'}</AvatarFallback>
                 </Avatar>
                 <div className="text-sm">
-                  <p className="font-medium">{user?.name || 'Utilisateur'}</p>
+                  <p className="font-medium">{(user as any)?.name || 'Utilisateur'}</p>
                   <p className="text-muted-foreground text-xs">
                     {user?.role === 'consumer' ? 'B2C' : user?.role === 'employee' ? 'Employé' : 'Manager'}
                   </p>

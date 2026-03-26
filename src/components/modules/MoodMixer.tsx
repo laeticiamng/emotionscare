@@ -27,7 +27,7 @@ interface MoodSettings {
 }
 
 export default function MoodMixer() {
-  const { playAudio, stopAll, crossfade } = useWebAudio();
+  const { play: playAudio, stopAll, crossfade } = useWebAudio() as any;
   
   const [settings, setSettings] = useState<MoodSettings>({
     energy: 50,
