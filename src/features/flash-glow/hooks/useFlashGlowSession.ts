@@ -131,7 +131,7 @@ export const useFlashGlowSession = (): Runtime => {
       extendTimerRef.current = null;
     }
 
-    logger.info(`flash:extend:${safeDuration}`, { duration_ms: safeDuration }, 'FLASH');
+    console.info(`flash:extend:${safeDuration}`, { duration_ms: safeDuration });
 
     setState((current) => ({ ...current, extendedMs: current.extendedMs + safeDuration }));
 
