@@ -157,7 +157,7 @@ const B2BUserDashboard: React.FC = () => {
               Tableau de bord Collaborateur
             </h1>
             <p className="text-muted-foreground">
-              Bienvenue dans votre espace de bien-être professionnel, {user?.name || 'collaborateur'}
+              Bienvenue dans votre espace de bien-être professionnel, {(user as any)?.name || user?.email || 'collaborateur'}
             </p>
           </motion.div>
           
