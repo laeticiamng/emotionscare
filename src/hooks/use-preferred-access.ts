@@ -22,7 +22,7 @@ const usePreferredAccess = () => {
     // Si l'utilisateur est sur /b2b/selection et est authentifié,
     // le rediriger vers son tableau de bord approprié
     if (location.pathname === '/b2b/selection' && isAuthenticated && user?.role) {
-      const normalizedRole = normalizeUserMode(user.role);
+      const normalizedRole = normalizeUserMode(user.role as string) as UserMode;
       const dashboardPath = getModeDashboardPath(normalizedRole);
       
       // Ajouter un léger délai pour une meilleure expérience visuelle
