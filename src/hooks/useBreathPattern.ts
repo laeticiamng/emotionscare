@@ -3,6 +3,7 @@ import { useVRStore, VR_PATTERN_TIMINGS, type VRPattern, type VRBreathPhase } fr
 import { useHRVSilk, type HRVData } from './useHRVSilk';
 import { usePrivacyPrefs } from './usePrivacyPrefs';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export const useBreathPattern = () => {
   const store = useVRStore();
@@ -168,7 +169,7 @@ export const useBreathPattern = () => {
     // Get HRV data if active
     let hrvData: HRVData | null = null;
     if (store.hrvActive) {
-      hrvData = hrv.stopRecording();
+      hrvData = hrv.stopRecording() ?? null;
       store.setHRVActive(false);
     }
 

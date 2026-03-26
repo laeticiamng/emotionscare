@@ -268,7 +268,7 @@ export const useCollaborativeFocus = () => {
         },
         (payload) => {
           if (payload.eventType === 'UPDATE') {
-            setActiveSession((prev) => ({ ...prev, ...payload.new }));
+            setActiveSession((prev) => prev ? { ...prev, ...payload.new } as TeamSession : prev);
             logger.info('🔄 Session updated', payload.new, 'COLLAB');
           }
         }

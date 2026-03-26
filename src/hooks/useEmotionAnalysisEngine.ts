@@ -80,7 +80,7 @@ export const useEmotionAnalysisEngine = () => {
       // Enrichir le résultat
       const enrichedResult: EmotionResult = {
         ...result,
-        sessionId: state.sessionId,
+        sessionId: state.sessionId ?? undefined,
         scanMode: 'facial',
         timestamp: new Date().toISOString()
       };
@@ -98,7 +98,7 @@ export const useEmotionAnalysisEngine = () => {
 
       toast({
         title: "Analyse faciale terminée",
-        description: `Émotion détectée: ${result.emotion} (${Math.round(result.confidence * 100)}%)`,
+        description: `Émotion détectée: ${result.emotion} (${Math.round((typeof result.confidence === 'number' ? result.confidence : 0.5) * 100)}%)`,
       });
 
       // Actions automatiques
@@ -147,7 +147,7 @@ export const useEmotionAnalysisEngine = () => {
 
       const enrichedResult: EmotionResult = {
         ...result,
-        sessionId: state.sessionId,
+        sessionId: state.sessionId ?? undefined,
         scanMode: 'voice',
         timestamp: new Date().toISOString()
       };
@@ -165,7 +165,7 @@ export const useEmotionAnalysisEngine = () => {
 
       toast({
         title: "Analyse vocale terminée",
-        description: `Émotion détectée: ${result.emotion} (${Math.round(result.confidence * 100)}%)`,
+        description: `Émotion détectée: ${result.emotion} (${Math.round((typeof result.confidence === 'number' ? result.confidence : 0.5) * 100)}%)`,
       });
 
       return enrichedResult;
@@ -217,7 +217,7 @@ export const useEmotionAnalysisEngine = () => {
         intensity: result.intensity || 0.5,
         source: 'text_analysis',
         scanMode: 'text',
-        sessionId: state.sessionId,
+        sessionId: state.sessionId ?? undefined,
         text,
         recommendations: result.recommendations
       };
@@ -405,7 +405,7 @@ export const useEmotionAnalysisEngine = () => {
       intensity: results.reduce((acc, r) => acc + r.intensity, 0) / results.length,
       source: 'multimodal',
       scanMode: 'combined',
-      sessionId: state.sessionId,
+      sessionId: state.sessionId ?? undefined,
       details: {
         modalityResults: results,
         fusionMethod: 'weighted_confidence'
