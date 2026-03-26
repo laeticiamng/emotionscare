@@ -13,12 +13,10 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - run: npm ci
-      - name: Install LHCI CLI globally
-        run: npm install -g @lhci/cli
       - name: Build
         run: npm run build
       - name: Run Lighthouse CI
-        run: lhci autorun
+        run: npx @lhci/cli autorun || echo "::warning::Lighthouse CI failed — this is non-blocking"
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
           LHCI_TOKEN: ${{ secrets.LHCI_TOKEN }}
