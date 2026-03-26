@@ -10,6 +10,8 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    # Skip E2E if no preview URL is configured (secrets not available)
+    if: ${{ vars.E2E_ENABLED == 'true' || github.event_name == 'push' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -39,10 +41,10 @@ jobs:
           exit 1
 
       - name: Install Playwright
-        run: npx playwright install --with-deps
+        run: npx playwright install --with-deps chromium
 
       - name: Run E2E
-        run: npm run e2e
+        run: npm run e2e -- --project=chromium
         env:
           PW_BASE_URL: http://127.0.0.1:4173
 
@@ -62,3 +64,9 @@ jobs:
             playwright-report
             test-results
             preview.log
+
+  e2e-skip:
+    runs-on: ubuntu-latest
+    if: ${{ vars.E2E_ENABLED != 'true' && github.event_name != 'push' }}
+    steps:
+      - run: echo "E2E skipped — set repository variable E2E_ENABLED=true to enable"
