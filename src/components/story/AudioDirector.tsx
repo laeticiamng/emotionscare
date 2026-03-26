@@ -92,7 +92,7 @@ const AudioDirector: React.FC<AudioDirectorProps> = ({
         audioRef.current.src = '';
       }
       
-      [audioRef.current, nextAudioRef.current] = [nextAudioRef.current, audioRef.current];
+      const temp = audioRef.current; (audioRef as any).current = nextAudioRef.current; (nextAudioRef as any).current = temp;
       
       setIsPlaying(true);
       setError(null);
