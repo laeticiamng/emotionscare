@@ -147,7 +147,7 @@ export const useEmotionAnalysisEngine = () => {
 
       const enrichedResult: EmotionResult = {
         ...result,
-        sessionId: state.sessionId,
+        sessionId: state.sessionId ?? undefined,
         scanMode: 'voice',
         timestamp: new Date().toISOString()
       };
