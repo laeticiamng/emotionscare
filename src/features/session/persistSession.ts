@@ -10,7 +10,7 @@ interface MusicSessionMetadata {
   intensity: 'very_low' | 'low' | 'medium';
   bpm_profile: 'slow' | 'neutral';
   crossfade_ms: number;
-  post_cta: 'cocoon' | 'encore_2min' | 'none';
+  post_cta: 'cocoon' | 'encore_2min' | 'none' | 'nyvee';
 }
 
 interface PersistMusicSessionInput {
