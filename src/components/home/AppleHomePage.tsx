@@ -49,6 +49,7 @@ const AppleHomePage: React.FC = () => {
         <AppleHeroSection />
 
         <HowItWorksSection />
+        <AnimatedPresentationSection />
         <Suspense fallback={<SectionSkeleton />}>
           <AppleFeatureSection />
         </Suspense>
