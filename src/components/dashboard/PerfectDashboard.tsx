@@ -328,7 +328,7 @@ const PerfectDashboard: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {dashboardData.recentActivities.map((activity) => (
+                {metrics.recentActivities.map((activity: any) => (
                   <div key={activity.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                     <div>
                       <p className="font-medium">{activity.title}</p>
