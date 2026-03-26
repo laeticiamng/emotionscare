@@ -11,8 +11,15 @@ import { UserModeSelector } from '@/components/ui/user-mode-selector';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
-// Import types from unified auth types
-import type { Challenge } from '@/types/badge';
+// Local challenge type for this dashboard
+interface B2BChallenge {
+  id: string;
+  title: string;
+  description: string;
+  progress: number;
+  dueDate: string;
+  type: 'daily' | 'weekly' | 'special';
+}
 
 // Type pour simuler les données du reporting
 interface ReportingMetric {
