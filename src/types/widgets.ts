@@ -15,7 +15,7 @@ export interface DraggableCardProps {
   subtitle?: string | ReactNode;
   ariaLabel?: string;
   onClick?: () => void;
-  status?: 'neutral' | 'success' | 'warning' | 'danger' | 'info';
+  status?: string;
   className?: string;
   isLoading?: boolean;
   footer?: ReactNode;
