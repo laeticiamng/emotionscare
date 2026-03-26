@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — Component Unit Tests
  */

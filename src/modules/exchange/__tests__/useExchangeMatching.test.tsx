@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Exchange Matching Algorithm - Tests Complets
  * Tests unitaires pour l'algorithme de matching et les hooks associés

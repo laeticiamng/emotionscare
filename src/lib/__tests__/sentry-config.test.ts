@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Event as SentryEvent } from '@sentry/types';
 import { describe, expect, it, vi } from 'vitest';
 

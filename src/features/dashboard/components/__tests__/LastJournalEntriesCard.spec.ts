@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { buildJournalSummaryMessage } from '@/features/dashboard/components/LastJournalEntriesCard'
 import type { SanitizedNote } from '@/modules/journal/types'

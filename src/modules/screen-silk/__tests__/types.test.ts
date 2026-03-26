@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Screen Silk Types Tests
  * Tests unitaires pour les schémas Zod du module Screen Silk

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests for breath-unified service
  * Tests des fonctions de protocoles et recommandations

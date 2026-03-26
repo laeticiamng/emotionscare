@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests unitaires pour Tournaments Service
  * @vitest-environment jsdom

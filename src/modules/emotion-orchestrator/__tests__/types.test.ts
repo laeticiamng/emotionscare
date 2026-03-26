@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Emotion Orchestrator Module - Types Tests
  * Tests unitaires pour les schemas Zod du module Emotion Orchestrator

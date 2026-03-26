@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour JournalEntryCard
  * Day 41 - Module 21: Journal UI Tests

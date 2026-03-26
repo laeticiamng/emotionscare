@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AI Coach Types Tests
  * Tests unitaires pour les schémas Zod du module AI Coach

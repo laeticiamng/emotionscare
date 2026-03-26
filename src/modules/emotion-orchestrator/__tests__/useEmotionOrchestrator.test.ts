@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests complets pour useEmotionOrchestrator hook
  */

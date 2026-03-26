@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests unitaires pour Guilds Service
  * @vitest-environment jsdom

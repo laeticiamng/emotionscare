@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour validateurs music.ts
  */

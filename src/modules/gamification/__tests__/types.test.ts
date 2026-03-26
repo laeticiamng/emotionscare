@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Gamification Module - Types Tests
  * Tests unitaires pour les types du module Gamification

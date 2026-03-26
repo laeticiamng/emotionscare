@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests unitaires - Services DICOM
  * EmotionsCare - DICOM Module

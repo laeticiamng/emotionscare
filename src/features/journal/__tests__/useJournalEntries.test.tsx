@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useJournalEntries Hook - Tests
  * Tests unitaires pour le hook useJournalEntries

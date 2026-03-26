@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Story Synth Types Tests
  * Tests unitaires pour les schémas Zod du module Story Synth

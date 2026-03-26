@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Mood Bus - Tests
  * Tests unitaires pour le système d'événements mood

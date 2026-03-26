@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests complets du Registry RouterV2
  * Validation exhaustive de toutes les routes

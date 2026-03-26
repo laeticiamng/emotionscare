@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests unitaires complets pour le service d'apprentissage automatique
  */

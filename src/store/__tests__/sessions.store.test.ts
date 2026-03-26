@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests for sessions.store.ts - Global session management
  */

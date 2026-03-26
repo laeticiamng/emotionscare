@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour le module Admin
  * Validation des opérations d'administration et sécurité

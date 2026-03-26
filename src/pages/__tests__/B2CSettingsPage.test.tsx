@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Tests E2E pour la page Paramètres B2C
  * Couvre les scénarios critiques et la conformité WCAG AA

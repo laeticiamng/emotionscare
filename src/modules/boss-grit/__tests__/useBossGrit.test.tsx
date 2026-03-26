@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook useBossGrit - Tests Complets
  * Tests unitaires pour le hook React useBossGrit

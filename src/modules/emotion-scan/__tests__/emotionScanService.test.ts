@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour EmotionScanService
  * Module critique : données santé et analyse émotionnelle

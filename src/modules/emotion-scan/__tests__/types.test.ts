@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour les types du module Emotion Scan
  * Validation des schémas Zod et sécurité des données

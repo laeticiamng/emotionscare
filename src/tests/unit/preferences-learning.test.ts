@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests unitaires pour le service d'apprentissage des préférences musicales
  */

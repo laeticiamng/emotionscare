@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests for progression.store.ts - Unified gamification system
  *

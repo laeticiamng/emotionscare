@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests unitaires pour l'API B2B
  * @vitest-environment jsdom

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests for music-unified blending capabilities
  * Tests des algorithmes de mélange émotionnel

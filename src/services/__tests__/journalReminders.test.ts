@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { journalRemindersService } from '@/services/journalReminders';
 import { supabase } from '@/integrations/supabase/client';

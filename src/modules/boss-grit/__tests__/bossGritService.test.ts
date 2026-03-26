@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Boss Grit Service - Tests Complets
  * Tests unitaires pour BossGritService

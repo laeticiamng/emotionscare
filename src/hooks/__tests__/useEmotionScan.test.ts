@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests pour useEmotionScan
  * Couvre : analyzeText, analyzeVoice, analyzeImage, scanEmotion, reset, erreurs

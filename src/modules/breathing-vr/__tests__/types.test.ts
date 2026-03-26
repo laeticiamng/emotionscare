@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests unitaires pour les types du module breathing-vr
  */

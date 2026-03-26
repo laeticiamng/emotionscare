@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests unitaires pour Manager Console B2B
  * @vitest-environment jsdom

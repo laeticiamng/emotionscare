@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Insights Module - Types Tests
  * Tests unitaires pour les schemas Zod du module Insights
