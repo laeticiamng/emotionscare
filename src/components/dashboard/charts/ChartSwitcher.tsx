@@ -51,7 +51,7 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
     setSelectedDimensionId(value);
     
     // Find the full dimension object
-    const dimension = availableDimensions.find(d => d.id === value);
+    const dimension = availableDimensions.find((d: any) => d.id === value);
     if (dimension && setSelectedDimension) {
       setSelectedDimension(dimension);
     }
