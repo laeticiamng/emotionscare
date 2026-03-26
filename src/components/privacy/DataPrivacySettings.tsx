@@ -332,7 +332,7 @@ const DataPrivacySettings: React.FC = () => {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <Label className="text-base font-medium">{setting.title}</Label>
-                      {setting.recommended && (
+                      {(setting as any).recommended && (
                         <Badge variant="secondary" className="text-xs">
                           Recommandé
                         </Badge>

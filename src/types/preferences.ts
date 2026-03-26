@@ -59,6 +59,11 @@ export interface UserPreferences {
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
   fullAnonymity?: boolean;
+  highContrast?: boolean;
+  colorBlindMode?: boolean;
+  reduceMotion?: boolean;
+  shareData?: boolean;
+  anonymizedData?: boolean;
 }
 
 export interface UserPreferencesContextType {

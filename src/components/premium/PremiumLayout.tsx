@@ -57,7 +57,7 @@ const PremiumLayout: React.FC<PremiumLayoutProps> = ({
   const getBackgroundIntensity = () => {
     switch (variant) {
       case 'immersive':
-        return 'high';
+        return 'intense';
       case 'premium':
         return 'medium';
       default:

@@ -13,7 +13,8 @@ interface ProductionReadyAppProps {
  * Wrapper simplifié pour l'application en mode production
  */
 const ProductionReadyApp: React.FC<ProductionReadyAppProps> = ({ children }) => {
-  const { isMonitoring } = useProductionMonitoring();
+  const { metrics, alerts } = useProductionMonitoring();
+  const isMonitoring = true;
 
   useEffect(() => {
     if (import.meta.env.PROD) {

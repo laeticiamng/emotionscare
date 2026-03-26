@@ -21,8 +21,8 @@ const DisplayPreferences: React.FC = () => {
     updatePreferences({ fontSize: value as FontSize });
   };
 
-  const handleFontFamilyChange = (value: FontFamily) => {
-    updatePreferences({ fontFamily: value });
+  const handleFontFamilyChange = (value: string) => {
+    updatePreferences({ fontFamily: value as FontFamily });
   };
 
   const handleDarkModeChange = (checked: boolean) => {

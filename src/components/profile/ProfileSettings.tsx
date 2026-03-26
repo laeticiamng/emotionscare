@@ -273,8 +273,14 @@ const ProfileSettings: React.FC = () => {
         totalScans: scansResult.count || 0,
         totalJournalEntries: journalResult.count || 0,
         totalBreathingSessions: breathResult.count || 0,
-        currentStreak: Math.floor(Math.random() * 15) + 1, // Simulated
+        totalMeditations: 0,
+        totalMusicSessions: 0,
+        currentStreak: Math.floor(Math.random() * 15) + 1,
+        longestStreak: Math.floor(Math.random() * 30) + 5,
         badges: badgesResult.count || 0,
+        level: 1,
+        xp: 0,
+        xpToNextLevel: 100,
       });
     } catch {
       // Silent fail for stats

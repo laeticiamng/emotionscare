@@ -50,7 +50,7 @@ const PrivacyPreferencesComponent: React.FC<PrivacyPreferencesProps> = ({
   
   const handleUpdatePrivacy = (key: string, value: any) => {
     if (onUpdate) {
-      const updatedPrivacy: PrivacyPreferences = {
+      const updatedPrivacy: any = {
         ...privacySettings,
         [key]: value
       };

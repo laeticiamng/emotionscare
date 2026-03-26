@@ -110,10 +110,7 @@ const PWANotifications: React.FC = () => {
               body: 'Comment vous sentez-vous aujourd\'hui ? Prenez un moment pour vous.',
               icon: '/icon-192.png',
               tag: 'daily-checkin',
-              actions: [
-                { action: 'checkin', title: 'Faire le check-in' },
-                { action: 'later', title: 'Plus tard' }
-              ]
+              // actions not supported in standard NotificationOptions
             });
           }, delay);
         }

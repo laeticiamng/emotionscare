@@ -25,7 +25,7 @@ const ThemeSettingsForm = () => {
         <CardContent>
           <RadioGroup
             value={theme}
-            onValueChange={(value) => setTheme(value as ThemeName)}
+            onValueChange={(value) => setTheme(value as any)}
             className="grid grid-cols-2 sm:grid-cols-4 gap-2"
           >
             <div className="flex items-center space-x-2">

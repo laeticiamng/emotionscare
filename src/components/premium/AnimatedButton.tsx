@@ -4,7 +4,7 @@ import { Button, ButtonProps } from '@/components/ui/button';
 import { Loader2, Sparkles, Star, Zap, Heart, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface AnimatedButtonProps extends ButtonProps {
+interface AnimatedButtonProps extends Omit<ButtonProps, 'variant'> {
   variant?: 'default' | 'premium' | 'magical' | 'success' | 'glow' | 'pulse';
   animation?: 'none' | 'hover' | 'pulse' | 'glow' | 'shimmer' | 'bounce';
   isLoading?: boolean;
