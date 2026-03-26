@@ -7,7 +7,11 @@ import { Moon, Sun, Monitor, PenTool } from 'lucide-react';
 import { FontSize, FontFamily, ThemeName } from '@/types/theme';
 
 const ThemeSettingsForm = () => {
-  const { theme, setTheme, fontSize, setFontSize, fontFamily, setFontFamily } = useTheme();
+  const { theme, setTheme } = useTheme();
+  const fontSize = 'md' as FontSize;
+  const setFontSize = (_size: FontSize) => {};
+  const fontFamily = 'sans' as FontFamily;
+  const setFontFamily = (_family: FontFamily) => {};
 
   return (
     <div className="space-y-6">
