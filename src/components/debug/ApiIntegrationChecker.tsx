@@ -44,7 +44,7 @@ const ApiIntegrationChecker: React.FC = () => {
       
       setStatus(data);
     } catch (err) {
-      setError(`Erreur lors du test: ${err.message}`);
+      setError(`Erreur lors du test: ${(err as Error).message}`);
       logger.error('API Integration Test Error:', err as Error, 'UI');
     } finally {
       setIsLoading(false);

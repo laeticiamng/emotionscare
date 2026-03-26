@@ -148,7 +148,6 @@ const DevTools: React.FC<{ enabled?: boolean }> = ({ enabled = false }) => {
                       <Button 
                         onClick={() => {
                           apiCache.clear();
-                          imageCache.clear();
                           userCache.clear();
                         }}
                         variant="outline" 

@@ -97,7 +97,7 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
                 <SelectValue placeholder="Filtre" />
               </SelectTrigger>
               <SelectContent>
-                {availableDimensions.map((dim) => (
+                {availableDimensions.map((dim: any) => (
                   <SelectItem key={dim.id} value={dim.id}>
                     {dim.label || dim.name}
                   </SelectItem>

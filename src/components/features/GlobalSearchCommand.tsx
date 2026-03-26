@@ -29,7 +29,7 @@ interface SearchResult {
   description: string;
   category: string;
   path: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   keywords: string[];
   priority: number;
   badge?: string;

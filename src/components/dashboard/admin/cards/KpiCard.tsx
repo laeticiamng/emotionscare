@@ -52,9 +52,9 @@ export const KpiCard = ({
   }
 
   // Convert number delta to object format for consistency in rendering
-  const deltaObj = typeof delta === 'number' 
+  const deltaObj: Record<string, any> | undefined = typeof delta === 'number' 
     ? { value: delta, trend: delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral' } 
-    : delta;
+    : delta as any;
 
   // Handle status color based on card status
   let statusColor = "";

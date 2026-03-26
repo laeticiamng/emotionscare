@@ -34,7 +34,7 @@ const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({ kpiCards 
 
   return (
     <DndContext onDragEnd={handleDragEnd}>
-      <SortableContext items={cards.map(card => card.id)} strategy={rectSortingStrategy}>
+      <SortableContext items={cards.map(card => card.id!).filter(Boolean)} strategy={rectSortingStrategy}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {cards.map((card) => (
             <DraggableCard

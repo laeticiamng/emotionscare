@@ -32,9 +32,9 @@ const BadgesWidget: React.FC<BadgesWidgetProps> = ({ badges, className }) => {
             {recentBadges.map(badge => (
               <div key={badge.id} className="flex flex-col items-center text-center">
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                  {badge.imageUrl || badge.image_url || badge.image ? (
+                  {badge.imageUrl || badge.image ? (
                     <img 
-                      src={badge.imageUrl || badge.image_url || badge.image} 
+                      src={badge.imageUrl || badge.image} 
                       alt={badge.name} 
                       className="w-12 h-12" 
                     />

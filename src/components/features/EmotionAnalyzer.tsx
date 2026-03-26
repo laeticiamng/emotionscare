@@ -66,7 +66,7 @@ const EmotionAnalyzer: React.FC = () => {
         try {
           // Simulation d'un blob audio
           const mockBlob = new Blob(['mock audio data'], { type: 'audio/wav' });
-          const result = await emotionsCareApi.analyzeVoiceEmotion(mockBlob);
+          const result: any = await emotionsCareApi.analyzeVoiceEmotion(mockBlob);
           setEmotionResult({
             emotion: result.emotion || 'Calme',
             confidence: result.confidence || 0.92,

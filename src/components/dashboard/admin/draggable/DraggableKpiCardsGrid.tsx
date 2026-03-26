@@ -18,7 +18,7 @@ import KpiCard from '../KpiCard';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({
+const DraggableKpiCardsGrid: React.FC<DraggableGridProps> = ({
   cards = [],
   onCardsReorder,
   onOrderChange,

@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 interface Emotion {
   id: string;
   name: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   color: string;
   intensity: number;
 }

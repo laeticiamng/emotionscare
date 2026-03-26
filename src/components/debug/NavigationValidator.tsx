@@ -14,49 +14,49 @@ const NavigationValidator: React.FC = () => {
     {
       name: 'Routes Principales',
       routes: [
-        { name: 'Accueil', path: Routes.home() },
-        { name: 'Choix Mode', path: Routes.b2c() },
-        { name: 'App Gate', path: Routes.app() },
+        { name: 'Accueil', path: '/' },
+        { name: 'Choix Mode', path: '/b2c' },
+        { name: 'App Gate', path: '/app' },
       ]
     },
     {
       name: 'Fonctionnalités Core',
       routes: [
-        { name: 'Scanner', path: Routes.scan() },
-        { name: 'Musique', path: Routes.music() },
-        { name: 'Breathwork', path: Routes.breath() },
-        { name: 'VR', path: Routes.vr() },
-        { name: 'Gamification', path: Routes.leaderboard() },
+        { name: 'Scanner', path: '/app/scan' },
+        { name: 'Musique', path: '/app/music' },
+        { name: 'Breathwork', path: '/app/breath' },
+        { name: 'VR', path: '/app/vr' },
+        { name: 'Gamification', path: '/app/leaderboard' },
       ]
     },
     {
       name: 'Modules Innovants',
       routes: [
-        { name: 'Flash Glow', path: Routes.flashGlow() },
-        { name: 'Boss Grit', path: Routes.bossGrit() },
-        { name: 'Mood Mixer', path: Routes.moodMixer() },
-        { name: 'Bounce Back', path: Routes.bounceBack() },
-        { name: 'Story Synth', path: Routes.storySynth() },
+        { name: 'Flash Glow', path: '/app/flash-glow' },
+        { name: 'Boss Grit', path: '/app/boss-grit' },
+        { name: 'Mood Mixer', path: '/app/mood-mixer' },
+        { name: 'Bounce Back', path: '/app/bounce-back' },
+        { name: 'Story Synth', path: '/app/story-synth' },
       ]
     },
     {
       name: 'Espaces Utilisateur B2C',
       routes: [
-        { name: 'Login B2C', path: Routes.login({ segment: 'b2c' }) },
-        { name: 'Signup B2C', path: Routes.signup({ segment: 'b2c' }) },
-        { name: 'Dashboard B2C', path: Routes.consumerHome() },
-        { name: 'Préférences', path: Routes.settingsGeneral() },
-        { name: 'Social Cocon', path: Routes.socialCocon() },
+        { name: 'Login B2C', path: '/login' },
+        { name: 'Signup B2C', path: '/signup' },
+        { name: 'Dashboard B2C', path: '/app/home' },
+        { name: 'Préférences', path: '/settings' },
+        { name: 'Social Cocon', path: '/app/social' },
       ]
     },
     {
       name: 'Espaces B2B',
       routes: [
-        { name: 'B2B Landing', path: Routes.enterprise() },
-        { name: 'Login B2B', path: Routes.login({ segment: 'b2b' }) },
-        { name: 'Dashboard User', path: Routes.employeeHome() },
-        { name: 'Dashboard Admin', path: Routes.managerHome() },
-        { name: 'Teams', path: Routes.teams() },
+        { name: 'B2B Landing', path: '/enterprise' },
+        { name: 'Login B2B', path: '/b2b/login' },
+        { name: 'Dashboard User', path: '/b2b/home' },
+        { name: 'Dashboard Admin', path: '/b2b/admin' },
+        { name: 'Teams', path: '/b2b/teams' },
       ]
     }
   ];
