@@ -17,8 +17,8 @@ const DisplayPreferences: React.FC = () => {
     updatePreferences({ theme: value as Theme });
   };
 
-  const handleFontSizeChange = (value: FontSize) => {
-    updatePreferences({ fontSize: value });
+  const handleFontSizeChange = (value: string) => {
+    updatePreferences({ fontSize: value as FontSize });
   };
 
   const handleFontFamilyChange = (value: FontFamily) => {
