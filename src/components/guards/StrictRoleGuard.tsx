@@ -72,7 +72,7 @@ export const useRoleAccess = () => {
   const { user } = useAuth();
   const { userMode } = useUserMode();
 
-  const currentRole = normalizeRole(user?.role || userMode);
+  const currentRole = normalizeRole(user?.role || userMode || undefined);
 
   const hasAccess = (allowedRoles: string[]): boolean => {
     const normalizedAllowedRoles = allowedRoles.map(role => normalizeRole(role));

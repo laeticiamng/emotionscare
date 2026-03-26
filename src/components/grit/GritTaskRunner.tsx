@@ -51,7 +51,7 @@ export const GritTaskRunner: React.FC<GritTaskRunnerProps> = ({
     onEmotionDetected: (emotion: string, confidence: number) => {
       logger.debug('Emotion detected', { emotion, confidence }, 'UI');
     },
-    onSummaryUpdate: (summary) => {
+    onSummaryUpdate: (summary: any) => {
       setHumeSummary(summary);
     }
   };

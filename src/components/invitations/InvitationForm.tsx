@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { UserRole } from '@/types';
+type UserRole = 'user' | 'premium' | 'admin' | 'b2b_user' | 'b2b_admin';
 
 // Form schema
 const formSchema = z.object({

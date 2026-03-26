@@ -240,7 +240,7 @@ const ViolationMonitoringDashboard: React.FC = () => {
                 ) : (
                   <div className="space-y-4">
                     {violations.map((violation) => (
-                      <Card key={violation.id} className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={() => setSelectedViolation(violation)} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setSelectedViolation(violation)} aria-label={`Voir les détails de la violation ${violation.type}`}>
+                      <Card key={violation.id} className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={() => setSelectedViolation(violation)} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setSelectedViolation(violation)} aria-label={`Voir les détails de la violation ${(violation as any).type || violation.id}`}>
                         <CardHeader className="pb-3">
                           <div className="flex items-start justify-between">
                             <div className="space-y-1 flex-1">

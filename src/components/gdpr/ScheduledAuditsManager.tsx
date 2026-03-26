@@ -405,7 +405,7 @@ export const ScheduledAuditsManager = () => {
                 </Card>
               ) : (
                 alerts.map(alert => {
-                  const config = SEVERITY_CONFIG[alert.severity];
+                  const config = (SEVERITY_CONFIG as any)[alert.severity];
                   const Icon = config.icon;
 
                   return (

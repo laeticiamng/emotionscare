@@ -288,7 +288,7 @@ const ImmersiveExperienceEngine: React.FC<ImmersiveProps> = ({
 
           {user && (
             <div className="mt-2 text-xs opacity-60">
-              Expérience personnalisée pour {user.name}
+              Expérience personnalisée pour {(user as any).name || user.email}
             </div>
           )}
         </div>

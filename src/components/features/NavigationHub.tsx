@@ -486,8 +486,8 @@ const NavigationHub: React.FC = () => {
                       </div>
                     )}
                   </CardContent>
-                </Link>
-              </Card>
+                </Card>
+              </Link>
             </motion.div>
           ))}
         </div>

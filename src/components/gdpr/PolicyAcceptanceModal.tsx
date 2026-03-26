@@ -29,7 +29,7 @@ export function PolicyAcceptanceModal() {
 
   return (
     <Dialog open={needsAcceptance} onOpenChange={() => {}}>
-      <DialogContent className="max-w-3xl max-h-[90vh] p-0 gap-0" hideCloseButton>
+      <DialogContent className="max-w-3xl max-h-[90vh] p-0 gap-0" onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader className="p-6 pb-4 border-b">
           <div className="flex items-start gap-3">
             <div className="p-2 rounded-lg bg-primary/10">

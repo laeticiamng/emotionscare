@@ -79,7 +79,7 @@ export function useVoiceCommands(options: VoiceCommandOptions = {}) {
     };
     
     recognition.onerror = (event) => {
-      const errorMessage = event.error || "Erreur de reconnaissance vocale";
+      const errorMessage = (event as any).error || "Erreur de reconnaissance vocale";
       setError(`Erreur de reconnaissance vocale: ${errorMessage}`);
       onError?.(`Erreur de reconnaissance vocale: ${errorMessage}`);
       setIsListening(false);
