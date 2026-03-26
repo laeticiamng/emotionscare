@@ -242,7 +242,7 @@ export const JournalQuickTips = memo<JournalQuickTipsProps>(({ className = '' })
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
             <div className="p-2 rounded-full bg-primary/10">
-              <currentTip.icon className="h-5 w-5 text-primary" aria-hidden="true" />
+              {React.createElement(currentTip.icon as React.ComponentType<{className?: string}>, { className: "h-5 w-5 text-primary", "aria-hidden": "true" })}
             </div>
             
             <div className="flex-1 space-y-3">
