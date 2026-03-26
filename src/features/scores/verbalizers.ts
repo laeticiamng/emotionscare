@@ -129,15 +129,16 @@ const SESSION_LABELS: Record<string, string> = {
   autre: 'Autres pratiques',
 };
 
-export interface SessionVerbalRow extends WeeklySessionPoint {
+export type SessionVerbalRow = {
   weekKey: string;
   axisLabel: string;
   longLabel: string;
   total: number;
   rhythm: string;
   highlights: string[];
+  week: string;
   [key: string]: string | number | string[];
-}
+};
 
 export function buildMoodVerbalSeries(points: MoodPoint[]): MoodVerbalPoint[] {
   if (!Array.isArray(points)) {

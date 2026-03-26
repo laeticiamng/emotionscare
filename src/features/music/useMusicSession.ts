@@ -109,7 +109,7 @@ export function useMusicSession(engine: UseMusicEngine): MusicSessionControls {
           intensity: engine.state.intensity,
           bpm_profile: engine.state.bpmProfile,
           crossfade_ms: engine.state.crossfadeMs,
-          post_cta: postCta,
+          post_cta: postCta as any,
         },
         durationSec: options?.durationSec,
       };
