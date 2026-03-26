@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { LucideIcon } from 'lucide-react';
 
 export interface DraggableCardProps {
-  id: string;
+  id?: string;
   title: string;
   value: string | number | React.ReactNode;
   icon?: ReactNode;
