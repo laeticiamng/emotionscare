@@ -41,7 +41,7 @@ const EmotionAnalyzer: React.FC = () => {
     
     setIsAnalyzing(true);
     try {
-      const result = await emotionsCareApi.analyzeEmotionText(textInput);
+      const result: any = await emotionsCareApi.analyzeEmotionText(textInput);
       setEmotionResult({
         emotion: result.emotion || 'Neutre',
         confidence: result.confidence || 0.85,
