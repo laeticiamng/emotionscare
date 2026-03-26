@@ -70,7 +70,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, className }
             
             // Determine difficulty color
             const difficultyColor = 
-              challenge.difficulty === 'hard' ? 'text-red-500' :
+              challenge.difficulty === 'hard' ? 'text-destructive' :
               challenge.difficulty === 'medium' ? 'text-amber-500' : 
               'text-green-500';
             
