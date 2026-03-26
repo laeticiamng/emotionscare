@@ -585,10 +585,10 @@ export function ComprehensiveDashboard() {
           </CardContent>
           <CardFooter>
             <Button asChild variant="outline" className="w-full justify-center gap-2">
-              <Link to="/app/mood-mixer">
+              <a href="/app/mood-mixer">
                 <Sparkles className="h-4 w-4" />
                 Ouvrir le Mood Mixer
-              </Link>
+              </a>
             </Button>
           </CardFooter>
         </Card>
