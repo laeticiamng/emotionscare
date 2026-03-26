@@ -28,8 +28,8 @@ export function ModalProvider() {
   const { modals, close } = useModalStore();
 
   return (
-    <AnimatePresence mode="multiple">
-      {modals.map((modal) => (
+    <AnimatePresence mode="wait">
+      {modals.map((modal: any) => (
         <ModalWrapper
           key={modal.id}
           modal={modal}

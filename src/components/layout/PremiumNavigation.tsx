@@ -242,7 +242,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Boss Level Grit',
           description: 'Développement de la détermination',
           icon: <Target className="w-5 h-5" />,
-          path: routes.consumer.bossGrit?.() || '/app/boss-grit',
+          path: '/app/boss-grit',
           category: 'games',
           premium: true,
           xp: 200,
