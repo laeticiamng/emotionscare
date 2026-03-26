@@ -119,16 +119,16 @@ const B2BUserLayout: React.FC = () => {
           <div className="p-4 border-b border-gray-200 dark:border-gray-800">
             <div className="flex items-center gap-3">
               <Avatar className="h-10 w-10 border-2 border-blue-200 dark:border-blue-800">
-                {user?.avatar ? (
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                ) : (
-                  <AvatarFallback className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
-                    {user?.name?.charAt(0) || '?'}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-              <div className="flex flex-col">
-                <span className="font-medium truncate max-w-[120px]">{user?.name || 'Chargement...'}</span>
+                {(user as any)?.avatar ? (
+                   <AvatarImage src={(user as any).avatar} alt={(user as any).name} />
+                 ) : (
+                   <AvatarFallback className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
+                     {(user as any)?.name?.charAt(0) || '?'}
+                   </AvatarFallback>
+                 )}
+               </Avatar>
+               <div className="flex flex-col">
+                 <span className="font-medium truncate max-w-[120px]">{(user as any)?.name || 'Chargement...'}</span>
                 <span className="text-xs text-muted-foreground">Collaborateur</span>
               </div>
             </div>
