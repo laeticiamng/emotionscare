@@ -53,7 +53,7 @@ interface PrivacyPreset {
   id: string;
   name: string;
   description: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   settings: {
     dataSharing: boolean;
     analytics: boolean;

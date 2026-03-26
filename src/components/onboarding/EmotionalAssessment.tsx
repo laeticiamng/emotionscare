@@ -29,7 +29,7 @@ interface EmotionalAssessmentProps {
 interface Emotion {
   id: string;
   label: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   color: string;
   description: string;
   suggestions: string[];

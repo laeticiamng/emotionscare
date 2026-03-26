@@ -19,7 +19,7 @@ interface NavigationItem {
   title: string;
   description: string;
   path: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   category: 'core' | 'wellness' | 'fun' | 'analytics' | 'settings';
   badge?: string;
   isNew?: boolean;

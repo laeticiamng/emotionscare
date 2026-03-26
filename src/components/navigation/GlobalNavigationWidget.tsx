@@ -18,7 +18,7 @@ import { routes } from '@/routerV2';
 interface QuickAction {
   title: string;
   description: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   path: string;
   color: string;
   badge?: string;

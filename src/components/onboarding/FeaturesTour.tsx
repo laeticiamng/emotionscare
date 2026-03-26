@@ -50,7 +50,7 @@ interface FeaturesTourProps {
 
 interface Feature {
   id: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   title: string;
   description: string;
   category: 'core' | 'wellness' | 'social' | 'security';

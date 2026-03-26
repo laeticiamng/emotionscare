@@ -25,7 +25,7 @@ export const AtRiskPanel: React.FC<AtRiskPanelProps> = ({ data }) => {
     if (!team.days || team.days.length < 2) return false;
     
     const lastTwoDays = team.days.slice(-2);
-    return lastTwoDays.every(day => day.bucket === 'low');
+    return lastTwoDays.every((day: any) => day.bucket === 'low');
   });
 
   // Équipes avec tendance "down"

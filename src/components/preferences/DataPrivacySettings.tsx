@@ -158,7 +158,7 @@ const DataPrivacySettings: React.FC<DataPrivacyProps> = ({
                 </p>
               </div>
               <Controller
-                name="anonymizedData"
+                name={"anonymizedData" as any}
                 control={control}
                 render={({ field }) => (
                   <motion.div whileTap={{ scale: 0.9 }}>
