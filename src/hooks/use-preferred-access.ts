@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { getModeDashboardPath, normalizeUserMode } from '@/utils/userModeHelpers';
+import { getModeDashboardPath, normalizeUserMode, type UserMode } from '@/utils/userModeHelpers';
 import { logger } from '@/lib/logger';
 
 /**
@@ -22,7 +22,7 @@ const usePreferredAccess = () => {
     // Si l'utilisateur est sur /b2b/selection et est authentifié,
     // le rediriger vers son tableau de bord approprié
     if (location.pathname === '/b2b/selection' && isAuthenticated && user?.role) {
-      const normalizedRole = normalizeUserMode(user.role);
+      const normalizedRole = normalizeUserMode(user.role as string) as UserMode;
       const dashboardPath = getModeDashboardPath(normalizedRole);
       
       // Ajouter un léger délai pour une meilleure expérience visuelle
@@ -45,7 +45,7 @@ const usePreferredAccess = () => {
     if (isAuthenticated && user?.role && 
         (location.pathname.includes('/dashboard') || location.pathname.includes('/profile'))) {
       
-      const normalizedRole = normalizeUserMode(user.role);
+      const normalizedRole = normalizeUserMode(user.role as string) as UserMode;
       const correctPathPrefix = 
         normalizedRole === 'b2b_admin' ? '/b2b/admin' :
         normalizedRole === 'b2b_user' ? '/b2b/user' :

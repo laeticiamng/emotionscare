@@ -12,8 +12,8 @@ export function getRoleHomePath(role: UserRole | string | undefined | null): str
   if (!role) return '/b2c/dashboard';
   
   // Use the existing utility function to get the dashboard path based on normalized role
-  const normalizedMode = normalizeUserMode(role);
-  return getModeDashboardPath(normalizedMode);
+  const normalizedMode = normalizeUserMode(role as string);
+  return getModeDashboardPath(normalizedMode as any);
 }
 
 /**
@@ -38,8 +38,8 @@ export function useRoleRedirect() {
       location.pathname === '/b2b/admin/login';
     
     if (isAuthenticated && user && isExplicitLoginPage) {
-      logger.info('[useRoleRedirect] Redirecting authenticated user to', { path: getModeDashboardPath(normalizeUserMode(user.role)) }, 'AUTH');
-      navigate(getModeDashboardPath(normalizeUserMode(user.role)));
+      logger.info('[useRoleRedirect] Redirecting authenticated user to', { path: getModeDashboardPath(normalizeUserMode(user.role ?? '') as any) }, 'AUTH');
+      navigate(getModeDashboardPath(normalizeUserMode(user.role ?? '') as any));
     }
   }, [isAuthenticated, user, isLoading, navigate, location.pathname]);
   

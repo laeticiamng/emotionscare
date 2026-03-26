@@ -12,7 +12,8 @@ export const useOptimizedMusicRecommendation = () => {
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const [error, setError] = useState<string | null>(null);
   
-  const { loadPlaylistForEmotion } = useMusic();
+  const musicCtx = useMusic();
+  const loadPlaylistForEmotion = (musicCtx as any).loadPlaylistForEmotion;
   const cache = useMusicCache();
   const debounceRef = useRef<NodeJS.Timeout>();
   const abortControllerRef = useRef<AbortController>();
@@ -27,9 +28,9 @@ export const useOptimizedMusicRecommendation = () => {
     if (useCache) {
       const cachedPlaylist = cache.getFromCache(params);
       if (cachedPlaylist) {
-        setCurrentPlaylist(cachedPlaylist);
+        setCurrentPlaylist(cachedPlaylist as any);
         setError(null);
-        return cachedPlaylist;
+        return cachedPlaylist as any;
       }
     }
 

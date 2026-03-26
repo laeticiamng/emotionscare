@@ -24,7 +24,7 @@ const ConversationTimeline: React.FC<ConversationTimelineProps> = ({
     (acc, conversation) => {
       const dateStr = conversation.createdAt instanceof Date 
         ? conversation.createdAt.toISOString().split('T')[0]
-        : new Date(conversation.createdAt).toISOString().split('T')[0]; // YYYY-MM-DD
+        : new Date(conversation.createdAt ?? Date.now()).toISOString().split('T')[0]; // YYYY-MM-DD
       if (!acc[dateStr]) {
         acc[dateStr] = [];
       }
@@ -63,7 +63,7 @@ const ConversationTimeline: React.FC<ConversationTimelineProps> = ({
             {groupedConversations[date].map((conversation) => {
               const isActive = activeConversationId === conversation.id;
               const emotionalTone = getEmotionalTone(conversation);
-              const createdTime = new Date(conversation.createdAt);
+              const createdTime = new Date(conversation.createdAt ?? Date.now());
               
               return (
                 <button

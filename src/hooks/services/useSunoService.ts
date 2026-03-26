@@ -71,7 +71,7 @@ export const useSunoService = (): SunoServiceHook => {
       setGenerationProgress(100);
 
       if (response.success && response.data) {
-        setGeneratedTrack(response.data);
+        setGeneratedTrack(response.data as any);
         
         // Si c'est un statut de génération, vérifier périodiquement
         if (response.data.status === 'generating') {
@@ -169,7 +169,7 @@ export const useSunoService = (): SunoServiceHook => {
         
         // Mettre à jour la playlist avec les prochaines pistes
         if (response.data.nextTracks) {
-          setPlaylist(prev => [...prev, ...response.data.nextTracks]);
+          setPlaylist(prev => [...prev, ...response.data!.nextTracks]);
         }
       } else if (response.error) {
         setError(response.error);
@@ -260,7 +260,7 @@ export const useSunoService = (): SunoServiceHook => {
     setError(null);
 
     try {
-      const response = await sunoService.getPersonalizedPlaylist(userId, context);
+      const response = await (sunoService as any).getPersonalizedPlaylist(userId, context);
       
       if (response.success && response.data?.playlist) {
         setPlaylist(response.data.playlist);
@@ -336,7 +336,7 @@ export const useSunoService = (): SunoServiceHook => {
           // Mettre à jour la piste générée avec l'URL finale
           setGeneratedTrack(prev => prev ? {
             ...prev,
-            audioUrl: response.data.audioUrl
+            audioUrl: response.data!.audioUrl
           } : null);
         }
       }

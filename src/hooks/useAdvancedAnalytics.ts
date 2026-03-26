@@ -88,7 +88,7 @@ export const useAdvancedAnalytics = (filter?: AnalyticsFilter) => {
             : 0;
         });
 
-        const variance = this.calculateVariance(weeklyAverages);
+        const variance = (this as any).calculateVariance(weeklyAverages);
         return {
           pattern: weeklyAverages,
           strength: Math.min(1, variance / 2),
@@ -109,7 +109,7 @@ export const useAdvancedAnalytics = (filter?: AnalyticsFilter) => {
         
         return {
           pattern: monthlyAverages,
-          strength: this.calculateVariance(monthlyAverages) / 3,
+          strength: (this as any).calculateVariance(monthlyAverages) / 3,
           peak: monthlyAverages.indexOf(Math.max(...monthlyAverages)),
           trough: monthlyAverages.indexOf(Math.min(...monthlyAverages))
         };
@@ -183,7 +183,7 @@ export const useAdvancedAnalytics = (filter?: AnalyticsFilter) => {
           slope,
           intercept,
           predict: (futureX: number) => slope * futureX + intercept,
-          rSquared: this.calculateRSquared(data, x.map(xi => slope * xi + intercept))
+          rSquared: (this as any).calculateRSquared(data, x.map((xi: number) => slope * xi + intercept))
         };
       },
 

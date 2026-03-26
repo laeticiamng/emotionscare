@@ -66,8 +66,8 @@ export function useMemoryOptimization(config: MemoryOptimizationConfig = {}) {
   const addToCache = useCallback((key: string, value: any) => {
     // Vérifier la taille du cache
     if (cacheRef.current.size >= maxCacheSize) {
-      const oldestKey = cacheRef.current.keys().next().value;
-      cacheRef.current.delete(oldestKey);
+      const oldestKey = cacheRef.current.keys().next().value as string | undefined;
+      if (oldestKey) cacheRef.current.delete(oldestKey);
     }
     
     cacheRef.current.set(key, value);

@@ -16,11 +16,7 @@ export const useConversationState = () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       lastMessage: "",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      last_message: "",
-      user_id: "user-123", // legacy field
-      messages: [] // Add empty messages array
+      messages: []
     };
 
     setConversations(prev => [newConversation, ...prev]);
