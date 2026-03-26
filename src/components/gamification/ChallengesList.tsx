@@ -108,7 +108,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, className }
                     <div className="flex items-center space-x-1">
                       <Flag className="h-3 w-3 text-muted-foreground" />
                       <span>
-                        {challenge.progress || challenge.completions || 0} / {typeof challenge.goal === 'number' ? challenge.goal : (challenge.total || challenge.totalSteps || 1)}
+                        {ch.progress || ch.completions || 0} / {typeof ch.goal === 'number' ? ch.goal : (ch.total || ch.totalSteps || 1)}
                       </span>
                     </div>
                     

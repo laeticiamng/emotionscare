@@ -410,7 +410,7 @@ const SmartCalendar: React.FC = () => {
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <goal.icon className={`h-5 w-5 ${goal.color}`} />
+                      {React.createElement(goal.icon as any, { className: `h-5 w-5 ${goal.color}` })}
                       <CardTitle className="text-base">{goal.title}</CardTitle>
                     </div>
                     <Badge className={getProgressColor(goal.current, goal.target)}>

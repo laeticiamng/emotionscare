@@ -19,7 +19,7 @@ interface StatCard {
   value: string;
   change: number;
   trend: 'up' | 'down' | 'stable';
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   progress: number;
   description: string;
 }

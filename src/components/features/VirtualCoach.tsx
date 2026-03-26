@@ -116,7 +116,7 @@ const VirtualCoach: React.FC = () => {
         content: response.message || generateContextualResponse(currentMessage),
         sender: 'coach',
         timestamp: new Date(),
-        type: response.type || 'text',
+        type: (response.type || 'text') as any,
         metadata: {
           emotion: response.detectedEmotion,
           confidence: response.confidence,
