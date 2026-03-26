@@ -257,7 +257,7 @@ const PerfectDashboard: React.FC = () => {
                   <div
                     key={i}
                     className={`w-4 h-4 rounded-full ${
-                      i < dashboardData.weekStreak ? 'bg-warning' : 'bg-muted'
+                      i < metrics.weekStreak ? 'bg-warning' : 'bg-muted'
                     }`}
                   />
                 ))}
