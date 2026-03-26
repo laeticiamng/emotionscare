@@ -202,7 +202,7 @@ const B2BUserDashboard: React.FC = () => {
                 <span className="hidden sm:inline">Défis</span>
               </TabsTrigger>
               <TabsTrigger value="reporting" className="flex items-center gap-2">
-                <ChartLine className="h-4 w-4" />
+                <TrendingUp className="h-4 w-4" />
                 <span className="hidden sm:inline">Reporting</span>
               </TabsTrigger>
               <TabsTrigger value="focus" className="flex items-center gap-2">
