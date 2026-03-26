@@ -125,7 +125,7 @@ export const PrivacyToggle: React.FC = () => {
           const config = PRIVACY_CONFIG[key];
           const IconComponent = config.icon;
           const isLocked = !!lockedByOrg[key];
-          const isEnabled = prefs[key];
+          const isEnabled = (prefs as any)[key];
           
           return (
             <div 

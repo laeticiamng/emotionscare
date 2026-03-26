@@ -33,15 +33,17 @@ const PrivacyPreferencesComponent: React.FC<PrivacyPreferencesProps> = ({
     
     if (typeof privacy === 'string') {
       return {
+        profileVisibility: privacy as 'private' | 'friends' | 'public',
+        dataCollection: privacy !== 'private',
+        analytics: privacy !== 'private',
+        marketing: privacy !== 'private',
         shareData: privacy !== 'private',
         shareEmotions: privacy !== 'private',
         shareActivity: privacy !== 'private',
         publicProfile: privacy !== 'private',
         dataSharing: privacy !== 'private',
-        analytics: privacy !== 'private',
         thirdParty: privacy !== 'private',
         anonymizeReports: true,
-        profileVisibility: privacy as 'private' | 'friends' | 'public'
       };
     }
     

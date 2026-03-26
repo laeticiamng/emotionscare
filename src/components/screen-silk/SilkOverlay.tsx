@@ -175,7 +175,7 @@ export const SilkOverlay: React.FC<SilkOverlayProps> = ({
       )}
 
       {/* Custom CSS for animations */}
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes gentle-drift {
           0%, 100% { transform: translateX(0) translateY(0); }
           25% { transform: translateX(1px) translateY(-1px); }

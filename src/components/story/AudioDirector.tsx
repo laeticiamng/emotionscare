@@ -123,7 +123,7 @@ const AudioDirector: React.FC<AudioDirectorProps> = ({
     };
 
     const handleError = (e: Event) => {
-      logger.error('Audio load error', e as Error, 'MUSIC');
+      logger.error('Audio load error', e as unknown as Error, 'MUSIC');
       setError('Impossible de charger l\'audio');
       setIsLoading(false);
     };

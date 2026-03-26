@@ -4,8 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { FontSize, FontFamily, ThemeName } from '@/types/theme';
-import { Theme } from '@/types/preferences';
+import { Theme, FontSize, FontFamily } from '@/types/preferences';
 
 const DisplayPreferences: React.FC = () => {
   const { preferences, updatePreferences } = useUserPreferences();

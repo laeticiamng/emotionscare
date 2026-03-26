@@ -8,7 +8,7 @@ import {
   Star, 
   Music, 
   Sword, 
-  Card,
+  CreditCard as Card,
   Shield,
   Flame,
   Lightbulb
