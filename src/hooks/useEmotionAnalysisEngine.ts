@@ -405,7 +405,7 @@ export const useEmotionAnalysisEngine = () => {
       intensity: results.reduce((acc, r) => acc + r.intensity, 0) / results.length,
       source: 'multimodal',
       scanMode: 'combined',
-      sessionId: state.sessionId,
+      sessionId: state.sessionId ?? undefined,
       details: {
         modalityResults: results,
         fusionMethod: 'weighted_confidence'
