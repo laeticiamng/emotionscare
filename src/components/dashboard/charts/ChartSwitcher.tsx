@@ -61,10 +61,10 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
     // Find the full option object
     if (!selectedDimensionId) return;
     
-    const dimension = availableDimensions.find(d => d.id === selectedDimensionId);
+    const dimension = availableDimensions.find((d: any) => d.id === selectedDimensionId);
     if (!dimension) return;
     
-    const option = dimension.options.find(o => o.value === value);
+    const option = dimension.options.find((o: any) => o.value === value);
     
     if (option && setSelectedOption) {
       setSelectedOption(option);
