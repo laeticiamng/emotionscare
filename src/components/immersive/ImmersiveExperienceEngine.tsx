@@ -169,7 +169,7 @@ const ImmersiveExperienceEngine: React.FC<ImmersiveProps> = ({
       className="immersive-experience-engine relative min-h-screen overflow-hidden"
       onMouseMove={handleMouseMove}
       style={{
-        background: theme?.background || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: (theme as any)?.background || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         filter: `saturate(${emotionEffects.saturate}) blur(${emotionEffects.blur}px)`
       }}
       initial={{ scale: 0.9, opacity: 0 }}
