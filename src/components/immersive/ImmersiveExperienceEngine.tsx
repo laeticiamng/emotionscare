@@ -187,8 +187,8 @@ const ImmersiveExperienceEngine: React.FC<ImmersiveProps> = ({
               key={particle.id}
               className="absolute w-1 h-1 rounded-full"
               style={{
-                background: theme?.particleColor || '#74b9ff',
-                boxShadow: `0 0 6px ${theme?.glowColor || '#a29bfe'}`,
+                background: (theme as any)?.particleColor || '#74b9ff',
+                boxShadow: `0 0 6px ${(theme as any)?.glowColor || '#a29bfe'}`,
                 left: particle.x,
                 top: particle.y
               }}
