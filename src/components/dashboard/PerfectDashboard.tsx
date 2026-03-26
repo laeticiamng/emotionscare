@@ -250,7 +250,7 @@ const PerfectDashboard: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-2">{dashboardData.weekStreak}</div>
+              <div className="text-3xl font-bold mb-2">{metrics.weekStreak}</div>
               <p className="text-sm text-muted-foreground mb-2">Jours consécutifs</p>
               <div className="flex items-center gap-1">
                 {Array.from({ length: 7 }).map((_, i) => (
