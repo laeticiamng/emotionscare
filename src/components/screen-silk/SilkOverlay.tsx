@@ -182,11 +182,10 @@ export const SilkOverlay: React.FC<SilkOverlayProps> = ({
           50% { transform: translateX(-0.5px) translateY(0.5px); }
           75% { transform: translateX(0.5px) translateY(-0.5px); }
         }
-        
         .bg-gradient-radial {
           background: radial-gradient(ellipse at center, var(--tw-gradient-stops));
         }
-      `}</style>
+      ` }} />
     </div>
   );
 };
