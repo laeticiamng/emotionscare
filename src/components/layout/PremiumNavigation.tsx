@@ -143,7 +143,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Respiration Thérapeutique',
           description: 'Techniques avancées de respiration',
           icon: <Wind className="w-5 h-5" />,
-          path: Routes.breath(),
+          path: routes.consumer.breath(),
           category: 'therapy',
           xp: 120,
           segment: 'consumer'
