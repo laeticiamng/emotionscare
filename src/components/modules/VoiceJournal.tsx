@@ -36,7 +36,9 @@ export default function VoiceJournal() {
   const audioChunksRef = useRef<Blob[]>([]);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   
-  const { startCamera: startMicrophone, stopCamera: stopMicrophone, stream } = useUserMedia();
+  const { startMedia, stopMedia, stream } = useUserMedia();
+  const startMicrophone = () => startMedia({ audio: true });
+  const stopMicrophone = () => stopMedia();
   
   const [recording, setRecording] = useState<RecordingState>({
     isRecording: false,
@@ -207,7 +209,7 @@ export default function VoiceJournal() {
         text: transcribedText,
         sentiment_label: analysis.sentiment_label,
         emotions: analysis.emotions,
-        prosody_analysis: prosodyAnalysis,
+        prosody_analysis: prosodyAnalysis ?? undefined,
         created_at: new Date().toISOString()
       };
 

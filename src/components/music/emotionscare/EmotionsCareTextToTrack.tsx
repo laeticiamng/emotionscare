@@ -112,10 +112,10 @@ const EmotionsCareTextToTrack: React.FC = () => {
             <div>
               <h3 className="font-semibold text-lg">{generatedTrack.title}</h3>
               <p className="text-sm text-muted-foreground">
-                Preset musical : <Badge variant="secondary">{generatedTrack.preset.tag}</Badge>
+                Preset musical : <Badge variant="secondary">{String((generatedTrack as any).preset?.tag ?? '')}</Badge>
               </p>
               <p className="text-sm text-muted-foreground">
-                Style : {generatedTrack.preset.style}
+                Style : {String((generatedTrack as any).preset?.style ?? '')}
               </p>
             </div>
 

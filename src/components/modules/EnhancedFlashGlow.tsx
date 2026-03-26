@@ -82,7 +82,7 @@ export default function EnhancedFlashGlow({
   const { playTone, stopAll } = useWebAudio();
   const btHook = useWebBluetooth();
   const hrConnected = btHook.isConnected;
-  const heartRate = (btHook as any).heartRate ?? btHook.heartRateData?.heartRate ?? null;
+  const heartRate = (btHook as any).heartRate ?? btHook.heartRateData?.bpm ?? null;
   
   const [selectedPattern, setSelectedPattern] = useState<BreathingPattern>(breathingPatterns[0]);
   const [currentPhase, setCurrentPhase] = useState<'inhale' | 'hold1' | 'exhale' | 'hold2'>('inhale');

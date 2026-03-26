@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, Help } from 'lucide-react';
+import { Settings, HelpCircle as Help } from 'lucide-react';
 import NavItem from './NavItem';
 
 interface UnifiedFooterNavProps {

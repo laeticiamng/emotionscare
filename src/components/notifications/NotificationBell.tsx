@@ -41,7 +41,7 @@ const NotificationBell: React.FC = () => {
   const filteredNotifications = useMemo(() => {
     if (selectedCategory === 'all') return notifications;
     return notifications.filter(n => {
-      const type = n.type?.toLowerCase() || '';
+      const type = ((n as any).type || n.category || '').toLowerCase();
       if (selectedCategory === 'social') return type.includes('message') || type.includes('social') || type.includes('friend');
       if (selectedCategory === 'achievements') return type.includes('achievement') || type.includes('badge') || type.includes('level');
       if (selectedCategory === 'system') return type.includes('system') || type.includes('alert') || type.includes('update');
@@ -53,11 +53,12 @@ const NotificationBell: React.FC = () => {
 
   // Category counts
   const categoryCounts = useMemo(() => {
+    const getType = (n: any) => (n.type || n.category || '').toLowerCase();
     return {
-      all: notifications.filter(n => !n.read).length,
-      social: notifications.filter(n => !n.read && (n.type?.includes('message') || n.type?.includes('social'))).length,
-      achievements: notifications.filter(n => !n.read && (n.type?.includes('achievement') || n.type?.includes('badge'))).length,
-      system: notifications.filter(n => !n.read && (n.type?.includes('system') || n.type?.includes('alert'))).length,
+      all: notifications.length,
+      social: notifications.filter(n => { const t = getType(n); return t.includes('message') || t.includes('social'); }).length,
+      achievements: notifications.filter(n => { const t = getType(n); return t.includes('achievement') || t.includes('badge'); }).length,
+      system: notifications.filter(n => { const t = getType(n); return t.includes('system') || t.includes('alert'); }).length,
     };
   }, [notifications]);
 

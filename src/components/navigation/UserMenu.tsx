@@ -59,11 +59,11 @@ const UserMenu: React.FC = () => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative flex items-center gap-2 p-1 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={user?.avatar} alt={user?.name || 'Utilisateur'} />
-            <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
+            <AvatarImage src={(user as any)?.avatar || user?.user_metadata?.avatar_url} alt={(user as any)?.name || user?.user_metadata?.name || 'Utilisateur'} />
+            <AvatarFallback>{getInitials((user as any)?.name || user?.user_metadata?.name || user?.email)}</AvatarFallback>
           </Avatar>
           <span className="hidden sm:inline text-sm font-medium">
-            {user?.name ? user.name.split(' ')[0] : 'Utilisateur'}
+            {(user as any)?.name ? (user as any).name.split(' ')[0] : user?.email?.split('@')[0] || 'Utilisateur'}
           </span>
         </Button>
       </DropdownMenuTrigger>

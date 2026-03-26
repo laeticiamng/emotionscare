@@ -58,8 +58,9 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
             {filteredNotifications.map(notification => (
               <NotificationItem
                 key={notification.id}
-                notification={notification}
-                onMarkAsRead={onMarkAsRead}
+                notification={notification as any}
+                onMarkAsRead={() => onMarkAsRead(notification.id)}
+                onDelete={() => {}}
               />
             ))}
           </div>

@@ -24,7 +24,7 @@ const OnboardingFormStep: React.FC<OnboardingFormStepProps> = ({
   fields,
   stepId
 }) => {
-  const { updateResponse, userResponses } = useOnboarding();
+  const { handleResponse: updateResponse, userResponses } = useOnboarding();
   const [formValues, setFormValues] = useState<Record<string, any>>(
     userResponses[stepId] || {}
   );

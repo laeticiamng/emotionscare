@@ -31,9 +31,9 @@ const NotificationList: React.FC<NotificationListProps> = ({
         {notifications.map((notification) => (
           <NotificationItem
             key={notification.id}
-            notification={notification}
-            onMarkAsRead={onMarkAsRead}
-            onRemove={onRemove}
+            notification={notification as any}
+            onMarkAsRead={() => onMarkAsRead?.(notification.id)}
+            onDelete={() => onRemove?.(notification.id)}
           />
         ))}
       </div>

@@ -9,7 +9,10 @@ import {
   Trophy, Flame, Target, Download, Star, Sparkles, ArrowRight,
   Heart, Wind, BookOpen, Calendar, Gift, Zap, Award, Copy
 } from 'lucide-react';
-import MoodBasedRecommendations from '@/components/music/MoodBasedRecommendations';
+// MoodBasedRecommendations lazy placeholder
+const MoodBasedRecommendations = React.lazy(() => 
+  import('@/components/music/MoodBasedRecommendations').catch(() => ({ default: () => null }))
+);
 import confetti from 'canvas-confetti';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -32,7 +35,7 @@ interface Challenge {
   id: string;
   title: string;
   description: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   xp: number;
   duration: string;
 }

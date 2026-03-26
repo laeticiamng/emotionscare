@@ -244,7 +244,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
     ];
     
     // Add B2B-specific steps if user is in B2B mode
-    if (userMode === 'b2b-admin' || userMode === 'b2b-collaborator') {
+    if (userMode === 'b2b_admin' || userMode === 'b2b_user') {
       const b2bSteps: OnboardingStep[] = [
         {
           id: 'team-features',
