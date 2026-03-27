@@ -59,7 +59,9 @@
     "src/**/*.e2e.test.ts",
     "src/**/*.e2e.test.tsx",
     "tests/e2e",
-    "supabase"
+    "supabase",
+    "scripts",
+    "services"
   ],
   "include": [
     "./src",
