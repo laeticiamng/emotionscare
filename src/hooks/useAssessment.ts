@@ -211,7 +211,7 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { flags } = useFlags();
-  const runtimeInstrument = instrumentRuntimeMap[instrument] ?? (instrument as ClinicalInstrumentCode);
+  const runtimeInstrument = (instrumentRuntimeMap[instrument] ?? instrument) as ClinicalInstrumentCode;
   const consent = useClinicalConsent(runtimeInstrument as ClinicalInstrumentCode);
   const callbacksRef = useRef<AssessmentCallbacks | null>(null);
   const initialFlagKeys = resolveFlagKeys(instrument);
