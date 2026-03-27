@@ -205,42 +205,33 @@ export default defineConfig(({ mode }) => ({
         manualChunks(id) {
           // Core React - loaded on every page
           if (id.includes('react-dom') || (id.includes('/react/') && !id.includes('react-'))) {
-            return 'react-vendor';
+            return 'vendor-react';
           }
           if (id.includes('react-router-dom') || id.includes('@remix-run/router')) {
-            return 'router-vendor';
+            return 'vendor-router';
           }
 
-          // UI framework - Radix primitives
+          // UI framework - Radix primitives (consolidate into single chunk)
           if (id.includes('@radix-ui/')) {
-            return 'ui-radix';
+            return 'vendor-ui';
           }
 
           // Data layer
-          if (id.includes('@tanstack/react-query')) {
-            return 'data-query';
-          }
-          if (id.includes('@supabase/')) {
-            return 'data-supabase';
-          }
-          if (id.includes('/zod/')) {
-            return 'data-zod';
+          if (id.includes('@tanstack/react-query') || id.includes('@supabase/') || id.includes('/zod/')) {
+            return 'vendor-data';
           }
 
-          // Animation - deferred
+          // Animation
           if (id.includes('framer-motion')) {
-            return 'animation-vendor';
+            return 'vendor-animation';
           }
 
-          // Charts - lazy loaded
-          if (id.includes('chart.js') || id.includes('react-chartjs-2')) {
-            return 'charts-chartjs';
-          }
-          if (id.includes('recharts') || id.includes('d3-')) {
-            return 'charts-recharts';
+          // Charts (consolidated)
+          if (id.includes('chart.js') || id.includes('react-chartjs-2') || id.includes('recharts') || id.includes('d3-')) {
+            return 'vendor-charts';
           }
 
-          // 3D / Heavy ML - lazy loaded, never in initial bundle
+          // 3D / Heavy ML - lazy loaded
           if (id.includes('three') || id.includes('@react-three/')) {
             return 'vendor-3d';
           }
@@ -253,25 +244,14 @@ export default defineConfig(({ mode }) => ({
             return 'vendor-audio';
           }
 
-          // i18n
-          if (id.includes('i18next') || id.includes('react-i18next')) {
-            return 'vendor-i18n';
+          // i18n + date (small, merge)
+          if (id.includes('i18next') || id.includes('react-i18next') || id.includes('date-fns') || id.includes('dayjs')) {
+            return 'vendor-i18n-date';
           }
 
-          // Date utilities
-          if (id.includes('date-fns') || id.includes('dayjs')) {
-            return 'vendor-date';
-          }
-
-          // Misc heavy vendors
-          if (id.includes('xlsx')) {
-            return 'vendor-xlsx';
-          }
-          if (id.includes('html2canvas')) {
-            return 'vendor-html2canvas';
-          }
-          if (id.includes('lottie-react') || id.includes('lottie-web')) {
-            return 'vendor-lottie';
+          // Heavy vendors (consolidated)
+          if (id.includes('xlsx') || id.includes('html2canvas') || id.includes('lottie-react') || id.includes('lottie-web')) {
+            return 'vendor-heavy';
           }
           if (id.includes('@sentry/')) {
             return 'vendor-sentry';
@@ -283,29 +263,44 @@ export default defineConfig(({ mode }) => ({
             return 'vendor-openai';
           }
 
-          // Music module chunks
-          if (id.includes('src/components/music/') || id.includes('src/hooks/music/') || id.includes('src/services/music/')) {
+          // Feature modules — group pages + components + hooks per domain
+          if (id.includes('src/components/music/') || id.includes('src/hooks/music/') || id.includes('src/services/music/') || id.includes('src/pages/music/')) {
             return 'module-music';
           }
-
-          // Admin module chunks
           if (id.includes('src/pages/admin/') || id.includes('src/components/admin/')) {
             return 'module-admin';
           }
-
-          // Gamification module chunks
           if (id.includes('src/pages/gamification/') || id.includes('src/components/gamification/') || id.includes('src/features/leaderboard/')) {
             return 'module-gamification';
           }
-
-          // B2B module chunks
           if (id.includes('src/pages/b2b/') || id.includes('src/components/b2b/')) {
             return 'module-b2b';
           }
-
-          // Journal module chunks
           if (id.includes('src/pages/journal/') || id.includes('src/components/journal/')) {
             return 'module-journal';
+          }
+          if (id.includes('src/pages/coach/') || id.includes('src/components/coach/')) {
+            return 'module-coach';
+          }
+          if (id.includes('src/pages/scanner/') || id.includes('src/components/scanner/')) {
+            return 'module-scanner';
+          }
+          if (id.includes('src/pages/compliance/') || id.includes('src/pages/legal/')) {
+            return 'module-legal';
+          }
+          if (id.includes('src/pages/errors/')) {
+            return 'module-errors';
+          }
+
+          // Shared components and hooks (reduce tiny per-page chunks)
+          if (id.includes('src/components/ui/')) {
+            return 'shared-ui';
+          }
+          if (id.includes('src/hooks/') && !id.includes('src/hooks/music/')) {
+            return 'shared-hooks';
+          }
+          if (id.includes('src/lib/') || id.includes('src/services/')) {
+            return 'shared-lib';
           }
         },
       },
