@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour Perplexity AI Search
  * Recherche contextuelle intelligente

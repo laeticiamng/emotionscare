@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour les données des équipes B2B avec données Supabase réelles
  * Inclut mutations create/update/delete

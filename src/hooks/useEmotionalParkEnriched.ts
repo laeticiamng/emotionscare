@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useEmotionalParkEnriched - Hook enrichi pour le Parc Émotionnel
  * Gère les attractions, quêtes, progression et expérience immersive

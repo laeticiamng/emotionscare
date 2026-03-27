@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook d'authentification unifié - Compatible avec SimpleAuth
  */

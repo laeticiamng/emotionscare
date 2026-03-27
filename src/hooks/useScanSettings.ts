@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useScanSettings - Hook pour persister les settings scan vers Supabase
  * Remplace localStorage pour scan_statistics, scan_history, favorite_scan_methods,

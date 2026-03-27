@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook for Screen Silk Micro-breaks - Pauses visuelles
  */

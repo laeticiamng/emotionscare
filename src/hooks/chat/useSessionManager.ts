@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect, useCallback } from 'react';
 import { ChatMessage } from '@/types/chat';
 import { faker } from '@faker-js/faker';

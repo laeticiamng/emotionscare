@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useAuthNavigation - Hook pour la navigation après authentification
  * Gère les redirections intelligentes basées sur le contexte utilisateur

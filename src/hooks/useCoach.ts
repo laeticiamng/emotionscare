@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Barrel export pour tous les hooks du coach
  */

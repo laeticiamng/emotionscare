@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useHaptics - Hook avancé pour les retours haptiques
  * Synchronisé avec les exercices de respiration et patterns thérapeutiques

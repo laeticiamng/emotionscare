@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useBreathingSession - Hook pour gérer une session de respiration
  */

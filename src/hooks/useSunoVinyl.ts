@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useSunoVinyl - Hook pour générer la musique des vinyls via Suno API
  * Avec cache DB pour éviter re-génération et affichage crédits

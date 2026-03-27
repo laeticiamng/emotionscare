@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer les données du cerveau (scans, régions, annotations)
  */

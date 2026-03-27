@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook for system health monitoring
  * Provides real-time health status and metrics

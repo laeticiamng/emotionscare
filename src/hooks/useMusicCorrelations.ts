@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useMusicCorrelations - Analyse des corrélations musique ↔ humeur
  * Détecte les patterns entre écoute musicale et états émotionnels

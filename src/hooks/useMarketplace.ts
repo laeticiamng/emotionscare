@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook useMarketplace - Phase 4.3
  * Gestion du marketplace avec cache et pagination

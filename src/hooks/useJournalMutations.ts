@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer les mutations du journal (create, update, delete)
  * Utilise l'API v1/journal

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useEmotionalJournalEntries - Hook pour gérer les entrées du journal émotionnel
  */

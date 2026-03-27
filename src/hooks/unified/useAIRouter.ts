@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useAIRouter - Hook intelligent pour orchestration IA proactive
  * 

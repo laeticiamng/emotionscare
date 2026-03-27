@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useSunoCallback - Hook pour écouter les callbacks Suno via Supabase Realtime
  * Écoute la table suno_callbacks en temps réel

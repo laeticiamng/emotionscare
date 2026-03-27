@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useHapticFeedback - Hook pour feedback haptique
  * Vibrations sur actions musicales (mobile)

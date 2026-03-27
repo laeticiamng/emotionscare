@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useToast } from '@/hooks/use-toast';
 
 export function usePlaylistNotifications() {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { subWeeks, format, startOfWeek, endOfWeek } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';

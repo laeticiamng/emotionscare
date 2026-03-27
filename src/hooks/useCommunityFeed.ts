@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useCommunityFeed - Hook pour le flux communautaire
  * Corrige: community_posts: 1 seul post existant

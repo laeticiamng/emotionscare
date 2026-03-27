@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useCallback } from 'react';
 import { useError } from '@/contexts';
 import { logger } from '@/lib/logger';

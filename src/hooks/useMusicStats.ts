@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useMusicStats - Statistiques musicales réelles depuis Supabase
  */

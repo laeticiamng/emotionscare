@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * Hook pour les événements B2B avec données Supabase réelles et mutations

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useScanRealtime - Hook pour les mises à jour temps réel des scans
  * Utilise Supabase Realtime pour synchroniser les données

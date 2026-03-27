@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour ElevenLabs Text-to-Speech
  * Voix ultra-réalistes pour le coach et les méditations

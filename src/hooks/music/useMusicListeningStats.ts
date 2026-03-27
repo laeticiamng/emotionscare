@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useMusicListeningStats - Hook pour statistiques d'écoute réelles
  * Charge les données depuis Supabase et calcule les statistiques

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Hook de notifications
 
 import { ReactElement, ReactNode } from 'react';

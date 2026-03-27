@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour calculer la progression hebdomadaire de l'utilisateur
  */

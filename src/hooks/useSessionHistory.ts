@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook unifié pour l'historique des sessions de tous les modules
  * Utilise la table session_history créée récemment

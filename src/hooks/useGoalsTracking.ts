@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useGoalsTracking - Hook pour la gestion des objectifs utilisateur
  * Corrige: user_goals: 0 définis

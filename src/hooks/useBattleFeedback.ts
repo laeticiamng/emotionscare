@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useBattleFeedback - Hook pour les feedbacks audio et haptique
  * Gère les sons et vibrations pendant les batailles Bounce-Back

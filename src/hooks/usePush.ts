@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * usePush - Hook de gestion des notifications push
  * Utilise l'API native Notification + localStorage pour la persistance

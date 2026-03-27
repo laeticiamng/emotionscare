@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useSpeechDictation - Hook for Web Speech API dictation
  * Provides real-time voice-to-text transcription

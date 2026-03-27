@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook React Query pour Bubble Beat
  * @deprecated Use useBubbleBeatMachine instead

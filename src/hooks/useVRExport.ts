@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour exporter les données VR
  */

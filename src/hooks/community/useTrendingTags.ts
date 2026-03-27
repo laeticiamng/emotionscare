@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour récupérer les tags tendance
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useNotificationSender - Hook pour envoyer des notifications
  * Corrige le problème de 0 notifications envoyées

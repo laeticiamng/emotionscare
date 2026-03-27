@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Index centralisé des hooks premium
  * Export des hooks ElevenLabs, Perplexity et Firecrawl

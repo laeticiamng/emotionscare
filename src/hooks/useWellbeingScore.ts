@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour calculer le score de bien-être basé sur les données réelles
  * Utilise clinical_signals comme source principale

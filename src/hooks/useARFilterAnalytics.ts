@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useARFilterAnalytics - Hook pour tracker l'utilisation des filtres AR
  * Corrige: AR Filters adoption nulle

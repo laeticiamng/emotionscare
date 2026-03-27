@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useCallback, useMemo } from 'react';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'critical';

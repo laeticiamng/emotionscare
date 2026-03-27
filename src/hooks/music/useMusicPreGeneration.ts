@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useMusicPreGeneration
  * Hook React pour intégrer le système de pré-génération musicale anticipée

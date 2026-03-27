@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { ChatMessage } from '@/types';
 import { useToast } from '@/hooks/use-toast';

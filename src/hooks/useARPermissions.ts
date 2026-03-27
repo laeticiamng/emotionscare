@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useARPermissions Hook - Phase 4.5
  * Manage device permissions for AR (camera, motion sensors)

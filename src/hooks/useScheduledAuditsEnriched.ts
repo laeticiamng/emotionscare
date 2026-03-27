@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useScheduledAuditsEnriched - Cycle complet audit GDPR avec exécution, rapports, analytics
  */

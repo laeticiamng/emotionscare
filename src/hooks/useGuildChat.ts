@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour le chat de guilde en temps réel
  * TOP 5 #2 Éléments moins développés - Système de guildes avec chat

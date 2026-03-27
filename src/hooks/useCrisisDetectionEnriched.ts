@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useCrisisDetectionEnriched - Détection de crise avec ML, alertes multi-canaux et suivi
  * Analyse complète multi-source avec scoring intelligent

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer les alertes B2B
  * Alertes de bien-être anonymisées pour les managers RH

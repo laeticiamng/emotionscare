@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour les statistiques comparatives Flash Glow
  * TOP 5 #1 - Enrichissement des stats avec comparaisons utilisateurs

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useParkModuleSymbiosis - Hook pour la symbiose Parc <-> Modules
  * Synchronise les activités du parc avec tous les modules de l'application

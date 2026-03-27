@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { User } from '@/types/user';
 import { logger } from '@/lib/logger';

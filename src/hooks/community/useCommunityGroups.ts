@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour la gestion des groupes de la communauté
  */

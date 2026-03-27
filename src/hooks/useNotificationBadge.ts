@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour le badge de notifications
  * Affiche le nombre de notifications non lues

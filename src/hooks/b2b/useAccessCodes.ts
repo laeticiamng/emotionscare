@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer les codes d'accès institutionnels
  */

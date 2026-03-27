@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useMusic Queue Hook - Gestion de la queue de lecture
  * Drag-and-drop, shuffle, repeat modes

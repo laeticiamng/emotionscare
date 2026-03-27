@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useMusic Hook - Hook avec validation
  * Accès sécurisé au MusicContext

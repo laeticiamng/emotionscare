@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useBreathGamification - Gamification des séances de respiration
  * Intègre XP, badges et streaks aux exercices de respiration

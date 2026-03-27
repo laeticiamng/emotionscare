@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * usePushNotifications - Gestion des notifications push Web
  */

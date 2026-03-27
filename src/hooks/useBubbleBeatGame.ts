@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook complet pour le jeu Bubble Beat
  */

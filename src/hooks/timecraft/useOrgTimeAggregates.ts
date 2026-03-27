@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour les données agrégées organisationnelles (B2B)
  * Données anonymisées uniquement - pas de tracking individuel

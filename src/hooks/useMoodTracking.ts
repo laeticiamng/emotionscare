@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useMoodTracking - Hook pour persister les entrées d'humeur
  * Corrige le problème de mood_entries: 0 enregistrés

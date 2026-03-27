@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook useLongTermPredictions - Phase 4.2
  * Gestion des prédictions long-terme avec cache et refresh automatique

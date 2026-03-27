@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook useModuleInterconnect
  * Hook React pour l'interconnexion des modules

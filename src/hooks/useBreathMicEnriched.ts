@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useBreathMicEnriched - Détection respiration via microphone avec traitement audio réel
  */

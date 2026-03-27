@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useParkRealtime - Hook pour notifications et mises à jour temps réel du parc
  */

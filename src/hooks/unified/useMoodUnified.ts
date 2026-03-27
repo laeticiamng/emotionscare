@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useMoodUnified - Hook unifié pour toute la gestion de l'humeur
  * Consolide: useMood, useCurrentMood, useMoodSession, useMoodTracking

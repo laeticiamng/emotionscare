@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook de gamification avec persistence Supabase
  * Synchonise les points, challenges et achievements

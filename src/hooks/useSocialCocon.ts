@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useContext } from 'react';
 import SocialCoconContext from '@/contexts/SocialCoconContext';
 

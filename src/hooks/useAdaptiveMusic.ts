@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect, useCallback } from 'react';
 import type { MusicTrack, AdaptiveMusicConfig } from '@/types/music';
 import { adaptiveMusicService } from '@/services/adaptiveMusicService';

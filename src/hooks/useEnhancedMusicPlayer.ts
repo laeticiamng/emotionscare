@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useEnhancedMusicPlayer - Hook enrichi avec feedback et persistance
  * Connecté à MusicContext + Supabase

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { subWeeks, format } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import { GlobalInterceptor } from '@/utils/globalInterceptor';

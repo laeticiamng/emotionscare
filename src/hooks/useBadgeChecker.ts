@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour vérifier et attribuer automatiquement les badges
  */

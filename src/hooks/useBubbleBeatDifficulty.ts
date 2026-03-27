@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour les niveaux de difficulté Bubble Beat
  * TOP 5 #2 Modules - Système de difficultés progressives

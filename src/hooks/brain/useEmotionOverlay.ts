@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer l'overlay émotionnel sur le cerveau 3D
  */

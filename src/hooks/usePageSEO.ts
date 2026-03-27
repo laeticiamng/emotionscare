@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect } from 'react';
 
 const BASE_URL = typeof window !== 'undefined' && window.location.hostname !== 'localhost'

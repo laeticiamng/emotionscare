@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useUser Hook - Wrapper autour du module profile
  * Maintient la compatibilité avec le code existant

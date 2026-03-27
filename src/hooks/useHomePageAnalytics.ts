@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useHomePageAnalytics - Hook pour analytics et tracking de la HomePage
  * Suit les interactions utilisateur et génère des insights

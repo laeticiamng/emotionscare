@@ -30,12 +30,12 @@ export const useBounceBattle = () => {
   const wsRef = useRef<WebSocket | null>(null);
   const stimuliTimeoutsRef = useRef<NodeJS.Timeout[]>([]);
 
-  const start = useCallback(async (mode: string = 'standard') => {
+  const start = useCallback(async (mode: 'quick' | 'standard' | 'zen' | 'challenge' = 'standard') => {
     setIsLoading(true);
     setError(null);
     
     try {
-      bounceStore.setMode(mode);
+      bounceStore.setMode(mode as 'quick' | 'standard' | 'zen' | 'challenge');
       bounceStore.setPhase('starting');
       
       const { data, error: supabaseError } = await supabase.functions.invoke('bounce-back-battle', {
@@ -69,7 +69,7 @@ export const useBounceBattle = () => {
       // Fallback offline mode
       const fallbackBattleId = `offline-${Date.now()}`;
       bounceStore.setBattleId(fallbackBattleId);
-      bounceStore.setMode(mode);
+      bounceStore.setMode(mode as 'quick' | 'standard' | 'zen' | 'challenge');
       
       // Generate offline stimuli
       const offlineStimuli = generateOfflineStimuli(mode);

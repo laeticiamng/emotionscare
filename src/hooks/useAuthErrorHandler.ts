@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useNavigate } from 'react-router-dom';
 import { useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';

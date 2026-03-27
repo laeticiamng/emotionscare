@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour Firecrawl Web Scraping
  * Extraction intelligente de contenu

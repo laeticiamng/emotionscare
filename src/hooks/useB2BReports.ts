@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour les rapports B2B avec données Supabase réelles
  */

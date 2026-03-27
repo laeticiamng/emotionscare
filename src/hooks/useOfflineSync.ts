@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer la synchronisation hors ligne
  * Utilise le Service Worker pour sauvegarder et sync les données

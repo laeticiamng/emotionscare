@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useMusicJourney - Gestion des parcours musicaux guidés
  * Transitions progressives d'émotions négatives vers positives

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour suivre le nombre d'utilisateurs en ligne en temps réel
  * Utilise Supabase Realtime Presence

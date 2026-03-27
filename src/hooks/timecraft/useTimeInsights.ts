@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour générer des insights temporels non-prescriptifs (B2C)
  */

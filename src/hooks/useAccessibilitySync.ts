@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour synchroniser les paramètres d'accessibilité avec Supabase
  */

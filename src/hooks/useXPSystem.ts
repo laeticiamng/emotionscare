@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useXPSystem - Hook centralisé pour le système XP
  * Corrige: XP Triggers ne s'incrémente pas

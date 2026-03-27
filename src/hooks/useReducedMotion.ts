@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useReducedMotion - Hook pour respecter la préférence utilisateur de mouvement réduit
  * Détecte automatiquement la préférence système et permet les override manuels

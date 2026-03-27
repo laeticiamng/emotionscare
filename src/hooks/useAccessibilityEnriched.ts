@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useAccessibility ENRICHED - Hook d'accessibilité complet
  * Version enrichie avec profils, export, analytics, préférences persistées

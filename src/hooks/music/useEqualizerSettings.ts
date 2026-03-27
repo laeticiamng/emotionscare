@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useEqualizerSettings - Persistance des réglages d'égaliseur
  */

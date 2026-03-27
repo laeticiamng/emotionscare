@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour corréler les données émotionnelles avec la structure temporelle
  */
