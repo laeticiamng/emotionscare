@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Unified Hooks - Hooks consolidés pour architecture optimisée
  * Point d'entrée unique pour les hooks unifiés

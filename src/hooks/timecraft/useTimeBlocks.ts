@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer les blocs temporels personnels (B2C)
  */

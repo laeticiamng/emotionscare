@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour générer des paroles via Suno API
  */

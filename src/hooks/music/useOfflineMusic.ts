@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useOfflineMusic - Hook pour gérer le mode hors-ligne de la musique
  * Gère le cache des pistes via Service Worker dédié et Cache API

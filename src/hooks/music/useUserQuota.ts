@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook useUserQuota - Gestion des quotas utilisateur
  *

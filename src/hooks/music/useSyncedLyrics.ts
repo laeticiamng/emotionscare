@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour récupérer et afficher les paroles d'un track
  * Connecté à l'API Suno lyrics

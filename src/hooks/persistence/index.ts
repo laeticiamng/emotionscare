@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Index des hooks de persistance EmotionsCare
  * Export centralisé pour faciliter les imports

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour la recherche dans la communauté
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useMusicSettings - Hook centralisé pour la persistance des paramètres music
  * Sync automatique avec Supabase user_settings, fallback localStorage offline

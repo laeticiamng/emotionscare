@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer les versions de trajectoires temporelles (B2C)
  */

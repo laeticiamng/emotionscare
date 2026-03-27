@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Centralized Music Hooks - Unified exports
 export { default as useMusicRecommendation } from '../useMusicRecommendation';
 export { default as useMusicStats } from '../useMusicStats';

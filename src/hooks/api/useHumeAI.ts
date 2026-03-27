@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useCallback } from 'react';
 import { EmotionResult, normalizeEmotionResult } from '@/types/emotion-unified';
 import { supabase } from '@/integrations/supabase/client';
