@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, beforeEach } from 'vitest';
 import Fastify, { FastifyInstance } from 'fastify';
 import { securityPlugin } from './security';

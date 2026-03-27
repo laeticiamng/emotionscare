@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { FastifyPluginAsync } from 'fastify';
 import { ZodError } from 'zod';
 

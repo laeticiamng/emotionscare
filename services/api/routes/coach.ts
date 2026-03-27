@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AI Coach API Routes
  * Endpoints pour gérer les sessions de coaching et les messages

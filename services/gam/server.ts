@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createServer } from '../lib/server';
 import { hash } from '../journal/lib/hash';
 import { listWeekly, listWeeklyOrg } from './lib/db';

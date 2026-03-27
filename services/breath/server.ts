@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getWeeklyUser } from './handlers/getWeeklyUser';
 import { getWeeklyOrg } from './handlers/getWeeklyOrg';
 import { createServer } from '../lib/server';

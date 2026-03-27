@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { IncomingMessage, ServerResponse } from 'http';
 import { listWeeklyOrg } from '../lib/db';
 

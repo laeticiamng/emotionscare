@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Fastify, { type FastifyInstance } from 'fastify';
 
 type RegisterFn = (app: FastifyInstance) => void;

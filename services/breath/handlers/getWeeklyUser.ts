@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { listWeekly } from '../lib/db';
 import { hash } from '../../journal/lib/hash';

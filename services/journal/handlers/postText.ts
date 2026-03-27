@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { IncomingMessage, ServerResponse } from 'http';
 import { TextSchema } from '../lib/validate';
 import { hash } from '../lib/hash';

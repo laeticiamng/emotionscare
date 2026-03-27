@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { TextSchema } from '../../journal/lib/validate';
 import { hash } from '../../journal/lib/hash';

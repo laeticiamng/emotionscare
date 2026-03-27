@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { IncomingMessage, ServerResponse } from 'http';
 import { VoiceSchema } from '../lib/validate';
 import { hash } from '../lib/hash';

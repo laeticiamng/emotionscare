@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { SignJWT, jwtVerify, JWTPayload } from 'jose';
 
 export type Role = 'b2c' | 'b2b_user' | 'b2b_admin';

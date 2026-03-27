@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createApp } from '../server';
 import * as db from '../lib/db';

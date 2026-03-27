@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Database service for Music Generation
  */

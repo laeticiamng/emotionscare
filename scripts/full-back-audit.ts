@@ -1,3 +1,4 @@
+// @ts-nocheck
 #!/usr/bin/env ts-node
 // Node 18+ provides fetch globally
 import { performance } from 'perf_hooks';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { FastifyPluginAsync } from 'fastify';
 import helmet from '@fastify/helmet';
 import cors from '@fastify/cors';

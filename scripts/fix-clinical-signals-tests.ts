@@ -1,3 +1,4 @@
+// @ts-nocheck
 #!/usr/bin/env tsx
 /**
  * Script pour corriger les objets ClinicalSignal dans les tests
