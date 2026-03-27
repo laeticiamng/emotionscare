@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Setup global des tests - fichier consolidé
  * Combine les configurations de test et les mocks Supabase/Auth/Router

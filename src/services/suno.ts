@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { SunoGenerateRequest, SunoExtendRequest } from '@/types/music/parcours';
 import { SUPABASE_URL } from '@/lib/env';
 

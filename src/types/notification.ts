@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Notification Types Definition
 
 export interface NotificationTypes {

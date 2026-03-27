@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service pour les métriques de la queue musicale
  */

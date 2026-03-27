@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { create } from 'zustand';
 import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';

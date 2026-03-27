@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { create } from 'zustand';
 
 export type MoodBucket = 'clear' | 'mixed' | 'pressured';

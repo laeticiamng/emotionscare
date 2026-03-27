@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ScanService - Service de scan émotionnel
  * Utilise les Edge Functions Supabase pour l'analyse

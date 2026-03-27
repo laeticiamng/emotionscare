@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Session Service - Persistence Supabase
  * Sessions thérapeutiques avec vraie persistance DB

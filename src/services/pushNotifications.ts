@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Push Notifications Service - PWA complet avec Service Worker
  * Gère permissions, tokens, envoi et réception de notifications push

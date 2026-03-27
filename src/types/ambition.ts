@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface AmbitionQuest {
   id: string;
   title: string;

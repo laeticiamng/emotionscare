@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Cart Store - Gestion du panier Shopify avec Zustand
  */

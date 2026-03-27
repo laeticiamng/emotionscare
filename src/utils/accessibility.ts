@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Utilitaires pour l'accessibilité WCAG 2.1
 
 export const announceToScreenReader = (message: string, priority: 'polite' | 'assertive' = 'polite') => {

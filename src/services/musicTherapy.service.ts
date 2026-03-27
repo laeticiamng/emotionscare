@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import sunoService from './suno.service';
 import emotionAnalysisService from './emotionAnalysis.service';

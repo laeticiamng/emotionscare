@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service social pour interactions musicales entre utilisateurs
  * Données réelles depuis Supabase

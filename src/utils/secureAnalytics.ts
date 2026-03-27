@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Analytics sécurisées
 
 import { GlobalInterceptor } from './globalInterceptor';

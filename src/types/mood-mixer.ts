@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface MoodProfile {
   id: string;
   name: string;

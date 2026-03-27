@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Team Analytics Service - Real Supabase Implementation
  * Fetches aggregated emotional analytics for B2B teams

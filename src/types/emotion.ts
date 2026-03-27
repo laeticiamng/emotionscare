@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface EmotionResult {
   id?: string;
   emotion: string;

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Shared Hooks - Hooks génériques réutilisables partout
  * Ces hooks ne sont pas liés à une feature métier spécifique

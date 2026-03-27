@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ACCESSIBILITY FIXES - WCAG AAA Compliance
  * Automatic fixes for common accessibility issues

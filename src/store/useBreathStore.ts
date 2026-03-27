@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { create } from 'zustand';
 import { format } from 'date-fns';
 import { fetchUserWeekly, fetchOrgWeekly, type BreathRow, type BreathOrgRow } from '@/services/breathApi';

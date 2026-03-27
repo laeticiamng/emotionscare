@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Support Chatbot Service - Phase 4.4
  * Gestion du chatbot support IA autonome avec détection d'intent

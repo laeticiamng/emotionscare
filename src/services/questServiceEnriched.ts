@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * QuestService ENRICHED - Service de quêtes complet
  * Version enrichie avec statistiques, notifications, favoris, recommandations

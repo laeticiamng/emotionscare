@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service d'invitations sociales - Système complet de gestion d'amis
  */

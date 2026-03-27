@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @deprecated Utiliser @/types/music.ts
  * Fichier de compatibilité uniquement

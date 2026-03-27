@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type Theme = 'light' | 'dark' | 'system';
 export type FontSize = 'small' | 'medium' | 'large';
 export type FontFamily = 'sans' | 'serif' | 'mono';

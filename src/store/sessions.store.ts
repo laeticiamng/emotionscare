@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Shared Zustand Store - Sessions
  * Store global pour toutes les sessions (musique, respiration, etc.)

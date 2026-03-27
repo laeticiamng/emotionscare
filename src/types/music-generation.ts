@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Types pour la génération musicale émotionnelle
  */

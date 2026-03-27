@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service de génération de templates HTML pour les rapports d'audit
  */

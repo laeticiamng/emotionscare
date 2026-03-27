@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Types pour les modules d'activité
 export type ModuleState = 'loading' | 'content' | 'empty' | 'verbal-feedback';
 

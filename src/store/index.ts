@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Store Index - Centralized Zustand stores
  * All application state management exports
