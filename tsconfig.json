@@ -68,8 +68,6 @@
     "./types",
     "./tests",
     "./test",
-    "./services",
-    "./scripts",
     "./ci",
     "./tools",
     "./vitest.config.ts",
