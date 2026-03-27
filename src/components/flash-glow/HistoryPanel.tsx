@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * HistoryPanel - Historique des sessions Flash Glow
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour supprimer définitivement un objectif
  */

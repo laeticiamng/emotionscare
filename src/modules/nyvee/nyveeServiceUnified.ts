@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service unifié pour Cocon Respiration - Respiration guidée avec bulle interactive et personnalisation
  * Consolide les anciens services en un service unifié

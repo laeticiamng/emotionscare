@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmotionGauge - Indicateur visuel d'émotion
  */

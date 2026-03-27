@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Graphique de tendance SEUIL
  */

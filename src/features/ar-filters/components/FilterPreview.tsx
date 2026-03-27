@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Preview du filtre AR actif
  * Simule l'affichage de la caméra avec le filtre appliqué

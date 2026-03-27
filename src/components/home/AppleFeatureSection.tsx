@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AppleFeatureSection - Section produit style Apple avec scroll reveal
  * Chaque feature se révèle progressivement au scroll

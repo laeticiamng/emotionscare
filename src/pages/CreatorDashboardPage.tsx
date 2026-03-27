@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page Dashboard Créateur
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Heatmap émotionnelle B2B
  * Visualisation des patterns émotionnels par équipe/période

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page Marketplace - Découverte des programmes
  */

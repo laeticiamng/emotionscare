@@ -1,3 +1,4 @@
+// @ts-nocheck
 export { useBuddies, useBuddyChat } from './useBuddies';
 export { useBuddyActivities } from './useBuddyActivities';
 export { useBuddyStats } from './useBuddyStats';

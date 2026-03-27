@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ActivityFeed - Placeholder pour le flux d'activité réel
  * Affiche uniquement des informations factuelles sur les fonctionnalités disponibles

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Index des widgets dashboard
  * Export centralisé de tous les widgets

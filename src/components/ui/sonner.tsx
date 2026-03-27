@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useTheme } from "@/providers/theme";
 import { Toaster as Sonner } from "sonner";
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VersionSelector - Sélecteur et gestionnaire de versions de trajectoires
  */

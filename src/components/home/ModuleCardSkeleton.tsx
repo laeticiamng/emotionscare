@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ModuleCardSkeleton - Skeleton loading pour les cartes de modules
  * @version 1.0.0

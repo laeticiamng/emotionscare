@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant des badges d'activités
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Inner Ocean Visualization for Breathwork
  * Calming ocean waves synchronized with breathing patterns

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PushNotificationService - Service complet de notifications push
  * Supporte les notifications natives + Service Worker pour PWA

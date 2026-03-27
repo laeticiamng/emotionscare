@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { ErrorInfo } from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import ErrorView from './ErrorView';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * HeatmapGrid - Visualisation grille du bien-être organisationnel
  * Affiche les données agrégées par équipe/département

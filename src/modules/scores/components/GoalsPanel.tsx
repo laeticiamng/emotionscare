@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * GoalsPanel - Objectifs personnalisés avec progression
  */

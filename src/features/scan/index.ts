@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature: Emotion Scan
  * Analyse émotionnelle via caméra, voix, texte

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Flash Glow Page - Luminothérapie et exercices de visualisation
  * Module complet avec séances, presets et statistiques

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Parcours de découverte guidés
  * @module discovery

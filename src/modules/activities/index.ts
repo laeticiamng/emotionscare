@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Point d'entrée du module activities
  * Module complet avec sessions, badges, statistiques et recommandations

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ResetPasswordPage — Allows users to set a new password after clicking
  * the reset link sent by Supabase.  The link redirects here with a

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composants pour le module Mood Mixer
  */

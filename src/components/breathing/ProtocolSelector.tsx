@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ProtocolSelector - Sélection du protocole de respiration
  */

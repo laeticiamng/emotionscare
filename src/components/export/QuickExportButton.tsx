@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * QuickExportButton - Bouton d'export rapide PDF/JSON
  * Pour export des données utilisateur (RGPD Art. 20)

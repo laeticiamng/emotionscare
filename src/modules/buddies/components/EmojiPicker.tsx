@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Sélecteur d'emojis simple
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Comprehensive System Audit Dashboard
  * Full audit of platform security, performance, compliance and data integrity

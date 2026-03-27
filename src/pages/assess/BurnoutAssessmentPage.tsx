@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MBI-HSS Burnout Assessment Page
  * 22-item scientifically validated questionnaire

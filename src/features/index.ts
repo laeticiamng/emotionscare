@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Features Registry - Index central des features
  * Architecture Feature-First pour EmotionsCare

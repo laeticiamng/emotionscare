@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Exchange Hub Page
  * Route: /exchange

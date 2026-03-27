@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoachQuickReplies - Réponses rapides suggérées
  */

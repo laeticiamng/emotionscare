@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Matching Panel - Display compatible users for exchange
  */

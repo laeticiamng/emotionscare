@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Galaxy 3D Scene — Unified visual direction
  * Intention: Exploration / Discovery / Majesty

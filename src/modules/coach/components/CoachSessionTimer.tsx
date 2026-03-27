@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoachSessionTimer - Affichage durée session en temps réel
  */

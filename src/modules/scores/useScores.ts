@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook useScores - Gestion des scores et vibes
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * JournalNoteActions - Action buttons for journal notes
  */

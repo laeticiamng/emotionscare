@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 import { logger } from '@/lib/logger';

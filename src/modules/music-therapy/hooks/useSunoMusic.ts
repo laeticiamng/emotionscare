@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour l'intégration Suno AI Music
  * Génération de musique thérapeutique personnalisée

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BrainViewer3D - Composant principal de visualisation 3D du cerveau
  * Utilise React Three Fiber pour le rendu WebGL

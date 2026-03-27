@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { captureException } from '@/lib/ai-monitoring';

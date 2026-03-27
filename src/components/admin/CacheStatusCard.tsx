@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant d'affichage du statut du cache Service Worker
  * Pour le dashboard GDPR

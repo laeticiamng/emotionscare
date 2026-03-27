@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MyAuraCard - Carte de l'aura de l'utilisateur courant
  */

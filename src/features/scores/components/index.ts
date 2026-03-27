@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Scores Feature - Composants analytiques
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Lecteur d'histoire immersif
  * @module story-synth

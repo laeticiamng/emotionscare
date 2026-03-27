@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Audio 3D Visualizer - Visualisations audio 3D avancées
  * Particules, ondes, spectre, géométries

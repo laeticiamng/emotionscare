@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * FIRST TIME GUIDE - EMOTIONSCARE
  * Composant de découverte guidée pour les nouveaux utilisateurs

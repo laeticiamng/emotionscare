@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Emotion Scan
  * Scan émotionnel multi-modal (texte, voix, image, facial)

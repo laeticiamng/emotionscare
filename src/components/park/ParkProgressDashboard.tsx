@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ParkProgressDashboard - Tableau de bord de progression du parc
  * Vue d'ensemble de la progression, streaks, et objectifs

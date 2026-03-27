@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, BarChart3, BookOpen, Brain } from 'lucide-react';

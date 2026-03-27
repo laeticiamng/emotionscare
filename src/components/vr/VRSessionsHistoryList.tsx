@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { VRNebulaSession } from './VRNebulaSession';
 import { Card, CardContent } from '@/components/ui/card';

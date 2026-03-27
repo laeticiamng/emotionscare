@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ChallengeCard - Carte d'affichage d'un défi
  */

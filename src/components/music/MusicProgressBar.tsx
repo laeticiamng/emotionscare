@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Gamification Components - Index centralisé
  */

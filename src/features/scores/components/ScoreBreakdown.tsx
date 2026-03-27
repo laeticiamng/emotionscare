@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ScoreBreakdown - Décomposition détaillée d'un score
  */

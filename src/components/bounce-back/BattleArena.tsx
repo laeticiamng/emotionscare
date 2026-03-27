@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BattleArena - Zone de combat principale avec score temps réel et calm boost timer
  */

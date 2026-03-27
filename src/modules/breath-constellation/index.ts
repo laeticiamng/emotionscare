@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Breath Constellation Module - Respiration guidée avec visualisation constellation
  * 

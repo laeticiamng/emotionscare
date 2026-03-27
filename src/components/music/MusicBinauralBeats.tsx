@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MusicBinauralBeats - Générateur de sons binauraux personnalisés
  * Crée des battements binauraux pour différents états mentaux

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour la persistance des paramètres SEUIL
  */

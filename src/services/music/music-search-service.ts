@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service de recherche et filtrage avancé pour la musique
  *

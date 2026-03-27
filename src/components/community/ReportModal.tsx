@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { Flag, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

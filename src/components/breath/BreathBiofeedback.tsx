@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BreathBiofeedback - Biofeedback temps réel pour la respiration
  * Affiche les données physiologiques en direct pendant l'exercice

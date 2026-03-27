@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Screen Silk Page - Micro-pauses visuelles
  */

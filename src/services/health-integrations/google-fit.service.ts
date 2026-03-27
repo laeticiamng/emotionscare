@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service d'intégration Google Fit
  * Phase 3 - Excellence

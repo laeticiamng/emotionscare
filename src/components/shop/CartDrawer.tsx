@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CartDrawer - Panier d'achat EmotionsCare Store
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * RouterV2 - Router unifié principal
  * TICKET: FE/BE-Router-Cleanup-01

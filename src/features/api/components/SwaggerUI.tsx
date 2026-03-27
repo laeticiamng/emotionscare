@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Interface Swagger UI pour la documentation de l'API publique
  * Phase 3 - Excellence

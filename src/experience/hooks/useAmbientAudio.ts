@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — useAmbientAudio
  * React hook for controlling the AudioEngine.

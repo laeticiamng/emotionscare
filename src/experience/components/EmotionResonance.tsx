@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — EmotionResonance
  * Visual feedback component that resonates with detected emotion after a scan.

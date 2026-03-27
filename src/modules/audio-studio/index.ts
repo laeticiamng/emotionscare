@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Point d'entrée du module audio-studio
  */

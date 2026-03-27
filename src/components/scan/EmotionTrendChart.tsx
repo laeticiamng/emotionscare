@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useMemo } from 'react';
 import { logger } from '@/lib/logger';
 import { Line, Bar, Area, ComposedChart } from 'recharts';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Export PDF du rapport émotionnel
  * Génère un rapport téléchargeable

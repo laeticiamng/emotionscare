@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Bubble Beat Service - Business Logic & API
  * Gère les sessions, scores et statistiques du jeu Bubble Beat

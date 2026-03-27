@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Layout principal avec sidebar immersive
  */

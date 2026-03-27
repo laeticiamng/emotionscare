@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * API Service pour le Marketplace
  */

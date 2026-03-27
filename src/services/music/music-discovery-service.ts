@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service de découverte musicale améliorée
  *

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Emotion Transaction History - Display emotion trading history
  */

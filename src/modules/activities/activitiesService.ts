@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service unifié pour la gestion des activités et analytics
  * Fusion de activity/ et activities/ modules

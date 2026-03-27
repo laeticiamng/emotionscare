@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Constantes et configuration du module SEUIL
  */

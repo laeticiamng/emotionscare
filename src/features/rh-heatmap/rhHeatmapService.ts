@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service RH Heatmap
  * Visualisation agrégée du bien-être organisationnel

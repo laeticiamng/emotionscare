@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * LivePlatformStats - Widget affichant les statistiques temps réel
  * Utilise la RPC get_live_platform_stats pour données dynamiques

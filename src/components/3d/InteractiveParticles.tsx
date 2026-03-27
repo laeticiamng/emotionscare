@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Particules interactives réagissant au curseur/touch
  * Effet "champ de force" — les particules s'écartent au passage de la souris

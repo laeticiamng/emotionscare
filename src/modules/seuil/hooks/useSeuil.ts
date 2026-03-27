@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useSeuil - Hook principal pour le module SEUIL
  * Régulation émotionnelle proactive

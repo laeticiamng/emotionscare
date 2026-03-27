@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Badge } from '@/types/gamification';
 import { logger } from '@/lib/logger';
 

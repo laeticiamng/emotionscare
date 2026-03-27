@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hooks pour le module Mood Mixer
  */

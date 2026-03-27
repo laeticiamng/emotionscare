@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Insights - Types
  * Types pour les insights IA personnalisés

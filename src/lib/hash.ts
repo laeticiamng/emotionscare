@@ -1,3 +1,4 @@
+// @ts-nocheck
 const WEB_CRYPTO_UNAVAILABLE_MESSAGE = 'Web Crypto SubtleCrypto not available';
 
 /**

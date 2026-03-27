@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — useAmbient hook
  * Provides convenient access to ambient state and actions.

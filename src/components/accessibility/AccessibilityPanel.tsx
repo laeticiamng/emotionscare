@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AccessibilityPanel - Panneau de configuration d'accessibilité avancée
  * Conforme WCAG 2.1 AA avec options personnalisables

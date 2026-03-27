@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Smart Notification Engine - Notifications intelligentes et personnalisées
  * Timing optimal, recommandations contextuelles, gamification

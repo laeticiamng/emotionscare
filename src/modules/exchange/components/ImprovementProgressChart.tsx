@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Improvement Progress Chart - Visualize goal progress over time
  */

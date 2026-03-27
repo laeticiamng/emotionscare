@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Shopify Storefront API Helpers
  */

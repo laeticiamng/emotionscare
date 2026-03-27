@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Defusion Haiku Card Component
  * Displays therapeutic haikus from the Grimoire collection

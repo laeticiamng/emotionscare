@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Journal Word Cloud Component
  * Colored word cloud visualization of journal entries

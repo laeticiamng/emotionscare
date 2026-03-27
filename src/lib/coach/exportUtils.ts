@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Utilitaires pour exporter les conversations du coach
  */

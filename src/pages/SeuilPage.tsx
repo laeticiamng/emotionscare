@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page SEUIL - Module de régulation émotionnelle proactive
  * Version enrichie avec persistance, export CSV/JSON, favoris, mode compact

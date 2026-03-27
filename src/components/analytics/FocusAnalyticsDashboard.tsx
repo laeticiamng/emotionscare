@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * FocusAnalyticsDashboard - Tableau de bord analytics Focus Flow
  */

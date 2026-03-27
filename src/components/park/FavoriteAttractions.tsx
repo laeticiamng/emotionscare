@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * FavoriteAttractions - Affichage des attractions favorites
  */

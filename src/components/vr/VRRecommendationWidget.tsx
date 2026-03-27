@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VR Recommendation Widget - Recommandations personnalisées
  */

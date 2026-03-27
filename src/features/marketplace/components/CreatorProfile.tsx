@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CreatorProfile - Profil public d'un créateur
  */

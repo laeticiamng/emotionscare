@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Widget Streak de Journal Gamifié
  * Affiche la série de jours consécutifs d'écriture

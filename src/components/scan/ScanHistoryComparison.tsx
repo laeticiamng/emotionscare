@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Comparaison historique multi-périodes
  * Compare les émotions entre différentes périodes

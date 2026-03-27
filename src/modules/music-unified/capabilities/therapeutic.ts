@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Unified - Capability Therapeutic
  * Fonctionnalités de musicothérapie

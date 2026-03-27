@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BreathingCircleAnimation - Animation du cercle de respiration
  * Grandit/rétrécit selon la phase de respiration

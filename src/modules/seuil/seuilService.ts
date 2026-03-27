@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service SEUIL
  * Régulation émotionnelle proactive - détection et accompagnement

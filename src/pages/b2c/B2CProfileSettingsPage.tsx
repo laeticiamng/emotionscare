@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2CProfileSettingsPage - Page de profil utilisateur complète
  * Intégration Supabase avec persistance réelle

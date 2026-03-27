@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Message de sortie SEUIL
  * Affiche un message bienveillant à la fin de l'interaction

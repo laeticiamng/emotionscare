@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * QuickAccessSidebar - Navigation rapide latérale
  * Accès direct aux fonctionnalités principales

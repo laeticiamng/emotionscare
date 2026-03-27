@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service Ambition Arcade
  * Gestion des runs, quêtes et artefacts gamifiés

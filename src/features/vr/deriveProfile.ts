@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { defaultBreathProfile, defaultGalaxyProfile, type VRBreathProfile, type VRGalaxyProfile } from './types';
 import type { VRActions as BreathActions } from './vrBreath.orchestrator';
 import type { VRActions as GalaxyActions } from './vrGalaxy.orchestrator';

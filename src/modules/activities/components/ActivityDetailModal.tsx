@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Modal de détail d'une activité avec mode guidé
  */

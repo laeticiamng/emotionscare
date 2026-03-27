@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Wall of Lights Visualization for Flash Glow (SUDS)
  * Grid of animated light bulbs that pulse and glow

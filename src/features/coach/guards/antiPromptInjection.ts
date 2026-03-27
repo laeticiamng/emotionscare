@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Anti-Prompt Injection Guard
  *

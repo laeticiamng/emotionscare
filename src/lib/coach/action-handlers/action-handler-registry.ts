@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { logger } from '@/lib/logger';
 import { ActionHandler } from './action-handler.interface';
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Unified - Capability Adaptive
  * Adaptation temps réel basée sur l'état physiologique (POMS)

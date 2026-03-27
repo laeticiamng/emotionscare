@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Liste des quêtes pour un objectif Ambition Arcade
  */

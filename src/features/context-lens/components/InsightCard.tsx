@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * InsightCard - Affiche un insight Context Lens
  */

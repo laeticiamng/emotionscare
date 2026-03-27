@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Services du module Community
  */

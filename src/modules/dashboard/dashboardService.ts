@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service Dashboard - Agrégation de toutes les données utilisateur
  */

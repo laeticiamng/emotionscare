@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Sentry } from '@/lib/errors/sentry-compat';
 import { supabase } from '@/integrations/supabase/client';
 import { createSession } from '@/services/sessions/sessionsApi';

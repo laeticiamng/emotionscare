@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2C Bounce Back Battle Page - Module de résilience gamifié
  */

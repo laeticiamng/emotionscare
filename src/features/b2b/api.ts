@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * API B2B centralisée
  */

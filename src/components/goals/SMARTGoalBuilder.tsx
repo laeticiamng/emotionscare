@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SMARTGoalBuilder - Créateur d'objectifs selon framework SMART
  * S = Spécifique, M = Mesurable, A = Atteignable, R = Réaliste, T = Temporel

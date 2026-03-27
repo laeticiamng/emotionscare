@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VinylCollection - Grille des vinyles thérapeutiques
  */

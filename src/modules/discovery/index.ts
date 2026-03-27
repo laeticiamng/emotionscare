@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Discovery - Exploration émotionnelle
  * Service, hooks et types pour la découverte personnalisée

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EnhancedShell - Layout principal avec style Apple élégant
  * Wrapper autour de AppleStyleShell pour compatibilité

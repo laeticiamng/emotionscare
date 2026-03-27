@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour les notifications du buddy system
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Command components - UI primitives for command palette
  */

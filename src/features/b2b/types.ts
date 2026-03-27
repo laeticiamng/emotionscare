@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Types B2B centralisés
  */

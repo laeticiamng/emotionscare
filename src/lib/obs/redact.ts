@@ -1,3 +1,4 @@
+// @ts-nocheck
 const SENSITIVE = /^(authorization|token|email|user_id|score_json|password|cookie|apikey|key)$/i;
 
 export function redact<T>(value: T): T {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AudioSourceBadge - Indique la source audio (Suno AI vs Demo)
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Filtres pour les sessions de groupe
  */

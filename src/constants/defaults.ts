@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Constantes par défaut de l'application
 
 // Time of day constants

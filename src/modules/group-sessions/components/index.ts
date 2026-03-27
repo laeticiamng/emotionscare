@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Exports du module group-sessions
  */

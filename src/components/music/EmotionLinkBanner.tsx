@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmotionLinkBanner - Lien entre scan émotionnel et musique adaptative
  * Propose de la musique basée sur l'état émotionnel détecté

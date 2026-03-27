@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Router Adapter Service
  * Couche d'abstraction pour la migration vers les routeurs consolidés

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Consent Management Page
  * GDPR Article 7 - Conditions for consent

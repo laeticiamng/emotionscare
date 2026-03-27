@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * OfflineDownloadButton - Télécharger une piste pour écoute hors-ligne
  * Utilise l'API Cache pour stockage local

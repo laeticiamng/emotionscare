@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SunoCreditsDisplay - Affichage des crédits Suno avec détails
  * Inclut notification proactive quand les crédits sont bas

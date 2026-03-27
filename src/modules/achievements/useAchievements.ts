@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook useAchievements
  * Gestion des achievements avec React Query

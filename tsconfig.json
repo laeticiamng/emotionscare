@@ -56,19 +56,7 @@
     "src/**/*.e2e.test.ts",
     "src/**/*.e2e.test.tsx",
     "tests/e2e",
-    "supabase",
-    "src/hooks/**/*",
-    "src/lib/**/*",
-    "src/services/**/*",
-    "src/components/**/*",
-    "src/contexts/**/*",
-    "src/features/**/*",
-    "src/core/**/*",
-    "src/store/**/*",
-    "src/layouts/**/*",
-    "src/i18n/**/*",
-    "scripts/**/*",
-    "services/**/*"
+    "supabase"
   ],
   "include": [
     "./src",

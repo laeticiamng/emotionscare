@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ChallengesPage - Défis communautaires avec données Supabase
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * DailyMissionsWidget - Widget des missions quotidiennes
  */

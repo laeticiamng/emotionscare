@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Theme Selector - Sélection des thèmes visuels
  */

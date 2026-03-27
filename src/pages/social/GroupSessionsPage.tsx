@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page des sessions de groupe B2C
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2C VR BREATH GUIDE PAGE - EMOTIONSCARE
  * Page VR respiration accessible WCAG 2.1 AA

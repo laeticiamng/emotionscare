@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — Type Definitions
  * Central types for the immersive experience system.

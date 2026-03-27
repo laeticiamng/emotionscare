@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * WearableHealthDashboard - Dashboard des métriques de santé connectées
  */

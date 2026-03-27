@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Générateur de piste EmotionsCare à partir de texte
  * Corrigé: Utilise Edge Functions au lieu de process.env

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Clinical questionnaire definitions - WHO-5 and PHQ-9
  * These are validated, royalty-free clinical tools

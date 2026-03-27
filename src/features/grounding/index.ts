@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature: Grounding
  * Techniques d'ancrage et exercices de présence

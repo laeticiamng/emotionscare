@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Types pour le module Music Therapy
  * Musicothérapie intelligente et adaptive

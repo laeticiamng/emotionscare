@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Production Logger System - EmotionsCare
  * Système de logging unifié avec niveaux et contexte

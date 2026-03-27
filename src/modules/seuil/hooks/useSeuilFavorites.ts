@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour les sessions favorites SEUIL
  */

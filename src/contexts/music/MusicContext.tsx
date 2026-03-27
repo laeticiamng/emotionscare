@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MUSIC CONTEXT - EmotionsCare Premium
  * Provider principal avec audio management

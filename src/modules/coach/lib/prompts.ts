@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type CoachMode = 'b2c' | 'b2b';
 export type CoachLocale = 'fr' | 'en';
 

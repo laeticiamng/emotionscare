@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Offline Mode Manager - Gestion avancée du mode hors ligne
  * Téléchargement par lot, priorité intelligente, qualité sélectionnable

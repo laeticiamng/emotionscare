@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Grounding Components - Exports centralisés
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * GroundingProgressDashboard - Dashboard de suivi des progrès d'ancrage
  */

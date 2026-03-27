@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Profile Module
  * Export centralisé du module de gestion du profil

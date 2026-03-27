@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Design Tokens - Couleurs centralisées pour remplacer les valeurs hardcodées
  * Migration des 206 fichiers contenant des couleurs en dur

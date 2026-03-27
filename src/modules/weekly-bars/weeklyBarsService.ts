@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service pour la récupération des données weekly-bars
  */

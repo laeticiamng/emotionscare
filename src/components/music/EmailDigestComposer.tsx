@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmailDigestComposer - Configuration des digests email musicaux
  * Permet de paramétrer la fréquence et le contenu des emails

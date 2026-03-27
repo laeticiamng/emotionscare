@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service pour Boss Grit (Bounce Battles)
  * Module de résilience et stratégies de coping

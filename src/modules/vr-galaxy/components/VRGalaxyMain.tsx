@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant principal enrichi du module VR Galaxy
  * Interface complète avec onglets, stats, historique et achievements

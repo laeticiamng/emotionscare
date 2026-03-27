@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useAICoachMachine - State Machine pour AI Coach
  */

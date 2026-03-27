@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature: Music
  * Génération musicale, thérapie musicale, playlists

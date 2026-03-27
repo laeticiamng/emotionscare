@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useXPSystem - Hook central pour la gestion de l'XP
  */

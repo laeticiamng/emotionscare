@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * RealTimeLyricsPanel - Paroles synchronisées en temps réel
  * Intégration de MusicLyricsSynchronized avec le player

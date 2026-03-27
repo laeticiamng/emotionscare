@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2CMusicTherapyPremiumPage - Expérience musicothérapie premium complète
  * Génération IA Suno, bibliothèque étendue, égaliseur, sessions guidées

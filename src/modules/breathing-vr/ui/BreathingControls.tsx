@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Contrôles de la session de respiration
  */

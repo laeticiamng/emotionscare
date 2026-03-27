@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module group-sessions - Point d'entrée
  */

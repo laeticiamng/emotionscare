@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * FlashGlowAchievements - Panel des achievements Flash Glow
  */

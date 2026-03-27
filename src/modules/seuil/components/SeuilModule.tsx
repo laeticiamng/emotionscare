@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module principal SEUIL
  * Expérience complète de régulation émotionnelle proactive

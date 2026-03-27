@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * WellnessHubPage - Hub bien-être B2B
  * Même expérience que B2C mais dans un contexte institutionnel

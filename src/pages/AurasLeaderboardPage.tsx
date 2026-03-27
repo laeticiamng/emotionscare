@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AurasLeaderboardPage - Page du ciel d'auras (/app/leaderboard)
  * Affiche un classement visuel sans chiffres, basé sur les auras

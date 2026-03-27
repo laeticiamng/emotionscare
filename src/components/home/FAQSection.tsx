@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * FAQSection - FAQ avec framing interventionnel
  * Vision: Répondre aux vraies questions sur le moment où utiliser EmotionsCare

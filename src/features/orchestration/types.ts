@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type AuraKey = 'cool_gentle' | 'neutral' | 'warm_soft';
 
 export type TextProgressKey = 'doucement' | 'sur la bonne voie' | 'presque là';

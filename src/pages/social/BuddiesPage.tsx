@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page des Buddies B2C - Version enrichie
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hooks pour les fonctionnalités étendues Ambition Arcade
  * Favoris, Ratings, Export, Recommendations

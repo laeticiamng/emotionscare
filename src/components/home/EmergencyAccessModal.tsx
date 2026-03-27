@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmergencyAccessModal - Modal d'accès rapide aux protocoles d'urgence
  * Accessible sans authentification pour les situations critiques

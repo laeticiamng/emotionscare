@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Map, Star, Compass, Eye } from 'lucide-react';

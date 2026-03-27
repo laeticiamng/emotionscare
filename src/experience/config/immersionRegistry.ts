@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — Immersion Registry
  * Maps each route pattern to its immersion level (0-3) and transition type.

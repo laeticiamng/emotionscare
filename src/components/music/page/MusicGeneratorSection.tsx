@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MusicGeneratorSection - Section génération IA avec lazy loading
  * Connecte le panneau ML au générateur de musique

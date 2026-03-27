@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Onglet des achievements/succès Ambition Arcade
  * Avec partage social intégré

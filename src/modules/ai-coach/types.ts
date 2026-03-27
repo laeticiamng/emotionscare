@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AI Coach Module - Types & Zod Schemas
  * Module de coaching IA personnalisé

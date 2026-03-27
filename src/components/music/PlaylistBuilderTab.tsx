@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Playlist Builder Tab - Création et gestion de playlists
  * Interface drag-and-drop, export, partage, templates

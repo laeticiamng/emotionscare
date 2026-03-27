@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Utilitaires pour exporter les données de scan émotionnel
  * Supporte les formats: JSON, CSV

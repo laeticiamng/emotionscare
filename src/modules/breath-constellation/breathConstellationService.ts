@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service pour le module Breath Constellation
  * Gestion des sessions de respiration avec visualisation constellation

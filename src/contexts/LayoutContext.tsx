@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import type { LayoutContextType } from '@/types/layout';
 

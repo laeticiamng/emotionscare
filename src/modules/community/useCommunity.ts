@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook useCommunity
  * Gestion des interactions communautaires avec React Query

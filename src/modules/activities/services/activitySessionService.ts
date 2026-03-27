@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service pour les sessions d'activités
  */

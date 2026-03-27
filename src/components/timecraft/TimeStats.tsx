@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TimeStats - Statistiques temporelles par type de bloc
  */

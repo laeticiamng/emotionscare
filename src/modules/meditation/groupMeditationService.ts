@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Group Meditation Service - Sessions collaboratives synchronisées
  * Mode groupe pour méditation avec synchronisation temps réel

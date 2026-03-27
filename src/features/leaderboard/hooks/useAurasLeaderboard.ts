@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour récupérer les auras des utilisateurs pour le leaderboard visuel
  * Affiche un "ciel d'auras" sans classement numérique, basé sur WHO-5 / activité

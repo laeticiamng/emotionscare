@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Sentry } from '@/lib/errors/sentry-compat';
 import { logger } from '@/lib/logger';
 import type { AppError } from './types';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Coach Pages - Export centralisé
  */

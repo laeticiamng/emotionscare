@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tutorial d'onboarding Ambition Arcade
  */

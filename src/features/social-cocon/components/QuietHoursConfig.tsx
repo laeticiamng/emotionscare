@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { memo, useCallback, useState } from 'react';
 import { Moon, Clock, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';

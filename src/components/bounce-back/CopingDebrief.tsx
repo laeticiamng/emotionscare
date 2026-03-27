@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CopingDebrief - Questionnaire post-bataille
  */

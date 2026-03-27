@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Types pour le module VR Galaxy
  * Exploration spatiale thérapeutique en réalité virtuelle

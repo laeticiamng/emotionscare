@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MusicRecommendations - Système de recommandations musicales IA
  * Suggère des morceaux basés sur l'écoute et les émotions

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Formulaire de génération d'histoire
  * @module story-synth

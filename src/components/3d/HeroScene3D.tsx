@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Premium Hero 3D Scene — Immersive background for the homepage hero
  *

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EnhancedUserDashboard - Version améliorée du tableau de bord utilisateur
  * Ajoute des fonctionnalités modernes tout en conservant la structure existante

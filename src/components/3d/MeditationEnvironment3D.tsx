@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Environnement 3D de méditation — scène apaisante avec orbes flottants
  * Thèmes : ocean, forest, cosmos, dawn

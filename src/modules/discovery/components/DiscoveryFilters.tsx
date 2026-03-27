@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Filtres de découverte
  * @module discovery

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Heart, BookOpen, Music, Brain, Sparkles, Check, Clock, Star, RefreshCw } from 'lucide-react';

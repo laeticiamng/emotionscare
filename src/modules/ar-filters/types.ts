@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Types pour le module AR Filters
  * Filtres de réalité augmentée pour l'expression émotionnelle

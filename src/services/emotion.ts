@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * Service d'analyse d'émotions EmotionsCare

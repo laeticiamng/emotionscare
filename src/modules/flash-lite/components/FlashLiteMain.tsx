@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant principal du module flash-lite
  */

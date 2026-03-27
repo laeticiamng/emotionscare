@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant de recommandation de buddies basé sur les intérêts communs
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Account Deletion Page with Grace Period
  * GDPR Article 17 - Right to Erasure

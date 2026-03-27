@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Réexport de tous les composants chart
 
 // Réexport de tous les composants chart

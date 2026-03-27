@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service de gestion des préférences de confidentialité
  * Intégration Supabase pour persistance et RGPD

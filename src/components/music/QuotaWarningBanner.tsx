@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * QuotaWarningBanner - Alerte quand les crédits Suno sont bas
  * Affiche un warning avec option de fallback

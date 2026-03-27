@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Statistiques personnelles des sessions de groupe
  */

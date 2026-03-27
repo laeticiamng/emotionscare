@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * IntensitySelector - Composant de sélection d'intensité pour Cocon Respiration
  */

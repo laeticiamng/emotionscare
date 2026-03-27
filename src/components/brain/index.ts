@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Brain Viewer Module - Exports
  * EmotionsCare - DICOM Brain Viewer

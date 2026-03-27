@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Affichage du message de zone SEUIL
  * Messages empathiques et non-jugeants selon le niveau

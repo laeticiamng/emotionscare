@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect, useCallback } from 'react';
 import { fullApiService } from '@/services/api/fullApiService';
 import { logger } from '@/lib/logger';

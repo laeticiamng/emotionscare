@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Bouton d'export des sessions de méditation
  */

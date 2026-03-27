@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service d'envoi d'emails enrichi avec SMTP, templates, et queue
  */

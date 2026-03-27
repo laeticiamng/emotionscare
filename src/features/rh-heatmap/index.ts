@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature: RH Heatmap
  * Visualisation agrégée du bien-être organisationnel

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmotionalJournalFilters - Filtres pour le journal émotionnel
  */

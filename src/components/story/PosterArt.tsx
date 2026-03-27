@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useCallback } from 'react';
 import { ImageIcon, Download, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';

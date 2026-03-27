@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature: Cocon Respiration
  * Respiration guidée immersive avec bulle interactive

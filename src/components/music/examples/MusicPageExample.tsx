@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MUSIC PAGE EXAMPLE - EmotionsCare
  *

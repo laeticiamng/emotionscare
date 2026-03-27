@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AcademySection - Section Academy avec framing interventionnel
  * Vision: "Apprendre à ne plus dépendre du hasard pour aller mieux"

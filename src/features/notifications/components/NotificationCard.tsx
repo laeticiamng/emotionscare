@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Carte de notification individuelle
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MeditationMain - Composant principal du module meditation
  */

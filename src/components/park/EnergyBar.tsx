@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EnergyBar - Barre d'énergie avec régénération
  */

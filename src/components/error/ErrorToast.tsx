@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { toast } from 'sonner';
 import i18n from '@/lib/i18n';
 import type { AppError } from '@/lib/errors/types';

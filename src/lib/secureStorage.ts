@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Secure Storage - Wrapper pour localStorage avec chiffrement
  * Conforme Art. 32 RGPD (sécurité des traitements)

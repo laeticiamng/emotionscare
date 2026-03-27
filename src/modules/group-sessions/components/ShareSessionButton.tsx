@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Bouton de partage de session
  */

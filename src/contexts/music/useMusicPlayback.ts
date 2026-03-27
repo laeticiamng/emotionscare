@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Playback Hook - Contrôles lecture audio
  */

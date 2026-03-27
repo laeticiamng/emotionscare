@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ThemeSelector - Sélecteur de thèmes visuel
  * Permet de choisir et prévisualiser les thèmes

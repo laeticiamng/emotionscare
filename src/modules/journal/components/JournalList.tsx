@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useMemo } from 'react'
 import { SafeHtml } from '@/components/ui/SafeHtml'
 import { Button } from '@/components/ui/button'

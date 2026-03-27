@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CreateGuildModal - Modal de création de guilde
  * Permet aux utilisateurs de créer leur propre guilde

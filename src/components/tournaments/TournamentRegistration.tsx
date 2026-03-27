@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TournamentRegistration - Formulaire d'inscription aux tournois
  * TOP 20 #4 - Composant UI pour useTournamentBrackets

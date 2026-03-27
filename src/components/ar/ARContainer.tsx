@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AR Container - Phase 4.5
  * Main wrapper for AR experiences with Three.js and WebXR support

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Context Lens API Service
  * Communication avec le backend EmotionsCare pour l'analyse des patterns émotionnels

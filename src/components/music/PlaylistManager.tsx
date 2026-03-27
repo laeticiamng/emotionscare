@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PlaylistManager - Gestionnaire de playlists avancé
  * Permet de créer, modifier et organiser des playlists

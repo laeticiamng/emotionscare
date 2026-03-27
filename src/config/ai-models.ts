@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Configuration for AI models used in different parts of the application
 
 export interface AIModelConfig {

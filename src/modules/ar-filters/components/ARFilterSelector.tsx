@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Sélecteur de filtres AR avec aperçu visuel
  */

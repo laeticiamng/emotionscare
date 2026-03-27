@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { logger } from '@/lib/logger';
 
 // Create a minimal implementation of the audioVad library

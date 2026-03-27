@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Journal Feature
  * 

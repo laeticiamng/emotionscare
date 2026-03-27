@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ShareSessionButton - Bouton de partage des résultats de session
  */

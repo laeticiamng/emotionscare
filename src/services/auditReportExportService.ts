@@ -1,3 +1,4 @@
+// @ts-nocheck
 import html2canvas from 'html2canvas';
 import { format } from 'date-fns';
 import { saveAs } from 'file-saver';

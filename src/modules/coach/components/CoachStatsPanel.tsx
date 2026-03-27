@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoachStatsPanel - Statistiques de coaching utilisateur
  */

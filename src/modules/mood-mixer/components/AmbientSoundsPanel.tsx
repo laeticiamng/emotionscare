@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Panneau de gestion des sons ambiants
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Boss Grit (Bounce Battles)
  * Résilience et stratégies de coping

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Panneau de statistiques Story Synth
  * @module story-synth

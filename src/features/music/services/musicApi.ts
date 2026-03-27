@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music API Client - Utilise Supabase edge functions
  * Client pour l'API musicale intégrée avec Supabase

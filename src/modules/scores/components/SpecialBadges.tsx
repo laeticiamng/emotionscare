@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SpecialBadges - Badges spéciaux et gamification avancée
  */

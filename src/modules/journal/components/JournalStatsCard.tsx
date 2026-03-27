@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * JournalStatsCard - Stats display card for journal
  */

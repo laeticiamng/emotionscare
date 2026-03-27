@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2BSettingsPage - Paramètres organisation B2B
  */

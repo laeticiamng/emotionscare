@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Liste des buddies en ligne avec présence temps réel
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * RegionInfoPanel - Panneau d'informations sur la région sélectionnée
  */

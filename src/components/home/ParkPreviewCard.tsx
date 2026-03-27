@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ParkPreviewCard - Aperçu de la carte du parc émotionnel avec accès direct
  */

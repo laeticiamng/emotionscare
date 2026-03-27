@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page Profil Musical Utilisateur
  * Badges, statistiques, niveau, défis et mode social

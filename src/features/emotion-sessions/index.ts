@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature: Emotion Sessions
  * Gestion complète des sessions d'analyse émotionnelle

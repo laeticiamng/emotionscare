@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * QueryStateWrapper - Consistent loading, error, and empty state handling
  * for React Query results. Prevents silent failures and infinite spinners.

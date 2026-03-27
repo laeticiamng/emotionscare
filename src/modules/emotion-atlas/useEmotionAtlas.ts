@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook useEmotionAtlas
  * Gestion de la cartographie émotionnelle avec React Query

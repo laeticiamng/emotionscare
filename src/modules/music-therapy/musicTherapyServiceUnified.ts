@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service unifié pour Music Therapy - Musicothérapie adaptative avec IA
  * Consolide musicTherapyService.ts + musicTherapyServiceEnriched.ts

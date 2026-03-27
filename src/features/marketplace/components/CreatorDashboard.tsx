@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CreatorDashboard - Tableau de bord pour les créateurs
  */

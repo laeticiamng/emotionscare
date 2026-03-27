@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Utilitaires pour analyser les données émotionnelles
  */

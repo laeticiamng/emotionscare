@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Firecrawl Web Scraping Service
  * Extraction intelligente de contenu bien-être

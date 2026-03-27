@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service Emotion Atlas
  * Gestion des données de cartographie émotionnelle

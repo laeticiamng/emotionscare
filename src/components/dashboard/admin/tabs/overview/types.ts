@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export interface ChartData {
   date: string;

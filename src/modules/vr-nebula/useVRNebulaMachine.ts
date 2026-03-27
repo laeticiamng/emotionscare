@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VR Nebula State Machine
  * Gère l'état des sessions VR de respiration

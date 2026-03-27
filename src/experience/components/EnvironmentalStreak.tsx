@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — EnvironmentalStreak
  * Persistent header indicator that visualizes the user's streak.

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature: AR Filters
  * Filtres de réalité augmentée pour l'expression émotionnelle

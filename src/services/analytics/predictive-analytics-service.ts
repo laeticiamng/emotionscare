@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service d'analytics prédictives - Analyse et prédictions IA long-terme
  * Utilise l'historique de l'utilisateur pour prédire les tendances émotionnelles

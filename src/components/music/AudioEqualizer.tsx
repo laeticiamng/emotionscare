@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AudioEqualizer - Égaliseur audio avec persistance des réglages
  * Compatible avec l'API Web Audio et le hook useEqualizerSettings

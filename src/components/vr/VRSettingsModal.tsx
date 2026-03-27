@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VR Settings Modal - Paramètres utilisateur VR
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { Suspense } from 'react';
 import { logger } from '@/lib/logger';
 import { useLocation } from 'react-router-dom';

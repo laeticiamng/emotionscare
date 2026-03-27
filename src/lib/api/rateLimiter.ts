@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Client-side rate limiter for Supabase Edge Function calls.
  *

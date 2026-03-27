@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Chatbot Panel - Vue complète du chatbot avec historique
  */

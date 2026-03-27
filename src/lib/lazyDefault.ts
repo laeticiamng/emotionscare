@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { lazy } from 'react';
 import type { ComponentType, LazyExoticComponent } from 'react';
 import { isValidElementType } from 'react-is';

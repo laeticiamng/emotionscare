@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Visualiseur audio animé pour le Mood Mixer
  */

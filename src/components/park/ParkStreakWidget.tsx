@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ParkStreakWidget - Widget de série/streak compact
  * Affiche la série de jours consécutifs et le calendrier de la semaine

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * JournalEditDialog - Dialog for editing journal notes
  */

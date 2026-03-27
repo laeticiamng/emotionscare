@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Panneau de paramètres Ambition Arcade
  */

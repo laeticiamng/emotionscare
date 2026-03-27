@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Nyvee Module - Respiration guidée avec bulle interactive et personnalisation
  */

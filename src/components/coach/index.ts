@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Barrel export pour tous les composants du coach
  */

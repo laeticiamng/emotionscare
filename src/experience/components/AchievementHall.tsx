@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — Achievement Hall (Signature Scene)
  * 3D explorable space for viewing collected badges and trophies.

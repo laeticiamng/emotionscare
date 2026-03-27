@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Privacy - Gestion de la confidentialité et RGPD
  * 

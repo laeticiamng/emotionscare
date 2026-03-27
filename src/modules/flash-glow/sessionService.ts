@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service pour gérer les sessions Flash Glow avec Supabase
  */

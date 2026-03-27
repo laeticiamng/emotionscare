@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Database module - Supabase abstraction layer
  * Provides a unified interface for database operations

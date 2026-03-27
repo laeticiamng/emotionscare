@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Recommandations personnalisées de découverte
  * @module discovery

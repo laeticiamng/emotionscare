@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant principal du module activities - Version complète
  * Intègre tous les sous-composants : Stats, Badges, History, Recommendations

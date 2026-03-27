@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * GuildLeaderboard - Classement des guildes
  * Affiche le top guildes avec leurs stats

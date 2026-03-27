@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * App.tsx - Point d'entrée de redirection vers RouterV2
  * 

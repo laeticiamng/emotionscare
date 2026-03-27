@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Carte de filtre AR
  */

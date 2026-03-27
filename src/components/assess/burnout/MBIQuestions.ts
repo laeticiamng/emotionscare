@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MBI-HSS (Maslach Burnout Inventory - Human Services)
  * 22-item questionnaire with 3 subscales

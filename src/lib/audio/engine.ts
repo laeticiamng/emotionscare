@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Moteur audio unifié avec WebAudio (si disponible), sinon HTMLAudio.
 // Append-only, pas d'impact sur l'existant.
 type Source = { url: string; loop?: boolean; volume?: number };

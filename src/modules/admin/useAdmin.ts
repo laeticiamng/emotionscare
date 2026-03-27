@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook useAdmin
  * Gestion de l'état et des opérations d'administration

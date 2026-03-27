@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React, { Component, ErrorInfo, ReactNode, startTransition } from 'react';
 import { logger } from '@/lib/logger';

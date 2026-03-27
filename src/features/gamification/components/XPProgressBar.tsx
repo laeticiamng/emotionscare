@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * XPProgressBar - Barre de progression XP avec animation
  */

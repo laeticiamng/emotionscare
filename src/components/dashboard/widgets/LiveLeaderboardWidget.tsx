@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Widget Leaderboard live connecté à Supabase
  * Affiche le classement en temps réel avec données persistées

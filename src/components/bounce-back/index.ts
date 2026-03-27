@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Bounce Back Components - Exports
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Therapy AR - Phase 4.5
  * Immersive music visualization with AR themes

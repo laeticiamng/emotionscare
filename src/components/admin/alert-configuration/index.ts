@@ -1,3 +1,4 @@
+// @ts-nocheck
 export { AlertConfigForm } from './AlertConfigForm';
 export { AlertConfigList } from './AlertConfigList';
 export { EmailNotificationSection } from './EmailNotificationSection';

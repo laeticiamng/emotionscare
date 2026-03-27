@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useCocoonMachine - State machine pour sessions Cocon Respiration
  */

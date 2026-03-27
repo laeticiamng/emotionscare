@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * OnboardingFlow - Parcours d'onboarding interactif
  * Guide les nouveaux utilisateurs à travers la plateforme

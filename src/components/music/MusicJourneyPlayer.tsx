@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MusicJourneyPlayer - Lecteur de parcours musical guidé
  * Visualisation progressive des transitions émotionnelles

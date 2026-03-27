@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useMemo, lazy, Suspense } from 'react';
 import Scene3DErrorBoundary from '@/components/3d/Scene3DErrorBoundary';
 

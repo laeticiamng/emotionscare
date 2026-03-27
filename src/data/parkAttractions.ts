@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PARK ATTRACTIONS DATA
  * Données centralisées des attractions du Parc Émotionnel

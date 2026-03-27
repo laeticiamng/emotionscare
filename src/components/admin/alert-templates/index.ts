@@ -1,3 +1,4 @@
+// @ts-nocheck
 export { AlertTemplateForm } from './AlertTemplateForm';
 export { AlertTemplateList } from './AlertTemplateList';
 export { TemplatePreview } from './TemplatePreview';

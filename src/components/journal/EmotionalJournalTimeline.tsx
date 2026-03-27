@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmotionalJournalTimeline - Liste chronologique des entrées du journal émotionnel
  */

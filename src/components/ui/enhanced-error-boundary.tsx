@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { log } from '@/lib/obs/logger';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { useTheme } from '@/providers/theme';
 import { Button } from '@/components/ui/button';

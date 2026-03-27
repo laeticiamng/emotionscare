@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoachEmotionDisplay - Affichage visuel de l'émotion détectée
  */

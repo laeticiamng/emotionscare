@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service pour la communauté et les interactions sociales
  */

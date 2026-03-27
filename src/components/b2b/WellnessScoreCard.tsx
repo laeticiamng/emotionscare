@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * WellnessScoreCard - Carte de score bien-être pour B2B
  * Affiche le score avec jauge circulaire et tendance

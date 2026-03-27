@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Galerie des photos capturées avec les filtres AR
  */

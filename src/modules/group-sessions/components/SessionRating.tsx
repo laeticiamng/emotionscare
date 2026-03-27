@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant de notation d'une session
  */

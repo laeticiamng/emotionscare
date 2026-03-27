@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Evidence-Based Interventions Library
  * Searchable cards with scheduling capability

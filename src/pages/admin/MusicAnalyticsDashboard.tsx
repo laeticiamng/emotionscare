@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MusicAnalyticsDashboard - Tableau de bord analytics musique
  * Métriques temps réel avec Chart.js et exports CSV

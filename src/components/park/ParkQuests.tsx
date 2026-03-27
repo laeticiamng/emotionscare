@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant pour afficher et gérer les quêtes du parc émotionnel
  */

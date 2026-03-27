@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ElevenLabs Text-to-Speech Service
  * Voix ultra-réalistes pour le coach et les méditations

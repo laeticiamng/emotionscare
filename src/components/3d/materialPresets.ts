@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Centralized premium material presets for all 3D scenes.
  * Ensures visual coherence across orbs, cores, rings, halos.

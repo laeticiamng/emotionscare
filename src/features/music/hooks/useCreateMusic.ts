@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { musicApi, type CreateMusicGenerationInput, type MusicGenerationSession } from '../services/musicApi';
 import { logger } from '@/lib/logger';

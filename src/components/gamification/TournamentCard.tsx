@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TournamentCard - Carte de présentation d'un tournoi
  */

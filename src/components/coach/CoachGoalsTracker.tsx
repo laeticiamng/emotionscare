@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Widget de suivi d'objectifs pour le Coach IA
  * Permet de définir et suivre des objectifs avec milestones

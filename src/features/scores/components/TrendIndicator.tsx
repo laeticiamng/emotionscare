@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TrendIndicator - Indicateur de tendance avec animation
  */

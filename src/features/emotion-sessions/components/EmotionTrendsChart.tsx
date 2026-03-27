@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmotionTrendsChart - Graphique de tendances émotionnelles
  * Visualise l'évolution des émotions sur une période

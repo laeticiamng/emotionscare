@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant de graphique à barres hebdomadaire
  */

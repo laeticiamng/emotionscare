@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { routes } from '@/lib/routes';

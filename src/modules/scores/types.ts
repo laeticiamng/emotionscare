@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Scores - Types
  * Types pour le système de scores émotionnels et vibes

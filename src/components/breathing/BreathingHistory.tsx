@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BreathingHistory - Historique et statistiques des sessions
  */

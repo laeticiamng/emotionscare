@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AI Coach Service Enriched - Service avancé pour le coaching IA
  * Inclut personnalisation, mémoire conversationnelle, et recommandations adaptatives

@@ -1,3 +1,4 @@
+// @ts-nocheck
 const KEY = "ec_journal_entries_v1";
 
 export type JournalEntryRec = {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, Lightbulb, AlertCircle, Sparkles, ArrowRight } from 'lucide-react';

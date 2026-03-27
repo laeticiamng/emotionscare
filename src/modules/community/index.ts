@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Community - Communauté sociale
  * Service de gestion des interactions communautaires

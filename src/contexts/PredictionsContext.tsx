@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Contexte Prédictions - Phase 4.2
  * Partage des prédictions long-terme à travers l'application

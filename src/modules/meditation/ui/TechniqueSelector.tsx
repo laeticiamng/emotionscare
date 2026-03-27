@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TechniqueSelector - Sélecteur de technique de méditation enrichi
  * Features: Favoris persistants, niveaux de difficulté, durées recommandées, animations

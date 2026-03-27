@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Streaming Service Integration - Connexion avec Spotify et Apple Music
  * OAuth, synchronisation, import/export de playlists

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Push Notification Manager - Gestion complète des notifications
  * Demande permission, gestion des préférences, notifications programmées

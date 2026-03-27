@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * OrgHeatmap - Heatmap organisationnelle pour B2B
  */

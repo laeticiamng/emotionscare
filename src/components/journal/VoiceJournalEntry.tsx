@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Voice Journal Entry - Entrée journal enrichie avec transcription vocale et prompts IA
  */

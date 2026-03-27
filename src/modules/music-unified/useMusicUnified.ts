@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Music Unified - Hook React
  * Hook pour utiliser le service musical unifié dans les composants

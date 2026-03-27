@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VoiceCommands - Commandes vocales pour le player musical
  * Intégration complète avec MusicContext

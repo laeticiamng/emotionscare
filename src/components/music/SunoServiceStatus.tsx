@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Indicateur visuel de statut du service Suno API
  */

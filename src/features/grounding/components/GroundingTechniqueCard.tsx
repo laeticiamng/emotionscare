@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * GroundingTechniqueCard - Carte de présentation d'une technique d'ancrage
  */

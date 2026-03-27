@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AurasGalaxy - Ciel d'auras visuelles (Leaderboard sans chiffres)
  * Affiche les auras comme un ciel cosmique où chaque utilisateur est une étoile

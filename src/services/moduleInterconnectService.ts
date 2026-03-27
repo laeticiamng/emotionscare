@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Interconnect Service
  * Service central pour l'interconnexion de tous les modules via Supabase

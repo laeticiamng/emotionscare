@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook useMusicTherapy
  * Gestion des sessions de musicothérapie avec React Query

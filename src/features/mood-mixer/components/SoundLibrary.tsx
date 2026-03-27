@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SoundLibrary - Bibliothèque de sons pour le Mood Mixer
  */

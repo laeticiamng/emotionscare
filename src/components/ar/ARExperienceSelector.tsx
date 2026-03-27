@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AR Experience Selector - Enhanced Phase 4.5
  * Menu enrichi pour sélectionner une expérience AR

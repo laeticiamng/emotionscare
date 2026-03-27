@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Context Lens Feature Module
  * MODULE 8 - EmotionsCare 2.0

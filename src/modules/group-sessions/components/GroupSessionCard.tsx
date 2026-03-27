@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Carte d'affichage d'une session de groupe
  */

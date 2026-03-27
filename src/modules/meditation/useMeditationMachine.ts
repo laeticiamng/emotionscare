@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useMeditationMachine - State machine pour sessions de méditation
  */

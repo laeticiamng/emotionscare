@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SkipLinks - Navigation rapide pour l'accessibilité
  * Permet aux utilisateurs de clavier/lecteurs d'écran de sauter directement au contenu

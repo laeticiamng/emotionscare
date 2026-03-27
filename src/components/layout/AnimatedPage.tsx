@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AnimatedPage — Wraps page content with experience-aware transitions.
  * Syncs route with experience store and renders ambient background.

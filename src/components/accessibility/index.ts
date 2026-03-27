@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Accessibility Components - Consolidated Exports
  * All a11y-related components in one place

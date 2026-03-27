@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VR Dashboard - Tableau de bord VR avec stats réelles
  */

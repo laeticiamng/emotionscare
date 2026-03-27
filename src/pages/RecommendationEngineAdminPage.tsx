@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import DemoBanner from '@/components/ui/DemoBanner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

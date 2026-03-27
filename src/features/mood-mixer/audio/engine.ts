@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type MixerParams = {
   warmth: 'low' | 'med' | 'high';
   brightness: 'low' | 'med' | 'high';

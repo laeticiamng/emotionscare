@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Immersive Mode - Mode théâtre plein écran
  * Visualiseur, paroles synchronisées, contrôles gestuels

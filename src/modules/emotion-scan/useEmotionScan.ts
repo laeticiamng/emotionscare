@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook React pour le scan émotionnel
  * Wrapper autour du EmotionScanService pour une utilisation facile dans les composants

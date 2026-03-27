@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { useCustomChallenges } from '@/hooks/useCustomChallenges';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

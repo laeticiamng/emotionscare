@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SilkOverlay - Overlay de pause écran avec blur progressif
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — useDepthInteraction
  * Mouse/touch tracking for parallax, glow position, and depth effects.

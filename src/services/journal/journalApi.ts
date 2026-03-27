@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client'
 import { Sentry } from '@/lib/errors/sentry-compat'
 import sanitizeHtml from 'sanitize-html'

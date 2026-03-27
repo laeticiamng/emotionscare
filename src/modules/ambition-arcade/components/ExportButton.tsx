@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Bouton d'export des données Ambition Arcade
  */

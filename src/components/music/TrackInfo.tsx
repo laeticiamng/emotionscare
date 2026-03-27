@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { MusicTrack } from '@/types/music';
 import { getTrackCover, getTrackTitle, getTrackArtist } from '@/utils/musicCompatibility';

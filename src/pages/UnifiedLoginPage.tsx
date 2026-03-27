@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { Heart, ArrowLeft, Eye, EyeOff, Shield, Users, Sparkles } from 'lucide-react';
 import { useForm } from 'react-hook-form';

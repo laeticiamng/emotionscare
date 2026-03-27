@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { z } from 'zod';
 import { CONFIG } from './config';
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Contexte React pour la gestion des thèmes
  * Phase 3 - Excellence

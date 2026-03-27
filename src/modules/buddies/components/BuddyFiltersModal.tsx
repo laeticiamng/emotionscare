@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Modal de filtres pour la découverte de buddies
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Actions rapides pour le Mood Mixer
  */

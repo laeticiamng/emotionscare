@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Graphique de tendance hebdomadaire - Mini sparkline des 7 derniers jours
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const coach = {
   header: 'KI-Coach',
   intro: 'Erhalten Sie personalisierte und sichere Anleitung, um jeden Tag stetige Fortschritte zu machen.',

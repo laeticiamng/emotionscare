@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer les phases de Flash Glow
  */

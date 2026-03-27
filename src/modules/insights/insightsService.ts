@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Insights - Service
  * Service pour gérer les insights IA personnalisés

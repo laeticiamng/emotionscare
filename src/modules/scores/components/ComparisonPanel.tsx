@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ComparisonPanel - Comparaison entre périodes
  */

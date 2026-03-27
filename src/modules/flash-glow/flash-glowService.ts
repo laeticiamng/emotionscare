@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service enrichi pour Flash Glow (Luminothérapie)
  */

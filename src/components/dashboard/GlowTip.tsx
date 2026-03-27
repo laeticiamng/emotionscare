@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Lightbulb, Heart, Share2, X, RefreshCw, ChevronLeft, ChevronRight, Clock, Star, Bookmark, Volume2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';

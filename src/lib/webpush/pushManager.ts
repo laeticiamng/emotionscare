@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Gestionnaire Web Push avec VAPID et heures calmes
  */

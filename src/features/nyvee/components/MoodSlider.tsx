@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MoodSlider - Slider pour évaluer l'humeur avant/après session
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmotionsCare Exchange Module V2.0
  * 

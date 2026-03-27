@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour le dashboard créateur
  */

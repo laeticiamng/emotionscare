@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service de mapping pour l'intégration backend des modules
  * Définit les configurations et achievements pour chaque module

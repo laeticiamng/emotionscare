@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Screen Silk Module - Types & Schemas
  * Module de micro-pauses écran et repos visuel

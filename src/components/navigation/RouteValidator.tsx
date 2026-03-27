@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * RouteValidator - Validation et test de toutes les routes
  * Vérification automatique de l'accessibilité

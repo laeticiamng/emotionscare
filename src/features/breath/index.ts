@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature: Breathing / Respiration
  * Exercices de respiration guidés

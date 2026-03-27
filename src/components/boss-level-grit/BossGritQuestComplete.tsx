@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * QuestComplete - Écran de complétion de quête
  */

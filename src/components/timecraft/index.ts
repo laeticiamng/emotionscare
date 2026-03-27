@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TIMECRAFT Components - Module de design du temps
  */

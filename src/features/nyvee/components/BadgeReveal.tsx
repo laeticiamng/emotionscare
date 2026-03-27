@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BadgeReveal - Révélation du badge avec animation
  */

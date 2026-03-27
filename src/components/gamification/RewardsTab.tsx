@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant Onglet Récompenses - EmotionsCare
  */

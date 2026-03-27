@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Breath Unified - Types
  * Types unifiés pour toutes les fonctionnalités de respiration

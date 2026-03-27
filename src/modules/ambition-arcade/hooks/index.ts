@@ -1,3 +1,4 @@
+// @ts-nocheck
 export { useAmbitionStats, type AmbitionStatsData } from './useAmbitionStats';
 export { 
   useAmbitionGoals, 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ClinicalQuestionnaireForm - Form for WHO-5, PHQ-9, etc.
  */

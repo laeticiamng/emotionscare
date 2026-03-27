@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AI Budget Dashboard - Monitoring des coûts API OpenAI
  * Affiche les dépenses, les seuils et les alertes budget

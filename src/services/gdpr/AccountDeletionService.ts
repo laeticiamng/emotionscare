@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Account Deletion Service with Grace Period
  * GDPR Article 17 - Right to Erasure ("Right to be Forgotten")

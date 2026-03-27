@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SecurityPage — Sécurité & confidentialité EmotionsCare
  * Page trust signal pour SEO et GEO

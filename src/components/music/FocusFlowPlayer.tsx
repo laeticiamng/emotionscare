@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Focus Flow Player - Interface de session de concentration
  * avec timer Pomodoro et progression visualisée

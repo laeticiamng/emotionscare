@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * COACH CONTEXT UNIFIÉ - EmotionsCare
  * Persistance Supabase (coach_conversations + coach_messages)

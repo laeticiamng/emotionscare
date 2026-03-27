@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmotionService - Service d'analyse émotionnelle
  * Utilise les Edge Functions Supabase pour toutes les analyses

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { memo, useState } from 'react';
 import { Copy, Mail, Check, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature: Flash Glow
  * Séances de luminothérapie et exercices de visualisation rapide

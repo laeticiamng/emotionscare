@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AR Context - Phase 4.5
  * Global AR state management

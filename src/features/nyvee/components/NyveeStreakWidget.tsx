@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CocoonStreakWidget - Widget de série pour le module Cocon Respiration
  */

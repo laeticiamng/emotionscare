@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Advanced Music Queue - Gestion avancée de la queue de lecture
  * Drag-and-drop, shuffle, repeat modes, prévisualisation

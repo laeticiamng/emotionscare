@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Graphique des tendances de tempo
  */

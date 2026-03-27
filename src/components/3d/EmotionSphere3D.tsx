@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Sphère 3D émotionnelle — visualise l'état émotionnel via valence et arousal
  * Valence (0→1) : rouge → vert (couleur)

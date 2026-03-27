@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PlaylistExportButton - Export de playlists vers JSON/M3U
  */

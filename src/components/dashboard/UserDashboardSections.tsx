@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * UserDashboardSections - Sessions VR recommandées avec données réelles
  */

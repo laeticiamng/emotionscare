@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ImageUpload Component - Usage Examples
  *

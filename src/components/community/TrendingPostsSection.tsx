@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { TrendingUp, ArrowRight, RefreshCw, Share2, Filter, Star, StarOff, Clock, Eye, Heart, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';

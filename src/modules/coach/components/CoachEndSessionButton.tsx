@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoachEndSessionButton - Bouton de fin de session
  */

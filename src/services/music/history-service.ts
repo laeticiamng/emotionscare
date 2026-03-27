@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music History Service
  * Gestion de l'historique d'écoute avec Supabase

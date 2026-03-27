@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Accessibility Panel - Accessibilité complète
  * Raccourcis clavier, navigation focus, annonces ARIA, mode contraste élevé

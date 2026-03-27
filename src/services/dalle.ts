@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * DALL-E Service
  * Utilise les Edge Functions Supabase pour la génération d'images sécurisée

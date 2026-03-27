@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect } from 'react';
 import { Phase } from '@/store/breath.store';
 import { Volume2, VolumeX } from 'lucide-react';

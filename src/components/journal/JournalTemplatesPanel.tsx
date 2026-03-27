@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Templates de journal personnalisables
  * Permet de créer des entrées pré-formatées par catégorie

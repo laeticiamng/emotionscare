@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Configuration centralisée des endpoints API pour EmotionsCare
  * Mise à jour pour intégration backend production

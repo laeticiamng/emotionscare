@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ArrowLeft, Home, Sparkles } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 

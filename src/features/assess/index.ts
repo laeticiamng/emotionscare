@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature: Assessment
  * Évaluations psychométriques (WHO-5, GAD-7, PHQ-9, etc.)

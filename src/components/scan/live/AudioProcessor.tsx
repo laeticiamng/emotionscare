@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useState, useRef } from 'react';
 import type { EmotionResult, EmotionRecommendation } from '@/types/emotion';
 

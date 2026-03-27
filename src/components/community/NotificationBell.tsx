@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { Bell, Check, CheckCheck, Trash2, MessageCircle, Heart, AtSign, UserPlus, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';

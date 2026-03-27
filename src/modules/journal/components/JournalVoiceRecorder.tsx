@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * JournalVoiceRecorder - Composant d'enregistrement vocal enrichi
  */

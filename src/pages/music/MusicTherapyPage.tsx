@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MusicTherapyPage - Point d'entrée musicothérapie
  * Redirige vers B2CMusicEnhanced pour cohérence

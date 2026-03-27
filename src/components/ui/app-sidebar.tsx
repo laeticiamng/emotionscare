@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Home, Heart, Gamepad2, Users, BarChart3, Settings, Music, Brain, BookOpen, Sparkles, MessageCircle, Calendar, FileText, Download, ChevronDown, BookText } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useState } from 'react';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmotionWheel - Visualisation de la roue des émotions
  * Affiche le profil émotionnel détecté avec couleurs

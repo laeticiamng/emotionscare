@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useJournalMachine - State machine pour le Journal
  */

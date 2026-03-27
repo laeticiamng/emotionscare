@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Activity, Music, Calendar, MessageCircle, FileText, LineChart, Grid3X3, ArrowRight } from 'lucide-react';

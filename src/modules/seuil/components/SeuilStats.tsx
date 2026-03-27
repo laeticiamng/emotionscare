@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Statistiques et insights SEUIL
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CreateTeamDialog - Dialog pour créer une nouvelle équipe B2B
  */

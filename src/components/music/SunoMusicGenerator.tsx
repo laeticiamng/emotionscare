@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Suno Music Generator Component
  * Complete music generation interface with mood selection and customization

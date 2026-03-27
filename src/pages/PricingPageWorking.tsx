@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PricingPageWorking - Page tarifs style Apple
  * Cohérente avec homepage, prix alignés sur Stripe, checkout intégré

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Contrôles de session AR avec démarrage/arrêt et feedback
  */

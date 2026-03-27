@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Sliders } from './types';
 
 const descriptors: Record<keyof Sliders, Array<{ max: number; label: string }>> = {

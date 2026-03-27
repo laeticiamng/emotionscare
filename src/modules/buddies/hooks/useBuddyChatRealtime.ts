@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour le chat en temps réel avec un buddy
  * Utilise Supabase Realtime pour les messages

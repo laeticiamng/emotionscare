@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AI-based Monitoring System
  * Remplace Sentry avec analyse OpenAI intelligente

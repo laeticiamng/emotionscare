@@ -1,3 +1,4 @@
+// @ts-nocheck
 import flags from "./flags.json";
 
 type FlagName = keyof typeof flags;

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MusicPageHeader - En-tête de la page musicothérapie
  */

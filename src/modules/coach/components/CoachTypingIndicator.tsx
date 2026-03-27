@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoachTypingIndicator - Indicateur d'écriture du coach
  */

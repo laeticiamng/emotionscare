@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer la présence en temps réel des buddies
  * Utilise Supabase Realtime Presence

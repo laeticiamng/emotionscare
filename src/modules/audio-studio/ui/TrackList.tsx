@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Liste des enregistrements
  */

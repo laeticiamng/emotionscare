@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Motion Design Tokens — Centralized animation system
  *

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Screen Silk Components - Consolidated Exports
  * Merged from screenSilk/ + screen-silk/

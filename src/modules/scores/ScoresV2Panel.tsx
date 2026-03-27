@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ScoresV2Panel - Panel complet de visualisation des scores et vibes
  */

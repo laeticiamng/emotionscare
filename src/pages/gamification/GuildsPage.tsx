@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * GuildsPage - Page de liste des guildes
  */

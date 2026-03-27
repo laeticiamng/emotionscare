@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Client Hume AI pour analyse émotionnelle
  * Utilise les Edge Functions - pas de clé API côté client

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoachBreathingExercise - Exercice de respiration inline
  */

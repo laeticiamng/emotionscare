@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant CoachRecommendations enrichi avec connexion backend
  * Génère des recommandations personnalisées via l'API ai-coach

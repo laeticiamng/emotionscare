@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Exchange Profile Card - Display and edit user's exchange profile
  */

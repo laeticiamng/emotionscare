@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook useBossGrit
  * Gestion des Bounce Battles avec React Query

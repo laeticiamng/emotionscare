@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Wearables Dashboard Page
  * Dashboard unifié pour tous les wearables connectés

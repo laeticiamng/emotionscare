@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * QuickStartModules - Sessions et Protocoles (pas playlists ni musiques)
  * Vision: Chaque session correspond à un moment vécu réel

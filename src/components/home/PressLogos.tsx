@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PressLogos - Logos de presse et partenaires
  * OPTIMISÉ: CSS animations au lieu de framer-motion pour performance

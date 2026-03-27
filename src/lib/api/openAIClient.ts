@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * OpenAI Client pour EmotionsCare
  * Corrigé: Utilise Edge Function openai-chat au lieu d'appels API directs

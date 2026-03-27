@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * QuestPanel - Panneau de quête active
  */

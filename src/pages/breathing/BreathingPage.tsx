@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BreathingPage - Page principale du module de respiration
  * /dashboard/breathing

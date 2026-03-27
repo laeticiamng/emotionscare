@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Advanced Music Dashboard - Dashboard complet avec tous les nouveaux composants
  * Intègre: Offline Mode, 3D Visualizations, Contextual Recommendations

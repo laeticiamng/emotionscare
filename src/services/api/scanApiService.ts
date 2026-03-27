@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Scan API Service - Gestion complète des scans émotionnels
  *

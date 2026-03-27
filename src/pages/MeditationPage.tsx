@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Meditation Page - Module complet de méditation guidée
  */

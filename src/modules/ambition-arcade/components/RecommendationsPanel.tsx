@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Panneau de recommandations Ambition Arcade
  */

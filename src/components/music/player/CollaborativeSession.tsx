@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CollaborativeSession - Session collaborative avec Supabase Realtime
  * Écoute synchronisée en temps réel

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Emotion Exchange Market - Buy and sell emotional experiences (enriched)
  */

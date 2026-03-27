@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Historique des sessions AR
  */

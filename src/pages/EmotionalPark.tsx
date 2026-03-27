@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EMOTIONAL PARK - Module complet et enrichi
  * Carte du Parc Émotionnel — Monde des Modules

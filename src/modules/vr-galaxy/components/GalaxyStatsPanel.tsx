@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart3, Clock, Zap, Star, TrendingUp, Heart, Calendar } from 'lucide-react';

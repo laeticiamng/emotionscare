@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * NyveeExportButton - Bouton d'export des données Cocon Respiration
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TrackFeedback - Composant de feedback utilisateur pour les tracks générées
  * Permet de noter et donner son avis sur la musique

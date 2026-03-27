@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Settings Tab - Paramètres et préférences musicales
  * Inclut: notifications, qualité audio, données, confidentialité

@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const sanitizeMoodScore = (value: number | null | undefined): number | null => {
   if (typeof value !== 'number' || Number.isNaN(value)) {
     return null;

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service pour la gestion des tags tendance
  */

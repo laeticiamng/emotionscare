@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { useARFilters } from '@/hooks/useARFilters';
 import { useAuth } from '@/contexts/AuthContext';

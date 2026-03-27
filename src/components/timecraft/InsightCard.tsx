@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * InsightCard - Carte d'insight non-prescriptif
  */

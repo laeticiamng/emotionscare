@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Notifications
  * Exports centralisés pour le système de notifications

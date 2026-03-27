@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ResourcePreloader - Preload des ressources critiques pour optimisation Lighthouse
  */

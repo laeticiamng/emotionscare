@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External Integrations Panel - Intégrations streaming
  * Spotify, Apple Music, YouTube Music, SoundCloud

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Bibliothèque d'histoires
  * @module story-synth

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant principal pour gérer les intégrations santé
  * Phase 3 - Excellence

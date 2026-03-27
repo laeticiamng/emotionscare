@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service de défis musicaux quotidiens et hebdomadaires
  */

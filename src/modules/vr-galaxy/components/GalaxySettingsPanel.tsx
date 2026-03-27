@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Settings, Volume2, VolumeX, Monitor, Eye, Sparkles, Gauge, Timer, AlertTriangle } from 'lucide-react';

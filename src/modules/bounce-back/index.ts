@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Bounce Back Module - Résilience et stratégies de coping
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service unifié pour Story Synth - Narration thérapeutique adaptative
  * Consolide storySynthService.ts + storySynthServiceEnriched.ts

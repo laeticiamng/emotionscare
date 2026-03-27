@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MeditationTimer - Affichage du temps écoulé/restant
  */

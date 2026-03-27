@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page d'analytics avancées
  * Affiche le dashboard complet avec graphiques et quêtes

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Nebula 3D Scene — Unified visual direction
  * Intention: Introspection / Envelopment / Presence

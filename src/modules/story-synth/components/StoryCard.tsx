@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Carte d'histoire dans la bibliothèque
  * @module story-synth

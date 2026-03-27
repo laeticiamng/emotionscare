@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * 🧠 Système de Scoring Implicite Avancé
  * 

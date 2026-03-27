@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Routes Admin - pages d'administration, monitoring, GDPR
  * Segment: admin

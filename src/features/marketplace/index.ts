@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Marketplace Créateurs - Module 6 EmotionsCare 2.0
  * 

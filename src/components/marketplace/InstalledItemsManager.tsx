@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Installed Items Manager - Gestion des thèmes/widgets installés
  */

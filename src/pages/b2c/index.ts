@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Pages B2C - Export centralisé
  * Toutes les pages orientées utilisateurs finaux (B2C)

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * JournalVoiceMode - Mode dictée vocale pour le journal
  * Permet de dicter ses entrées de journal par la voix

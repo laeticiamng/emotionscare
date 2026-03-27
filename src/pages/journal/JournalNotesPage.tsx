@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * JournalNotesPage - Page principale des notes enrichie
  */

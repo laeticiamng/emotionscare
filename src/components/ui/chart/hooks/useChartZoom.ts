@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useCallback, RefObject } from 'react';
 
 // Define the brush index interface

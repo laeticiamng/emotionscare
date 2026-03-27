@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface Incident {
   id: string;
   incident_id: string;

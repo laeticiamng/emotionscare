@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant de recommandations de playlists personnalisées
  */

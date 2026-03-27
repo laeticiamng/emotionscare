@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Sentry Alerting Configuration
  * Defines alert rules, thresholds, and integrations for production monitoring

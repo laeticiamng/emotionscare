@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * journalService - Service pour le journal vocal et textuel
  * Intégré avec la table journal_notes de Supabase

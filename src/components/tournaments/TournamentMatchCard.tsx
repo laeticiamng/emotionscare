@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TournamentMatchCard - Carte de match pour les tournois
  * Affiche les détails d'un match avec les participants

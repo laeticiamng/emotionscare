@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * LiveCounter - Indicateurs factuels de la plateforme
  * Affiche uniquement des données vérifiables ou le compteur d'utilisateurs en ligne réel

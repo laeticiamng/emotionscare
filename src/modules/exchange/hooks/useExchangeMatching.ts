@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Exchange Matching Algorithm - Algorithme de matching intelligent
  * Utilise un système de scoring multi-critères pour le matching

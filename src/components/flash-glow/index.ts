@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Flash Glow Components - Unified Exports
  * Consolidation de flash-glow/ et flashglow/

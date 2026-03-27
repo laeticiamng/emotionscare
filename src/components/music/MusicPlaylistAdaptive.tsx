@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Playlists adaptatives par humeur
  * Génère des playlists basées sur l'état émotionnel

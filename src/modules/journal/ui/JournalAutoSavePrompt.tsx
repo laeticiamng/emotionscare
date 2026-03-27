@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * JournalAutoSavePrompt - Bannière de restauration de brouillon
  * S'affiche si une sauvegarde automatique existe

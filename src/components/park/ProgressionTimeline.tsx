@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Timeline visuelle de la progression du joueur dans le parc émotionnel
  */

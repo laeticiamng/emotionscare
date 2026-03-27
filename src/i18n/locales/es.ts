@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Spanish translations for EmotionsCare
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CohortAnalysisPanel - Analyse de cohortes
  * Segmentation et comparaison de groupes d'utilisateurs

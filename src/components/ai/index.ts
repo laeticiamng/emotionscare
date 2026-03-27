@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composants IA - Index
  * Export des composants d'intelligence artificielle

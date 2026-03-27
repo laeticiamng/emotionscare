@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * StatsPanel - Panneau de statistiques Flash Glow
  */

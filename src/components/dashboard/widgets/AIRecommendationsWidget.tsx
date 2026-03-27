@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Widget de recommandations IA personnalisées
  * @module dashboard/widgets

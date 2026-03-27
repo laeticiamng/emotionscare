@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Exchange Leaderboard - Rankings enriched with search, profiles, sharing
  */

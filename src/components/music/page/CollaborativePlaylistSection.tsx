@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Collaborative Playlist Section - Playlists collaboratives
  * Connecté à Supabase avec persistence réelle

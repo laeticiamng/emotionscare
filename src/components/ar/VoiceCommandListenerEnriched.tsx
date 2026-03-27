@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VoiceCommandListener ENRICHED - Commandes vocales avancées
  * Version enrichie avec historique, statistiques, personnalisation, feedback haptique

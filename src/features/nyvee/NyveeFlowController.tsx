@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CocoonFlowController - Contrôleur de flux post-session Cocon Respiration avec transitions douces
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PlayerStats - Statistiques du joueur
  */

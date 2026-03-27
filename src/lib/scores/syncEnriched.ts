@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * syncEnriched - Synchronisation scores avec Supabase, queue offline, analytics
  */

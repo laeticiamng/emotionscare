@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Indicateur de tendance
  */

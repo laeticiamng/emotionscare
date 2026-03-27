@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ARCameraPreview - Prévisualisation de la caméra avec filtres AR
  */

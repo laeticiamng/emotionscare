@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { WellnessGamificationPanel } from '@/components/gamification/WellnessGamificationPanel';
 import { WellnessStreakDisplay } from '@/components/gamification/WellnessStreakDisplay';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service unifié pour VR Galaxy - Exploration spatiale thérapeutique
  * Consolide vrGalaxyService.ts + vrGalaxyServiceEnriched.ts

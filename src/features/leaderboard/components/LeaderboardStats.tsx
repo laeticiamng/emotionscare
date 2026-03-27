@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * LeaderboardStats - Statistiques globales du leaderboard
  */

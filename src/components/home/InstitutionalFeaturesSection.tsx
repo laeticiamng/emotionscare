@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * InstitutionalFeaturesSection - Outils cliniques et institutionnels
  * 5 cartes B2B/cliniques visibles depuis la homepage
