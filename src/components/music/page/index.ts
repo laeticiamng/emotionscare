@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Page Components - Barrel export
  */

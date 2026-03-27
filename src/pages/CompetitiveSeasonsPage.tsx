@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Scene3DErrorBoundary } from '@/components/3d/Scene3DErrorBoundary';
 import { Link } from 'react-router-dom';

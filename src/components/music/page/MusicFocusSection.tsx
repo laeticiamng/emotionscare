@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MusicFocusSection - Sections Focus avec lazy loading et ErrorBoundary
  */

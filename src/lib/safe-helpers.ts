@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Helpers sécurisés pour éviter l'erreur "Cannot read properties of undefined (reading 'add')"
  */

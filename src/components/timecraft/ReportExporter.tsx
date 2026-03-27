@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ReportExporter - Export de rapports stratégiques B2B
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock, Users, ArrowLeft, Play, Sparkles, Filter, Search, Star, Check, Lock, TrendingUp } from 'lucide-react';

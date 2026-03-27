@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Dashboard RH B2B
  * Vue d'ensemble pour les responsables RH

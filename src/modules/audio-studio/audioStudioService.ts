@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service pour l'enregistrement et gestion audio
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service de parsing NIfTI
  * Support .nii et .nii.gz

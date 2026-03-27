@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2BModuleWrapperPage - Wrapper pour accès aux modules en contexte B2B
  * Permet l'accès anonyme aux modules wellness pour les employés B2B

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * FlashGlowSettingsPanel - Paramètres personnalisés pour Flash Glow
  */

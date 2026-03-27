@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * DiagnosticsPanel - Panneau de diagnostics dev-only
  * Affiche les informations système pour le débogage

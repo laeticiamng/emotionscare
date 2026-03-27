@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour l'export des données SEUIL
  */

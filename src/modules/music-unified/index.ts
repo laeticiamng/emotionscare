@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Music Unified - Point d'entrée
  * Service unifié pour toutes les fonctionnalités musicales

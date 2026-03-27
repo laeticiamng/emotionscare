@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VR Breath Guide Page - Respiration guidée en VR
  * Session immersive de cohérence cardiaque

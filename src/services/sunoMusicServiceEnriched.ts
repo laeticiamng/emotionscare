@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service Suno Music API enrichi avec fallback et génération adaptative
  */

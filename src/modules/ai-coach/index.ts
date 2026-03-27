@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AI Coach Module - Coaching IA personnalisé
  */

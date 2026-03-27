@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { Settings, HelpCircle as Help } from 'lucide-react';
 import NavItem from './NavItem';

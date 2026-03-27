@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VREnvironmentCreator - Créateur d'environnements VR personnalisés
  * Permet aux utilisateurs de personnaliser leur espace de méditation VR

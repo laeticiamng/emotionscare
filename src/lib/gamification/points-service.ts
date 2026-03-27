@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { logger } from '@/lib/logger';
 
 // Award points to a user

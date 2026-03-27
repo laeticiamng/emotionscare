@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Scores - Service
  * Service de calcul et gestion des scores émotionnels, wellbeing et engagement

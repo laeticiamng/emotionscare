@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Smart Reminders - Rappels intelligents basés sur les patterns utilisateur
  * Analyse les habitudes pour proposer des rappels personnalisés

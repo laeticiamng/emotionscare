@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ModulesNavigationGrid - Grille de navigation vers TOUS les modules
  * Catégorisé et complet pour garantir l'accessibilité

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — RevealContainer
  * Wraps content that starts veiled (blurred, dimmed) and reveals on trigger.

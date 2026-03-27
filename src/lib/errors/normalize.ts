@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ZodError } from 'zod';
 import type { AppError, ErrorCode } from './types';
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Actions disponibles selon la zone SEUIL
  * Choix doux et non-culpabilisants

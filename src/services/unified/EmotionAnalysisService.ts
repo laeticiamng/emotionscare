@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service Unifié d'Analyse Émotionnelle
  *

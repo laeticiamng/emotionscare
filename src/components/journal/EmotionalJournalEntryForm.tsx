@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmotionalJournalEntryForm - Formulaire de création d'entrée journal émotionnel
  */

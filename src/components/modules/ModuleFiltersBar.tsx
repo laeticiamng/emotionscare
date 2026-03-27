@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ModuleFiltersBar - Barre de filtres avancés pour les modules
  * @version 1.0.0

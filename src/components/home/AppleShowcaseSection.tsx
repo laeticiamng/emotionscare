@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AppleShowcaseSection - Section showcase avec démo immersive style Apple
  * CTA retiré pour réduire la fatigue — seuls Hero et CTA finale

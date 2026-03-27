@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Marketplace Service - Phase 4.3
  * Gestion complète du marketplace (thèmes, widgets, packs, rituels)

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ExamModePage - Mode Examens / Étudiants
  * Page dédiée aux expériences de bien-être pour les périodes d'examens

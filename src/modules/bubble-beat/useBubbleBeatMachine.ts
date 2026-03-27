@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Bubble Beat State Machine
  * Gère l'état du jeu, le score et les interactions

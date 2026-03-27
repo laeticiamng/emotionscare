@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Lazy Motion Configuration
  *

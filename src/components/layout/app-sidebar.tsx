@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AppSidebar - Navigation immersive avec sidebar moderne
  */

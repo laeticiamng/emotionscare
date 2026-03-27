@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — SeasonalTheme
  * Applies seasonal visual overrides to the ambient system

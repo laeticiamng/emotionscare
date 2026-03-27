@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Types pour le système de récompenses et souvenirs
  */

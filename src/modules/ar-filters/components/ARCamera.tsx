@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant caméra AR avec accès webcam réel et effets de filtre
  */

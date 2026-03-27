@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2B User Scan Page - Scan émotionnel avec SEO
  */

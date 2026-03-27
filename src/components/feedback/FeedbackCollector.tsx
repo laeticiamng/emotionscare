@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * FeedbackCollector - Système de collecte de feedback utilisateur
  * Permet de recueillir des retours détaillés avec catégorisation

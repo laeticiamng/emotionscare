@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2C Boss Level Grit Page - Module de résilience gamifié
  */

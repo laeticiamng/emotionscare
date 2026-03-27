@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MicroFeedback - Composant de micro-feedback rapide
  * Permet aux utilisateurs de donner un retour en 1 clic

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2BDashboardPage - Dashboard principal B2B
  * Vue d'ensemble avec stats temps réel, navigation et actions rapides

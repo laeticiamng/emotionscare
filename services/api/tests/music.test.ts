@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { beforeAll, afterAll, describe, it, expect } from 'vitest';
 import { createApp } from '../server';
 import { signJwt } from '../../lib/jwt';

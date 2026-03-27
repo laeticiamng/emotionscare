@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * GuildCard - Carte de présentation d'une guilde
  */

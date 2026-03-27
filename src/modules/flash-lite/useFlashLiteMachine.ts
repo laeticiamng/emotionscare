@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Machine d'état pour flash-lite
  */

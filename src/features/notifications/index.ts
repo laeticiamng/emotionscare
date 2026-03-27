@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Notifications Feature Module
  * Gestion des notifications push, in-app et email

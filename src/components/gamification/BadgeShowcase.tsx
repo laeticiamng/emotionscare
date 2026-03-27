@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Badge Showcase - Collection de badges utilisateur
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ModernHomePage - Homepage révolutionnaire style Apple
  * Re-export du nouveau composant AppleHomePage

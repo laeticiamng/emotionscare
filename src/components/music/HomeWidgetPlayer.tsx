@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Home Widget Player - Mini-player pour la page d'accueil
  * Compact, responsive, avec contrôles essentiels

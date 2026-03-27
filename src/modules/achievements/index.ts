@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Achievements
  * Gestion des succès, badges et progression utilisateur

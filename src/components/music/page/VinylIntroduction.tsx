@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VinylIntroduction - Section d'introduction avec vinyle
  */

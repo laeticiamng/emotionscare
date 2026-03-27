@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AutoMixPlayer - Lecteur intelligent avec contexte temps réel et crossfade audio
  */

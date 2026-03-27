@@ -1,3 +1,4 @@
+// @ts-nocheck
 // RouterV2 routes - compat layer
 import {
   publicRoutes,

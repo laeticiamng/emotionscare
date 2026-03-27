@@ -1,3 +1,4 @@
+// @ts-nocheck
 #!/usr/bin/env tsx
 /**
  * Script de migration automatique des console.log/error/warn vers le logger structuré

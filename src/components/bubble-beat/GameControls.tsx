@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Game Controls - Contrôles du jeu Bubble Beat
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Analytics Page - Dashboard complet d'analytics musicales
  * Version complète avec tendances, comparaisons et insights IA

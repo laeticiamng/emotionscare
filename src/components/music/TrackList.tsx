@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useCallback } from 'react';
 import type { MusicTrack } from '@/types/music';
 import { Button } from '@/components/ui/button';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoachMoodTracker - Suivi de l'humeur avant/après session
  */

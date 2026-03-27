@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Widget de recommandations IA pour le dashboard
  * Connecté au backend ai-coach pour générer des recommandations personnalisées

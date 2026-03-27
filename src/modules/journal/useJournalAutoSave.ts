@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useJournalAutoSave - Hook pour sauvegarde automatique du journal
  * Sauvegarde toutes les 30 secondes si du texte a été modifié

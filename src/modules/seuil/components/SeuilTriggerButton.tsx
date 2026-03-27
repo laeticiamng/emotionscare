@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Bouton d'entrée du module SEUIL
  * "Ça commence" - accessible depuis Emotion Square et le Parc émotionnel

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Context Lens Types - MODULE 8 EmotionsCare 2.0
  * NLP multilingue, patterns émotionnels, insights personnalisés

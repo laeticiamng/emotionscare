@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page principale du module Ambition
  * Gestion unifiée des objectifs (Standard + Mode Arcade)

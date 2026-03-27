@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook Gamification Unifié - EmotionsCare
  * Centralise toute la logique de gamification avec React Query

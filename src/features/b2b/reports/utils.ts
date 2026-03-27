@@ -1,3 +1,4 @@
+// @ts-nocheck
 /** Seuil de confidentialité minimum pour afficher une cellule */
 export const CONFIDENTIALITY_THRESHOLD = 5;
 

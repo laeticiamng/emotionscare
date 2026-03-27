@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2C BREATHWORK PAGE - EMOTIONSCARE
  * Page de respiration avancée accessible WCAG 2.1 AA

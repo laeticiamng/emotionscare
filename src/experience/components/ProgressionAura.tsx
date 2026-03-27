@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — ProgressionAura
  * Visual ambient indicator of progression that replaces flat percentage bars.

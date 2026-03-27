@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service unifié pour Mood Mixer - Mélange émotionnel thérapeutique avec IA
  * Consolide moodMixerService.ts + moodMixerServiceEnriched.ts

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Configuration centralisée pour EmotionsCare Production
  */

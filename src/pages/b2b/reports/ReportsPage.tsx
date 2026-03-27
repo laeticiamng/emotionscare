@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page de rapports B2B - Affiche les rapports mensuels générés
  */

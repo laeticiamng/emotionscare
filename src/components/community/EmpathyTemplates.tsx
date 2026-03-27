@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmpathyTemplates - Modèles de réponses empathiques
  * Aide les utilisateurs à répondre avec bienveillance

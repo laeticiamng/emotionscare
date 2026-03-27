@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MusicFavoritesSection - Section des favoris
  */

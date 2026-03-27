@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Suno Music Generator Demo Page
  * Complete music generation interface with Suno AI

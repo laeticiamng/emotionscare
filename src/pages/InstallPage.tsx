@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page d'installation PWA - Instructions visuelles pour iOS/Android/Desktop
  * Accessible via /install

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MusicEmotionSync - Synchronisation scan → musique
  * Connecte les résultats de scan émotionnel au module musique

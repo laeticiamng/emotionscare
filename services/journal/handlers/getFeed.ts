@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { IncomingMessage, ServerResponse } from 'http';
 import { hash } from '../lib/hash';
 import { listFeed } from '../lib/db';

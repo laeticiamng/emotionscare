@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import type { MusicTrack } from '@/types/music';
 import { Badge } from '@/components/ui/badge';

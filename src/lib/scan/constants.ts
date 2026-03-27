@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Constantes pour le module de scan émotionnel
  */

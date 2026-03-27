@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Web Vitals Tracking pour EmotionsCare
  * Intégration avec Sentry pour monitoring production

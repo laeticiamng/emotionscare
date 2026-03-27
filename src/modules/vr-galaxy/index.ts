@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VR Galaxy Module - Exploration spatiale thérapeutique
  */

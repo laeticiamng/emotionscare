@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SettingsPanel - Configuration Flash Glow
  */

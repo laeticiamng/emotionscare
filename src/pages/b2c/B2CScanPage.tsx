@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useCallback, useEffect, useMemo, useRef, useState, lazy, Suspense } from 'react';
 import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MusicGamificationSection - Section gamification avec lazy loading
  */

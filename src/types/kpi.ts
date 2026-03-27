@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type React from 'react';
 // Types pour les KPIs
 

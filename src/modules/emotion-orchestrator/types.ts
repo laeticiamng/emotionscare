@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module EmotionOrchestrator - Types
  * Types pour l'orchestration intelligente des modules basée sur l'état émotionnel

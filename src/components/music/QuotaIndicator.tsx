@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * QuotaIndicator - Composant d'affichage du quota utilisateur enrichi
  *

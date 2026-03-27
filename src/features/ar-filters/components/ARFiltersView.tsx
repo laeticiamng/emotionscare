@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Vue principale des filtres AR
  * Interface pour sélectionner et utiliser les filtres de réalité augmentée

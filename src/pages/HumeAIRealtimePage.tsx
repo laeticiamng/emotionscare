@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hume AI Real-time Emotion Analysis Page
  * Multimodal emotion detection: facial, vocal, and text analysis

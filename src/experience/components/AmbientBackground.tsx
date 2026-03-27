@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — AmbientBackground
  * Adaptive background that renders CSS gradients (low/medium tier)

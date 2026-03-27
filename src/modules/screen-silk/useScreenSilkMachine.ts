@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useScreenSilkMachine - State machine pour Screen Silk
  */

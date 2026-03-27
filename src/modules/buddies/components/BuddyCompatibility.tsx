@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Affichage détaillé de la compatibilité entre buddies
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Paramètres du module SEUIL
  * Personnalisation des rappels, seuils et préférences

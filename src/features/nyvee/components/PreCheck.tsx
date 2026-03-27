@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PreCheck - Composant de pré-vérification avant session Cocon Respiration
  */

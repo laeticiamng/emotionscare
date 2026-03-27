@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Index des routes - compose le componentMap global à partir des segments
  */

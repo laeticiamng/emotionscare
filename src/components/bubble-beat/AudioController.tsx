@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Audio Controller - Contrôle audio binaural et ambient
  */

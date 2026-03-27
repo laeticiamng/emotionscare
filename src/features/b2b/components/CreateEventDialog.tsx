@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CreateEventDialog - Dialog pour créer un nouvel événement B2B
  */

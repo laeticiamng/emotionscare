@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Chat en temps réel pour les sessions de groupe
  */

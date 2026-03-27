@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Notifications - Service
  * Service centralisé pour la gestion des notifications

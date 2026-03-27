@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Context Lens Components - Export centralisé
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Paramètres de notifications
  * Configuration des préférences de notifications

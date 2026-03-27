@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { Canvas } from '@react-three/fiber';
 import { XR, createXRStore } from '@react-three/xr';

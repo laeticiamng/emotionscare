@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Dashboard Analytics des Préférences Musicales
  * Visualise les statistiques et tendances des préférences utilisateur

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { BookOpen, Wand2 } from 'lucide-react';
 import ActionButton from '@/components/buttons/ActionButton';

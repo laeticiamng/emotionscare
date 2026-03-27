@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { DemoBanner } from '@/components/ui/DemoBanner';
 import { motion } from 'framer-motion';

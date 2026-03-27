@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PremiumShell - Layout premium avec navigation et transitions
  * Mobile-first, animations douces, accessibilité

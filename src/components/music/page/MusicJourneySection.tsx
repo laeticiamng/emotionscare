@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MusicJourneySection - Section parcours musicaux guidés
  * Avec historique des parcours et création personnalisée

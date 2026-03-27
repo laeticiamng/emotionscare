@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Mixeur de sons ambiants pour méditation
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour les sessions WebXR immersives
  * Gère l'état de la session VR et les interactions

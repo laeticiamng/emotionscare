@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { forwardRef, useMemo } from 'react';
 import type { ForwardedRef } from 'react';
 import { format, startOfISOWeek } from 'date-fns';

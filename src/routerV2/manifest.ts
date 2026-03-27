@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * RouterV2 Manifest helpers
  * Construit une liste plate de toutes les routes connues

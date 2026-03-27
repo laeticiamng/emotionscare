@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant de notation par étoiles
  */

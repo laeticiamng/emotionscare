@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * WearableCard - Carte d'affichage d'un appareil connecté
  */

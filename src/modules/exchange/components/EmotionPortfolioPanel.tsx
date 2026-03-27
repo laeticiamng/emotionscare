@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Emotion Portfolio Panel - Display, activate and sell emotions from portfolio
  */

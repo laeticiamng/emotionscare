@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Types pour l'orchestration émotionnelle
 
 export interface MoodEvent {

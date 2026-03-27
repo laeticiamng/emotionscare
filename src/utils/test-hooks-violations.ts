@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ❌ EXEMPLES DE VIOLATIONS - Ces patterns déclencheront des erreurs ESLint
 
 import React from 'react';

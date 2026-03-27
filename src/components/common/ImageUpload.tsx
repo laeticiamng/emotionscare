@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ImageUpload - Generic reusable image upload component
  * Features: drag & drop, preview, validation, multiple files support

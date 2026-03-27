@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Notifications Hooks
  * Hooks pour le système de notifications

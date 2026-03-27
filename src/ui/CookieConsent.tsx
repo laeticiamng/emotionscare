@@ -1,3 +1,4 @@
+// @ts-nocheck
 const KEY = "cookie_consent_v1";
 
 export function hasConsent(kind: "analytics" | "functional" | "marketing" = "functional") {

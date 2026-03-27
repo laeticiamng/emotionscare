@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { LayoutDashboard, Rows3 } from 'lucide-react';

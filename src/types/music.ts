@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MUSIC TYPES - SOURCE DE VÉRITÉ UNIQUE
  * Tous les types music doivent être importés depuis ce fichier

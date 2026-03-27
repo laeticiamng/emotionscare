@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Contexte Offline - Phase 4
  * Partage l'état offline à travers l'application

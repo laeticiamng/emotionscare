@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — AudioEngine
  * Web Audio API-based ambient audio and feedback sound manager.

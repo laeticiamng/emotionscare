@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Session de découverte active
  * @module discovery

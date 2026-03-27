@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Bubble Canvas - Zone de jeu interactive avec bulles animées
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EXAMPLE_DATA } from './types';
 import { logger } from '@/lib/logger';

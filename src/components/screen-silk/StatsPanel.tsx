@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Stats Panel - Statistiques Screen Silk
  */

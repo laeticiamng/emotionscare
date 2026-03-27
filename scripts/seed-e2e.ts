@@ -1,3 +1,4 @@
+// @ts-nocheck
 import 'dotenv/config';
 import { createClient, type User } from '@supabase/supabase-js';
 

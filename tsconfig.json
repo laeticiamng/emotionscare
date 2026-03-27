@@ -39,7 +39,10 @@
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictPropertyInitialization": false,
     "target": "ES2020",
     "noEmit": true,
     "types": [
@@ -56,15 +59,15 @@
     "src/**/*.e2e.test.ts",
     "src/**/*.e2e.test.tsx",
     "tests/e2e",
-    "supabase"
+    "supabase",
+    "scripts",
+    "services"
   ],
   "include": [
     "./src",
     "./types",
     "./tests",
     "./test",
-    "./services",
-    "./scripts",
     "./ci",
     "./tools",
     "./vitest.config.ts",

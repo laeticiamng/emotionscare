@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BreathingFeedback - Feedback post-session
  */

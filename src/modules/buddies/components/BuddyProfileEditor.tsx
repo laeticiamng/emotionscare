@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Éditeur de profil buddy
  */

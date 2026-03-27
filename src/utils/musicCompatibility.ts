@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
 

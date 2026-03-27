@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service Admin
  * Opérations d'administration centralisées

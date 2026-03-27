@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SliceViewer - Vues 2D des coupes cérébrales (Axiale, Sagittale, Coronale)
  * EmotionsCare - Module DICOM

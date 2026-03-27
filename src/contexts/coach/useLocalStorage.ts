@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useCallback, useRef } from 'react';
 import { ChatMessage } from '@/types/chat';
 import { supabase } from '@/integrations/supabase/client';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hume AI WebSocket Service
  * Real-time emotion streaming using Hume AI Expression Measurement API

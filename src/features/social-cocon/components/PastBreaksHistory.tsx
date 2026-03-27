@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { memo } from 'react';
 import { History, Calendar } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

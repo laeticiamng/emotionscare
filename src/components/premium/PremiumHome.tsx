@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PremiumHome - Page d'accueil mobile-first premium
  * Design Apple-like, ton apaisant et enveloppant

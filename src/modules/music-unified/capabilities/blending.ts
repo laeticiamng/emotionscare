@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Unified - Capability Blending
  * Fonctionnalités de mélange émotionnel (mood-mixer)

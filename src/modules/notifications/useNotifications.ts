@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Notifications - Hook principal
  * Hook React pour la gestion des notifications

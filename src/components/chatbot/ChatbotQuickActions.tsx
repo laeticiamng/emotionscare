@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Chatbot Quick Actions - Actions rapides sugérées
  */

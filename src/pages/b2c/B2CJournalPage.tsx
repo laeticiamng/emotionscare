@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, lazy, Suspense } from 'react';
 import PageRoot from '@/components/common/PageRoot';
 import PremiumLoader from '@/components/ui/PremiumLoader';

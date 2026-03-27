@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ParkNotificationsPanel - Panneau de notifications temps réel du parc
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Carte flash individuelle
  */

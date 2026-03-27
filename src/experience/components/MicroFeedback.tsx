@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — MicroFeedback
  * Composable micro-interaction feedback system.

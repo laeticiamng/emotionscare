@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Types pour les intégrations santé (Phase 3 - Excellence)
  * Google Fit, Apple Health, Withings

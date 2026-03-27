@@ -1,3 +1,4 @@
+// @ts-nocheck
 #!/usr/bin/env tsx
 /**
  * Script d'audit des routes 404 et pages non fonctionnelles

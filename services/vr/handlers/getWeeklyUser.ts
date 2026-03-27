@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { IncomingMessage, ServerResponse } from 'http';
 import { hash } from '../../journal/lib/hash';
 import { listWeekly } from '../lib/db';

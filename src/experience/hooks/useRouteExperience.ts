@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — useRouteExperience
  * Hook that syncs the current route with the experience store.

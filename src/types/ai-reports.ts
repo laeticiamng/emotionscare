@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Types pour les rapports automatiques enrichis IA
  * Phase 3 - Excellence

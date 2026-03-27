@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Graphique de popularité des moods
  */

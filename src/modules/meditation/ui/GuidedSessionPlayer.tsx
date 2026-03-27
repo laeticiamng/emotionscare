@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Lecteur de session guidée avec audio
  */

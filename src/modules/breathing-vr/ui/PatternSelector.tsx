@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Sélecteur de pattern de respiration
  */

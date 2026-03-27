@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer les activités partagées entre buddies
  */

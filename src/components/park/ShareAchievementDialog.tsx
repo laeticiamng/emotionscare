@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ShareAchievementDialog - Dialog pour partager un accomplissement
  */

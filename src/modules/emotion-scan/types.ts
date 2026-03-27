@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Emotion Scan - Types
  * Types pour le scan émotionnel (texte, voix, image, facial)

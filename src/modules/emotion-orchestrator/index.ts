@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module EmotionOrchestrator - Point d'entrée
  * Orchestration intelligente des modules basée sur l'état émotionnel

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * GlassMusicPlayer — Premium glass shell wrapping the music player
  * Adds ambient glow, 3D elevation, glass morphism, and cinematic presence

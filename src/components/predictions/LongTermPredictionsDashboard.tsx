@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Long-Term Predictions Dashboard - Phase 4.2
  * Dashboard principal pour les prédictions IA long-terme

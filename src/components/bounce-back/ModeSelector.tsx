@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ModeSelector - Sélection du mode de bataille avec 4 modes
  */

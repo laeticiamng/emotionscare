@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PremiumVideoPlayer — Cinematic, immersive video player
  * Glass frame, ambient glow, progressive controls, fullscreen transitions

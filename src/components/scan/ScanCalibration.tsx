@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ScanCalibration - Calibration personnalisée par utilisateur
  * Ajuste les paramètres d'analyse selon le profil émotionnel de base

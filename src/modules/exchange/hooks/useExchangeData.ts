@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook for Exchange Hub data management
  */

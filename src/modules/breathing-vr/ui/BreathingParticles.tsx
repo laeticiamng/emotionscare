@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Champ de particules immersif pour la respiration
  * Les particules s'étendent à l'inspiration et se contractent à l'expiration

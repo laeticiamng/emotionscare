@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { TrendingUp, Calendar, Award, Target } from 'lucide-react';

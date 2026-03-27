@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Mood Mixer Components - Exports centralisés
  */

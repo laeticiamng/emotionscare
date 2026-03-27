@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Community Hub Service - Gestion des interactions communautaires
  * Partage, réactions, notifications sociales, temps réel

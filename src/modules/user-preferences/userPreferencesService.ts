@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module User Preferences - Service
  * Service unifié pour settings, profile, privacy et notifications

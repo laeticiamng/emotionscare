@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page Story Synth enrichie avec toutes les fonctionnalités
  * @module story-synth

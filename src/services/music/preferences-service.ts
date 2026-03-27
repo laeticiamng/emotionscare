@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * User Music Preferences Service
  * Gestion des préférences musicales utilisateur

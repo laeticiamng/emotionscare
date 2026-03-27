@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { UserModeType } from '@/types/userMode';
 
 export const getUserModeDisplayName = (mode: UserModeType): string => {

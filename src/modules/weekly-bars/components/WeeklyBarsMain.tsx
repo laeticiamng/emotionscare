@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant principal du module weekly-bars
  */

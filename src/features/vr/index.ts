@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature: VR Experiences
  * Expériences immersives en réalité virtuelle

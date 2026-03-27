@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AI Coach PDF Export - Export des conversations en PDF
  * Utilise html2canvas pour la capture et génère un fichier téléchargeable

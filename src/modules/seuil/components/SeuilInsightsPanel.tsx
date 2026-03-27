@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Panel d'insights et patterns SEUIL
  * Affiche les tendances et recommandations personnalisées

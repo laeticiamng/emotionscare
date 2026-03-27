@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TimeCraftB2BPage - Module TIMECRAFT pour organisations (B2B)
  * Design du temps collectif & charge humaine

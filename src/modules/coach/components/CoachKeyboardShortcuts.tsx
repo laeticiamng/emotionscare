@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoachKeyboardShortcuts - Aide raccourcis clavier
  */

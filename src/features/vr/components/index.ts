@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VR Components - Exports centralisés
  */

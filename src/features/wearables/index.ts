@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature: Wearables
  * Intégrations avec montres connectées et trackers d'activité

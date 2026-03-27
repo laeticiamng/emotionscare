@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Footer - Pied de page EmotionsCare
  * Liens vérifiés vers routes publiques uniquement

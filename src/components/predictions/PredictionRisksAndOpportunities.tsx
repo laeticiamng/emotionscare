@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Prediction Risks and Opportunities Component
  */

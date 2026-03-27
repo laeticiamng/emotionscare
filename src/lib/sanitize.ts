@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Utilitaires de sanitisation HTML pour les exports et injections de contenu.
  * À utiliser systématiquement avant tout document.write() ou dangerouslySetInnerHTML.

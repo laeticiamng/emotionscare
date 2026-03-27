@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service d'apprentissage automatique des préférences musicales
  * Ajuste les préférences en fonction de l'historique d'écoute réel

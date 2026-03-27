@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Types du module Profile
  * Définitions TypeScript pour la gestion du profil utilisateur

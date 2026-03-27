@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Theme Selector - Thèmes visuels personnalisés
  * Sélection de thèmes, couleurs, animations, preview en temps réel

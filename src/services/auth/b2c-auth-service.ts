@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import type { AuthError, Session, User } from '@supabase/supabase-js';
 

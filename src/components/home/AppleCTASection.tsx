@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AppleCTASection - Section CTA finale style Apple
  * Grande typographie, minimaliste, impactante

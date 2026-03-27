@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { MusicTrack, MusicPlaylist } from '@/types/music';

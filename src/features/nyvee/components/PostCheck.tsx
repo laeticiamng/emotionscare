@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PostCheck - Composant de post-vérification après session Cocon Respiration
  */

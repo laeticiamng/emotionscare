@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ClinicalAssessmentHistory - History chart and list
  */

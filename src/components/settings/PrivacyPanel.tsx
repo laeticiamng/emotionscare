@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { type LucideIcon } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';

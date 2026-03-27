@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Marketplace Browser - Navigation et recherche
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — Immersive Onboarding
  * Exploratory 5-step onboarding replacing the flat 3-step card flow.

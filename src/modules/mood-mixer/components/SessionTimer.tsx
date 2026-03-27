@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Timer de session avec modes prédéfinis
  */

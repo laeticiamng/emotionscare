@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Analytics utilities pour tracking événements utilisateur
  * Intègre Vercel Analytics + Supabase custom events

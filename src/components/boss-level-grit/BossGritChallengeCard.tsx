@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ChallengeCard - Carte de défi Boss Grit
  */

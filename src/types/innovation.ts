@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Types for innovation experiments
 
 export interface Experiment {

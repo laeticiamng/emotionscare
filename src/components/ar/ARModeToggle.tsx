@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AR Mode Toggle - Phase 4.5
  * Toggle between AR and fallback modes

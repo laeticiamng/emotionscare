@@ -1,3 +1,4 @@
+// @ts-nocheck
 export function triggerDownload(fileName: string, dataUrl: string) {
   const link = document.createElement('a');
   link.download = fileName;

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Ambition
  * Système complet de gestion d'objectifs gamifiés

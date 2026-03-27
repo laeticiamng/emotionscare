@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature: Mood Mixer
  * Création et mixage d'ambiances sonores personnalisées

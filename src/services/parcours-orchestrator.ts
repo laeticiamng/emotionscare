@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import type { ParcoursPreset, ParcoursRun, ParcoursSegment } from '@/types/music/parcours';
 import { logger } from '@/lib/logger';

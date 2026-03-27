@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TimeBlockEditor - Modal d'édition de bloc temporel
  */

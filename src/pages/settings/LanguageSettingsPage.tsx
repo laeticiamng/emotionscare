@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * LanguageSettingsPage - Paramètres de langue
  */

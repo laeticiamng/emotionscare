@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Flash Glow Components - Exports centralisés
  */

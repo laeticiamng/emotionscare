@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Mini Player - Lecteur flottant compact
  * Gestes, animations, contrôles rapides

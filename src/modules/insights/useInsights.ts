@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Insights - Hook
  * Hook React pour gérer les insights IA avec pagination et filtres persistés

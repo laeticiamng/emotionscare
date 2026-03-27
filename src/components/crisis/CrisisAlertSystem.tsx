@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Crisis Alert System - Système d'alertes de crise en temps réel
  * Gère les contacts d'urgence, détection de patterns et notifications

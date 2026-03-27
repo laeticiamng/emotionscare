@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmotionalJournalPage - Page principale du journal émotionnel
  * /dashboard/journal

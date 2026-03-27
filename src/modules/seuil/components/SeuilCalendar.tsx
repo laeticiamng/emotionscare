@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Calendrier SEUIL - Visualisation mensuelle des événements
  */

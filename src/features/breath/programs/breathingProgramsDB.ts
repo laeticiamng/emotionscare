@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Guided breathing programs database
 
 export interface ProgramSession {

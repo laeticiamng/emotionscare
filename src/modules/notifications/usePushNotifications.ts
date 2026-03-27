@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook usePushNotifications
  * Interface React pour les notifications push

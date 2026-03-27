@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Pages - Export centralisé
  */

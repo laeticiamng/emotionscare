@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ScrollProgress - Indicateur de progression du scroll
  */

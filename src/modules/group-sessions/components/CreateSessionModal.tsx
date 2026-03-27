@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Modal de création d'une session de groupe
  */

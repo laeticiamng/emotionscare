@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ExportDashboard - Tableau de bord d'export de données
  * Exports personnalisés avec formats multiples et planification

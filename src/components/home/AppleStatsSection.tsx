@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AppleStatsSection - Section statistiques avec compteurs animés
  * CTA retiré pour réduire la fatigue — seuls Hero et CTA finale

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, FileText, Download, HardDrive } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';

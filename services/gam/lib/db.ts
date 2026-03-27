@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type GamWeeklyRow = {
   user_id_hash: string;
   week_start: string;

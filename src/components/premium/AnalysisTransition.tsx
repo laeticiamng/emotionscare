@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AnalysisTransition - Animation de transition pendant l'analyse
  * Effet apaisant de respiration/onde

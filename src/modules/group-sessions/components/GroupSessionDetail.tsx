@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Vue détaillée d'une session de groupe
  */

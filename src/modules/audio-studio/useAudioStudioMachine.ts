@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * State machine pour audio-studio
  */

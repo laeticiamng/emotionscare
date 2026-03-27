@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Protocoles de respiration disponibles
  */

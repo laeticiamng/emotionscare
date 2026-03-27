@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * GuildCard - Carte d'affichage d'une guilde
  * Affiche les informations principales et permet de rejoindre

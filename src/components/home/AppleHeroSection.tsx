@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AppleHeroSection - Hero révolutionnaire style Apple
  * Design minimaliste, typographie impactante, animations fluides

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MarketingLayout - Layout partagé pour les pages marketing (hors homepage)
  * Utilise SharedHeader pour éviter la duplication

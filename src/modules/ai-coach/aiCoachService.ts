@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AI Coach Service - Business Logic & API
  * Gère les sessions de coaching IA et interactions

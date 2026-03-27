@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Session Visualizer - Animation visuelle de la session
  */

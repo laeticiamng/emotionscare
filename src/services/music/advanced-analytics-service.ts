@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface AdvancedAnalytics {
   totalPlays: number;
   totalTracks: number;

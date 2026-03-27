@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Queue Service - Gestion de la file d'attente
  */

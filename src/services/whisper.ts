@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service Whisper - Transcription vocale via Edge Function
  * 

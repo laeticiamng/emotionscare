@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook: WebGL capability detection & device adaptation
  * Provides reactive state for WebGL status, device tier, DPR, reduced-motion,

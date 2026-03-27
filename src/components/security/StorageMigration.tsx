@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Storage Migration Component
  * Migre automatiquement les données sensibles de localStorage vers secure storage

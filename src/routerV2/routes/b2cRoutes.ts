@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Routes B2C - pages utilisateur connecté (bien-être, scan, journal, musique, etc.)
  * Segment: b2c

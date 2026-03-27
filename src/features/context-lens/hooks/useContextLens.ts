@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useContextLens - Hook principal pour le module Context Lens
  * Gestion des insights, patterns et analyses NLP

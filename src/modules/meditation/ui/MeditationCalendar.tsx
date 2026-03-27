@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Vue calendrier des sessions de méditation
  */

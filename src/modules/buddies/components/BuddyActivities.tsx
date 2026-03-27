@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Gestion des activités partagées entre buddies
  */

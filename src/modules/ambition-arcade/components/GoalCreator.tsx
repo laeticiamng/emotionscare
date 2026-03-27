@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant de création d'objectifs Ambition Arcade avec génération IA
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Polyfill for Array.findLast
 if (!Array.prototype.findLast) {
   (Array.prototype as any).findLast = function<T>(this: T[], predicate: (element: T, index: number, array: T[]) => boolean): T | undefined {

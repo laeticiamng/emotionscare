@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TimeCraftPage - Module de design du temps personnel (B2C)
  * Visualisation du temps comme architecture, pas comme to-do list

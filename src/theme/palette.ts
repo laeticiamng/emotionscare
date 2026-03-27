@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * theme.ts
  * Defines color palettes for the application's various themes

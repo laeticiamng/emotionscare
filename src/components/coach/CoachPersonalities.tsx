@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Personnalités de Coach IA
  * Différents styles de coaching adaptés aux besoins

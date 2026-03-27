@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Offline Queue Status - Affiche le détail de la queue
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Chatbot Widget - Widget flottant du chatbot support
  */

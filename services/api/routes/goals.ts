@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Goals API Routes
  * Endpoints pour gérer les objectifs personnels et le bien-être

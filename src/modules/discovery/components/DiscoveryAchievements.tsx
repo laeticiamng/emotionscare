@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Succès et achievements Discovery
  * @module discovery

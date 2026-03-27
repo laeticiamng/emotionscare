@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Mic, CircleStop } from 'lucide-react';

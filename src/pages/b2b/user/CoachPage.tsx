@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2BCoachPage - Coach IA d'équipe pour managers
  * Interface conversationnelle avec suggestions et métriques

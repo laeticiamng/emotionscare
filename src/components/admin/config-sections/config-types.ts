@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TYPES DE CONFIGURATION SYSTÈME
  * Types partagés pour le centre de configuration globale

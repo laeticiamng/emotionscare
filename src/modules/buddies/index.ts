@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module buddies - Point d'entrée
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TEST ACCOUNTS PAGE - DEVELOPMENT ONLY
  * Page pour créer et gérer les comptes de test

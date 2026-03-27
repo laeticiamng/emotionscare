@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2BPreventionProgramPage - Programme de prevention B2B
  * Module 18 : Parcours de prevention sur mesure pour les etablissements

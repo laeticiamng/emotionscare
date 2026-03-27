@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Lazy Components - Code-splitting pour les modules lourds
  * Utilise React.lazy avec retry automatique

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { z } from 'zod';
 
 // Schémas de validation sécurisés

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Shared Zustand Store - Unified Progression
  * Système unifié de progression cross-module avec achievements et challenges

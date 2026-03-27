@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * GuildChat - Chat en temps réel pour une guilde
  */

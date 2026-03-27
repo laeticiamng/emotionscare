@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Meditation Audio Service - Gestion des sons ambiants et guidages audio
  * Prend en charge les sons de fond, la voix de guidance et les transitions

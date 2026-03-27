@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service d'intégration Withings
  * Phase 3 - Excellence

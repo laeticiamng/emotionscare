@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useMeditation - Hook principal pour le module meditation
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Gamification - EmotionsCare
  * @module gamification

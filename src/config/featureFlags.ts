@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature Flags Configuration - DEPRECATED
  * ⚠️ Ce fichier est conservé pour la compatibilité

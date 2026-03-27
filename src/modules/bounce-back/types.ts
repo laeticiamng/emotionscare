@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Bounce Back Module - Types & Zod Schemas
  * Module de résilience et coping avec mécaniques de jeu

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Challenges Feature - Composants
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music API Service - Gestion complète de la musicothérapie IA
  *

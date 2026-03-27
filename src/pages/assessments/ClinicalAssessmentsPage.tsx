@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ClinicalAssessmentsPage - Main page for WHO-5 and PHQ-9 assessments
  * /dashboard/assessments

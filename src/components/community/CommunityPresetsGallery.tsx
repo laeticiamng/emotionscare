@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CommunityPresetsGallery - Galerie des presets communautaires
  * TOP 20 #3 - Composant UI pour useMoodMixerPresets

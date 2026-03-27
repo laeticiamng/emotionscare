@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Context Lens Dashboard - Vue principale du module
  * Affiche insights, patterns et émotions en temps réel

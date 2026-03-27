@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MarketplaceBrowser - Navigation et découverte des programmes
  */

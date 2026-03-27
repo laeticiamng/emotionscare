@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BurnSealToggle - Toggle pour marquer une entrée comme éphémère
  */

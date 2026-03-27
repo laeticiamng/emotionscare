@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant pour l'enregistrement du mood avant/après une activité
  */

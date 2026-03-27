@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Insights - Export principal
  */

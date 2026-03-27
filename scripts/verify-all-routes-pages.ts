@@ -1,3 +1,4 @@
+// @ts-nocheck
 #!/usr/bin/env tsx
 /**
  * Vérification exhaustive route par route

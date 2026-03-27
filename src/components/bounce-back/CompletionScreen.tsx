@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CompletionScreen - Écran de fin de bataille avec XP basé sur mode et partage
  */

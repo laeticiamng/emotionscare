@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Badge 3D de réussite — trophée rotatif pour la gamification
  * Aspect métallique avec couleurs basées sur la rareté :

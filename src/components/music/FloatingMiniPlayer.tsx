@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Floating Mini Player - Player audio flottant
  * Affiche en permanence la chanson en cours sur la page

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoachSuggestionsPanel - Suggestions et techniques du coach
  */

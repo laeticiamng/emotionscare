@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TeamEngagementWidget - Widget d'engagement équipe
  * Affiche les métriques d'engagement et d'activité

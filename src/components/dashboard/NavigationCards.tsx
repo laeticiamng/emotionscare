@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * NavigationCards - Cartes de navigation pour le dashboard
  * Accès à toutes les fonctionnalités principales

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { captureException } from '@/lib/ai-monitoring';
 

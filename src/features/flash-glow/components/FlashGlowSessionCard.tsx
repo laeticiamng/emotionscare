@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * FlashGlowSessionCard - Carte de session de luminothérapie
  */

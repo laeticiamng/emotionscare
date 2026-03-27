@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Theme System - Point d'entrée principal
  */

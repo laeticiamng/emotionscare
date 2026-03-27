@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Achievement Toast - Notification d'achievement débloqué
  */

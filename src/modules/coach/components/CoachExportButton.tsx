@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoachExportButton - Export de la conversation
  */

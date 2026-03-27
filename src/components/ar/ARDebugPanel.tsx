@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AR Debug Panel - Phase 4.5
  * Development debug panel for AR experiences

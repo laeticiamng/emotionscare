@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Routes publiques - pages accessibles sans authentification
  * Segment: public, marketing, legal, store

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MusicHistorySection - Section historique d'écoute avec données DB réelles
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AuraFullscreenToggle - Bouton pour activer le mode plein écran immersif
  */

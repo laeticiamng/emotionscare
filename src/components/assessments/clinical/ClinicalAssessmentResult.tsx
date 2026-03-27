@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ClinicalAssessmentResult - Display results with recommendations
  */

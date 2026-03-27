@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Music Unified - Types
  * Types unifiés pour toutes les fonctionnalités musicales

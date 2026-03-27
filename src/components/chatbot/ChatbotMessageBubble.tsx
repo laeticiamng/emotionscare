@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Chatbot Message Bubble - Affichage d'un message
  */

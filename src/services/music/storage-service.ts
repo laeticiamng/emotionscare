@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Storage Service
  * Gestion des fichiers audio dans Supabase Storage

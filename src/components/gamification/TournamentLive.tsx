@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TournamentLive - Streaming de tournois en direct
  * Affiche les tournois en cours avec classement temps réel

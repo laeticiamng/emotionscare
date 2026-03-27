@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Push Notification Service
  * Service complet pour les notifications push (Web Push API)

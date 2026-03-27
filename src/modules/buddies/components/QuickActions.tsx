@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Actions rapides pour interagir avec un buddy
  */

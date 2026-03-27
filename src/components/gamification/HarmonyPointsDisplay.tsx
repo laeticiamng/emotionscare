@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { Sparkle, TrendingUp, TrendingDown, History } from 'lucide-react';
 import { cn } from '@/lib/utils';

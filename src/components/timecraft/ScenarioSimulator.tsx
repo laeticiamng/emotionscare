@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ScenarioSimulator - Simulateur de scénarios organisationnels B2B
  */

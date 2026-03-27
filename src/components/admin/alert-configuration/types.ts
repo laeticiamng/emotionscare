@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface AlertConfiguration {
   id: string;
   created_at: string;

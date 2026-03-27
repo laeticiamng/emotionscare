@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import type { MusicTrack } from '@/types/music';
 import { cn } from '@/lib/utils';

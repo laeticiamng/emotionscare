@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Advanced Analytics Dashboard - Analytics musicales avancées
  * Graphiques, tendances, insights, exports

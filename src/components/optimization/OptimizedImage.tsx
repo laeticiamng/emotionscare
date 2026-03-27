@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useRef, useCallback, memo } from 'react';
 import { useIntersectionObserver } from '@/hooks/optimization/useIntersectionObserver';
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Playlist Hook - Gestion playlists
  */

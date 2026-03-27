@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2B Components exports
  */

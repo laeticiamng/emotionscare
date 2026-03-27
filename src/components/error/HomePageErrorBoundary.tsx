@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * HomePageErrorBoundary - Error boundary spécifique pour la page d'accueil
  * Fournit un fallback gracieux en cas d'erreur

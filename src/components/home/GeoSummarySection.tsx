@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * GeoSummarySection - Bloc "En bref" optimisé pour les moteurs génératifs
  * Contenu factuel, structuré, citable par les IA

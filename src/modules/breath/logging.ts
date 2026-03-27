@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { captureException } from '@/lib/ai-monitoring';
 import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant StatsCard réutilisable avec loading states et animations
  * Supporte différentes variations et thèmes

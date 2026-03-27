@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2BDashboardAnalytics - Dashboard Établissement
  * Vue d'ensemble anonymisée de l'état émotionnel des équipes

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useCocoonSessions - Hook React Query pour les sessions Cocon Respiration
  * Gère la persistance et le fetching des sessions

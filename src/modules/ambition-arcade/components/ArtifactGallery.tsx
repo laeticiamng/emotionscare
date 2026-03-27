@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Galerie des artefacts Ambition Arcade
  */

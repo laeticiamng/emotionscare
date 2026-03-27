@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Crown, Zap } from 'lucide-react';

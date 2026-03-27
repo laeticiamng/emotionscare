@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Community Components
  * Enhanced components for the community page

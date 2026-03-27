@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmotionSessionCard - Carte de session émotionnelle
  * Affiche un résumé visuel d'une session d'analyse

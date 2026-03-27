@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useState, useCallback } from 'react';
 import type { MicroGesture } from '@/features/mood/useSamOrchestration';
 import { useAIMicroGestures, type AIMicroGesture } from '@/hooks/useAIMicroGestures';

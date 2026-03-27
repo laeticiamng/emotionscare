@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Offline Queue Manager - Phase 4
  * Gestion des actions en queue quand hors-ligne

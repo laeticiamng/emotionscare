@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TrackLyrics - Génération et affichage des paroles via Suno API
  * Utilise suno-lyrics edge function

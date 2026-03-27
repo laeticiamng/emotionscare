@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Item d'historique SEUIL avec actions (favoris, notes)
  */

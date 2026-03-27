@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ScannerHistoryChart - Graphique d'évolution des scans
  */

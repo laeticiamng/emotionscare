@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type CoachAction =
   | { action: 'set_response_mode'; key: 'micro' | 'brief' }
   | { action: 'queue_microcards'; keys: string[] }

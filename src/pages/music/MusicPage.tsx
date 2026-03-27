@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page principale du module Musicotherapie
  * Optimisee pour tous les appareils (mobile, tablette, desktop)

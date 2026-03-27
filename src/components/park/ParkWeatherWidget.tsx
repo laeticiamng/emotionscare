@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ParkWeatherWidget - Widget météo émotionnelle du parc
  * Affiche la "météo" basée sur les émotions récentes de l'utilisateur

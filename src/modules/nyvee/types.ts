@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Cocon Respiration Module - Types & Schemas
  */

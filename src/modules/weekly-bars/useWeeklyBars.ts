@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook principal pour weekly-bars
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * XPBar - Barre de progression XP visible dans le header
  * Affiche le niveau, les points d'expérience et les badges

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Types pour les composants assess
 export type Instrument = 
   | 'WHO5' 

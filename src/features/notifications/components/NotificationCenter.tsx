@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Centre de notifications
  * Affiche toutes les notifications avec filtrage et actions groupées

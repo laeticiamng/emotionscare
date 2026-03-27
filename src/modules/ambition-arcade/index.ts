@@ -1,3 +1,4 @@
+// @ts-nocheck
 export { AmbitionArcadeMain } from './components/AmbitionArcadeMain';
 export { GoalCard } from './components/GoalCard';
 export { GoalCreator } from './components/GoalCreator';

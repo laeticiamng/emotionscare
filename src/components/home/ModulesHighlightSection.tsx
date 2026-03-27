@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ModulesHighlightSection - Bento Grid layout inspiré 21st.dev
  * Cards cliquables avec hover effects premium

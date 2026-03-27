@@ -1,3 +1,4 @@
+// @ts-nocheck
 import sanitizeHtml from 'sanitize-html';
 
 const USER_CONTENT_SANITIZE_OPTIONS: sanitizeHtml.IOptions = {

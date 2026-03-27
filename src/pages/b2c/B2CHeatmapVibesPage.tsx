@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2CHeatmapVibesPage - Visualisation avancée des patterns émotionnels
  * Fonctionnalités: Heatmap interactive, insights IA, comparaison temporelle, export

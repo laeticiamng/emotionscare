@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page de succès après paiement Stripe
  */

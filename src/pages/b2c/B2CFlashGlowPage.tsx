@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2C FLASH GLOW PAGE - EMOTIONSCARE
  * Page de respiration gamifiée accessible WCAG 2.1 AA

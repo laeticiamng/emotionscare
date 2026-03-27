@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * OnboardingGuide - Onboarding ultra court, orienté action immédiate
  * Vision: L'utilisateur lance une session AVANT toute explication

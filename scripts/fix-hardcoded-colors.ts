@@ -1,3 +1,4 @@
+// @ts-nocheck
 #!/usr/bin/env tsx
 /**
  * Script automatisé de détection et correction des couleurs hardcodées

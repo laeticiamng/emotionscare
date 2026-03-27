@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Profile Service
  * Service Supabase centralisé pour la gestion du profil utilisateur

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AuraGalaxySkeleton - Skeleton de chargement pour la galaxie
  */

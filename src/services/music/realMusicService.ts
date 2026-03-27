@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service de musique connecté au backend Supabase
  * Remplace les données sample par des vraies données

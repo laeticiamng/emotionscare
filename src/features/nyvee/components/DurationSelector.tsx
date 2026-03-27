@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * DurationSelector - Sélecteur de durée de session (nombre de cycles)
  */

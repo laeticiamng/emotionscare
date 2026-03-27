@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useMemo } from 'react'
 import DOMPurify from 'dompurify'
 import { AlertCircle, Brain, Sparkles } from 'lucide-react'

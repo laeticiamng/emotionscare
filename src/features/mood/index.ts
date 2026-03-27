@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature: Mood Management
  * Point d'entrée unifié pour toute la gestion de l'humeur

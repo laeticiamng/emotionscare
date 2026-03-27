@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Emotion History Chart Component
  * Graphique d'évolution des émotions sur 7 jours

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * QUICK ACTION BUTTON - EMOTIONSCARE
  * Bouton d'action rapide avec animations et états

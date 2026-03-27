@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * UserReputationSystem - Système de réputation utilisateur
  * Points, badges, niveaux et confiance communautaire

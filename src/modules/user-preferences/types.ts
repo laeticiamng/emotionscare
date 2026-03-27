@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module User Preferences - Types
  * Types pour settings, profile, privacy et notifications

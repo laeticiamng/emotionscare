@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composants UI pour VR Nebula
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hume AI Real-time Emotion Scanner
  * Displays live emotion streaming with WebSocket

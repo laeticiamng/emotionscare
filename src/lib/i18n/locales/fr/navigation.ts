@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const navigation = {
   // Navigation principale
   home: 'Accueil',

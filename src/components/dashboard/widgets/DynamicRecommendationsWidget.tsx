@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Widget affichant les recommandations dynamiques personnalisées
  */

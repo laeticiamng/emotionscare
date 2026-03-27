@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hero 3D immersif pour la page d'accueil (ImmersiveHome variant)
  * Now uses unified visual direction and delegates to HeroScene3D

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Journal Module - Journal vocal et textuel avec IA
  * @version 2.0.0

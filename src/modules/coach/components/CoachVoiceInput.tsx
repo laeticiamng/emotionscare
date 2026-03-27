@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoachVoiceInput - Saisie vocale pour le coach
  */

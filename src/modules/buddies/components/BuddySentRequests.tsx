@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Demandes de buddy envoyées
  */

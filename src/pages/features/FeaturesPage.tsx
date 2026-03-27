@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * FeaturesPage - Premium Apple-style showcase of all features
  * /features

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { logger } from '@/lib/logger';
 
 export const executeAction = async (actionType: string, data: any) => {

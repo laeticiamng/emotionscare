@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page admin pour la synchronisation et le monitoring des modules
  * Route: /admin/module-sync

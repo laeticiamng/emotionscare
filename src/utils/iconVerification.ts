@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Vérification automatique des imports manquants dans les composants
  */

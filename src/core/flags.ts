@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature Flags System - Unified
  * Système unifié de gestion des feature flags

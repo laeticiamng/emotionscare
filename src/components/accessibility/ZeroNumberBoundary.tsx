@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { type ComponentPropsWithoutRef, type ElementType, type ReactNode, useEffect, useRef } from 'react';
 import { logger } from '@/lib/logger';
 

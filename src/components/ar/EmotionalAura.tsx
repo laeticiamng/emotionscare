@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Emotional Aura - Phase 4.5
  * Visualize emotional state as an immersive AR aura

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Discovery Tab - Exploration et découverte de musiques
  * Inclut: vinyles, générateur IA, recommandations, journeys

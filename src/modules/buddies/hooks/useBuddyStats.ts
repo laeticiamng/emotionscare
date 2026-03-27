@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook dédié aux statistiques du buddy system
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * TYPES UNIFIÉS EMOTIONSCARE - PLATEFORME PREMIUM

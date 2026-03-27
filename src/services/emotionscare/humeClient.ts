@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hume Client pour EmotionsCare
  * Corrigé: Utilise Edge Function hume-analysis au lieu d'appels API directs

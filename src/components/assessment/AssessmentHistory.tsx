@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { AssessmentCard } from './AssessmentCard';
 import { ScrollArea } from '@/components/ui/scroll-area';

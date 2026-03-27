@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Trust Activity Feed - Recent trust transactions and activities
  */

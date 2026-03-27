@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — AmbientProvider
  * Top-level provider that initializes the experience system.

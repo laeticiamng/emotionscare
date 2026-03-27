@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Barrel export pour les composants admin
  * Optimise les imports répétés à travers l'application

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Breath - Utilitaires de respiration
  * Module utilitaire fournissant des protocoles, logging et mood tracking

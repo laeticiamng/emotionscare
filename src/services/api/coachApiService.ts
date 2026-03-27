@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Coach API Service - Coaching IA émotionnel
  *

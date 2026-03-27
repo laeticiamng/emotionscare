@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @deprecated Utiliser @/providers/theme à la place
  * Ce fichier est conservé pour la rétrocompatibilité

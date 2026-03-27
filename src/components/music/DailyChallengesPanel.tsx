@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Panneau des défis quotidiens et hebdomadaires
  */

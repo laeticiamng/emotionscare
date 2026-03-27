@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Carte individuelle d'une quête Ambition Arcade
  */

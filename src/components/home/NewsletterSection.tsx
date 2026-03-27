@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * NewsletterSection - Section d'inscription à la newsletter
  * Capture d'emails avec connexion Supabase

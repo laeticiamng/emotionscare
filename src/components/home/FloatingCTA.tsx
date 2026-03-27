@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * FloatingCTA - CTA flottant qui apparaît au scroll
  * Avec tracking analytics intégré

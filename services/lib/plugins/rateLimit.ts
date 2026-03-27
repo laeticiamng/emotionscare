@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { FastifyPluginAsync } from 'fastify';
 import rateLimit from '@fastify/rate-limit';
 

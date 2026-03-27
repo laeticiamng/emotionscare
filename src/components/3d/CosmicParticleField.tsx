@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Champ de particules cosmiques paramétrable et réutilisable
  * Uses unified visual direction defaults

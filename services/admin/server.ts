@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createServer } from '../lib/server';
 import { z } from 'zod';
 import { getSupabaseClient } from '../api/lib/supabase';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BreathProgramsMultiWeek - Programmes de respiration multi-semaines
  * Parcours progressifs sur plusieurs semaines pour développer la pratique

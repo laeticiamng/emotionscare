@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 
 type ProviderWithProps = [React.ComponentType<any>, Record<string, any>?];

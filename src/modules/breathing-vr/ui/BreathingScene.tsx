@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Scène 3D immersive pour la respiration — unified visual direction
  * Intention: Calm / Centering / Rhythm

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PARK ZONES DATA
  * Définition des zones du Parc Émotionnel

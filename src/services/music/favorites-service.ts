@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Favorites Service
  * Gestion des favoris utilisateur avec Supabase

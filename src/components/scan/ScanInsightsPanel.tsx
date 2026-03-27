@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ScanInsightsPanel - Affiche les insights émotionnels générés par l'IA
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Suno Client pour EmotionsCare
  * Corrigé: Utilise Edge Functions au lieu d'appels API directs

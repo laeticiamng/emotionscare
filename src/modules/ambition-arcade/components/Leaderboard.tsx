@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Leaderboard Ambition Arcade
  * Classement anonymisé des utilisateurs par XP

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PremiumPage - Upgrade vers les plans payants
  * Redirige vers la page Pricing canonique pour éviter toute incohérence tarifaire

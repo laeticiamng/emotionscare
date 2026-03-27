@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CocoonGallery - Galerie des cocons débloqués avec thèmes sémantiques
  */

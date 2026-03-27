@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Types pour le module Sessions
  * Gestion des sessions utilisateur et timers

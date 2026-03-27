@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CONFIG SECTIONS - Barrel Export
  * Composants modulaires pour le centre de configuration

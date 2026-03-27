@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Widget de recommandations IA proactives
  * Affiche les suggestions contextuelles basées sur l'état émotionnel

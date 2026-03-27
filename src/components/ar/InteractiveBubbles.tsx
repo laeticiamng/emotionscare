@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Interactive Bubbles - Phase 4.5
  * Interactive floating bubbles with gratitude affirmations

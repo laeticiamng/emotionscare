@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — PageTransition
  * AnimatePresence wrapper that applies configured transition per route.

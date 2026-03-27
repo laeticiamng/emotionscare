@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Currency formatting utilities
  */

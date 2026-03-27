@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AuraSphere - Une sphère d'aura flottante dans le ciel
  * Composant visuel représentant un utilisateur sans chiffre

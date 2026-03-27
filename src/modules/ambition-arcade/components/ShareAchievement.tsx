@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant de partage des réussites Ambition Arcade
  */

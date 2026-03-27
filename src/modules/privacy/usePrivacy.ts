@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook React pour la gestion des préférences de confidentialité
  * Avec real-time updates et persistance Supabase

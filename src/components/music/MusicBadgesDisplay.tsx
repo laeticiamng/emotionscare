@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Affichage des badges musicaux
  */

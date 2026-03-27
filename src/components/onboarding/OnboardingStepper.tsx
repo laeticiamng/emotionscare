@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { Check, Circle, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';

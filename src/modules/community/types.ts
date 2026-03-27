@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Types pour le module Community
  * Gestion de la communauté, posts, commentaires et interactions

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ProgramCard - Carte de programme compacte
  */

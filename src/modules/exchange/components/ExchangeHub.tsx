@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Exchange Hub - Main dashboard for all markets
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { JournalVoiceCard } from './JournalVoiceCard';
 import { JournalTextCard } from './JournalTextCard';

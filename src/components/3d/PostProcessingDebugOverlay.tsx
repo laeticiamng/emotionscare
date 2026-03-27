@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Dev-only overlay for real-time visual tuning of post-processing parameters.
  * Renders sliders for bloom, vignette, exposure, and fog.

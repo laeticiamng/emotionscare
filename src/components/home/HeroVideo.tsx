@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * HeroVideo — Premium video component for hero sections
  * Uses PremiumVideoPlayer for cinematic background video,

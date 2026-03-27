@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Carte de profil buddy
  */

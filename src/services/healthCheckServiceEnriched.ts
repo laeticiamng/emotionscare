@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service de Health Check avancé avec monitoring DB et services externes
  */

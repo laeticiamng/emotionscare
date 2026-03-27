@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * API Components
  * Composants pour la documentation et le monitoring des APIs

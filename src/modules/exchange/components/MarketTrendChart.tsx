@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Market Trend Chart - Mini sparkline chart for market trends
  */

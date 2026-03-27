@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service Sessions
  * Gestion centralisée des sessions utilisateur

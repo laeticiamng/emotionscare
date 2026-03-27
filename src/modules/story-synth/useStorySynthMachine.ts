@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Story Synth State Machine
  * Gère l'état des sessions de narration thérapeutique

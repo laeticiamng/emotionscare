@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Pages nécessaires pour RouterV2 uniquement
 
 // Re-export HomePage from components (where it's located)

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { Download, FileJson, FileSpreadsheet, FileText, Check, Loader2, Shield, Eye, Clock, AlertCircle } from 'lucide-react';

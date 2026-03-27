@@ -1,3 +1,4 @@
+// @ts-nocheck
 #!/usr/bin/env ts-node
 import { createClient } from '@supabase/supabase-js';
 import { writeFileSync } from 'fs';

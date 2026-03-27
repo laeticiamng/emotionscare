@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { memo, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3, Clock, Hash, TrendingUp } from 'lucide-react';

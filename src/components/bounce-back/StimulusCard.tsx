@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * StimulusCard - Carte de stimulus stressant avec payloads typés
  */

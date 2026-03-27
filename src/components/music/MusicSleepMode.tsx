@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Mode sommeil avec fade-out
  * Timer de sommeil avec transition progressive

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoachSessionHistory - Historique des sessions de coaching
  */

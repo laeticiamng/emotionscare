@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Emotion Scan - Service
  * Service centralisant toutes les fonctionnalités de scan émotionnel

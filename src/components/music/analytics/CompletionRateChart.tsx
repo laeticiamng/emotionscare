@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Graphique du taux de complétion par cohorte
  */

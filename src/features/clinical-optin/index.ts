@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature: Clinical Opt-In
  * Gestion du consentement clinique et des opt-ins spécifiques

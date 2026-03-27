@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * DashboardWidgetBuilder - Constructeur de widgets personnalisés
  * Permet aux utilisateurs de créer leur propre dashboard

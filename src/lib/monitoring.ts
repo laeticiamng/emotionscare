@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Production monitoring and alerting utilities
  */

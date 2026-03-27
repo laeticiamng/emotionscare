@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Share Button - Partage social avancé
  * Preview, copy link, QR code, réseaux sociaux

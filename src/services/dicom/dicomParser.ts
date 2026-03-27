@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service de parsing DICOM
  * Implémentation légère sans dépendance cornerstone

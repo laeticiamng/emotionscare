@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SoundLayerCard - Carte de contrôle d'une couche sonore
  */

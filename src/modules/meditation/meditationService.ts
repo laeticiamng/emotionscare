@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Meditation Service - API calls et business logic
  */

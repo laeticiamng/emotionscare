@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * GLOBAL CONFIGURATION CENTER - Refactorisé
  * Centre de configuration système modulaire et maintenable

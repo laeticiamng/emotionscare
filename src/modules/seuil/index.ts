@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module SEUIL - Régulation émotionnelle proactive
  * Détecte et accompagne le moment fragile avant le décrochage

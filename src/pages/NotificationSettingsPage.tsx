@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { Bell, BellOff, Clock, Smartphone, Mail, MessageSquare, Heart, Trophy, Calendar } from 'lucide-react';

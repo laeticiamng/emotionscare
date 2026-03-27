@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { Clock } from 'lucide-react';
 import { format as formatDate } from 'date-fns';

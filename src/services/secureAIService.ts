@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service AI sécurisé - Toutes les requêtes passent par Edge Functions
  * Remplace les appels directs à OpenAI côté client

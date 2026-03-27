@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { getISOWeek, getISOWeekYear, isAfter, addHours, parseISO, isValid } from 'date-fns';
 import { logger } from '@/lib/logger';

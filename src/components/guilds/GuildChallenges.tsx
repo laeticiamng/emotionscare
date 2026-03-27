@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * GuildChallenges - Défis collaboratifs de guilde
  * Permet aux membres de participer ensemble

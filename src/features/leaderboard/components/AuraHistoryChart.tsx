@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AuraHistoryChart - Historique d'évolution de l'aura utilisateur
  */

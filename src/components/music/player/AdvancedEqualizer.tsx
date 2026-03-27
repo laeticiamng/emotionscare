@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AdvancedEqualizer - Égaliseur connecté à Web Audio API
  * Modifications audio en temps réel

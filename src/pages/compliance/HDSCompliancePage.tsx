@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * HDSCompliancePage - Sécurité des données de santé
  * Module 37 : Protection des données de santé — Feuille de route

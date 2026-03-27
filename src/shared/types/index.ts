@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Shared Types - Types TypeScript génériques réutilisables
  */

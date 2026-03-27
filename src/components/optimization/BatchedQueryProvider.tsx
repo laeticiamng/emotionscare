@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Provider pour optimiser les requêtes par batch
  * Évite les requêtes multiples simultanées

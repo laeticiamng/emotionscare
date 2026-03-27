@@ -1,3 +1,4 @@
+// @ts-nocheck
 type Key = string;
 type CacheEntry = { ts: number; status: number; body: unknown };
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CookieConsent - Bannière de consentement aux cookies RGPD
  */

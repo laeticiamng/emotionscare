@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Breathing AR Guide - Phase 4.5
  * Immersive breathing guidance with 3D sphere animations

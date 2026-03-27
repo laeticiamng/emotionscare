@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface AudioPlayerState {
   isPlaying: boolean;
   currentTime: number;

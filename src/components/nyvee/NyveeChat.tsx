@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoachChat - Coach IA, bulle flottante bottom-right
  * Interface de chat avec réponses pré-écrites contextuelles

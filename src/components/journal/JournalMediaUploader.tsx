@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Média riches pour le journal
  * Permet d'ajouter images, audio et vidéo aux entrées

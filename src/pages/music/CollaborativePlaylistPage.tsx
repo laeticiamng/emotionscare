@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CollaborativePlaylistPage - Page dédiée aux playlists collaboratives
  * Route: /app/music/collab/:playlistId

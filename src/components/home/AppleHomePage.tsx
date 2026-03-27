@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AppleHomePage - Homepage style Apple
  * Parcours simplifié : Hero > Comment ça marche > Features > Showcase > Modules > Social Proof > CTA

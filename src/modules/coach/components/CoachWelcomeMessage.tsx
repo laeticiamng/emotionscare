@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoachWelcomeMessage - Message d'accueil personnalisé
  */

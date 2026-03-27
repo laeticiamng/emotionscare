@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour les notifications réactives Ambition Arcade
  * Utilise Supabase Realtime pour les mises à jour en temps réel

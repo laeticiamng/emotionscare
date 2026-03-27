@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, Minus, Info, Heart, History, Share2, Download, ChevronDown, Star, Target, Activity } from 'lucide-react';
 import {

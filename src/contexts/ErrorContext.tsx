@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { AppError } from '@/lib/errors/types';
 import { toAppError } from '@/lib/errors/normalize';

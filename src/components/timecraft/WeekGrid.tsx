@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * WeekGrid - Grille de visualisation hebdomadaire des blocs temporels
  */

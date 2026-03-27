@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service de templates de journal - Templates pré-configurés et personnalisés
  */

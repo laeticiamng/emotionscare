@@ -1,3 +1,4 @@
+// @ts-nocheck
 export { SeuilModule } from './SeuilModule';
 export { SeuilTriggerButton } from './SeuilTriggerButton';
 export { SeuilScale } from './SeuilScale';

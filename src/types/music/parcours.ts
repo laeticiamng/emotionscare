@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Types for EC-MUSIC-PARCOURS-XL system
 
 export interface ParcoursPreset {

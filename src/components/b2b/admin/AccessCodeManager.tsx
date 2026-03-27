@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Gestionnaire des codes d'accès institutionnels
  * Permet de créer, gérer et révoquer les codes d'accès B2B

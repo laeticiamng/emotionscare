@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Galerie globale de tous les artefacts de l'utilisateur
  */

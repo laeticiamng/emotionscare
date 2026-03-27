@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect, memo } from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * FlashGlowSessionHistory - Historique des sessions Flash Glow
  */

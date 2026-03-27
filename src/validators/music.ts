@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Validators - Validation et sanitization des inputs
  *

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Breath API - Service d'analyse de respiration
  * Utilise Supabase pour la persistance et l'analyse

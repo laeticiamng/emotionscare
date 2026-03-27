@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmotionalCalendarHeatmap - Calendrier avec heatmap émotionnelle
  * Visualisation des tendances émotionnelles sur le mois

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoachPersonalitySelector - Sélecteur de personnalité du coach
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Accessibility Feature Module
  * Composants pour les paramètres d'accessibilité

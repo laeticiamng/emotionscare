@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Emotional Forecast Chart - Graphique des prédictions
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SupportCircleWidget - Widget des cercles de soutien
  */

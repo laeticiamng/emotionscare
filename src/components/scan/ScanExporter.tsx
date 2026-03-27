@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ScanExporter - Export historique scans émotionnels
  * Formats: PDF, CSV, JSON

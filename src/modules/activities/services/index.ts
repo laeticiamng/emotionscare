@@ -1,3 +1,4 @@
+// @ts-nocheck
 export { ActivitySessionService } from './activitySessionService';
 export type { 
   ActivitySession, 

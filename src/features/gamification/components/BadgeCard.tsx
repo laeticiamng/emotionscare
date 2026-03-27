@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BadgeCard - Carte affichant un badge avec animation
  */

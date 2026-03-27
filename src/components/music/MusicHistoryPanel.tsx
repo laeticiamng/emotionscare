@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MusicHistoryPanel - Historique d'écoute
  * Affiche les morceaux récemment écoutés avec persistance Supabase

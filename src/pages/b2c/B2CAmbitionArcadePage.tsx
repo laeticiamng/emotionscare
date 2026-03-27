@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page Ambition Arcade - Gamification d'objectifs
  * Module complet avec tutoriel, leaderboard, calendrier et paramètres

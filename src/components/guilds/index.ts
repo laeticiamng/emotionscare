@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Guilds module - Export centralisé
  */

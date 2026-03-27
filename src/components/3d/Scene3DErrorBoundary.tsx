@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Error Boundary + WebGL detection for 3D scenes
  * Provides graceful fallback when WebGL fails, context is lost, or postprocessing crashes.

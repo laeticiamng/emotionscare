@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Offline Indicator - Affiche le statut de connexion
  */

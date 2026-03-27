@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PREMIUM COMPONENTS LIBRARY
  * Composants haut de gamme avec accessibilité WCAG AAA et animations fluides

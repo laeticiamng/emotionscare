@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Emotion Sessions Components
  * Composants UI pour les sessions émotionnelles

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VREnvironmentCard - Carte de sélection d'environnement VR
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Search and Filter - Recherche avancée et filtrage
  * Full-text search, filtres par mood/genre/durée

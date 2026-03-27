@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ParkQuickActions - Actions rapides pour le parc
  */

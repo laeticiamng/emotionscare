@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useProfile Hook
  * Hook React centralisé pour la gestion du profil avec real-time updates

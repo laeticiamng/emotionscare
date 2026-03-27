@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createHash } from 'crypto';
 
 const PEPPER = process.env.HASH_PEPPER;

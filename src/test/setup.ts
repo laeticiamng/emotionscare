@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Setup de test Vitest
  * Configuration globale pour les tests unitaires

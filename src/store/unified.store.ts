@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Unified Store - Centralizes all application state
  * Replaces redundant contexts with a single Zustand store

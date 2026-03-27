@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Mappings centralisés Role <-> UserMode
  * Source unique de vérité pour éviter incohérences

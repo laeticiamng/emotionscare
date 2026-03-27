@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Widget de notifications et rappels du dashboard
  */

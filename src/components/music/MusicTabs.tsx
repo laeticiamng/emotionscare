@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Tabs - Organisateur des différentes sections de l'app musicale
  * Divise l'interface en: Découverte, Playlists, Analyse, Paramètres

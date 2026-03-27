@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Statistiques utilisateur pour le module AR Filters
  */

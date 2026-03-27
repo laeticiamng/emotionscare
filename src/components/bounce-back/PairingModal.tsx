@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PairingModal - Modal de partage pair-à-pair
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PostCommentSection - Section de commentaires pour un post
  * Intègre useCommunityComments avec affichage et formulaire

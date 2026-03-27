@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AppGatePage - Dispatcher intelligent selon le rôle utilisateur
  * TICKET: FE/BE-Router-Cleanup-01

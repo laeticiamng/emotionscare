@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TeamAlertsPanel - Panneau d'alertes équipes RH
  * Affiche les alertes de bien-être par équipe

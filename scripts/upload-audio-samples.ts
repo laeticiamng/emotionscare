@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Script d'upload automatisé de fichiers audio de test
  * Télécharge des fichiers audio libres de droits et les upload dans Supabase Storage

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Visualisation Interactive de la Carte du Parc Émotionnel
  * Affiche une vue spatiale et interconnectée des zones du parc

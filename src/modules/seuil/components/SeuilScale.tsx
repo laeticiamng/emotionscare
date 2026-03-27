@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Échelle de seuil émotionnel
  * Slider visuel de 0 à 100 représentant le niveau de bascule

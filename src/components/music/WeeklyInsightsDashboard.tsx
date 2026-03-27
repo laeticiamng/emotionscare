@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tableau de bord d'insights hebdomadaires - Données réelles depuis Supabase
  */

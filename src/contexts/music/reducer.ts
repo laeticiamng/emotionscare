@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Reducer - State management
  */

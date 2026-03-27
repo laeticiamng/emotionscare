@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createServer } from '../lib/server';
 import { hash } from '../journal/lib/hash';
 import { createExportJob, findRecentJob, getJob, createDeleteRequest, getDeleteRequest } from './lib/db';

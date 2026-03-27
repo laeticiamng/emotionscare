@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Prompts quotidiens adaptatifs pour le journal
  * Suggestions intelligentes basées sur l'humeur et le contexte

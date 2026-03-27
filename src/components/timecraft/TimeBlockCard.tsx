@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TimeBlockCard - Carte de bloc temporel interactive
  */

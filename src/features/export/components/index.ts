@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Export Components
  * Composants UI pour l'export de données

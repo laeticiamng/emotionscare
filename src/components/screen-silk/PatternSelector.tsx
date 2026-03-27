@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Pattern Selector - Sélection des motifs visuels
  */

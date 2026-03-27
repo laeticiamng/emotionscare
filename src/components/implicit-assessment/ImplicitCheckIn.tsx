@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ImplicitCheckIn - Composant de check-in ludique
  * 

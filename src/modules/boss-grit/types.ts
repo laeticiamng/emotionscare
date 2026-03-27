@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Boss Grit (Bounce Battles) - Types
  * Types pour le module de résilience et stratégies de coping

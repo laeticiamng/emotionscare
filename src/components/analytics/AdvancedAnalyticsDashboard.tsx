@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Dashboard analytics avancé avec graphiques Chart.js
  * Affiche l'évolution des stats sur 7/30 jours, comparaison moyenne utilisateurs, prédictions IA

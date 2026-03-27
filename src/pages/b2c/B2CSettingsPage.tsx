@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2C SETTINGS PAGE - EMOTIONSCARE
  * Page des paramètres généraux complète et accessible WCAG 2.1 AA

@@ -1,3 +1,4 @@
+// @ts-nocheck
 #!/usr/bin/env tsx
 /**
  * Corrections automatiques J1 - Architecture

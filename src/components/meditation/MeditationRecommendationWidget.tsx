@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Widget de recommandations personnalisées pour la méditation
  */

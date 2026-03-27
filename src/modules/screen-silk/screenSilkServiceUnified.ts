@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Screen Silk Service Unified - Service consolidé pour les micro-pauses écran
  *

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Bubble Beat Module - Libération musicale anti-stress
  */

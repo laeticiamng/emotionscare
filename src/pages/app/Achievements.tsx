@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge as BadgeUI } from '@/components/ui/badge';

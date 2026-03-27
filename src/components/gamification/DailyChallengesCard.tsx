@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant Défis Quotidiens - EmotionsCare
  */

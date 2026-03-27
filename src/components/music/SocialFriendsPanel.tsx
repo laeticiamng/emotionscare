@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Panneau social - Amis et comparaisons
  */

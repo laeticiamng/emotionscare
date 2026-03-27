@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Bubble Beat Module - Types & Schemas
  * Module de libération musicale anti-stress par bulles

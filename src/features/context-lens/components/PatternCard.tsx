@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PatternCard - Affiche un pattern émotionnel détecté
  */

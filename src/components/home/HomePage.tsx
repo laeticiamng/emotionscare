@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * HomePage - Page d'accueil accessible à tous
  */

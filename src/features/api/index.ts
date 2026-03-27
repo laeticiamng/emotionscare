@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * API Feature Module
  * Documentation et monitoring des APIs

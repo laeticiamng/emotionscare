@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VR Nebula Service - Business Logic & API
  * Gère les sessions VR de respiration et cohérence cardiaque

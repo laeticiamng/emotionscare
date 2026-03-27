@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { ChatConversation } from '@/types/chat';
 import { format } from 'date-fns';

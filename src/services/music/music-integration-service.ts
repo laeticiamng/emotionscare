@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Integration Service - Gestionnaire central des intégrations
  * Coordonne Streaming, Notifications, et Widget

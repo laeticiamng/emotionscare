@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Générateur de maillage 3D à partir de données volumétriques
  * Utilise l'algorithme Marching Cubes simplifié

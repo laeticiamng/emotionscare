@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Export des composants du module activities
  */

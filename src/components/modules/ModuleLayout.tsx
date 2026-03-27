@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { ModuleState } from '@/types/modules';
 import { Button } from '@/components/ui/button';

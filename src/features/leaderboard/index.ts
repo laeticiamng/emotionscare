@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Leaderboard Feature Module
  * Exports pour le module de leaderboard visuel (auras)

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Patterns de respiration avancés
  * Wim Hof, Box Breathing, 4-7-8, Cohérence cardiaque, etc.

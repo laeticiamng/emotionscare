@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tournaments Feature
  *

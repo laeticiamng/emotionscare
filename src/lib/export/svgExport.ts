@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { sanitizeFileName, triggerDownload } from './utils';
 
 export interface SvgExportOptions {

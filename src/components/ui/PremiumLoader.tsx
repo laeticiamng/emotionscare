@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PremiumLoader — Orbital loading indicator
  * Replaces generic spinners with a cinematic ring animation

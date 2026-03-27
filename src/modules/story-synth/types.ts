@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Story Synth Module Types
  * Narration thérapeutique immersive

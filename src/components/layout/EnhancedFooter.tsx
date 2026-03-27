@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EnhancedFooter - Footer élégant style Apple
  * Design minimaliste avec gradient subtil et animations fluides

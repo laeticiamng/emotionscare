@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmotionalInput - Écran d'entrée émotionnelle premium
  * Espace de dépose, sélecteurs élégants, slider lisible

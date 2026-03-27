@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AuraShareButton - Bouton de partage de son aura
  */

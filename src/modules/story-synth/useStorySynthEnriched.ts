@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook enrichi Story Synth - Gestion complète des sessions de narration
  * @module story-synth

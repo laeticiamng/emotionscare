@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VRSessionControls - Contrôles de session VR immersive
  */

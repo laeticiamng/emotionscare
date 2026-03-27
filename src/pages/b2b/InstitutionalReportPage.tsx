@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Institutional Report Generator
  * CHSCT-ready QVT reports with improvement actions

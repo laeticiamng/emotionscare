@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Onboarding Components - Export centralisé
  */

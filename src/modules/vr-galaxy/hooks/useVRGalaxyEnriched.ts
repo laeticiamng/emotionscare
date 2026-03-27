@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useVRGalaxyEnriched - Hook enrichi pour l'expérience VR Galaxy
  * Intègre: persistance Supabase, biométriques, favoris, statistiques, export

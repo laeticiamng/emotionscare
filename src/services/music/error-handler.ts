@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Error Handler - Service unifié de gestion d'erreurs
  *

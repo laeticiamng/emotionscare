@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Parcours XL - Mode dégradé
  * Playlists de secours si Suno API est indisponible

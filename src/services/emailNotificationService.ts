@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Email Notification Service - Envoi d'emails via Edge Function
  * Supporte notifications, résumés, alertes

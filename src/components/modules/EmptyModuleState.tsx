@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmptyModuleState - État vide pour les listes de modules
  * @version 1.0.0

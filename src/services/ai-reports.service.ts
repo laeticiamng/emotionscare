@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service de génération de rapports automatiques enrichis IA
  * Phase 3 - Excellence

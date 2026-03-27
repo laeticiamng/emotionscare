@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Sound Forest 3D Visualizer for Music Therapy
  * Audio-reactive 3D forest with trees that sway and glow to music

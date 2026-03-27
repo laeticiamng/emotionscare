@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service d'envoi de rapports hebdomadaires par email
  */

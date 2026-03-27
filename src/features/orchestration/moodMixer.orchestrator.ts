@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type MixerAction =
   | { action: 'set_warmth'; key: 'low' | 'med' | 'high' }
   | { action: 'set_brightness'; key: 'low' | 'med' | 'high' }

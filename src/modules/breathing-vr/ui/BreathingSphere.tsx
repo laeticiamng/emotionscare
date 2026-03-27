@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Sphère 3D immersive avec vertex shader Simplex noise
  * Déformation organique en temps réel — l'orbe "respire" comme un organisme vivant

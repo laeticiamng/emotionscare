@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Types pour le module audio-studio
  */

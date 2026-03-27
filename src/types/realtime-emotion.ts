@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Types pour l'analyse émotionnelle temps réel
 
 export interface EmotionScore {

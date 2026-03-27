@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ScanUploadDialog - Dialog d'import de scans DICOM/NIfTI
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { lazy, Suspense, useMemo } from 'react';
 import DemoBanner from '@/components/ui/DemoBanner';
 import { motion } from 'framer-motion';

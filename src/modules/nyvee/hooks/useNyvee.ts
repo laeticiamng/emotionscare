@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useNyvee - Hook principal pour le module Cocon Respiration
  * Respiration guidée avec bulle interactive

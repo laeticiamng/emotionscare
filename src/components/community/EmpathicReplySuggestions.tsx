@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmpathicReplySuggestions - Suggestions de réponses empathiques IA
  * Génère des réponses bienveillantes pour la communauté

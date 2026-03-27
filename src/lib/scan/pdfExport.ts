@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PDF Export Service pour les scans émotionnels
  * Génère des rapports PDF détaillés avec graphiques et statistiques

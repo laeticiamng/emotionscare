@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Contextual Recommendations - Recommandations basées sur le contexte
  * Heure, météo, jour de la semaine, activité

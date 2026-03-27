@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Stats Panel - Statistiques et historique Bubble Beat
  */

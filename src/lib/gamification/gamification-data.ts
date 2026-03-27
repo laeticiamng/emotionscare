@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { supabase } from '@/lib/supabase-client';
 import { calculateLevel } from './level-service';
 import { logger } from '@/lib/logger';

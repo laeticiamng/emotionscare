@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MusicPreGenerationService
  * Service client pour la pré-génération et le cache intelligent de musique

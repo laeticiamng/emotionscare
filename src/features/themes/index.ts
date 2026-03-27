@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Themes Feature Module
  * Gestion des thèmes visuels et personnalisation

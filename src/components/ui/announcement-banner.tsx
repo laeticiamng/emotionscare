@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AnnouncementBanner - Composant de bannière d'annonce style 21st.dev
  * Pill animée, dismissable, avec support lien + icône

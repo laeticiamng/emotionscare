@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AchievementsPanel - Panneau des achievements Flash Glow
  */

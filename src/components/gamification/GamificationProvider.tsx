@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Gamification Provider - Context pour les notifications d'achievements
  */

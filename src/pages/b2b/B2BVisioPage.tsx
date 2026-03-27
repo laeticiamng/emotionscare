@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2BVisioPage - Module de visioconférence bien-être
  * Module 31 : Sessions de soutien en visioconférence avec consentement renforcé

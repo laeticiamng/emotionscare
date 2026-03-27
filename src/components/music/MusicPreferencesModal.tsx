@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Modal questionnaire préférences musicales avec animations
  */

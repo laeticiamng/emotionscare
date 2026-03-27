@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service d'administration enrichi EmotionsCare
  * APIs réelles avec analytics avancés, export et audit

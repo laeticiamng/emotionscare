@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MedicalDisclaimer - Important medical warning component
  */

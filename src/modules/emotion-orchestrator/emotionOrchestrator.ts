@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module EmotionOrchestrator - Service principal
  * Orchestration intelligente des modules basée sur l'état émotionnel

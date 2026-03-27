@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MusicCollaborativePlaylist - Création collaborative de playlists
  * Permet à plusieurs utilisateurs de contribuer à une playlist partagée

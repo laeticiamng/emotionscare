@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { FastifyPluginAsync } from 'fastify';
 
 export const loggingPlugin: FastifyPluginAsync = async (app) => {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Dashboard - Tableau de bord
  * Service d'agrégation de statistiques du tableau de bord

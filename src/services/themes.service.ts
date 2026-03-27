@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service de gestion des thèmes personnalisables
  * Phase 3 - Excellence

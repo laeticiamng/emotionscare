@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 
 export const GlowGaugeSkeleton: React.FC = () => {

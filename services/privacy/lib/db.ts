@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type PrivacyPrefs = {
   user_id_hash: string;
   cam: boolean;

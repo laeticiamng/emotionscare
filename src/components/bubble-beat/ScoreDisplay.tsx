@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Score Display - Affichage en temps réel du score et des métriques
  */

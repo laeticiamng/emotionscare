@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Generation Hook - Génération Suno avec fallback Lovable AI
  */

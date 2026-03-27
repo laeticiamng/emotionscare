@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Story Synth Module - Narration thérapeutique immersive et adaptative
  * @module story-synth

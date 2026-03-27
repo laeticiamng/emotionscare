@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Exchange Data Export - Export user data in various formats
  */

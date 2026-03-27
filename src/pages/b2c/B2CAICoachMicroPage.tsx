@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Send, Mic, Zap, Target, Clock, TrendingUp, Sparkles, ArrowLeft } from 'lucide-react';

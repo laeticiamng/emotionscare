@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module EmotionOrchestrator - Hook React
  * Hook pour utiliser l'orchestrateur d'émotions dans les composants

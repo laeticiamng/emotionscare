@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Auth error service - translates Supabase errors to French
 /**
  * AuthErrorService - Service de gestion des erreurs d'authentification

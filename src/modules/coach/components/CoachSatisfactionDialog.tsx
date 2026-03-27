@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoachSatisfactionDialog - Dialog de feedback de satisfaction enrichi
  */

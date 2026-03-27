@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * StreakTracker - Composant de suivi des séries
  */

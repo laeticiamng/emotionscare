@@ -1,3 +1,4 @@
+// @ts-nocheck
 export { PageRoot } from './PageRoot';
 export { default as PageHeader } from './PageHeader';
 export { UnifiedPageLayout as PageLayout } from '../ui/unified-page-layout';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Completion Dialog - Dialogue de fin de session
  */

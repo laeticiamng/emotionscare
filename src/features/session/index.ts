@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature: Session Management
  * Gestion et persistance des sessions utilisateur

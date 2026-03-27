@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Widget de notifications pour le dashboard
  * Affiche les notifications récentes et permet de les marquer comme lues

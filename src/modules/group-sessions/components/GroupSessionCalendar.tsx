@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Calendrier des sessions de groupe
  */

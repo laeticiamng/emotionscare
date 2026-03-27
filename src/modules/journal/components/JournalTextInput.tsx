@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * JournalTextInput - Composant de saisie texte pour le journal
  * Day 41 - Module 21: Journal UI Components

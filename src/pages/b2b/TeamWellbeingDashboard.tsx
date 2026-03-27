@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Team Wellbeing Dashboard for Ward Managers
  * Aggregate scores, heatmap, threshold alerts

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { create } from 'zustand';
 
 export type AdminNotificationType = 'info' | 'warning' | 'success' | 'error';

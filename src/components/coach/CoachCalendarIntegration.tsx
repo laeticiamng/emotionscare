@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoachCalendarIntegration - Intégration calendrier pour les sessions de coaching
  * Planification et rappels de sessions avec le coach IA

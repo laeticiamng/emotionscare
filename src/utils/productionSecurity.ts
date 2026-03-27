@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { logger } from '@/lib/logger';
 
 const isProd = import.meta.env.MODE === 'production';

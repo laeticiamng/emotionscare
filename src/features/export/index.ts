@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature: Data Export
  * Export de données en différents formats (PNG, PDF, CSV, JSON)

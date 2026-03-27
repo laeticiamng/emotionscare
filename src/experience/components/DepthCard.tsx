@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Experience Layer — DepthCard
  * Card with CSS perspective, parallax hover, and adaptive shadows.

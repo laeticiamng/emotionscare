@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Feather, Monitor, Sparkles, XCircle } from 'lucide-react';

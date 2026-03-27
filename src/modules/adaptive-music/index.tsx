@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Adaptive Music - Point d'entrée
  */

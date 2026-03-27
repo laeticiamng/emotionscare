@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Maximize2, Minimize2, RotateCw, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';

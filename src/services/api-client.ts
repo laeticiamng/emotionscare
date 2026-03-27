@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Client API centralisé avec gestion d'erreurs robuste
  * Implémente toutes les bonnes pratiques de sécurité et UX

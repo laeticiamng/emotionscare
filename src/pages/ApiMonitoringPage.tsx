@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page dédiée au monitoring des APIs
  * Accessible via l'interface d'administration

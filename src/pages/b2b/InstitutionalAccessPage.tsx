@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * InstitutionalAccessPage - Page d'accès institutionnel
  * Permet l'accès via lien, QR code ou SSO

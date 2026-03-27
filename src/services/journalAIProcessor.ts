@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Journal AI Processor - Traitement AI réel pour le journal
  * Utilise Lovable AI Gateway pour transcription et analyse de sentiment

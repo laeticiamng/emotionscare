@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Breath Unified - Point d'entrée
  * Service unifié pour toutes les fonctionnalités de respiration

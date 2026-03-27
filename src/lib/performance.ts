@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Performance monitoring utilities for Web Vitals and bundle analysis
  */

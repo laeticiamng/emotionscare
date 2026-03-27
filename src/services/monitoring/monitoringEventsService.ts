@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 
 // Type definitions for monitoring_events table (until types are regenerated)

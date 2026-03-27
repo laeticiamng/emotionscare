@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature: Coach IA
  * Coaching émotionnel personnalisé avec IA

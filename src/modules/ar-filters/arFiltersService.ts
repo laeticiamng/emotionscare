@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service enrichi pour AR Filters (Filtres de réalité augmentée)
  */

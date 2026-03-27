@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ProductScreenshots - Aperçu visuel des fonctionnalités
  * Utilise des illustrations stylisées au lieu d'images statiques

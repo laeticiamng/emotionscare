@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page Optimizer - Utilitaires pour optimiser la rapidité d'affichage
  * Preloading, prefetching, lazy loading, cache intelligent

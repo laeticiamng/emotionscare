@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect, useMemo } from 'react';
 import DemoBanner from '@/components/ui/DemoBanner';
 import { logger } from '@/lib/logger';

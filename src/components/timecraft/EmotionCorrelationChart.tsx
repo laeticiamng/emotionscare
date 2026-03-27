@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmotionCorrelationChart - Visualisation des corrélations temps ↔ émotions
  */

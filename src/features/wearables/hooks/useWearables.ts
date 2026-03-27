@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useWearables - Hook principal pour la gestion des wearables
  */

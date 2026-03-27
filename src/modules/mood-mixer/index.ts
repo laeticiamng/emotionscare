@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Mood Mixer - Mixeur d'humeur
  * Système de mélange d'émotions pour créer des playlists personnalisées

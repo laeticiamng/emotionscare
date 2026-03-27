@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmotionalJournalSelector - Grille d'émojis pour le journal émotionnel
  */

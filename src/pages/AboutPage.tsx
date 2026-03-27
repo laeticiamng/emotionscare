@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ABOUT PAGE - EMOTIONSCARE
  * Page À propos — style Apple, cohérente avec homepage

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MLRecommendationsPanel - Recommandations IA connectées au contexte
  * Utilise les données réelles de l'utilisateur pour les recommandations

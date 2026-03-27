@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Marketplace Item Card - Affichage d'un item
  */

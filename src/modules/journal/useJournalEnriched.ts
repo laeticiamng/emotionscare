@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useJournalEnriched - Hook enrichi pour le journal avec stats, favoris, archives
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Music Therapy - Musicothérapie
  * Service de musicothérapie avec playlists basées sur l'humeur

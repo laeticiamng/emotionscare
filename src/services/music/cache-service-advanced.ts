@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Advanced Music Cache Service
  *

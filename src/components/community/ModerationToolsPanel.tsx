@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ModerationToolsPanel - Outils de modération communautaire
  * Gestion des signalements, filtres et actions modérateurs

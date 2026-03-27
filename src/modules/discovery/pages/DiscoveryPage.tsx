@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page principale du module Discovery
  * @module discovery

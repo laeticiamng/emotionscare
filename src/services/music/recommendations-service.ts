@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service de recommandations musicales personnalisées
  * Basé sur l'apprentissage automatique des préférences

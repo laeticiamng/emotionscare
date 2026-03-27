@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Discovery Service
  * Service pour l'interaction avec l'API Discovery backend

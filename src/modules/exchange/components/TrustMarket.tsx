@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Trust Market - Exchange and invest trust
  */

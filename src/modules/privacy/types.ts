@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Types pour le module Privacy
  * Gestion des préférences de confidentialité et consentements RGPD

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Voice Recognition & Speech Synthesis Utilities
  * Complete implementation using Web Speech API

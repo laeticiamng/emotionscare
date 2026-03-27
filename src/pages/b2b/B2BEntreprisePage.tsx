@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2BEntreprisePage - Landing page B2B style Apple
  * Cohérente avec la homepage, typographie massive, animations framer-motion

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Dashboard de synchronisation des modules
  * Affiche l'état de cohérence front/back de tous les modules

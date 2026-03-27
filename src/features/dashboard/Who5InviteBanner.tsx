@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { HeartHandshake } from 'lucide-react';

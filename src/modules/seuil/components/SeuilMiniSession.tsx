@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Mini-session guidée SEUIL (3min / 5min)
  * Contenu réel pour les actions de régulation

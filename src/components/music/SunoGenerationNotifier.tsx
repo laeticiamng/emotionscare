@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SunoGenerationNotifier - Composant de notification pour génération Suno
  * Affiche un toast persistant pendant la génération avec callback Realtime

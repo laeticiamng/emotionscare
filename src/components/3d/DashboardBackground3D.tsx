@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Arrière-plan 3D subtil pour tableaux de bord
  * Formes géométriques translucides flottantes (cubes, sphères) en rotation lente

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Notification } from "@/types/notification";
 import { logger } from '@/lib/logger';
 

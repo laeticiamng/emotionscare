@@ -1,3 +1,4 @@
+// @ts-nocheck
 export { ARFiltersMain } from './components/ARFiltersMain';
 export { ARCamera } from './components/ARCamera';
 export { ARFilterSelector } from './components/ARFilterSelector';

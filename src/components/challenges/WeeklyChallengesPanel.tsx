@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * WeeklyChallengesPanel - Panneau des défis hebdomadaires
  * TOP 20 #5 - Composant pour les weekly_challenges

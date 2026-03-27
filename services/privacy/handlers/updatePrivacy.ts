@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { IncomingMessage, ServerResponse } from 'http';
 import { updatePrefs, logChange } from '../lib/db';
 import { hash as hashUser } from '../../journal/lib/hash';

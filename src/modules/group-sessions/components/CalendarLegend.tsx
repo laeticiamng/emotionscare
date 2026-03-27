@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Légende du calendrier des sessions
  */

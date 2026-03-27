@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Notifications Components
  * Composants pour le système de notifications

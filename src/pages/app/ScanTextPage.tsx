@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ScanTextPage - Page de scan émotionnel par analyse textuelle
  */

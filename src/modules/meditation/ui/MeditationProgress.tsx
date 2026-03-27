@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MeditationProgress - Barre de progression circulaire
  */

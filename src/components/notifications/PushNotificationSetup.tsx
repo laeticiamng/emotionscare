@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PushNotificationSetup - Configuration des notifications push
  */

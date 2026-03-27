@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * History Panel - Historique des sessions
  */

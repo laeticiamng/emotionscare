@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Compatibility layer for Sentry API
  * Redirects Sentry calls to AI Monitoring

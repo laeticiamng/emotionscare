@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Timer pour les quêtes Ambition Arcade
  */

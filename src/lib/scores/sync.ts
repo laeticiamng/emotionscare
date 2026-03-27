@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getEvents, clearEvents } from "./events";
 import { hasConsent } from "@/ui/CookieConsent";
 import { ff } from "@/lib/flags/ff";

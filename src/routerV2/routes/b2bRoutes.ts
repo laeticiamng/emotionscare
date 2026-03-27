@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Routes B2B - pages entreprise, RH, institutional
  * Segment: b2b

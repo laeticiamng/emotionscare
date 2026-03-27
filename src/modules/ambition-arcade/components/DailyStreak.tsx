@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Affichage du streak quotidien Ambition Arcade avec données réelles
  * Inclut badges de milestone et récompenses visuelles

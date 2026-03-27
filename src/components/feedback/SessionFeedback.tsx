@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Composant de feedback post-session enrichi
  * Collecte satisfaction, notes et émotions

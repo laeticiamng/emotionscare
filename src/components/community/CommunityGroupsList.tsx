@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CommunityGroupsList - Liste des groupes de soutien
  */

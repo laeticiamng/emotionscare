@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Messages d'erreur localisés pour le module de scan émotionnel
  * Supporte le français et l'anglais

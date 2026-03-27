@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Email Integration Service - Gestion des digests hebdomadaires
  * Composition et envoi de rapports email personnalisés

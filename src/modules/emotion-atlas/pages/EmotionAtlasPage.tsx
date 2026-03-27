@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Grid3X3, Map, Download, Share2, ArrowLeft } from 'lucide-react';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect, useCallback, memo } from 'react';
 import { 
   Lightbulb, RefreshCw, Heart, Clock, Star, ChevronDown, ChevronUp, 

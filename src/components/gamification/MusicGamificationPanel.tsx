@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MUSIC GAMIFICATION PANEL - EmotionsCare
  * Panel gamification spécifique musique

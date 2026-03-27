@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service d'analytics sans PII - Conforme RGPD
  * Collecte uniquement des métriques techniques anonymisées

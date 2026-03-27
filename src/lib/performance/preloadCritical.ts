@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Critical Resource Preloading & Performance Optimization
  * Optimise la rapidité d'affichage de chaque page

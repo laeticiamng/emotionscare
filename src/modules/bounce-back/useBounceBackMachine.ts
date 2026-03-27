@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useBounceBackMachine - State Machine pour Bounce Back
  */

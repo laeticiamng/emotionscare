@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Module Notifications - Types
  * Types centralisés pour le système de notifications

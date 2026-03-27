@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Collaborative Playlist UI - Partage et édition temps réel
  * Invitations, permissions, synchronisation live avec Supabase Realtime

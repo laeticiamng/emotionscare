@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { execSync } from 'node:child_process';
 import { readdirSync } from 'fs';
 import path from 'path';

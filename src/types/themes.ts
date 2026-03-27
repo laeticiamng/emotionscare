@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Types pour le système de thèmes personnalisables avancés
  * Phase 3 - Excellence

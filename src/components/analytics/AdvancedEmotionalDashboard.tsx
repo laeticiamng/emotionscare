@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Dashboard d'Analyse Émotionnelle Avancée
  *

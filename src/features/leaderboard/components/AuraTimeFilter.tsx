@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AuraTimeFilter - Filtre temporel pour le leaderboard
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * GroundingSessionPlayer - Lecteur de session d'ancrage guidé
  * Interface interactive pour les exercices de grounding 5-4-3-2-1

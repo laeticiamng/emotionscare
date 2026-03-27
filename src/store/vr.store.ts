@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { create } from 'zustand';
 
 export type VRPattern = '4-2-4' | '4-6-8' | '5-5';

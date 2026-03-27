@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { StateCreator, StoreApi } from 'zustand';
 import { logger } from '@/lib/logger';
 

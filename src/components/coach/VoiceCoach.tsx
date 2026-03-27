@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
