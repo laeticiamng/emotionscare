@@ -1,5 +1,5 @@
-// @ts-nocheck
 #!/usr/bin/env ts-node
+// @ts-nocheck
 import { createClient } from '@supabase/supabase-js';
 import { writeFileSync } from 'fs';
 import 'dotenv/config';
