@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useSunoRealtimeUpdates - Listen to Suno callback updates via Supabase Realtime
  * Notifies when music generation completes

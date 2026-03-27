@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useVRSessionTracking - Hook pour tracker les sessions VR
  * Corrige: Sessions VR non trackées

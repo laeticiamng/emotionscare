@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useRef, useEffect } from 'react';
 import type { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';

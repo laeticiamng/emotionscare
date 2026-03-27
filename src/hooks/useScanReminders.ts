@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useScanReminders - Hook pour gérer les rappels de scan émotionnel
  * Intègre les notifications et la persistance

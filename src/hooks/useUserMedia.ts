@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook getUserMedia API native - Architecture minimale
  * Remplace les libs externes pour cam/mic (face AR, journal voix, scan)

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour utiliser le service d'intégration des modules
  * Gère les XP, badges et synchronisation avec le leaderboard

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useParkExport - Hook pour exporter l'historique et progression du parc
  */

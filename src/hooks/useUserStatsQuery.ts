@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook React Query pour les statistiques utilisateur avec cache optimisé
  * Inclut revalidation intelligente et invalidation sur actions

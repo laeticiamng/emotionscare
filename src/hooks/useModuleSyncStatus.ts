@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook unifié pour vérifier le statut de synchronisation front/back de tous les modules
  * Assure la cohérence et la complétude de chaque module

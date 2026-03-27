@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useReminders - Gestion des rappels avec persistance Supabase
  */

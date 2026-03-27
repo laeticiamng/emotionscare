@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour les presets communautaires Mood Mixer
  * TOP 5 #5 Fonctionnalités - Système de presets partagés

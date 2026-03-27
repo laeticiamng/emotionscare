@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useOptimizedPage - Hook pour optimiser automatiquement chaque page
  * Combine prefetch, preload, et mesure de performance

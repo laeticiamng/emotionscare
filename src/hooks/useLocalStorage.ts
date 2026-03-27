@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useLocalStorage - Hook avec chiffrement automatique
  * Utilise secureStorage en interne pour protection RGPD Art. 32

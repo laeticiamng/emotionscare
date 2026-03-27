@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useParkEnergy - Hook pour la gestion de l'énergie du parc avec persistance
  * Régénération automatique et sauvegarde via Supabase

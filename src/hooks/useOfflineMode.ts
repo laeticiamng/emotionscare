@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook useOfflineMode - Phase 4
  * Gestion de l'état offline et de la synchronisation

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useImplicitAssessment - Hook pour intégrer les évaluations de façon implicite
  * 

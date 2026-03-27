@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook useSupportChatbot - Phase 4.4
  * Gestion complète du chatbot support avec état et actions

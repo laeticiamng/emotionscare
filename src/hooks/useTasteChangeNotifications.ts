@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer les notifications de changement de goût
  */

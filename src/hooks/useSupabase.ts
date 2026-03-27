@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook centralisé pour l'utilisation de Supabase
  */

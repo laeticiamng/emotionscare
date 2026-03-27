@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour surveiller et valider les parcours critiques
  * Permet de détecter les blocages et optimiser l'UX

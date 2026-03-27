@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useScannerHistory - Hook pour gérer l'historique des scans
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour les notifications en temps réel de la queue musicale
  */

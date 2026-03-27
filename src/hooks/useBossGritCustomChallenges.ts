@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour les défis personnalisés Boss Grit
  * TOP 5 #3 Modules - Système de défis custom

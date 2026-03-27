@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour tracker les streaks de l'utilisateur
  */

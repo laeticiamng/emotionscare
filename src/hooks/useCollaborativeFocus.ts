@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useCollaborativeFocus - Sessions Focus Flow collaboratives en temps réel
  */

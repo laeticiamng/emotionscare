@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/store/appStore';

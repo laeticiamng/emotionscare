@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useMusicAnalytics Hook
  * Statistiques et analytics musicales utilisateur

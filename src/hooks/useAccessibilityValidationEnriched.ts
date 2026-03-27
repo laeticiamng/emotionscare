@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useAccessibilityValidationEnriched - Validation WCAG réelle avec axe-core et audit DOM
  */

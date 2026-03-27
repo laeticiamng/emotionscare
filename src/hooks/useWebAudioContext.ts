@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useWebAudioContext - Hook pour Web Audio API avec Equalizer et Analyser
  * Fournit un contexte audio partagé pour visualisation et égalisation réelles

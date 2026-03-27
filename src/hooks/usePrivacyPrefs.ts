@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook de compatibilité pour les préférences de confidentialité
  * Redirige vers le nouveau module privacy

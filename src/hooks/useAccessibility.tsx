@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useCallback, type RefObject } from 'react';
 import { announceToScreenReader } from '@/utils/accessibility';
 

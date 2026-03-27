@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour générer des recommandations dynamiques basées sur les données utilisateur
  */

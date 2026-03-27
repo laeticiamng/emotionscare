@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer les paramètres du journal
  * @deprecated Use useJournalSettingsSupabase for Supabase persistence

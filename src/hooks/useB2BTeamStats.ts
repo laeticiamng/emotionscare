@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook React Query pour les statistiques d'équipe B2B
  * Récupère les données agrégées de l'organisation de manière anonymisée

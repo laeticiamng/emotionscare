@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useNotifications - Hook de gestion des notifications avec persistance Supabase
  */

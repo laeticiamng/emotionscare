@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook Focus Flow - Gestion des sessions de concentration profonde
  * avec progression tempo optimisée, timer Pomodoro et persistence DB

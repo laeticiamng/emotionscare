@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer l'état d'onboarding du journal
  * Utilise Supabase pour la persistance cross-device

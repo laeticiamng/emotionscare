@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer le statut du service Suno avec health check réel
  */

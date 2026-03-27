@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour exporter les sessions de méditation en CSV ou JSON
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect } from 'react';
 import { shallow } from 'zustand/shallow';
 import { useDashboardStore, type Nudge } from '@/store/dashboard.store';

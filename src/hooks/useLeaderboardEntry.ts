@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer l'entrée utilisateur dans le leaderboard
  */

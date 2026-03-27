@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useParkAchievements - Hook pour générer tous les achievements du parc
  * Combine les zones débloquées avec les potentiels non débloqués

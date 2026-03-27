@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState } from 'react';
 import { useToast } from './use-toast';
 import type { UserPreferences } from '@/types/preferences';

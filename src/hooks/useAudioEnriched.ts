@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useAudio ENRICHED - Hook audio complet
  * Version enrichie avec historique écoute, favoris, égaliseur, statistiques

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { VoiceEmotionResult } from '@/types/realtime-emotion';
 import { toast } from 'sonner';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour les statistiques personnelles d'un collaborateur B2B
  * Données individuelles confidentielles

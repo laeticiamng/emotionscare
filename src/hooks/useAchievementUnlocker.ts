@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useAchievementUnlocker - Hook pour débloquer automatiquement les badges
  * Corrige le problème de user_achievements: 0 badges

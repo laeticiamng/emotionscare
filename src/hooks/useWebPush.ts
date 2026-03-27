@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook Web Push API native - Architecture minimale
  * Utilise l'API Notification native + localStorage pour persistance

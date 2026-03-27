@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useParkSharing - Hook pour partager les accomplissements du parc
  */

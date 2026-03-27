@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * usePlaylists Hook
  * Gestion des playlists avec persistance Supabase

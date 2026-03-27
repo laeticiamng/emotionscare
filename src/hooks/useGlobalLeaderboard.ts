@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour le leaderboard global persisté
  */

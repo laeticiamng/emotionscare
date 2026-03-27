@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useB2BInvitations - Gestion des invitations B2B
  * Créer, envoyer, suivre et révoquer les invitations

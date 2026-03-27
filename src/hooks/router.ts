@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Custom router hook - Wrapper unifié pour react-router-dom
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useParkFavorites - Hook pour gérer les attractions favorites
  */

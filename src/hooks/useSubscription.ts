@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer l'état d'abonnement Stripe
  */

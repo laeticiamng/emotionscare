@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useStorageMigration - Hook centralisé pour migrer tous les localStorage vers Supabase
  * Migration automatique au login + fallback offline

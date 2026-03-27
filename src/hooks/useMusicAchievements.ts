@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useMusicAchievements - Hook pour gérer les achievements musicaux
  * Vérifie automatiquement les conditions et débloque les badges

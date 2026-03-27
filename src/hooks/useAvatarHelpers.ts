@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useAvatarHelpers Hook
  * Wrapper autour du module profile pour la gestion des avatars

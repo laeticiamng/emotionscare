@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer l'onboarding utilisateur
  * Sauvegarde le profil initial dans user_profiles

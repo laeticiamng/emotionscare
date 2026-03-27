@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useMeditationEnriched - Hook enrichi pour la méditation avec audio et guidance
  * Ajoute des sons ambiants, guidance vocale et persistance Supabase

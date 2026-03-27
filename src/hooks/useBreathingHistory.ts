@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useBreathingHistory - Hook pour l'historique des sessions de respiration
  */

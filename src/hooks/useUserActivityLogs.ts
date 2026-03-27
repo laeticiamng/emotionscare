@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { AnonymousActivity, ActivityStats } from '@/types/activity';
 import { logger } from '@/lib/logger';

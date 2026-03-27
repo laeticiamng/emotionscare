@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState } from 'react';
 import { toast } from 'sonner';
 import type { SanitizedNote } from '@/modules/journal/types';

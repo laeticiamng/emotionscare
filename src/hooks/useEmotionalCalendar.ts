@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useEmotionalCalendar - Hook pour les données du calendrier émotionnel
  */

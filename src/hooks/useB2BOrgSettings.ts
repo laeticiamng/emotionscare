@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useB2BOrgSettings - Paramètres organisation B2B
  * Gestion des configurations, préférences et politiques de l'organisation

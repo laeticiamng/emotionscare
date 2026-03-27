@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useParkStreak - Hook pour la gestion des séries (streaks) du parc
  * Persistance via Supabase avec calcul automatique

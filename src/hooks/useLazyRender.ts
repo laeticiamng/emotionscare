@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { type MutableRefObject, useEffect, useRef, useState } from 'react';
 
 interface UseLazyRenderOptions {

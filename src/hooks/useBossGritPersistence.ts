@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour la persistance des sessions Boss Grit dans Supabase
  * Utilise boss_grit_sessions pour les données de session

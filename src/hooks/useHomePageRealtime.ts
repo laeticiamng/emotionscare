@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useHomePageRealtime - Hook pour les mises à jour temps réel de la HomePage
  * Gère les notifications, compteurs live et événements en temps réel

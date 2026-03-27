@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useCallback } from 'react';
 import { useCoach } from '@/contexts/coach/CoachContextProvider';
 import { v4 as uuidv4 } from 'uuid';

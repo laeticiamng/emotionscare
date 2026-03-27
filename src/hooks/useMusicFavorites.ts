@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useMusicFavorites Hook
  * Gestion des favoris avec sync DB

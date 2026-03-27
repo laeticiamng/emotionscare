@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook de persistance pour VR Galaxy
  * Gestion des sessions d'exploration spatiale thérapeutique

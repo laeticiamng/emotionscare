@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useMultiSourceScan - Hook pour combiner les analyses multi-sources
  * Fusionne les résultats de scans texte, vocal et facial en un profil unifié

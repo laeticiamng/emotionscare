@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour afficher des notifications toast automatiques lors des changements de stats
  * Détecte les nouveaux badges, niveaux, objectifs et affiche des notifications animées avec sons

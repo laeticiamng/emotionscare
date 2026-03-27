@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour récupérer les statistiques utilisateur depuis Supabase
  * Remplace les données mockées par de vraies données

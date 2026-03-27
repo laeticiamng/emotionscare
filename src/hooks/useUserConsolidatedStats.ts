@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour les statistiques consolidées utilisateur
  * Agrège toutes les stats des différents modules

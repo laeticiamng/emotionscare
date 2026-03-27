@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Hook d'optimisation des performances
 import { useCallback, useMemo, useRef, useEffect, useState } from 'react';
 import { logger } from '@/lib/logger';

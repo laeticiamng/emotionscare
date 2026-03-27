@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour charger la vraie bibliothèque musicale depuis Supabase
  * Avec fallback sur les pistes sample

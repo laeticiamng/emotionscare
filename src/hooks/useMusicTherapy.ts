@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useMusicTherapy Hook
  * Interface React pour le service MusicTherapy

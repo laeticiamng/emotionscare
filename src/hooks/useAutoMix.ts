@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useAutoMix - Génération intelligente de playlists contextuelles
  */

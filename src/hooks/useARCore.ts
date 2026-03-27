@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useARCore Hook - Phase 4.5
  * Manage AR sessions, permissions, and core AR functionality

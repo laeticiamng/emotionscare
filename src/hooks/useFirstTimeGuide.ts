@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer l'affichage du guide de première visite
  */

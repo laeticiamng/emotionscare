@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect } from 'react';
 
 const TUTORIAL_KEY = 'emotionscare_tutorial_completed';

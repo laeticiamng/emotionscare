@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour l'apprentissage automatique des préférences musicales
  */

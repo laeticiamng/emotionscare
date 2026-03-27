@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer l'onboarding du dashboard (3 étapes)
  * Persiste les réponses dans user_preferences

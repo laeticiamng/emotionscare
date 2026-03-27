@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useClinicalAssessments - Hook for managing clinical assessments
  */

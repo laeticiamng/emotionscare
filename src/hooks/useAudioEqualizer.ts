@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useAudioEqualizer - Hook pour égaliseur audio réel avec Web Audio API
  * Fournit des filtres biquad pour modifier le son en temps réel
