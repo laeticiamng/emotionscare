@@ -78,10 +78,10 @@ export function useB2BExport(): UseB2BExportReturn {
     return JSON.stringify(data, null, 2);
   }, []);
 
-  const generateFilename = useCallback((type: ExportType, format: ExportFormat): string => {
+  const generateFilename = useCallback((type: ExportType, fmt: ExportFormat): string => {
     const date = format(new Date(), 'yyyy-MM-dd', { locale: fr });
     const sanitizedOrgName = orgName.replace(/[^a-zA-Z0-9]/g, '_');
-    return `${sanitizedOrgName}_${type}_${date}.${format}`;
+    return `${sanitizedOrgName}_${type}_${date}.${fmt}`;
   }, [orgName]);
 
   const exportData = useCallback(async (

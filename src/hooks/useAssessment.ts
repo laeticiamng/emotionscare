@@ -398,27 +398,28 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
           throw new Error('submit_failed');
         }
 
+        const computation = result.computation!;
         const phase = options?.phase;
-        runCallbacks(result.computation);
+        runCallbacks(computation);
         queryClient.invalidateQueries({ queryKey: HISTORY_QUERY_KEY(instrument) }).catch(() => undefined);
 
         if (phase) {
-          const generatedAt = result.computation.generatedAt;
+          const generatedAt = computation.generatedAt;
           setPhaseCompletion((prev) => ({
             pre: phase === 'pre' ? generatedAt : prev.pre,
             post: phase === 'pre' ? null : phase === 'post' ? generatedAt : prev.post,
           }));
         }
 
-        setLastSummary(result.computation.summary);
-        setLastLevel(result.computation.level);
+        setLastSummary(computation.summary);
+        setLastLevel(computation.level);
 
         setState((prev) => ({
           ...prev,
           isSubmitting: false,
           isActive: false,
-          lastComputation: result.computation,
-          lastCompletedAt: result.computation.generatedAt,
+          lastComputation: computation,
+          lastCompletedAt: computation.generatedAt,
         }));
 
         return true;

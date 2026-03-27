@@ -22,7 +22,7 @@ export const useBreathMetrics = () => {
       setLoading(true);
       setError(null);
       const data = await ApiService.getBreathWeekly(user.id);
-      setMetrics(data);
+      setMetrics(data as BreathMetrics);
     } catch (err) {
       setError('Erreur lors du chargement des métriques');
       logger.error('Breath metrics error', err as Error, 'UI');
