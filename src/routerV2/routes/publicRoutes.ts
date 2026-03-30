@@ -22,7 +22,6 @@ const PricingPageWorking = lazy(() => import('@/pages/PricingPageWorking'));
 const FAQPage = lazy(() => import('@/pages/FAQPage'));
 const SupportPage = lazy(() => import('@/pages/SupportPage'));
 const SupportChatbotPage = lazy(() => import('@/pages/SupportChatbotPage'));
-const PublicAPIPage = lazy(() => import('@/pages/PublicAPIPage'));
 const InstallPage = lazy(() => import('@/pages/InstallPage'));
 const HowItAdaptsPage = lazy(() => import('@/pages/HowItAdaptsPage'));
 const UseCasesPage = lazy(() => import('@/pages/UseCasesPage'));
@@ -47,13 +46,6 @@ const UnifiedErrorPage = lazy(() => import('@/pages/errors/404/page'));
 const NotFoundPage = lazy(() => import('@/pages/NotFound'));
 const ServerErrorPage = lazy(() => import('@/pages/errors/500/page'));
 
-// Composants de redirection
-const RedirectToScan = lazy(() => import('@/pages/RedirectToScan'));
-const RedirectToJournal = lazy(() => import('@/pages/RedirectToJournal'));
-const RedirectToSocialCocon = lazy(() => import('@/components/redirects/RedirectToSocialCocon'));
-const RedirectToEntreprise = lazy(() => import('@/pages/RedirectToEntreprise'));
-const RedirectToMusic = lazy(() => import('@/components/redirects/RedirectToMusic'));
-
 export const publicComponentMap = {
   // Public
   HomePage,
@@ -73,7 +65,6 @@ export const publicComponentMap = {
   FAQPage,
   SupportPage,
   SupportChatbotPage,
-  PublicAPIPage,
   InstallPage,
   HowItAdaptsPage,
   UseCasesPage,
@@ -87,11 +78,6 @@ export const publicComponentMap = {
   CookiesPage,
   TermsPage,
   PrivacyPage: PrivacyPolicyPage,
-  LegalTermsPage: TermsPage,
-  LegalPrivacyPage: PrivacyPolicyPage,
-  LegalMentionsPage: MentionsLegalesPage,
-  LegalSalesPage: SalesTermsPage,
-  LegalCookiesPage: CookiesPage,
 
   // Store
   StorePage,
@@ -104,14 +90,6 @@ export const publicComponentMap = {
   NotFoundPage,
   ServerErrorPage,
 
-  // Redirects
-  RedirectToScan,
-  RedirectToScanPage: RedirectToScan,
-  RedirectToJournal,
-  RedirectToJournalPage: RedirectToJournal,
-  RedirectToSocialCocon,
-  RedirectToEntreprise,
-  RedirectToEntreprisePage: RedirectToEntreprise,
-  RedirectToMusic,
+  // Redirects — only aliases actually used by registry
   UnifiedHomePage: HomePage,
 } as const;
