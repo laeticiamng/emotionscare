@@ -654,8 +654,10 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app-sidebar',
-    component: 'B2CMoodMixerPage',
+    component: 'MusicHubPage',
     guard: true,
+    deprecated: true,
+    redirectTo: '/app/music-hub?tab=mixer',
     aliases: ['/mood-mixer'],
   },
   {
