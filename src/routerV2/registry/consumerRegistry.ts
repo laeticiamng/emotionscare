@@ -511,9 +511,11 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app-sidebar',
-    component: 'B2CNyveeCoconPage',
+    component: 'BreathHubPage',
     guard: true,
     requireAuth: true,
+    deprecated: true,
+    redirectTo: '/app/breath-hub?mode=nuit',
   },
   {
     name: 'face-ar',
