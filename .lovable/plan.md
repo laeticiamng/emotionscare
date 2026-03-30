@@ -1,64 +1,144 @@
 
 
-## Plan : Ajouter les traductions allemandes et compléter FR/EN/DE sur toute la plateforme
+# Plan de Consolidation et Complétion des Modules EmotionsCare
 
-### Constat actuel
+## Constat
 
-L'application dispose de deux systèmes i18n parallèles :
-1. **Système principal** (`src/lib/i18n/locales/{fr,en}/`) — 11 namespaces (common, navigation, dashboard, settings, modules, auth, consent, errors, legal, journal, coach) avec FR et EN complets
-2. **Système secondaire** (`src/i18n/locales/{fr,en,de}.ts`) — squelettique, utilisé par `src/i18n/config.ts`
-3. **Fichiers JSON** (`public/locales/{fr,en}/`) — partiels (common, errors, breath)
+L'application a actuellement :
+- **48 dossiers** dans `src/modules/`
+- **37 modules** listés dans `ModulesDashboard.tsx` (tous en statut "partial" sauf 2)
+- **209 routes** listées dans `NavigationPage.tsx` réparties en 24 catégories
+- De nombreux doublons et modules qui se chevauchent
 
-Le **DE (allemand)** existe uniquement dans `src/i18n/locales/de.ts` avec un contenu riche mais n'est **pas branché** dans le système principal (`src/providers/i18n/resources.ts` ne charge que `fr` et `en`).
+La demande est claire : **ne rien supprimer, mais compléter et fusionner** pour que chaque module serve vraiment l'utilisateur.
 
-De plus, de nombreuses pages (100+) contiennent encore des **chaînes hardcodées en français** non internationalisées.
+---
 
-### Plan d'implémentation
+## Stratégie : Fusionner par famille, compléter le contenu
 
-#### 1. Creer les fichiers de traduction DE (11 fichiers)
+### Famille 1 — Respiration (6 modules → 1 hub unifié)
 
-Creer `src/lib/i18n/locales/de/` avec les 11 fichiers miroirs de FR/EN :
-- `common.ts`, `navigation.ts`, `dashboard.ts`, `settings.ts`, `modules.ts`, `auth.ts`, `consent.ts`, `errors.ts`, `legal.ts`, `journal.ts`, `coach.ts`
+Modules existants : `breath`, `breath-constellation`, `breathing-vr`, `bubble-beat`, `nyvee`, `breath-unified`
 
-Chaque fichier sera la traduction allemande complète des clés existantes en FR/EN.
+**Action** : `breath-unified` devient le point d'entrée unique avec 4 modes accessibles par onglets :
+- Mode Classique (cohérence cardiaque, 4-7-8, box breathing)
+- Mode Gamifié (bubble-beat : éclater des bulles au rythme)
+- Mode Immersif (constellation + VR)
+- Mode Nuit (nyvee : cocon d'endormissement)
 
-#### 2. Brancher DE dans le système principal
+Les 5 autres modules deviennent des re-exports vers breath-unified. Les routes `/app/bubble-beat`, `/app/nyvee`, `/app/breath` redirigent vers `/app/breath?mode=X`.
 
-Modifier `src/providers/i18n/resources.ts` pour :
-- Importer les 11 modules DE
-- Ajouter la locale `de` dans l'objet `resources`
+### Famille 2 — Musique (5 modules → 1 hub unifié)
 
-#### 3. Mettre à jour la configuration i18n
+Modules : `music-therapy`, `music-unified`, `adaptive-music`, `mood-mixer`, `audio-studio`
 
-- `src/lib/i18n.ts` : ajouter `'de'` dans `supportedLngs`
-- `src/lib/i18n/i18n.tsx` : ajouter le type `'de'` au type `Lang`
-- `src/i18n/locales/fr.ts` et `src/i18n/locales/en.ts` : ajouter `de: 'Allemand'` / `de: 'German'` dans `languageNames`
+**Action** : `music-unified` absorbe tout avec 3 onglets :
+- Bibliothèque (vinyles thématiques, playlists)
+- Mixer (mood-mixer : mélanger des ambiances)
+- Journal Vocal (audio-studio : enregistrement + transcription pour le journal)
 
-#### 4. Mettre à jour le sélecteur de langue
+### Famille 3 — Gamification (8 modules → 2)
 
-- `src/ui/NavBar.tsx` : supporter le cycle FR → EN → DE → FR
-- `src/i18n/LanguageSwitcher.tsx` : s'assurer que DE est dans les options (il utilise `SUPPORTED_LOCALES` qui inclut déjà `de`)
+Modules : `gamification`, `scores`, `achievements`, `ambition-arcade`, `ambition`, `boss-grit`, `bounce-back`, `flash-lite`
 
-#### 5. Ajouter les fichiers JSON DE dans public/locales
+**Action** :
+- `gamification` = hub unique (XP, niveaux, badges, leaderboard, streaks)
+- `ambition-arcade` = Défis & Objectifs (absorbe ambition, boss-grit, bounce-back, flash-lite)
 
-Creer `public/locales/de/` avec `common.json`, `errors.json`, `breath.json`
+### Famille 4 — Social (5 modules → 1)
 
-#### 6. Internationaliser les composants avec chaînes hardcodees
+Modules : `community`, `buddies`, `group-sessions`, `exchange`, `meditation`
 
-Migrer progressivement les composants critiques contenant du texte FR hardcode :
-- `GroupHeader.tsx` : remplacer "Aujourd'hui"/"Hier" par `t('common.today')`/`t('common.yesterday')` et utiliser la locale dynamique pour `Intl.DateTimeFormat`
-- `NavBar.tsx` : utiliser les clés de traduction pour les liens
-- `Footer.tsx` : utiliser les clés de traduction pour les liens legaux
+**Action** : `community` devient le hub social avec :
+- Entraide (forum/cercles)
+- Buddies (trouver un binôme)
+- Sessions Groupe (pratiquer ensemble)
+- Échange de temps (la partie utile d'exchange : s'échanger du temps d'écoute)
 
-### Details techniques
+### Famille 5 — VR & Immersif (3 modules → 1)
 
-- Les 11 fichiers DE suivront exactement la structure des fichiers EN existants
-- Le type `Lang` sera etendu a `'fr' | 'en' | 'de'`
-- Le `fallbackLng` reste `'fr'`
-- Environ **15-20 fichiers** seront modifies ou crees
+Modules : `vr-galaxy`, `vr-nebula`, `breathing-vr`
 
-### Limites
+**Action** : Un seul module `vr` avec scènes sélectionnables (galaxie, nébuleuse, respiration immersive).
 
-- Les 100+ pages avec texte FR hardcode ne seront pas toutes migrées dans cette iteration — seuls les composants partagés (NavBar, Footer, GroupHeader) et la configuration seront traités
-- Les pages individuelles (ModulesDashboard, UnifiedHomePage, etc.) necessiteront des passes supplementaires
+### Famille 6 — Modules à compléter (leur donner un vrai contenu)
+
+| Module | Transformation |
+|--------|---------------|
+| **screen-silk** | Devient "Protocole Stop" : timer 20-20-20 guidé avec sons, stats de pauses prises |
+| **story-synth** | Devient "Récits Thérapeutiques" : bibliothèque de récits guidés par l'IA pour la relaxation |
+| **emotion-atlas** | Fusionné dans le Scanner : visualisation de l'historique émotionnel sur une carte temporelle |
+| **seuil** | Fusionné dans le Coach IA : alertes proactives quand les indicateurs dépassent un seuil |
+| **ar-filters** | Supprimé de la nav (pas de valeur thérapeutique), code conservé en hidden |
+| **discovery** | Fusionné dans le Dashboard : section "Découvrir" avec suggestions personnalisées |
+| **emotion-orchestrator** | Module technique interne, retiré de la navigation utilisateur |
+
+---
+
+## Nettoyage de NavigationPage (209 → ~80 routes)
+
+Supprimer de la liste visible :
+- **Doublons** : `/app/communaute` vs `/app/community`, `/export` vs `/app/data-export`, double accessibilité, double notifications
+- **Pages admin/dev** : 20+ routes admin (alert-config, cron-monitoring, blockchain-backups...) → déplacer dans une section cachée, visible uniquement pour admin
+- **Pages système** : 401/403/404/500, test pages → retirer de la navigation
+- **Sous-pages** inutiles comme navigation autonome : `/app/journal/notes`, `/app/journal/search`, `/app/journal/archive` → onglets dans le Journal, pas des pages séparées dans la nav
+
+Catégories résultantes (~80 routes) :
+1. Accueil (3)
+2. Comprendre — Scan, Insights, Tendances (5)
+3. Agir — Respiration, Coach, Journal, Protocoles (8)
+4. S'évader — Musique, VR, Parc Émotionnel (5)
+5. Progresser — Gamification, Défis, Objectifs (6)
+6. Communauté — Entraide, Buddies, Sessions (4)
+7. B2B — Dashboard RH, Rapports, Alertes, Équipes (10)
+8. Paramètres — Profil, Confidentialité, Premium (8)
+9. Public — About, Pricing, FAQ, Légal (10)
+10. Admin (masqué par défaut, ~20 routes)
+
+---
+
+## Mise à jour de ModulesDashboard (37 → 30 modules)
+
+Fusionner les entrées redondantes et mettre à jour les statuts. Les 37 modules deviennent 30 modules bien définis avec des descriptions précises et des routes fonctionnelles.
+
+---
+
+## Phases d'implémentation
+
+### Phase 1 — Fusions respirations et musique
+- Ajouter les modes/onglets dans `breath-unified` et `music-unified`
+- Créer les redirections depuis les anciennes routes
+- Mettre à jour les imports
+
+### Phase 2 — Fusions gamification et social
+- Consolider `gamification` comme hub unique
+- Fusionner `ambition-arcade` + `boss-grit` + `bounce-back`
+- Unifier `community` + `buddies` + `group-sessions`
+
+### Phase 3 — Compléter les modules "vides"
+- Screen Silk → timer 20-20-20 fonctionnel
+- Story Synth → contenu enrichi
+- Emotion Atlas → fusionné dans Scan
+- Seuil → fusionné dans Coach IA
+- Discovery → section dans Dashboard
+
+### Phase 4 — Nettoyer NavigationPage et ModulesDashboard
+- Réduire NavigationPage de 209 à ~80 routes
+- Mettre à jour ModulesDashboard avec les statuts réels
+- Masquer les routes admin/dev pour les utilisateurs normaux
+
+### Phase 5 — VR et finitions
+- Unifier les 3 modules VR
+- Vérifier que toutes les redirections fonctionnent
+- Build final et test
+
+---
+
+## Détails techniques
+
+- Les fusions utilisent des **re-exports** pour ne casser aucun import existant
+- Les routes deprecated reçoivent `deprecated: true` + `redirectTo` dans le registry (le routeur redirige automatiquement)
+- Les routes admin reçoivent `hidden: true` dans le registry
+- NavigationPage filtre les routes `hidden` et `deprecated` au lieu de les lister en dur
+- Le ModulesDashboard lit dynamiquement les statuts depuis le registry au lieu d'un tableau statique
 
