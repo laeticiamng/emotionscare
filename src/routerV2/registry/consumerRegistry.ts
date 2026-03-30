@@ -124,16 +124,45 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     requireAuth: true,
     aliases: ['/app/scan/questionnaire', '/scanner'],
   },
+  // ═══════════════════════════════════════════════════════════
+  // BREATH HUB - Hub unifié de respiration (4 modes)
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'breath-hub',
+    path: '/app/breath-hub',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'simple',
+    component: 'BreathHubPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/app/breath', '/app/breathing', '/respiration', '/breath'],
+  },
   {
     name: 'breathing-dashboard',
     path: '/dashboard/breathing',
     segment: 'consumer',
     role: 'consumer',
     layout: 'simple',
-    component: 'BreathingPage',
+    component: 'BreathHubPage',
     guard: true,
     requireAuth: true,
-    aliases: ['/app/breathing', '/respiration'],
+    deprecated: true,
+    redirectTo: '/app/breath-hub',
+  },
+  // ═══════════════════════════════════════════════════════════
+  // MUSIC HUB - Hub unifié de musique (3 onglets)
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'music-hub',
+    path: '/app/music-hub',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'MusicHubPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/music-hub'],
   },
   {
     name: 'emotional-journal',
