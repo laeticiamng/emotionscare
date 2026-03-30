@@ -25,7 +25,6 @@ const SystemHealthDashboard = lazy(() => import('@/pages/admin/SystemHealthDashb
 const ExecutiveDashboard = lazy(() => import('@/pages/admin/ExecutiveDashboard'));
 const MonitoringDashboard = lazy(() => import('@/pages/admin/MonitoringDashboard'));
 const AdminSystemHealthPage = lazy(() => import('@/pages/AdminSystemHealthPage'));
-const K6AnalyticsDashboard = lazy(() => import('@/pages/K6AnalyticsDashboard'));
 
 // Admin Tools
 const TicketIntegrationConfig = lazy(() => import('@/pages/admin/TicketIntegrationConfig'));
@@ -59,7 +58,7 @@ const ChallengesDashboard = lazy(() => import('@/pages/admin/ChallengesDashboard
 const CronMonitoring = lazy(() => import('@/pages/CronMonitoring'));
 const BlockchainBackups = lazy(() => import('@/pages/BlockchainBackups'));
 
-// Dev-only (guarded: not loaded in production)
+// Dev-only
 const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
 const SecurityAuditScorecard = lazy(() => import('@/pages/admin/SecurityAuditScorecard'));
 const SecurityDossierB2B = lazy(() => import('@/pages/admin/SecurityDossierB2B'));
@@ -105,8 +104,6 @@ export const adminComponentMap = {
   MonitoringDashboard,
   MonitoringDashboardPage: MonitoringDashboard,
   AdminSystemHealthPage,
-  K6AnalyticsDashboard,
-  K6AnalyticsDashboardPage: K6AnalyticsDashboard,
 
   // Admin Tools
   TicketIntegrationConfig,
@@ -148,16 +145,12 @@ export const adminComponentMap = {
   CronMonitoringPage: CronMonitoring,
   BlockchainBackups,
   BlockchainBackupsPage: BlockchainBackups,
-  Achievements: lazy(() => import('@/pages/app/Achievements')),
 
   // Dev-only
   ComprehensiveSystemAuditPage,
   SecurityAuditScorecard,
-  SecurityAuditScorecardPage: SecurityAuditScorecard,
   SecurityDossierB2B,
-  SecurityDossierB2BPage: SecurityDossierB2B,
   ErrorBoundaryTestPage,
-  // Test/dev pages: only included in development builds
   ...(import.meta.env.DEV && TestAccountsPage ? { TestAccountsPage } : {}),
   ...(import.meta.env.DEV && TestPage ? { TestPage } : {}),
 } as const;

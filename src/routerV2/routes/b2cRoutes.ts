@@ -7,7 +7,6 @@ import { lazy } from 'react';
 
 // Dashboard & Navigation
 const B2CDashboardPage = lazy(() => import('@/pages/b2c/B2CDashboardPage'));
-const ModeSelectionPage = lazy(() => import('@/pages/ModeSelectionPage'));
 const ModulesDashboard = lazy(() => import('@/pages/ModulesDashboard'));
 const AppGatePage = lazy(() => import('@/pages/AppGatePage'));
 const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
@@ -17,15 +16,12 @@ const B2CScanPage = lazy(() => import('@/pages/b2c/B2CScanPage'));
 const ScanFacialPage = lazy(() => import('@/pages/app/ScanFacialPage'));
 const ScanVoicePage = lazy(() => import('@/pages/app/ScanVoicePage'));
 const ScanTextPage = lazy(() => import('@/pages/app/ScanTextPage'));
-const VoiceScanPage = lazy(() => import('@/pages/VoiceScanPage'));
-const TextScanPage = lazy(() => import('@/pages/TextScanPage'));
 const QuestionnaireScannerPage = lazy(() => import('@/pages/scanner/QuestionnaireScannerPage'));
 const ScannerEmotionnelPage = lazy(() => import('@/pages/ScannerEmotionnelPage'));
 const HumeAIRealtimePage = lazy(() => import('@/pages/HumeAIRealtimePage'));
 
 // Music
 const B2CMusicEnhanced = lazy(() => import('@/pages/b2c/B2CMusicEnhanced'));
-const MusicTherapyPage = lazy(() => import('@/pages/music/MusicTherapyPage'));
 const MusicAnalyticsPage = lazy(() => import('@/pages/music/MusicAnalyticsPage'));
 const MusicProfilePage = lazy(() => import('@/pages/music/MusicProfilePage'));
 const CollaborativePlaylistPage = lazy(() => import('@/pages/music/CollaborativePlaylistPage'));
@@ -83,8 +79,6 @@ const B2CStorySynthLabPage = lazy(() => import('@/pages/b2c/B2CStorySynthLabPage
 const MeditationPage = lazy(() => import('@/pages/MeditationPage'));
 const SeuilPage = lazy(() => import('@/pages/SeuilPage'));
 const BreathingPage = lazy(() => import('@/pages/breathing/BreathingPage'));
-const FlashGlowPage = lazy(() => import('@/pages/flash-glow/index'));
-const BossGritPage = lazy(() => import('@/modules/boss-grit/BossGritPage'));
 
 // Parcours & Discovery
 const EmotionalPark = lazy(() => import('@/pages/EmotionalPark'));
@@ -97,7 +91,6 @@ const ContextLensPage = lazy(() => import('@/pages/ContextLensPage'));
 // Gamification
 const B2CGamificationPage = lazy(() => import('@/pages/b2c/B2CGamificationPage'));
 const LeaderboardPage = lazy(() => import('@/pages/AurasLeaderboardPage'));
-const AurasLeaderboardPage = lazy(() => import('@/pages/AurasLeaderboardPage'));
 const GuildListPage = lazy(() => import('@/pages/gamification/GuildListPage'));
 const GuildPage = lazy(() => import('@/pages/gamification/GuildPage'));
 const PremiumRewardsPage = lazy(() => import('@/pages/PremiumRewardsPage'));
@@ -113,26 +106,17 @@ const ChallengesPage = lazy(() => import('@/pages/gamification/ChallengesPage'))
 const ChallengeDetailPage = lazy(() => import('@/pages/gamification/ChallengeDetailPage'));
 const ChallengeCreatePage = lazy(() => import('@/pages/gamification/ChallengeCreatePage'));
 const ChallengesHistory = lazy(() => import('@/pages/app/ChallengesHistory'));
-const Achievements = lazy(() => import('@/pages/app/Achievements'));
 
 // Social
 const B2CSocialCoconPage = lazy(() => import('@/pages/b2c/B2CSocialCoconPage'));
-const B2CCommunautePage = lazy(() => import('@/pages/b2c/B2CCommunautePage'));
 const GroupSessionsPage = lazy(() => import('@/pages/social/GroupSessionsPage'));
 const BuddiesPage = lazy(() => import('@/pages/social/BuddiesPage'));
 const MessagesPage = lazy(() => import('@/pages/social/MessagesPage'));
-const FriendsPage = lazy(() => import('@/pages/social/FriendsPage'));
-const GroupsPage = lazy(() => import('@/pages/social/GroupsPage'));
-const CommunityPage = lazy(() => import('@/pages/social/CommunityPage'));
 const ExchangeHubPage = lazy(() => import('@/pages/ExchangeHubPage'));
 const EntraidePage = lazy(() => import('@/pages/EntraidePage'));
 
 // Cocon Respiration
 const B2CNyveeCoconPage = lazy(() => import('@/pages/b2c/B2CNyveeCoconPage'));
-const NyveeTestPage = lazy(() => import('@/pages/NyveeTestPage'));
-const ValidationPage = import.meta.env.DEV
-  ? lazy(() => import('@/pages/ValidationPage'))
-  : undefined;
 
 // Settings & Profile
 const B2CSettingsPage = lazy(() => import('@/pages/b2c/B2CSettingsPage'));
@@ -143,7 +127,6 @@ const B2CNotificationsPage = lazy(() => import('@/pages/b2c/B2CNotificationsPage
 const DashboardSettingsPage = lazy(() => import('@/pages/settings/DashboardSettingsPage'));
 const LanguageSettingsPage = lazy(() => import('@/pages/settings/LanguageSettingsPage'));
 const SecuritySettingsPage = lazy(() => import('@/pages/settings/SecuritySettingsPage'));
-const NotificationSettingsPage = lazy(() => import('@/pages/NotificationSettingsPage'));
 const AccessibilitySettingsPage = lazy(() => import('@/pages/AccessibilitySettingsPage'));
 const ThemesPage = lazy(() => import('@/pages/ThemesPage'));
 const CustomizationPage = lazy(() => import('@/pages/CustomizationPage'));
@@ -180,13 +163,10 @@ const PremiumPage = lazy(() => import('@/pages/PremiumPage'));
 const PaymentSuccessPage = lazy(() => import('@/pages/PaymentSuccess'));
 const BillingPage = lazy(() => import('@/pages/BillingPage'));
 const TicketsPage = lazy(() => import('@/pages/TicketsPage'));
-const VoiceAnalysisPage = lazy(() => import('@/pages/VoiceAnalysisPage'));
 const EventsCalendarPage = lazy(() => import('@/pages/EventsCalendarPage'));
 const WorkshopsPage = lazy(() => import('@/pages/WorkshopsPage'));
 const WebinarsPage = lazy(() => import('@/pages/WebinarsPage'));
 const IntegrationsPage = lazy(() => import('@/pages/IntegrationsPage'));
-const APIKeysPage = lazy(() => import('@/pages/APIKeysPage'));
-const WebhooksPage = lazy(() => import('@/pages/WebhooksPage'));
 const CalendarPage = lazy(() => import('@/pages/CalendarPage'));
 const Point20Page = lazy(() => import('@/pages/Point20Page'));
 const WearablesPage = lazy(() => import('@/pages/WearablesPage'));
@@ -195,7 +175,6 @@ const AccountDeletionPage = lazy(() => import('@/pages/AccountDeletionPage'));
 const MarketplacePage = lazy(() => import('@/pages/MarketplacePage'));
 const CreatorDashboardPage = lazy(() => import('@/pages/CreatorDashboardPage'));
 const ActivityLogsPage = lazy(() => import('@/pages/ActivityLogsPage'));
-const SystemHealthPage = lazy(() => import('@/pages/SystemHealthPage'));
 
 // TIMECRAFT
 const TimeCraftPage = lazy(() => import('@/pages/timecraft/TimeCraftPage'));
@@ -206,8 +185,6 @@ const HDSCompliancePage = lazy(() => import('@/pages/compliance/HDSCompliancePag
 export const b2cComponentMap = {
   // Dashboard
   B2CDashboardPage,
-  ModeSelectionPage,
-  ChooseModePage: ModeSelectionPage,
   ModulesDashboard,
   ModulesDashboardPage: ModulesDashboard,
   AppGatePage,
@@ -218,19 +195,14 @@ export const b2cComponentMap = {
   ScanFacialPage,
   ScanVoicePage,
   ScanTextPage,
-  FacialScanPage: B2CScanPage,
   EmojiScanPage: B2CScanPage,
-  VoiceScanPage,
-  TextScanPage,
   QuestionnaireScannerPage,
   ScannerEmotionnelPage,
-  ScanPage: B2CScanPage,
   HumeAIRealtimePage,
 
   // Music
   B2CMusicEnhanced,
   B2CMusicEnhancedPage: B2CMusicEnhanced,
-  MusicTherapyPage,
   MusicAnalyticsPage,
   MusicProfilePage,
   CollaborativePlaylistPage,
@@ -240,7 +212,6 @@ export const b2cComponentMap = {
   // Coach
   B2CAICoachPage,
   B2CAICoachMicroPage,
-  CoachPage: B2CAICoachPage,
   CoachProgramsPage,
   CoachProgramDetailPage,
   CoachSessionsPage,
@@ -290,11 +261,6 @@ export const b2cComponentMap = {
   MeditationPage,
   SeuilPage,
   BreathingPage,
-  FlashGlowPage,
-  BossGritPage,
-  BubbleBeatPage: B2CBubbleBeatPage,
-  MoodMixerPage: B2CMoodMixerPage,
-  StorySynthPage: B2CStorySynthLabPage,
 
   // Parcours
   EmotionalPark,
@@ -310,7 +276,6 @@ export const b2cComponentMap = {
   // Gamification
   B2CGamificationPage,
   LeaderboardPage,
-  AurasLeaderboardPage,
   GuildListPage,
   GuildPage,
   PremiumRewardsPage,
@@ -327,25 +292,17 @@ export const b2cComponentMap = {
   ChallengeCreatePage,
   ChallengesHistory,
   ChallengesHistoryPage: ChallengesHistory,
-  Achievements,
 
   // Social
   B2CSocialCoconPage,
-  B2CCommunautePage,
   GroupSessionsPage,
   BuddiesPage,
   MessagesPage,
-  FriendsPage,
-  GroupsPage,
-  CommunityPage,
   ExchangeHubPage,
   EntraidePage,
 
   // Cocon Respiration
   B2CNyveeCoconPage,
-  NyveeTestPage,
-  // ValidationPage: only included in development builds
-  ...(import.meta.env.DEV && ValidationPage ? { ValidationPage } : {}),
 
   // Settings
   B2CSettingsPage,
@@ -356,7 +313,6 @@ export const b2cComponentMap = {
   DashboardSettingsPage,
   LanguageSettingsPage,
   SecuritySettingsPage,
-  NotificationSettingsPage,
   AccessibilitySettingsPage,
   ThemesPage,
   CustomizationPage,
@@ -393,13 +349,10 @@ export const b2cComponentMap = {
   PremiumPage,
   BillingPage,
   TicketsPage,
-  VoiceAnalysisPage,
   EventsCalendarPage,
   WorkshopsPage,
   WebinarsPage,
   IntegrationsPage,
-  APIKeysPage,
-  WebhooksPage,
   CalendarPage,
   Point20Page,
   WearablesPage,
@@ -408,7 +361,6 @@ export const b2cComponentMap = {
   MarketplacePage,
   CreatorDashboardPage,
   ActivityLogsPage,
-  SystemHealthPage,
   UnifiedDashboardPage: B2CDashboardPage,
 
   // TIMECRAFT
