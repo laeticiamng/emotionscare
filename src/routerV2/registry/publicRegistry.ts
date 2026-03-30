@@ -338,8 +338,10 @@ export const PUBLIC_ROUTES: readonly RouteMeta[] = [
     path: '/app/bubble-beat',
     segment: 'public',
     layout: 'simple',
-    component: 'B2CBubbleBeatPage',
+    component: 'BreathHubPage',
     guard: false,
+    deprecated: true,
+    redirectTo: '/app/breath-hub?mode=gamifie',
     aliases: ['/bubble-beat'],
   },
   {
