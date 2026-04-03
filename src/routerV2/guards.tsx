@@ -47,10 +47,11 @@ export const AuthGuard: React.FC<GuardChildren> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
+    logger.info('AuthGuard: redirecting to login', { from: location.pathname }, 'AUTH');
     return (
       <Navigate
         to={routes.auth.login()}
-        state={{ from: location.pathname }}
+        state={{ from: location.pathname + location.search }}
         replace
       />
     );
