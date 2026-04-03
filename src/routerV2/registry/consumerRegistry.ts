@@ -47,6 +47,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2CDashboardPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/app/home', '/b2c/dashboard', '/dashboard'],
   },
   // ═══════════════════════════════════════════════════════════

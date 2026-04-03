@@ -94,7 +94,12 @@ const LayoutWrapper: React.FC<{
 function applyRouteGuards(element: React.ReactNode, routeMeta: RouteMeta) {
   let guardedElement = element;
 
-  if (routeMeta.segment && routeMeta.segment !== 'public') {
+  const isProtectedSegment = routeMeta.segment && routeMeta.segment !== 'public';
+  const hasRoleRestriction = routeMeta.role || (routeMeta.allowedRoles && routeMeta.allowedRoles.length > 0);
+  const needsAuth = routeMeta.guard || routeMeta.requireAuth || hasRoleRestriction || isProtectedSegment;
+
+  // 1. Mode guard — syncs user mode with the expected segment
+  if (isProtectedSegment) {
     guardedElement = (
       <ModeGuard segment={routeMeta.segment}>
         {guardedElement}
@@ -102,7 +107,8 @@ function applyRouteGuards(element: React.ReactNode, routeMeta: RouteMeta) {
     );
   }
 
-  if (routeMeta.role || (routeMeta.allowedRoles && routeMeta.allowedRoles.length > 0)) {
+  // 2. Role guard — checks user role matches route requirement
+  if (hasRoleRestriction) {
     guardedElement = (
       <RoleGuard requiredRole={routeMeta.role} allowedRoles={routeMeta.allowedRoles}>
         {guardedElement}
@@ -110,7 +116,9 @@ function applyRouteGuards(element: React.ReactNode, routeMeta: RouteMeta) {
     );
   }
 
-  if (routeMeta.guard || routeMeta.requireAuth || routeMeta.role || (routeMeta.allowedRoles && routeMeta.allowedRoles.length > 0)) {
+  // 3. Auth guard — outermost, redirects to login if not authenticated
+  // Applied for ANY non-public route, regardless of explicit guard/requireAuth flags
+  if (needsAuth) {
     guardedElement = <AuthGuard>{guardedElement}</AuthGuard>;
   }
 
