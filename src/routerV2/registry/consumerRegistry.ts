@@ -47,6 +47,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2CDashboardPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/app/home', '/b2c/dashboard', '/dashboard'],
   },
   // ═══════════════════════════════════════════════════════════
@@ -260,6 +261,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2CMusicTherapyPremiumPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/music-therapy-premium'],
   },
   // Route supprimée - fonctionnalité intégrée dans B2CMusicEnhanced
@@ -272,6 +274,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'B2CAICoachPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/coach'],
   },
   {
@@ -322,6 +325,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2CAICoachMicroPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/coach-micro-decisions'],
   },
   {
@@ -332,6 +336,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'B2CJournalPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/journal'],
   },
   {
@@ -525,6 +530,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'B2CARFiltersPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/ar-filters'],
   },
   {
@@ -547,6 +553,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'B2CVoiceJournalPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/voice-journal', '/vocal-journal'],
   },
   // Route /app/emotions supprimée - alias vers /app/scan
@@ -634,6 +641,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'B2CScreenSilkBreakPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/screen-silk-break'],
   },
   // Routes VR déjà définies aux lignes 676-686 et 666-675
@@ -646,6 +654,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'B2CBossLevelGritPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/boss-level-grit'],
   },
   {
@@ -656,6 +665,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'MusicHubPage',
     guard: true,
+    requireAuth: true,
     deprecated: true,
     redirectTo: '/app/music-hub?tab=mixer',
     aliases: ['/mood-mixer'],
@@ -678,6 +688,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'B2CAmbitionArcadePage',
     guard: true,
+    requireAuth: true,
     aliases: ['/ambition-arcade'],
   },
   {
@@ -688,6 +699,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'B2CBounceBackBattlePage',
     guard: true,
+    requireAuth: true,
     aliases: ['/bounce-back-battle'],
   },
   {
@@ -698,6 +710,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'B2CStorySynthLabPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/story-synth-lab'],
   },
   {
@@ -723,6 +736,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'EmotionalParkPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/parc', '/park'],
   },
   {
@@ -733,6 +747,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'ParkJourneyPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/voyage', '/journey'],
   },
   {
@@ -743,6 +758,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'EmotionAtlasPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/atlas', '/emotion-map'],
   },
   {
@@ -753,6 +769,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'DiscoveryPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/discovery', '/exploration'],
   },
   // ═══════════════════════════════════════════════════════════
@@ -766,6 +783,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'AnalyticsPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/analytics'],
   },
   {
@@ -776,6 +794,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'LeaderboardPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/leaderboard'],
   },
   {
@@ -796,6 +815,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'ScoresPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/app/heatmap', '/heatmap-vibes'],
   },
   // Routes supplémentaires
@@ -809,6 +829,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'SessionsPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/session', '/sessions'],
   },
   {
@@ -1014,6 +1035,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'MessagesPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/chat', '/nyvee-chat'],
   },
   {
@@ -1024,6 +1046,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'CalendarPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/agenda'],
   },
   {
@@ -1034,6 +1057,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'Point20Page',
     guard: true,
+    requireAuth: true,
     aliases: ['/recuperation-20'],
   },
   // test-page supprimé — route dev-only
@@ -1071,6 +1095,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'B2CSettingsPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/settings', '/preferences'],
   },
   {
@@ -1081,6 +1106,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'B2CProfileSettingsPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/profile-settings'],
   },
   {
@@ -1091,6 +1117,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'DataSettingsPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/data-settings'],
   },
   {
@@ -1101,6 +1128,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'B2CProfileSettingsPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/profile'],
   },
   {
@@ -1111,6 +1139,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'B2CPrivacyTogglesPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/privacy-toggles', '/settings/data-privacy'],
   },
   {
@@ -1286,6 +1315,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'ThemesPage',
     guard: true,
+    requireAuth: true,
     status: 'beta',
   },
   {
@@ -1296,6 +1326,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'CustomizationPage',
     guard: true,
+    requireAuth: true,
     status: 'beta',
   },
   {
@@ -1306,6 +1337,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'WidgetsPage',
     guard: true,
+    requireAuth: true,
     status: 'beta',
   },
   // Événements & Ateliers
@@ -1327,6 +1359,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'WorkshopsPage',
     guard: true,
+    requireAuth: true,
     status: 'beta',
   },
   {
@@ -1337,6 +1370,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'WebinarsPage',
     guard: true,
+    requireAuth: true,
     status: 'beta',
   },
   // Export & Partage
@@ -1379,6 +1413,7 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'IntegrationsPage',
     guard: true,
+    requireAuth: true,
     status: 'beta',
   },
   // api-keys et webhooks supprimés — routes dev-only

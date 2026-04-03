@@ -19,6 +19,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     role: 'manager',
     layout: 'app',
     guard: true,
+    requireAuth: true,
     component: 'B2BReportsHeatmapPage',
   },
   {
@@ -69,6 +70,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2BCollabDashboardPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/b2b/user/dashboard'],
   },
   {
@@ -79,6 +81,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2BRHDashboardPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/b2b/admin/dashboard'],
   },
   // ═══════════════════════════════════════════════════════════
@@ -92,6 +95,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2BTeamsPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/teams'],
   },
   {
@@ -115,6 +119,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2BReportsPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/reports'],
   },
   {
@@ -135,6 +140,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2BEventsPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/events'],
   },
   {
@@ -145,6 +151,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2BOptimisationPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/optimisation'],
   },
   {
@@ -155,6 +162,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2BSecurityPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/security'],
   },
   {
@@ -165,6 +173,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2BAuditPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/audit'],
   },
   {
@@ -185,6 +194,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2BAccessibilityPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/accessibility'],
   },
   {
@@ -199,6 +209,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-api-monitoring',
+    hidden: true,
     path: '/admin/api-monitoring',
     segment: 'manager',
     role: 'manager',
@@ -209,6 +220,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-cron-monitoring',
+    hidden: true,
     path: '/admin/cron-monitoring',
     segment: 'manager',
     role: 'manager',
@@ -219,6 +231,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-music-queue',
+    hidden: true,
     path: '/admin/music-queue',
     segment: 'manager',
     role: 'manager',
@@ -229,6 +242,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-music-metrics',
+    hidden: true,
     path: '/admin/music-metrics',
     segment: 'manager',
     role: 'manager',
@@ -239,6 +253,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-user-roles',
+    hidden: true,
     path: '/admin/user-roles',
     segment: 'manager',
     role: 'manager',
@@ -279,6 +294,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-system-health',
+    hidden: true,
     path: '/admin/system-health',
     segment: 'manager',
     role: 'manager',
@@ -289,6 +305,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-monitoring-dashboard',
+    hidden: true,
     path: '/admin/monitoring',
     segment: 'manager',
     role: 'manager',
@@ -299,6 +316,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-ai-monitoring',
+    hidden: true,
     path: '/admin/ai-monitoring',
     segment: 'manager',
     role: 'manager',
@@ -309,6 +327,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-alert-config',
+    hidden: true,
     path: '/admin/alert-config',
     segment: 'manager',
     role: 'manager',
@@ -319,6 +338,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-alert-analytics',
+    hidden: true,
     path: '/admin/alert-analytics',
     segment: 'manager',
     role: 'manager',
@@ -329,6 +349,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-alert-templates',
+    hidden: true,
     path: '/admin/alert-templates',
     segment: 'manager',
     role: 'manager',
@@ -339,6 +360,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-alert-playground',
+    hidden: true,
     path: '/admin/alert-playground',
     segment: 'manager',
     role: 'manager',
@@ -349,6 +371,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-scheduled-reports',
+    hidden: true,
     path: '/admin/scheduled-reports',
     segment: 'manager',
     role: 'manager',
@@ -359,6 +382,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-alert-escalation',
+    hidden: true,
     path: '/admin/alert-escalation',
     segment: 'manager',
     role: 'manager',
@@ -369,6 +393,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-ai-templates',
+    hidden: true,
     path: '/admin/ai-template-suggestions',
     segment: 'manager',
     role: 'manager',
@@ -379,6 +404,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-escalation-monitoring',
+    hidden: true,
     path: '/admin/escalation/monitoring',
     segment: 'manager',
     role: 'manager',
@@ -410,6 +436,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-ai-template-suggestions',
+    hidden: true,
     path: '/admin/alerts/ai-suggestions',
     segment: 'manager',
     role: 'manager',
@@ -420,6 +447,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-ticket-integration',
+    hidden: true,
     path: '/admin/tickets/integrations',
     segment: 'manager',
     role: 'manager',
@@ -430,6 +458,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-ab-test-manager',
+    hidden: true,
     path: '/admin/escalation/ab-tests',
     segment: 'manager',
     role: 'manager',
@@ -440,6 +469,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-notification-webhooks',
+    hidden: true,
     path: '/admin/escalation/webhooks',
     segment: 'manager',
     role: 'manager',
@@ -450,6 +480,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-system-health-dashboard',
+    hidden: true,
     path: '/admin/system-health/dashboard',
     segment: 'manager',
     role: 'manager',
@@ -460,6 +491,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-executive',
+    hidden: true,
     path: '/admin/executive',
     segment: 'manager',
     role: 'manager',
@@ -470,6 +502,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-incidents',
+    hidden: true,
     path: '/admin/incidents',
     segment: 'manager',
     role: 'manager',
@@ -480,6 +513,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-unified-dashboard',
+    hidden: true,
     path: '/admin/unified',
     segment: 'manager',
     role: 'manager',
@@ -490,6 +524,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-cron-setup',
+    hidden: true,
     path: '/admin/cron-setup',
     segment: 'manager',
     role: 'manager',
@@ -500,6 +535,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-alert-tester',
+    hidden: true,
     path: '/admin/alert-tester',
     segment: 'manager',
     role: 'manager',
@@ -510,6 +546,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-ml-assignment-rules',
+    hidden: true,
     path: '/admin/ml-assignment-rules',
     segment: 'manager',
     role: 'manager',
@@ -520,6 +557,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-team-skills',
+    hidden: true,
     path: '/admin/team-skills',
     segment: 'manager',
     role: 'manager',
@@ -530,6 +568,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-module-sync',
+    hidden: true,
     path: '/admin/module-sync',
     segment: 'manager',
     role: 'manager',
@@ -540,6 +579,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
   },
   {
     name: 'admin-recommendation-engine',
+    hidden: true,
     path: '/admin/recommendation-engine',
     segment: 'manager',
     role: 'manager',
