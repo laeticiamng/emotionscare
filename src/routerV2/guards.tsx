@@ -79,10 +79,11 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
   }
 
   if (!isAuthenticated) {
+    logger.info('RoleGuard: not authenticated, redirecting to login', { from: location.pathname }, 'AUTH');
     return (
       <Navigate
         to={routes.auth.login()}
-        state={{ from: location.pathname }}
+        state={{ from: location.pathname + location.search }}
         replace
       />
     );
@@ -93,22 +94,19 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
   }
 
   const currentRole = normalizeRole(user?.role || user?.user_metadata?.role || userMode);
+  const rolesToCheck = requiredRole ? [requiredRole, ...allowedRoles] : allowedRoles;
 
-  if (requiredRole && currentRole !== requiredRole) {
+  if (rolesToCheck.length > 0 && !rolesToCheck.includes(currentRole)) {
+    logger.warn('RoleGuard: insufficient role', {
+      from: location.pathname,
+      currentRole,
+      requiredRole,
+      allowedRoles,
+    }, 'AUTH');
     return (
       <Navigate
         to={routes.special.forbidden()}
-        state={{ from: location.pathname, role: currentRole, requiredRole }}
-        replace
-      />
-    );
-  }
-
-  if (allowedRoles.length > 0 && !allowedRoles.includes(currentRole)) {
-    return (
-      <Navigate
-        to={routes.special.forbidden()}
-        state={{ from: location.pathname, role: currentRole, allowedRoles }}
+        state={{ from: location.pathname, role: currentRole, requiredRole, allowedRoles }}
         replace
       />
     );
