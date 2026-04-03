@@ -19,6 +19,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     role: 'manager',
     layout: 'app',
     guard: true,
+    requireAuth: true,
     component: 'B2BReportsHeatmapPage',
   },
   {
@@ -69,6 +70,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2BCollabDashboardPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/b2b/user/dashboard'],
   },
   {
@@ -79,6 +81,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2BRHDashboardPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/b2b/admin/dashboard'],
   },
   // ═══════════════════════════════════════════════════════════
@@ -92,6 +95,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2BTeamsPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/teams'],
   },
   {
@@ -115,6 +119,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2BReportsPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/reports'],
   },
   {
@@ -135,6 +140,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2BEventsPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/events'],
   },
   {
@@ -145,6 +151,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2BOptimisationPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/optimisation'],
   },
   {
@@ -155,6 +162,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2BSecurityPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/security'],
   },
   {
@@ -165,6 +173,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2BAuditPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/audit'],
   },
   {
@@ -185,6 +194,7 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     layout: 'app',
     component: 'B2BAccessibilityPage',
     guard: true,
+    requireAuth: true,
     aliases: ['/accessibility'],
   },
   {
