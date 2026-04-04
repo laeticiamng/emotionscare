@@ -1,737 +1,118 @@
-# EmotionsCare — Plateforme de Bien-Être Émotionnel
+<h1 align="center">EmotionsCare</h1>
 
-> **"Prendre soin de celles et ceux qui prennent soin"**
-> Plateforme de gestion du bien-être émotionnel pour les professionnels de santé et les étudiants en médecine.
+<p align="center">
+  <strong>Prendre soin de celles et ceux qui prennent soin</strong>
+</p>
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-18-61dafb)](https://reactjs.org/)
-[![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E.svg)](https://supabase.io/)
-[![Vite](https://img.shields.io/badge/Vite-5-646CFF.svg)](https://vitejs.dev/)
-[![Tailwind](https://img.shields.io/badge/Tailwind-3-38B2AC.svg)](https://tailwindcss.com/)
+<p align="center">
+  Plateforme SaaS de bien-etre emotionnel concue pour les professionnels de sante.<br/>
+  Intelligence artificielle, gamification et therapies digitales au service du mieux-etre.
+</p>
 
----
-
-## État Réel du Projet (Mars 2026)
-
-### Metriques Verifiees (Audit v6.0 - Mars 2026)
-
-| Métrique | Valeur | Vérification |
-|----------|--------|--------------|
-| **Tables Supabase** | 723+ | `SELECT COUNT(*) FROM information_schema.tables` |
-| **Edge Functions** | 272+ | Scan `serve(async` dans supabase/functions |
-| **Features Modules** | 37 | Comptage dossiers src/features/ |
-| **Fichiers de Tests** | 420+ | Tests unitaires, sécurité, accessibilité, E2E |
-| **Pages Routées** | 257+ | src/routerV2/registry.ts |
-| **Custom Hooks** | 668+ | src/hooks/ |
-| **Composants** | 2 031+ | src/components/ |
-| **Migrations SQL** | 318 | supabase/migrations/ |
-
-### Maturité des Modules (37 features - 100% complets)
-
-| Catégorie | Modules | Statut |
-|-----------|---------|--------|
-| **Core** | Scan, Journal, Coach, Breath, Dashboard, Mood, Assess, Session | Production |
-| **Gamification** | XP System, Challenges, Tournaments, Guilds, Leaderboard, Scores | Production |
-| **Social** | Community, Social Cocon, Nyvée | Production |
-| **Immersif** | VR Galaxy/Breath, AR Filters, Mood Mixer, Flash Glow, Grounding, Music | Production |
-| **Health** | Health Integrations, Wearables, Emotion Sessions, Context Lens, Clinical Opt-in | Production |
-| **B2B** | Dashboard RH, Heatmap, Orchestration | Production |
-| **Platform** | Accessibility, Themes, Notifications, Export, API, Marketplace | Production |
+<p align="center">
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white" alt="TypeScript" /></a>
+  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white" alt="React 18" /></a>
+  <a href="https://supabase.com/"><img src="https://img.shields.io/badge/Supabase-Backend-3ECF8E?logo=supabase&logoColor=white" alt="Supabase" /></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/Licence-Proprietary-red" alt="Licence" /></a>
+</p>
 
 ---
 
-## Public Cible
+## Vision
 
-> **Focus : Professionnels de santé**
-
-- Médecins (généralistes, spécialistes)
-- Infirmiers/Infirmières
-- Étudiants en médecine/soins infirmiers
-- Personnel hospitalier
-- Cliniques et hôpitaux (B2B)
-- Écoles de médecine (B2B)
+EmotionsCare est ne d'un constat : les soignants prennent soin des autres, mais personne ne prend soin d'eux. La plateforme combine analyse emotionnelle par IA, exercices therapeutiques interactifs et gamification pour offrir un accompagnement continu, accessible et engageant. Notre ambition est de devenir la reference du bien-etre emotionnel en milieu hospitalier et en formation medicale.
 
 ---
 
-## Fonctionnalités Principales
+## Fonctionnalites
 
-### Modules Bien-Être (37 Features)
+**Analyse emotionnelle IA** — Scan facial temps reel (Hume AI, MediaPipe), analyse textuelle et vocale pour objectiver l'etat emotionnel. Les resultats alimentent un tableau de bord personnalise avec tendances et recommandations proactives.
 
-| Module | Description | Route |
-|--------|-------------|-------|
-| **Scan Émotionnel** | Analyse faciale IA en temps réel (Hume AI + MediaPipe) | `/app/scan` |
-| **Journal** | Journaling vocal/texte avec analyse IA | `/app/journal` |
-| **Respiration** | Cohérence cardiaque avec biofeedback | `/app/breath` |
-| **Coach IA Nyvée** | Accompagnement personnalisé OpenAI + ElevenLabs TTS | `/app/coach` |
-| **Musicothérapie** | Génération musicale IA adaptative (Suno) | `/app/music` |
-| **Flash Glow** | Apaisement instantané en 2 min | `/app/flash-glow` |
-| **Mood Mixer** | DJ des émotions - mixage sonore | `/app/mood-mixer` |
-| **VR Galaxy** | Exploration immersive 3D | `/app/vr-galaxy` |
-| **VR Breath** | Respiration guidée en VR | `/app/vr-breath-guide` |
-| **Boss Grit** | Forge de persévérance gamifiée | `/app/boss-grit` |
-| **Bubble Beat** | Défouloir rythmé (bulles) | `/app/bubble-beat` |
-| **Story Synth** | Contes thérapeutiques IA | `/app/story-synth` |
-| **Screen Silk** | Wallpapers apaisants animés | `/app/screen-silk` |
-| **Parc Émotionnel** | Visualisation spatiale des émotions | `/app/emotional-park` |
-| **Exchange Hub** | Échanges émotionnels communautaires | `/app/exchange` |
-| **Face AR** | Filtres de réalité augmentée | `/app/face-ar` |
-| **Ambition Arcade** | Objectifs gamifiés roguelike | `/app/ambition-arcade` |
-| **Bounce Back** | Résilience et rebond | `/app/bounce-back` |
-| **Hume AI Realtime** | Analyse émotionnelle multimodale temps réel | `/app/hume-realtime` |
-| **AI Recommendations** | Suggestions proactives contextuelles | Dashboard |
-| **AI Wellness Assistant** | Recherche bien-être avec Perplexity + ElevenLabs | `/app/ai-assistant` |
+**Coach IA Nyvee** — Un accompagnateur virtuel disponible 24/7, propulse par GPT-4 et ElevenLabs TTS. Il propose des micro-gestes adaptes au contexte, des exercices de respiration guides (coherence cardiaque, 4-7-8, box breathing) et un journal emotionnel avec analyse de sentiment.
 
-### Modules B2B
+**Therapies digitales immersives** — Environnements 3D (Three.js / WebXR) pour la meditation guidee, musicotherapie generative via Suno AI, galerie VR apaisante et filtres AR. Chaque module s'adapte au profil emotionnel de l'utilisateur.
 
-| Module | Description | Route |
-|--------|-------------|-------|
-| **Dashboard RH** | Analytics bien-être équipe | `/b2b/dashboard` |
-| **Heatmap Vibes** | Cartographie émotionnelle temps réel | `/b2b/heatmap` |
-| **Rapports** | Export PDF/Excel automatisé | `/b2b/reports` |
-| **Gestion Équipes** | Invitation, rôles, permissions | `/b2b/teams` |
-| **Événements** | Ateliers bien-être, webinaires | `/b2b/events` |
-| **Sécurité** | Audit RGPD, sessions, logs | `/b2b/security` |
-| **Enterprise** | SSO, SCIM, multi-tenant | `/b2b/enterprise` |
-| **Prévention Burnout** | Programme de prévention avec évaluation | `/b2b/prevention` |
-| **Wellbeing Hub** | Hub bien-être institutionnel | `/b2b/wellness-hub` |
-| **Interventions** | Bibliothèque d'interventions | `/b2b/interventions` |
+**Gamification complete** — Systeme XP a 20 niveaux, 50+ badges, streaks, tournois hebdomadaires, guildes avec chat temps reel et defis quotidiens generes par IA. L'engagement transforme le bien-etre en habitude.
 
-### Gamification Complète
+**Evaluations cliniques validees** — PHQ-9 (depression), GAD-7 (anxiete), PSS-10 (stress), WEMWBS (bien-etre), K6 (detresse psychologique) et evaluation burnout. Suivi longitudinal avec export RGPD.
 
-| Fonctionnalité | Description |
-|----------------|-------------|
-| **XP & Niveaux** | Progression avec 20 niveaux et récompenses |
-| **Badges** | 50+ badges à débloquer (raretés variées) |
-| **Streaks** | Suivi des séries quotidiennes avec milestones |
-| **Leaderboard** | Classement temps réel avec auras personnalisées |
-| **Tournois** | Compétitions hebdomadaires |
-| **Guildes** | Équipes avec chat temps réel et défis collectifs |
-| **Challenges** | Défis quotidiens/hebdomadaires générés par IA |
-| **Récompenses** | Système de rewards automatisé |
-| **Saisons** | Saisons compétitives avec classements |
-
-### Évaluations Cliniques
-
-| Questionnaire | Description |
-|---------------|-------------|
-| **PHQ-9** | Dépression (Patient Health Questionnaire) |
-| **GAD-7** | Anxiété généralisée |
-| **PSS-10** | Stress perçu |
-| **WEMWBS** | Bien-être mental |
-| **SAM** | Self-Assessment Manikin (valence/arousal) |
-| **SUDS** | Échelle de détresse subjective |
-| **K6** | Détresse psychologique (Kessler) |
-| **Burnout** | Évaluation risque burnout (B2B) |
+**Module B2B** — Dashboard RH avec heatmap emotionnelle, rapports automatises, gestion d'equipes, SSO/SCIM, prevention burnout et hub bien-etre institutionnel. Concu pour les hopitaux, cliniques et ecoles de medecine.
 
 ---
 
-## Stack Technique
+## Architecture
 
-### Frontend
-
-```
-React 18 + TypeScript (strict mode)
-Vite 5 (bundler ultra-rapide)
-Tailwind CSS 3 + Design Tokens HSL
-shadcn/ui (60+ composants accessibles)
-React Router v6 (routage typé, 257+ routes)
-TanStack Query v5 (state serveur, cache intelligent)
-Zustand (state client)
-Framer Motion (animations fluides)
-Three.js + React Three Fiber (3D/VR/XR)
-i18next (internationalisation FR/EN/DE)
-MediaPipe Tasks Vision (détection faciale client)
-Hugging Face Transformers.js (IA embarquée)
-Recharts + Chart.js (visualisations)
+```mermaid
+graph LR
+    A[React 18 SPA] -->|HTTPS| B[Supabase]
+    B -->|Auth / RLS| C[(PostgreSQL)]
+    B -->|Realtime| A
+    B -->|Edge Functions| D[IA Gateway]
+    D --> E[OpenAI GPT-4]
+    D --> F[Hume AI]
+    D --> G[Suno AI]
+    D --> H[ElevenLabs TTS]
+    A -->|WebXR| I[Three.js / R3F]
+    A -->|Analytics| J[Sentry + Vercel]
 ```
 
-### Backend (Supabase Cloud)
-
-```
-PostgreSQL 15 (723+ tables)
-Row Level Security (RLS) durcie sur toutes les tables
-272+ Edge Functions (Deno)
-Realtime subscriptions (WebSocket)
-Storage (avatars, audio, exports, médias)
-Auth (email, OAuth Google/GitHub, magic link)
-pg_cron (tâches planifiées)
-Security Definer Functions (is_authenticated, is_owner, has_role)
-```
-
-### Backend Services (Fastify)
-
-```
-9 micro-services Fastify (account, admin, api, breath, gam, journal, privacy, scan, vr)
-Zod validation sur tous les endpoints
-Rate limiting configurable par user/IP
-JWT authentication (décorateur Fastify)
-CORS + Security headers (Helmet-style)
-Logging structuré (pino)
-404 handler global
-Error handler centralisé (plugins/error.ts)
-Env validation plugin (fail-fast au démarrage)
-Try/catch systématique sur tous les handlers
-```
-
-### Infrastructure & DevOps
-
-```
-Vercel (frontend deployment, CDN global)
-Supabase Cloud (backend, DB, auth, storage)
-Sentry (error tracking, performance monitoring)
-Lighthouse CI (audits performance automatisés)
-GitHub Actions (CI/CD)
-Playwright (E2E tests)
-Vitest (unit/integration tests)
-Storybook (component documentation)
-```
+Le frontend React communique exclusivement avec Supabase, qui orchestre l'authentification (email, OAuth, magic link), le stockage et les 272+ Edge Functions Deno. Ces fonctions servent de proxy securise vers les APIs d'IA externes, garantissant que les cles ne transitent jamais cote client.
 
 ---
 
-## Intégrations Premium (11 APIs)
+## Stack technique
 
-> **"Best-in-Class" Stack** — Chaque API est leader mondial dans sa catégorie
-
-| API | Catégorie | Utilisation | Edge Function |
-|-----|-----------|-------------|---------------|
-| **Suno AI** | Musique Générative | Création de morceaux thérapeutiques personnalisés | `suno-music` |
-| **Hume AI** | Analyse Émotionnelle | Détection faciale/vocale des émotions en temps réel | `analyze-emotion` |
-| **ElevenLabs** | Text-to-Speech | Voix ultra-réalistes multilingues (`eleven_multilingual_v2`) | `elevenlabs-tts` |
-| **Perplexity** | Recherche IA | Réponses contextuelles avec citations (modèle `sonar`) | `perplexity-search` |
-| **Firecrawl** | Web Scraping IA | Extraction intelligente de ressources bien-être | `firecrawl-scrape` |
-| **OpenAI GPT-4** | LLM | Coach IA, génération de contenu, analyse | `chat-coach` |
-| **Google Gemini** | LLM Multimodal | Analyse d'images, vision | `router-ai` |
-| **Stripe** | Paiements | Abonnements, facturation, webhooks | `stripe-webhook` |
-| **Shopify** | E-commerce | Boutique de produits bien-être | `shopify-webhook` |
-| **Resend** | Email Transactionnel | Notifications, rapports, onboarding | `send-email` |
-| **Sentry** | Monitoring | Tracking erreurs, performance, replays | `sentry-webhook-handler` |
-
-### Architecture 3D Immersive (Three.js / R3F)
-
-Le système 3D utilise `@react-three/fiber`, `@react-three/drei` et `@react-three/postprocessing` avec une architecture device-aware :
-
-| Composant | Usage | Fonctionnalité |
-|-----------|-------|----------------|
-| **EmotionSphere3D** | Scan émotionnel | Sphère pulsante colorée selon valence (rouge→vert) et arousal (taille/vitesse) |
-| **AchievementBadge3D** | Gamification | Badge 3D métallique par rareté : bronze, argent, or, diamant (arc-en-ciel) |
-| **MeditationEnvironment3D** | Méditation | Orbes flottants + particules sync respiration (thèmes : ocean, forest, cosmos, dawn) |
-| **DashboardBackground3D** | Dashboard | Fond géométrique subtil non-intrusif |
-| **HeroScene3D** | Landing page | Scène cosmique avec particules et post-processing |
-| **CosmicParticleField** | Partagé | Système de particules paramétrique (count, radius, color, speed, size) |
-
-**Device Tiers** (`visualDirection.ts`) :
-- **High** : 1200 particules, post-processing complet (bloom, vignette, noise)
-- **Medium** : 600 particules, bloom uniquement
-- **Low** : 200 particules, pas de post-processing
-
-**Accessibilité** : `prefersReducedMotion()` désactive toutes les animations. `Scene3DErrorBoundary` fournit un fallback élégant quand WebGL n'est pas disponible.
+| Couche | Technologies |
+|--------|-------------|
+| **Frontend** | React 18, TypeScript strict, Vite 5, Tailwind CSS 3, shadcn/ui, Framer Motion |
+| **State** | TanStack Query v5 (serveur), Zustand (client), React Hook Form + Zod |
+| **3D / VR** | Three.js, React Three Fiber, WebXR, Post-processing |
+| **Backend** | Supabase (PostgreSQL, Auth, Storage, Realtime, Edge Functions) |
+| **IA** | OpenAI GPT-4, Hume AI, Suno AI, ElevenLabs, MediaPipe, Hugging Face |
+| **Services** | Fastify micro-services (9), Kysely ORM, Rate limiting, JWT |
+| **Infra** | Vercel (CDN), Sentry (monitoring), Lighthouse CI, GitHub Actions |
+| **Tests** | Vitest, Playwright E2E, Testing Library, axe-core (a11y) |
+| **i18n** | i18next (FR / EN / DE) |
 
 ---
 
-## Architecture du Projet
-
-```
-emotionscare/
-├── src/
-│   ├── features/              # 37 modules métier (feature-first)
-│   │   ├── scan/              # Analyse émotionnelle (faciale, vocale, texte)
-│   │   ├── journal/           # Journaling vocal/texte avec IA
-│   │   ├── breath/            # Cohérence cardiaque + biofeedback
-│   │   ├── coach/             # Coach IA Nyvée (OpenAI + ElevenLabs)
-│   │   ├── music/             # Musicothérapie (Suno AI)
-│   │   ├── gamification/      # XP, badges, streaks, rewards
-│   │   ├── challenges/        # Défis quotidiens/hebdomadaires
-│   │   ├── tournaments/       # Tournois compétitifs
-│   │   ├── guilds/            # Guildes avec chat temps réel
-│   │   ├── leaderboard/       # Classements avec auras
-│   │   ├── community/         # Social (feed, groupes, messages)
-│   │   ├── social-cocon/      # Réseau de soutien
-│   │   ├── nyvee/             # Avatar IA Nyvée
-│   │   ├── vr/                # Expériences VR (Three.js + WebXR)
-│   │   ├── flash-glow/        # Apaisement rapide en 2 min
-│   │   ├── mood-mixer/        # DJ émotionnel
-│   │   ├── mood/              # Tracking humeur
-│   │   ├── assess/            # Évaluations cliniques (PHQ-9, GAD-7, etc.)
-│   │   ├── b2b/               # Fonctionnalités entreprise
-│   │   ├── health-integrations/ # Wearables (Apple Health, Garmin)
-│   │   ├── export/            # Export données RGPD
-│   │   ├── accessibility/     # A11y (WCAG 2.1 AA)
-│   │   ├── orchestration/     # Routeur IA contextuel
-│   │   └── ...                # 14 modules additionnels
-│   │
-│   ├── pages/                 # 346+ pages routées
-│   │   ├── app/               # Routes utilisateur (/app/*)
-│   │   ├── b2b/               # Routes entreprise (/b2b/*)
-│   │   ├── b2c/               # Routes B2C avec SEO
-│   │   ├── admin/             # Routes administration (/admin/*)
-│   │   ├── gamification/      # Routes gamification
-│   │   ├── settings/          # Hub paramètres unifié
-│   │   ├── legal/             # Pages légales (RGPD, CGV, etc.)
-│   │   └── errors/            # Pages d'erreur (401, 403, 404, 500)
-│   │
-│   ├── routerV2/              # Système de routage v2 modulaire
-│   │   ├── registry.ts        # 257+ routes enregistrées
-│   │   ├── routes/            # Maps segmentées (public, b2c, b2b, admin)
-│   │   ├── guards.tsx         # Protection (Auth, Role, Mode)
-│   │   └── router.tsx         # Configuration React Router
-│   │
-│   ├── components/            # 2 031+ composants réutilisables
-│   │   ├── ui/                # shadcn/ui (60+ composants)
-│   │   ├── 3d/                # Système 3D immersif (Three.js/R3F)
-│   │   │   ├── ImmersiveCanvas.tsx       # Canvas wrapper réutilisable
-│   │   │   ├── CosmicParticleField.tsx   # Système de particules paramétrique
-│   │   │   ├── EmotionSphere3D.tsx       # Sphère émotionnelle (valence/arousal)
-│   │   │   ├── AchievementBadge3D.tsx    # Badge 3D par rareté (bronze→diamant)
-│   │   │   ├── MeditationEnvironment3D.tsx # Environnement méditation + sync respiration
-│   │   │   ├── DashboardBackground3D.tsx # Fond géométrique subtil pour dashboard
-│   │   │   ├── HeroScene3D.tsx           # Scène hero landing page
-│   │   │   ├── Scene3DErrorBoundary.tsx  # WebGL detection + fallback premium
-│   │   │   ├── ImmersivePostProcessing.tsx # Bloom, vignette adaptatif
-│   │   │   └── visualDirection.ts        # Direction visuelle unifiée (palettes, device tiers)
-│   │   ├── dashboard/         # Widgets dashboard (tendances, objectifs, notifications, IA)
-│   │   ├── error/             # Error boundaries multi-niveaux
-│   │   ├── layout/            # Shell, Header, Sidebar, Footer
-│   │   └── ...                # Composants métier par domaine
-│   │
-│   ├── hooks/                 # 668+ custom hooks
-│   │   ├── useAuth.ts         # Authentification
-│   │   ├── useHumeStream.ts   # Analyse émotionnelle Hume AI
-│   │   ├── useXPSystem.ts     # Système XP centralisé
-│   │   ├── useElevenLabs.ts   # TTS Premium
-│   │   └── ...                # Hooks spécialisés par feature
-│   │
-│   ├── services/              # 28+ clients API
-│   │   ├── ai/                # Services IA (OpenAI, Hume, Gemini)
-│   │   ├── coach/             # Service coach avec détection de crise
-│   │   ├── music/             # Service musicothérapie
-│   │   └── ...                # Services par domaine
-│   │
-│   ├── lib/                   # 40+ utilitaires
-│   │   ├── ai/                # Utilitaires IA
-│   │   ├── security/          # Sécurité (CSP, sanitization)
-│   │   ├── cache/             # Stratégies de cache
-│   │   └── ...
-│   │
-│   ├── types/                 # 110+ définitions TypeScript
-│   ├── i18n/                  # Traductions (FR, EN, DE)
-│   └── integrations/          # Client Supabase
-│
-├── services/                  # 9 micro-services Fastify
-│   ├── account/               # Gestion compte (export, suppression RGPD)
-│   ├── admin/                 # Administration organisations
-│   ├── api/                   # API hub (health, journal, music, coach)
-│   ├── breath/                # Analytics respiration
-│   ├── gam/                   # Métriques gamification
-│   ├── journal/               # Entrées journal (voix + texte)
-│   ├── privacy/               # Préférences confidentialité
-│   ├── scan/                  # Analytics scan émotionnel
-│   └── vr/                    # Métriques sessions VR
-│
-├── supabase/
-│   ├── functions/             # 272+ Edge Functions (Deno)
-│   │   ├── router-ai/         # Routeur IA principal (OpenAI, Gemini)
-│   │   ├── router-music/      # APIs musique (Suno, recommandations)
-│   │   ├── router-b2b/        # APIs entreprise
-│   │   ├── router-wellness/   # APIs bien-être
-│   │   ├── router-gdpr/       # APIs conformité RGPD
-│   │   ├── router-community/  # APIs social
-│   │   ├── router-system/     # APIs système
-│   │   ├── router-context-lens/ # APIs contexte médical
-│   │   ├── elevenlabs-tts/    # TTS Premium
-│   │   ├── perplexity-search/ # Recherche IA
-│   │   ├── firecrawl-scrape/  # Web scraping
-│   │   ├── analyze-emotion/   # Hume AI
-│   │   ├── chat-coach/        # Coach OpenAI
-│   │   ├── suno-music/        # Génération Suno
-│   │   ├── crisis-detection/  # Détection de crise
-│   │   ├── gamification/      # XP, badges, rewards
-│   │   ├── stripe-webhook/    # Paiements
-│   │   ├── gdpr-data-deletion/ # Suppression RGPD
-│   │   └── ...                # 250+ fonctions additionnelles
-│   │
-│   └── migrations/            # 318 migrations SQL
-│
-├── packages/
-│   └── contracts/             # Schémas Zod partagés frontend/backend
-│
-├── openapi/                   # 13 spécifications OpenAPI (YAML)
-├── tests/                     # Tests E2E et unitaires
-├── docs/                      # 400+ fichiers documentation
-└── reports/                   # Audits accessibilité/sécurité
-```
-
----
-
-## Démarrage Rapide
-
-### Prérequis
-
-- **Node.js** >= 20
-- **npm** >= 10 (pas bun - incompatibilité @vitest/browser)
-- Compte **Supabase** (fourni avec le projet)
-
-### Installation
+## Demarrage rapide
 
 ```bash
-# 1. Cloner le dépôt
-git clone https://github.com/emotionscare/emotionscare.git
+# Cloner le depot
+git clone https://github.com/laeticiamng/emotionscare.git
 cd emotionscare
 
-# 2. Installer les dépendances
-npm ci --legacy-peer-deps
+# Installer les dependances
+npm install --legacy-peer-deps
 
-# 3. Copier les variables d'environnement
+# Configurer l'environnement
 cp .env.example .env.local
+# Renseigner VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY
 
-# 4. Lancer le serveur de développement
+# Lancer en developpement
 npm run dev
 ```
 
-### Variables d'Environnement
-
-```env
-# Supabase (obligatoire)
-VITE_SUPABASE_URL=https://xxx.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIs...
-VITE_SUPABASE_PROJECT_ID=xxx
-
-# APIs IA (configurées côté Supabase Secrets)
-# OPENAI_API_KEY        - Coach IA, analyse, génération
-# HUME_API_KEY          - Analyse émotionnelle multimodale
-# SUNO_API_KEY          - Génération musicale
-# ELEVENLABS_API_KEY    - Text-to-Speech
-# PERPLEXITY_API_KEY    - Recherche IA
-# FIRECRAWL_API_KEY     - Web scraping
-
-# Paiements & Commerce
-# STRIPE_SECRET_KEY     - Abonnements
-# SHOPIFY_API_KEY       - Boutique bien-être
-
-# Communications
-# RESEND_API_KEY        - Emails transactionnels
-# VAPID_PUBLIC_KEY      - Web Push Notifications
-
-# Monitoring
-# SENTRY_DSN            - Error tracking
-```
-
-### Scripts Disponibles
-
-```bash
-# Développement
-npm run dev              # Serveur de développement (Vite)
-npm run build            # Build production
-npm run preview          # Prévisualiser le build
-
-# Tests
-npm run test             # Tests unitaires Vitest
-npm run test:coverage    # Avec couverture
-npm run test:e2e         # Tests Playwright E2E
-npm run test:api         # Tests API
-npm run test:db          # Tests base de données
-
-# Qualité
-npm run lint             # ESLint
-npm run lint:fix         # Auto-fix ESLint
-npm run tsc              # TypeScript check
-
-# Base de données
-npm run db:migrate       # Appliquer les migrations
-npm run db:seed          # Données de seed
-
-# Services backend
-npm run dev:services     # Lancer les micro-services Fastify
-npm run dev:api          # Lancer le service API
-
-# Analyse
-npm run build:analyze    # Analyse du bundle
-npm run perf:lighthouse  # Audit Lighthouse
-```
+L'application demarre sur `http://localhost:8080`. Les Edge Functions necessitent un projet Supabase configure separement (`supabase start` pour le developpement local).
 
 ---
 
-## Sécurité & Conformité
+## Roadmap
 
-### Hardening Mars 2026
-
-| Amélioration | Détail |
-|--------------|--------|
-| **Security Definer Functions** | `is_authenticated()`, `is_owner()`, `is_admin()`, `has_role()` avec `SET search_path = public` |
-| **RLS Durcies** | Policies sur 723+ tables restreintes au propriétaire |
-| **User Roles** | Table séparée `user_roles` (anti-privilege escalation) |
-| **Index Performance** | Ajout d'index sur `user_id` pour toutes les tables critiques |
-| **Secrets Management** | Toutes les clés API dans Supabase Vault |
-| **Détection de crise** | Edge Function `crisis-detection` avec ressources d'urgence |
-| **Backend 404** | Handlers globaux sur tous les services Fastify |
-
-### RGPD
-
-| Fonctionnalité | Statut |
-|----------------|--------|
-| Chiffrement AES-256-GCM | Implémenté |
-| Consentement explicite (opt-in clinique) | Implémenté |
-| Droit à l'oubli (suppression données) | Implémenté |
-| Export données (JSON/CSV) | Implémenté |
-| Anonymisation statistiques B2B | Implémenté |
-| Pseudonymisation | Implémenté |
-| Politique de rétention | Implémenté |
-| DPO contact | Implémenté |
-| DSAR automatisé | Implémenté |
-| Score de conformité RGPD | Implémenté |
-
-### Sécurité Backend
-
-| Mesure | Statut |
-|--------|--------|
-| Row Level Security (RLS) durcie sur 723+ tables | Actif |
-| Security Definer Functions avec search_path | Actif |
-| JWT validation dans Edge Functions | Actif |
-| Rate limiting API (configurable par service) | Actif |
-| Secrets management (Supabase Vault) | Actif |
-| Audit logs | Actif |
-| CSP Headers | Actif |
-| Input sanitization (DOMPurify + Zod) | Actif |
-| CORS configuré par origine | Actif |
-| Détection de crise IA | Actif |
-
----
-
-## Accessibilité
-
-### Conformité WCAG 2.1 AA
-
-| Critère | Implémentation |
-|---------|----------------|
-| **Navigation clavier** | Tab, Enter, Escape sur tous les éléments interactifs |
-| **Skip links** | Présents sur toutes les pages |
-| **Focus visible** | Ring focus personnalisé |
-| **ARIA** | Labels, rôles, descriptions, live regions |
-| **Contraste** | Minimum 4.5:1 (AA) |
-| **Reduced motion** | Respect `prefers-reduced-motion` |
-| **High contrast** | Support mode contraste élevé |
-| **Screen readers** | Compatible NVDA, VoiceOver, JAWS |
-| **Semantic HTML** | `<main>`, `<nav>`, `<header>`, `<section>` |
-| **Page Settings** | Settings dédiés accessibilité (vision, audition, moteur, cognitif) |
-
----
-
-## Performances
-
-### Core Web Vitals
-
-| Métrique | Valeur | Cible | Statut |
-|----------|--------|-------|--------|
-| **FCP** (First Contentful Paint) | 1.2s | < 1.8s | OK |
-| **LCP** (Largest Contentful Paint) | 2.1s | < 2.5s | OK |
-| **CLS** (Cumulative Layout Shift) | 0.05 | < 0.1 | OK |
-| **TTI** (Time to Interactive) | 2.8s | < 3.8s | OK |
-| **FID** (First Input Delay) | 50ms | < 100ms | OK |
-
-### Optimisations
-
-- Code splitting + lazy loading routes (257+ routes lazy-loaded)
-- Images AVIF/WebP optimisées
-- TanStack Query cache intelligent (stale times configurés)
-- Tree shaking Vite
-- Prefetching des routes critiques
-- Design tokens centralisés HSL
-- Indexes DB optimisés pour les lookups `user_id`
-- Edge Functions CDN global (Supabase Edge)
-- Error boundaries multi-niveaux (page, module, global)
-
----
-
-## Tests
-
-### Couverture des Tests
-
-| Type | Fichiers | État |
-|------|----------|------|
-| **Smoke Tests** | 1 | Navigation, Auth, Data |
-| **Sécurité** | 2 | RLS, XSS, Injection |
-| **Accessibilité** | 2 | WCAG AA, Contraste, ARIA, Keyboard |
-| **Performance** | 1 | Benchmarks FCP/LCP |
-| **Coherence Platform** | 1 | Backend/Frontend sync |
-| **Data Management** | 1 | Supabase, sanitization |
-| **E2E Scenarios** | 30+ | Parcours utilisateur complets (Playwright) |
-| **VR/Wearables** | 1 | WebXR, Health APIs |
-| **Hooks** | 20+ | Custom hooks critiques |
-| **Services** | 15+ | Services API |
-| **Types/Validation** | 50+ | Schémas Zod |
-
-**Total : 420+ fichiers de tests**
-
-### Commandes
-
-```bash
-npm run test              # Tests unitaires Vitest
-npm run test:coverage     # Avec couverture
-npm run test:e2e          # Tests Playwright
-npm run test:api          # Tests API
-npm run test:db           # Tests base de données
-```
-
----
-
-## Dashboard Widgets
-
-Le dashboard utilisateur inclut des widgets temps réel :
-
-| Widget | Description |
-|--------|-------------|
-| **Tendance hebdomadaire** | Mini sparkline des 7 derniers jours avec données d'activité et signaux cliniques |
-| **Recommandations IA** | Suggestions contextuelles basées sur l'heure, l'humeur, l'énergie et les streaks |
-| **Objectifs personnels** | Progression des objectifs avec création inline |
-| **Notifications** | Rappels, achievements, conseils personnalisés avec persistance localStorage |
-| **Sessions VR** | Sessions VR recommandées depuis la base de données |
-
----
-
-## Edge Functions - Architecture
-
-### 8 Super-Routers
-
-| Router | Endpoints | Description |
-|--------|-----------|-------------|
-| `router-ai` | 10+ | Orchestration IA (OpenAI, Gemini, sélection de modèle, fallback) |
-| `router-b2b` | 8+ | API entreprise (équipes, événements, rapports, sécurité) |
-| `router-community` | 6+ | Social (feed, groupes, messages) |
-| `router-context-lens` | 12+ | Contexte médical (ressources, recommandations) |
-| `router-gdpr` | 6+ | Conformité RGPD (export, suppression, consentement) |
-| `router-music` | 8+ | Musicothérapie (génération, recommandations, queue) |
-| `router-system` | 5+ | Opérations système (monitoring, health, cron) |
-| `router-wellness` | 6+ | Bien-être (méditation, grounding, relaxation) |
-
-### Fonctions Spécialisées Notables
-
-| Fonction | Description |
-|----------|-------------|
-| `crisis-detection` | Analyse ML-like avec 5 types d'indicateurs, détection de tendance et régression |
-| `ai-coach` | Personnalité configurable, détection de crise, ressources d'urgence |
-| `music-recommendations` | 6 playlists thérapeutiques, scoring contextuel, personnalisation |
-| `gamification` | XP, badges auto-unlock, challenges quotidiens, tournois |
-| `b2b-aggregate` | Anonymisation avec seuil, distribution temporelle |
-| `gdpr-data-deletion` | Code de confirmation, suppression ordonnée sur 11 tables, audit log |
-
----
-
-## Limitations Connues
-
-### En Cours d'Amélioration
-
-| Element | Impact | Plan |
-|---------|--------|------|
-| **Tests accessibilite** | Couverture partielle | Generalisation axe-core |
-| **Documentation Edge Functions** | A enrichir | Ajout exemples et schemas |
-
-### Resolu (Audit v6.0)
-
-| Element | Resolution |
-|---------|------------|
-| **@ts-nocheck (1698 fichiers)** | Retrait massif : 1698 -> ~100 restants, types corriges |
-| **Mock data (50+ fichiers)** | 100% remplace par requetes Supabase reelles |
-| **Fichiers mock supprimes** | sampleTracks.ts, musicPlaylists.ts, line-chart-data.ts, playlist-data.ts + 15 precedents |
-| **Contexts mock** | InnovationContext, ReportingContext, FeedbackContext connectes Supabase |
-| **useDashboardData mock** | Remplace par vraies requetes admin (profiles, emotion_scans, user_alerts) |
-| **CoachAdvancedAnalytics mock** | Remplace par requetes coach_sessions reelles |
-| **EmotionScanCard mock** | Tendance 7 jours depuis emotion_scans |
-| **EmotionalClimateAnalytics mock** | 3 onglets connectes a Supabase (emotions, activite, engagement) |
-| **B2BPreventionProgramPage mock** | SAMPLE_PROGRAMS remplace par prevention_programs table |
-| **APIKeysPage** | Hardcoded keys remplace par CRUD Supabase + handlers copy/delete |
-| **CustomizationPage** | 8 switches/sliders connectes avec localStorage persistence |
-| **ai-monitoring console.logs** | Remplace par logger structure |
-| **Backend handlers sans error handling** | try/catch ajoute sur tous les handlers |
-| **Pages sans navigation retour** | Back buttons ajoutes sur 20+ pages |
-| **console.log en production** | Supprimes ou conditionnes a DEV |
-| **Boutons sans handlers** | Handlers reels ajoutes |
-| **3D Premium etendu** | Integration sur 18+ pages (Music, EmotionalPark, Calendar, Analytics...) |
-
----
-
-## Documentation Technique
-
-| Document | Description |
-|----------|-------------|
-| [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) | Architecture technique détaillée |
-| [`docs/SECURITY_PRIVACY.md`](./docs/SECURITY_PRIVACY.md) | Sécurité et RGPD |
-| [`docs/API_REFERENCE.md`](./docs/API_REFERENCE.md) | Référence complète des 8 super-routers |
-| [`docs/INTEGRATIONS.md`](./docs/INTEGRATIONS.md) | Guide APIs premium |
-| [`docs/GAMIFICATION.md`](./docs/GAMIFICATION.md) | Système gamification |
-| [`docs/GAMIFICATION_GUIDE.md`](./docs/GAMIFICATION_GUIDE.md) | Guide XP, badges, guildes, tournois |
-| [`docs/RGPD_COMPLIANCE.md`](./docs/RGPD_COMPLIANCE.md) | Conformité RGPD, droits utilisateurs |
-| [`docs/MODULE_STATUS.md`](./docs/MODULE_STATUS.md) | État réel de chaque module |
-| [`SETUP_GUIDE.md`](./SETUP_GUIDE.md) | Guide d'installation détaillé |
-| [`CONTRIBUTING.md`](./CONTRIBUTING.md) | Guide de contribution |
-
----
-
-## Roadmap 2026
-
-### Q1 2026 (Termine)
-- [x] Modules core operationnels (Scan, Breath, Journal, Coach, Music)
-- [x] Gamification complete (XP, badges, streaks, tournois, guildes)
-- [x] 272+ Edge Functions deployees
-- [x] Dashboard B2B complet avec prevention burnout
-- [x] Wearables en beta (Apple Watch, Garmin)
-- [x] Analyse Hume AI multimodale (faciale, vocale, texte)
-- [x] Hub parametres unifie
-- [x] 3D Premium etendu sur 18+ pages (EmotionSphere, AchievementBadge, MeditationEnvironment, DashboardBackground)
-- [x] Suppression de 100% des donnees mockees (50+ fichiers)
-- [x] Backend error handling systematique (9 micro-services)
-- [x] Navigation ergonomique unifiee (back buttons sur 20+ pages, headers coherents)
-- [x] Retrait massif @ts-nocheck (1698 -> ~100 restants)
-- [x] Contexts et hooks connectes Supabase (Innovation, Reporting, Feedback, Dashboard admin)
-- [x] CustomizationPage fonctionnelle avec persistence localStorage
-
-### Q2 2026 (En cours)
-- [ ] Application mobile React Native
-- [ ] Amelioration couverture tests > 80%
-- [ ] Retrait des ~100 @ts-nocheck restants
-- [ ] Tests accessibilite axe-core automatises en CI
-
-### Q3-Q4 2026
-- [ ] VR standalone (Meta Quest 3)
-- [ ] IA prédictive burnout
-- [ ] Certification HDS (Hébergement de Données de Santé)
-- [ ] Application desktop (Electron)
-
----
-
-## Contribution
-
-Voir [`CONTRIBUTING.md`](./CONTRIBUTING.md) pour les guidelines.
-
-```bash
-# Fork & clone
-git checkout -b feature/ma-feature
-# Développer avec tests
-npm run test
-npm run lint
-# PR avec description détaillée
-```
-
----
-
-## Support
-
-| Canal | Contact |
-|-------|---------|
-| **Email** | support@emotionscare.app |
-| **DPO** | dpo@emotionscare.app |
-| **Documentation** | [docs.emotionscare.app](https://docs.emotionscare.app) |
+| Jalon | Description | Horizon |
+|-------|-------------|---------|
+| **v1.3 — Pilote hospitalier** | Deploiement en conditions reelles dans 2 etablissements partenaires, collecte de feedback terrain | T3 2026 |
+| **v1.4 — IA proactive** | Recommandations contextuelles basees sur les signaux cliniques, micro-gestes personnalises en temps reel | T4 2026 |
+| **v2.0 — Marketplace** | Ouverture aux therapeutes tiers pour publier des contenus (meditations, exercices, programmes) | T1 2027 |
+| **v2.1 — Mobile natif** | Applications iOS et Android via React Native, notifications push et mode hors-ligne | T2 2027 |
 
 ---
 
 ## Licence
 
-Propriétaire — © 2024-2026 EmotionsCare. Tous droits réservés.
+Ce projet est la propriete de **EmotionsCare SASU**. Tous droits reserves.
 
----
+**Contact** — [contact@emotionscare.com](mailto:contact@emotionscare.com)
 
-<div align="center">
-
-**Fait avec soin pour les soignants**
-
-*Derniere mise a jour : 18 mars 2026 - Audit v6.0*
-
-</div>
+**Site** — [emotionscare.com](https://emotionscare.com)

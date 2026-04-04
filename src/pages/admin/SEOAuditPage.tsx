@@ -39,7 +39,7 @@ interface AuditResult {
 }
 
 const SEOAuditPage: React.FC = () => {
-  const [url, setUrl] = useState('https://emotions-care.lovable.app');
+  const [url, setUrl] = useState('https://emotionscare.com');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<AuditResult | null>(null);
 

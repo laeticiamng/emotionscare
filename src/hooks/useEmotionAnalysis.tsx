@@ -33,7 +33,7 @@ export const useEmotionAnalysis = (): UseEmotionAnalysisReturn => {
     setError(null);
 
     try {
-      // Call Lovable AI-powered emotion analysis (Gemini 2.5 Flash)
+      // Call AI-powered emotion analysis (Gemini 2.5 Flash)
       const { data, error: apiError } = await supabase.functions.invoke('emotion-analysis', {
         body: {
           text,

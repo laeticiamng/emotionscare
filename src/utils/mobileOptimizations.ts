@@ -89,7 +89,7 @@ export const getOptimizedImageSrc = (src: string, screenSize: 'mobile' | 'tablet
     
     const sizeParam = sizeMap[screenSize] || sizeMap.desktop;
     
-    return src.includes('lovable-uploads') 
+    return src.includes('lovable-uploads') || src.includes('supabase.co/storage')
       ? `${src}?${sizeParam}`
       : src;
   } catch (error) {

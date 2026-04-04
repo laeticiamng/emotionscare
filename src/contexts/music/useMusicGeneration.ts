@@ -1,6 +1,6 @@
 // @ts-nocheck
 /**
- * Music Generation Hook - Génération Suno avec fallback Lovable AI
+ * Music Generation Hook - Génération Suno avec fallback IA
  */
 
 import { useCallback, Dispatch } from 'react';

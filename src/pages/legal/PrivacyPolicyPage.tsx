@@ -169,10 +169,10 @@ export const PrivacyPolicyPage: React.FC = () => {
                     <td className="p-3">DPA signé, ISO 27001</td>
                   </tr>
                   <tr className="border-t">
-                    <td className="p-3">Lovable</td>
+                    <td className="p-3">Vercel</td>
                     <td className="p-3">Hébergement web</td>
                     <td className="p-3">🇺🇸 USA</td>
-                    <td className="p-3">CCT UE-USA</td>
+                    <td className="p-3">CCT UE-USA, SOC 2</td>
                   </tr>
                   <tr className="border-t">
                     <td className="p-3">OpenAI (optionnel)</td>

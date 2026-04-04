@@ -388,7 +388,7 @@ describe('Security Configuration', () => {
         'http://localhost:3000',
         'https://app.emotionscare.com',
         'https://admin.emotionscare.com',
-        'https://emotions-care.lovable.app'
+        'https://emotionscare.com'
       ];
 
       const isAllowedOrigin = (origin: string): boolean => allowedOrigins.includes(origin);

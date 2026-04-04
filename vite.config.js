@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
-import { componentTagger } from "lovable-tagger";
 
 export default defineConfig(({ mode }) => ({
   plugins: [
@@ -9,7 +8,6 @@ export default defineConfig(({ mode }) => ({
       jsxRuntime: 'automatic',
       typescript: false, // Disable TS type checking in Vite - use esbuild only for transformation
     }),
-    mode === 'development' && componentTagger(),
   ].filter(Boolean),
   
   server: {
@@ -60,7 +58,7 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     exclude: [
       'sharp', 'pg', 'fastify', '@fastify/cors', '@fastify/helmet', '@fastify/rate-limit',
-      'kysely', 'tsx', 'imagemin-avif', 'imagemin-webp', 'node-fetch',
+      'kysely', 'tsx', 'node-fetch',
     ],
   },
 

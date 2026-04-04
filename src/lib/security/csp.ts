@@ -12,7 +12,7 @@ export const CSP_DIRECTIVES = {
     // ⚠️ SECURITY: unsafe-inline and unsafe-eval are ONLY allowed in development
     // In production, these directives are removed to prevent XSS attacks
     ...(isDevelopment ? ["'unsafe-inline'", "'unsafe-eval'"] : []),
-    "https://cdn.gpteng.co", // Lovable badge
+    "https://cdn.gpteng.co", // External CDN
     "https://www.googletagmanager.com",
     "https://unpkg.com" // For external libraries
   ],

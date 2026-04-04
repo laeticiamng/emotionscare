@@ -64,9 +64,9 @@ export const MentionsLegalesPage: React.FC = () => {
             <section>
               <h2>2. Hébergement</h2>
               <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-                <p><strong>Hébergeur web :</strong> Lovable (interface)</p>
-                <p><strong>Adresse :</strong> Lovable Platform, États-Unis</p>
-                <p><strong>Site :</strong> <a href="https://lovable.dev" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">lovable.dev</a></p>
+                <p><strong>Hébergeur web :</strong> Vercel Inc.</p>
+                <p><strong>Adresse :</strong> 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis</p>
+                <p><strong>Site :</strong> <a href="https://vercel.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">vercel.com</a></p>
                 
                 <hr className="my-4" />
                 

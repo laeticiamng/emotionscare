@@ -51,7 +51,7 @@ export const MonitoringChatbot: React.FC = () => {
         if (error.message?.includes('429')) {
           toast.error('Trop de requêtes. Réessayez dans quelques instants.');
         } else if (error.message?.includes('402')) {
-          toast.error('Crédits Lovable AI insuffisants. Veuillez recharger votre compte.');
+          toast.error('Crédits IA insuffisants. Veuillez recharger votre compte.');
         } else {
           throw error;
         }

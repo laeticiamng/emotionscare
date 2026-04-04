@@ -17,7 +17,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   },
   global: {
     headers: {
-      'X-Client-Info': 'lovable-wellness-app',
+      'X-Client-Info': 'emotionscare-app',
     },
   },
 });

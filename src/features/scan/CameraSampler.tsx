@@ -149,7 +149,7 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
       ctx.drawImage(videoRef.current, 0, 0);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
       
-      logger.debug('[CameraSampler] Calling analyze-vision with Lovable AI...', 'FEATURE');
+      logger.debug('[CameraSampler] Calling analyze-vision...', 'FEATURE');
 
       const { data, error } = await supabase.functions.invoke('analyze-vision', {
         body: { 

@@ -22,7 +22,7 @@ const DEFAULT_CONFIG: SEOConfig = {
   title: 'EmotionsCare - Bien-être émotionnel intelligent',
   description: 'Plateforme de bien-être émotionnel avec scan IA, coach virtuel, méditation guidée et gamification. Prenez soin de vos émotions.',
   keywords: ['bien-être', 'émotions', 'santé mentale', 'méditation', 'respiration', 'coach IA'],
-  ogImage: 'https://emotions-care.lovable.app/og-image.png',
+  ogImage: 'https://emotionscare.com/og-image.png',
   ogType: 'website',
   twitterCard: 'summary_large_image',
 };

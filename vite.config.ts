@@ -1,9 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-// Dev taggers conditionally imported
-// import { componentTagger } from "lovable-tagger";
-// import dyadComponentTagger from '@dyad-sh/react-vite-component-tagger';
 import { VitePWA } from 'vite-plugin-pwa';
 import { visualizer } from 'rollup-plugin-visualizer';
 
