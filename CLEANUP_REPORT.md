@@ -20,8 +20,13 @@
 | `@types/react-helmet` | Package correspondant (`react-helmet`) non utilise ; `react-helmet-async` est utilise a la place |
 | `lovable-tagger` | Boilerplate Lovable — supprime |
 | `esbuild` (dep directe) | Fourni par Vite en tant que dependance transitive |
+| `@huggingface/transformers` | Aucun import dans src/ (reference uniquement dans la page de licences) |
+| `@tanstack/react-table` | Aucun import trouve dans src/ |
+| `hume` | Le package npm n'est jamais importe ; les services locaux utilisent des wrappers internes |
+| `react-simple-typewriter` | Aucun import ; le composant TypewriterEffect est une implementation custom |
+| `vite-tsconfig-paths` | Non utilise dans vite.config.ts (aliases manuels via resolve.alias) |
 
-**Total : 11 dependances supprimees**
+**Total : 16 dependances supprimees**
 
 ---
 
@@ -46,7 +51,9 @@
 | `terser` | Outil de build (minification) |
 | `tsx` | Outil d'execution TypeScript pour scripts |
 
-**Total : 16 dependances deplacees vers devDependencies**
+| `kysely` | Utilise uniquement dans tests/ (tests DB) |
+
+**Total : 17 dependances deplacees vers devDependencies**
 
 ---
 
@@ -127,9 +134,9 @@ Les references Lovable dans `supabase/functions/` (CORS origins, API Gateway) et
 
 | Metrique | Avant | Apres |
 |----------|-------|-------|
-| Dependencies (production) | 128 | 101 |
-| DevDependencies | 47 | 63 |
-| Total packages declares | 175 + 2 optional | 164 + 2 optional |
-| Deps inutilisees | 11 | 0 |
-| Deps mal classees (dev en prod) | 16 | 0 |
+| Dependencies (production) | 128 | 89 |
+| DevDependencies | 47 | 65 |
+| Total packages declares | 175 + 2 optional | 154 + 2 optional |
+| Deps inutilisees | 16 | 0 |
+| Deps mal classees (dev en prod) | 17 | 0 |
 | References Lovable dans src/ | 16 | 1 (backward compat `lovable-uploads`) |
