@@ -80,6 +80,19 @@ const MeditationPage = lazy(() => import('@/pages/MeditationPage'));
 const SeuilPage = lazy(() => import('@/pages/SeuilPage'));
 const BreathingPage = lazy(() => import('@/pages/breathing/BreathingPage'));
 
+// Hubs unifiés
+const BreathHubPage = lazy(() => import('@/pages/breath/BreathHubPage'));
+const MusicHubPage = lazy(() => import('@/pages/music/MusicHubPage'));
+const CommunityHubPage = lazy(() => import('@/pages/social/CommunityHubPage'));
+const GamificationHubPage = lazy(() => import('@/pages/gamification/GamificationHubPage'));
+
+// Assessments supplémentaires
+const StressAssessmentPage = lazy(() => import('@/pages/assess/StressAssessmentPage'));
+const DepressionAssessmentPage = lazy(() => import('@/pages/assess/DepressionAssessmentPage'));
+
+// Validation
+const ValidationPage = lazy(() => import('@/pages/ValidationPage'));
+
 // Parcours & Discovery
 const EmotionalPark = lazy(() => import('@/pages/EmotionalPark'));
 const ParkJourney = lazy(() => import('@/pages/ParkJourney'));
@@ -362,6 +375,19 @@ export const b2cComponentMap = {
   CreatorDashboardPage,
   ActivityLogsPage,
   UnifiedDashboardPage: B2CDashboardPage,
+
+  // Hubs unifiés
+  BreathHubPage,
+  MusicHubPage,
+  CommunityHubPage,
+  GamificationHubPage,
+
+  // Assessments
+  StressAssessmentPage,
+  DepressionAssessmentPage,
+
+  // Validation
+  ValidationPage,
 
   // TIMECRAFT
   TimeCraftPage,
