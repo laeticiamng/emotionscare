@@ -558,18 +558,25 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
   },
   // Route /app/emotions supprimée - alias vers /app/scan
   // ═══════════════════════════════════════════════════════════
-  // MODULE ENTRAIDE UNIFIÉ (consolide Community, Groups, Buddies, Guilds, Social Cocon)
+  // COMMUNITY HUB (consolide Entraide, Buddies, Group Sessions, Community)
   // ═══════════════════════════════════════════════════════════
+  {
+    name: 'community-hub',
+    path: '/app/community',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'CommunityHubPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/community', '/community-groups', '/groups', '/buddies-hub', '/social'],
+  },
   {
     name: 'entraide',
     path: '/app/entraide',
     segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'EntraidePage',
-    guard: true,
-    requireAuth: true,
-    aliases: ['/community', '/community-groups', '/groups', '/buddies-hub', '/social', '/entraide'],
+    deprecated: true,
+    redirectTo: '/app/community?tab=entraide',
   },
   // community-legacy supprimé — redirection dans aliases.tsx
   // ═══════════════════════════════════════════════════════════
