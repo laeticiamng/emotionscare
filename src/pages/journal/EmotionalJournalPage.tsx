@@ -11,9 +11,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
   ArrowLeft, BookOpen, Plus, Download, 
-  BarChart3, FileText, Filter 
+  BarChart3, FileText, Filter, TrendingUp, TrendingDown, Minus 
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
 import { EmotionalJournalEntryForm, EmotionalJournalEntryData } from '@/components/journal/EmotionalJournalEntryForm';
 import { EmotionalJournalTimeline } from '@/components/journal/EmotionalJournalTimeline';
 import { EmotionalJournalFilters } from '@/components/journal/EmotionalJournalFilters';
@@ -163,7 +164,56 @@ const EmotionalJournalPage: React.FC = () => {
           />
         </div>
 
-        {/* Filtres (collapsible) */}
+        {/* Suivi longitudinal — Tendances émotionnelles */}
+        {entries.length >= 3 && (
+          <Card className="mb-6">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4 text-primary" />
+                  Évolution émotionnelle
+                </h3>
+                {(() => {
+                  const recent = entries.slice(0, 5);
+                  const older = entries.slice(5, 10);
+                  if (recent.length < 2 || older.length < 1) return null;
+                  const recentAvg = recent.reduce((s, e) => s + (e.intensity || 5), 0) / recent.length;
+                  const olderAvg = older.reduce((s, e) => s + (e.intensity || 5), 0) / older.length;
+                  const diff = recentAvg - olderAvg;
+                  if (Math.abs(diff) < 0.5) return <span className="text-xs text-muted-foreground flex items-center gap-1"><Minus className="h-3 w-3" /> Stable</span>;
+                  return diff > 0 
+                    ? <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1"><TrendingUp className="h-3 w-3" /> En hausse</span>
+                    : <span className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1"><TrendingDown className="h-3 w-3" /> En baisse</span>;
+                })()}
+              </div>
+              <div className="h-32">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={entries.slice(0, 20).reverse().map((e, i) => ({
+                    day: i + 1,
+                    intensité: e.intensity || 5,
+                  }))}>
+                    <defs>
+                      <linearGradient id="journalGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="day" hide />
+                    <YAxis domain={[0, 10]} hide />
+                    <Tooltip 
+                      contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }}
+                      formatter={(value: number) => [`${value}/10`, 'Intensité']}
+                    />
+                    <Area type="monotone" dataKey="intensité" stroke="hsl(var(--primary))" fill="url(#journalGrad)" strokeWidth={2} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Dernières {Math.min(entries.length, 20)} entrées · L'intensité émotionnelle reflète la force de vos ressentis
+              </p>
+            </CardContent>
+          </Card>
+        )}
         <AnimatePresence>
           {showFilters && (
             <motion.div
