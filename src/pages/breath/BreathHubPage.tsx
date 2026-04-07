@@ -84,12 +84,39 @@ export default function BreathHubPage() {
   const initialMode = (searchParams.get('mode') as BreathMode) || 'classique';
   const [activeMode, setActiveMode] = useState<BreathMode>(initialMode);
   const [isSessionActive, setIsSessionActive] = useState(false);
+  const [lastScan, setLastScan] = useState<{ urgency: string; protocol: string } | null>(null);
 
   usePageSEO({
     title: 'Respiration Guidée - EmotionsCare',
     description: 'Hub de respiration guidée avec 4 modes : classique, gamifié, immersif et nuit. Protocoles basés sur les neurosciences.',
     keywords: 'respiration, cohérence cardiaque, relaxation, stress, soignants',
   });
+
+  // Load latest scan recommendation
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data } = await supabase
+          .from('emotion_scan_results')
+          .select('results')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+        if (data?.results) {
+          setLastScan({
+            urgency: (data.results as any).urgency || 'low',
+            protocol: (data.results as any).recommendation || '',
+          });
+        }
+      } catch {
+        // No scan data
+      }
+    })();
+  }, []);
 
   const handleModeChange = (mode: string) => {
     setActiveMode(mode as BreathMode);
@@ -133,6 +160,32 @@ export default function BreathHubPage() {
       </header>
 
       <main className="container mx-auto px-4 py-6 space-y-6">
+        {/* Post-scan recommendation banner */}
+        {lastScan && lastScan.urgency !== 'low' && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`p-4 rounded-xl border flex items-center gap-3 ${
+              lastScan.urgency === 'high'
+                ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800'
+                : 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800'
+            }`}
+          >
+            <Sparkles className="h-5 w-5 shrink-0 text-primary" />
+            <div className="flex-1">
+              <p className="text-sm font-medium">
+                Recommandation post-scan : <strong>{lastScan.protocol}</strong>
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Basé sur votre dernier scanner émotionnel
+              </p>
+            </div>
+            <Button size="sm" variant="outline" onClick={() => setLastScan(null)}>
+              Compris
+            </Button>
+          </motion.div>
+        )}
+
         {/* Mode Selector Tabs */}
         <Tabs value={activeMode} onValueChange={handleModeChange}>
           <TabsList className="grid w-full grid-cols-4 h-auto">

@@ -558,18 +558,25 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
   },
   // Route /app/emotions supprimée - alias vers /app/scan
   // ═══════════════════════════════════════════════════════════
-  // MODULE ENTRAIDE UNIFIÉ (consolide Community, Groups, Buddies, Guilds, Social Cocon)
+  // COMMUNITY HUB (consolide Entraide, Buddies, Group Sessions, Community)
   // ═══════════════════════════════════════════════════════════
+  {
+    name: 'community-hub',
+    path: '/app/community',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'CommunityHubPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/community', '/community-groups', '/groups', '/buddies-hub', '/social'],
+  },
   {
     name: 'entraide',
     path: '/app/entraide',
     segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'EntraidePage',
-    guard: true,
-    requireAuth: true,
-    aliases: ['/community', '/community-groups', '/groups', '/buddies-hub', '/social', '/entraide'],
+    deprecated: true,
+    redirectTo: '/app/community?tab=entraide',
   },
   // community-legacy supprimé — redirection dans aliases.tsx
   // ═══════════════════════════════════════════════════════════
@@ -591,12 +598,8 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     name: 'buddies',
     path: '/app/buddies',
     segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'BuddiesPage',
-    guard: true,
-    requireAuth: true,
-    aliases: ['/buddy-system', '/find-buddy'],
+    deprecated: true,
+    redirectTo: '/app/community?tab=buddies',
   },
   {
     name: 'wearables',
@@ -717,12 +720,8 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     name: 'group-sessions',
     path: '/app/group-sessions',
     segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'GroupSessionsPage',
-    guard: true,
-    requireAuth: true,
-    aliases: ['/group-sessions', '/sessions-groupe'],
+    deprecated: true,
+    redirectTo: '/app/community?tab=groups',
   },
   // social-cocon-b2c et communaute-b2c supprimés — redirections dans aliases.tsx
   // ═══════════════════════════════════════════════════════════
@@ -790,22 +789,29 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     name: 'leaderboard',
     path: '/app/leaderboard',
     segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'LeaderboardPage',
-    guard: true,
-    requireAuth: true,
-    aliases: ['/leaderboard'],
+    deprecated: true,
+    redirectTo: '/app/gamification?tab=leaderboard',
   },
+  // ═══════════════════════════════════════════════════════════
+  // GAMIFICATION HUB (consolide XP, Badges, Défis, Classement)
+  // ═══════════════════════════════════════════════════════════
   {
-    name: 'gamification',
-    path: '/gamification',
+    name: 'gamification-hub',
+    path: '/app/gamification',
     segment: 'consumer',
     role: 'consumer',
     layout: 'app-sidebar',
-    component: 'B2CGamificationPage',
+    component: 'GamificationHubPage',
     guard: true,
     requireAuth: true,
+    aliases: ['/gamification'],
+  },
+  {
+    name: 'gamification-legacy',
+    path: '/gamification',
+    segment: 'consumer',
+    deprecated: true,
+    redirectTo: '/app/gamification',
   },
   {
     name: 'heatmap',
