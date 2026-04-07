@@ -5,10 +5,13 @@
  * Résultat graphique radar (Recharts) + recommandation de protocole
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePageSEO } from '@/hooks/usePageSEO';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -150,6 +153,9 @@ function getRecommendation(scores: Record<string, number>) {
 
 const ScannerEmotionnelPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedId, setSavedId] = useState<string | null>(null);
 
   usePageSEO({
     title: 'Scanner Émotionnel — Évaluez votre état en 60 secondes',
@@ -160,6 +166,42 @@ const ScannerEmotionnelPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [scores, setScores] = useState<Record<string, number>>({});
   const [showResults, setShowResults] = useState(false);
+
+  /** Persist scan results to Supabase when results are shown */
+  const saveScanResults = useCallback(async (scanScores: Record<string, number>) => {
+    if (!user || savedId) return;
+    setIsSaving(true);
+    try {
+      const avg = SCAN_STEPS.reduce((sum, s) => sum + (scanScores[s.id] ?? 5), 0) / SCAN_STEPS.length;
+      const rec = getRecommendation(scanScores);
+      
+      const { data, error } = await supabase
+        .from('emotion_scan_results')
+        .insert({
+          user_id: user.id,
+          scan_type: 'questionnaire',
+          results: {
+            dimensions: scanScores,
+            average: Math.round(avg * 10) / 10,
+            recommendation: rec.protocol,
+            urgency: rec.urgency,
+          },
+          primary_emotion: rec.urgency === 'high' ? 'stressed' : rec.urgency === 'medium' ? 'neutral' : 'positive',
+          confidence_score: 1.0,
+        })
+        .select('id')
+        .single();
+
+      if (error) throw error;
+      setSavedId(data?.id ?? null);
+      toast.success('Scan sauvegardé', { description: 'Retrouvez vos résultats dans votre historique.' });
+    } catch (err) {
+      // Silent fail — scan results still shown
+      toast.error('Sauvegarde impossible', { description: 'Vos résultats sont affichés mais non enregistrés.' });
+    } finally {
+      setIsSaving(false);
+    }
+  }, [user, savedId]);
 
   const step = SCAN_STEPS[currentStep];
   const currentScore = scores[step?.id] ?? 5;
