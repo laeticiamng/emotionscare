@@ -720,12 +720,8 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     name: 'group-sessions',
     path: '/app/group-sessions',
     segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'GroupSessionsPage',
-    guard: true,
-    requireAuth: true,
-    aliases: ['/group-sessions', '/sessions-groupe'],
+    deprecated: true,
+    redirectTo: '/app/community?tab=groups',
   },
   // social-cocon-b2c et communaute-b2c supprimés — redirections dans aliases.tsx
   // ═══════════════════════════════════════════════════════════
