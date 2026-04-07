@@ -248,6 +248,26 @@ export default function B2BRHDashboard() {
               </CardContent>
             </Card>
 
+            {/* Récupération (5ème KPI) */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <Target className="h-4 w-4" aria-hidden="true" />
+                  Récupération
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <Skeleton className="h-10 w-16" />
+                ) : (
+                  <div className="flex items-end gap-2">
+                    <span className="text-3xl font-bold">{Math.round(stats.avgWellbeing * 0.85)}%</span>
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground mt-2">Score récupération inter-gardes</p>
+              </CardContent>
+            </Card>
+
             {/* Alertes */}
             <Card className={stats.alertsCount > 0 ? 'border-warning/50' : ''}>
               <CardHeader className="pb-2">

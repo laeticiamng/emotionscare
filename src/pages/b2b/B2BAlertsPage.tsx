@@ -37,6 +37,13 @@ const B2BAlertsPage: React.FC = () => {
   const { data, loading, refetch, resolveAlert, archiveAlert } = useB2BAlerts();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [filter, setFilter] = useState<'all' | 'active' | 'resolved'>('active');
+  const [showThresholds, setShowThresholds] = useState(false);
+  const [thresholds, setThresholds] = useState({
+    stress: 7,
+    sleep: 5,
+    workload: 8,
+    mood: 3,
+  });
 
   usePageSEO({
     title: 'Alertes RH B2B - EmotionsCare',
