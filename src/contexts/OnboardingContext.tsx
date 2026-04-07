@@ -25,7 +25,7 @@ interface OnboardingContextType {
   completeOnboarding: () => Promise<boolean>;
 }
 
-const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
+export const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
 
 export const useOnboarding = () => {
   const context = useContext(OnboardingContext);
