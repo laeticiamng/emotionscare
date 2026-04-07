@@ -150,11 +150,62 @@ const B2BAlertsPage: React.FC = () => {
             </p>
           </div>
           <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => setShowThresholds(!showThresholds)}>
+              <Settings className="h-4 w-4 mr-2" /> Seuils
+            </Button>
             <Button variant="outline" onClick={handleRefresh} disabled={loading || isRefreshing}>
               {isRefreshing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
             </Button>
           </div>
         </header>
+
+        {/* Threshold Configuration Panel */}
+        {showThresholds && (
+          <Card className="mb-6 border-primary/30">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Configuration des seuils d'alerte
+              </CardTitle>
+              <CardDescription>Définissez les seuils qui déclenchent les alertes pour votre établissement</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium">Stress élevé (score &gt;)</label>
+                    <Badge variant="outline">{thresholds.stress}/10</Badge>
+                  </div>
+                  <input type="range" min="1" max="10" value={thresholds.stress} onChange={e => setThresholds(prev => ({ ...prev, stress: Number(e.target.value) }))} className="w-full" aria-label="Seuil de stress" />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium">Sommeil insuffisant (&lt; heures)</label>
+                    <Badge variant="outline">{thresholds.sleep}h</Badge>
+                  </div>
+                  <input type="range" min="3" max="8" value={thresholds.sleep} onChange={e => setThresholds(prev => ({ ...prev, sleep: Number(e.target.value) }))} className="w-full" aria-label="Seuil de sommeil" />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium">Charge mentale (score &gt;)</label>
+                    <Badge variant="outline">{thresholds.workload}/10</Badge>
+                  </div>
+                  <input type="range" min="1" max="10" value={thresholds.workload} onChange={e => setThresholds(prev => ({ ...prev, workload: Number(e.target.value) }))} className="w-full" aria-label="Seuil de charge mentale" />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium">Humeur basse (score &lt;)</label>
+                    <Badge variant="outline">{thresholds.mood}/10</Badge>
+                  </div>
+                  <input type="range" min="1" max="10" value={thresholds.mood} onChange={e => setThresholds(prev => ({ ...prev, mood: Number(e.target.value) }))} className="w-full" aria-label="Seuil d'humeur" />
+                </div>
+              </div>
+              <div className="flex justify-end mt-4">
+                <Button size="sm" onClick={() => setShowThresholds(false)}>Enregistrer les seuils</Button>
+              </div>
+            </CardContent>
+          </Card>
+        )
 
         {/* Stats Overview */}
         <section aria-labelledby="stats-title" className="mb-8">
