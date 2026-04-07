@@ -174,10 +174,10 @@ export default function B2BRHDashboard() {
           </motion.div>
         </motion.header>
 
-        {/* KPIs principaux */}
+        {/* KPIs principaux — 5 indicateurs standards */}
         <section aria-labelledby="kpi-title" className="mb-8">
           <h2 id="kpi-title" className="sr-only">Indicateurs clés</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {/* Bien-être moyen */}
             <Card className="bg-gradient-to-br from-primary/5 to-primary/10">
               <CardHeader className="pb-2">
