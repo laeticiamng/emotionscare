@@ -1,111 +1,115 @@
 
 
-# Analyse Complète et Plan de Complétion — EmotionsCare
+# Analyse Complète du Repo EmotionsCare — Rapport & Plan
 
-## Constat actuel
+## Etat actuel (chiffres)
 
-| Métrique | Valeur |
-|----------|--------|
-| Pages | 347 fichiers |
-| Components | 1960 fichiers |
-| Hooks | 626 fichiers |
-| Tests | 320 (~7% couverture vs 90% cible) |
-| Modules "Complets" | 10/26 |
-| **Modules "Partiels"** | **16/26** |
-| i18n FR | 18 lignes — complet |
-| i18n EN/ES/DE | 167 lignes chacun — **stubs incomplets** |
-
----
-
-## Les 16 modules partiels — Diagnostic et Actions
-
-### Groupe A — Modules fonctionnels mais incomplets (complétion rapide)
-
-| # | Module | Lignes | Ce qui manque | Action |
-|---|--------|--------|---------------|--------|
-| 1 | **Protocole Reset** (flash-glow) | 668 | Marqué "partial" mais le code est riche (3D, timers, stats). Il manque un protocole standardisé 3 min. | Ajouter un mode "Reset Express 3 min" structuré + passer en "complete" |
-| 2 | **Musicothérapie Hub** | 306 | Le mixer et le journal vocal sont des stubs visuels sans logique réelle | Connecter le mixer à des pistes audio réelles, ajouter enregistrement vocal fonctionnel |
-| 3 | **Écoute thérapeutique** | (dans Music) | Pas de mode auto-play contextuel | Ajouter un mode "Auto selon humeur" basé sur le dernier scan |
-| 4 | **VR thérapeutique** | 462 | 3 scènes existent mais pas unifiées, pas d'indicateurs tolérance | Ajouter sélecteur de scène + timer de tolérance |
-| 5 | **FAQ interactive** | 423 | FAQ statique, pas de recherche contextuelle | Ajouter recherche full-text et catégorisation dynamique |
-| 6 | **Export RGPD** | 515 | L'export fonctionne mais n'est pas centralisé (2 pages : ExportPage + DataExportPage) | Fusionner en un seul parcours avec sélection des données |
-
-### Groupe B — Modules B2B à structurer
-
-| # | Module | Lignes | Ce qui manque | Action |
-|---|--------|--------|---------------|--------|
-| 7 | **Dashboard B2B RH** | 437 | KPIs non structurés, pas de vrais indicateurs bien-être | Ajouter 5 KPIs standards (charge, tension, récupération, engagement, absentéisme) |
-| 8 | **Rapports anonymisés** | 158 | Stub minimal, pas de template exportable | Créer templates hebdo/mensuels avec graphiques et export PDF |
-| 9 | **Alertes RH** | 352 | Alertes affichées mais pas de seuils configurables | Ajouter panneau de configuration des seuils par établissement |
-
-### Groupe C — Modules transversaux
-
-| # | Module | Ce qui manque | Action |
-|---|--------|---------------|--------|
-| 10 | **Parc émotionnel** (1091 lignes) | Pas relié au scan ni au plan personnalisé | Connecter les zones aux résultats du scanner pour guider le parcours |
-| 11 | **Méditation** (1060 lignes) | Pas de bibliothèque audio réelle | Créer 6 méditations guidées textuelles avec timer intégré |
-| 12 | **Récits Thérapeutiques** (369 lignes) | Bibliothèque vide, génération IA non connectée | Ajouter 8 récits prédéfinis + connecter à l'edge function existante |
-| 13 | **Wearables** (560 lignes) | UI complète mais aucune intégration réelle (Apple Health/Google Fit) | Ajouter Web Bluetooth API pour capteurs HR basiques |
-| 14 | **Mode PWA** (sw.js 366 lignes) | Service worker existe mais cache minimal | Étendre le cache offline aux protocoles essentiels (respiration, journal) |
-| 15 | **Support multilingue** | FR complet (18 clés), EN/ES/DE = stubs (167 lignes identiques) | Compléter les traductions EN/ES/DE avec les mêmes clés que FR |
-| 16 | **Accessibilité WCAG** | Audit en cours (72→95 cible) | Passe aria-label sur les composants hub restants |
+```text
+Pages         : 347 fichiers .tsx
+Composants    : 1 960
+Hooks         : 626
+Modules       : 48 (src/modules/)
+Features      : 37 (src/features/)
+Edge Functions: 273 (8 super-routers + spécialisées)
+Tables DB     : 1 051
+Tests         : 417 fichiers
+i18n          : 87 clés FR/EN
+3D components : 14
+```
 
 ---
 
-## Éléments manquants hors modules
+## Ce qui manque / est incomplet
 
-### 1. Notifications push réelles
-`NotificationsCenterPage.tsx` = 124 lignes avec des données mockées. Aucune notification réelle n'est envoyée.
-**Action** : Connecter aux événements Supabase Realtime (nouveau défi, rappel respiration, alerte scan).
+### A. Pages placeholder / stub (contenu vide ou < 20 lignes)
 
-### 2. Onboarding post-inscription
-`OnboardingPage.tsx` existe (469 lignes) mais le contexte `OnboardingContext` a été réécrit récemment.
-**Action** : Vérifier que le flux post-signup redirige bien vers l'onboarding et que les étapes sont persistées.
+| Page | Problème |
+|------|----------|
+| `ComprehensiveSystemAuditPage` (6 lignes) | Squelette vide |
+| `SystemHealthPage` (17 lignes) | Squelette minimal |
+| `ValidationPage` (12 lignes) | Redirect uniquement |
+| `admin/UserRolesPage` (12 lignes) | Squelette vide |
+| `b2b/user/LoginPage` (15 lignes) | Formulaire minimal |
+| `b2b/user/RegisterPage` (11 lignes) | Formulaire minimal |
 
-### 3. Système de rappels/notifications planifiées
-Aucun système de rappels quotidiens (ex: "C'est l'heure de votre scan", "Défi du jour").
-**Action** : Ajouter un composant de rappels dans les paramètres + logique côté service worker.
+### B. 21 pages en mode "Demo" (DemoBanner / données mockées)
+
+Ces pages affichent un bandeau "Mode démonstration" et utilisent des données statiques au lieu de données Supabase :
+
+- **Social** : `MessagesPage` (chat IA fake, pas de vrai messaging)
+- **B2C** : `BubbleBeatPage`, `ActivitePage`, `VoiceJournalPage`, `WeeklyBarsPage`, `DataPrivacyPage`
+- **Gamification** : `AchievementsPage`
+- **B2B/Admin** : `PlatformAuditPage`, `GDPRDashboard`, `APIMonitoring`, `Accessibility`, `Optimization`, `Reports`, `Security`
+- **Assess** : `BurnoutAssessmentPage`
+- **Autres** : `RecommendationEngineAdmin`, `SupportChatbot`, `WeeklyReport`, `InstitutionalReport`, `InterventionsLibrary`, `ResearchExport`
+
+### C. 4 modules stub (index < 10 lignes, pas de vrai contenu)
+
+| Module | Lignes index | Statut |
+|--------|-------------|--------|
+| `buddies` | 9 | Structure OK (hooks/components/services) mais index stub |
+| `group-sessions` | 9 | Idem |
+| `insights` | 8 | Service existe mais index stub |
+| `bubble-beat` | 9 | Composants existent mais index stub |
+
+### D. Fonctionnalités manquantes identifiées
+
+1. **Notifications en temps réel** — `NotificationsCenterPage` utilise des données statiques hardcodées (4 notifs fictives). Pas de connexion Supabase Realtime.
+
+2. **Messagerie sociale** — `MessagesPage` est un faux chat IA avec réponses aléatoires. Pas de vrai système de messages entre utilisateurs.
+
+3. **Système d'amis/buddies** — Le module existe structurellement mais les hooks importés dans `BuddiesPage` (`useBuddies`, `useBuddyChat`, etc.) ne sont pas connectés à des données réelles.
+
+4. **Sessions de groupe** — Module structuré mais stub.
+
+5. **Stripe Checkout** — Les edge functions existent (`create-checkout`, `stripe-webhook`, `customer-portal`, `check-subscription`) mais la page `PremiumPage` redirige vers `/pricing` qui pointe vers `PricingPageWorking` — à vérifier si le checkout Stripe est fonctionnel de bout en bout.
+
+6. **Export CSV fonctionnel** — `ExportCSVPage` affiche l'UI mais pas de logique d'export réelle.
+
+7. **Partage de données** — `ShareDataPage` affiche l'UI mais pas de logique de partage.
+
+8. **Rapport hebdomadaire** — Mode démo uniquement.
 
 ---
 
-## Plan d'implémentation (5 phases)
+## Plan d'implémentation
 
-### Phase 1 — Compléter les 6 modules les plus proches de "complete" (Groupe A)
-1. **Flash-Glow** : Ajouter mode "Reset Express 3 min" (inhale 4s → hold 4s → exhale 6s × 12 cycles)
-2. **Music Hub** : Connecter les boutons play à des pistes audio réelles (URL depuis Supabase storage ou CDN), ajouter enregistrement MediaRecorder au journal vocal
-3. **VR** : Ajouter sélecteur de scène unifié + timer de tolérance avec alerte
-4. **FAQ** : Ajouter recherche full-text avec filtrage par catégorie
-5. **Export RGPD** : Fusionner ExportPage et DataExportPage en un flux unique
-6. **Écoute thérapeutique** : Ajouter mode auto-play basé sur le dernier scan
+Vu l'ampleur (98 pages avec placeholder, 21 en mode démo, 4 modules stub), je propose de prioriser les corrections à **impact utilisateur immédiat** :
 
-### Phase 2 — B2B complet (Groupe B)
-7. **Dashboard RH** : 5 KPIs cards avec sparklines, données depuis `gam_weekly_org`
-8. **Rapports** : Templates mensuels avec 4 sections (synthèse, tendances, alertes, recommandations) + export PDF
-9. **Alertes RH** : Panneau admin pour configurer seuils (stress > 7, sommeil < 5h, etc.)
+### Phase 1 — Corriger les 4 modules stub (exports manquants)
+- Compléter les `index.ts` de `buddies`, `group-sessions`, `insights`, `bubble-beat` pour exporter correctement leurs composants, hooks et types existants.
 
-### Phase 3 — Modules transversaux (Groupe C)
-10. **Parc émotionnel** : Connecter zones aux résultats scan
-11. **Méditation** : 6 sessions guidées textuelles avec gong/timer
-12. **Récits thérapeutiques** : 8 récits prédéfinis (relaxation, résilience, gratitude, etc.)
-13. **i18n** : Compléter EN avec toutes les clés FR
+### Phase 2 — Connecter les notifications au réel
+- Brancher `NotificationsCenterPage` sur le hook `useNotifications` existant (271 lignes) au lieu des données statiques.
 
-### Phase 4 — Infrastructure manquante
-14. **Notifications réelles** : Connecter Supabase Realtime pour notifications in-app
-15. **PWA offline** : Étendre le cache du service worker aux pages respiration et journal
-16. **Accessibilité** : Passe aria-label sur les hubs créés récemment
+### Phase 3 — Rendre l'export CSV fonctionnel
+- Ajouter la logique de téléchargement dans `ExportCSVPage` (générer CSV depuis les données Supabase de l'utilisateur).
 
-### Phase 5 — Mise à jour ModulesDashboard
-17. Passer tous les modules complétés de "partial" à "complete"
-18. Score cible : 100% complete (26/26)
+### Phase 4 — Compléter les pages admin stub
+- `UserRolesPage` : interface de gestion des rôles utilisateur
+- `SystemHealthPage` : dashboard de santé système
 
----
+### Phase 5 — Remplacer les DemoBanner par des données réelles
+- Prioriser : `AchievementsPage`, `ActivitePage`, `WeeklyBarsPage` (B2C visible)
+- Puis : les pages admin/manager
 
-## Détails techniques
+### Détails techniques
 
-- Toutes les données audio/méditation utilisent des URLs Supabase Storage ou des timers Web Audio API (pas de fichiers locaux lourds)
-- Les traductions EN réutilisent la structure exacte du fichier FR avec substitution des valeurs
-- Les exports PDF utilisent `window.print()` avec CSS `@media print` (déjà en place dans `print-b2b.css`)
-- Les notifications in-app utilisent Supabase Realtime `postgres_changes` sur une table `notifications`
-- Les KPIs B2B agrègent les données anonymisées depuis les tables `emotion_scan_results` et `gam_weekly_org`
-- Le service worker étendu pré-cache les protocoles respiration (données JSON statiques, pas de réseau requis)
+**Fichiers modifiés (Phase 1)** :
+- `src/modules/buddies/index.ts` — re-export hooks, components, types
+- `src/modules/group-sessions/index.ts` — idem
+- `src/modules/insights/index.ts` — export `useInsights`, `insightsService`, types
+- `src/modules/bubble-beat/index.ts` — export composants et hooks
+
+**Fichiers modifiés (Phase 2)** :
+- `src/pages/NotificationsCenterPage.tsx` — remplacer `useState([...])` statique par `useNotifications()`
+
+**Fichiers modifiés (Phase 3)** :
+- `src/pages/ExportCSVPage.tsx` — ajouter logique de fetch + conversion CSV + download
+
+**Fichiers modifiés (Phase 4)** :
+- `src/pages/admin/UserRolesPage.tsx` — interface CRUD rôles
+- `src/pages/SystemHealthPage.tsx` — métriques système
+
+**Scope estimé** : ~15 fichiers modifiés, aucune migration DB nécessaire (les tables existent déjà).
 
