@@ -218,8 +218,9 @@ const ScannerEmotionnelPage: React.FC = () => {
       setCurrentStep((prev) => prev + 1);
     } else {
       setShowResults(true);
+      saveScanResults(scores);
     }
-  }, [currentStep]);
+  }, [currentStep, scores, saveScanResults]);
 
   const handlePrev = useCallback(() => {
     if (currentStep > 0) {
