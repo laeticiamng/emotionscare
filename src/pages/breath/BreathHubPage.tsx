@@ -84,12 +84,39 @@ export default function BreathHubPage() {
   const initialMode = (searchParams.get('mode') as BreathMode) || 'classique';
   const [activeMode, setActiveMode] = useState<BreathMode>(initialMode);
   const [isSessionActive, setIsSessionActive] = useState(false);
+  const [lastScan, setLastScan] = useState<{ urgency: string; protocol: string } | null>(null);
 
   usePageSEO({
     title: 'Respiration Guidée - EmotionsCare',
     description: 'Hub de respiration guidée avec 4 modes : classique, gamifié, immersif et nuit. Protocoles basés sur les neurosciences.',
     keywords: 'respiration, cohérence cardiaque, relaxation, stress, soignants',
   });
+
+  // Load latest scan recommendation
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data } = await supabase
+          .from('emotion_scan_results')
+          .select('results')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+        if (data?.results) {
+          setLastScan({
+            urgency: (data.results as any).urgency || 'low',
+            protocol: (data.results as any).recommendation || '',
+          });
+        }
+      } catch {
+        // No scan data
+      }
+    })();
+  }, []);
 
   const handleModeChange = (mode: string) => {
     setActiveMode(mode as BreathMode);
