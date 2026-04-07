@@ -205,7 +205,7 @@ const B2BAlertsPage: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-        )
+        )}
 
         {/* Stats Overview */}
         <section aria-labelledby="stats-title" className="mb-8">
