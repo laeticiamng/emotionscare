@@ -1641,4 +1641,34 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     aliases: ['/assess/burnout', '/burnout'],
     status: 'demo',
   },
+
+  // ═══════════════════════════════════════════════════════════
+  // MODULE 39 - Stress Assessment (PSS-10)
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'stress-assessment',
+    path: '/app/assess/stress',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'StressAssessmentPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/assess/stress', '/pss-10'],
+    status: 'stable',
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // MODULE 40 - Depression Screening (PHQ-9)
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'depression-assessment',
+    path: '/app/assess/depression',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'DepressionAssessmentPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/assess/depression', '/phq-9'],
+    status: 'stable',
+  },
 ] as const;
