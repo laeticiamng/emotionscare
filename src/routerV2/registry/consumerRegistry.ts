@@ -789,22 +789,29 @@ export const CONSUMER_ROUTES: readonly RouteMeta[] = [
     name: 'leaderboard',
     path: '/app/leaderboard',
     segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'LeaderboardPage',
-    guard: true,
-    requireAuth: true,
-    aliases: ['/leaderboard'],
+    deprecated: true,
+    redirectTo: '/app/gamification?tab=leaderboard',
   },
+  // ═══════════════════════════════════════════════════════════
+  // GAMIFICATION HUB (consolide XP, Badges, Défis, Classement)
+  // ═══════════════════════════════════════════════════════════
   {
-    name: 'gamification',
-    path: '/gamification',
+    name: 'gamification-hub',
+    path: '/app/gamification',
     segment: 'consumer',
     role: 'consumer',
     layout: 'app-sidebar',
-    component: 'B2CGamificationPage',
+    component: 'GamificationHubPage',
     guard: true,
     requireAuth: true,
+    aliases: ['/gamification'],
+  },
+  {
+    name: 'gamification-legacy',
+    path: '/gamification',
+    segment: 'consumer',
+    deprecated: true,
+    redirectTo: '/app/gamification',
   },
   {
     name: 'heatmap',
