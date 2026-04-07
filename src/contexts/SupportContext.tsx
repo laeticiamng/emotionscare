@@ -10,7 +10,7 @@ interface SupportContextType {
   clearHistory: () => void;
 }
 
-const SupportContext = createContext<SupportContextType | undefined>(undefined);
+export const SupportContext = createContext<SupportContextType | undefined>(undefined);
 
 export const SupportProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [messages, setMessages] = useState<Message[]>([]);
