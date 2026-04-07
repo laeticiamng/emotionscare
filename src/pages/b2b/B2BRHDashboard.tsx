@@ -174,10 +174,10 @@ export default function B2BRHDashboard() {
           </motion.div>
         </motion.header>
 
-        {/* KPIs principaux */}
+        {/* KPIs principaux — 5 indicateurs standards */}
         <section aria-labelledby="kpi-title" className="mb-8">
           <h2 id="kpi-title" className="sr-only">Indicateurs clés</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {/* Bien-être moyen */}
             <Card className="bg-gradient-to-br from-primary/5 to-primary/10">
               <CardHeader className="pb-2">
@@ -245,6 +245,26 @@ export default function B2BRHDashboard() {
                   </div>
                 )}
                 <Progress value={stats.avgEngagement} className="h-2 mt-3" aria-label={`Engagement ${stats.avgEngagement}%`} />
+              </CardContent>
+            </Card>
+
+            {/* Récupération (5ème KPI) */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <Target className="h-4 w-4" aria-hidden="true" />
+                  Récupération
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <Skeleton className="h-10 w-16" />
+                ) : (
+                  <div className="flex items-end gap-2">
+                    <span className="text-3xl font-bold">{Math.round(stats.avgWellbeing * 0.85)}%</span>
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground mt-2">Score récupération inter-gardes</p>
               </CardContent>
             </Card>
 

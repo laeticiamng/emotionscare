@@ -55,8 +55,22 @@ interface FlashPreset {
   bpm: number;
 }
 
+// Protocole Reset Express 3 min (inhale 4s → hold 4s → exhale 6s × 12 cycles)
+const RESET_EXPRESS: FlashPreset = {
+  id: 'reset-express',
+  name: 'Reset Express 3 min',
+  description: 'Protocole standardisé : 12 cycles respiratoires (4-4-6) avec lumière apaisante',
+  icon: <RotateCcw className="h-5 w-5" />,
+  colors: ['#4F46E5', '#6366F1', '#818CF8', '#4F46E5'],
+  duration: 180,
+  intensity: 'medium',
+  category: 'relaxation',
+  bpm: 4
+};
+
 // Presets de luminothérapie
 const FLASH_PRESETS: FlashPreset[] = [
+  RESET_EXPRESS,
   {
     id: 'calm-ocean',
     name: 'Océan Calme',
@@ -196,7 +210,36 @@ const FlashGlowPage: React.FC = () => {
   const { stats, loading: statsLoading } = useFlashGlowStats();
   
   // State
-  const [selectedPreset, setSelectedPreset] = useState<FlashPreset>(FLASH_PRESETS[0]);
+  const [selectedPreset, setSelectedPreset] = useState<FlashPreset>(RESET_EXPRESS);
+  const [resetPhase, setResetPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
+  const [resetCycle, setResetCycle] = useState(0);
+  const resetPhaseRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Reset Express breathing guide (4-4-6 pattern)
+  useEffect(() => {
+    if (isPlaying && selectedPreset.id === 'reset-express') {
+      const phases = [
+        { name: 'inhale' as const, duration: 4000 },
+        { name: 'hold' as const, duration: 4000 },
+        { name: 'exhale' as const, duration: 6000 },
+      ];
+      let phaseIdx = 0;
+      let cycleCount = 0;
+
+      const runPhase = () => {
+        const phase = phases[phaseIdx % 3];
+        setResetPhase(phase.name);
+        if (phaseIdx > 0 && phaseIdx % 3 === 0) {
+          cycleCount++;
+          setResetCycle(cycleCount);
+        }
+        phaseIdx++;
+        resetPhaseRef.current = setTimeout(runPhase, phase.duration);
+      };
+      runPhase();
+      return () => { if (resetPhaseRef.current) clearTimeout(resetPhaseRef.current); };
+    }
+  }, [isPlaying, selectedPreset.id]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [currentColorIndex, setCurrentColorIndex] = useState(0);
@@ -423,9 +466,18 @@ const FlashGlowPage: React.FC = () => {
                     {selectedPreset.icon}
                   </div>
                   <h2 className="text-2xl font-bold mb-2">{selectedPreset.name}</h2>
-                  <p className="text-white/80 text-sm max-w-xs mx-auto">
-                    {selectedPreset.description}
-                  </p>
+                  {selectedPreset.id === 'reset-express' && isPlaying ? (
+                    <div className="text-white/90 text-lg font-semibold">
+                      <p className="text-3xl mb-1">
+                        {resetPhase === 'inhale' ? '🫁 Inspirez' : resetPhase === 'hold' ? '⏸️ Retenez' : '💨 Expirez'}
+                      </p>
+                      <p className="text-white/70 text-sm">Cycle {resetCycle + 1}/12</p>
+                    </div>
+                  ) : (
+                    <p className="text-white/80 text-sm max-w-xs mx-auto">
+                      {selectedPreset.description}
+                    </p>
+                  )}
                 </motion.div>
               </AnimatePresence>
 

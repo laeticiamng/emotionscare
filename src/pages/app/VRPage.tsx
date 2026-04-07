@@ -199,7 +199,29 @@ export default function VRPage() {
           className="mb-8"
         >
           <h2 className="text-lg font-semibold mb-4">Expériences VR</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          {/* Tolerance Timer Banner */}
+          <Card className="mb-4 border-warning/30 bg-warning/5">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Clock className="h-5 w-5 text-warning" />
+                  <div>
+                    <p className="font-medium text-sm">Timer de tolérance VR</p>
+                    <p className="text-xs text-muted-foreground">
+                      Recommandé : max 20 min par session. Faites une pause si vertiges ou fatigue oculaire.
+                    </p>
+                  </div>
+                </div>
+                <Badge variant="outline" className="border-warning/50 text-warning">
+                  {settings.maxSessionMinutes || 20} min max
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Scene Selector */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card className="group cursor-pointer hover:shadow-lg transition-all border-primary/20 hover:border-primary/40">
               <Link to="/app/vr-galaxy">
                 <CardContent className="p-6">
@@ -210,7 +232,7 @@ export default function VRPage() {
                       </div>
                       <div>
                         <h3 className="font-semibold text-foreground">VR Galaxy</h3>
-                        <p className="text-sm text-muted-foreground">Cathédrale cosmique sous les étoiles</p>
+                        <p className="text-sm text-muted-foreground">Cathédrale cosmique</p>
                       </div>
                     </div>
                     <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -233,14 +255,37 @@ export default function VRPage() {
                       </div>
                       <div>
                         <h3 className="font-semibold text-foreground">VR Breath</h3>
-                        <p className="text-sm text-muted-foreground">Respiration guidée immersive</p>
+                        <p className="text-sm text-muted-foreground">Respiration guidée</p>
                       </div>
                     </div>
                     <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-info transition-colors" />
                   </div>
                   <div className="mt-4 flex gap-2">
-                    <Badge variant="secondary" className="text-xs">Cohérence cardiaque</Badge>
+                    <Badge variant="secondary" className="text-xs">Cohérence</Badge>
                     <Badge variant="outline" className="text-xs">Guidé</Badge>
+                  </div>
+                </CardContent>
+              </Link>
+            </Card>
+
+            <Card className="group cursor-pointer hover:shadow-lg transition-all border-accent/20 hover:border-accent/40">
+              <Link to="/app/vr-nebula">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-xl bg-accent/10 group-hover:bg-accent/20 transition-colors">
+                        <Heart className="h-6 w-6 text-accent-foreground" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground">VR Nébuleuse</h3>
+                        <p className="text-sm text-muted-foreground">Relaxation profonde</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-accent-foreground transition-colors" />
+                  </div>
+                  <div className="mt-4 flex gap-2">
+                    <Badge variant="secondary" className="text-xs">Relaxation</Badge>
+                    <Badge variant="outline" className="text-xs">Nébuleuse</Badge>
                   </div>
                 </CardContent>
               </Link>

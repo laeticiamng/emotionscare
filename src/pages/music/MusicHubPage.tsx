@@ -30,11 +30,11 @@ const PLAYLISTS = [
 ];
 
 const TRACKS = [
-  { id: '1', title: 'Fréquence 432 Hz', artist: 'EmotionsCare', duration: '4:12', isPlaying: false },
-  { id: '2', title: 'Pluie sur les feuilles', artist: 'Nature Sounds', duration: '5:30', isPlaying: false },
-  { id: '3', title: 'Ondes theta', artist: 'Brainwave Lab', duration: '6:00', isPlaying: false },
-  { id: '4', title: 'Guitare apaisante', artist: 'Acoustic Therapy', duration: '3:45', isPlaying: false },
-  { id: '5', title: 'Bol tibétain', artist: 'EmotionsCare', duration: '8:20', isPlaying: false },
+  { id: '1', title: 'Fréquence 432 Hz', artist: 'EmotionsCare', duration: '4:12', isPlaying: false, audioSrc: 'https://cdn.pixabay.com/audio/2024/11/28/audio_3a2f2b2c3d.mp3' },
+  { id: '2', title: 'Pluie sur les feuilles', artist: 'Nature Sounds', duration: '5:30', isPlaying: false, audioSrc: 'https://cdn.pixabay.com/audio/2022/05/16/audio_460b6c2cf6.mp3' },
+  { id: '3', title: 'Ondes theta', artist: 'Brainwave Lab', duration: '6:00', isPlaying: false, audioSrc: 'https://cdn.pixabay.com/audio/2024/09/10/audio_6e8453e98c.mp3' },
+  { id: '4', title: 'Guitare apaisante', artist: 'Acoustic Therapy', duration: '3:45', isPlaying: false, audioSrc: 'https://cdn.pixabay.com/audio/2023/10/07/audio_b6485ef048.mp3' },
+  { id: '5', title: 'Bol tibétain', artist: 'EmotionsCare', duration: '8:20', isPlaying: false, audioSrc: 'https://cdn.pixabay.com/audio/2024/04/17/audio_2b6e2469c0.mp3' },
 ];
 
 // ── Mixer Tab ───────────────────────────────────────────────────
@@ -53,11 +53,62 @@ export default function MusicHubPage() {
   const [activeTab, setActiveTab] = useState<MusicTab>(initialTab);
   const [currentTrack, setCurrentTrack] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const [mixerValues, setMixerValues] = useState<Record<string, number>>({
     nature: 50, water: 30, melody: 70, bass: 20, binaural: 40, voice: 0,
   });
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
+  const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
+  const chunksRef = React.useRef<Blob[]>([]);
+  const [recordings, setRecordings] = useState<Array<{ date: string; duration: string; mood: string; url: string }>>([]);
+
+  // Audio player
+  const playTrack = (trackId: string) => {
+    const track = TRACKS.find(t => t.id === trackId);
+    if (!track) return;
+    if (currentTrack === trackId && isPlaying) {
+      audioRef.current?.pause();
+      setIsPlaying(false);
+      return;
+    }
+    if (audioRef.current) audioRef.current.pause();
+    const audio = new Audio(track.audioSrc);
+    audio.play().catch(() => {});
+    audio.onended = () => { setIsPlaying(false); setCurrentTrack(null); };
+    audioRef.current = audio;
+    setCurrentTrack(trackId);
+    setIsPlaying(true);
+  };
+
+  // Voice recording with MediaRecorder
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: true } });
+      const recorder = new MediaRecorder(stream, { audioBitsPerSecond: 128000 });
+      chunksRef.current = [];
+      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
+      recorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        const url = URL.createObjectURL(blob);
+        setRecordings(prev => [{ date: new Date().toLocaleString('fr-FR'), duration: formatTime(recordingTime), mood: '😊', url }, ...prev]);
+        stream.getTracks().forEach(t => t.stop());
+      };
+      recorder.start();
+      mediaRecorderRef.current = recorder;
+      setIsRecording(true);
+      setRecordingTime(0);
+    } catch {
+      // Microphone access denied
+    }
+  };
+
+  const stopRecording = () => {
+    mediaRecorderRef.current?.requestData();
+    mediaRecorderRef.current?.stop();
+    mediaRecorderRef.current = null;
+    setIsRecording(false);
+  };
 
   usePageSEO({
     title: 'Musicothérapie - EmotionsCare',
@@ -145,10 +196,8 @@ export default function MusicHubPage() {
                       variant="ghost"
                       size="icon"
                       className="shrink-0"
-                      onClick={() => {
-                        setCurrentTrack(track.id);
-                        setIsPlaying(true);
-                      }}
+                      onClick={() => playTrack(track.id)}
+                      aria-label={currentTrack === track.id && isPlaying ? `Pause ${track.title}` : `Écouter ${track.title}`}
                     >
                       {currentTrack === track.id && isPlaying ? (
                         <Pause className="h-4 w-4" />
@@ -249,14 +298,7 @@ export default function MusicHubPage() {
                     ? 'bg-red-500 animate-pulse shadow-lg shadow-red-500/30'
                     : 'bg-primary hover:bg-primary/90 shadow-lg'
                 }`}
-                onClick={() => {
-                  if (isRecording) {
-                    setIsRecording(false);
-                    setRecordingTime(0);
-                  } else {
-                    setIsRecording(true);
-                  }
-                }}
+                onClick={() => isRecording ? stopRecording() : startRecording()}
                 aria-label={isRecording ? 'Arrêter l\'enregistrement' : 'Commencer l\'enregistrement'}
               >
                 {isRecording ? (
@@ -279,24 +321,24 @@ export default function MusicHubPage() {
             {/* Previous recordings */}
             <div className="space-y-3">
               <h3 className="text-sm font-semibold">Enregistrements récents</h3>
-              {[
-                { date: 'Aujourd\'hui, 08:30', duration: '2:45', mood: '😊' },
-                { date: 'Hier, 22:15', duration: '4:12', mood: '😔' },
-                { date: '28 mars, 07:00', duration: '1:30', mood: '😐' },
-              ].map((rec, i) => (
-                <Card key={i}>
-                  <CardContent className="py-3 flex items-center gap-4">
-                    <Button variant="ghost" size="icon" className="shrink-0">
-                      <Play className="h-4 w-4" />
-                    </Button>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">{rec.date}</p>
-                      <p className="text-xs text-muted-foreground">{rec.duration}</p>
-                    </div>
-                    <span className="text-xl">{rec.mood}</span>
-                  </CardContent>
-                </Card>
-              ))}
+              {recordings.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8">Aucun enregistrement. Appuyez sur le micro pour commencer.</p>
+              ) : (
+                recordings.map((rec, i) => (
+                  <Card key={i}>
+                    <CardContent className="py-3 flex items-center gap-4">
+                      <Button variant="ghost" size="icon" className="shrink-0" onClick={() => { const a = new Audio(rec.url); a.play(); }} aria-label={`Écouter enregistrement du ${rec.date}`}>
+                        <Play className="h-4 w-4" />
+                      </Button>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{rec.date}</p>
+                        <p className="text-xs text-muted-foreground">{rec.duration}</p>
+                      </div>
+                      <span className="text-xl">{rec.mood}</span>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
           </TabsContent>
         </Tabs>
