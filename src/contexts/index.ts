@@ -21,37 +21,14 @@ export { InnovationProvider, useInnovation } from './InnovationContext';
 export { EthicsProvider, useEthics } from './EthicsContext';
 export { ErrorProvider, useErrorHandler as useError } from './ErrorContext';
 
-// ========== CONTEXTES SIMPLIFIÉS POUR COMPATIBILITÉ ==========
-
 // UserPreferences - utiliser l'implémentation complète
 export { UserPreferencesContext, UserPreferencesProvider, useUserPreferences } from './UserPreferencesContext';
 
-export const SidebarContext = React.createContext(null);
-export const SupportContext = React.createContext(null);
-export const OnboardingContext = React.createContext(null);
+// Sidebar - implémentation réelle avec état persistant
+export { SidebarProvider, useSidebar, SidebarContext } from './SidebarContext';
 
-export const SidebarProvider = ({ children }: { children: React.ReactNode }) => children;
-export const SupportProvider = ({ children }: { children: React.ReactNode }) => children;
-export const OnboardingProvider = ({ children }: { children: React.ReactNode }) => children;
+// Support - chat de support avec historique de messages
+export { SupportProvider, useSupport, SupportContext } from './SupportContext';
 
-export const useSidebar = () => ({ 
-  collapsed: false, 
-  toggleCollapsed: () => {}, 
-  setCollapsed: () => {} 
-});
-
-export const useSupport = () => ({ 
-  contactSupport: () => Promise.resolve(),
-  getFAQ: () => [],
-  submitTicket: () => Promise.resolve('ticket-123')
-});
-
-export const useOnboarding = () => ({ 
-  isCompleted: true,
-  currentStep: 0,
-  totalSteps: 5,
-  nextStep: () => {},
-  previousStep: () => {},
-  complete: () => {},
-  reset: () => {}
-});
+// Onboarding - parcours d'accueil avec étapes et persistence Supabase
+export { OnboardingProvider, useOnboarding, OnboardingContext } from './OnboardingContext';
