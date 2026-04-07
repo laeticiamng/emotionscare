@@ -21,6 +21,8 @@ export default class RootErrorBoundary extends React.Component<RootErrorBoundary
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
+    console.error('[RootErrorBoundary] Caught error:', error?.message, error?.stack);
+    console.error('[RootErrorBoundary] Component stack:', info?.componentStack);
     captureException(error, {
       boundary: 'root',
       componentStack: info.componentStack,
