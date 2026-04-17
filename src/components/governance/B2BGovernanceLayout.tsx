@@ -15,11 +15,18 @@ interface B2BGovernanceLayoutProps {
   description?: string;
 }
 
-const NAV = [
+interface NavItem {
+  to: string;
+  label: string;
+  icon: typeof Shield;
+  end?: boolean;
+}
+
+const NAV: NavItem[] = [
   { to: '/b2b/governance', label: "Vue d'ensemble", icon: BarChart3, end: true },
   { to: '/b2b/governance/modules', label: 'Modules', icon: Boxes },
   { to: '/b2b/governance/slo', label: 'Santé services', icon: Activity },
-] as const;
+];
 
 export function B2BGovernanceLayout({ children, title, description }: B2BGovernanceLayoutProps) {
   const { pathname } = useLocation();

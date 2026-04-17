@@ -1,12 +1,16 @@
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Activity, ExternalLink, AlertCircle } from 'lucide-react';
+import { Activity, ExternalLink, AlertCircle, RefreshCw } from 'lucide-react';
+import { toast } from 'sonner';
 import { GovernanceLayout } from '@/components/governance/GovernanceLayout';
 import { governanceService } from '@/lib/governance';
+import { aggregateSLO, computeGlobalScore } from '@/lib/governance/sloEngine';
+import { SLOChart } from '@/components/governance/SLOChart';
+import { supabase } from '@/integrations/supabase/client';
 
 const statusColor = {
   healthy: 'text-emerald-600',
