@@ -11625,6 +11625,48 @@ export type Database = {
         }
         Relationships: []
       }
+      governance_audits: {
+        Row: {
+          audit_type: string
+          created_at: string
+          findings: Json
+          id: string
+          metadata: Json
+          score: number | null
+          severity: string
+          summary: string | null
+          title: string
+          triggered_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          audit_type: string
+          created_at?: string
+          findings?: Json
+          id?: string
+          metadata?: Json
+          score?: number | null
+          severity?: string
+          summary?: string | null
+          title: string
+          triggered_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          audit_type?: string
+          created_at?: string
+          findings?: Json
+          id?: string
+          metadata?: Json
+          score?: number | null
+          severity?: string
+          summary?: string | null
+          title?: string
+          triggered_by?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       group_meditation_invitations: {
         Row: {
           created_at: string
@@ -16335,6 +16377,54 @@ export type Database = {
           source_module?: string
           target_module?: string
           weight?: number | null
+        }
+        Relationships: []
+      }
+      module_lifecycle: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_name: string
+          id: string
+          kill_switch_enabled: boolean
+          last_reviewed_at: string | null
+          metadata: Json
+          module_key: string
+          owner: string | null
+          rollout_percentage: number
+          status: string
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_name: string
+          id?: string
+          kill_switch_enabled?: boolean
+          last_reviewed_at?: string | null
+          metadata?: Json
+          module_key: string
+          owner?: string | null
+          rollout_percentage?: number
+          status?: string
+          updated_at?: string
+          version?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_name?: string
+          id?: string
+          kill_switch_enabled?: boolean
+          last_reviewed_at?: string | null
+          metadata?: Json
+          module_key?: string
+          owner?: string | null
+          rollout_percentage?: number
+          status?: string
+          updated_at?: string
+          version?: string
         }
         Relationships: []
       }
@@ -22028,6 +22118,42 @@ export type Database = {
           },
         ]
       }
+      route_audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          new_state: Json | null
+          performed_by: string | null
+          previous_state: Json | null
+          reason: string | null
+          route_name: string | null
+          route_path: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          new_state?: Json | null
+          performed_by?: string | null
+          previous_state?: Json | null
+          reason?: string | null
+          route_name?: string | null
+          route_path: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          new_state?: Json | null
+          performed_by?: string | null
+          previous_state?: Json | null
+          reason?: string | null
+          route_name?: string | null
+          route_path?: string
+        }
+        Relationships: []
+      }
       route_metadata: {
         Row: {
           category: string
@@ -23389,6 +23515,48 @@ export type Database = {
           status?: string
           target_value?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      slo_metrics: {
+        Row: {
+          id: string
+          metadata: Json
+          metric_type: string
+          module_key: string
+          recorded_at: string
+          status: string | null
+          target: number | null
+          unit: string
+          value: number
+          window_end: string
+          window_start: string
+        }
+        Insert: {
+          id?: string
+          metadata?: Json
+          metric_type: string
+          module_key: string
+          recorded_at?: string
+          status?: string | null
+          target?: number | null
+          unit?: string
+          value: number
+          window_end: string
+          window_start: string
+        }
+        Update: {
+          id?: string
+          metadata?: Json
+          metric_type?: string
+          module_key?: string
+          recorded_at?: string
+          status?: string | null
+          target?: number | null
+          unit?: string
+          value?: number
+          window_end?: string
+          window_start?: string
         }
         Relationships: []
       }
