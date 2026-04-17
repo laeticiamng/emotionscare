@@ -19,7 +19,7 @@ export const useShareRoom = ({ roomId, inviteCode }: UseShareRoomOptions): UseSh
   const [isCopied, setIsCopied] = useState(false);
 
   const shareUrl = useMemo(() => {
-    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://emotionscare.app';
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://emotionscare.com';
     return `${baseUrl}/app/social-cocon/join?code=${encodeURIComponent(inviteCode)}`;
   }, [inviteCode]);
 
