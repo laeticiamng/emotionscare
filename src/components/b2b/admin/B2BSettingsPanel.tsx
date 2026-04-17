@@ -213,7 +213,7 @@ export const B2BSettingsPanel: React.FC = () => {
               <div
                 role="status"
                 aria-live="polite"
-                className="rounded-md border border-dashed border-amber-500/40 bg-amber-500/5 p-3 text-sm text-amber-700 dark:text-amber-400"
+                className="rounded-md border border-dashed border-warning/40 bg-warning/5 p-3 text-sm text-warning-foreground"
               >
                 Aucune clé API n’est actuellement configurée pour cette
                 organisation. La génération de clés sera disponible une fois
