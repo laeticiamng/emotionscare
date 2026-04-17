@@ -27,6 +27,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import DemoDataNotice from '@/components/admin/DemoDataNotice';
 import {
   type SystemConfig,
   type ConfigurationHistory,
@@ -226,11 +227,12 @@ export const GlobalConfigurationCenter: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      <DemoDataNotice context="la configuration affichée ici est un jeu de données de démonstration ; elle n’est pas appliquée au système tant que le backend n’est pas branché." />
       {/* En-tête */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Centre de Configuration Globale</h1>
-          <p className="text-gray-600 mt-1">Administration centralisée du système</p>
+          <h1 className="text-3xl font-bold text-foreground">Centre de Configuration Globale</h1>
+          <p className="text-muted-foreground mt-1">Administration centralisée du système</p>
         </div>
         <div className="flex gap-3">
           <input

@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { budgetMonitor } from '@/lib/ai/budgetMonitor';
+import DemoDataNotice from '@/components/admin/DemoDataNotice';
 
 interface UsageData {
   model: string;
@@ -117,6 +118,7 @@ export const AIBudgetDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <DemoDataNotice context="les coûts API affichés ici sont simulés tant que la collecte budget n’est pas branchée." />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
