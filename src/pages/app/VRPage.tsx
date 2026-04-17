@@ -506,3 +506,11 @@ function VRPageInner() {
     </div>
   );
 }
+
+export default function VRPage() {
+  return (
+    <ModuleGate moduleKey="vr">
+      <VRPageInner />
+    </ModuleGate>
+  );
+}
