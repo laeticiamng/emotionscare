@@ -1,55 +1,32 @@
 // @ts-nocheck
 /**
- * AtAGlanceSection - "En bref" + "Pour qui"
- * Sections explicites pour SEO/GEO et compréhension immédiate.
+ * AtAGlanceSection — "En bref" + "À qui s’adresse la plateforme ?" + "Comment ça marche ?"
+ *
+ * Copy strictement issue du brief produit (aucune donnée inventée).
+ * Pas de chiffres, pas de prix, pas d'avis, pas de certifications non confirmées.
  */
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { Activity, Brain, HeartPulse, ShieldCheck, GraduationCap, Stethoscope, Users, Building2 } from 'lucide-react';
+import { Eye, LineChart, Wrench } from 'lucide-react';
 
-const highlights = [
+const STEPS = [
   {
-    icon: Activity,
-    title: 'Régulation en 3 minutes',
-    description: 'Exercices courts validés cliniquement (PSS-10, WHO-5, PHQ-9) pour réguler le stress sans rupture du quotidien.',
+    icon: Eye,
+    title: 'Observer son état émotionnel',
+    description:
+      'Prenez un instant pour identifier ce que vous ressentez, sans jugement, à l’aide d’outils d’auto-évaluation simples.',
   },
   {
-    icon: Brain,
-    title: 'Coach IA 24h/24',
-    description: 'Accompagnement personnalisé par IA conversationnelle, sans jugement, en français.',
+    icon: LineChart,
+    title: 'Suivre son évolution dans le temps',
+    description:
+      'Visualisez l’évolution de votre état émotionnel sur la durée pour mieux comprendre vos déclencheurs et vos progrès.',
   },
   {
-    icon: HeartPulse,
-    title: 'Scanner émotionnel',
-    description: 'Auto-évaluation rapide pour identifier l’état du moment et déclencher la bonne intervention.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Sécurité renforcée',
-    description: 'Données chiffrées, conformité RGPD, hébergement européen. Aucune donnée revendue.',
-  },
-];
-
-const audiences = [
-  {
-    icon: GraduationCap,
-    title: 'Étudiants en santé',
-    description: 'Médecine, pharmacie, IFSI, kiné : prévenir l’épuisement dès la formation.',
-  },
-  {
-    icon: Stethoscope,
-    title: 'Soignants en activité',
-    description: 'Infirmiers, médecins, aides-soignants : un réflexe entre deux gardes.',
-  },
-  {
-    icon: Users,
-    title: 'Particuliers',
-    description: 'Toute personne souhaitant un outil sérieux et discret pour sa santé mentale.',
-  },
-  {
-    icon: Building2,
-    title: 'Établissements',
-    description: 'Hôpitaux, EHPAD, écoles : déploiement collectif avec tableau de bord agrégé.',
+    icon: Wrench,
+    title: 'Utiliser des outils adaptés selon ses besoins',
+    description:
+      'Accédez à un ensemble d’exercices et de ressources que vous pouvez mobiliser au quotidien selon votre situation.',
   },
 ];
 
@@ -72,52 +49,77 @@ const AtAGlanceSection: React.FC = () => {
           >
             EmotionsCare en quelques mots
           </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            Plateforme française de régulation émotionnelle conçue pour les métiers du soin et toute personne exposée au stress chronique.
+          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            EmotionsCare est une plateforme numérique de suivi émotionnel et
+            d’accompagnement personnel. Elle aide l’utilisateur à mieux
+            comprendre son état émotionnel, à suivre son évolution et à accéder
+            à des outils adaptés au quotidien.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-20">
-          {highlights.map(({ icon: Icon, title, description }) => (
-            <Card
-              key={title}
-              className="p-6 bg-card border-border hover:border-primary/40 transition-colors"
-            >
-              <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
-                <Icon className="w-6 h-6" aria-hidden="true" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">{title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
-            </Card>
-          ))}
-        </div>
-
-        {/* Pour qui */}
-        <div id="pour-qui" className="text-center mb-12">
+        {/* À qui s'adresse la plateforme */}
+        <div
+          id="pour-qui"
+          aria-labelledby="audience-title"
+          className="mt-20 max-w-4xl mx-auto text-center"
+        >
           <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-3">
-            Pour qui
+            À qui s’adresse la plateforme ?
           </p>
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
-            Conçu pour celles et ceux qui prennent soin
+          <h2
+            id="audience-title"
+            className="text-3xl md:text-5xl font-bold tracking-tight mb-4"
+          >
+            Pour qui ?
           </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            Une réponse adaptée à chaque parcours, du premier stage à la direction d’établissement.
+          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
+            Pour les personnes qui veulent mieux suivre leur état émotionnel,
+            structurer leur réflexion et accéder à des outils d’accompagnement
+            simples au quotidien.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-          {audiences.map(({ icon: Icon, title, description }) => (
-            <Card
-              key={title}
-              className="p-6 bg-card border-border hover:border-primary/40 transition-colors"
+        {/* Comment ça marche */}
+        <div
+          id="comment-ca-marche"
+          aria-labelledby="how-it-works-title"
+          className="mt-20"
+        >
+          <div className="text-center mb-12">
+            <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-3">
+              Comment ça marche ?
+            </p>
+            <h2
+              id="how-it-works-title"
+              className="text-3xl md:text-5xl font-bold tracking-tight mb-4"
             >
-              <div className="w-12 h-12 rounded-xl bg-accent/15 text-accent-foreground flex items-center justify-center mb-4">
-                <Icon className="w-6 h-6" aria-hidden="true" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">{title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
-            </Card>
-          ))}
+              Trois étapes simples
+            </h2>
+          </div>
+
+          <ol className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 list-none">
+            {STEPS.map(({ icon: Icon, title, description }, index) => (
+              <li key={title}>
+                <Card className="p-6 h-full bg-card border-border hover:border-primary/40 transition-colors">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span
+                      aria-hidden="true"
+                      className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold"
+                    >
+                      {index + 1}
+                    </span>
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                      <Icon className="w-5 h-5" aria-hidden="true" />
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">{title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {description}
+                  </p>
+                </Card>
+              </li>
+            ))}
+          </ol>
         </div>
       </div>
     </section>
