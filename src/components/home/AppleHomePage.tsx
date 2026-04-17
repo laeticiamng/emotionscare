@@ -10,6 +10,7 @@ import SharedHeader from '@/components/layout/SharedHeader';
 import AppleHeroSection from '@/components/home/AppleHeroSection';
 import HowItWorksSection from '@/components/home/HowItWorksSection';
 import AnimatedPresentationSection from '@/components/home/AnimatedPresentationSection';
+import AtAGlanceSection from '@/components/home/AtAGlanceSection';
 import NyveeChat from '@/components/nyvee/NyveeChat';
 import XPBar from '@/components/gamification/XPBar';
 import { useAuth } from '@/contexts/AuthContext';
@@ -20,6 +21,7 @@ const AppleShowcaseSection = lazy(() => import('@/components/home/AppleShowcaseS
 const ModulesHighlightSection = lazy(() => import('@/components/home/ModulesHighlightSection'));
 
 const SocialProofSection = lazy(() => import('@/components/home/SocialProofSection'));
+const FAQSection = lazy(() => import('@/components/home/FAQSection'));
 const AppleCTASection = lazy(() => import('@/components/home/AppleCTASection'));
 const Footer = lazy(() => import('@/components/home/Footer'));
 
