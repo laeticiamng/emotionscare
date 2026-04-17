@@ -28,6 +28,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ModuleGate } from '@/components/governance/ModuleGate';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useVRStats, useVRHistory, useVRWeeklyProgress } from '@/hooks/useVRStats';
@@ -55,7 +56,7 @@ const PATTERN_LABELS: Record<string, string> = {
   calm: 'Calme',
 };
 
-export default function VRPage() {
+function VRPageInner() {
   const navigate = useNavigate();
   const { data: stats, isLoading: statsLoading } = useVRStats();
   const { data: history, isLoading: historyLoading } = useVRHistory(10);
@@ -503,5 +504,13 @@ export default function VRPage() {
       {/* Settings Modal */}
       <VRSettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
     </div>
+  );
+}
+
+export default function VRPage() {
+  return (
+    <ModuleGate moduleKey="vr">
+      <VRPageInner />
+    </ModuleGate>
   );
 }

@@ -16,6 +16,7 @@ import {
   Volume2, Heart, Clock, Disc3, Sparkles, Waves, ListMusic,
 } from 'lucide-react';
 import { usePageSEO } from '@/hooks/usePageSEO';
+import { ModuleGate } from '@/components/governance/ModuleGate';
 
 type MusicTab = 'bibliotheque' | 'mixer' | 'vocal';
 
@@ -47,7 +48,7 @@ const MIXER_LAYERS = [
   { id: 'voice', name: 'Voix', emoji: '🗣️', color: 'bg-indigo-500' },
 ];
 
-export default function MusicHubPage() {
+function MusicHubPageInner() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = (searchParams.get('tab') as MusicTab) || 'bibliotheque';
   const [activeTab, setActiveTab] = useState<MusicTab>(initialTab);
@@ -344,5 +345,13 @@ export default function MusicHubPage() {
         </Tabs>
       </main>
     </div>
+  );
+}
+
+export default function MusicHubPage() {
+  return (
+    <ModuleGate moduleKey="music">
+      <MusicHubPageInner />
+    </ModuleGate>
   );
 }

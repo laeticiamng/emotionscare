@@ -15,7 +15,8 @@ import {
   Globe,
   Zap,
   Database,
-  DollarSign
+  DollarSign,
+  Network,
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -91,6 +92,12 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ currentPath }) => {
       href: '/admin/gdpr',
       icon: Shield,
       description: 'Sécurité et conformité'
+    },
+    {
+      title: 'Gouvernance plateforme',
+      href: '/admin/governance',
+      icon: Network,
+      description: 'Routing, RLS, SLO, modules'
     },
     {
       title: 'Monitoring APIs',
