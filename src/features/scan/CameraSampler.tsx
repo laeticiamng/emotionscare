@@ -137,17 +137,21 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
         return;
       }
 
-      // Capture frame
+      // Capture frame — downscale to 480px max for faster upload + lower bandwidth
+      const MAX_DIM = 480;
+      const vw = videoRef.current.videoWidth;
+      const vh = videoRef.current.videoHeight;
+      const scale = Math.min(1, MAX_DIM / Math.max(vw, vh));
       const canvas = document.createElement('canvas');
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
+      canvas.width = Math.round(vw * scale);
+      canvas.height = Math.round(vh * scale);
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         logger.error('[CameraSampler] Canvas context not available', 'FEATURE');
         return;
       }
-      ctx.drawImage(videoRef.current, 0, 0);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
       
       logger.debug('[CameraSampler] Calling analyze-vision with Lovable AI...', 'FEATURE');
 
