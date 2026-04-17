@@ -35,6 +35,14 @@ describe('robots.txt', () => {
     expect(robots).toMatch(/Disallow:\s*\/admin\//);
     expect(robots).toMatch(/Disallow:\s*\/auth\//);
   });
+
+  it('explicitly allows generative AI crawlers (GEO)', () => {
+    expect(robots).toMatch(/User-agent:\s*GPTBot/i);
+    expect(robots).toMatch(/User-agent:\s*OAI-SearchBot/i);
+    expect(robots).toMatch(/User-agent:\s*PerplexityBot/i);
+    expect(robots).toMatch(/User-agent:\s*ClaudeBot/i);
+    expect(robots).toMatch(/User-agent:\s*Google-Extended/i);
+  });
 });
 
 describe('sitemap.xml', () => {

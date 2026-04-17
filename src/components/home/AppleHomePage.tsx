@@ -22,6 +22,7 @@ const ModulesHighlightSection = lazy(() => import('@/components/home/ModulesHigh
 
 const SocialProofSection = lazy(() => import('@/components/home/SocialProofSection'));
 const FAQSection = lazy(() => import('@/components/home/FAQSection'));
+const SecurityTrustSection = lazy(() => import('@/components/home/SecurityTrustSection'));
 const AppleCTASection = lazy(() => import('@/components/home/AppleCTASection'));
 const Footer = lazy(() => import('@/components/home/Footer'));
 
@@ -65,6 +66,9 @@ const AppleHomePage: React.FC = () => {
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
           <SocialProofSection />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
+          <SecurityTrustSection />
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
           <FAQSection />
