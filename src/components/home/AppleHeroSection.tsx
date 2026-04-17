@@ -37,7 +37,7 @@ const AppleHeroSection: React.FC = () => {
   const scaleSpring = useSpring(scale, springConfig);
 
   // Text reveal animation — grouped for reading flow
-  const words = ["Gérez", "votre stress", "en 3 minutes."];
+  const words = ["Comprendre", "ses émotions", "et agir avec un accompagnement structuré"];
   
   return (
     <section 
