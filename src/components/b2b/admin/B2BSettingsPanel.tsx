@@ -210,21 +210,36 @@ export const B2BSettingsPanel: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div
+                role="status"
+                aria-live="polite"
+                className="rounded-md border border-dashed border-amber-500/40 bg-amber-500/5 p-3 text-sm text-amber-700 dark:text-amber-400"
+              >
+                Aucune clé API n’est actuellement configurée pour cette
+                organisation. La génération de clés sera disponible une fois
+                l’intégration backend configurée.
+              </div>
               <div className="flex items-center gap-2">
                 <Input
                   type={showApiKey ? 'text' : 'password'}
-                  value="sk_live_xxxx_xxxx_xxxx_xxxx"
+                  value=""
+                  placeholder="Aucune clé générée"
                   readOnly
+                  aria-label="Clé API (non configurée)"
                   className="font-mono"
                 />
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={() => setShowApiKey(!showApiKey)}
+                  aria-label={showApiKey ? 'Masquer la clé' : 'Afficher la clé'}
+                  disabled
                 >
                   {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
-                <Button variant="outline">Régénérer</Button>
+                <Button variant="outline" disabled title="Indisponible — backend requis">
+                  Régénérer
+                </Button>
               </div>
               <p className="text-xs text-muted-foreground">
                 Ne partagez jamais votre clé API. Utilisez des variables d'environnement.
