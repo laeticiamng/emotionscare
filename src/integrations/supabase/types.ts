@@ -18654,7 +18654,6 @@ export type Database = {
       }
       oic_extraction_progress: {
         Row: {
-          auth_cookies: string | null
           created_at: string | null
           current_page_url: string | null
           error_message: string | null
@@ -18670,7 +18669,6 @@ export type Database = {
           total_pages: number | null
         }
         Insert: {
-          auth_cookies?: string | null
           created_at?: string | null
           current_page_url?: string | null
           error_message?: string | null
@@ -18686,7 +18684,6 @@ export type Database = {
           total_pages?: number | null
         }
         Update: {
-          auth_cookies?: string | null
           created_at?: string | null
           current_page_url?: string | null
           error_message?: string | null
