@@ -3,9 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Shield, Eye, Lock, TrendingUp } from 'lucide-react';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 export default function HowItAdaptsPage() {
   const navigate = useNavigate();
+  usePageSEO({
+    title: 'Comment EmotionsCare s’adapte à votre ressenti',
+    description: "Découvrez comment EmotionsCare adapte automatiquement les exercices de régulation émotionnelle à votre état du moment, sans collecte intrusive de données.",
+    keywords: 'adaptation, personnalisation, bien-être, régulation émotionnelle, soignants',
+    canonical: 'https://emotionscare.com/how-it-adapts',
+    ogType: 'website',
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 p-6">
