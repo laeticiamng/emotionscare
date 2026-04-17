@@ -42,6 +42,13 @@ const PlatformAuditPage = lazy(() => import('@/pages/admin/PlatformAuditPage'));
 const ModuleSyncPage = lazy(() => import('@/pages/admin/ModuleSyncPage'));
 const SEOAuditPage = lazy(() => import('@/pages/admin/SEOAuditPage'));
 
+// Governance Hub
+const GovernanceOverviewPage = lazy(() => import('@/pages/admin/governance/GovernanceOverviewPage'));
+const RoutingGovernancePage = lazy(() => import('@/pages/admin/governance/RoutingGovernancePage'));
+const DataGovernancePage = lazy(() => import('@/pages/admin/governance/DataGovernancePage'));
+const ObservabilityGovernancePage = lazy(() => import('@/pages/admin/governance/ObservabilityGovernancePage'));
+const ModulesGovernancePage = lazy(() => import('@/pages/admin/governance/ModulesGovernancePage'));
+
 // Music Admin
 const GamificationCronMonitoring = lazy(() => import('@/pages/admin/GamificationCronMonitoring'));
 const MusicQueueAdminPage = lazy(() => import('@/pages/admin/MusicQueueAdminPage'));
@@ -122,6 +129,13 @@ export const adminComponentMap = {
   PlatformAuditPage,
   ModuleSyncPage,
   SEOAuditPage,
+
+  // Governance Hub
+  GovernanceOverviewPage,
+  RoutingGovernancePage,
+  DataGovernancePage,
+  ObservabilityGovernancePage,
+  ModulesGovernancePage,
 
   // Music Admin
   GamificationCronMonitoring,

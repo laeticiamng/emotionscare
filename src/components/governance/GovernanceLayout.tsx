@@ -11,13 +11,20 @@ interface GovernanceLayoutProps {
   description?: string;
 }
 
-const NAV = [
-  { to: '/admin/governance', label: 'Vue d\'ensemble', icon: Shield, end: true },
+interface NavItem {
+  to: string;
+  label: string;
+  icon: typeof Shield;
+  end?: boolean;
+}
+
+const NAV: NavItem[] = [
+  { to: '/admin/governance', label: "Vue d'ensemble", icon: Shield, end: true },
   { to: '/admin/governance/routing', label: 'Routing & Registre', icon: Network },
   { to: '/admin/governance/data', label: 'Données & RLS', icon: Database },
   { to: '/admin/governance/observability', label: 'Observabilité & SLO', icon: Activity },
   { to: '/admin/governance/modules', label: 'Modules & Flags', icon: Boxes },
-] as const;
+];
 
 export function GovernanceLayout({ children, title, description }: GovernanceLayoutProps) {
   const { pathname } = useLocation();
