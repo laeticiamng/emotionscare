@@ -27,65 +27,65 @@ const faqs: FAQItem[] = [
   {
     id: 1,
     category: 'Quand utiliser',
-    question: "C'est pour quel genre de moment ?",
+    question: "Pour quel type de moment est-ce conçu ?",
     answer:
-      "Quand ton cerveau ne veut pas s'arrêter. Quand tu sens une montée d'anxiété. Quand tu es épuisé mais que tu n'arrives pas à dormir. Quand tu dois continuer ta journée mais que tu es au bord de l'effondrement. Ce ne sont pas des exercices de relaxation. Ce sont des interventions pour des moments précis.",
+      "Pour les moments où votre cerveau ne s'arrête plus : fin de garde, montée d'anxiété, épuisement qui empêche de dormir, journée à terminer alors que vous êtes au bord. Ce ne sont pas des exercices de relaxation génériques, mais des protocoles courts pour des moments précis du quotidien soignant.",
     icon: '🎯',
   },
   {
     id: 2,
     category: 'Quand utiliser',
-    question: 'Combien de temps ça prend ?',
+    question: 'Combien de temps faut-il prévoir ?',
     answer:
-      "Entre 2 et 5 minutes. On ne te demande pas de méditer 30 minutes. Une session Stop prend 2 minutes. Un Reset en prend 3. L'objectif n'est pas de t'occuper, c'est de produire un effet. Rapidement.",
+      "Entre 2 et 5 minutes par session. Aucune méditation longue n'est requise : l'objectif est de produire un effet rapidement, entre deux consultations ou avant de reprendre la route.",
     icon: '⏱️',
   },
   {
     id: 3,
     category: 'Quand utiliser',
-    question: 'Est-ce que ça marche vraiment ?',
+    question: 'Est-ce que cela fonctionne réellement ?',
     answer:
-      "Tu le sentiras. Pas besoin de croire à quoi que ce soit. Le protocole agit sur ton système nerveux, pas sur tes croyances. Si après 2 minutes tu ne sens rien de différent, c'est que ce n'était pas le bon protocole pour ce moment-là. On t'en proposera un autre.",
+      "Les exercices reposent sur des techniques validées : respiration contrôlée (cohérence cardiaque), relaxation guidée, pleine conscience. Si après une session vous ne ressentez pas d'effet, un autre protocole vous est proposé. Aucune croyance n'est requise pour que cela agisse sur votre système nerveux.",
     icon: '✨',
   },
   {
     id: 4,
     category: 'Comment ça marche',
-    question: "C'est quoi exactement ?",
+    question: "Concrètement, c'est quoi ?",
     answer:
-      "Des protocoles audio-visuels qui agissent sur ton système nerveux. On n'explique pas comment pendant que tu les utilises. Tu lances, tu laisses faire, tu observes ce qui change. L'explication viendra après si tu la veux.",
+      "Des protocoles audio et visuels guidés (respiration, relaxation, ambiances sonores) à lancer en autonomie. Vous suivez la consigne à l'écran, sans préparation ni installation matérielle.",
     icon: '🧠',
   },
   {
     id: 5,
     category: 'Comment ça marche',
-    question: 'Et la musique là-dedans ?',
+    question: 'Quel est le rôle de la musique ?',
     answer:
-      "La musique n'est pas le produit. C'est le véhicule. Tu n'écoutes pas de la musique pour te détendre. Tu reçois un signal qui recalibre ton état. La différence : une playlist te distrait, un protocole te transforme.",
+      "La musique sert de support sensoriel pendant les exercices : tempo, ambiance et progression sont calibrés pour accompagner la respiration ou la relaxation. Elle n'est pas une simple playlist d'écoute.",
     icon: '🎵',
   },
   {
     id: 6,
     category: 'Sécurité',
-    question: 'Mes données sont protégées ?',
+    question: 'Mes données sont-elles protégées ?',
     answer:
-      "Oui. Chiffrement niveau bancaire, conformité RGPD totale. Mais surtout : on ne stocke rien d'inutile. Ton historique t'appartient. Tu peux tout supprimer à tout moment. On n'a pas besoin de tes données pour que ça fonctionne.",
+      "Oui. Chiffrement des données en transit (TLS) et au repos, hébergement dans l'Union européenne, conformité RGPD. Vous pouvez exporter ou supprimer votre contenu à tout moment depuis votre espace personnel.",
     icon: '🔒',
   },
   {
     id: 7,
     category: 'Accès',
-    question: "C'est gratuit ?",
+    question: "Est-ce gratuit ?",
     answer:
-      "30 jours d'essai sans carte bancaire. Ensuite c'est un abonnement. Mais réfléchis : combien te coûtent tes nuits blanches ? Tes crises d'anxiété ? Tes journées où tu n'arrives pas à fonctionner ? Le vrai coût, c'est de ne rien faire.",
+      "Oui, un plan Gratuit est disponible (exercices de base, journal émotionnel, communauté), sans carte bancaire requise. Un abonnement Pro à 14,90€/mois débloque les fonctionnalités complètes. Un droit de rétractation de 14 jours s'applique sur le plan Pro.",
     icon: '💳',
   },
   {
     id: 8,
     category: 'Accès',
-    question: 'Je peux annuler quand je veux ?',
+    question: 'Puis-je annuler à tout moment ?',
     answer:
-      "Oui. Sans justification. Sans frais cachés. On préfère que tu reviennes parce que ça te manque, pas parce que tu es coincé.",
+      "Oui, sans justification ni frais cachés. L'annulation se fait depuis votre espace personnel. Vous conservez l'accès à votre abonnement jusqu'à la fin de la période en cours.",
     icon: '🚪',
   },
 ];
@@ -161,10 +161,10 @@ const FAQSection: React.FC = () => {
               Questions légitimes
             </Badge>
             <h2 id="faq-title" className="text-3xl lg:text-4xl font-bold">
-              Ce que tu te demandes probablement
+              Questions fréquentes
             </h2>
             <p className="text-lg text-muted-foreground">
-              Pas de jargon. Des réponses directes.
+              Réponses directes, sans jargon.
             </p>
           </div>
 
@@ -271,7 +271,7 @@ const FAQSection: React.FC = () => {
                 className="text-center py-12"
               >
                 <p className="text-muted-foreground text-lg">
-                  Aucune question trouvée. Essaie autre chose.
+                  Aucune question trouvée. Essayez un autre terme.
                 </p>
               </motion.div>
             )}
@@ -288,8 +288,8 @@ const FAQSection: React.FC = () => {
               La meilleure façon de comprendre, c'est d'essayer.
             </p>
             <Button asChild>
-              <Link to="/app/scan">
-                Lancer une session maintenant
+              <Link to="/signup">
+                Créer un compte gratuit
               </Link>
             </Button>
           </motion.div>

@@ -189,13 +189,13 @@ const AnimatedPresentationSection: React.FC = () => {
           ))}
         </div>
 
-        {/* Animated demo preview */}
+        {/* Animated breathing preview — pas de fausses statistiques utilisateur */}
         <motion.div
           initial={{ opacity: 0, y: 60, scale: 0.9 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-16 lg:mt-24 mx-auto max-w-4xl"
+          className="mt-16 lg:mt-24 mx-auto max-w-3xl"
         >
           <div className="relative overflow-hidden rounded-2xl border border-border/40 bg-card/40 backdrop-blur-sm shadow-2xl shadow-primary/5">
             {/* Browser chrome mockup */}
@@ -207,88 +207,25 @@ const AnimatedPresentationSection: React.FC = () => {
               </div>
               <div className="mx-auto flex-1 max-w-xs">
                 <div className="rounded-md bg-muted/30 px-3 py-1 text-center text-xs text-muted-foreground">
-                  emotionscare.app
+                  emotionscare.com — Respiration guidée
                 </div>
               </div>
             </div>
 
-            {/* Animated dashboard preview */}
-            <div className="relative p-6 lg:p-10">
-              <div className="grid gap-4 md:grid-cols-3">
-                {/* Mood card */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.5 }}
-                  className="rounded-xl border border-border/30 bg-card/80 p-4"
-                >
-                  <div className="mb-2 text-xs font-medium text-muted-foreground">Humeur du jour</div>
-                  <div className="text-3xl">😊</div>
-                  <div className="mt-2 text-sm font-medium text-foreground">Serein</div>
-                  <div className="mt-1 h-1.5 w-full rounded-full bg-muted/50">
-                    <motion.div
-                      className="h-full rounded-full bg-primary"
-                      initial={{ width: 0 }}
-                      whileInView={{ width: '75%' }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 1.2, delay: 0.8, ease: 'easeOut' }}
-                    />
-                  </div>
-                </motion.div>
-
-                {/* Breathing card */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.7 }}
-                  className="rounded-xl border border-border/30 bg-card/80 p-4"
-                >
-                  <div className="mb-2 text-xs font-medium text-muted-foreground">Respiration</div>
-                  <div className="flex items-center justify-center py-2">
-                    <motion.div
-                      className="h-16 w-16 rounded-full border-2 border-primary/50"
-                      animate={{
-                        scale: [1, 1.3, 1],
-                        borderColor: ['hsl(var(--primary) / 0.3)', 'hsl(var(--primary))', 'hsl(var(--primary) / 0.3)'],
-                      }}
-                      transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                    />
-                  </div>
-                  <div className="text-center text-xs text-muted-foreground">Inspire... Expire...</div>
-                </motion.div>
-
-                {/* Stats card */}
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.9 }}
-                  className="rounded-xl border border-border/30 bg-card/80 p-4"
-                >
-                  <div className="mb-2 text-xs font-medium text-muted-foreground">Cette semaine</div>
-                  <div className="space-y-2">
-                    {[
-                      { label: 'Sessions', value: '12', color: 'bg-primary' },
-                      { label: 'Minutes', value: '36', color: 'bg-accent' },
-                      { label: 'Streak', value: '5j', color: 'bg-emerald-500' },
-                    ].map((stat, i) => (
-                      <motion.div
-                        key={stat.label}
-                        className="flex items-center justify-between"
-                        initial={{ opacity: 0, x: 10 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 1 + i * 0.15 }}
-                      >
-                        <span className="text-xs text-muted-foreground">{stat.label}</span>
-                        <span className="text-sm font-semibold text-foreground">{stat.value}</span>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              </div>
+            {/* Aperçu illustratif d'un exercice — sans données fictives */}
+            <div className="relative p-8 lg:p-12 flex flex-col items-center justify-center min-h-[280px]">
+              <p className="text-xs uppercase tracking-widest text-muted-foreground mb-6">Aperçu d'un exercice</p>
+              <motion.div
+                className="h-32 w-32 rounded-full border-4 border-primary/40 flex items-center justify-center bg-primary/5"
+                animate={{
+                  scale: [1, 1.25, 1],
+                  borderColor: ['hsl(var(--primary) / 0.3)', 'hsl(var(--primary))', 'hsl(var(--primary) / 0.3)'],
+                }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <span className="text-sm font-medium text-primary">Respirez</span>
+              </motion.div>
+              <p className="mt-6 text-sm text-muted-foreground">Inspire 4s · Retient 4s · Expire 6s</p>
             </div>
           </div>
         </motion.div>
