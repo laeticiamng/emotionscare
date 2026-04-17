@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
-import { Network, RefreshCw, AlertTriangle, ShieldAlert, Copy, Trash2 } from 'lucide-react';
+import { Network, RefreshCw, AlertTriangle, ShieldAlert, Copy, Trash2, Camera, Loader2 } from 'lucide-react';
 import { GovernanceLayout } from '@/components/governance/GovernanceLayout';
-import { runRoutingAudit, type AuditFinding } from '@/lib/governance';
+import { runRoutingAudit, type AuditFinding, governanceService } from '@/lib/governance';
 import { ROUTES_REGISTRY } from '@/routerV2/registry';
+import { toast } from 'sonner';
 
 const severityColor: Record<AuditFinding['severity'], string> = {
   info: 'secondary',
@@ -21,8 +22,44 @@ const severityColor: Record<AuditFinding['severity'], string> = {
 export default function RoutingGovernancePage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [search, setSearch] = useState('');
+  const [snapshotLoading, setSnapshotLoading] = useState(false);
 
   const report = useMemo(() => runRoutingAudit(ROUTES_REGISTRY), [refreshKey]);
+
+  const persistSnapshot = async () => {
+    setSnapshotLoading(true);
+    try {
+      const severity =
+        report.unguardedSensitive.length > 0
+          ? 'high'
+          : report.findings.some((f) => f.severity === 'high' || f.severity === 'critical')
+          ? 'medium'
+          : report.findings.length > 0
+          ? 'low'
+          : 'info';
+      await governanceService.createAudit({
+        audit_type: 'routing',
+        title: `Snapshot routing — ${new Date().toLocaleString('fr-FR')}`,
+        summary: `Score ${report.score}/100 · ${report.findings.length} anomalies · ${report.totalRoutes} routes`,
+        score: report.score,
+        severity: severity as any,
+        findings: report.findings.slice(0, 100) as any,
+        metadata: {
+          totalRoutes: report.totalRoutes,
+          duplicates: report.duplicates.length,
+          missingRedirects: report.missingRedirects.length,
+          unguardedSensitive: report.unguardedSensitive.length,
+          segmentDistribution: report.segmentDistribution,
+        },
+        triggered_by: null,
+      });
+      toast.success('Snapshot enregistré dans l\'historique des audits');
+    } catch (e: any) {
+      toast.error(`Échec snapshot : ${e.message ?? e}`);
+    } finally {
+      setSnapshotLoading(false);
+    }
+  };
 
   const filteredFindings = useMemo(() => {
     if (!search.trim()) return report.findings;
@@ -48,9 +85,19 @@ export default function RoutingGovernancePage() {
             <p className="text-xs text-muted-foreground">Calculé localement à chaque rendu, sans appel réseau.</p>
           </div>
         </div>
-        <Button variant="outline" size="sm" onClick={() => setRefreshKey((k) => k + 1)}>
-          <RefreshCw className="mr-2 h-4 w-4" /> Recalculer
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setRefreshKey((k) => k + 1)}>
+            <RefreshCw className="mr-2 h-4 w-4" /> Recalculer
+          </Button>
+          <Button size="sm" onClick={persistSnapshot} disabled={snapshotLoading}>
+            {snapshotLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Camera className="mr-2 h-4 w-4" />
+            )}
+            Snapshot
+          </Button>
+        </div>
       </div>
       <Progress value={report.score} className="mb-8 h-2" />
 

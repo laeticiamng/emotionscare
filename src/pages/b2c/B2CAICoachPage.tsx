@@ -10,8 +10,9 @@ import { usePageSEO } from '@/hooks/usePageSEO';
 import { useOptimizedPage } from '@/hooks/useOptimizedPage';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Target } from 'lucide-react';
+import { ModuleGate } from '@/components/governance/ModuleGate';
 
-const B2CAICoachPage = () => {
+const B2CAICoachPageInner = () => {
   useOptimizedPage('B2CAICoachPage');
   usePageSEO({
     title: 'Coach IA Émotionnel - Conseils personnalisés',
@@ -75,5 +76,11 @@ const B2CAICoachPage = () => {
     </div>
   );
 };
+
+const B2CAICoachPage = () => (
+  <ModuleGate moduleKey="coach">
+    <B2CAICoachPageInner />
+  </ModuleGate>
+);
 
 export default B2CAICoachPage;
