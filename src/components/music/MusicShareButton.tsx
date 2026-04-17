@@ -111,10 +111,10 @@ export const MusicShareButton: React.FC<MusicShareButtonProps> = ({
     : 'EmotionsCare Music';
 
   const shareUrl = track
-    ? `https://emotionscare.app/music/track/${track.id}`
+    ? `https://emotionscare.com/music/track/${track.id}`
     : playlist
-    ? `https://emotionscare.app/music/playlist/${playlist.id}`
-    : 'https://emotionscare.app/music';
+    ? `https://emotionscare.com/music/playlist/${playlist.id}`
+    : 'https://emotionscare.com/music';
 
   const shareText = track
     ? `🎵 J'écoute "${track.title}" par ${track.artist} sur EmotionsCare`

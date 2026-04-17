@@ -103,7 +103,7 @@ const MusicCollaborativePlaylist = memo(() => {
   });
 
   const copyInviteLink = () => {
-    navigator.clipboard.writeText(`https://emotionscare.app/playlist/${playlist.id}/join`);
+    navigator.clipboard.writeText(`https://emotionscare.com/playlist/${playlist.id}/join`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
     toast({ title: 'Lien copié', description: 'Partagez ce lien pour inviter des collaborateurs' });
