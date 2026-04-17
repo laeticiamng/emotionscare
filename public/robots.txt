@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-# Espaces applicatifs / privés
+# Espaces applicatifs / privés (non indexables)
 Disallow: /app/
 Disallow: /admin/
 Disallow: /api/
@@ -15,6 +15,43 @@ Disallow: /billing
 Disallow: /profile
 Disallow: /reset-password
 Disallow: /payment-success
+
+# Generative Engine Optimization (GEO) — autorisations explicites
+User-agent: GPTBot
+Allow: /
+Disallow: /app/
+Disallow: /admin/
+Disallow: /auth/
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /app/
+Disallow: /admin/
+Disallow: /auth/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /app/
+Disallow: /admin/
+Disallow: /auth/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /app/
+Disallow: /admin/
+Disallow: /auth/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /app/
+Disallow: /admin/
+Disallow: /auth/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /app/
+Disallow: /admin/
+Disallow: /auth/
 
 # Sitemap
 Sitemap: https://emotionscare.com/sitemap.xml
