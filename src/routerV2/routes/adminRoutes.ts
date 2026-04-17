@@ -49,6 +49,11 @@ const DataGovernancePage = lazy(() => import('@/pages/admin/governance/DataGover
 const ObservabilityGovernancePage = lazy(() => import('@/pages/admin/governance/ObservabilityGovernancePage'));
 const ModulesGovernancePage = lazy(() => import('@/pages/admin/governance/ModulesGovernancePage'));
 
+// B2B Governance (Manager)
+const B2BGovernanceOverviewPage = lazy(() => import('@/pages/b2b/governance/B2BGovernanceOverviewPage'));
+const B2BGovernanceModulesPage = lazy(() => import('@/pages/b2b/governance/B2BGovernanceModulesPage'));
+const B2BGovernanceSLOPage = lazy(() => import('@/pages/b2b/governance/B2BGovernanceSLOPage'));
+
 // Music Admin
 const GamificationCronMonitoring = lazy(() => import('@/pages/admin/GamificationCronMonitoring'));
 const MusicQueueAdminPage = lazy(() => import('@/pages/admin/MusicQueueAdminPage'));
@@ -136,6 +141,11 @@ export const adminComponentMap = {
   DataGovernancePage,
   ObservabilityGovernancePage,
   ModulesGovernancePage,
+
+  // B2B Governance
+  B2BGovernanceOverviewPage,
+  B2BGovernanceModulesPage,
+  B2BGovernanceSLOPage,
 
   // Music Admin
   GamificationCronMonitoring,

@@ -746,6 +746,45 @@ export const B2B_ROUTES: readonly RouteMeta[] = [
     requireAuth: true,
     meta: { title: 'Gouvernance Modules & Flags' },
   },
+  // ═══════════════════════════════════════════════════════════
+  // GOUVERNANCE B2B (Manager — lecture seule)
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'b2b-governance-overview',
+    path: '/b2b/governance',
+    segment: 'manager',
+    role: 'manager',
+    allowedRoles: ['manager', 'admin'],
+    layout: 'simple',
+    component: 'B2BGovernanceOverviewPage',
+    guard: true,
+    requireAuth: true,
+    meta: { title: 'Gouvernance — Vue Manager' },
+  },
+  {
+    name: 'b2b-governance-modules',
+    path: '/b2b/governance/modules',
+    segment: 'manager',
+    role: 'manager',
+    allowedRoles: ['manager', 'admin'],
+    layout: 'simple',
+    component: 'B2BGovernanceModulesPage',
+    guard: true,
+    requireAuth: true,
+    meta: { title: 'Gouvernance — Modules (Manager)' },
+  },
+  {
+    name: 'b2b-governance-slo',
+    path: '/b2b/governance/slo',
+    segment: 'manager',
+    role: 'manager',
+    allowedRoles: ['manager', 'admin'],
+    layout: 'simple',
+    component: 'B2BGovernanceSLOPage',
+    guard: true,
+    requireAuth: true,
+    meta: { title: 'Gouvernance — Santé services (Manager)' },
+  },
   // context-lens-duplicate supprimé — doublon de context-lens (ligne ~1007)
   // ═══════════════════════════════════════════════════════════
   // MODULE 18 - Programme de prévention (B2B)
