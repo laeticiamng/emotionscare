@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
+
+# Espaces applicatifs / privés
 Disallow: /app/
 Disallow: /admin/
 Disallow: /api/
@@ -11,9 +13,8 @@ Disallow: /dashboard
 Disallow: /settings
 Disallow: /billing
 Disallow: /profile
-Disallow: /login
-Disallow: /signup
-Disallow: /register
 Disallow: /reset-password
 Disallow: /payment-success
+
+# Sitemap
 Sitemap: https://emotionscare.com/sitemap.xml
