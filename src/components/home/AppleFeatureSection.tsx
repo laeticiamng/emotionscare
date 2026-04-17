@@ -42,11 +42,11 @@ const features: Feature[] = [
   },
   {
     icon: <Shield className="h-12 w-12" />,
-    title: "Vos données restent chez vous.",
-    subtitle: "Rien ne quitte votre appareil.",
-    description: "Les analyses émotionnelles tournent directement sur votre téléphone. Aucune vidéo, aucune photo n'est envoyée ni stockée. Conforme RGPD.",
+    title: "Vos données vous appartiennent.",
+    subtitle: "Chiffrement et hébergement européen.",
+    description: "Données chiffrées en transit (TLS) et au repos. Hébergement dans l'Union européenne. Vous pouvez exporter ou supprimer votre contenu à tout moment. Conforme RGPD.",
     gradient: "from-primary/80 to-primary",
-    stat: { value: "100%", label: "des données restent sur votre appareil" }
+    stat: { value: "RGPD", label: "hébergement Union européenne" }
   },
   {
     icon: <Heart className="h-12 w-12" />,

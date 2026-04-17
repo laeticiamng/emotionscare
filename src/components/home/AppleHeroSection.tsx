@@ -37,7 +37,7 @@ const AppleHeroSection: React.FC = () => {
   const scaleSpring = useSpring(scale, springConfig);
 
   // Text reveal animation — grouped for reading flow
-  const words = ["Comprendre", "ses émotions", "et agir avec un accompagnement structuré"];
+  const words = ["Reprenez votre souffle,", "même au cœur du soin."];
   
   return (
     <section 
@@ -114,7 +114,7 @@ const AppleHeroSection: React.FC = () => {
             transition={{ duration: 0.8, delay: 0.85 }}
             className="text-base sm:text-lg text-muted-foreground/80 max-w-xl mx-auto mb-8"
           >
-            Utilisable entre deux consultations. Sans rendez-vous. Sans jugement. <span className="text-primary font-medium">Gratuit pour commencer.</span>
+            Des exercices courts entre deux consultations. Sans rendez-vous, sans jugement. <span className="text-primary font-medium">Plan gratuit, sans carte bancaire.</span>
           </motion.p>
 
           {/* CTAs */}
